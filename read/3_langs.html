@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Books about programming languages</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Books about programming languages</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">unpublished</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>特定のプログラミング言語に関する本をリストしました。未読の物が多いです。</p>
+</div>
+<div class="paragraph">
+<p>言語の入門書は、細かい言語仕様から語り始めるものが多い気がします。僕はモジュールの分け方を最初に知りたいので、参考になるリポジトリを探すところが出発点になりがちです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_not_read">1. Not read</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_type_driven_development_with_idris">1.1. Type-Driven Development with Idris</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">書名</th>
+<th class="tableblock halign-left valign-top"><a href="https://www.manning.com/books/type-driven-development-with-idris">Type-Driven Development with Idris</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">著者</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Edwin Brady</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">出版日</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">March 2017</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ページ数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">480</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>純粋関数型言語の実用性、型を第一に考える作法と、 <a href="https://www.idris-lang.org/">Idris</a> 言語について書かれているようです。本気で役立つのではないかというワクワク感があります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_modern_c">1.2. Modern C</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">書名</th>
+<th class="tableblock halign-left valign-top"><a href="https://modernc.gforge.inria.fr/">Modern C</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">著者</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jens Gustedt</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">出版日</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">November 2019</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ページ数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">408</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>C は、どの言語からでも呼べるので重要だと思っています。一冊読んでみるべきだと思って、少しずつ読み進めています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_すごいhaskellたのしく学ぼう">1.3. すごいHaskellたのしく学ぼう!</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">書名</th>
+<th class="tableblock halign-left valign-top"><a href="https://www.amazon.co.jp/Miran-Lipova%C4%8Da/dp/4274068854/ref=tmm_pap_swatch_0?_encoding=UTF8&amp;qid=&amp;sr=">すごいHaskellたのしく学ぼう!</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">著者</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Miran Lipovača  (著), 田中 英行 (翻訳), 村主 崇行 (翻訳)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">出版日</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">May 25, 2012</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ページ数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">420</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Haskell は、自分でモジュールを作れるようになるまでが長くて挫折中です。パッケージマネジャも決定版が無いみたいでつらい。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_land_of_lisp">1.4. Land of Lisp</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">書名</th>
+<th class="tableblock halign-left valign-top"><a href="https://www.amazon.co.jp/M-D-ConradBarski/dp/4873115876">Land of Lisp</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">著者</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">M.D. ConradBarski, 川合 史朗 (翻訳)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">出版日</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">February 23, 2013</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ページ数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">512</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>面白くなくて、途中で読むのを止めてしまいました。</p>
+</div>
+<div class="paragraph">
+<p>言語サーバ無しの自作言語を作るとき、静的型を持った Lisp はアリかなと検討しています。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_finished_reading">2. Finished reading</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_the_rust_programming_language">2.1. The Rust Programming Language</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">書名</th>
+<th class="tableblock halign-left valign-top"><a href="https://www.amazon.co.jp/Steve-Klabnik/dp/1718500440/ref=tmm_pap_swatch_0?_encoding=UTF8&amp;qid=1604043794&amp;sr=1-4">The Rust Programming Language (Covers Rust 2018)</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">著者</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Steve Klabnik</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">出版日</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">August 12, 2019</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ページ数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">560</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><a href="https://www.rust-lang.org/">Rust</a> の公式本です。ユーザの観点から書かれています。読むのに時間がかかる上に、この本だけでは実践的なコードは書けません。しかしよく書かれており、読後は何らかの教育を受けたと感じることができます。そういった感覚が好きなら、読み通すのも良いと思います。</p>
+</div>
+<div class="paragraph">
+<p>効率に関しては、日本語で書かれた Rust の本を読んだ方が速いかもしれません。また、 Rust 言語そのものを理解するには、別の積み重ねが必要そうです。たとえば、 <a href="https://arxiv.org/pdf/1903.00982">Oxide: The Essence of Rust</a> を読んでみるとか……。</p>
+</div>
+<div class="paragraph">
+<p>Rust について書かれた日本語のブログを探すと、凄い人たちばかりで、とても良かったです。今のこの人に僕は一生及ばないかも、と思わせられる専門性を感じました:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://keens.github.io/">Lispエイリアンの狂想曲 | κeenのHappy Hacκing Blog</a></p>
+</li>
+<li>
+<p><a href="https://mizunashi-mana.github.io/blog/index.html">続くといいな日記</a></p>
+</li>
+<li>
+<p><a href="https://qnighy.hatenablog.com/">簡潔なQ</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>などなど……。まだまだ気づいていないブログもたくさんありそうです。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_else">3. Else</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://ziglang.org/">Zig</a></p>
+</li>
+<li>
+<p><a href="https://odin-lang.org/">Odin</a></p>
+</li>
+<li>
+<p><a href="https://github.com/vlang/v/blob/master/doc/docs.md">V</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

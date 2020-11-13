@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Books about command line</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Books about command line</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Nov 11, 2019</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Shell, Vim, Git に関する本をリストしました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_books">1. Books</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_新しい_linux_の教科書">1.1. 新しい Linux の教科書</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">書名</th>
+<th class="tableblock halign-left valign-top"><a href="https://www.amazon.co.jp/%E6%96%B0%E3%81%97%E3%81%84Linux%E3%81%AE%E6%95%99%E7%A7%91%E6%9B%B8-%E4%B8%89%E5%AE%85-%E8%8B%B1%E6%98%8E/dp/4797380942/ref=tmm_hrd_swatch_0?_encoding=UTF8&amp;qid=&amp;sr=">新しいLinuxの教科書</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">著者</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">三宅 英明、大角 祐</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">出版日</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2015/06/06</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ページ数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">440</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Linux = Unix シェル (bash) とした入門書です。相対パスや絶対パス、環境変数など、 <strong>基礎知識のバックアップ</strong> を丁寧にやってくれる本でした。</p>
+</div>
+<div class="paragraph">
+<p>内容は、ネット検索で手に入るものと言えますが、一冊の本として仕上げられており、ネットの断片的な情報よりも遥かに贅沢です。コラムも面白く、著者の心遣いを満喫できます。</p>
+</div>
+<div class="paragraph">
+<p>初期投資に良い本でした。投資がスカになるのでは、という懸念はよくありますが、この本は違いました。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_シェルプログラミング実用テクニック">1.2. シェルプログラミング実用テクニック</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">書名</th>
+<th class="tableblock halign-left valign-top"><a href="https://www.amazon.co.jp/%E3%82%B7%E3%82%A7%E3%83%AB%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0%E5%AE%9F%E7%94%A8%E3%83%86%E3%82%AF%E3%83%8B%E3%83%83%E3%82%AF-Software-Design-plus-%E4%B8%8A%E7%94%B0/dp/4774173444/ref=tmm_other_meta_binding_swatch_0?_encoding=UTF8&amp;qid=&amp;sr=">シェルプログラミング実用テクニック</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">著者</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">上田隆一</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">出版日</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2015/05/15</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ページ数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">416</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>sed</code>, <code>grep</code>, <code>awk</code> など、いわゆる <em>Unix filter</em> で <em>one-liner program</em> を書き、様々な作業を行います。この本のおかげで、僕はシェルを常用するようになりました。</p>
+</div>
+<div class="paragraph">
+<p>文字列処理さえできれば、シェルは 8 割方マスターできたと言って良さそうです。その観点では、二章までが基本、三〜八章は応用となります。基本の中にエッセンスのクリームを漏れ出んばかりに押し込んでくれているので、応用部分は消化試合のように思いました。</p>
+</div>
+<div class="paragraph">
+<p>濃い内容に、丁寧な説明が着いています。文章量が多く、初見では噛み砕くのが難しかったです。文章すべてがしっくりと来て、うんうんそうだね……と言えるようになったとき、本の真価が分かります。</p>
+</div>
+<div class="paragraph">
+<p>読後は、胸を張って言って良いと思います。 <a href="https://enpedia.rxy.jp/wiki/チョットデキル">コマンドライン チョットデキル</a> 。……言い過ぎました。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_フルスクラッチから1日でcmsを作る_シェルスクリプト高速開発手法入門_改訂2版">1.3. フルスクラッチから1日でCMSを作る シェルスクリプト高速開発手法入門 改訂2版</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">書名</th>
+<th class="tableblock halign-left valign-top"><a href="https://www.amazon.co.jp/%E3%83%95%E3%83%AB%E3%82%B9%E3%82%AF%E3%83%A9%E3%83%83%E3%83%81%E3%81%8B%E3%82%891%E6%97%A5%E3%81%A7CMS%E3%82%92%E4%BD%9C%E3%82%8B-%E3%82%B7%E3%82%A7%E3%83%AB%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%97%E3%83%88%E9%AB%98%E9%80%9F%E9%96%8B%E7%99%BA%E6%89%8B%E6%B3%95%E5%85%A5%E9%96%80-%E6%94%B9%E8%A8%822%E7%89%88-USP%E7%A0%94%E7%A9%B6%E6%89%80/dp/4048930699/ref=pd_sim_14_4/356-0696996-4808706?_encoding=UTF8&amp;pd_rd_i=4048930699&amp;pd_rd_r=b8f5b6ef-42b8-46be-a705-56143336a7ae&amp;pd_rd_w=ZbCUP&amp;pd_rd_wg=OLwz8&amp;pf_rd_p=4446cd16-eada-4bb1-91df-7c54a5fbd0b9&amp;pf_rd_r=RX4TMKV8CAJC89GMME71&amp;psc=1&amp;refRID=RX4TMKV8CAJC89GMME71">フルスクラッチから1日でCMSを作る シェルスクリプト高速開発手法入門 改訂2版</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">著者</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">上田隆一</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">出版日</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2019/06/28</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ページ数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">304</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>ブログ用 CMS の自作をテーマにした本です。 markdown で書いた記事を GitHub に <code>push</code> すると、サーバが自動的に記事を更新する、という仕組みを整えます。</p>
+</div>
+<div class="paragraph">
+<p>この本は、新たなシェルの入門書として作られたそうです。そして、 CMS の作成という『面白そうな』テーマが選ばれています。しかし、少なめの説明でどんどんシェルを使うため、この本が入門者向きであるとは思えません。</p>
+</div>
+<div class="paragraph">
+<p>シェルの入門者が読みたいのは、『シェルプログラミング実用テクニック』の方ではないのかと思います。そして、そちらを読めば、この本を読む必要は無くなります。意図に反して、 <strong>マニアックな本</strong> になったのではないかと捉えます <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> 。</p>
+</div>
+<div class="paragraph">
+<p>2019 年に執筆された本だけあって、これ以上は無いと思うほど良い文で、シェルについて綴ってあります。 <strong>プロの物書きの文章</strong> といった印象で、買って良かったと思いました。</p>
+</div>
+<div class="paragraph">
+<p>通信には、 <a href="https://en.wikipedia.org/wiki/Common_Gateway_Interface">CGI</a> という規格のおかげで、 stdin/stdout を使った普通のシェルスクリプトを使用できるようです。結局、 html の生成に最も力を使います。 CMS を作るのに必要な知識とは、 html/css の知識のようでした <sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> 。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_実践vim">1.4. 実践Vim</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">書名</th>
+<th class="tableblock halign-left valign-top"><a href="https://tatsu-zine.com/books/practical-vim">実践Vin</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">著者</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">新丈径（翻訳）、Drew Neil（著）</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">出版日</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2013/8/29 (和書) 2015/11/08　(洋書 第二版)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ページ数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>砥石</strong> のような本です。一周読むだけでVimの操作が改善されます。しかも、操作法は錆びることがない。おすすめです。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://www.amazon.co.jp/Practical-Vim-Speed-Thought-English-ebook/dp/B018T6ZVPK">洋書</a>には第二版もあり、 <a href="https://pragprog.com/book/dnvim2/practical-vim-second-edition">Vim8 に対応している</a> そうです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_独習git">1.5. 独習Git</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">書名</th>
+<th class="tableblock halign-left valign-top"><a href="https://www.amazon.co.jp/%E7%8B%AC%E7%BF%92Git-%E3%83%AA%E3%83%83%E3%82%AF%E3%83%BB%E3%82%A6%E3%83%9E%E3%83%AA/dp/4798144614/ref=tmm_other_meta_binding_swatch_0?_encoding=UTF8&amp;qid=&amp;sr=">独習Git</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">著者</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リック・ウマリ (著), 吉川邦夫 (翻訳)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">出版日</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2016/2/26 (和書)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ページ数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">384</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>ギター奏者のチュートリアルのように、『ゆっくりと演奏する』ことを心がけてGitを解説する、というような前書きの本でした。 <strong>モチベーションに良かった</strong> です。</p>
+</div>
+<div class="paragraph">
+<p><em>working directory</em>, <em>index</em> などの基本的な概念を導入し、 <em>commit</em> や <em>merge</em> ができるようになります。本の構成上、 <code>.gitconfig</code> は付録のような位置にあるので、早めに読んで、コマンドを便利にすると良いと思います。</p>
+</div>
+<div class="paragraph">
+<p>merge, <em>rebase</em> については、合わせて <a href="https://www.slideshare.net/kotas/git-15276118">怖くないGit</a> というスライドを見ると、理解が深まりました。それ以上の細かいコマンドは、必要に応じて調べたら良いと思います。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+ちなみに、僕の <code>.gitconfig</code> の解説が <a href="https://toyboot4e.github.io/dotfiles/cli/git.html#gitconfig">ここ</a> にあります。  Git に慣れていない人こそ、こういうのが欲しいのではないかと思って書きました。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pro_git_second_edition">1.6. Pro Git (second edition)</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">書名</th>
+<th class="tableblock halign-left valign-top"><a href="https://git-scm.com/book/en/v2">Pro Git</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">著者</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scott Chacon</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">出版日</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2014/11/9 (洋書)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ページ数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">456</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>公式の本です。あまり読んでいないのですが、タイトルに反して易しい本のようでした。肌に合うなら、この本で入門できそうです。</p>
+</div>
+<div class="paragraph">
+<p><strong>web版、電子書籍版はフリー</strong> です (<a href="https://git-scm.com/book/en/v2">サイト</a>) 。 3rd edition はしばらく出ないと思います。</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. マニアックな本は好きです
+</div>
+<div class="footnote" id="_footnotedef_2">
+<a href="#_footnoteref_2">2</a>. 下のレイヤに行かないで済む、というのが答えだとすると、少々肩透かしに思いました。
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

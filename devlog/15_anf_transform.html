@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>ANF devlog #5: Transform</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>ANF devlog #5: Transform</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Sep 30, 2020</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>ANF フレームワークに 4x4 行列を導入しました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_animations">1.1. Animations</h3>
+<div class="paragraph">
+<p>複数のコマ (frames) で構成されるアニメーション用の状態を用意しました。これでイカちゃんがシャカシャカします:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/anf/ika_chan_anim.gif" alt="ika chan anim">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_transformation_matrices">1.2. Transformation matrices</h3>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+長いです。適当に飛ばしてください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>僕は 2 次元のゲームを作っていますが、 <em>vertex shader</em> には 3 次元座標の変換行列を送る必要があります。これは 4x4 行列です。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、並進 (並行移動) はこのように表現します:</p>
+</div>
+<div class="stemblock">
+<div class="content">
+\[\begin{bmatrix}
+x + T_x \\
+y + T_y \\
+z + T_z \\
+1
+\end{bmatrix} =
+
+\begin{bmatrix}
+1 &amp; 0 &amp; 0 &amp; T_x \\
+0 &amp; 1 &amp; 0 &amp; T_y \\
+0 &amp; 0 &amp; 1 &amp; T_z \\
+0 &amp; 0 &amp; 0 &amp; 1 \\
+\end{bmatrix}
+
+\begin{bmatrix} x \\ y \\ z \\ 1\end{bmatrix}\]
+</div>
+</div>
+<div class="paragraph">
+<p>3x3 行列では表現不能ですね。</p>
+</div>
+<div class="paragraph">
+<p>4x4 行列は回転・拡大も表すことができ、複数回の変換を 1 つの値 (行列の積) として保存できます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+より一般的に、 4x4 行列は <em>affine 変換</em> を表現できるようです。たぶん
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>よし、完全に理解した！</p>
+</div>
+<div class="sect3">
+<h4 id="_translationwait_what">Translation&#8201;&#8212;&#8201;wait. What?</h4>
+<div class="paragraph">
+<p>改めて、 <a href="https://www.google.com/search?q=translation+matrix&amp;client=safari&amp;rls=en&amp;source=lnms&amp;tbm=isch&amp;sa=X&amp;ved=2ahUKEwiIm6aO1o_sAhUIPnAKHV1DB4UQ_AUoAXoECBMQAw&amp;biw=1920&amp;bih=1081&amp;dpr=2">画像検索</a> と行きましょう。 <strong>これが並進 (平行移動) 行列</strong> です！</p>
+</div>
+<div class="stemblock">
+<div class="content">
+\[\begin{bmatrix}
+1 &amp; 0 &amp; 0 &amp; T_x \\
+0 &amp; 1 &amp; 0 &amp; T_y \\
+0 &amp; 0 &amp; 1 &amp; T_z \\
+0 &amp; 0 &amp; 0 &amp; 1 \\
+\end{bmatrix}\]
+</div>
+</div>
+<div class="paragraph">
+<p>そして、 <strong>これが並進行列</strong> です！</p>
+</div>
+<div class="stemblock">
+<div class="content">
+\[\begin{bmatrix}
+1 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 1 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0 \\
+T_x &amp; T_y &amp; T_z &amp; 1 \\
+\end{bmatrix}\]
+</div>
+</div>
+<div class="paragraph">
+<p><em>どっちなんだぁ……</em></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_rowcolumn_major_notation_and_transposition">Row/column-major notation and transposition</h4>
+<div class="paragraph">
+<p>後者の例では、式全体が転置されているようですね:</p>
+</div>
+<div class="stemblock">
+<div class="content">
+\[\begin{bmatrix}
+x + T_x &amp; y + T_y &amp; z + T_z &amp; 1
+\end{bmatrix} =
+
+\begin{bmatrix}
+x &amp; y &amp; z &amp; 1
+\end{bmatrix}
+
+\begin{bmatrix}
+1 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 1 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0 \\
+T_x &amp; T_y &amp; T_z &amp; 1 \\
+\end{bmatrix}\]
+</div>
+</div>
+<div class="paragraph">
+<p>このようなやり方は <em>row-major</em> (vector/matrix) <em>notation</em> と呼ばれています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>位置ベクトル</strong> が row vector → "row-major"</p>
+</li>
+<li>
+<p>位置ベクトルが column vector → "column-major"</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Row-major 表記の場合、教科書的な行列はだいたい全て転置しますし、積の順番も逆転します。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_rowcolumn_major_matrix_encoding">Row/column-major matrix encoding</h4>
+<div class="paragraph">
+<p>行列データのメモリ格納順序にも、 row/column-major という言葉を使います:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>row-major encoding: \(m_{11}, m_{12}, m_{13}, ..\) のデータ順で格納</p>
+</li>
+<li>
+<p>column-major encoding: \(m_{11}, m_{21}, m_{21}, ..\) のデータ順で格納</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>つまり、添字とメモリ位置の対応が 2 種類あります。注意すべきなのは、どちらの encoding を使っても、 (アクセサ越しなら) <strong>添字と値の対応は変わらない</strong> ことです。積の結果などにも影響ありません。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<strong>行列データは、普通 row-major で格納されている</strong> 印象です。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_summary">Summary</h4>
+<div class="paragraph">
+<p>意味が分からなくなってきたので、目標に立ち返ります。</p>
+</div>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p><i class="fa fa-check-square-o"></i> 変換行列を計算できる</p>
+<div class="paragraph">
+<p>Row/column-major 表記によって、行列の転置・積の順序の交換が起こる</p>
+</div>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> シェーダに正しい行列データを送る</p>
+<div class="paragraph">
+<p>Row/column-major 表記、 row/column-major encoding, 両者の影響で行列データが転置する。 Vertex shader が使う向きでデータを送信するように気を付ける</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これで僕も変換入門マスター！</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_transform">1.3. Transform</h3>
+<div class="paragraph">
+<p>では Tiled のマップを描きます:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/anf/tiled_angle_scale.png" alt="tiled angle scale">
+</div>
+</div>
+<div class="paragraph">
+<p>\(-\frac \pi 6\) 回転を付けて、 1.5 倍に拡大して表示しています。実は並進も付けました。変換行列が正しく動作しています！</p>
+</div>
+<div class="paragraph">
+<p>疲れたので、今回はこの辺で。 ANF devlog は、短めの記事をたくさん出す方針です。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_random">2. Random</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>あとは雑多に。雑多と言って、今回は本当に多いですね。</p>
+</div>
+<div class="sect2">
+<h3 id="_names">2.1. Names</h3>
+<div class="paragraph">
+<p>ANF で上手く行っているモジュール名を紹介したいと思います。様々なパクリを含みます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>gfx</code>, <code>draw</code></p>
+<div class="paragraph">
+<p><code>gfx</code>: graphics (texture データ型など). <code>draw</code>: 描画用 trait など</p>
+</div>
+</li>
+<li>
+<p><code>geom2d</code>: 2D の幾何型 (<code>Vec2f</code>, <code>Rect2f</code>, <code>Mat2f</code>, ..)</p>
+<div class="paragraph">
+<p><code>geom</code> = geometry (幾何). <code>2f</code> と書いて、 2 次元で <code>f32</code> を使った型を表します。ちなみに point/size で型を分けない (どちらにも <code>Vec2f</code> を使う) 方針です。</p>
+</div>
+</li>
+<li>
+<p><code>geom3d</code>: 3D の幾何型 (<code>Mat3f</code>, <code>Quaternion</code>, ..)</p>
+</li>
+<li>
+<p><code>grid2d</code>: 2D の離散的な幾何型 (<code>Vec2u</code>, <code>Vec2i</code>, <code>Rect2i</code>, ..)</p>
+</li>
+<li>
+<p><code>anf::engine::{app, draw, lifecycle, prelude, time, utils}</code></p>
+<div class="paragraph">
+<p>フレームワーク部分を <code>engine</code> と名付けました。 <code>framework</code> の方が適切ですが、 9 文字は長いと思います。コールバックを <code>AnfLifecycle</code> と名付けたのも上手く行っていると思います。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_writing_primitive_types_in_rust">2.2. Writing primitive types in Rust</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]</code></p>
+</li>
+<li>
+<p><a href="https://docs.rs/auto_ops">auto_ops</a> で演算子を実装</p>
+</li>
+<li>
+<p><code>impl AsRef</code>, <code>impl Into</code></p>
+<div class="paragraph">
+<p><code>String</code>, <code>PathBuf</code> は <code>Deref</code> を実装しているため、暗黙的に <code>&amp;str</code>, <code>&amp;Path</code> に変換されます。通常はそうもいかないため、 <code>AsRef</code> や <code>Into</code> を引数にとって、関数内で変換します。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>定数を書くときに、 <code>const fn value()</code> と <code>const VALUE</code> で書き方を迷っています。ひとまず、スネークケースのために <code>const fn</code> を使っています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_map_editors">2.3. Map editors</h3>
+<div class="paragraph">
+<p>色々ありますが、結局 <strong>Tiled がポータブルで良い</strong> と思います。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.mapeditor.org/">Tiled</a></p>
+<div class="paragraph">
+<p>タイルセット (<code>tsx</code>) とマップデータ (<code>tmx</code>) を作ることができるツールです。どちらも XML ファイルとしてパースできます。</p>
+</div>
+<div class="paragraph">
+<p>オートタイルのやり方が分かりません。 Terrain?</p>
+</div>
+</li>
+<li>
+<p><a href="https://ogmo-editor-3.github.io/">Ogmo Editor</a></p>
+<div class="paragraph">
+<p><strong>『プロジェクト』という概念</strong> を提供するツールで、複数のマップデータやタイルセットを一括管理できると思います。統合的な開発環境として良さそうでしたが、高 DPI では GUI がイマイチでした。</p>
+</div>
+</li>
+<li>
+<p><a href="https://rxi.itch.io/tilekit">Tilekit</a> (有料, Window/Linux only)</p>
+<div class="paragraph">
+<p><strong>画期的なオートタイリング</strong> をしてくれるエディタで、一見の価値があります。実は <a href="https://github.com/prime31/zig-upaya">Upaya</a> に再実装 (<code>tilescript</code>) があります。  (Upaya: ImGUI で GUI ツールを作るためのリポジトリ、Zig)</p>
+</div>
+</li>
+<li>
+<p><a href="https://deepnight.net/tools/led-2d-level-editor/">LEd</a></p>
+<div class="paragraph">
+<p>Mac では動きませんでした。 <a href="https://store.steampowered.com/app/588650/Dead_Cells/">Dead Cells</a> の作者が作ったエディタ、というのは心躍る文言ではありますが。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Ascii 文字で書いたマップから地形生成をする人もいます。何かの FPS もそうだったかな。</p>
+</div>
+<div class="paragraph">
+<p>ツクール系のマップエディタは、マップにスクリプトを書き込めるのが良かったと思います。近いもの、より良いものを用意できるか検討中……</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<a href="https://gamefromscratch.com/">GFS (GameFromScratch)</a> にニュースサイト (リンクサイト) として期待しています。 LEd も載っていました
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_remarkable_crates">2.4. Remarkable crates</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/mrDIMAS/rg3d">rg3d</a></p>
+<div class="paragraph">
+<p>Non-ECS な『古典的』 3D ゲームエンジンです。まだまだ制作中のようですが、普通に参考になると思います。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/whatisaphone/genawaiter">genawaiter</a></p>
+<div class="paragraph">
+<p>マクロで <code>yield</code> を書けるようです。まだ半信半疑です。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/fleabitdev/glsp">glsp</a> (<a href="https://gamelisp.rs/">GameLisp</a>)</p>
+<div class="paragraph">
+<p>見た目が Lisp 、中身は Rust 的な動的スクリプト言語です。マニュアルがよく書かれていて楽しそう。先ほどのスクリプトの件もあり、導入するか・できるか検討したいです。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/tuzz/game-loop">game-loop</a>, <a href="https://github.com/DomWilliams0/gameloop-rs">gameloop-rs</a></p>
+<div class="paragraph">
+<p>ゲームループのクレートです。 FNA を写経したため、お世話になることはありませんでした。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/HannesMann/keyframe">keyframe</a> (<a href="https://docs.rs/keyframe/1.0.3/keyframe/">API</a>)</p>
+<div class="paragraph">
+<p>Easing のシーケンスを作るライブラリで、アニメーションの状態に使用できるようです。名前は CSS の <code>@keyframe</code> から。ちょうど参考にするかもしれません。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_compilation_time">2.5. Compilation time</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/dev/style.md">rust-analyzer/style.md at master · rust-analyzer/rust-analyzer</a></p>
+<div class="paragraph">
+<p>Generics な関数を使うと、依存先クレートの再コンパイルが必要なるときもあるそうです。それを避けるのが Rust Analyzer の方針で、具体的な型を引数に取るようにしているだとか。</p>
+</div>
+<div class="paragraph">
+<p>僕は、しばらく使いやすさを優先します。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_zig">2.6. Zig</h3>
+<div class="paragraph">
+<p>僕が追っている開発者が、 Zig のファンになりました。僕の方でも、 <code>comptime</code> など、言語機能を追いたいところです。</p>
+</div>
+<div class="paragraph">
+<p>構文さえ何とかなればな……。僕自身は、この先 5 年は Rust でゲームを作る気がしています。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">3. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>どうやらゲームが作れそうですよ？！</p>
+</div>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

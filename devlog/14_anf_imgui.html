@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>ANF devlog #4: ImGUI</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>ANF devlog #4: ImGUI</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Sep 27, 2020</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>ANF で ImGUI を導入しました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Safari から見ると、 mp4 を再生できないのが悩みです。</p>
+</div>
+<div class="sect2">
+<h3 id="_dear_imgui">1.1. Dear ImGUI!</h3>
+<div class="paragraph">
+<p><a href="https://github.com/ocornut/imgui">Dear ImGUI</a> (ディア・アイエムグイ) は開発者向け GUI ライブラリです。 <em>Inspector</em> や <em>editor</em> を作るために使用されます。見た目は良くないので、ゲームの UI は他のライブラリで作るのが普通です。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/ocornut/imgui/tree/master/docs">API</a> としては、ウィンドウ位置・ボタンの開閉などの <strong>状態管理が自動</strong> なのが特徴的です。</p>
+</div>
+<div class="sect3">
+<h4 id="_wrapper_imgui_rs_ver_0_5">Wrapper (imgui-rs ver. 0.5)</h4>
+<div class="paragraph">
+<p><a href="https://github.com/Gekkio/imgui-rs">imgui-rs</a> はよくメンテナンスされています。まだ <strong>experimental</strong> で今後 API も変わりますが、導入が速いので良いと思います。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_backend_renderer">Backend &amp; renderer</h4>
+<div class="paragraph">
+<p>imgui-rs では、入力を受け取る <em>backend platform</em> と、画像を書き出すための <em>renderer</em> をユーザが実装できます。おかげで任意の環境で動作するということですね。叡智</p>
+</div>
+<div class="paragraph">
+<p>やってみました:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/anf/omgui.png" alt="omgui">
+</div>
+<div class="title">Figure 1. OMGUI</div>
+</div>
+<div class="paragraph">
+<p><em>なぜビームを出している？</em></p>
+</div>
+<details>
+<summary class="title">Fix</summary>
+<div class="content">
+<div class="paragraph">
+<p>Renderer が non-premultiplied alpha を使うように修正しました。また、 vertex buffer の初期化ミス (バイト長の計算ミス) を修正しました。</p>
+</div>
+</div>
+</details>
+<div class="paragraph">
+<p>Backend は SDL での <a href="https://github.com/Gekkio/imgui-rs/issues/78">実装 </a> を借りました。 Renderer は <a href="https://github.com/Gekkio/imgui-rs/tree/master/imgui-gfx-renderer">example</a> を参考に実装しました。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_menus">Menus</h4>
+<div class="paragraph">
+<p>ImGUI にイカちゃんを収納できます:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/anf/imguika_chan.gif" alt="imguika chan" width="70%">
+</div>
+</div>
+<div class="paragraph">
+<p>一瞬スクロールバーが見えているのは、 <code>scissors_rect</code> (描画判定の四角形) の計算ミスのためだと思います。</p>
+</div>
+<div class="paragraph">
+<p>ちなみに、 imgui-rs のサンプルとして、これはイカちゃん収容用コードです <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Ika-chan window (called every frame)</div>
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">// ui: imgui::Ui
+imgui::Window::new(im_str!("Ika-chan"))
+    .size([320.0, 180.0], imgui::Condition::FirstUseEver)
+    .build(&amp;ui, || {
+        ui.text(im_str!("こんにちは世界！"));
+        ui.columns(2, im_str!("cols"), false);
+        // `ika-chan.png` is stored with texture ID zero
+        imgui::Image::new(imgui::TextureId::from(0), [284.0 / 3.0, 384.0 / 4.0])
+            .uv1([1.0 / 3.0, 1.0 / 4.0])
+            .build(&amp;ui);
+        ui.next_column();
+        ui.new_line();
+        ui.new_line();
+        ui.text(im_str!("タス...ケテ......"));
+        ui.text(im_str!("タス...ケテ......"));
+    });</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>サンプルシーンを切り替えできるようにしました:</p>
+</div>
+<div class="videoblock">
+<div class="content">
+<video src="/static/img/anf/tiled_bug.mp4" controls>
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>バグってますね！　バグが出ると嬉しくなります。太いイカちゃんも悪く無いですね。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_inspector">Inspector</h4>
+<div class="paragraph">
+<p><a href="https://github.com/aclysma/imgui-inspect">imgui-inspect</a> を入れると、 Rust でも inspector を作れるようです。</p>
+</div>
+<div class="paragraph">
+<p>たぶん serde と同様に、マクロで静的リフレクションをしています。違うかもですが。僕の手には負えない部分が、他力本願で何とかなりそうです。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_more_like_a_framework">1.2. More like a framework</h3>
+<div class="sect3">
+<h4 id="_builtin_lifecycle_and_custom_lifecycle_on_top_of_it">Builtin lifecycle and custom lifecycle on top of it</h4>
+<div class="paragraph">
+<p>継承が、オブジェクトの <strong>静的な定義に良かった</strong> と思います。</p>
+</div>
+<div class="paragraph">
+<p>継承が無い場合、フレームワークが提供するコードは <strong>静的に拡張できない</strong> と思います。そこで ANF では、提供する lifecycle (callback 関数の呼び出しパタン) を原始的にします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">pub type AnfResult&lt;T&gt; = ::anyhow::Result&lt;T&gt;;
+
+pub trait AnfLifecycle {
+    fn event(&amp;mut self, ev: &amp;Event) -&gt; AnfResult&lt;()&gt; { Ok(()) }
+    fn update(&amp;mut self, time_step: TimeStep) -&gt; AnfResult&lt;()&gt; { Ok(()) }
+    fn render(&amp;mut self, time_step: TimeStep) -&gt; AnfResult&lt;()&gt; { Ok(()) }
+    fn on_end_frame(&amp;mut self) -&gt; AnfResult&lt;()&gt; { Ok(()) }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この上に、ユーザは独自の lifecycle を作ります:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ユーザは、 <code>post_render</code> や <code>debug_render</code> のような、より特別な段階 (<em>stage</em>) を設定すると思います</p>
+</li>
+<li>
+<p>データ管理には、 context/user-data のパタンを使うか、 <code>HashMap&lt;Type, Box&lt;dyn Any&gt;&gt;</code> に相当するものを使うと思います</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>言語に継承が無い場合は、ユーザ負担のコードを増やすか、動的に拡張可能にするかの二択になると考えました。動的なやり方は <a href="https://bevyengine.org/">Bevy Engine</a> が最強に思えたため、静的なアプローチを採りました。基底クラスが無い分だけ、ユーザ側の負担が大きくなりますが、リーズナブルかなと思っています。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>?</code> 演算子を使いたくなると思って、戻り値は <code>anyhow::Result</code> にしておきました。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_more_like_a_game">More like a game</h4>
+<div class="paragraph">
+<p>そろそろ基盤ができて来て、今後はフレームワークを建てて行く時間だと思います。 Rust の醍醐味として、この辺りが楽しみです:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Pool + Handler (アセット管理など)</p>
+</li>
+<li>
+<p>Event (ウィンドウリサイズの通知など)</p>
+</li>
+<li>
+<p>Tween (<code>SpriteAnimation</code> のように特化したオブジェクトなら可能？　ポインタ (<code>unsafe</code>) を使えば、何でも tween 可能ではある)</p>
+</li>
+<li>
+<p>Renderables (親子関係など)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ECS (<a href="https://github.com/Ralith/hecs">hecs</a> など) を使えば、一気に解決するとは思いますが、 <strong>ECS は使わない</strong> ポリシーで行きます。なぜなら、この開発のコンセプトは、既存の Rust 製フレームワークとは別の方向性を行く (<code>Box&lt;dyn T&gt;</code> を避けつつも <strong>OOP 寄りのプログラミングをする</strong>) ことだからです。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_random">2. Random</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_asciidoctor_reveal_js">2.1. Asciidoctor-reveal-js</h3>
+<div class="paragraph">
+<p>英語圏への宣伝を妄想し、 (するだけですが) 、スライド作成を考えています。ぶつぶつ喋るだけの動画なら、僕にも作れます。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://matklad.github.io/">matklad</a> さんが <a href="https://matklad.github.io/2019/05/19/consider-using-asciidoctor-for-your-next-presentation.html">おすすめ</a> していた <a href="https://github.com/asciidoctor/asciidoctor-reveal.js">asciidoctor-reveal.js</a> に目を通しました。 Reveal.js は、 Markdown や AsciiDoc のような <strong>テキストファイルからスライドを生成</strong> できるのが良いと思います。</p>
+</div>
+<div class="paragraph">
+<p>Asciidoctor-reveal.js の <a href="https://github.com/toyboot4e/presentation_template">テンプレート</a> を用意しました。ちなみに、このブログの html も AsciiDoc から生成されています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_resources">2.2. Resources</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/prime31/Nez">Nez</a>, <a href="https://fna-xna.github.io/">FNA</a></p>
+<div class="paragraph">
+<p>元ネタにできるソースコードを知っているのが、今回の開発の強みです。でも FNA のコードはレガシーかな。</p>
+</div>
+</li>
+<li>
+<p><a href="https://learnopengl.com/">Learn OpenGL, extensive tutorial resource for learning Modern OpenGL</a></p>
+<div class="paragraph">
+<p>僕は OpenGL を使っていませんが、グラフィクスの知識はこの本から仕入れていました。 3D もやりたくなった時に読書を再開する予定です。</p>
+</div>
+</li>
+<li>
+<p><a href="http://marupeke296.com/GameMain.html">ゲームつくろー！</a></p>
+<div class="paragraph">
+<p>Render target を使った post processing の記事などを読もうと思います:</p>
+</div>
+<div class="paragraph">
+<p><a href="http://marupeke296.com/DX10Smp_No9_MultiRenderTarget.html">その９ マルチレンダーターゲットで異なる情報を一度に描いてみる ： サンプルプログラム</a></p>
+</div>
+</li>
+<li>
+<p><a href="https://www.amazon.co.jp/dp/B084ZC9WF8/ref=dp-kindle-redirect?_encoding=UTF8&amp;btkr=1">RustではじめるOpenGL</a></p>
+<div class="paragraph">
+<p><a href="https://toyamaguchi.hatenablog.com/entry/2020/02/23/151000">『RustではじめるOpenGL』が商業出版で販売スタート - Toshihiro YAMAGUCHI’s Diary</a></p>
+</div>
+<div class="paragraph">
+<p>軽く目を通しました:</p>
+</div>
+<details>
+<summary class="title">感想</summary>
+<div class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>印象</p>
+<div class="ulist">
+<ul>
+<li>
+<p>表紙が良い = モチベーションに良い (重要)</p>
+</li>
+<li>
+<p>Rust やグラフィクスに関する見識がスムーズに頭に入って来る。つまり、読み物の醍醐味、エッセイ的な面白さが含まれている。</p>
+</li>
+<li>
+<p>分量は多くない (入門者向けに内容が絞られている) 。この先は Rust の本として解説する意味が無いということかもしれない。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>技術的な内容について</p>
+<div class="ulist">
+<ul>
+<li>
+<p>なぜ OpenGL なのかは、本の半ばで語られる</p>
+</li>
+<li>
+<p>OpenGL と他の低レベル API との比較は、ほとんど省かれている (command buffer の有無による差などは語られない)</p>
+</li>
+<li>
+<p>今度、 3D の部分をちゃんと読みたいと思います</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>電子書籍版について</p>
+<div class="ulist">
+<ul>
+<li>
+<p>コードブロックには色が欲しい。箇条書きのスペーシングが良くない</p>
+</li>
+<li>
+<p>僕は英単語をアルファベットで書いてくれた方が好み (e.g. vertex buffer) 。でも、カタカナで書いた方がウケが良いのかも</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</details>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">3. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>そろそろ『フレームワーク』になって行きそうです。今後もあらゆる細部でつまづくと思いますが、時間をかければ解決できるような気がしてきました。順調です。</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. これが毎フレーム呼ばれることで immediate mode GUI として動作するのが不思議です。名前が ID になっているのでしょうか
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

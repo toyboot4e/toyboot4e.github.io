@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Note #1: Great command line tools</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Note #1: Great command line tools</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Mar 13, 2020</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_about">1. About</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>モダンな定番のコマンドラインツールなどをリストしました。</p>
+</div>
+<div class="sect2">
+<h3 id="_background">1.1. Background</h3>
+<div class="paragraph">
+<p>コマンドラインは機能／ UI を両立していて、ほぼ理想郷だと思います。ただそれは、最新のツールを入れたためでもあるので、リンクを集めてみました。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_command_line_tools">2. Command line tools</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_replacements">2.1. Replacements</h3>
+<div class="paragraph">
+<p>最新のツールを使うと、着色や再帰検索がデフォルトとなり、オプションも整理されます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">feature</th>
+<th class="tableblock halign-left valign-top">classic</th>
+<th class="tableblock halign-left valign-top">modern</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">manual</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>man</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/dbrgn/tealdeer">tealdeer</a> (<code>tldr</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">line-based search</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>grep</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/BurntSushi/ripgrep">ripgrep</a> (<code>rg</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">file search</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>find</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/sharkdp/fd">fd</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list files</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ls</code>, <code>tree</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/ogham/exa">exa</a>, <code>exa -T</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">line-based edit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sed</code>, <code>gsed</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/chmln/sd">sd</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>最低限、 <a href="https://github.com/BurntSushi/ripgrep">rg</a> と <a href="https://github.com/sharkdp/fd">fd</a> は使った方が良いと思います。本当にいいツールなので。 <code>tree</code> や <code>exa -T</code> の代わりに <code>fd</code> + <a href="https://github.com/jez/as-tree">as-tree</a> のコンボもアリです。</p>
+</div>
+<div class="paragraph">
+<p>他には、 GNU xargs (<code>gxargs</code>), GNU awk (<code>gawk</code>) や <code>rename</code> コマンドをよく使っています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_navigation">2.2. Navigation</h3>
+<div class="paragraph">
+<p><a href="https://github.com/rupa/z">z</a> の fish 版を使っています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_packages">2.3. Packages</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/List_of_GNU_Core_Utilities_commands">coreutils</a> <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup></p>
+<div class="paragraph">
+<p><code>sort</code>, <code>uniq</code>, <code>tr</code> などの Unix フィルタは、継続して使っています。</p>
+</div>
+</li>
+<li>
+<p><a href="https://joeyh.name/code/moreutils/">moreutils</a></p>
+<div class="paragraph">
+<p>エディタで加工する <code>vi</code> シリーズが便利です。 stdout を加工する <code>vipe</code>, 一括リネームの <code>vidir</code> が含まれています。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_editors">2.4. Editors</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/neovim/neovim">NeoVim</a> (<code>nvim</code>)</p>
+<div class="paragraph">
+<p>Vim の fork です。動作が軽く、僕はこちらを使っています。</p>
+</div>
+</li>
+<li>
+<p><a href="https://www.gnu.org/s/emacs/">Emacs</a></p>
+<div class="paragraph">
+<p><a href="https://github.com/emacs-evil/evil">Evil</a> を入れると Vim になります。実は、起動以外は NeoVim よりも軽快です。ただ、 Evil 特有の不具合やハマりポイントがあって、かなり調整が難しい印象です。また、言語サーバのサポートはかなり弱いと思います (不具合が普通にあります) 。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_shells_terminal_multiplexers">2.5. Shells, terminal multiplexers</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://fishshell.com/">fish</a></p>
+<div class="paragraph">
+<p>シェルです。 <a href="https://www.zsh.org/">zsh</a> でもいいかもしれません <sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> 。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/tmux/tmux">tmux</a></p>
+<div class="paragraph">
+<p>ターミナルのインスタンスを複数作り <sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup> 、 <em>session</em>, <em>window</em>, <em>pane</em> という親子関係で整理してくれます。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_git">2.6. Git</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/dandavison/delta">delta</a></p>
+<div class="paragraph">
+<p>diff が綺麗になります。特に行番号を表示できるのが好みです。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/github/hub">hub</a></p>
+<div class="paragraph">
+<p>GitHub の非公式 CLI ツールです。リポジトリの作成や URL の取得などに便利です。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/cli/cli">gh</a></p>
+<div class="paragraph">
+<p>GitHub 公式 CLI ツールです。僕はまだ活用できていません。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/x-motemen/ghq">ghq</a></p>
+<div class="paragraph">
+<p>リモートリポジトリの管理に便利だそうです……？</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_input_macos_only">2.7. Input (macOS only)</h3>
+<div class="paragraph">
+<p>OS が進化したかのように便利になります:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://pqrs.org/osx/karabiner/">Karabiner-Elements</a></p>
+<div class="paragraph">
+<p>キー入力を自由にマッピングできます。僕は <kbd>CapsLock</kbd> を <span class="keyseq"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>Cmd</kbd></span> (<em>hyper key</em>) に変えて、ランチャの hot key としています (<code>skhd</code> 経由) 。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/koekeishiya/skhd">skhd</a></p>
+<div class="paragraph">
+<p>キー入力に応じて、シェルコマンドを実行してくれます。アプリのランチャとして使っており、 <code>yabai</code> コマンドの呼び出しもしています。</p>
+</div>
+</li>
+<li>
+<p><a href="https://toyboot4e.github.io/dotfiles/">yabai</a></p>
+<div class="paragraph">
+<p><em>Tiling window manager</em> です。ウィンドウのレイアウトやリサイズなどをしてくれます。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>yabai は HACK の塊のような印象があります。 100 % 想定された通り動作すると期待しない方が良いかもしれません。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_markup_languages">2.8. Markup languages</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://asciidoctor.org/">Asciidoctor</a></p>
+<div class="paragraph">
+<p>表現力豊かな markup 言語 (AsciiDoc) の実装です。このブログ生成にも <code>asciidoctor</code> が使われています。 org-mode も良さそうです。</p>
+</div>
+</li>
+<li>
+<p><a href="https://pandoc.org/">pandoc</a></p>
+<div class="paragraph">
+<p>主に markdown, html の相互変換に使っています。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_downloaders">2.9. Downloaders</h3>
+<div class="paragraph">
+<p><code>dl</code> コマンドを作り、与えられた URL に応じて、ダウンローダを割り当てています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/ytdl-org/youtube-dl">youtube-dl</a></p>
+<div class="paragraph">
+<p>youtube やニコニコした動画／音源をダウンロードしてくれます。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/iheanyi/bandcamp-dl">bandcamp-dl</a></p>
+<div class="paragraph">
+<p>bandcamp から音源をダウンロードしてくれます。タグもちゃんと付けてくれるのが良いと思います。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/whiteleaf7/narou/wiki">narou.rb</a> (<code>narou</code>)</p>
+<div class="paragraph">
+<p>小説家になる感じのサイトなどから原稿をダウンロードし、電子書籍に変換してくれます。 pixiv 小説は非対応。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_browsers">2.10. Browsers</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/cmus/cmus">cmus</a></p>
+<div class="paragraph">
+<p>音楽のプレイヤで、 Vim 風のキーバインドで動きます。実用しています。</p>
+</div>
+</li>
+<li>
+<p><a href="http://w3m.sourceforge.net/">w3m</a></p>
+<div class="paragraph">
+<p>古いブラウザです。 JS は動きません。これはたまに使います。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/michael-lazar/rtv">rtv</a></p>
+<div class="paragraph">
+<p>reddit の閲覧ができる CLI ツールです。十分に使用できますが、 web 版の方が便利でした。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/Bios-Marcel/cordless">cordless</a></p>
+<div class="paragraph">
+<p>Discord の CLI ツールです。不完全な擬似的 GUI といった印象で、そもそも検索ができません？</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/ggerganov/hnterm">hnterm</a></p>
+<div class="paragraph">
+<p>慣れなくて使っていません。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">3. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ターミナルの魅力は、アプリのサンドボックスであることだと思います。 <code>tmux</code> を使えば、思うさま画面分割ができ、文字しか表示されないことは、 <strong>コンスタントなレイアウト</strong> が与えられる意味でメリットと言えます。しかし、これが最高の環境かと言えば、実はグラフィカルな環境が再び覇権を取り戻すのではないかと予想しています (?) 。</p>
+</div>
+<div class="paragraph">
+<p>一方で、今日のターミナルは、ほとんど極まっており、今後大きく上回るものが出るかには疑問があります。UI が最高水準に達した後は、人間が進化するしかないのかもしれません。</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. Rust で書き直された coreutils も <a href="https://github.com/uutils/coreutils">あります</a> 。正直、コードとしてはそこまで参考になりませんでしたが……。
+</div>
+<div class="footnote" id="_footnotedef_2">
+<a href="#_footnoteref_2">2</a>. 最近の Mac は zsh がデフォルトシェルです
+</div>
+<div class="footnote" id="_footnotedef_3">
+<a href="#_footnoteref_3">3</a>. 内部的には <em>presudo terminal</em> (<code>man 4 pty</code>) が働いているとか
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Lang #1: Crafting Interpreters - 1/2</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Lang #1: Crafting Interpreters - 1/2</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Nov 10, 2019</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_about">1. About</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_summary">1.1. Summary</h3>
+<div class="paragraph">
+<p>Crafting Interpreters を読み、 Rust 言語で tree-walk interpreter を実装しました。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://craftinginterpreters.com/">Crafting Interpreters</a></p>
+</li>
+<li>
+<p><a href="https://github.com/toyboot4e/loxrs">loxrs</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_background">1.2. Background</h3>
+<div class="paragraph">
+<p>僕は <a href="http://stuffwithstuff.com/">Robert Nystrom</a> 氏のファンで、彼の <a href="https://www.amazon.co.jp/Game-Programming-Patterns-%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2%E9%96%8B%E7%99%BA%E3%81%AE%E5%95%8F%E9%A1%8C%E8%A7%A3%E6%B1%BA%E3%83%A1%E3%83%8B%E3%83%A5%E3%83%BC-impress/dp/4844338900">書籍</a> 、 <a href="http://journal.stuffwithstuff.com">ブログ</a> 、 <a href="https://github.com/munificent/hauberk">コード</a> を読んでいました。プログラミングの半分くらいは、彼から学んだようなものだと思います。しかし当時は、そこが縁の終わりだと思っており、 <a href="https://craftinginterpreters.com/">Crafting Interpreters</a> が公開されたときは、大いに興奮したものです。</p>
+</div>
+<div class="paragraph">
+<p>Rust 言語で実践しました。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_result">2. Result</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+継承 (<a href="https://craftinginterpreters.com/inheritance.html">Chapter 13</a>) は未実装です。また、一部キーワードをオリジナルの Lox から変更しています。
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_example">2.1. Example</h3>
+<div class="paragraph">
+<p>loxrs は、 <a href="https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">REPL</a> とスクリプトファイルの実行ができます。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、次のようなコードを用意します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">// examples/for_readme.lox
+class Vec2 {
+    fn init(x, y) {
+        @.x = x;
+        @.y = y;
+    }
+
+    fn add(another) {
+        return Vec2(@.x + another.x, @.y + another.y);
+    }
+}
+
+var x = Vec2(1, 2);
+var y = Vec2(3, 4);
+print x.add(y);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>走らせてみます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sh" data-lang="sh">$ cargo run -- examples/for_readme.lox
+(instance (class Vec2) ((x 4), (y 6)))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ベクトルの足し算が計算できています！　様々な仕組みが合わせって機能しているのを実感しました。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+出力がLISP風なのは、手抜きです。いっそ Lisp 風の言語を作ってみたくなりますね。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_layout_of_the_repository">2.2. Layout of the repository</h3>
+<div class="paragraph">
+<p>適切なファイル分けは、適切な設計に通じるところがあると思います。特に Rust では、ファイル構成 = module 構成となるため重要です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sh" data-lang="sh">$ tree src/
+src/
+├── analizer
+│   ├── mod.rs
+│   └── resolver.rs
+├── ast
+│   ├── expr.rs
+│   ├── mod.rs
+│   ├── pretty_printer.rs
+│   ├── stmt.rs
+│   └── visitor.rs
+├── lexer
+│   ├── mod.rs
+│   ├── parser.rs
+│   ├── scanner.rs
+│   └── token.rs
+├── lib.rs
+├── main.rs
+└── runtime
+    ├── env.rs
+    ├── interpreter.rs
+    ├── mod.rs
+    └── obj.rs
+
+4 directories, 17 files</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>まあまあ分かりやすい配置にできたと思います。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_line_counting">2.3. Line counting</h3>
+<div class="paragraph">
+<p><a href="https://github.com/XAMPPRocky/tokei">tokei</a> で行数をカウントしました。今回、テストはあまり書いていません。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sh" data-lang="sh">$ tokei --files
+--------------------------------------------------------------------------------
+ Language             Files        Lines         Code     Comments       Blanks
+--------------------------------------------------------------------------------
+ Rust                    17         3615         2874          340          401
+--------------------------------------------------------------------------------
+ ./lib.rs                            212          174           12           26
+ ./main.rs                             6            5            0            1
+ ./lexer/token.rs                    124           98           10           16
+ ./lexer/scanner.rs                  367          308           25           34
+ ./lexer/mod.rs                        5            3            1            1
+ ./lexer/parser.rs                   723          552          101           70
+ ./runtime/env.rs                    103           83            9           11
+ ./runtime/mod.rs                     24           16            4            4
+ ./runtime/obj.rs                    327          262           27           38
+ ./runtime/interpreter.rs            452          361           41           50
+ ./analizer/mod.rs                     8            1            6            1
+ ./analizer/resolver.rs              318          236           40           42
+ ./ast/stmt.rs                       184          144           14           26
+ ./ast/mod.rs                          7            6            0            1
+ ./ast/expr.rs                       356          284           27           45
+ ./ast/pretty_printer.rs             331          287           12           32
+ ./ast/visitor.rs                     68           54           11            3
+--------------------------------------------------------------------------------
+ Total                   17         3615         2874          340          401
+--------------------------------------------------------------------------------</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>約 3,600 行で、空行をのぞけば 3,000 行弱です。一番長いのはパーサで、 700 行を超えています。その他のファイルは 400 行未満で住んでいます。短いですね。</p>
+</div>
+<div class="paragraph">
+<p>※ 3,600 行 / 半年 = 3,600行 / 180 日 = 20 行 / 日</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_impl_lox">3. impl Lox</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>本と std のドキュメントを読めば実装できます。どちらも非常に高品質でした。</p>
+</div>
+<div class="sect2">
+<h3 id="_the_rust_programming_language">3.1. The Rust programming language</h3>
+<div class="paragraph">
+<p>素人目線で Rust の話をします。</p>
+</div>
+<div class="paragraph">
+<p>始め Rust は『システム・プログラミング言語』として謳われました。 Mozilla も <em>oxide metal</em> という表現をしたようです <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> 。しかし現在は <em>empowerment</em> のための言語とされており、幅広い用途が考えられています。 おそらくコンセプトは一貫しており、高速なコードを、リッチな言語機能 <sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> に基づいて記述することができます。</p>
+</div>
+<div class="paragraph">
+<p>では Rust が最強なのかと言うと、まだ検討が続いているように思います。 Rust では、 <strong>同一変数の可変参照を 2 つ同時に作れない</strong> 、という強い制約があります (<em>borrow rules</em>)。この制約は良い設計を促すことが多いのですが、所有権が複雑な UI プログラミングなどは困難になります。したがって、 <strong>まだまだ研究が続く</strong> と思います。</p>
+</div>
+<div class="paragraph">
+<p>Rust は今回のインタープリタ作りには、最適な言語だったと思います。</p>
+</div>
+<div class="paragraph">
+<p>追記: 僕は Rust は綺麗なコードが書ける言語だと思っていますが、関数型言語のユーザはよく『Rust は汚い』と言います。その感覚は、関数型言語を使ってみないと分からないのかもしれません。いつか試して比較したいです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_contents_of_the_book">3.2. Contents of the book</h3>
+<div class="paragraph">
+<p><a href="https://craftinginterpreters.com/">Crafting Interpreters</a> の Part I, II の内容は:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>1~3 章</p>
+<div class="paragraph">
+<p>開発意欲を高め、技術分野を分類し、実装すべき動的言語 Lox のイメージを掴みます。</p>
+</div>
+</li>
+<li>
+<p>4~7 章</p>
+<div class="paragraph">
+<p><a href="https://craftinginterpreters.com/representing-code.html">構文の表記法</a> を定めます。  <code>[Char] &#8594; [Token] &#8594; AST</code> という変換を行います (<code>Scanner</code> と <code>Parser</code>) 。 AST (抽象構文木) には、今後データを追加します。</p>
+</div>
+</li>
+<li>
+<p>8 ~ 13 章</p>
+<div class="paragraph">
+<p>制御構文、関数、クラスを実装します。 AST を拡張する毎に、 AST の <code>Visitor</code>, <code>Interpreter</code>, <code>Resolver</code> を拡張します。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Part III (14 ~ 30 章) では C 言語で bytecode VM を実装するようですが、今回は読んでいません。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_scanner_char_token_a_k_a_tokenizer">3.3. Scanner: <code>[char] &#8594; [Token]</code> (a.k.a. Tokenizer)</h3>
+<div class="paragraph">
+<p>まず、文字列として与えられたコードを、 <code>Token</code> 列に変換します。 <code>Token</code> は、言語文法の最小単位で、 <code>{</code>, <code>1.2</code>, <code>class</code> などが相当します。このとき、数値や文字列の場合はフィールドに入れました。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">pub enum Token {
+    String(String),
+    Number(f64),
+    Comma,  // ","
+    Period, // "."
+    // ~~
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>しかし、今考えると、 <code>struct Token&lt;'a&gt; { &amp;'a str, TokenTag }</code> という形の方が良かったと思います。これなら数値や文字列の取り出しは次のステップに回すことができますし、ソース位置も簡単に追跡できます。</p>
+</div>
+<div class="paragraph">
+<p>実際 <a href="https://rustc-dev-guide.rust-lang.org/about-this-guide.html">rustc</a> では <code>struct ByteSpan { low: u8, high: u8 }</code> によってソース文字列をスライスしています。必要なら、 <code>SourceMap</code> から行／列情報を復元できるようです。この機能を真似たクレートに <a href="https://github.com/brendanzab/codespan">codespan</a> があります。</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Bytes and character encodings</div>
+<div class="paragraph">
+<p>Rust や C の文字列は、 UTF-8 で符号化されています。 C#, Java, JavaScript などでは、文字列は UTF-16 で符号化されています。</p>
+</div>
+<div class="paragraph">
+<p>UTF-8 では、 Ascii 文字は 1 byte で表現されます。このとき、マルチバイト文字の一部が Ascii 文字と一致することはありません。なぜなら、マルチバイト文字の各バイトは、頭の bit が 1 になっています。したがって、 byte 単位で tokenize しても、 <code>{</code> や <code>}</code> などの記号を見落とすことはありません。</p>
+</div>
+<div class="paragraph">
+<p>UTF-16 の場合、 Ascii 文字は 2 bytes です。 UTF-16 には『サロゲートペア』によって表される 4 bytes の文字がありますが、やはりこの一部が Ascii 文字と一致することはありません。サロゲートペアでは、各 2 bytes の頭 5 bits が使用されているためです。 2 bytes 単位で tokenize できます。</p>
+</div>
+<div class="paragraph">
+<p>複数文字を合体させる符号などについては調べていません。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Scan (tokenize) のやり方は、『文脈』に依存することがあります。たとえば、 <code>&amp;&amp;T</code> は参照 2 つですが、 <code>p &amp;&amp; q</code> では <code>&amp;&amp;</code> を 1 つトークンとして認識します。しかし、 Lox にはこのような文脈依存の文法はありません (context-free) 。入門にいい感じです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_parser_token_ast">3.4. Parser: <code>[Token] &#8594; AST</code></h3>
+<div class="paragraph">
+<p>次に、 <code>Token</code> 列を文 (<code>Statement</code>) の列に変換します。 <code>Statement</code> は、コードのデータ表現です。これらの表現を <em>抽象木</em> (<em>abstract syntax tree</em>; AST) と呼びます。</p>
+</div>
+<div class="sect3">
+<h4 id="_abstract_syntax_tree">Abstract syntax tree</h4>
+<div class="paragraph">
+<p>AST は任意のコードを表現できます。たとえば、式 \(1 + 3 * 2\) は、次のような <em>具体木</em> に翻訳できます:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/ditaa/ast_expr.png" alt="ast expr" width="150" height="238">
+</div>
+</div>
+<div class="paragraph">
+<p>文よりも先に、このような式を生成できるようにしました。 <code>Interpreter</code> がこのデータを走査するときは、評価順などを一切気にすることなく、愚直に実行することができます。</p>
+</div>
+<div class="paragraph">
+<p>僕は <code>Box</code> を使って AST を再帰的な木構造にしました。もっと Rust らしい方法は、 <code>Vec</code> に AST のノードを保存して、 index で他のノードを参照する方法です。 <a href="http://smallcultfollowing.com/babysteps/blog/2015/04/06/modeling-graphs-in-rust-using-vector-indices/">より進んだ方法</a> の 1 つに arena や <a href="https://github.com/saschagrunert/indextree">indextree</a> があります。 <a href="https://github.com/kvark/froggy">froggy</a> なども面白いかもしれません。でも <code>Box</code> を使うのが一番簡単だと思います。</p>
+</div>
+<div class="sect4">
+<h5 id="_ast_printer">AST printer</h5>
+<div class="paragraph">
+<p>AST の <code>pretty_print</code> をできるようにしました。 \(1 + 3 * 2\) は <code>(+ (1 (* 3 2)))</code> と表現できます。上の図と等価な表現ができており、 Lisp の構文は、 AST の表現そのものであると分かります。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+この構文は prefix notation (Polish notation) とも言えます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Pretty printer には、文字列のバッファ (<code>&amp;mut String</code>) を引数に取る関数を用意しました。 <code>impl std::fmt::Write</code> でも良かったかもしれません。</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_recursive_descent_parser">Recursive descent parser</h4>
+<div class="paragraph">
+<p>具体木の生成時は、評価順に注意する必要があります。たとえば、 <code>1 + 2 * 3</code> は <code>(+ 1 (* 2 3)</code> であって <code>(* (+ 1 2) 3)</code> ではありません。パーサはこのようなディテールを考慮して書く必要があります。</p>
+</div>
+<div class="paragraph">
+<p>ところが、パーサのコードは考えることが少なく、文法を書き写したようなコードになりました ( <a href="https://craftinginterpreters.com/parsing-expressions.html#recursive-descent-parsing"><em>recursive descent parser</em></a> )。このやり方では、 <strong>文法を定義することの方が難しいと思います</strong> 。</p>
+</div>
+<div class="paragraph">
+<p>大部分の文法は、任意の回数繰り返すという再帰で表現されます。再帰には二種類あって、同じ文法を <em>左再帰</em> か <em>右再帰</em> で表すことができます。左再帰は <code>A = (A +) (A +) .. B</code> のような形で、右再帰は <code>A = B (+ A) (+ A) + ..</code> という形です。左再帰をコードにすると無限ループになるため、右再帰 (右側に再帰) の形で文法を定義します。</p>
+</div>
+<div class="paragraph">
+<p>右再帰は、高階関数で実装しました。汚いですが:</p>
+</div>
+<div class="listingblock">
+<div class="title">Right recursive parsing</div>
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">    /// Right recursive parse: Expr (Oper Expr)*
+    #[inline]
+    fn rrp&lt;Oper, SubRule, Folder&gt;(
+        &amp;mut self,
+        // parser of recursive part
+        sub_rule: SubRule,
+        delimiters: &amp;[Token],
+        folder: Folder,
+    ) -&gt; Result&lt;Expr&gt;
+    where
+        Token: Into&lt;Option&lt;Oper&gt;&gt;,
+        SubRule: Fn(&amp;mut Self) -&gt; Result&lt;Expr&gt;,
+        Folder: Fn(Expr, Oper, Expr) -&gt; Expr,
+    {
+        let mut expr = sub_rule(self)?;
+        while let Some(token) = self.consume_any_of(delimiters) {
+            let right = sub_rule(self)?;
+            let oper = token.into().unwrap();
+            expr = folder(expr, oper, right);
+        }
+        Ok(expr)
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>なんとなくで書けてしまいましたが、もっと洗練できるかもしれません。</p>
+</div>
+<div class="paragraph">
+<p>パーサ実装のポイントは、 <strong><em>error context</em></strong> を集めることでした。エラー表示は、言語の主要なインタフェイスであり、ユーザ体験に直接影響します。しかし今回は、コードのソース位置を早々に破棄するなど、失敗が目立ってしまいました。別の機会に洗練させたいと思います。</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Categories of parsers</div>
+<div class="paragraph">
+<p>今回実装したのは top-down のパーサで、 Rust, C#, JavaScript などでも実用されている手法だそうです。一方、アカデミックな世界では、 bottom-up のパーサが人気らしいです。研究のし甲斐があるためだとか (著者の <a href="https://corecursive.com/032-bob-nystrom-on-building-an-interpreter/">PodCast</a> より)。</p>
+</div>
+<div class="paragraph">
+<p>Recursive descent parser を進化させたものに <a href="https://en.wikipedia.org/wiki/Pratt_parser">Pratt parser</a> というものがあります。先ほど『文法を直接コードに翻訳したかのよう』と書きましたが、こちらは『Token をパーサ関数に関連付ける』そうです。 maktlad 氏が書いた <a href="https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html">記事</a> では、 Pratt parser を押し進め、演算子の結合順位を書くことでパーサを定義できるようにしています。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_runtime">3.5. Runtime</h3>
+<div class="paragraph">
+<p>AST を走査して、実行できるようにします。</p>
+</div>
+<div class="sect3">
+<h4 id="_visitor_pattern">Visitor pattern</h4>
+<div class="paragraph">
+<p>AST に対する、 <a href="https://github.com/rust-unofficial/patterns/blob/master/patterns/visitor.md">Visitor</a> を用意しました。何度も <code>match</code> を書かなくて済むようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">pub trait ExprVisitor&lt;T&gt; {
+    /// Dispathes a specific sub function to a variant of `Expr`
+    fn visit_expr(&amp;mut self, expr: &amp;Expr) -&gt; T {
+        use Expr::*;
+        match expr {
+            Literal(args) =&gt; self.visit_literal_expr(args),
+            Unary(args) =&gt; self.visit_unary_expr(args.as_ref()),
+            Binary(args) =&gt; self.visit_binary_expr(args.as_ref()),
+            Logic(args) =&gt; self.visit_logic_expr(args.as_ref()),
+            Grouping(args) =&gt; self.visit_expr(&amp;args.expr),
+            Variable(var) =&gt; self.visit_var_expr(var),
+            Assign(args) =&gt; self.visit_assign_expr(args.as_ref()),
+            Call(call) =&gt; self.visit_call_expr(call.as_ref()),
+            Get(get) =&gt; self.visit_get_expr(get.as_ref()),
+            Set(set) =&gt; self.visit_set_expr(set.as_ref()),
+            Self_(self_) =&gt; self.visit_self_expr(self_),
+        }
+    }
+    // sub functions to one of the variants of `Expr`
+    fn visit_literal_expr(&amp;mut self, literal: &amp;LiteralData) -&gt; T;
+    fn visit_unary_expr(&amp;mut self, unary: &amp;UnaryData) -&gt; T;
+    fn visit_binary_expr(&amp;mut self, binary: &amp;BinaryData) -&gt; T;
+    fn visit_logic_expr(&amp;mut self, logic: &amp;LogicData) -&gt; T;
+    fn visit_var_expr(&amp;mut self, var: &amp;VarUseData) -&gt; T;
+    fn visit_assign_expr(&amp;mut self, assign: &amp;AssignData) -&gt; T;
+    fn visit_call_expr(&amp;mut self, call: &amp;CallData) -&gt; T;
+    fn visit_get_expr(&amp;mut self, get: &amp;GetUseData) -&gt; T;
+    fn visit_set_expr(&amp;mut self, set: &amp;SetUseData) -&gt; T;
+    fn visit_self_expr(&amp;mut self, self_: &amp;SelfData) -&gt; T;
+}
+
+pub trait StmtVisitor&lt;T&gt; {
+    // ~~
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_object_environment">Object &amp; Environment</h4>
+<div class="paragraph">
+<p>AST 上の表現と別に、ランタイム用のオブジェクトを用意しました。</p>
+</div>
+<div class="paragraph">
+<p>Lox は動的言語なので、すべての値は <code>enum</code> にアップキャストして保存しました。これが手痛いコストとして感じられるのが、 Rust の面白いところです。</p>
+</div>
+<div class="paragraph">
+<p><code>Environment</code> は、変数名を値にマッピングします。基本的には <code>HashMap&lt;String, Rc&lt;RefCell&lt;runtime::Obj&gt;&gt;&gt;</code> です。ここで、 Rust の <strong>borrow rules</strong> が致命的に思われましたが、遠慮無い <code>clone</code> で所有権の問題を避けました。より高い効率を目指すなら、他の方法を考えなければならないと思います。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+コードブロックは <code>Rc</code> スマートポインタに入れたため、値の <code>clone</code> が重すぎるということはありません。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_interpreter">Interpreter</h4>
+<div class="paragraph">
+<p>AST の実行は、スコープに気を使いますが、主に AST を走査するだけで済みます。 AST の生成と解析の方が重要だったと思います。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Lisp の場合は、変数束縛の際、スコープを明示する <sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup> ため、さらに解析が楽そうです。
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_return_statement">Return statement</h5>
+<div class="paragraph">
+<p>元の本では、例外処理を使って <code>return</code> を実装する <sup class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnotedef_4" title="View footnote.">4</a>]</sup> HACK が使われていました。僕は <code>Result</code> を使っていたので、 無理なく関数のネストから値を返すことができました。</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_jlox_vs_loxrs">jlox vs loxrs</h4>
+<div class="paragraph">
+<p>最後に、 Java と Rust を比較します。</p>
+</div>
+<div class="paragraph">
+<p>Rust には代数データ型 ( <code>enum</code> ) があったおかげで、高効率で、しかも自然なコードを書けました。また、 <code>clone</code> や <code>enum</code> へのアップキャスト時に、コストをよく意識させられました。</p>
+</div>
+<div class="paragraph">
+<p>Java に関しては、うーん、、良かった点が思い浮かびません。 Rust が映えるテーマだったため、日頃 (C# で) いかにファジーなプログラミングをしていたか、実感することになりました。 Java は実用的な言語だと思いますが、厳密さが犠牲になっていたところがあり、今後は <strong>精度と抽象</strong> を両立させた言語が人気になると思いました。方向性としては、 Better C++ (Rust など) と Better C (<a href="https://odin-lang.org/">Odin</a> など) があるように見えます。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">4. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>本に沿ってコードを書きながらも、 Rust 向けに洗練する自由がありました。軽めのコード量 (3,000 ~ 4,000 lines) で実際に動くものが仕上がって楽しかったです。</p>
+</div>
+<div class="paragraph">
+<p>Rust の borrow rules が実装の問題になるかと思われましたが、今回はどんどん <code>clone</code> したため大丈夫でした (いいのでしょうか) 。ただし、インタープリタの効率はまだまだなので、今度は Part III を読んで、 <a href="https://gameprogrammingpatterns.com/bytecode.html">bytecode VM</a> を実装したいと思います。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_appendix">Appendix</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_a_the_author_of_crafting_interpreters">A. The author of Crafting Interpreters</h3>
+<div class="paragraph">
+<p><a href="http://stuffwithstuff.com/">彼</a> は <a href="https://rephial.org/">Angband</a> の勝者であり、 <a href="https://gameprogrammingpatterns.com/">Game Programming Patterns</a> の著者であり、 <a href="https://dart.dev/">Dart</a> の開発チームの一員であり（ <a href="https://journal.stuffwithstuff.com/2015/09/08/the-hardest-program-ive-ever-written/">例</a> )、 <a href="https://github.com/munificent/hauberk">Hauberk</a> の開発者であり……</p>
+</div>
+<div class="sect3">
+<h4 id="_podcast">Podcast</h4>
+<div class="paragraph">
+<p>この本に関するラジオ？　があります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://corecursive.com/032-bob-nystrom-on-building-an-interpreter/">How (and why) to build a programming language with Bob Nystrom</a></p>
+<div class="paragraph">
+<p>著者の雰囲気を味わえます。オタクとはかくあるべしという感じ。早口にも親近感が……笑</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p><em>"Who wouldn&#8217;t wanna make a programming language? (It&#8217;s) <strong>awesome</strong>. Super fun."</em></p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_b_resources">B. Resources</h3>
+<div class="sect3">
+<h4 id="_repositories_i_learned_from">Repositories I learned from</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/munificent/craftinginterpreters">craftinginterpreters</a></p>
+<div class="paragraph">
+<p>本のリポジトリです。コード全体が載っており、サイトの生成も見られます。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/rodaine/rlox">rlox</a></p>
+<div class="paragraph">
+<p>比較的元の本に忠実な実装です。Part II (A TREE-WALK INTERPRETER) まで。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/mariosangiorgio/rulox">rulox</a></p>
+<div class="paragraph">
+<p>上手なやり方が目立つ実装です。Part III (A BYTECODE VIRTUAL MACHINE) に取り組んでいます。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_posts_about_rust_by_others">Posts about Rust by others</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://speakerdeck.com/mariosangiorgio/learning-rust-by-crafting-interpreters">Learning Rusty by Crafting Interpreters</a></p>
+<div class="paragraph">
+<p><a href="https://github.com/mariosangiorgio/rulox">rulox</a> の作者のスライドです。大事なことを大体全部言っています。</p>
+</div>
+</li>
+<li>
+<p><a href="https://gendignoux.com/blog/2017/09/05/rust-vs-cpp-ocaml-part1.html">Rust from a C++ and OCaml programmer&#8217;s perspective (Part 1)</a></p>
+<div class="paragraph">
+<p>Rust と OCaml の構文を比較した珍しい記事です。 OCaml は、 Rust の最初のコンパイラを実装した言語です。</p>
+</div>
+</li>
+<li>
+<p><a href="https://thume.ca/2019/04/29/comparing-compilers-in-rust-haskell-c-and-python/">Comparing the Same Project in Rust, Haskell, C++, Python, Scala and OCaml</a></p>
+<div class="paragraph">
+<p>コード量に注目して、コンパイラの実装を比較した記事です。コンパイラを作る授業だったそうですが、羨ましいほど楽しそうですね。</p>
+</div>
+</li>
+<li>
+<p><a href="https://thume.ca/2019/04/18/writing-a-compiler-in-rust/">Writing a Compiler in Rust</a></p>
+<div class="paragraph">
+<p>上記授業における、記事著者のチームの実装を詳説した記事です。僕の手が届かない範囲のことを書いていてくれて、とても参考になりました。</p>
+</div>
+</li>
+<li>
+<p><a href="http://bfnightly.bracketproductions.com/rustbook/chapter_0.html">Roguelike Tutorial - in Rust</a></p>
+<div class="paragraph">
+<p>RLTK ( <a href="https://github.com/thebracket/rltk_rs">roguelike toolkit</a> ) の作者によるチュートリアルです。詳しすぎるので、まだあまり読めていません。 <em>wave function collapse</em> の解説は、ちゃんと読もうと思います。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_c_further_reading">C. Further reading</h3>
+<div class="paragraph">
+<p>幸せなことに、まだまだ良い本があります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://craftinginterpreters.com/contents.html">Crafting Interpreters</a></p>
+<div class="paragraph">
+<p>この本だ！　……まだ Part III:  A BYTECODE VIRTUAL MACHINE をやってません。この領域は僕にとって <strong>完全なブラックボックス</strong> なので、期待できます。 <strong>Part III からが本番</strong> という気がしてきました。</p>
+</div>
+</li>
+<li>
+<p><a href="https://www.cis.upenn.edu/~bcpierce/tapl/">Types and Programming Languages</a></p>
+<div class="paragraph">
+<p>型システムに関する著名な本です。 <strong>理論ができていれば後は実現するだけ</strong> 、という側面を、今回感じる所がありました。やはり読むべき本なのでしょう。</p>
+</div>
+</li>
+<li>
+<p><a href="https://mitpress.mit.edu/sites/default/files/sicp/index.html">Structure and Interpretation of Computer Programs</a></p>
+<div class="paragraph">
+<p>著名な古典です。 Scheme で Scheme のインタープリタ、コンパイラすらも作るそうです。楽しそう。遅延評価の実装などにも詳しくなれる見込みがあります。</p>
+</div>
+</li>
+<li>
+<p><a href="https://www.sigbus.info/compilerbook">低レイヤを知りたい人のためのCコンパイラ作成入門</a></p>
+<div class="paragraph">
+<p>C で C を実装する本です。稀な良文で、部分的に読むだけでもためになります。全体を読めば、相当な実力が着きそうです。ただ、 <strong>アセンブリなどの低レイヤ</strong> 方面へ向かうべきかは迷います。インタープリタとは打って変わって、コンパイラでは <strong>レジスタ</strong> が主役になるようです。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>この先 3 年で 2 冊は読んで行きたいと思います。</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. マシン (metal) を薄膜 (Rust) を介して手中とする、みたいなニュアンスだと思います。
+</div>
+<div class="footnote" id="_footnotedef_2">
+<a href="#_footnoteref_2">2</a>. trait, borrow rules, lifetime など
+</div>
+<div class="footnote" id="_footnotedef_3">
+<a href="#_footnoteref_3">3</a>. <code>(let name value) (name value (|statements here|))</code>
+</div>
+<div class="footnote" id="_footnotedef_4">
+<a href="#_footnoteref_4">4</a>. global escape? (大域脱出)
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

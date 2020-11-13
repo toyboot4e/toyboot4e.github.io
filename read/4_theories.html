@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Books on theories</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Books on theories</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>この先楽しんでいくには、理論的な物が必要な気がしてメモしておきました。それとも、『専門性』が必要だと思ったのでしょうか。</p>
+</div>
+<div class="paragraph">
+<p>言語を作りたいような、 C/C++/Rust/Zig で十分なような……。追い求める物が無いので、イマイチ身が入りません。あえて言うなら、記号を使った表記法を集めてみたい気がします。論理学？</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_not_read">1. Not read</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_computer_science">1.1. Computer science</h3>
+<div class="paragraph">
+<p>一冊でも読んだら、僕にしてはよくやったと思います。一冊読めば、次の一冊を求めるようになる、そんな読書を今後に期待したいです。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://www.amazon.co.jp/-/en/Michael-Sipser/dp/113318779X/ref=sr_1_1?dchild=1&amp;keywords=Introduction+to+the+Theory+of+Computation&amp;qid=1604046924&amp;s=english-books&amp;sr=1-1">Introduction to the Theory of Compuetation</a></p>
+<div class="paragraph">
+<p>熱い文章でモチベーションに素晴らしく良さそうです。プログラミング言語を作るときにも役立ちそう。</p>
+</div>
+</li>
+<li>
+<p><a href="https://www.amazon.co.jp/CPU%E3%81%AE%E5%89%B5%E3%82%8A%E3%81%8B%E3%81%9F-%E6%B8%A1%E6%B3%A2-%E9%83%81/dp/4839909865">CPUの創りかた</a></p>
+<div class="paragraph">
+<p><a href="https://www.sigbus.info/compilerbook">compilerbook</a> を読むのに一番必要なのは、レジスタなど CPU の知識の気がします。評判の良いこの本を読めば、楽になるのでしょうか。</p>
+</div>
+</li>
+<li>
+<p><a href="https://www.amazon.co.jp/-/en/Benjamin-C-Pierce/dp/0262162091/ref=sr_1_1?crid=1D9623KKIQ6QF&amp;dchild=1&amp;keywords=types+and+programming+languages&amp;qid=1604046943&amp;s=english-books&amp;sprefix=types+and+%2Cenglish-books%2C250&amp;sr=1-1">Types and Programming Languages</a></p>
+<div class="paragraph">
+<p>記号で表現できる物が増えたら面白いと思います。 Prolog と組み合わせると理解しやすいらしい？</p>
+</div>
+</li>
+<li>
+<p><a href="https://www.amazon.co.jp/-/en/W-Stevens/dp/0321637739/ref=tmm_pap_swatch_0?_encoding=UTF8&amp;qid=&amp;sr=">Advanced Programming in the UNIX Environment</a> (third edition) (<a href="https://www.amazon.co.jp/dp/4798134880/">詳解UNIXプログラミング</a>)</p>
+<div class="paragraph">
+<p>これは理論の本ではないですが、気になっています。</p>
+</div>
+</li>
+<li>
+<p><a href="https://www.amazon.co.jp/-/en/%E3%82%B8%E3%83%A7%E3%83%B3%E3%83%BBL-%E3%83%98%E3%83%8D%E3%82%B7%E3%83%BC/dp/4822298426/ref=pd_bxgy_3/356-9842781-3017706?_encoding=UTF8&amp;pd_rd_i=4822298426&amp;pd_rd_r=0c373c8f-099a-45e4-b992-9a5f0763b2ed&amp;pd_rd_w=h58CC&amp;pd_rd_wg=LGQIe&amp;pf_rd_p=e64b0a81-ca1b-4802-bd2c-a4b65bccc76e&amp;pf_rd_r=J7B99QGH7RHREK9QFHQK&amp;psc=1&amp;refRID=J7B99QGH7RHREK9QFHQK">コンピュータの構成と設計</a> (パタヘネ)</p>
+<div class="paragraph">
+<p>一定レベルを超えた人たちは、この本が常識みたいに言っていますね。</p>
+</div>
+</li>
+<li>
+<p><a href="http://herumi.github.io/ango/">『クラウドを支えるこれからの暗号技術』</a></p>
+<div class="paragraph">
+<p>高評価だったので一応。</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_physics">1.2. Physics</h3>
+<div class="paragraph">
+<p>物理が途中から難しくて分からなくなりました。理論物理と縁が無かったので、テンソルとかウェッジ積あたりまで理解したいなと思っています。相対論も記号が多くて面白そう。</p>
+</div>
+<div class="paragraph">
+<p>ただ、やはり理論的なものを全く習得していないので、先は長そうです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mathmatics">1.3. Mathmatics</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://sites.google.com/site/winitzki/linalg">Linear Algebra via Exterior Products</a></p>
+<div class="paragraph">
+<p>外積を理解したら、線形代数は強くてニューゲーム？！</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_finished_reading">2. Finished reading</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

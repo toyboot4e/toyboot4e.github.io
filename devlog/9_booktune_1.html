@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>booktune #1: outline parser</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>booktune #1: outline parser</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Jun 9, 2020</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>ブログ用マークアップ言語 booktune を作成中です。現在、 900 行で階層構造を扱えるようになりました。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/toyboot4e/booktune">booktune</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_background">1. Background</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://asciidoctor.org/">AsciiDoc</a> でブログを書いています。機能的には満足しており、脚注や <em><a href="https://asciidoctor.org/docs/user-manual/#callouts">callout</a></em> なども気軽に書ける、十二分な言語と言えます。しかし、 <strong>拡張</strong> は Ruby で書く必要があり、手ごろな SSG もありません。 <strong>ツールセットとしては扱いづらい</strong> と思います。</p>
+</div>
+<div class="paragraph">
+<p>したがって、 100% の自由を得るには、 <strong>マークアップ言語</strong> と <strong>SSG</strong> の両方を自作する必要があると考えました。それぞれ、 <em>booktune</em> と <em>tunedbook</em> という名前を考えています。</p>
+</div>
+<div class="sect2">
+<h3 id="_booktune">1.1. booktune</h3>
+<div class="paragraph">
+<p>booktune は、 AsciiDoc に酷似したマークアップ言語 (となる予定) です。</p>
+</div>
+<div class="paragraph">
+<p>今回は、パーサの骨組みを作成しました。たとえば、以下のような入力を与えます:</p>
+</div>
+<div class="listingblock">
+<div class="title">input.tune</div>
+<div class="content">
+<pre class="highlight"><code class="language-asciidoc" data-lang="asciidoc">= Simple booktune example
+
+== Header (level 2)
+
+This is a first paragraph. _Italic_
+
+--[ rust
+fn main() {
+    println!("Hello, world!");
+}
+--]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次のように出力されます:</p>
+</div>
+<div class="listingblock">
+<div class="title">output.html</div>
+<div class="content">
+<pre class="highlight"><code class="language-html" data-lang="html">&lt;h1&gt;Simple booktune example&lt;/h1&gt;
+&lt;h2&gt;Header (level 2)&lt;/h2&gt;
+&lt;p&gt;This is a first paragraph. _Italic_&lt;/p&gt;
+&lt;div&gt;
+fn main() {&lt;br&gt;    println!("Hello, world!");&lt;br&gt;}
+&lt;/div&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ドキュメントの概形をパースしてくれました。段落内部の書体指定 (<em>format</em>) や、コードブロックなどは未実装です。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_an_outline_parser">2. An outline parser</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>booktune は、 <code>.tune</code> ファイルを読んで html を出力します。データを <em>要素</em> 単位で読み出して、別のものに加工する、という意味では、 deserializer に似ています。そのため、 <a href="https://serde.rs/">serde</a> <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> の設計を真似ることになりました。</p>
+</div>
+<div class="sect2">
+<h3 id="_push_pull">2.1. Push &amp; pull</h3>
+<div class="paragraph">
+<p>パーサには、 push 型と pull 型があるようです。僕のイメージでは、</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>pull 型のパーサ = 要素のイテレータ</p>
+<div class="paragraph">
+<p>出力側が、 1 つずつ要素を <em>引っ張り出す</em> (<code>next</code> を呼ぶ) 形です。</p>
+</div>
+</li>
+<li>
+<p>push 型のパーサ = visitor の <em>driver</em></p>
+<div class="paragraph">
+<p>入力側が、 1 つずつ要素を <em>押し出す</em> (<code>visit_xxx</code> を呼ぶ) 形です。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>一方、 serde の Deserializer は、 push 型と pull のハイブリッドのように見えます。</p>
+</div>
+<div class="sect3">
+<h4 id="_visitor_access">Visitor &amp; access</h4>
+<div class="paragraph">
+<p>serde の deserialize では、まず <code>visit_xxx</code> といったメソッドが呼ばれます。これは push 型のパーサと言えます。しかし、たとえば配列が見つかった場合、 <a href="https://docs.serde.rs/serde/de/trait.SeqAccess.html">SeqAccess</a> が visitor に渡されます。その後、 Visitor 側から <code>SeqAccess.next_element</code> を使って配列要素をパースし、この間は pull 型のパースと言えそうです。</p>
+</div>
+<div class="paragraph">
+<p><strong>出力側に入力側への <em>access</em> を渡す</strong> のは、上手いパタンだと思います。状態管理が簡単になるからです。 booktune の場合、たとえば、ブロック (コードやテーブル) の内側では、段落などとは別のメソッドでパースする必要があります。また、ブロックはネストする可能性があり、 <strong>状態管理が必要</strong> です。それらは <code>BlockAccess</code> を経由して適切に扱われると信頼できます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_no_generic_element">No generic element</h4>
+<div class="paragraph">
+<p>次のようなイメージでパース (visitor を drive) します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">fn one_step_driving(stream: &amp;mut impl Stream, visitor: &amp;mut impl StreamVisitor) {
+    // block
+    if let Some(start) = stream.apply(block_rule) {
+        visitor.visit_block(&amp;start);
+        return true;
+    }
+
+    // list
+    if let Some(initial) = stream.apply(list_rule) {
+        visitor.visit_list(&amp;initial);
+        return true;
+    }
+
+    // ~~
+
+    false
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ネストしたデータも、 access 経由で処理されます。したがって、 <strong>データ種別毎のパースが独立</strong> しています。このとき、『任意の要素』を表す <code>enum</code> はありません。</p>
+</div>
+<div class="paragraph">
+<p>後からデータを足すのは容易に見えます; 対応するパーサ (<code>if let..</code>) を書き足して、 visitor を <code>StreamVisitor: VisitorA + VisitorB+ ..</code> にします <sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> 。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>enum</code> を使った場合よりも、拡張が楽だと思います。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>もしも木構造などを作りたければ、 visitor 側でやってもらいます。そのときは、 html 要素のツリーのような、 <strong>パース時とは違った文脈で node を作る</strong> と思います。やはり、任意の parse 要素をアップキャストするような <code>enum</code> は要らないと考えました。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_one_pass_html_renderer">2.2. One-pass html renderer</h3>
+<div class="paragraph">
+<p>現状、木構造は作らずに、 visitor から直接 html を書き出しています。まだアウトラインしか扱わないこともあり、 100 行程度のシンプルな renderer となりました。キモは parser の方です。</p>
+</div>
+<div class="paragraph">
+<p>One-pass では実装できない機能ももちろんあります。たとえば、目次の挿入です。木構造無しでやってみようと思うので、 one-pass の中で目次データを収集しておいて、後から handlebars のテンプレート機能で挿入、などを考えています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_details">2.3. Details</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>行単位でパースしています</p>
+</li>
+<li>
+<p>段落は単語単位でパースする予定です</p>
+</li>
+<li>
+<p>ブロックはプラグインが処理する形にします。また、テーブルも一種のブロックとして扱います</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">3. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>serde を真似ることで、 outline パーサを綺麗に書くことができました。特に access が活躍しましたし、他の場所でも応用が利くと思います。</p>
+</div>
+<div class="paragraph">
+<p>ブログや執筆用ツールチェインの作成、出だしは好調です。</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. serde: SerDe; serialize/deserialize
+</div>
+<div class="footnote" id="_footnotedef_2">
+<a href="#_footnoteref_2">2</a>. この辺はマクロで自動化できそうな気がします
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

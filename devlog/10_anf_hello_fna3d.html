@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>ANF devlog #1: Sprite rendering!</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>ANF devlog #1: Sprite rendering!</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Jul 24, 2020</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Rust から FNA3D を使います。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_background">1. Background</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>僕はゲーム制作に <a href="https://github.com/prime31/Nez">Nez</a> を使っていました。 <a href="https://github.com/prime31/Nez">Nez</a> はオープンソースの 2D フレームワーク (C#) で、 <strong>ソースを読めば中身は何でも分かります</strong> 。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/prime31/Nez">Nez</a> からの学びは多く、使っていて快適でしたが、むしろ <a href="https://github.com/prime31/Nez">Nez</a> そのものを作りたくなってしまいました。そこで、好みの Rust 言語でフレームワークを作り始めました。最終目標は 2D ローグライクゲームを作る事です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_draw_sprites">2. Draw sprites</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_fna">2.1. FNA</h3>
+<div class="paragraph">
+<p><a href="https://github.com/prime31/Nez">Nez</a> は <a href="https://fna-xna.github.io/">FNA</a> フレームワークを使っています <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> 。 <a href="https://fna-xna.github.io/">FNA</a> は <a href="https://ja.wikipedia.org/wiki/Microsoft_XNA">XNA</a> の再実装で、 <a href="https://terraria.org/">Terraria</a> や <a href="https://store.steampowered.com/app/115800/Owlboy/">Owlboy</a> などのゲームにも使用されています。</p>
+</div>
+<div class="paragraph">
+<p>今年 <a href="https://fna-xna.github.io/">FNA</a> のグラフィクス部分が <a href="https://www.gamingonlinux.com/articles/fna-2005-xna4-reimplementation-is-out-with-a-brand-new-3d-graphics-library-fna3d.16560">C で書き直されて</a>、 <a href="https://github.com/FNA-XNA/FNA3D">FNA3D</a> というライブラリになりました。 C は ABI (application binary interface) が安定しているため、他のどの言語からも使用できます。</p>
+</div>
+<div class="paragraph">
+<p>『C ライブラリに依存する』のは、『すべてを Rust で書く』のと比べてクールではないかもしれません。しかし、様々な言語から FNA3D が使用されている状況は面白いと思い、僕もその一員になりたいと思いました。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<a href="https://github.com/FNA-XNA/FNA3D">FNA3D</a> は、 9 月 1 日から <a href="https://fna-xna.github.io/">FNA</a> の master ブランチで使用される予定です。 7 月 24 日の現在、 API がほぼ安定しているので、使い始めて良いと思います。
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_rust_fna3d">Rust-FNA3D</h4>
+<div class="paragraph">
+<p><a href="https://github.com/FNA-XNA/FNA3D">FNA3D</a> を Rust でラッピングしました (<a href="https://github.com/toyboot4e/rust-fna3d">Rust-FNA3D</a>):</p>
+</div>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p><i class="fa fa-check-square-o"></i> C ライブラリを sub module として追加</p>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p><i class="fa fa-square-o"></i> 自動 pull</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> C ライブラリのビルドの自動化</p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> C ライブラリへの FFI bindings の生成 (<a href="https://github.com/rust-lang/rust-bindgen">bindgen</a>)</p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> 生成された bindings のラッピング</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>結構な作業量でした。 Rust-FNA3D を使ったコードは、ユーザから見えない所に隠れるので、ラッピングせずに、 <code>bindgen</code> の出力を直接使っても良かったかもしれません。</p>
+</div>
+<div class="paragraph">
+<p>Rust から FNA3D を使ったのは、僕が初めてだと思います。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sprites_textured_quadliterals">2.2. Sprites = textured quadliterals</h3>
+<div class="paragraph">
+<p>それでは絵を出していきます！</p>
+</div>
+<div class="sect3">
+<h4 id="_quadliteral_two_triangles">Quadliteral = two triangles</h4>
+<div class="paragraph">
+<p>FNA3D の描画機能は <em>primitive</em> 単位でした。 Primitive は普通は三角形で、 3 つの <em>vertex</em> (頂点) で指定されます。頂点は、頂点バッファ (頂点配列) への <em>index</em> で指定されます。</p>
+</div>
+<div class="paragraph">
+<p>四角形は 2 つの三角形であると捉えて、 4 つの頂点と 6 つの index で指定します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+一般の四辺形を <em>quadliteral</em> (quad) と呼ぶようです。四辺形／四角形はよく描くので、 <code>draw_primitives</code> とは別に <code>draw_quads</code> を用意したライブラリもあるかもしれません。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_sprite_batch">Sprite batch</h4>
+<div class="paragraph">
+<p>ゲームは毎フレーム <a href="https://gameprogrammingpatterns.com/double-buffer.html">2 つ (以上) の画面</a> を切り替えて表示されます。次のフレームに表示する画面のデータを <em>back buffer</em> (back frame buffer) と呼びます。</p>
+</div>
+<div class="paragraph">
+<p>画像を画面に表示するには、 back buffer への書き込みが必要です。 Back buffer (もしくは任意の <em>render target</em>)  への画像データの書き込みは、 GPU 側に依頼します。この依頼コマンドを <strong>draw call</strong> と呼びます。具体的には、 <code>FNA3D_DrawIndexedPrimitive</code> の呼び出しが draw call に相当します。</p>
+</div>
+<div class="paragraph">
+<p>GPU はピクセルの計算に強く、 CPU よりも遥かに速く画像処理ができます。しかし、 GPU にデータを送るのは時間がかかります。そこで、同種の (かつ連続した <sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup>) draw call に関しては、複数データを一括して GPU へ送ることで、効率を良くします (drawcall batching)。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+大まかに、同じ画像 (の一部) をどこかへ書き込む命令は、 1 つの draw call に束ねる (batching) 事ができます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>と、断定して書きましたが、 <strong>不正確な情報だと思います</strong> 。ともかく、画像を描く前に頂点データを蓄え、 draw 関数の呼び出し回数を減らします。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_z_sorting">Z sorting</h4>
+<div class="paragraph">
+<p>いわゆる <code>SpriteRenderer</code> のソートについて、一応先に考えておきます。</p>
+</div>
+<div class="paragraph">
+<p>実はこれ、 <a href="https://github.com/prime31/Nez">Nez</a> では <code>renderables.Sort()</code> という 1 行で済んでいました。内部的にはクイックソートです。最善の方法では無いと思いますが、ソートはさほど問題にならないと考えて良さそうです。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_initialization_rendering_pipeline">Initialization &amp; rendering pipeline</h4>
+<div class="paragraph">
+<p>FNA3D は、特定の関数を特定のサイクルで呼ぶことを要求します。何もしないことを設定するようなコードも書く必要があって、奇妙に思えたものですが、ひとまず人のコードを真似して動かしました <sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup> 。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">3. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>ヤッター！</strong></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/anf/he.png" alt="he">
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+大王イカ？　の画像は <a href="http://park2.wakwak.com/~kuribo/">敦煌回廊</a> さんより
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>片側の primitive のみ表示すると、確かに三角形になっています:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/anf/half_of_him.png" alt="half of him">
+</div>
+</div>
+<div class="paragraph">
+<p>フレームワークの名前は ANF としました。 FNA を逆さに読んでおり、発音は An F (アネフ) とします。今後は <code>Texture</code> に lifetime を課したり、 <code>cargo add anf</code> ですぐ使えるようにしたいと思います。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_notes">Notes</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_why_triangles">Why triangles?</h3>
+<div class="paragraph">
+<p>三角形を primitive として使うことには、法線が一意的になる、などの妥当な理由があるようです。また、グラフィクスの低レイヤ API (DirectX, OpenGL, Metal, Vulka..) が三角形の使用を前提としています。</p>
+</div>
+<div class="paragraph">
+<p>3D では、三角形が作ったポリゴン (mesh?) に 2D 画像を貼り付けたします。 2D でも三角形を使うメリット・デメリットなどは気になります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_repositories_using_fna3d">Repositories using FNA3D</h3>
+<div class="paragraph">
+<p>魅惑の repository たちがここに！</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://gist.github.com/jessechounard/d4252efc12ee24494484611d92b1debe">Simple texture rendering in FNA3D</a> (C)</p>
+</li>
+<li>
+<p><a href="https://github.com/silenttowergames/stonetower">Stonetower</a> (C)</p>
+</li>
+<li>
+<p><a href="https://github.com/KillaMaaki/BNA">BNA</a> (<a href="https://www.beeflang.org/">Beef</a>)</p>
+</li>
+<li>
+<p><a href="https://github.com/prime31/Odin-Libs">Odin-Libs</a> (<a href="https://odin-lang.org/">Odin</a>)</p>
+</li>
+<li>
+<p><a href="https://github.com/prime31/via">Via</a> (<a href="https://vlang.io/">V</a>)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Odin 言語は、かなり低レベル寄りで面白そうだと思いました。 V は C の薄いラッパーのような言語らしいです。 Beef は C# みたいな見た目の C++ みたいな言語だと思います。</p>
+</div>
+<div class="paragraph">
+<p>FNA3D のユーザから Rust ユーザが出なかったのは、他の言語に関心があったからかと思います。僕は Rust が一番慣れた言語だったので、なぜ Rust を使わないのか疑問に思ったものですが、 C ライブラリを使うには他言語よりも <strong>遥かに</strong> 労力が必要だと感じたので、少しずつ Rust を使わない人の視点も補われていくのを感じています。</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. 実際には MonoGame も使用できますが、 FNA が推奨されています。
+</div>
+<div class="footnote" id="_footnotedef_2">
+<a href="#_footnoteref_2">2</a>. 連続していない draw call とは、たとえば『猫』『犬』『猫』の順で描く場合は、 2 つの猫の draw call は、同種ですが連続していません
+</div>
+<div class="footnote" id="_footnotedef_3">
+<a href="#_footnoteref_3">3</a>. Rendering pipeline がうまく動いていない場合も特にエラーが出なかったのがキツかったです。また、 FNA3D にはドキュメントが無いのも大変でした。
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

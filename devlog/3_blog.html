@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>SSG #1: bash + Asciidoctor</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>SSG #1: bash + Asciidoctor</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Nov 12, 2019</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_summary">1. Summary</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Asciidoctor を使って、本ブログの html を作成しました。また html/css に入門しました。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/toyboot4e/devlog">スクリプト、原稿ファイル</a></p>
+</li>
+<li>
+<p><a href="https://github.com/toyboot4e/toyboot4e.github.io">生成された html</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>やり方としては、 <a href="https://asciidoctor.org">Asciidoctor</a> で原稿を html に変換し、 bash でヘッダとフッタを追加します。一人で作業する分には、シンプルで悪くないと思います。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_static_site_generation">2. Static site generation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>始めに、最もシンプルな SSG として、 <a href="https://github.com/rust-lang/mdBook">mdbook</a> を検討しました。これは Rust 言語の <a href="https://doc.rust-lang.org/book/">本</a> に使用されており、見た目も良いと思います。しかし、 <strong>画像に caption を加えられない</strong> 、など markdown の表現力に制限を感じました。したがって、他の markup 言語が必要でした。</p>
+</div>
+<div class="sect2">
+<h3 id="_markup_language">2.1. Markup language</h3>
+<div class="paragraph">
+<p>様々な言語が見つかりました。ツールの <strong>選択に迷った時は、ドキュメントが良い環境を選ぶ</strong> ことにしています。 AsciiDoc (処理系は Asciidoctor) に行き着きました。</p>
+</div>
+<div class="paragraph">
+<p>AsciiDoc には、 <em>macro</em>, <em>block</em>, <em>attribute</em> といった <strong>一般的な構文</strong> が用意されており、豊富な機能にアクセスできます <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>:</p>
+</div>
+<details>
+<summary class="title">Syntax example (macros and blocks)</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-adoc" data-lang="adoc">// macros
+image::path[align="center"]
+kbd:[Ctrl+z]
+footnote:[脚注]
+
+// blocks with attributes
+[source,csharp]
+----
+public class TestClass {
+    // code block
+}
+----
+
+[quote]
+____
+Shall we dance! // quoting block
+____</code></pre>
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title">Demo</summary>
+<div class="content">
+<div class="paragraph">
+<p>とりわけブログに良かった機能は、 <a href="https://asciidoctor.org/docs/user-manual/#callouts">callouts</a> や <a href="https://asciidoctor.org/docs/user-manual/#user-footnotes">footnote</a><sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> (脚注) でした。脚注は今出した通りのもので、 callouts は、次のように表示できます:</p>
+</div>
+<div class="listingblock">
+<div class="title">Example of callouts</div>
+<div class="content">
+<pre class="highlight"><code class="language-sh" data-lang="sh">$ asciidoctor devlog.adoc <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これが callout です。</td>
+</tr>
+</table>
+</div>
+<div class="stemblock">
+<div class="content">
+\[数式も書けます \\
+convert (adoc) := asciidoctor(adoc, extensions) \\
+where\ extensions\ are\ awesome\]
+</div>
+</div>
+<div class="paragraph">
+<p><kbd>Enter</kbd>, <span class="keyseq"><kbd>Ctrl</kbd>+<kbd>T</kbd></span> ← キーボードキーです <sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup>。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://asciidoctor.org/docs/asciidoctor-diagram/">sciidoctor-diagram</a> のおかげで、文字データから図を作り出すツールも使用できます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>マインドマップを <a href="https://plantuml.com/">PlantUML</a> で描いてみました <sup class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnotedef_4" title="View footnote.">4</a>]</sup>:</p>
+<div class="imageblock freesize">
+<div class="content">
+<img src="/static/img/3_blog_mindmap.svg" alt="3 blog mindmap" width="200%" height="200%">
+</div>
+</div>
+<div class="paragraph">
+<p>箇条書きで書けるのが便利です。上下にノードを伸ばせないのがイマイチです。</p>
+</div>
+</li>
+<li>
+<p><a href="http://ditaa.sourceforge.net/">ditaa</a> で図も書けます:</p>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/3_blog_serde.png" alt="3 blog serde" width="620" height="294">
+</div>
+<div class="title">Figure 1. Separation in <a href="https://serde.rs/">serde</a> (maybe it&#8217;s like this)</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</details>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+もう 1 点優れているのは、 <strong>本の作成が念頭に置かれている</strong> ことです。 AsciiDoc では、分割ファイルの <code>include</code> ができます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>これで、 <strong>記事部分は思い通り作れます</strong> 。後は外枠を補填し、ページとページをリンクで繋げることでサイトとします。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_generating_html">2.2. Generating html</h3>
+<div class="paragraph">
+<p>Asciidoctor を使ったブログ生成の話題は、 SSG (static site generator) に限られていました。大半の SSG には、メタデータを <a href="https://asciidoctor.org/docs/user-manual/#static-website-generators">yaml frontmatter として書かされる</a> ようです。しかし、それでは AsciiDoc 本来の書き味を損うと捉え、 <strong>自力で html を加工</strong> することにしました。</p>
+</div>
+<div class="sect3">
+<h4 id="_recommended_way">Recommended way?</h4>
+<div class="paragraph">
+<p>Asciidoctor のツールチェインには、 Ruby で書ける <a href="https://github.com/asciidoctor/asciidoctor-extensions-lab">拡張</a> や <a href="https://github.com/asciidoctor/asciidoctor-stylesheet-factory">stylesheet factory</a> がありました。実際、 <a href="https://smijake3.hatenablog.com/entry/2018/12/13/224443">上手く使った人</a> もいます。しかし、使い方を理解するのが大変そうだったので、今回はパスしました。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_adoc_html_html"><code>.adoc</code> &#8594; <code>.html</code> &#8594; <code>.html</code></h4>
+<div class="paragraph">
+<p>Asciidoctor で <code>.adoc</code> ファイルを変換すると、記事部分だけのシンプルな <code>.html</code> が出力されます。それを bash で変換し、 header, footer を追加しました (<a href="https://github.com/toyboot4e/devlog/blob/master/_archived/ssg">ソース</a>)。</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+ただ、何でも bash でやるのは良くないですね。プログラミング言語を使うか、 html の加工にはテンプレート言語を使った方が良かったと思います。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_hand_written_css">Hand-written css</h4>
+<div class="paragraph">
+<p><strong>ターミナル画面の再現</strong> をコンセプトに、 <a href="https://github.com/toyboot4e/devlog/blob/master/styles/term.css">css</a> に着手しました。素人ではあったものの、インターンシップで html/css の経験があったため、概要は理解していました。</p>
+</div>
+<div class="paragraph">
+<p>まず記事を中央に配置し、ターミナルの配色をコピーしました。それだけで、悪くない画面になりました。その後修正を繰り返し、おそらく細部に問題がありますが、ブログとしては十分だと思います。満足しています。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">3. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>以前はサイトの作り方など知らず、大きな壁に思えたものですが、どうやら <strong>html のファイル構成 ~ サイト</strong> と思って良さそうです。『難しいはずの部分』は、 <a href="https://pages.github.com/">GitHub Pages</a> やブラウザ任せにできました。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://asciidoctor.org/">Asciidoctor</a> は得るべき道具だったと思います。今後も、 <strong>サイト・レポート・スライドの作成</strong> に使っていこうと思います。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_appendix">Appendix</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_a_markup_languages_other_than_asciidoc">A. Markup languages other than AsciiDoc</h3>
+<div class="paragraph">
+<p><a href="https://orgmode.org/">org-mode</a> にも注目しています。まだ調べている最中ですが、この選択は何らかの trade-off になるという印象です。それだけ Asciidoctor の完成度が高いのだと捉えました。</p>
+</div>
+<div class="paragraph">
+<p>両言語の表現力は、ほぼ同等に見えます。ただし、 org-mode は <strong>UI とツールが非常に発達</strong> しています。特に Emacs から使うと強力で、 TODO 管理などに向いているようです。任意の設定ファイルを <code>.org</code> ファイルに書き込んで、コマンド 1 つで実ファイルにコピーする、みたいな使い方をしている人もいます。この拡張性は Emacs + Emacs Lisp に由来しています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_b_asciidoctor_for_other_than_html">B. Asciidoctor for other than html</h3>
+<div class="paragraph">
+<p>ブラウザの印刷機能を使えば、 html から pdf を生成できます。これがレポートの作成に重宝しました。というのも、 AsciiDoc では <strong>分割ファイルの <code>include</code> が可能</strong> なため、長い原稿も編集が楽だからです。 Office はもう要らないですね。</p>
+</div>
+<div class="paragraph">
+<p>拡張機能が豊富なのも、 Asciidoctor の特徴です。 pdf や スライド<sup class="footnote">[<a id="_footnoteref_5" class="footnote" href="#_footnotedef_5" title="View footnote.">5</a>]</sup>、電子書籍も作れるようです。実際、 <a href="https://hackernoon.com/living-the-future-of-technical-writing-2f368bd0a272">ProGit の執筆に使用された</a> という実績があります。</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+ただし、 html 以外の出力は、スムーズに行かないと思います。 asciidoctor-pdf は、デフォルトのフォントが日本語を含まないなど、様々な問題が出ます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_c_other_ways_to_convert_html_files">C. Other ways to convert html files</h3>
+<div class="paragraph">
+<p>bash で html を加工する必要は無かったはずです。他の方法を検討してみます。</p>
+</div>
+<div class="sect3">
+<h4 id="_editing_an_html_as_a_tree">Editing an html as a tree</h4>
+<div class="paragraph">
+<p>Asciidoctor が作った html を木としてパースし、加工してから、再び html として出力します。これは意外と複雑そうです。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_templating_engines">Templating engines</h4>
+<div class="paragraph">
+<p>ページ外観の html を用意し、そこに記事内容をはめ込みます。これは templating と呼ばれるそうです。</p>
+</div>
+<div class="listingblock">
+<div class="title">Pseudo html template</div>
+<div class="content">
+<pre class="highlight"><code class="language-html" data-lang="html">&lt;!DOCTYPE html&gt;
+&lt;html lang="jp"&gt;
+&lt;head&gt;
+    &lt;!-- 省略 --&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- templates --!&gt;
+    {{header}}      &lt;!-- パンくずリスト --!&gt;
+    {{article}}     &lt;!-- 記事 --!&gt;
+    {{footer}}      &lt;!-- footer !--&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><a href="https://pandoc.org/">pandoc</a> や <a href="https://handlebarsjs.com/">handlebars</a> が『それっぽい』ツールの気がします。ただし、構文がキメラっぽく見えて苦手に思いました。今回は使いませんでした。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_d_getting_started_with_htmlcss">D. Getting started with html/css</h3>
+<div class="paragraph">
+<p>今回、最も難しかったのは、 html/css を理解することでした。入門書こそ多いのですが、ポイントを掴みにくい仕組みだと思います。</p>
+</div>
+<div class="sect3">
+<h4 id="_tips">Tips</h4>
+<div class="paragraph">
+<p>たとえば、こういった情報を集めるのに手間がかかります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>常識</p>
+<div class="ulist">
+<ul>
+<li>
+<p>静的サイトの <strong>URL は、ファイル構成と一致</strong> します。ルートとなるページは <code>index.html</code> で、 <code>path/to/file.html</code> が 1 ページに相当します。</p>
+</li>
+<li>
+<p>ルートに <code>404.html</code> を置くと、存在しないページにアクセスしたときに表示されます (<strong>GitHub Pages の場合</strong>) 。</p>
+</li>
+<li>
+<p>自分のコンピュータ上で絶対パス (<code>/some/url</code> という形式で書く、サイトのルートからの相対パス) を使うには、 <a href="https://developer.mozilla.org/en-US/docs/Learn/Common_questions/set_up_a_local_testing_server">ローカルサーバ</a> を使います。</p>
+</li>
+<li>
+<p>ブラウザ毎に、デフォルトの CSS 設定があります（余白など）。無効化する方法として、 <a href="https://meyerweb.com/eric/tools/css/reset/">Reset CSS</a> が有名ですが、賛否両論あります。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>操作</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Chrome/Firefox で <span class="keyseq"><kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>c</kbd></span> を押すと、マウスホバーでレイアウトを確認できます。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>手法</p>
+<div class="ulist">
+<ul>
+<li>
+<p>このサイトのトップは、 <code>flexbox</code> という機能を使ってレイアウトしています。</p>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+トップ画面は変更しました。要素を横に並べるときに <code>flex</code> は便利です。
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>フォントは Google Fonts から取ってくるのが楽ですが、デメリットもあるようです。</p>
+</li>
+<li>
+<p><a href="https://www.mathjax.org/">MathJax</a> (数式表示) や <a href="https://prismjs.com/">Prism.js</a> (構文ハイライト) が便利な JS だと思います。これらは <code>&lt;script&gt;</code> タグを追加することで使用できます。 JS ファイルは、ダウンロードするかネット上のものにリンクします。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+ブラウザの仕組みが気になったときは、 <a href="https://www.html5rocks.com/ja/tutorials/internals/howbrowserswork/">ブラウザの仕組み: 最新ウェブブラウザの内部構造</a> などが参考になります。意外とテキストエディタに似ているかもしれません。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_layout_with_css">Layout with CSS</h4>
+<div class="paragraph">
+<p>簡単に html/css の概要を説明してみようと思います。</p>
+</div>
+<div class="paragraph">
+<p>まず、ミニマルな html は、次のような構造を持ちます。</p>
+</div>
+<div class="listingblock">
+<div class="title">Minimal html</div>
+<div class="content">
+<pre class="highlight"><code class="language-html" data-lang="html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;title&gt;The website&lt;/title&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;!-- page content --&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>木構造としては以下のような関係と言えます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-html" data-lang="html">html
+├── head
+│   ├── title
+│   └── link
+└── body</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>まず、 body の下にデータを足していきます。 <code>article</code> を配置し、その下に <code>header</code>, <code>content</code>, <code>footer</code> を作ったとします（手書きで、あるいは markdown などから）。</p>
+</div>
+<div class="listingblock">
+<div class="title">Basic html</div>
+<div class="content">
+<pre class="highlight"><code class="language-html" data-lang="html">  &lt;body&gt;
+    &lt;div id="article"&gt;
+        &lt;div id="header"&gt;
+            &lt;!-- content !--&gt;
+        &lt;/div&gt;
+        &lt;div id="content"&gt;
+            &lt;!-- content !--&gt;
+        &lt;/div&gt;
+        &lt;div id="footer"&gt;
+            &lt;!-- content !--&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次はレイアウトです。ブラウザは、 css を元に、 html の木を表示します。 css は、 cascading style sheet というだけあって、親要素から子要素へと情報を受け継いで行きます。</p>
+</div>
+<div class="paragraph">
+<p>そこで、 <code>article</code> の横幅を <code>40rem</code> (40 文字) くらいに設定すれば、その下に配置された <code>header</code>, <code>content</code>, <code>footer</code> の横幅も制限され、 <strong>行あたり文字数を設定できます</strong> 。</p>
+</div>
+<div class="paragraph">
+<p>さらに、 <code>article</code> の <code>margin</code> を <code>auto</code> にします。すると、記事を画面中央に配置できます。このブログの基本的なレイアウトは、実にそれだけです。</p>
+</div>
+<div class="listingblock">
+<div class="title">Basic layout</div>
+<div class="content">
+<pre class="highlight"><code class="language-css" data-lang="css">div#content, div#footnotes&gt;*{
+    max-width:44em;
+    margin:auto;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>基本ができたら、後は自力で何とかできると思います。たとえば、画面脇に目次を表示したいとします。ひとまず、 <a href="https://www.w3schools.com/howto/howto_css_fixed_sidebar.asp">Fixed Sidebar</a> を真似れば表示できます。さらにメニューを、横に狭い画面では非表示にするとして、たとえば <em>media query</em> で <em><a href="https://www.w3schools.com/howto/howto_css_sidebar_responsive.asp">responsive</a></em> にすることを検討します。この段階まで来たら、『静的サイトを作ることができる』と言って良いのではないでしょうか。</p>
+</div>
+<div class="paragraph">
+<p>もっとも、『正しい方法』『質の高い html/css 』などを求め始めると、格段に難度は上がりそうです。僕なら <a href="https://github.com/rust-lang/mdBook">mdbook</a> を見てみますが、極めるのは非常に大変そうですね。趣味で良かったです。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. 一方で、変な構文もけっこうあります
+</div>
+<div class="footnote" id="_footnotedef_2">
+<a href="#_footnoteref_2">2</a>. これが footnote です
+</div>
+<div class="footnote" id="_footnotedef_3">
+<a href="#_footnoteref_3">3</a>. 見た目がバグってますね
+</div>
+<div class="footnote" id="_footnotedef_4">
+<a href="#_footnoteref_4">4</a>. 下方向にノードが伸びていく <a href="https://plantuml.com/wbs-diagram">WBS diagram</a> というのもあるようです
+</div>
+<div class="footnote" id="_footnotedef_5">
+<a href="#_footnoteref_5">5</a>. <a href="https://matklad.github.io/2019/05/19/consider-using-asciidoctor-for-your-next-presentation.html">Consider Using Asciidoctor for Your Next Presentation - matklad</a>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

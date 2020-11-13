@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>ANF devlog #2: Object-oriented rendering API</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>ANF devlog #2: Object-oriented rendering API</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Sep 4, 2020</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>自前の 2D フレームワークが実用に近づいてきました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>前回、 FNA3D でイカちゃんを表示した所からの続きです。</p>
+</div>
+<div class="sect2">
+<h3 id="_rendering_pipeline_overview">1.1. Rendering pipeline overview</h3>
+<div class="paragraph">
+<p><a href="https://learnopengl.com/">learnopengl.com</a> の第一章を読み、知識が補填されました。 Texture sampling, mipmap, vertex/fragment shader, uniform などなど……。 OpenGL は古すぎる API のように言われていますが、他の API との共通部分も多いようなので、このサイトもタメになると思います。</p>
+</div>
+<div class="paragraph">
+<p>Graphics card (GPU が詰まったハード) 側の処理を図示してみました。これは <em>rendering pipeline</em> と呼ばれます:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/anf/pipeline.png" alt="pipeline" width="1180" height="182">
+</div>
+<div class="title">Figure 1. Rendering pipeline (I guess. <strong>may be incorrect</strong>)</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>GPU が効率的に使えるメモリがあり、 GPU が使用するデータ (頂点データや texture) はそこに入れます。 CPU 側は、 GPU 側メモリへのデータの <em>upload</em> (send/copy) 後は、 CPU 側のメモリを開放しても構いません。普通は開放します。</p>
+</li>
+<li>
+<p><em>Draw call</em> とは、 <code>glDraw**</code> みたいな <code>draw</code> 関数の呼び出し (drawing funtion call) です。これらの関数は、 graphics card 側へ頂点データを送り、 <em>rendering pipeline</em> を <em>kick</em> します (動かします) 。</p>
+</li>
+<li>
+<p>Rendering pipeline では 3D データを 2D 画面に投影します。 2D ゲームでは orthographics projection matrix を使うのが一般的で、深さ軸 (z 軸) を使わないと思います。 Depth/stencil buffer とかでは使うかもしれません。</p>
+</li>
+<li>
+<p>注意: この図には rasterizing/clipping などが抜けています。どこに入るんでしょう……。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>まだまだですが、意外と理解できそうです。 2D だから簡単というのもあります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_refactoring">1.2. Refactoring</h3>
+<div class="paragraph">
+<p><a href="https://github.com/floooh/sokol/blob/master/sokol_gfx.h">sokol_gfx</a> は分かりやすそうです。非常によくコメントされており、多数のデータを束ねる型もあります (<code>sg_bindings</code>, <code>sg_pipeline</code>) <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> 。一方、 FNA3D は不親切で、中々把握できません。</p>
+</div>
+<div class="paragraph">
+<p>そこで、 <strong>インクリメンタルな開発</strong> に振り切ることにしました。僕が知らない機能、僕が使わない機能は実装されませんし、 <a href="https://www.google.com/search?q=WIP">WIP</a> のコードもありません。『見れば分かる』コードになったと思います。</p>
+</div>
+<div class="paragraph">
+<p>以下のような切り捨てをしました:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>色々諦めて <strong>単ウィンドウ・シングルスレッドにする</strong> 。</p>
+</li>
+<li>
+<p>今後の拡張性を考えたコードは削除する。たとえば、 <em>mipmap</em> を使わないので <code>mipmap</code> フィールドを削除しました。</p>
+</li>
+<li>
+<p>あまり抽象化せず、具体的な型やフィールドを直接使う。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>意外と気持ちの割合が大きいですね。気持ちの上での『切り捨て』は、つまり優先度の設定と同じだと思います。分かっていることだけでコードを組んで、必要になったら新しい知識を仕入れるようにしました。</p>
+</div>
+<div class="paragraph">
+<p>コードの修正には <code>cargo +nightly doc</code> で生成される <strong>ドキュメントページを基準に</strong> しました。ドキュメントが分かりやすければ、コードも分かりやすいはずです。</p>
+</div>
+<div class="paragraph">
+<p>リファクタリングには時間が必要でしたが、他のどの 2D フレームワークよりも分かりやすくなったと思います。コードは 2,000 行弱。もちろん、機能不足のためですが……。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rendering_api">1.3. Rendering API</h3>
+<div class="paragraph">
+<p>画像の表示は以下のようにします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">use anf::gfx::{DrawContext, Texture2D};
+
+fn example_rendering(dcx: &amp;mut DrawContext, tex: Texture2D) {
+    let mut pass = dcx.pass(); // RenderPass
+    pass.texture(tex).dest_pos_px(100.0, 100.0);
+    pass.texture(tex).dest_pos_px(100.0, 400.0);
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>DrawContext</code>: <code>RenderPass</code> を発行できるオブジェクトです。</p>
+</li>
+<li>
+<p><code>RenderPass</code> <sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup>: ある状態セットに対して <code>SpritePushCommand</code> を発行できるオブジェクトです。たとえば、ある <code>RenderTarget</code> への書き込みは、 1 つの <code>RenderPass</code> を経由して行います (予定) 。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_repositories">2. Repositories</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>今後は人の Rust 製フレームワークを参考にしたいと思います。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://bevyengine.org/">Bevy Engine</a></p>
+<div class="paragraph">
+<p>今年 8 月に出たゲームエンジンです。 <a href="https://bevyengine.org/news/introducing-bevy/">Introducing Bevy</a> を見て、 <strong>この世で最も綺麗な API</strong> を持つゲームエンジンなんじゃないかと思いました。動的な機能を非常に上手く使っています。特にアセット管理 (<code>Assets</code>, <code>AssetLoader</code>) とグローバルオブジェクトの管理 (<code>Resource</code>, <code>Resources</code>, <code>Res&lt;T&gt;</code>, <code>ResMut&lt;T&gt;</code>) を参考にしようと思います。</p>
+</div>
+</li>
+<li>
+<p><a href="https://tetra.seventeencups.net/">tetra</a> (<a href="https://docs.rs/tetra/latest/tetra/">API</a>)</p>
+<div class="paragraph">
+<p>XNA に影響を受けたという 2D フレームワークです。 <code>time</code> モジュールのコメント量が多かったので、ゲームループを作るときに参考にします。 <a href="https://docs.rs/ggez/latest/ggez/">ggez</a> と同様に、 <code>Context</code> にグローバルな依存性を置いています。このパタンについては、今後の記事で触れようと思います。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/not-fl3/miniquad">miniquad</a> (<a href="https://docs.rs/miniquad/latest/miniquad/">API</a>)</p>
+<div class="paragraph">
+<p>Sokol に影響を受けたという 2D rendering library です。やはり FNA3D には無いような大きな単位の構造体が提供されているので、参考にするかもしれません。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/gfx-rs/wgpu-rs">wgpu-rs</a> (<a href="https://docs.rs/wgpu/latest/wgpu/">API</a>)</p>
+<div class="paragraph">
+<p><a href="https://wgpu.rs/">Web GPU</a> (wgpu) もやはり参考になりそうです。 <a href="https://docs.rs/wgpu/latest/wgpu/struct.RenderPass.html">RenderPass</a> や <code>*Descripter</code> を使った API は、 FNA3D は OpenGL とはかなり異なっているようです。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/not-fl3/macroquad">macroquad</a> (<a href="https://docs.rs/macroquad/latest/macroquad/">API</a>)</p>
+<div class="paragraph">
+<p><a href="https://github.com/raysan5/raylib">raylib</a> に影響されたという 2D rendering library です。すべてのアイテムをフラットに公開しているのが特徴的です。内部的には、なんと global state (static 変数) を活用しています。また、 <em>lifetime</em> など Rust 特有の機能を隠しています。僕がやらない方向性なので参考になります。所々で知性を感じるのもいい感じです。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/hecrj/coffee">coffee</a> (<a href="https://docs.rs/coffee/latest/coffee/">API</a>)</p>
+<div class="paragraph">
+<p>GUI が凄そうな 2D フレームワークです。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>docs.rs の読みさすさのおかげで、人の設計に簡単に触れることができます。やはり Rust は環境が素晴らしい！</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">3. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>DrwaContext</code> はオブジェクト指向の API で、他のフレームワークと比べても意外と良い出来になりそうです。</p>
+</div>
+<div class="paragraph">
+<p>目下の悩みは、 FNA3D の自動ビルド &amp; 出力への同封です。 <a href="https://github.com/alexcrichton/cmake-rs">cmake-rs</a> でささっと行けるかと思ったのですが、苦戦しています。</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. Sokol で分かりにくそうなのは、 <code>#ifdef</code> を使っている部分です。 <code>#ifdef</code> を読み飛ばすと、かなり分かりやすく見えました
+</div>
+<div class="footnote" id="_footnotedef_2">
+<a href="#_footnoteref_2">2</a>. この <em>render pass</em> が元の用語と正しく対応しているのかは分かりません。
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

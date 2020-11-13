@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>SSG #2: Rust + Asciidoctor</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>SSG #2: Rust + Asciidoctor</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Apr 17, 2020</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>ブログ生成を bash から Rust に移行しました。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/toyboot4e/devlog">repository</a> / <a href="https://github.com/toyboot4e/devlog/tree/master/ssg_rs">ssg_rs</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>html を木にパースしてから加工しています。 <a href="https://handlebarsjs.com/">Handlebars</a> の使い方を調べるか、 <code>.adoc</code> ファイルをテンプレート代わりに使う方向性の方が良かったかもしれません。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+追記: 今回作った ssg_rs が良くなかったため、マークアップ言語 + SSG の作成を <a href="/posts/9_booktune_1.html">始めました</a>。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_background">1. Background</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="/posts/3_blog.html">前回</a>、 bash を使ってブログを生成しました。十分に機能しましたが、機能追加には厳しいものがありました。したがって、今回はプログラミング言語を使い、柔軟性を高めました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_impl_ssg_rs">2. impl ssg_rs</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_environment">2.1. Environment</h3>
+<div class="paragraph">
+<p><a href="https://rvm.io/">rvm</a> を使って <a href="https://asciidoctor.org/">Asciidoctor</a> を再インストールすると、原稿の変換速度が <strong>3 倍以上</strong> に改善されました。Mac の Homebrew/rbenv 経由だと、間のスクリプトが遅かったのではないかと思います。 <code>rbenv</code> を使っている人は、 <a href="https://asciidoctor.org/docs/install-asciidoctor-macos/">検討</a> されてみてはいかがでしょうか。</p>
+</div>
+<div class="paragraph">
+<p>また、 Rust では <a href="https://github.com/rust-analyzer/rust-analyzer">rust-analyzer</a> が rls の代替となるようなので、移行しました。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_parsing">2.2. Parsing</h3>
+<div class="paragraph">
+<p>html を文字列ベースで (タグ名を <code>enum</code> にせずに) パースしてみました。また、 html の builder を作りました。しかし、結局必要だったのは templating engine に相当する機能だと分かりました。 <span class="line-through">つまり無駄でした</span> <strong>このブログ専用のジェネレータとなってしまいました</strong>。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_how_to_use">2.3. How to use</h3>
+<div class="paragraph">
+<p><code>ssg_rs</code> は、以下のようなファイル構成を前提とします:</p>
+</div>
+<div class="listingblock">
+<div class="title">Directory layout for ssg_rs</div>
+<div class="content">
+<pre class="highlight"><code class="language-sh" data-lang="sh">.
+├── img/
+├── posts/
+├── drafts/
+├── site/
+├── ssg/
+└── styles/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>ssg/</code> 以下に、 <a href="https://github.com/ron-rs/ron">Rusty Object Notation</a> で書いた設定ファイルを置きます:</p>
+</div>
+<div class="listingblock">
+<div class="title">ssg/setup.ron</div>
+<div class="content">
+<pre class="highlight"><code class="language-dart" data-lang="dart">Config(
+    layout: Layout(
+        markups: ["posts", "read"],
+        dest: "site",
+        img: "img",
+        styles: "styles",
+    ),
+    site: Site(
+        title: "Toy toy beam",
+        message: "toyboot4e のブログです。プライベートな気分で記事を書きます。",
+    )
+)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>struct</code> の上に <code>#derive[Deserialize]</code> と書くだけで、設定ファイルから <code>deserialize</code> できるようになります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rust">2.4. Rust!</h3>
+<div class="paragraph">
+<p>CLI 引数は <a href="https://github.com/clap-rs/clap">clap</a> (ver. 3) でパースしました。また、標準ライブラリがしっかりと活躍しました。 <strong>エラーが大量に出る</strong> のが Rust の特徴だと感じましたが、かえって <strong>インクリメンタルに</strong> 変更に強いコードへリファクタリングする必要が出て良かったです。</p>
+</div>
+<div class="paragraph">
+<p>エラーが出る度に、共通箇所をまとめました。その結果、高階関数が非常によく活躍しました。共通の引数が多い場合は、 <code>struct</code> にキャプチャすべき変数をまとめ、関数はメソッドになりました。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">3. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>bash (400 行弱) から Rust (2,000 行強) へ移行しました。この程度の複雑さには、コンスタントに対処できそうです。成果としては、オプションを指定することで、下書きファイル (<code>drafts/*</code>) も変換できるようになりました。</p>
+</div>
+<div class="paragraph">
+<p>今後は、 <strong>より多彩なサイト生成が可能な SSG</strong> を目指してみようと思います。設計的に面白そうですし、 <a href="https://asciidoctor.org/">Asciidoctor</a> に native 対応した SSG は少ないこともあり、若干のモチベーションがあります。差し当たり、 <a href="https://github.com/rust-lang/mdBook">mdbook</a> の代替として、 <code>adbook</code> を作ることを目標に考えています。</p>
+</div>
+<div class="paragraph">
+<p>&#8658; 追記: マークアップ言語と SSG の両方を自作する方向に舵を切りました。マークアップ言語にテンプレート言語を兼ねさせてみたいです。</p>
+</div>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

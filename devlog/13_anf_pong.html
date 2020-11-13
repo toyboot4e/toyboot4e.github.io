@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>ANF devlog #3: Pong</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>ANF devlog #3: Pong</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Sep 22, 2020</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>制作中フレームワーク ANF で Pong を作りました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_pong">1.1. Pong</h3>
+<div class="paragraph">
+<p>Pong とは、画面端のバー (paddle) でピンポン球を打ち合うゲームです。</p>
+</div>
+<div class="paragraph">
+<p>まずは paddle を表示しました:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/static/img/13_pong/paddles_1.png" alt="paddles 1"></span></p>
+</div>
+<div class="paragraph">
+<p>おっと、イカちゃんが paddle 役をやってくれるようです！　画面に調和を感じますね。</p>
+</div>
+<div class="sect3">
+<h4 id="_sub_textures_enabled">&gt;&gt;&gt; Sub textures enabled</h4>
+<div class="paragraph">
+<p><code>ika-chan.png</code> は 12 のイカちゃんが詰まった画像ファイルなので、左右の paddle は、元 texture の sub texture と言えます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_delta_time">Delta time</h4>
+<div class="paragraph">
+<p>左のパドルをプレイヤが動かせるようにしたいと思います。パドル位置は \(\mathbb{x} = \int \mathbb{v}(t) dt\) という積分値ですが、オイラー法によって 1 次式に近似できます:</p>
+</div>
+<div class="stemblock">
+<div class="content">
+\[\mathbb{x}(t+dt) \sim \mathbb{x}(t) + \mathbb{v}(t) * dt \\
+\mathbb{v}(t+dt) \sim \mathbb{v}(t) + \mathbb{a}(t) * dt\]
+</div>
+</div>
+<div class="paragraph">
+<p>ここで \(dt\) を与えるために、 FNA の <a href="https://github.com/FNA-XNA/FNA/blob/fda1ef9a2bd520c3424d294baf954d654b46a316/src/Game.cs#L422">ゲームループ</a> をパクりました。写経は学びと実装を両立できて効率良いですね。</p>
+</div>
+<div class="paragraph">
+<p>これで、イカちゃんを操作できるようになるはずです:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/static/img/13_pong/paddles_2.png" alt="paddles 2"></span></p>
+</div>
+<div class="paragraph">
+<p><strong>ンンン</strong>　画面外に行ってしまいました。画面端で止まるように修正します。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_bounce">Bounce</h4>
+<div class="paragraph">
+<p>画面端や paddle に当たったボールには反射してもらいます。</p>
+</div>
+<div class="videoblock">
+<div class="content">
+<video src="/static/img/anf/no_bounce.mp4" controls>
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p><em>おっと</em> 反射してくれません。イカちゃん (paddle) の下端に当たり判定が無かったようです。</p>
+</div>
+<div class="paragraph">
+<p>まあ修正します……</p>
+</div>
+<div class="videoblock">
+<div class="content">
+<video src="/static/img/anf/bounce.mp4" controls>
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>ヤッター！</strong></p>
+</div>
+<div class="paragraph">
+<p>もっと色々やりたかったんですが、詰まったので記事にしました。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_random">2. Random</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>あとは雑多に。</p>
+</div>
+<div class="sect2">
+<h3 id="_tips_on_rust">2.1. Tips on Rust</h3>
+<div class="sect3">
+<h4 id="_api_guideline">API guideline</h4>
+<div class="paragraph">
+<p><a href="https://sinkuu.github.io/api-guidelines/">Rust APIガイドライン</a> を読む。読みます。</p>
+</div>
+<div class="paragraph">
+<p>翻訳グループの仕事は素晴らしいですね。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_nightly_version_of_cargo_doc">Nightly version of <code>cargo doc</code></h4>
+<div class="paragraph">
+<p>Nightly 版のドキュメントでは、アイテムのリンクが楽です:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">//! `cargo +nightly doc` allows these link notations:
+//!
+//! [`X`] and [`A`](crate::a::A)
+
+struct X {}
+
+mod a {
+    struct A {}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><a href="https://crates.io/">crates.io</a> も、 <code>cargo doc</code> は nightly 版を使用しています。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_build_rs_build_script">2.2. <code>build.rs</code> (build script)</h3>
+<div class="paragraph">
+<p>ANF フレームワークのベースには、 <a href="https://github.com/toyboot4e/rust-fna3d">Rust-FNA3D</a> があります。これは、 C ライブラリ FNA3D のラッパーです。 Rust-FNA3D を crates.io に出す前に、以下を自動化したいです:</p>
+</div>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p><i class="fa fa-square-o"></i> FNA3D が無ければ pull</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> FNA3D の <code>CMakeList.txt</code> にパッチを適用</p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> FNA3D がビルドされていなければ、 <code>cmake</code> で自動ビルド</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> Windows でも動く <code>build.rs</code> にする</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_global_objects">2.3. Global objects</h3>
+<div class="paragraph">
+<p>グローバルなデータの扱い方には、 3 通りあると思います。</p>
+</div>
+<div class="sect3">
+<h4 id="_1_big_context_object">1. Big <code>Context</code> object</h4>
+<div class="paragraph">
+<p><a href="https://docs.rs/ggez/latest/ggez/">ggez</a> や <a href="https://docs.rs/tetra/latest/tetra">tetra</a> のやり方です。ウィンドウ、画像、音声などを <code>Context</code> 入れておきます。フレームワークの関数は <code>Context</code> オブジェクトを受け取って機能を発揮します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">ggez::graphics::draw(Context, DrawParams)</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>この方法では、 <code>Context</code> を引数として渡して回ることになります。すると、オブジェクト指向な API を作れないと思います。それはそれで、コンスタントな API となって良いかもしれません。</p>
+<div class="paragraph">
+<p>細部が分からないので、 ggez や tetra の上に作られたフレームワークを見てみたいです。</p>
+</div>
+</li>
+<li>
+<p><a href="https://docs.rs/macroquad/latest/macroquad/">macroquad</a> では、 <code>Context</code> オブジェクトはユーザから隠されており、グローバルオブジェクトとしてフレームワーク内で共有されています。</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_2_dynamic_map">2. Dynamic map</h4>
+<div class="paragraph">
+<p><span class="line-through"><a href="https://bevyengine.org/">Bevy</a> ESC の <code>Resource</code> がこれだと思います</span> うーん？ <code>HashMap&lt;Type, Box&lt;dyn Any&gt;&gt;</code> 相当のものを使います。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_3_subclass">3. Subclass</h4>
+<div class="paragraph">
+<p>XNA では、 <code>Game</code> クラスを継承することで、フレームワークを拡張できます。多態性無しでも継承は結構いいんじゃないかと思いました。</p>
+</div>
+<div class="paragraph">
+<p>ANF では継承をイメージして、 <code>Game</code> クラス相当のものをサンプルコードとして提供しようと思います。ユーザは、そのコードを書き換えることでフレームワークを拡張します。継承すべきコードをユーザ側のコードに入れてしまう形です。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">3. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>イカちゃんは <a href="http://park2.wakwak.com/~kuribo/">敦煌回廊</a> (うなうなぎ 様) からお借りしております。カワイイヤッター！</p>
+</div>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>
