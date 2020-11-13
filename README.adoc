@@ -2,5 +2,5 @@
 
 This is my devlog hosted https://toyboot4e.github.io/[here].
 
-It's generated with https://github.com/toyboot4e/adbook[adbook], an SSG powered by https://asciidoctor.org/[Asciidoctor]. Articles are written in AsciiDoc.
+Articles are written in AsciiDoc. Htmls are generated in `gh-pages` branch using https://github.com/toyboot4e/adbook[adbook]; it's an SSG powered by https://asciidoctor.org/[Asciidoctor].
 
