@@ -285,16 +285,16 @@ src/
 <div class="sect2">
 <h3 id="_the_rust_programming_language">3.1. The Rust programming language</h3>
 <div class="paragraph">
+<p>Rust は今回のインタープリタ作りには、最適な言語だったと思います。</p>
+</div>
+<div class="paragraph">
 <p>素人目線で Rust の話をします。</p>
 </div>
 <div class="paragraph">
 <p>始め Rust は『システム・プログラミング言語』として謳われました。 Mozilla も <em>oxide metal</em> という表現をしたようです <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> 。しかし現在は <em>empowerment</em> のための言語とされており、幅広い用途が考えられています。 おそらくコンセプトは一貫しており、高速なコードを、リッチな言語機能 <sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> に基づいて記述することができます。</p>
 </div>
 <div class="paragraph">
-<p>では Rust が最強なのかと言うと、まだ検討が続いているように思います。 Rust では、 <strong>同一変数の可変参照を 2 つ同時に作れない</strong> 、という強い制約があります (<em>borrow rules</em>)。この制約は良い設計を促すことが多いのですが、所有権が複雑な UI プログラミングなどは困難になります。したがって、 <strong>まだまだ研究が続く</strong> と思います。</p>
-</div>
-<div class="paragraph">
-<p>Rust は今回のインタープリタ作りには、最適な言語だったと思います。</p>
+<p>では Rust が最強なのかと言うと、まだ検討が続いているように思います。 Rust では、 <strong>可変参照は排他的である</strong> (可変参照されたオブジェクトに大して、同時に他の参照を作ることができない) という強い制約があります (<em>borrow rules</em>)。この制約は良い設計を促すことが多いのですが、所有権が複雑な UI プログラミングなどは困難になります。したがって、 <strong>まだまだ研究が続く</strong> と思います。</p>
 </div>
 <div class="paragraph">
 <p>追記: 僕は Rust は綺麗なコードが書ける言語だと思っていますが、関数型言語のユーザはよく『Rust は汚い』と言います。その感覚は、関数型言語を使ってみないと分からないのかもしれません。いつか試して比較したいです。</p>
@@ -372,6 +372,18 @@ src/
 </div>
 <div class="paragraph">
 <p>Scan (tokenize) のやり方は、『文脈』に依存することがあります。たとえば、 <code>&amp;&amp;T</code> は参照 2 つですが、 <code>p &amp;&amp; q</code> では <code>&amp;&amp;</code> を 1 つトークンとして認識します。しかし、 Lox にはこのような文脈依存の文法はありません (context-free) 。入門にいい感じです。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+文脈依存の場合でも、 tokenizer は context-free として扱うのが良さそうです。たとえば、 <code>&amp;</code> 2 つとして tokenize しておき、式の文脈では <code>&amp;&amp;</code> (and and) と見做します。
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">

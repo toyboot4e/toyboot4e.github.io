@@ -97,24 +97,23 @@
     <div id="content" class="article">
         
         <main>
-            <!-- Asciidoctor output --><div id="preamble">
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>入力、音声、フォントのライブラリを調達しました。</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_devlog">1. Devlog</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_aside">1.1. Aside</h3>
 <div class="paragraph">
 <p>欲しいものほど足りないもので、自分で作ってみようとするのですが、要求が次々と変化していくこともあり、常に役者不足を免れられません…… 笑</p>
 </div>
 <div class="paragraph">
 <p>今は『理想の 2D 用コードベース』が欲しいです。 Minecraft を作って神になる算段も忘れちゃいけません。</p>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_using_c_libraries_from_rust">1.1. Using C libraries from Rust</h3>
+<h3 id="_using_c_libraries_from_rust">1.2. Using C libraries from Rust</h3>
 <div class="paragraph">
 <p>C は Rust からでも普通に呼べます。ただ borrow rules はガン無視する方向へ心が傾きました。所有権を考慮して wrapper を作るよりも、所有権を無視してポインタをコピーします。</p>
 </div>
@@ -150,7 +149,7 @@ impl Drop for DeviceDrop { /* ~~ */}</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_crates">1.2. Crates</h3>
+<h3 id="_crates">1.3. Crates</h3>
 <div class="paragraph">
 <p>一通りのメディアを扱えるようにしました:</p>
 </div>
@@ -215,7 +214,7 @@ impl Drop for DeviceDrop { /* ~~ */}</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_map">1.3. Map</h3>
+<h3 id="_map">1.4. Map</h3>
 <div class="paragraph">
 <p>ANF フレームワークのサンプルゲームとして、ローグライクを作っています。ちなみに本命もローグライク (Elona ライク) です。</p>
 </div>
@@ -319,7 +318,7 @@ impl Drop for DeviceDrop { /* ~~ */}</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_visualization">1.4. Visualization</h3>
+<h3 id="_visualization">1.5. Visualization</h3>
 <div class="paragraph">
 <p>早速表示してみました:</p>
 </div>
