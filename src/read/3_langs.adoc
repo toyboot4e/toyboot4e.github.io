@@ -1,0 +1,95 @@
+= Books about programming languages
+:revdate: unpublished
+:idris: https://www.idris-lang.org/[Idris]
+
+特定のプログラミング言語に関する本をリストしました。未読の物が多いです。
+
+言語の入門書は、細かい言語仕様から語り始めるものが多い気がします。僕はモジュールの分け方を最初に知りたいので、参考になるリポジトリを探すところが出発点になりがちです。
+
+== Not read
+
+=== Type-Driven Development with Idris
+
+[cols="1,3"]
+|====
+| 書名     | https://www.manning.com/books/type-driven-development-with-idris[Type-Driven Development with Idris]
+
+| 著者     | Edwin Brady
+| 出版日   | March 2017
+| ページ数 | 480
+|====
+
+純粋関数型言語の実用性、型を第一に考える作法と、 {idris} 言語について書かれているようです。本気で役立つのではないかというワクワク感があります。
+
+=== Modern C
+
+[cols="1,3"]
+|====
+| 書名     | https://modernc.gforge.inria.fr/[Modern C]
+
+| 著者     | Jens Gustedt
+| 出版日   | November 2019
+| ページ数 | 408
+|====
+
+C は、どの言語からでも呼べるので重要だと思っています。一冊読んでみるべきだと思って、少しずつ読み進めています。
+
+=== すごいHaskellたのしく学ぼう!
+
+[cols="1,3"]
+|====
+| 書名     | https://www.amazon.co.jp/Miran-Lipova%C4%8Da/dp/4274068854/ref=tmm_pap_swatch_0?_encoding=UTF8&qid=&sr=[すごいHaskellたのしく学ぼう!]
+
+| 著者     | Miran Lipovača  (著), 田中 英行 (翻訳), 村主 崇行 (翻訳)
+| 出版日   | May 25, 2012
+| ページ数 | 420
+|====
+
+Haskell は、自分でモジュールを作れるようになるまでが長くて挫折中です。パッケージマネジャも決定版が無いみたいでつらい。
+
+=== Land of Lisp
+
+[cols="1,3"]
+|====
+| 書名     | https://www.amazon.co.jp/M-D-ConradBarski/dp/4873115876[Land of Lisp]
+
+| 著者     | M.D. ConradBarski, 川合 史朗 (翻訳)
+| 出版日   | February 23, 2013
+| ページ数 | 512
+|====
+
+面白くなくて、途中で読むのを止めてしまいました。
+
+言語サーバ無しの自作言語を作るとき、静的型を持った Lisp はアリかなと検討しています。
+
+== Finished reading
+
+=== The Rust Programming Language
+
+[cols="1,3"]
+|====
+| 書名     | https://www.amazon.co.jp/Steve-Klabnik/dp/1718500440/ref=tmm_pap_swatch_0?_encoding=UTF8&qid=1604043794&sr=1-4[The Rust Programming Language (Covers Rust 2018)]
+
+| 著者     | Steve Klabnik
+| 出版日   | August 12, 2019
+| ページ数 | 560
+|====
+
+{rust} の公式本です。ユーザの観点から書かれています。読むのに時間がかかる上に、この本だけでは実践的なコードは書けません。しかしよく書かれており、読後は何らかの教育を受けたと感じることができます。そういった感覚が好きなら、読み通すのも良いと思います。
+
+効率に関しては、日本語で書かれた Rust の本を読んだ方が速いかもしれません。また、 Rust 言語そのものを理解するには、別の積み重ねが必要そうです。たとえば、 https://arxiv.org/pdf/1903.00982[Oxide: The Essence of Rust] を読んでみるとか……。
+
+Rust について書かれた日本語のブログを探すと、凄い人たちばかりで、とても良かったです。今のこの人に僕は一生及ばないかも、と思わせられる専門性を感じました:
+
+* https://keens.github.io/[Lispエイリアンの狂想曲 | κeenのHappy Hacκing Blog]
+* https://mizunashi-mana.github.io/blog/index.html[続くといいな日記]
+* https://qnighy.hatenablog.com/[簡潔なQ]
+
+などなど……。まだまだ気づいていないブログもたくさんありそうです。
+
+== Else
+
+* https://ziglang.org/[Zig]
+* https://odin-lang.org/[Odin]
+* https://github.com/vlang/v/blob/master/doc/docs.md[V]
+

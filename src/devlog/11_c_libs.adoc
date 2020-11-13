@@ -1,0 +1,112 @@
+= Note #3: C libraries and modern C-like langs
+:revdate: Aug 2, 2020
+
+C ライブラリの分かりやすさが良さそうです。
+
+== Background
+
+Nez の作者が https://github.com/prime31/zig-upaya[Upaya] を公開しました。これは https://github.com/ziglang/zig[Zig] 言語から https://github.com/ocornut/imgui[Dear ImGUI] を使って GUI ツールを作るためのリポジトリです。画像は https://github.com/floooh/sokol[Sokol] で出しています。
+
+同作者は https://rxi.itch.io/tilekit[Tilekit] のクローン footnote:[Mac でも動くのが、 Tilekit との違いの 1 つです] を Upaya で制作したようです (未公開) 。 Electron と比べた場合のメリットは、 *開発環境のシンプルさ* と *アプリの動作速度* だと思います。ただ、 game-in editor が欲しいときはゲームの開発環境を使うと思うので、僕が直接真似するのは ImGUI を多用する姿勢だけになるかもしれません。
+
+NOTE: Upaya では、マルチウィンドウや組み込みターミナルができないと思います。日本語入力もできないかも……？　ただ、大きなツールがヘヴィ過ぎてオーバーキルとなる場面もあるので、そのときは Upaya が輝くと思います。
+
+== Why Zig + C libraries?
+
+Upaya は Nez の作者の集大成 footnote:[この方は C# が嫌になってきたらしく、半年で 3 つのプログラミング言語 (V, Odin, Zig) を使って 3 つの 2D フレームワークを作りました。僕も確実に影響を受けました。] に近いもので、 *理想の言語 + 理想のライブラリ* のような形になっています。この良さを感じるために、 C 言語の周辺を追っていきます。
+
+=== C libraries
+
+C ライブラリは使い勝手が良いです。 *少ない依存性* 、 *小さなバイナリ* 、 *動作環境の多さ* などのメリットがあります。この *分かりやすさ* は魅力的で、マイナ環境を追う人たちの共通目的ではないかと思います。
+
+C は *他のプログラミング言語からも利用できる* ことも注目点です。ゲームに向いた C ライブラリには、以下のようなものがあります:
+
+* https://github.com/FNA-XNA/FNA3D[FNA3D]
++
+画像ライブラリです。ウィンドウは https://www.sdl.com/[SDL] で出すことになると思います。
+
+* https://github.com/floooh/sokol[Sokol]
++
+画像ライブラリです。ウィンドウも出せます。 Header-only です。
+
+* https://github.com/nothings/stb[stb]
++
+Header-only のライブラリ集です。特に stbi (stb_image) の利用者が多そうです。
+
+* https://sol.gfxile.net/soloud/[SoLoud] (C++)
++
+音声ライブラリです。
+
+https://ourmachinery.com/[The Machinery] も面白そうなプロジェクトです。これは *3D ゲームエンジンを作るためのツールセット* で、基礎を用意するから *好きにやっちゃってください* ということのようです。特に面白そうなのが、 GUI ツールによる編集が C のソースと完全連動している点で、 *visual scripting とソース編集がシームレス* になっているようです。 *分かりやすい* 。コンセプトは https://github.com/baku89/glisp[GLisp] と似ているのかもしれません。たぶん https://ourmachinery.com/post/[ブログ] に詳しい話が載っています。難点としては、ソースは非公開のようです。また、 Mac 版はまだ無く、僕も試せていません。評判は非常に良いです。
+
+=== Better C than C
+
+Rust や D が巨大な pass:[C++-like] 言語だとすると、最近は C-like な言語にも人気があります。 Hacker news で https://news.ycombinator.com/item?id=22199942[見た] _better C than C_ という言葉が、このトレンドをよく表していると思います。
+
+以下は、僕から見た各言語の印象です。 Odin, V を軽く触っただけなので、不正確ですが:
+
+* https://github.com/odin-lang/Odin[Odin]
++
+名前にフォーカスした構文が特徴的です。たとえば、手続きは `my_procedure pass:[::] proc() { .. }`, 構造体は `My_Data pass:[::] struct { .. }` のように書きます。 https://github.com/BSVino/JaiPrimer/blob/master/JaiPrimer.md[Jai] 言語からインスパイアされたような豊かな機能が揃っている一方、継承やインタフェイスがありません。シンプルかつ低レベルな言語のようで、使用には *C に近い言語観* が要求されそうです。もちろんバイナリを吐きます (LLVM) 。
+
+* https://vlang.io/[V]
++
+C の単ファイルに変換 (トランスパイル) される言語です。見た目は Go に近いかも。サイトに過剰な表現が入っているようで、外から見ただけでは理想と現実がどうなっているのか分かりませんが、安定した日には期待できると思います。
+
+* https://github.com/ziglang/zig[Zig]
++
+*C との親和性が非常に高い* ようです。 C ライブラリを使うには理想的な言語かもしれません。アロケータをユーザが自由に用意する (メモリ戦略を完全にユーザが決める) など、プログラマの野生が光るような印象です。しかも『 borrow checker 無しで Rust 並の安全性を保証する』という話もあって、 `comptime` が面白そうです。
++
+構文には引っかかりを覚えます。まだまだ開発中で、 Linux 以外では動かない印象です。
+
+ Odin は version 1.0 が近いようです。他はまだまだ未完の言語です。
+
+=== Rust vs Zig
+
+Modern C-like な言語と比べると、 Rust には以下のような傾向があるようです:
+
+* アロケータが不自由
++
+Odin, Zig ではユーザがアロケータを設定できます。すると、メモリ戦略をユーザが自由かつ明示的に選べるようになります。 Rust を使っていると、その辺りはコンパイラにお任せとなります。
+
+* 依存性が複雑
++
+ライブラリ同士が複雑に依存しており、 1 つのライブラリを `Cargo.toml` に入れると無数のライブラリが付いてきます。 C の header-only library と比べたら複雑な慣習で、しかも逃れられません。
+
+* Borrow checker がある
++
+Borrow checker を『かい潜る』ために C 言語におけるシンプルさが失われるような感覚、分かる気もします。
+
+* 抽象レイヤを作りがち
++
+C 言語を使うと、具体的なコードをたくさん書くことになります。一方で、 Rust では書きやすいコードを書くためのツール (レイヤ) を作ってから、それを使うことになります。
+
+色々書きましたが、僕は C をあまり使ったことがないので分かりません。
+
+== Wrapping up
+
+C ライブラリの良さを確認しました。 Zig は C との親和性が非常に高く、 Zig + C ライブラリの組み合わせは理想的らしいです。
+
+現在の言語観としては、
+
+* C#
++
+依存性は class のフィールドへ入れる。データは親への参照を持ちがち
+
+* Rust
++
+依存性は引数で渡す。データはほぼ完全にツリー状
+
+* C
++
+？
+
+* Haskell
++
+？
+
+* Lisp
++
+？
+
+少しずつ理想のプログラミングへ近づけそうです。

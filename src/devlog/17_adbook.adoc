@@ -1,0 +1,99 @@
+= SSG #3: adbook
+:revdate: Oct 30, 2020
+
+:adbook: https://github.com/toyboot4e/adbook[adbook]
+:mdbook: https://github.com/rust-lang/mdBook[mdBook]
+:anyhow: https://docs.rs/anyhow/latest/anyhow/[anyhow]
+:thiserror:  https://docs.rs/thiserror/latest/thiserror/[thiserror]
+:clap: https://github.com/clap-rs/clap[Clap]
+:structopt: https://github.com/TeXitoi/structopt[StructOpt]
+:handlebars: https://handlebarsjs.com/[Handlebars]
+
+三代目 SSG は、 mdBook を目指して adbook と名付けました。
+
+https://toyboot4e.github.io/adbook/index.html[Demo]. このブログもデモみたいなものですね。
+
+Rust のソースは 2,000 行程度です。 html の生成は Handlebars に頼っています。
+
+== Backstory
+
+AsciiDoc の表現力は魅力的です。原稿は AsciiDoc で書きたいものの、生の AsciiDoc は本や単ページの生成に特化しており、ページ同士のリンクなどには向いていません。したがって `asciidoctor` の出力を利用した SSG が必要です。
+
+AsciiDoc を使った SSG は、 https://gist.github.com/briandominick/e5754cc8438dd9503d936ef65fffbb2d[非公式リンク集] に載っています。大半の SSG には、 front matter を YAML で書くことが求められます。しかし、 AsciiDoc には _document attribute_ を設定する構文 (`:attr: value`) があるので、それを読んでくれた方が嬉しいです。したがって、 SSG を自作しています。
+
+NOTE: ちなみに https://antora.org/[Antora] という SSG は、 AsciiDoc に特化していて良さそうなのですが、使い方が難しそうなので試していません。
+
+== Development
+
+=== File structure
+
+{mdbook} は、主に `src` ディレクトリの中身を `book` ディレクトリに丸写しします。 Hugo の https://gohugo.io/getting-started/directory-structure/[ファイル構成] とは大違いですね。
+
+{adbook} も同じようにしますが、出力に含めるファイルは明示的に設定します:
+
+* `book.ron` は Rust の Cargo.toml に相当し、基本的な設定を行います。コピーするファイル (`asciidoctor` で変換しないファイル) はここで指定します。
+* `toc.ron` は Rust の `mod.rs` に相当し、そのディレクトリ内のアイテムをリストします。
+
+`src` にあって出力に無いファイルとしては、他ファイルから `include` される AsciiDoc ファイル、 Handlebars テンプレートファイルなどを想定しています。
+
+=== Rust
+
+==== Command line interface
+
+CLI には {clap} ver.3 ({structopt} のマージ) を使っています。 {structopt} の方がドキュメントが良いので、そちらを参照することになりますが、 `clap` の方が名前が短い点は好みです。 `#[derive(Clap)]` で CLI を作ります。
+
+エラーハンドリングには `anyhow::Result` を使いました。 {anyhow} のエラーを early return するためには、 `ensure!` や `bail!` マクロを使います。 {thiserror} でエラー型を定義することもありましたが、エラー出力を綺麗にするのが主な目的だったので、 `anyhow!` で文字列をエラーとしてラッピングして返した場面が多いです。
+
+==== Embedded files
+
+Rust では `include_bytes!` を使い、ファイルをバイナリとして埋め込みできます。ディレクトリを埋め込むことはできないので、 https://github.com/toyboot4e/adbook/blob/master/src/book/init.rs[手書き] して対応しました。自動化したいです。
+
+https://github.com/Michael-F-Bryan/include_dir[include_dir] は理想的ではなかったです。自分でマクロを書けるようになる必要性を感じています。まずは `include_dir` のソースを読むかもしれません。
+
+==== Parallel conversion
+
+それぞれのファイルの変換は独立しているので、並列的に実行できます。
+
+スレッドを使うべきシーンの気がしましたが、今回は `async` を使ってみました。 `async` で作った `Future` を https://docs.rs/async-std/latest/async_std/[async_std] で並列的に走らせます:
+
+[source,rust]
+----
+async_std::task::spawn(async move { v.visit_file(&file) })
+----
+
+スレッド毎に複数の `Future` の実行を割り当てるなど、うまいことやってくれたのではないでしょうか。もしかしたら `thread::spawn` と何も変わらない可能性もありますけれど……。並列・並行処理も身に付けたいです。
+
+=== Handlebars
+
+{handlebars} は html の『テンプレート言語』で、流し込まれたデータを元に html を生成できます:
+
+.Example
+[source,handlebars]
+----
+{{~ #if a_title ~}}
+<h1>{{a_title}}</h1>
+{{else}}
+<h1>Untitled</h1>
+{{~ /if ~}}
+----
+
+分岐やループを使えます。再帰をするには、 partial ファイルからそれ自身を読み込みます。
+
+Rust の https://docs.rs/handlebars/latest/handlebars/[handlebars] を見ると分かるのですが、使うのは簡単でした。最も高いハードルだと思っていたので良かったです。
+
+`.hbs` ファイルに提供されるデータは、ソースに https://docs.rs/adbook/0.1.3/adbook/build/convert/hbs/struct.HbsData.html[ハードコーディング] しています。特殊な html を作るときには、ソースを書き換えなければなりません。
+
+=== CSS
+
+実はこれが一番大変でした。 https://toyboot4e.github.io/adbook/index.html[デモサイト] にサイドバーとそのトグルボタンを付けたのですが、大変だった上に、安っぽい見た目になってしまいました。こういう作業をやりたくない人には、 {adbook} の需要がありえるのかなと思います。
+
+でも、ユーザは僕しかいないかな。
+
+== Wrapping up
+
+{handlebars} を使った html の生成ができました。 `async_std` のおかげか変換が速いのが良かったと思います。ローグライク本などを作るときに使いたいと思います。
+
+欠けた機能は、サイドバーにおける現ページのハイライトと、印刷用ページの生成です。特に後者は大変そうなので、もしかしたら実装しないかもしれません。
+
+拡張性は無くて、 Rust 側のコードで集めたデータしか、テンプレートファイルでは使用できません。拡張性を確保するには、テーマ毎にスクリプトを用意できるようにする必要があると思います。
+

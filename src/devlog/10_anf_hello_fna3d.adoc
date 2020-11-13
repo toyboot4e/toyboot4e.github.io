@@ -1,0 +1,109 @@
+= ANF devlog #1: Sprite rendering!
+:revdate: Jul 24, 2020
+
+Rust から FNA3D を使います。
+
+== Background
+
+僕はゲーム制作に {nez} を使っていました。 {nez} はオープンソースの 2D フレームワーク (C#) で、 *ソースを読めば中身は何でも分かります* 。
+
+{nez} からの学びは多く、使っていて快適でしたが、むしろ {nez} そのものを作りたくなってしまいました。そこで、好みの Rust 言語でフレームワークを作り始めました。最終目標は 2D ローグライクゲームを作る事です。
+
+== Draw sprites
+
+=== FNA
+
+{nez} は {fna} フレームワークを使っています footnote:[実際には MonoGame も使用できますが、 FNA が推奨されています。] 。 {fna} は {xna} の再実装で、 https://terraria.org/[Terraria] や https://store.steampowered.com/app/115800/Owlboy/[Owlboy] などのゲームにも使用されています。
+
+今年 {fna} のグラフィクス部分が https://www.gamingonlinux.com/articles/fna-2005-xna4-reimplementation-is-out-with-a-brand-new-3d-graphics-library-fna3d.16560[C で書き直されて]、 {fna3d} というライブラリになりました。 C は ABI (application binary interface) が安定しているため、他のどの言語からも使用できます。
+
+『C ライブラリに依存する』のは、『すべてを Rust で書く』のと比べてクールではないかもしれません。しかし、様々な言語から FNA3D が使用されている状況は面白いと思い、僕もその一員になりたいと思いました。
+
+NOTE: {fna3d} は、 9 月 1 日から {fna} の master ブランチで使用される予定です。 7 月 24 日の現在、 API がほぼ安定しているので、使い始めて良いと思います。
+
+==== Rust-FNA3D
+
+{fna3d} を Rust でラッピングしました ({rust-fna3d}):
+
+* [x] C ライブラリを sub module として追加
+** [ ] 自動 pull
+* [ ] C ライブラリのビルドの自動化
+* [x] C ライブラリへの FFI bindings の生成 (https://github.com/rust-lang/rust-bindgen[bindgen])
+* [x] 生成された bindings のラッピング
+
+結構な作業量でした。 Rust-FNA3D を使ったコードは、ユーザから見えない所に隠れるので、ラッピングせずに、 `bindgen` の出力を直接使っても良かったかもしれません。
+
+Rust から FNA3D を使ったのは、僕が初めてだと思います。
+
+=== Sprites = textured quadliterals
+
+それでは絵を出していきます！
+
+==== Quadliteral = two triangles
+
+FNA3D の描画機能は _primitive_ 単位でした。 Primitive は普通は三角形で、 3 つの _vertex_ (頂点) で指定されます。頂点は、頂点バッファ (頂点配列) への _index_ で指定されます。
+
+四角形は 2 つの三角形であると捉えて、 4 つの頂点と 6 つの index で指定します。
+
+NOTE: 一般の四辺形を _quadliteral_ (quad) と呼ぶようです。四辺形／四角形はよく描くので、 `draw_primitives` とは別に `draw_quads` を用意したライブラリもあるかもしれません。
+
+==== Sprite batch
+
+ゲームは毎フレーム https://gameprogrammingpatterns.com/double-buffer.html[2 つ (以上) の画面] を切り替えて表示されます。次のフレームに表示する画面のデータを _back buffer_ (back frame buffer) と呼びます。
+
+画像を画面に表示するには、 back buffer への書き込みが必要です。 Back buffer (もしくは任意の _render target_)  への画像データの書き込みは、 GPU 側に依頼します。この依頼コマンドを *draw call* と呼びます。具体的には、 `FNA3D_DrawIndexedPrimitive` の呼び出しが draw call に相当します。
+
+GPU はピクセルの計算に強く、 CPU よりも遥かに速く画像処理ができます。しかし、 GPU にデータを送るのは時間がかかります。そこで、同種の (かつ連続した footnote:[連続していない draw call とは、たとえば『猫』『犬』『猫』の順で描く場合は、 2 つの猫の draw call は、同種ですが連続していません]) draw call に関しては、複数データを一括して GPU へ送ることで、効率を良くします (drawcall batching)。
+
+NOTE: 大まかに、同じ画像 (の一部) をどこかへ書き込む命令は、 1 つの draw call に束ねる (batching) 事ができます。
+
+と、断定して書きましたが、 *不正確な情報だと思います* 。ともかく、画像を描く前に頂点データを蓄え、 draw 関数の呼び出し回数を減らします。
+
+==== Z sorting
+
+いわゆる `SpriteRenderer` のソートについて、一応先に考えておきます。
+
+実はこれ、 {nez} では `renderables.Sort()` という 1 行で済んでいました。内部的にはクイックソートです。最善の方法では無いと思いますが、ソートはさほど問題にならないと考えて良さそうです。
+
+==== Initialization & rendering pipeline
+
+FNA3D は、特定の関数を特定のサイクルで呼ぶことを要求します。何もしないことを設定するようなコードも書く必要があって、奇妙に思えたものですが、ひとまず人のコードを真似して動かしました footnote:[Rendering pipeline がうまく動いていない場合も特にエラーが出なかったのがキツかったです。また、 FNA3D にはドキュメントが無いのも大変でした。] 。
+
+== Wrapping up
+
+*ヤッター！*
+
+image::anf/he.png[]
+
+NOTE: 大王イカ？　の画像は http://park2.wakwak.com/~kuribo/[敦煌回廊] さんより
+
+片側の primitive のみ表示すると、確かに三角形になっています:
+
+image::anf/half_of_him.png[]
+
+フレームワークの名前は ANF としました。 FNA を逆さに読んでおり、発音は An F (アネフ) とします。今後は `Texture` に lifetime を課したり、 `cargo add anf` ですぐ使えるようにしたいと思います。
+
+// * https://github.com/toyboot4e/anf[toyboot4e/anf]
+
+:sectnums!:
+== Notes
+
+=== Why triangles?
+
+三角形を primitive として使うことには、法線が一意的になる、などの妥当な理由があるようです。また、グラフィクスの低レイヤ API (DirectX, OpenGL, Metal, Vulka..) が三角形の使用を前提としています。
+
+3D では、三角形が作ったポリゴン (mesh?) に 2D 画像を貼り付けたします。 2D でも三角形を使うメリット・デメリットなどは気になります。
+
+=== Repositories using FNA3D
+
+魅惑の repository たちがここに！
+
+* https://gist.github.com/jessechounard/d4252efc12ee24494484611d92b1debe[Simple texture rendering in FNA3D] \(C)
+* https://github.com/silenttowergames/stonetower[Stonetower] \(C)
+* https://github.com/KillaMaaki/BNA[BNA] (https://www.beeflang.org/[Beef])
+* https://github.com/prime31/Odin-Libs[Odin-Libs] (https://odin-lang.org/[Odin])
+* https://github.com/prime31/via[Via] (https://vlang.io/[V])
+
+Odin 言語は、かなり低レベル寄りで面白そうだと思いました。 V は C の薄いラッパーのような言語らしいです。 Beef は C# みたいな見た目の C++ みたいな言語だと思います。
+
+FNA3D のユーザから Rust ユーザが出なかったのは、他の言語に関心があったからかと思います。僕は Rust が一番慣れた言語だったので、なぜ Rust を使わないのか疑問に思ったものですが、 C ライブラリを使うには他言語よりも *遥かに* 労力が必要だと感じたので、少しずつ Rust を使わない人の視点も補われていくのを感じています。

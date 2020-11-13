@@ -1,0 +1,124 @@
+= booktune #1: outline parser
+:revdate: Jun 9, 2020
+
+ブログ用マークアップ言語 booktune を作成中です。現在、 900 行で階層構造を扱えるようになりました。
+
+* https://github.com/toyboot4e/booktune[booktune]
+
+== Background
+
+https://asciidoctor.org/[AsciiDoc] でブログを書いています。機能的には満足しており、脚注や _https://asciidoctor.org/docs/user-manual/#callouts[callout]_ なども気軽に書ける、十二分な言語と言えます。しかし、 *拡張* は Ruby で書く必要があり、手ごろな SSG もありません。 *ツールセットとしては扱いづらい* と思います。
+
+したがって、 100% の自由を得るには、 *マークアップ言語* と *SSG* の両方を自作する必要があると考えました。それぞれ、 _booktune_ と _tunedbook_ という名前を考えています。
+
+=== booktune
+
+booktune は、 AsciiDoc に酷似したマークアップ言語 (となる予定) です。
+
+今回は、パーサの骨組みを作成しました。たとえば、以下のような入力を与えます:
+
+.input.tune
+[source,asciidoc]
+----
+= Simple booktune example
+
+== Header (level 2)
+
+This is a first paragraph. _Italic_
+
+--[ rust
+fn main() {
+    println!("Hello, world!");
+}
+--]
+----
+
+次のように出力されます:
+
+.output.html
+[source,html]
+----
+<h1>Simple booktune example</h1>
+<h2>Header (level 2)</h2>
+<p>This is a first paragraph. _Italic_</p>
+<div>
+fn main() {<br>    println!("Hello, world!");<br>}
+</div>
+----
+
+ドキュメントの概形をパースしてくれました。段落内部の書体指定 (_format_) や、コードブロックなどは未実装です。
+
+== An outline parser
+
+booktune は、 `.tune` ファイルを読んで html を出力します。データを _要素_ 単位で読み出して、別のものに加工する、という意味では、 deserializer に似ています。そのため、 https://serde.rs/[serde] footnote:[serde: SerDe; serialize/deserialize] の設計を真似ることになりました。
+
+=== Push & pull
+
+パーサには、 push 型と pull 型があるようです。僕のイメージでは、
+
+* pull 型のパーサ = 要素のイテレータ
++
+出力側が、 1 つずつ要素を _引っ張り出す_ (`next` を呼ぶ) 形です。
+
+* push 型のパーサ = visitor の _driver_
++
+入力側が、 1 つずつ要素を _押し出す_ (`visit_xxx` を呼ぶ) 形です。
+
+一方、 serde の Deserializer は、 push 型と pull のハイブリッドのように見えます。
+
+==== Visitor & access
+
+serde の deserialize では、まず `visit_xxx` といったメソッドが呼ばれます。これは push 型のパーサと言えます。しかし、たとえば配列が見つかった場合、 https://docs.serde.rs/serde/de/trait.SeqAccess.html[SeqAccess] が visitor に渡されます。その後、 Visitor 側から `SeqAccess.next_element` を使って配列要素をパースし、この間は pull 型のパースと言えそうです。
+
+*出力側に入力側への _access_ を渡す* のは、上手いパタンだと思います。状態管理が簡単になるからです。 booktune の場合、たとえば、ブロック (コードやテーブル) の内側では、段落などとは別のメソッドでパースする必要があります。また、ブロックはネストする可能性があり、 *状態管理が必要* です。それらは `BlockAccess` を経由して適切に扱われると信頼できます。
+
+==== No generic element
+
+次のようなイメージでパース (visitor を drive) します:
+
+[source,rust]
+----
+fn one_step_driving(stream: &mut impl Stream, visitor: &mut impl StreamVisitor) {
+    // block
+    if let Some(start) = stream.apply(block_rule) {
+        visitor.visit_block(&start);
+        return true;
+    }
+
+    // list
+    if let Some(initial) = stream.apply(list_rule) {
+        visitor.visit_list(&initial);
+        return true;
+    }
+
+    // ~~
+
+    false
+}
+----
+
+ネストしたデータも、 access 経由で処理されます。したがって、 *データ種別毎のパースが独立* しています。このとき、『任意の要素』を表す `enum` はありません。
+
+後からデータを足すのは容易に見えます; 対応するパーサ (`if let..`) を書き足して、 visitor を `StreamVisitor: VisitorA + VisitorB+ ..` にします footnote:[この辺はマクロで自動化できそうな気がします] 。
+
+NOTE: `enum` を使った場合よりも、拡張が楽だと思います。
+
+もしも木構造などを作りたければ、 visitor 側でやってもらいます。そのときは、 html 要素のツリーのような、 *パース時とは違った文脈で node を作る* と思います。やはり、任意の parse 要素をアップキャストするような `enum` は要らないと考えました。
+
+=== One-pass html renderer
+
+現状、木構造は作らずに、 visitor から直接 html を書き出しています。まだアウトラインしか扱わないこともあり、 100 行程度のシンプルな renderer となりました。キモは parser の方です。
+
+One-pass では実装できない機能ももちろんあります。たとえば、目次の挿入です。木構造無しでやってみようと思うので、 one-pass の中で目次データを収集しておいて、後から handlebars のテンプレート機能で挿入、などを考えています。
+
+=== Details
+
+* 行単位でパースしています
+* 段落は単語単位でパースする予定です
+* ブロックはプラグインが処理する形にします。また、テーブルも一種のブロックとして扱います
+
+== Wrapping up
+
+serde を真似ることで、 outline パーサを綺麗に書くことができました。特に access が活躍しましたし、他の場所でも応用が利くと思います。
+
+ブログや執筆用ツールチェインの作成、出だしは好調です。

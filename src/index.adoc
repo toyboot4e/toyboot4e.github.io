@@ -1,0 +1,11 @@
+= Toy toy beam
+
+== Welcome!
+
+これは toyboot4e のブログです。 link:https://github.com/toyboot4e[GitHub アカウント]
+
+This is a blog of toyboot4e. link:https://github.com/toyboot4e[GitHub account]
+
+.Neofetch
+image::intro/neofetch.png[width=518]
+

@@ -1,0 +1,732 @@
+= RL #2: Field of view (recursive scanning)
+:revdate: Jan 26, 2020
+
+// TODO: scannig を分かりやすく
+
+== Introduction
+
+ゲーム用にセル単位の視野 (FoV; field of view) を実装しました。
+
+.Field of view
+image::fov/render_final.png[]
+
+画面に見応えが生まれて良かったです。
+
+本記事では、 FoV の計算、可視化、アニメーションを扱います。また、 C# でコードを書いて実装します。ついでに FoW (fog of war) も実装しました。
+
+WARNING: *無駄な文章が多い* 記事となっていました。修正したいです……
+
+== How to calculate FoV
+
+ある点から、円形の視野を計算する方法を考えます。
+
+=== Circle = octants
+
+円形視野の計算を、 45 度分の計算 8 回に分けます。このとき、 45 度分の円の部分を、 `Octant` と呼びます。
+
+`Octant` ごとに列座標系を取ると、座標成分は `(column, row)` と表すことができます。たとえば、 `(column, row) = (1, 3)` は、 1 番目の縦列と 3 番目の横列の交点です。
+
+NOTE: 値としての `column` (縦列) は、『縦列番号』とも考えられます。 `row` は横列番号です。
+
+基底ベクトルを用いて、
+
+[stem]
+++++
+(x, y) = column \times columnUnitVec + row \times rowUnitVec
+++++
+
+したがって、 `Octant` に対して視野計算ができるなら、基底ベクトルを差し替えていくことで、円全体の視野を得ることができます。
+
+.Octants and their names footnote:[図は https://www.draw.io/[draw.io] で作成しました]
+image::fov/octants.png[width=80%]
+
+図では、 y 軸を下向きに取っています。
+
+=== Scanning rows
+
+`Octant.B` の場合で、視野の計算を考えてみます。まず、傾き (`slope`) を stem:[slope := column / row] と定義します。すると、 1 つの `Octant` は、 stem:[0 \leq slope \leq 1] の範囲に収まります。
+
+.Field of view in Octant.B
+image::fov/init.png[width=80%]
+
+壁の影響も、傾きの観点から可視化してみます。
+
+.Slopes and visibilities (pixel-based)
+image::fov/slopes_pixel.png[width=100%]
+
+上図では、ピクセル単位で視野範囲を可視化しました。しかし、必要なのはセル単位の視野です。そこで、可視範囲が *セルの中心* を含むとき、そのセルを見ることができるとします。
+
+.Slopes and visibilities (cell-based)
+image::fov/slopes_cell.png[width=100%]
+
+さらに考えを進めます。視野の計算は、 `row` の走査に分けることができます:
+
+.Scanning an octant
+image::fov/scan.png[width=100%]
+
+縦向きの矢印は、走査 (スキャン) を表しています。スキャンは、傾きの範囲内のセルに対して行われ、スキャンされたセルは視野内にあるとします。
+
+スキャン中に壁を見つけると、傾きの範囲を更新したり、スキャンが 2 つに分かれます footnote:[http://www.roguebasin.com/index.php?title=FOV_using_recursive_shadowcasting[FOV using recursive shadowcasting - Rogue Basin]]。図では、茶色の矢印が黄色の矢印に分かれました。
+
+NOTE: 上図のスキャンの分割は、茶色矢印の傾き範囲の修正 と、黄色矢印の生成 (`splitScan`) に分けて考えることができます。
+
+=== Scanning an octant
+
+具体例として、次の走査を考えます。右端の走査に注目します:
+
+.Scanning a row
+image::fov/scan_example.png[width=100%]
+
+*スキャンしたセル* に対応するアクションは 3 通りで、 *直前のセル* が何であったかが影響します。また、 `column = 0` のセルに対しては、特別なアクションは取りません。
+
+これらは、状態遷移表によって表現できます footnote:[http://www.roguebasin.com/index.php?title=Improved_Shadowcasting_in_Java[Improved Shadowcasting in Java - Rogue Basin]] :
+
+.Actions on scanning a cell
+[cols="1,1,1"]
+|====
+| state          | opaque cell | transparent cell
+
+| Initial        |             |
+| WasTransparent | splitScan   |
+| WasOpaque      |             | updateStartSlope
+|====
+
+状態遷移図としては、次のようになります。
+
+.Scanning state transition
+[ditaa, "ditaa/fov_states"]
+// [source,text]
+....
+                   /-----------------\
+              +--> | was_transparent |
+              |    \-----------------/
+/---------\   |    split|  ^ update
+| initial | --+    scan |  | startSlope
+\---------/   |         v  |
+              |    /------------\
+              +--> | was_opaque |
+                   \------------/
+
+
+....
+
+=== Edge cases (□ model vs ◇ model)
+
+これまでは、壁の形を□形として扱ってきました。ここで、角における視野を考えます。□形に基づくと、視野は直線になります:
+
+.FoV (□ block model0
+[source]
+----
++@#...    @ player              +@++++
++#+...    # opaque cell         +#++++
+...+..    . transparent cell    ...+++
+....+.    + visible cell        ....++
+.....+                          .....+
+----
+
+しかし、もしもこれが『自然ではない』と考えるなら、壁の形を 45 度回転させ、トランプのダイヤマークのような判定◇を使用します。すると、より permissive (寛容) な視野が得られます:
+
+.FoV (◇ block model)
+[source]
+----
++@#...    @ player              +@++++
++#++..    # opaque cell         +#++++
+..++++    . transparent cell    ..++++
+...+++    + visible cell        ...+++
+....++                          ....++
+----
+
+NOTE: 検討項目は、視野の対称性です。モンスターの視野が主人公の視野よりも狭い場合は、少しゲームが簡単になります。なるべく『フェア』な式を使いたいところですが、多少のエラーはゲームプレイに影響しないので、見栄えさえ良くできればと思います。
+
+=== One more fix
+
+セルの中心を可視判定に用いました。しかし、 **中心は隠れているけれど、その角 (かど) が視野角に影響するはずの壁** が出てきます。それらの当たり判定を考慮して、走査範囲を更新する必要があります。
+
+== Implementing FoV
+
+概要を掴みました。実装します (C#) 。
+
+この先は無駄に長いので、ここまでで終了しても十分です。
+
+NOTE: 改めて Rust でも https://gist.github.com/toyboot4e/fe62130e19147bfee817b39ad81af226[実装しました]  (2020/10/02) 。以下のコードは、 *細かい部分が間違っている* ことが分かったので、話半分で読んでください……。
+
+=== Definitions
+
+まずはデータを定義します。 `Octant` と、便利そうなので `Vec2i` も作ってみました:
+
+.Fov.cs
+[source,csharp]
+----
+using System; // Math
+using System.Linq;
+
+namespace MyRoguelikeGame.Utils.Fov {
+
+public enum Octant {
+    // clockwise
+    A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6 , H = 7,
+}
+
+public struct Vec2i {
+    public int x;
+    public int y;
+    public int len => (int) Math.Sqrt(x * x + y * y);
+
+    public Vec2i(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public static Vec2i operator *(Vec2i v, int c) => new Vec2i(v.x * c, v.y * c);
+    public static Vec2i operator +(Vec v1, Vec v2) => new Vec2i(v1.x + v2.x, v1.y + v2.y);
+    public static Vec2i operator -(Vec2i v1, Vec2i v2) => new Vec2i(v1.x - v2.x, v1.y - v2.y);
+
+    public override string ToString() => $"({x}, {y})";
+}
+// ~ // <1>
+----
+<1> この記事では、 `// ~` でコードの省略を表します。
+
+==== Unit vectors
+
+`Octant` 毎に基底ベクトルを定義します。値は、先に <<How to calculate FoV,図で表した>> 通りです。
+
+[source,csharp]
+----
+public static class OctantExt {
+    // (rowUnitVec, colUnitVec)
+    public static(Vec2i, Vec2i) toUnitVecs(this Octant self) {
+        return unitVecs[(int) self];
+    }
+
+    // [(rowUnitVec, colUnitVec)]
+    static(Vec2i, Vec2i) [] unitVecs = new [] {
+            ((0, -1), (1, 0)),
+            ((1, 0), (0, -1)),
+            ((1, 0), (0, 1)),
+            ((0, 1), (1, 0)),
+            ((0, 1), (-1, 0)),
+            ((-1, 0), (0, 1)),
+            ((-1, 0), (0, -1)),
+            ((0, -1), (-1, 0)),
+        }
+        .Select(vs => (
+            new Vec2i(vs.Item1.Item1, vs.Item1.Item2),
+            new Vec2i(vs.Item2.Item1, vs.Item2.Item2)))
+        .ToArray();
+    }
+}
+----
+
+==== Interfaces
+
+視野更新を generic にするために、インタフェイスを定義します:
+
+[source,csharp]
+----
+// interface to update FoV data
+public interface iFovData {
+    void onRefresh(int radius, int originX, int originY);
+    // Only called for points INSIDE a map
+    void light(int x, int y);
+}
+
+// used to scan through a map
+public interface iOpacityMap {
+    bool isOpaeue(int x, int y);
+    bool contains(int x, int y);
+}
+----
+
+透明／不透明 (opaque/transparent) という表現をしたのは、『道を塞ぐけれど視野は塞がないセル』を考慮したためです。水晶などが考えられます。
+
+=== Entry point
+
+円形視野の計算 = それぞれの `Octant` に対し `OctantScanner` を作って走らせること です。 `OctantScanner` は後で定義します。
+
+[source,csharp]
+----
+public static class Scanner<Fov, Map>
+        where Fov : iFovData
+        where Map : iOpacityMap {
+    // shared by octant scanners
+    public class ScanContext {
+        public Map map;
+        public Fov fov;
+        public Vec2i origin;
+        public int radius;
+
+        public Vec2i localToWorld(Vec2i local) {
+            return local + this.origin;
+        }
+    }
+
+    public static void refresh(Fov fov, Map map, int originX, int originY, int radius) {
+        fov.onRefresh(radius, originX, originY);
+
+        var cx = new ScanContext {
+            map = map,
+            fov = fov,
+            origin = new Vec2i(originX, originY),
+            radius = radius,
+        };
+
+        fov.light(originX, originY);
+        for (int i = 0; i < 8; i++) {
+            new OctantScanner((Octant) i).scanOctant(cx);
+        }
+    }
+}
+----
+
+=== Octant scanner
+
+1/8 円を走査するためのクラスを定義します。
+
+[source,csharp]
+----
+public struct OctantScanner {
+    // (x, y) = (row * rowUnit) + (col * colUnit)
+    Vec2i colUnit;
+    Vec2i rowUnit;
+    float startSlope;
+    float endSlope;
+
+    public OctantScanner(Vec2i rowUnit, Vec2i colUnit, float startSlope, float endSlope) {
+        // ~~ omitted ~~
+    }
+
+    public void scanOctant(ScanContext cx, int startRow = 1) {
+        for (int row = startRow; row <= cx.radius; row++) {
+            if (this.scanRow(row, cx)) break;
+        }
+    }
+
+    // Returns true if finished
+    bool scanRow(int row, ScanContext cx) {
+        // ~~ later implemented ~~
+    }
+}
+----
+
+状況設定は完了しました。 *アルゴリズムのコア* は、 `row` の走査にあります。
+
+==== Scanning a row
+
+列を走査します。 <<Scanning an octant,最後の図>> で解説した通り、状態を上手く使います。傾き計算の `Rule` クラスは後で解説します。
+
+.OctantScanner
+[source,csharp]
+----
+enum RowScanState {
+    Initial,
+    WasOpaque,
+    WasTransparent,
+}
+
+// Returns true if finished
+bool scanRow(int row, ScanContext cx) {
+    var rowVec = this.rowUnit * row;
+    (int fromCol, int toCol) = Rule.colRangeForRow(row, cx.radius, this.startSlope, this.endSlope);
+
+    // finish the scan if the view is completely blocked
+    if (toCol < fromCol) return true;
+
+    { // finish the scan if the row is out of the map
+        var initPos = cx.localToWorld(rowVec);
+        if (!cx.map.contains(initPos.x, initPos.y)) return true;
+    }
+    // ~~
+----
+
+これが肝心の走査です:
+
+[source,csharp]
+----
+    // scanning through the row
+    var state = RowScanState.Initial;
+    for (int col = fromCol; col <= toCol; col++) {
+        var pos = cx.localToWorld(rowVec + this.colUnit * col);
+
+        // skip points out of the map
+        if (!cx.map.contains(pos.x, pos.y)) return false;
+
+        // scan the cell
+        if (cx.map.isOpaeue(pos.x, pos.y)) { // <1>
+            if (state == RowScanState.WasTransparent) { // <2>
+                this.splitScan(Rule.updateEndSlope(col, row)).scanOctant(cx, row + 1);
+            }
+            state = RowScanState.WasOpaque;
+        } else { // <3>
+            if (state == RowScanState.WasOpaque) { // <4>
+                this.startSlope = Rule.updateStartSlope(col, row);
+            }
+            state = RowScanState.WasTransparent;
+        }
+
+        cx.fov.light(pos.x, pos.y); // <5>
+    }
+
+    return state == RowScanState.WasOpaque;
+}
+
+OctantScanner splitScan(float endSlope) {
+    return new OctantScanner(this.rowUnit, this.colUnit, this.startSlope, endSlope);
+}
+----
+<1> 不透明なセルを見つけた場合、
+<2> 直前に走査したセルが透明だったなら、スキャンを分割します。
+<3> 透明なセルを見つけた場合、
+<4> 直前に走査したセルが不透明だったなら、 `startSlope` を更新します。
+<5> どのケースでも、走査したセルは可視化します。
+
+==== Slope calculations
+
+`Rule` クラスは式の集まりです。ディテールに影響します。
+
+[source,csharp]
+----
+static class Rule {
+    // Range of columns in a row to scan through; [from, to]
+    public static(int, int) colRangeForRow(int row, int radius, float startSlope, float endSlope) {
+        int from = (int) Math.Ceiling(startSlope * row); // <1>
+        int to = Math.Min(
+            (int) Math.Floor(endSlope * row), // <1>
+            Rule.maxColForRow(row, radius) // <2>
+        );
+        return (from, to);
+    }
+
+    public static int maxColForRow(int row, int radius) {
+        // we add 0.5 to the radius so that FoV looks more natural
+        return (int) Math.Sqrt((radius + 0.5) * (radius + 0.5) - row * row); // <2>
+    }
+----
+<1> 傾き範囲がセルの中心を通るセルを走査範囲とします。 `Math.Ceiling` は切り上げ、 `Math.Floor` は切り捨てをします。
+<2> 走査範囲を円形にします。この補正無しだと、正方形範囲の走査となります。半径に `0.5` を加える理由は、円が自然な形になるためです (c.f. https://www.redblobgames.com/grids/circle-drawing/[Circle fill on a grid]) 。
+
+傾き範囲の更新は、不可視セルのモデル (<<Edge cases (□ model vs ◇ model)>>) に応じて式を変えます。
+
+===== □ block model
+
+セルの形を□形だとみなした場合、以下のような式となります:
+
+.□ rule
+[source,csharp]
+----
+    // Called after scanning opaque cells
+    public static float updateStartSlope(int col, int row) =>
+        Math.Min(1f,  (col + 0.5f) / (row - 0.5f)); // <1>
+    // Called when splitting a scan
+    public static float updateEndSlope(int col, int row) =>
+        (col - 0.5f) / (row + 0.5f); // <1>
+----
+<1> 傾き範囲をセルの角に対して更新するため、半セル単位で計算します。 footnote:[ただし、 `startSlope` は `1.0` 以下に制限します。]
+
+===== ◇ block model
+
+セルの形を◇形だとみなした場合、以下のような式となります:
+
+.◇ rule
+[source,csharp]
+----
+    // Called after scanning opaque cells
+    public static float updateStartSlope(int col, int row) =>
+        (col + 0.5f) / row;
+    // Called when splitting a scan
+    public static float updateEndSlope(int col, int row) =>
+        (col - 0.5f) / row;
+----
+
+NOTE: 式を差し替え可能にするなら、 `Rule` を静的クラスではなくオブジェクトにします。 Strategy パタン？
+
+=== Polish
+
+ここまでのコードで、視野の計算を行います:
+
+.Initial FoV
+image::fov/render_init.png[width=110%]
+
+NOTE: 視野の可視化は次の項で行います。
+
+不具合が見つかりました。下の図を見てください。青く囲まれた壁は、その中心が手前の壁に阻まれているため、見えないことになっています。よって走査の対象とならず、傾き範囲の更新も行われません。しかし、この壁の角 (かど) によって、後続のセル (赤い四角) が隠されるべきです。
+
+.Issues
+image::fov/render_issues.png[width=110%]
+
+そこで、部分的に視野に入った壁も、走査対象に入れてしまいます。
+
+`scanRow` 末尾の `return` 直前に、以下を追記します。
+
+.OctantScanner.scanRow
+[source,csharp]
+----
+// for an opaque cell that's behind another but whose edge affects the range of the slopes
+var permissiveCol = Rule.colForSlopePermissive(this.endSlope, row); // <1>
+if (permissiveCol > toCol) { // <2>
+    if (!cx.map.contains(pos.x, pos.y)) {
+        // here we filter cells outside the map
+    } else if (cx.map.isOpaeue(pos.x, pos.y)) { // <3>
+        // light it as an artifact (try commenting it out if you think it's too permissive)
+        cx.fov.light(pos.x, pos.y);
+        // and update the range of the slopes
+        this.endSlope = Rule.updateEndSlope(permissiveCol, row);
+        // we do not update `state` here
+    } else {
+        // transparent cells are ignored
+    }
+}
+----
+<1> `Rule` に関数を追加しました（後述）。 permissive に計算された `col` 値に対して、
+<2> それが走査範囲を拡張するか判定します。さらに、
+<3> それがマップ内のセルで、不透明なら走査します。
+
+Permissive な column は、以下のように計算しました。なぜか複雑な式を使っていますが、普通に切り上げたら良かったと思います。
+
+.Rule
+[source,csharp]
+----
+// Used to detect a cell whose center it not in the range
+// but one of whose vertex may hide following cells
+public static int colForSlopePermissive(float slope, int row) {
+    return Math.Min(
+        Rule.maxColForRow(row, radius),
+        (int) Math.Ceiling(slope * (row + 0.5) - 0.500001f)
+    );
+    // We reduced (0.5f + small_amount) not to include a vertex
+    // which is on an `endSlope` e.g. (row, col) = (1, 1),
+}
+----
+
+これで、自然な視野になりました。
+
+.FoV drawing (final result)
+image::fov/render_final.png[width=110%]
+
+==== Edge cases
+
+角における視野を確認しておきます。□形のブロックをモデルにすると、視野は直線になります。
+
+image::fov/model_rect.png[width=50%]
+
+◇形のブロックをモデルにすると、視野は扇状になります。
+
+image::fov/model_dia.png[width=50%]
+
+ただしこの場合、 `permissiveCol` が意図しない範囲にまで広がります。
+
+image::fov/model_dia_exception.png[]
+
+よって、走査を修正します。
+
+.OctantScanner.scanRow
+[source,csharp]
+----
+var permissiveCol = Rule.colForSlopePermissive(this.endSlope, row);
+if (permissiveCol < toCol && state != RowScanState.WasOpaque) {
+    // ~~
+----
+
+この修正は、□形の視野への副作用なしで動作しました。
+
+== Visualizing FoV
+
+視野の可視化を試みます。綺麗な画面を作りこめるのが、グラフィカルなゲームを作るときの特権だと思います。
+
+NOTE: 不透明度を含む renderig が上手くいかない場合は、アルファ値の計算を間違えている可能性があります。アルファ値の計算法 (blend mode) には、 *straight alpha* と *premultiplied alpha* があり、使っているフレームワーク（の設定）にあった計算が必要です。
+
+=== Rendering
+
+まずは、セル単位で明度を調整する方法を考えます。
+
+==== Shadow/light casting
+
+セル毎に *影を* 描くことにしました。
+
+.Light casting
+[sidebar]
+--
+以下の二案はボツとしました。
+
+* まずマップ全体に影を描いてから、視野範囲を明るくする方法が考えられます。しかし、 `Color` の RGB 値は負の数を取れないため、影を描いたときに正確な色情報が失われる恐れがありました。
+
+* もう 1 つ考えられるのは、影の `Texture` を作ってから、出力画面に合成する方法です。が、やり方が分からなくて止めました。負荷が増えそうな気もします。
+--
+
+==== How to render
+
+僕は `Renderable` の `render` メソッドを実装しました。他に思いつくのは、 `Sprite` をセル毎に配置する方法ですが、本質的にはどちらも同じです。
+
+* `Sprite` を設置した場合は、 `Renderer` がそれらを自動的に走査して、セルの明るさに影響を与えます。
+* `render` メソッドを実装する場合は、メソッド中でセルを走査して、明るさを調整します。
+
+NOTE: Immediate mode か retained mode かという差です
+
+後は、状態が必要なときに、 `Sprite` オブジェクトに入れるか、自前のフィールドに入れるかという違いがあります。
+
+==== Decaying shadows
+
+影の濃さを定義する関数 stem:[f] を考えます。引数は規格化距離です:
+
+[stem]
+++++
+dimAlpha = maxDimAlpha * f(distance / radius)
+++++
+
+まず線形の場合ですが、明るさの変化が滑らか過ぎて、セルとセルの境界がはっきりとしませんでした。グリッドベースのゲームにおいては、機能的とは言えません。
+
+代わりの https://easings.net/en[補完関数] を用います。まず sin カーブが思い浮かびましたが、最も見栄えが良かったのは `CubicInOut` でした。
+
+NOTE: 記事の画像では、常に `CubicInOut` を補完に使用しています。
+
+==== Interface for reading
+
+`iFovData` は、視野を更新するためのインタフェイスでした。更新した視野を確認できるように、メソッドを追加します。
+
+[source,csharp]
+----
+public interface iFovData {
+    // used to update fov data
+    void onRefresh(int radius, int originX, int originY);
+    void light(int x, int y);
+    // used to visualize fov data
+    bool canSee(int x, int y);
+    Vec2i origin();
+    int radius();
+}
+----
+
+NOTE: あるいは、インタフェイスを分けるのが良いと思います: `iFovWrite`, `iFovRead`
+
+このインタフェイスに対して `FovRenderer` を実装し、冒頭の絵を得ました。
+
+.FoV drawing
+image::fov/render_final.png[width=110%]
+
+=== Animation
+
+視野が更新されたとき、セルの明度を滑らかに遷移させたいと思います。
+
+何らかの方法で、 FoV の変更を追跡する必要があります。また、追跡のためのコストは、セル毎に stem:[O(1)] であってほしいと思います。
+
+==== Double buffer of FoV
+
+プレイヤの視野データを 2 つ持ち、交互に更新します。すると、現在の視野データと、前回の視野データが手に入り、セル毎に前回と今回の明るさが分かります。後は経過時間を参照すれば、滑らかに明度を推移させることができます。
+
+シンプルだったため採用しました。
+
+WARNING: この方法は、表現力に限界があります。キャラの移動が視野アニメーションの更新よりも速い場合は、違和感が出ると思います。キューに視野データのコピーを入れていく……？
+
+.Ways not in use
+[sidebar]
+--
+* Hash table of changes
+
+明度の変更を `(x, y)` の hash table に入れます。メモリや状態の管理が大変そうなので止めました。
+
+* Grid of states
+
+セル毎にアニメーション状態を持たせる方法です。 `Sprite` を配置するのとほぼ等価であり、最強ですが、ボツとしました。
+
+[source,csharp]
+----
+public class FovViewStateForCell {
+    public float previousAlpha;
+    public float targetAlpha;
+}
+----
+
+マップ内の全セルに持たせると、無駄が多いです。あるいは、カメラ周辺のセルにのみアニメ状態を持たせることもできますが、複雑になるため止めました。
+--
+
+==== FovRenderer
+
+`(x, y)` に関して、可視状態の推移と、プレイヤからの規格化距離が得られるようなインタフェイスを定義します。
+
+[source,csharp]
+----
+// used for fov rendering
+public interface iFovDiff {
+    (bool, float) prevFovFor(int x, int y);
+    (bool, float) currentFovFor(int x, int y);
+}
+----
+
+これに対して `FovRenderer` を実装しました。
+
+.FoV animation
+video::fov/animation.mp4[]
+
+うまく動作しました。
+
+== FoW (fog of war)
+
+さらに FoW を実装します。これは、『未探索』のセルのタイルを非表示にするという機能です。命名は、シミュレーションゲームから来ていると思います。
+
+セル毎に `bool` 値を持たせる配列 `fog` を用意して実装しました:
+
+.FoW visualized
+video::fov/fow.mp4[]
+
+WARNING: まだ FoW はアニメーションしません。検討中です
+
+FoV/FoW は、内部データの更新のタイミングが同じです。そこで FoV の wrapper を用意し、 FoV への書き込みと同時に、 FoW への書き込みも行うようにしました。
+
+また、 FoV と FoW を同じイテレーションで描画しました。こちらは `FovRenderer` に直書きし、名前を `ShadowRenderer` に改めました。
+
+== Wrapping up
+
+無理なく実装できました。しばらくは、マップを歩き回るのが楽しくて仕方がないでしょう。しかし、プレイヤの人たちは、この画面を見ても特に感想は無いと思います。みんな僕よりも目が肥えていますし、何より『ゲーム』をプレイしたいはずなので。
+
+したがって、コンテンツを作らなければなりません。今後もゲームの完成を目指していきます。
+
+== Credits
+
+ねくら さんの作成したタイルセットを使用させていただきました。
+
+* https://ci-en.net/creator/1430[ねくらマップチップのいろいろ]
+* http://silsec.sakura.ne.jp/WolfRPGEditor/MaterialList/html/[マップチップまとめ]
+
+また、本記事のアルゴリズムは、以下の記事に基づきました。
+
+* http://www.roguebasin.com/index.php?title=fov/using_recursive_shadowcasting[FOV using recursive shadowcasting - Rogue Basin]
+* http://www.roguebasin.com/index.php?title=Improved_Shadowcasting_in_Java[Improved Shadowcasting in Java - Rogue Basin]
+
+:sectnums!:
+== Appendix
+
+=== A. Another way to calculate FoV
+
+Robert Nystrom 氏が解説した https://journal.stuffwithstuff.com/2015/09/07/what-the-hero-sees/[Fov の記事] もあります。 Bob いつもありがとう！
+
+こちらの記事では、 `Octant` 中の *全セル* を走査します。壁を見つけたときは、 *不可視の傾き範囲* `shadows` を更新します。以降、見つけたセルは、 `shadows` の範囲に含まれるかで、可視／不可視を判定します。
+
+傾きの計算式がかなり https://github.com/munificent/fov/issues/4[独特] です。
+
+=== B. Hiding entities
+
+WARNING: この項は未実装です
+
+視野外の `Entity` を非表示にします。視野の端から出て来た `Entity` に対しては、
+
+* 画像全体の不透明度を滑らかに変化させる　もしくは、
+* 視野領域で pixel 単位の _culling_ を行う。やり方？？
+
+=== C. Shapes of shadows
+
+可視／不可視のセルの境界を、滑らかに繋ぐことができれば、より美しい見た目になります。そのために、影や明かりの形を改良したいと思います。
+
+WARNING: 未実装のため、草案のみです。
+
+==== Adjacency
+
+8 方向への影の接続を調べておきます。 bit flags としてメモリに置きます。
+
+==== Nine slice rendering
+
+セル単位の `Texture` を用意すると、その数は周辺の影との接続の場合の数に等しく、 stem:[2^8 = 256] にもなります。そこで、影の rendering を 9 つに分けます。すなわち、中心と八方向です。 `adjacency` に応じて、それぞれの部分を描きます。
+
+==== Superpositions
+
+影の形を変えながら明るさを変化させる必要が出てきます。 2 種類の影をそれぞれの明度で描画して、重ね合わせれば、滑らかに推移すると思います。
+

@@ -1,0 +1,35 @@
+= Novels
+
+面白かった小説などです。
+
+ほとんど翻訳は読んでいなかったはずなので、翻訳物が出てきたのは不思議です。
+
+== Novels
+
+* https://www.amazon.co.jp/%E3%83%87%E3%83%A2%E3%83%8A%E3%83%BC%E3%82%BF-1%E5%B9%95-%E3%83%AD%E3%83%BC%E3%83%89%EF%BD%A5%E3%83%AD%E3%82%B9-%E3%83%80%E3%83%AC%E3%83%B3%E3%83%BB%E3%82%B7%E3%83%A3%E3%83%B3/dp/4092903219[デモナータ]
++
+これ一冊で一生分の小説だった気がします。
+
+* https://www.amazon.co.jp/%E3%82%AF%E3%83%A9%E3%83%BC%E3%82%AF/dp/433475144X/ref=tmm_pap_swatch_0?_encoding=UTF8&qid=&sr=[幼年期の終わり]
++
+感心した様々な物語、原型はこれだったと思いました。
+
+* https://www.amazon.co.jp/%E3%82%B9%E3%83%86%E3%82%A3%E3%83%BC%E3%83%B4%E3%83%BB%E3%83%8F%E3%83%9F%E3%83%AB%E3%83%88%E3%83%B3/dp/4151718540/ref=sr_1_1?crid=MSV5PXENTAL&dchild=1&keywords=%E9%96%8B%E9%8C%A0%E5%B8%AB&qid=1604049116&s=books&sprefix=%E9%96%8B%E9%8C%A0%E5%B8%AB%2Cstripbooks%2C272&sr=1-1[解錠師]
++
+僕にも声が出ない友達がいたんです。
+
+* https://www.amazon.co.jp/%E6%A3%AE-%E5%8D%9A%E5%97%A3/dp/4120031586/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr=[スカイ・クロラ]
++
+面白い小説を読むと、音が消えますよね。
+
+* https://www.amazon.co.jp/dp/B00AJCM55W/ref=dp-kindle-redirect?_encoding=UTF8&btkr=1[獣の奏者]
++
+賢くなって成り上がっていく話だと思って読んでいました。今読んだら、全然違う感想になると思います。誤読した本かなぁ
+
+== Not novels
+
+取材や研究データから見たエッセイのような本が面白かったです。
+
+* https://www.amazon.co.jp/%E5%85%B1%E6%84%9F%E8%A6%9A%E8%80%85%E3%81%AE%E9%A9%9A%E3%81%8F%E3%81%B9%E3%81%8D%E6%97%A5%E5%B8%B8%E2%80%95%E5%BD%A2%E3%82%92%E5%91%B3%E3%82%8F%E3%81%86%E4%BA%BA%E3%80%81%E8%89%B2%E3%82%92%E8%81%B4%E3%81%8F%E4%BA%BA-%E3%83%AA%E3%83%81%E3%83%A3%E3%83%BC%E3%83%89%E3%83%BB-%E3%82%B7%E3%83%88%E3%83%BC%E3%82%A6%E3%82%A3%E3%83%83%E3%82%AF/dp/4794211279[感覚者の驚くべき日常―形を味わう人、色を聴く人]
+* https://www.amazon.co.jp/%E3%81%BC%E3%81%8F%E3%81%AB%E3%81%AF%E6%95%B0%E5%AD%97%E3%81%8C%E9%A2%A8%E6%99%AF%E3%81%AB%E8%A6%8B%E3%81%88%E3%82%8B-%E8%AC%9B%E8%AB%87%E7%A4%BE%E6%96%87%E5%BA%AB-%E3%83%80%E3%83%8B%E3%82%A8%E3%83%AB%E3%83%BB%E3%82%BF%E3%83%A1%E3%83%83%E3%83%88/dp/4062778602/ref=asc_df_4062778602/?tag=jpgo-22&linkCode=df0&hvadid=288695801517&hvpos=&hvnetw=g&hvrand=8302226931224798297&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=1009534&hvtargid=pla-524252627653&psc=1&th=1&psc=1[ぼくには数字が風景に見える]
+

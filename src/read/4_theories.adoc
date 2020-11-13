@@ -1,0 +1,50 @@
+= Books on theories
+
+この先楽しんでいくには、理論的な物が必要な気がしてメモしておきました。それとも、『専門性』が必要だと思ったのでしょうか。
+
+言語を作りたいような、 C/C++/Rust/Zig で十分なような……。追い求める物が無いので、イマイチ身が入りません。あえて言うなら、記号を使った表記法を集めてみたい気がします。論理学？
+
+== Not read
+
+=== Computer science
+
+一冊でも読んだら、僕にしてはよくやったと思います。一冊読めば、次の一冊を求めるようになる、そんな読書を今後に期待したいです。
+
+. https://www.amazon.co.jp/-/en/Michael-Sipser/dp/113318779X/ref=sr_1_1?dchild=1&keywords=Introduction+to+the+Theory+of+Computation&qid=1604046924&s=english-books&sr=1-1[Introduction to the Theory of Compuetation]
++
+熱い文章でモチベーションに素晴らしく良さそうです。プログラミング言語を作るときにも役立ちそう。
+
+. https://www.amazon.co.jp/CPU%E3%81%AE%E5%89%B5%E3%82%8A%E3%81%8B%E3%81%9F-%E6%B8%A1%E6%B3%A2-%E9%83%81/dp/4839909865[CPUの創りかた]
++
+https://www.sigbus.info/compilerbook[compilerbook] を読むのに一番必要なのは、レジスタなど CPU の知識の気がします。評判の良いこの本を読めば、楽になるのでしょうか。
+
+. https://www.amazon.co.jp/-/en/Benjamin-C-Pierce/dp/0262162091/ref=sr_1_1?crid=1D9623KKIQ6QF&dchild=1&keywords=types+and+programming+languages&qid=1604046943&s=english-books&sprefix=types+and+%2Cenglish-books%2C250&sr=1-1[Types and Programming Languages]
++
+記号で表現できる物が増えたら面白いと思います。 Prolog と組み合わせると理解しやすいらしい？
+
+. https://www.amazon.co.jp/-/en/W-Stevens/dp/0321637739/ref=tmm_pap_swatch_0?_encoding=UTF8&qid=&sr=[Advanced Programming in the UNIX Environment] (third edition) (https://www.amazon.co.jp/dp/4798134880/[詳解UNIXプログラミング])
++
+これは理論の本ではないですが、気になっています。
+
+. https://www.amazon.co.jp/-/en/%E3%82%B8%E3%83%A7%E3%83%B3%E3%83%BBL-%E3%83%98%E3%83%8D%E3%82%B7%E3%83%BC/dp/4822298426/ref=pd_bxgy_3/356-9842781-3017706?_encoding=UTF8&pd_rd_i=4822298426&pd_rd_r=0c373c8f-099a-45e4-b992-9a5f0763b2ed&pd_rd_w=h58CC&pd_rd_wg=LGQIe&pf_rd_p=e64b0a81-ca1b-4802-bd2c-a4b65bccc76e&pf_rd_r=J7B99QGH7RHREK9QFHQK&psc=1&refRID=J7B99QGH7RHREK9QFHQK[コンピュータの構成と設計] (パタヘネ)
++
+一定レベルを超えた人たちは、この本が常識みたいに言っていますね。
+
+. http://herumi.github.io/ango/[『クラウドを支えるこれからの暗号技術』]
++
+高評価だったので一応。
+
+=== Physics
+
+物理が途中から難しくて分からなくなりました。理論物理と縁が無かったので、テンソルとかウェッジ積あたりまで理解したいなと思っています。相対論も記号が多くて面白そう。
+
+ただ、やはり理論的なものを全く習得していないので、先は長そうです。
+
+=== Mathmatics
+
+* https://sites.google.com/site/winitzki/linalg[Linear Algebra via Exterior Products]
++
+外積を理解したら、線形代数は強くてニューゲーム？！
+
+== Finished reading
+

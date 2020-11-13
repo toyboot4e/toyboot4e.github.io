@@ -1,0 +1,155 @@
+= Note #1: Great command line tools
+:revdate: Mar 13, 2020
+
+== About
+
+モダンな定番のコマンドラインツールなどをリストしました。
+
+=== Background
+
+コマンドラインは機能／ UI を両立していて、ほぼ理想郷だと思います。ただそれは、最新のツールを入れたためでもあるので、リンクを集めてみました。
+
+== Command line tools
+
+=== Replacements
+
+最新のツールを使うと、着色や再帰検索がデフォルトとなり、オプションも整理されます。
+
+|====
+| feature           | classic    | modern
+
+| manual            | `man`         | https://github.com/dbrgn/tealdeer[tealdeer] (`tldr`)
+| line-based search | `grep`        | https://github.com/BurntSushi/ripgrep[ripgrep] (`rg`)
+| file search       | `find`        | https://github.com/sharkdp/fd[fd]
+| list files        | `ls`, `tree`  | https://github.com/ogham/exa[exa], `exa -T`
+| line-based edit   | `sed`, `gsed` | https://github.com/chmln/sd[sd]
+|====
+
+最低限、 https://github.com/BurntSushi/ripgrep[rg] と https://github.com/sharkdp/fd[fd] は使った方が良いと思います。本当にいいツールなので。 `tree` や `exa -T` の代わりに `fd` + https://github.com/jez/as-tree[as-tree] のコンボもアリです。
+
+他には、 GNU xargs (`gxargs`), GNU awk (`gawk`) や `rename` コマンドをよく使っています。
+
+=== Navigation
+
+https://github.com/rupa/z[z] の fish 版を使っています。
+
+=== Packages
+
+* https://en.wikipedia.org/wiki/List_of_GNU_Core_Utilities_commands[coreutils] footnote:[Rust で書き直された coreutils も https://github.com/uutils/coreutils[あります] 。正直、コードとしてはそこまで参考になりませんでしたが……。]
++
+`sort`, `uniq`, `tr` などの Unix フィルタは、継続して使っています。
+
+* https://joeyh.name/code/moreutils/[moreutils]
++
+エディタで加工する `vi` シリーズが便利です。 stdout を加工する `vipe`, 一括リネームの `vidir` が含まれています。
+
+=== Editors
+
+* https://github.com/neovim/neovim[NeoVim] (`nvim`)
++
+Vim の fork です。動作が軽く、僕はこちらを使っています。
+
+* https://www.gnu.org/s/emacs/[Emacs]
++
+https://github.com/emacs-evil/evil[Evil] を入れると Vim になります。実は、起動以外は NeoVim よりも軽快です。ただ、 Evil 特有の不具合やハマりポイントがあって、かなり調整が難しい印象です。また、言語サーバのサポートはかなり弱いと思います (不具合が普通にあります) 。
+
+=== Shells, terminal multiplexers
+
+* https://fishshell.com/[fish]
++
+シェルです。 https://www.zsh.org/[zsh] でもいいかもしれません footnote:[最近の Mac は zsh がデフォルトシェルです] 。
+
+* https://github.com/tmux/tmux[tmux]
++
+ターミナルのインスタンスを複数作り footnote:[内部的には _presudo terminal_ (`man 4 pty`) が働いているとか] 、 _session_, _window_, _pane_ という親子関係で整理してくれます。
+
+=== Git
+
+* https://github.com/dandavison/delta[delta]
++
+diff が綺麗になります。特に行番号を表示できるのが好みです。
+
+* https://github.com/github/hub[hub]
++
+GitHub の非公式 CLI ツールです。リポジトリの作成や URL の取得などに便利です。
+
+* https://github.com/cli/cli[gh]
++
+GitHub 公式 CLI ツールです。僕はまだ活用できていません。
+
+* https://github.com/x-motemen/ghq[ghq]
++
+リモートリポジトリの管理に便利だそうです……？
+
+=== Input (macOS only)
+
+OS が進化したかのように便利になります:
+
+* https://pqrs.org/osx/karabiner/[Karabiner-Elements]
++
+キー入力を自由にマッピングできます。僕は kbd:[CapsLock] を kbd:[Ctrl+Shift+Alt+Cmd] (_hyper key_) に変えて、ランチャの hot key としています (`skhd` 経由) 。
+
+* https://github.com/koekeishiya/skhd[skhd]
++
+キー入力に応じて、シェルコマンドを実行してくれます。アプリのランチャとして使っており、 `yabai` コマンドの呼び出しもしています。
+
+* https://toyboot4e.github.io/dotfiles/[yabai]
++
+_Tiling window manager_ です。ウィンドウのレイアウトやリサイズなどをしてくれます。
+
+yabai は HACK の塊のような印象があります。 100 % 想定された通り動作すると期待しない方が良いかもしれません。
+
+=== Markup languages
+
+* https://asciidoctor.org/[Asciidoctor]
++
+表現力豊かな markup 言語 (AsciiDoc) の実装です。このブログ生成にも `asciidoctor` が使われています。 org-mode も良さそうです。
+
+* https://pandoc.org/[pandoc]
++
+主に markdown, html の相互変換に使っています。
+
+=== Downloaders
+
+`dl` コマンドを作り、与えられた URL に応じて、ダウンローダを割り当てています。
+
+* https://github.com/ytdl-org/youtube-dl[youtube-dl]
++
+youtube やニコニコした動画／音源をダウンロードしてくれます。
+
+* https://github.com/iheanyi/bandcamp-dl[bandcamp-dl]
++
+bandcamp から音源をダウンロードしてくれます。タグもちゃんと付けてくれるのが良いと思います。
+
+* https://github.com/whiteleaf7/narou/wiki[narou.rb] (`narou`)
++
+小説家になる感じのサイトなどから原稿をダウンロードし、電子書籍に変換してくれます。 pixiv 小説は非対応。
+
+=== Browsers
+
+* https://github.com/cmus/cmus[cmus]
++
+音楽のプレイヤで、 Vim 風のキーバインドで動きます。実用しています。
+
+* http://w3m.sourceforge.net/[w3m]
++
+古いブラウザです。 JS は動きません。これはたまに使います。
+
+* https://github.com/michael-lazar/rtv[rtv]
++
+reddit の閲覧ができる CLI ツールです。十分に使用できますが、 web 版の方が便利でした。
+
+* https://github.com/Bios-Marcel/cordless[cordless]
++
+Discord の CLI ツールです。不完全な擬似的 GUI といった印象で、そもそも検索ができません？
+
+* https://github.com/ggerganov/hnterm[hnterm]
++
+慣れなくて使っていません。
+
+== Wrapping up
+
+ターミナルの魅力は、アプリのサンドボックスであることだと思います。 `tmux` を使えば、思うさま画面分割ができ、文字しか表示されないことは、 **コンスタントなレイアウト** が与えられる意味でメリットと言えます。しかし、これが最高の環境かと言えば、実はグラフィカルな環境が再び覇権を取り戻すのではないかと予想しています (?) 。
+
+一方で、今日のターミナルは、ほとんど極まっており、今後大きく上回るものが出るかには疑問があります。UI が最高水準に達した後は、人間が進化するしかないのかもしれません。
+

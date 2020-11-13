@@ -1,0 +1,160 @@
+= Odin + Sokol
+:revdate: Nov 5, 2020
+
+{odin} 言語から {sokol} を使って見ました。
+
+ANF (Rust の 2D フレームワーク) の方はバグで難航しています。
+
+== The Odin programming language
+
+{odin} は、 better C than C の流行を行く言語の 1 つです。言語機能はミニマムで、メソッドすらもありません。 C 言語並にプリミティブだと言ってもよいのではないでしょうか。
+
+ここでは、 Odin の名前空間に注目します。言語機能は、公式のドキュメントを見た方が良いと思います。
+
+=== Example
+
+構文は {jai} が元ネタみたいで、ちょっと面白いです:
+
+[source,go]
+----
+import sa "gia:sokol_app" // <1>
+import sg "gia:sokol_gfx"
+import engine "gia:engine"
+
+main :: proc() { // <2>
+	sa.run({
+		init_cb = init,
+		frame_cb = frame,
+		cleanup_cb = cleanup,
+		width = 1280,
+		height = 720,
+		window_title = "Triangle",
+	});
+}
+
+@(private="file") // <3>
+g_engine: engine.Wodin_Engine; // <4>
+
+init :: proc() {
+	g_engine.gfx = gfx.init(RENDERER);
+}
+
+frame :: proc() {
+	// ~~
+}
+
+cleanup :: proc() {
+	sg.shutdown();
+}
+
+----
+<1> `import alias "collection:package"` の形 footnote:[インポート先が文字列になっているのは、構文が context-free になって実装が楽なんだと思います。同様に、参照を `^` 記号にすることで、 `&&` が and-and かダブルポインタかの区別が不要になっています。] で、パッケージをスコープに入れます。
+<2> `p :: proc()` や `Data :: struct` のように、常に名前を前置します。
+<3> 公開性は attribute を使って設定します。 Public がデフォルトです。
+<4> 変数名がパッケージ名 (`engine`) と被ると動作しません。この辺りの細部は、自分で 1 つ 1 つ確かめていく必要があります。
+
+左端に名前が集まっており、見ていて気持ちがいいと思います。そのためユニークな言語に見えますが、他に目新しいのはコンパイルタイム定数くらいだと思います。本質的には C 言語なのでしょう。
+
+ちなみにインデントはタブ文字で、型名は `Type_Name` のように書きます。
+
+=== Module system
+
+シンプル過ぎて少し戸惑いました。
+
+==== Import
+
+Package の `import` には 2 種類あります:
+
+. `import relateive/path/to/package`
+. `import collection:package/package`
+
+備考:
+
+* ルートは提供されず、相対パスによる `import` が基本となる。ただ、コンパイラオプションを使って、ルートに相当する collection を提供することはできる。
+* `import` できるのは package のみ。型や関数は、 `imported_package.Type` のようにしてアクセスする他にない。
+
+==== Namespace
+
+Odin の名前空間は 3 つの要素で構成されます:
+
+. collection: package の集まりです。 `odin` のコンパイラオプションで設定できます。
+. package: 名前空間の単位です。ディレクトリが相当します。
+. 型や関数: package 内のファイルで定義します。
+
+備考:
+
+* collection の直下に型や関数を置くことはできません。置けるのはパッケージだけです。
+* package は standalone です。 `imported_package.nested_package` にはアクセスできません。 `import package/nested` と 1 つ 1 つ `import` する必要があります。
+* package 間の循環 import は不可能です。
+
+==== File structure (example)
+
+僕のプロジェクト構成です:
+
+.My project
+[source]
+----
+.
+├── Makefile // <1>
+├── bin
+│   └── main
+├── gia // <2>
+│   ├── _native // <3>
+│   ├── engine // <5>
+│   │   ├── something.odin
+│   │   └── engine.odin
+│   ├── gfx
+│   │   └── gfx.odin
+│   ├── sokol_app // <4>
+│   └── sokol_gfx
+└── src
+    └── main.odin
+----
+<1> 伝統的な Makefile (シェルの wrapper) で `src/main.odin` を走らせます。
+<2> `gia` は collection (package の集まり) として使います。
+<3> ここで C ライブラリをビルドしたり Odin でラッピングします。
+<4> パッケージへの symlink です。擬似的な re-exporting とも言えます。
+<5> ディレクトリが名前空間に相当します footnote:[Rust のモジュールは、ファイルか `directory/mod.rs` が名前空間に相当しました。 Odin の方がモジュールの仕組みはシンプルです。] 。
+
+==== Importing
+
+パッケージを `import` すると、そのファイルからアクセスできるようになります。 `import` の書き方は 2 種類です:
+
+[source,go]
+----
+import sg "relative/path/to/package" // <1>
+import sg "COLLECTION:sokol_gfx" // <2>
+----
+<1> 相対パスからの `import`
+<2> パッケージのコレクションからの `import`
+
+`import` できるのはパッケージのみであり、外部の関数や型は `external_package.item` のようにアクセスする必要があります。
+
+`core` と `shared` の 2 パッケージは予約されています:
+
+[source,go]
+----
+// <0>
+import sg "core:fmt" // <1>
+import sg "shared:sokol_gfx" // <2>
+----
+<0> ユーザは、リポジトリ `Odin` をダウンロード・コンパイル済みであるとします。
+<1> `core`: `Odin/core` に置かれた標準ライブラリのコレクションを表します。
+<2> `shared`: `Odin/shared` に置かれたコレクションを表します。
+
+ユーザが作ったパッケージ (ディレクトリ) にアクセスするには、 `odin` にコンパイルフラッグを渡す必要があります。 `odin` をラッピングしたビルドツールと、プロジェクトの設定ファイルがあれば良いかとも思いましたが、 `Makefile` で渡せば十分です。
+
+アイテムの公開性は、 public (default), package, file から選ぶことができます。名前空間を構成するアイテムを定義するファイルが複数あって、ファイル間では、互いに対して公開するアイテムを限定できるということですね。
+
+=== Environment
+
+まだ開発中の言語ということもあって、 {odin} のドキュメントは少ないです。特に標準ライブラリ (`core`) が大変ですが、人のコードや `core` のコードを読んで使用します。
+
+エディタのサポートは弱いです。今、ちょうど LSP を作っている Odin のユーザがいますが、基本的に補完無しで作業することになっています。
+
+Sublime では goto 補完もサポートした拡張が https://github.com/prime31/Odin-Sublime-Text-Plugin[ありました] 。アイテムを名前でフィルタリングするだけのシンプルな仕組みのようで、名前が被った場合は、候補から選んで移動します。 Sublime はプレビュー機能が強いので、それでも十分に快適です。
+
+=== Wrapping up
+
+Odin は C 並にプリミティブな言語です。名前空間はディレクトリをベースにしており、 symlink を使って擬似的な re-exporting ができます。ビルドツールはありません。
+

@@ -1,0 +1,10 @@
+(
+    summary: ("", "summary.adoc"),
+    items: [
+        File("", "./1_cli.adoc"),
+        File("", "./2_write.adoc"),
+        File("", "./3_langs.adoc"),
+        File("", "./4_theories.adoc"),
+        File("", "./5_novels.adoc"),
+    ],
+)

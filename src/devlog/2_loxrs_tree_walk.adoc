@@ -1,0 +1,447 @@
+= Lang #1: Crafting Interpreters - 1/2
+:revdate: Nov 10, 2019
+:bob-lox: https://craftinginterpreters.com/[Crafting Interpreters]
+
+== About
+
+=== Summary
+
+Crafting Interpreters を読み、 Rust 言語で tree-walk interpreter を実装しました。
+
+* {bob-lox}
+* https://github.com/toyboot4e/loxrs[loxrs]
+
+=== Background
+
+僕は http://stuffwithstuff.com/[Robert Nystrom] 氏のファンで、彼の https://www.amazon.co.jp/Game-Programming-Patterns-%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2%E9%96%8B%E7%99%BA%E3%81%AE%E5%95%8F%E9%A1%8C%E8%A7%A3%E6%B1%BA%E3%83%A1%E3%83%8B%E3%83%A5%E3%83%BC-impress/dp/4844338900[書籍] 、 http://journal.stuffwithstuff.com[ブログ] 、 https://github.com/munificent/hauberk[コード] を読んでいました。プログラミングの半分くらいは、彼から学んだようなものだと思います。しかし当時は、そこが縁の終わりだと思っており、 {bob-lox} が公開されたときは、大いに興奮したものです。
+
+Rust 言語で実践しました。
+
+== Result
+
+NOTE: 継承 (https://craftinginterpreters.com/inheritance.html[Chapter 13]) は未実装です。また、一部キーワードをオリジナルの Lox から変更しています。
+
+=== Example
+
+loxrs は、 https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop[REPL] とスクリプトファイルの実行ができます。
+
+たとえば、次のようなコードを用意します:
+
+[source,rust]
+----
+// examples/for_readme.lox
+class Vec2 {
+    fn init(x, y) {
+        @.x = x;
+        @.y = y;
+    }
+
+    fn add(another) {
+        return Vec2(@.x + another.x, @.y + another.y);
+    }
+}
+
+var x = Vec2(1, 2);
+var y = Vec2(3, 4);
+print x.add(y);
+----
+
+走らせてみます。
+
+[source,sh]
+----
+$ cargo run -- examples/for_readme.lox
+(instance (class Vec2) ((x 4), (y 6)))
+----
+
+ベクトルの足し算が計算できています！　様々な仕組みが合わせって機能しているのを実感しました。
+
+NOTE: 出力がLISP風なのは、手抜きです。いっそ Lisp 風の言語を作ってみたくなりますね。
+
+=== Layout of the repository
+
+適切なファイル分けは、適切な設計に通じるところがあると思います。特に Rust では、ファイル構成 = module 構成となるため重要です。
+
+[source,sh]
+----
+$ tree src/
+src/
+├── analizer
+│   ├── mod.rs
+│   └── resolver.rs
+├── ast
+│   ├── expr.rs
+│   ├── mod.rs
+│   ├── pretty_printer.rs
+│   ├── stmt.rs
+│   └── visitor.rs
+├── lexer
+│   ├── mod.rs
+│   ├── parser.rs
+│   ├── scanner.rs
+│   └── token.rs
+├── lib.rs
+├── main.rs
+└── runtime
+    ├── env.rs
+    ├── interpreter.rs
+    ├── mod.rs
+    └── obj.rs
+
+4 directories, 17 files
+----
+
+まあまあ分かりやすい配置にできたと思います。
+
+=== Line counting
+
+https://github.com/XAMPPRocky/tokei[tokei] で行数をカウントしました。今回、テストはあまり書いていません。
+
+[source,sh]
+----
+$ tokei --files
+--------------------------------------------------------------------------------
+ Language             Files        Lines         Code     Comments       Blanks
+--------------------------------------------------------------------------------
+ Rust                    17         3615         2874          340          401
+--------------------------------------------------------------------------------
+ ./lib.rs                            212          174           12           26
+ ./main.rs                             6            5            0            1
+ ./lexer/token.rs                    124           98           10           16
+ ./lexer/scanner.rs                  367          308           25           34
+ ./lexer/mod.rs                        5            3            1            1
+ ./lexer/parser.rs                   723          552          101           70
+ ./runtime/env.rs                    103           83            9           11
+ ./runtime/mod.rs                     24           16            4            4
+ ./runtime/obj.rs                    327          262           27           38
+ ./runtime/interpreter.rs            452          361           41           50
+ ./analizer/mod.rs                     8            1            6            1
+ ./analizer/resolver.rs              318          236           40           42
+ ./ast/stmt.rs                       184          144           14           26
+ ./ast/mod.rs                          7            6            0            1
+ ./ast/expr.rs                       356          284           27           45
+ ./ast/pretty_printer.rs             331          287           12           32
+ ./ast/visitor.rs                     68           54           11            3
+--------------------------------------------------------------------------------
+ Total                   17         3615         2874          340          401
+--------------------------------------------------------------------------------
+----
+
+約 3,600 行で、空行をのぞけば 3,000 行弱です。一番長いのはパーサで、 700 行を超えています。その他のファイルは 400 行未満で住んでいます。短いですね。
+
+※ 3,600 行 / 半年 = 3,600行 / 180 日 = 20 行 / 日
+
+== impl Lox
+
+本と std のドキュメントを読めば実装できます。どちらも非常に高品質でした。
+
+=== The Rust programming language
+
+素人目線で Rust の話をします。
+
+始め Rust は『システム・プログラミング言語』として謳われました。 Mozilla も _oxide metal_ という表現をしたようです footnote:[マシン (metal) を薄膜 (Rust) を介して手中とする、みたいなニュアンスだと思います。] 。しかし現在は _empowerment_ のための言語とされており、幅広い用途が考えられています。 おそらくコンセプトは一貫しており、高速なコードを、リッチな言語機能 footnote:[trait, borrow rules, lifetime など] に基づいて記述することができます。
+
+では Rust が最強なのかと言うと、まだ検討が続いているように思います。 Rust では、 *同一変数の可変参照を 2 つ同時に作れない* 、という強い制約があります (_borrow rules_)。この制約は良い設計を促すことが多いのですが、所有権が複雑な UI プログラミングなどは困難になります。したがって、 *まだまだ研究が続く* と思います。
+
+Rust は今回のインタープリタ作りには、最適な言語だったと思います。
+
+追記: 僕は Rust は綺麗なコードが書ける言語だと思っていますが、関数型言語のユーザはよく『Rust は汚い』と言います。その感覚は、関数型言語を使ってみないと分からないのかもしれません。いつか試して比較したいです。
+
+=== Contents of the book
+
+https://craftinginterpreters.com/[Crafting Interpreters] の Part I, II の内容は:
+
+* 1~3 章
++
+開発意欲を高め、技術分野を分類し、実装すべき動的言語 Lox のイメージを掴みます。
+
+* 4~7 章
++
+https://craftinginterpreters.com/representing-code.html[構文の表記法] を定めます。  `[Char] -> [Token] -> AST` という変換を行います (`Scanner` と `Parser`) 。 AST (抽象構文木) には、今後データを追加します。
+
+* 8 ~ 13 章
++
+制御構文、関数、クラスを実装します。 AST を拡張する毎に、 AST の `Visitor`, `Interpreter`, `Resolver` を拡張します。
+
+Part III (14 ~ 30 章) では C 言語で bytecode VM を実装するようですが、今回は読んでいません。
+
+=== Scanner: `[char] -> [Token]` (a.k.a. Tokenizer)
+
+まず、文字列として与えられたコードを、 `Token` 列に変換します。 `Token` は、言語文法の最小単位で、 `{`, `1.2`, `class` などが相当します。このとき、数値や文字列の場合はフィールドに入れました。
+
+[source,rust]
+----
+pub enum Token {
+    String(String),
+    Number(f64),
+    Comma,  // ","
+    Period, // "."
+    // ~~
+}
+----
+
+しかし、今考えると、 `struct Token<'a> { &'a str, TokenTag }` という形の方が良かったと思います。これなら数値や文字列の取り出しは次のステップに回すことができますし、ソース位置も簡単に追跡できます。
+
+実際 https://rustc-dev-guide.rust-lang.org/about-this-guide.html[rustc] では `struct ByteSpan { low: u8, high: u8 }` によってソース文字列をスライスしています。必要なら、 `SourceMap` から行／列情報を復元できるようです。この機能を真似たクレートに https://github.com/brendanzab/codespan[codespan] があります。
+
+.Bytes and character encodings
+[sidebar]
+--
+Rust や C の文字列は、 UTF-8 で符号化されています。 C#, Java, JavaScript などでは、文字列は UTF-16 で符号化されています。
+
+UTF-8 では、 Ascii 文字は 1 byte で表現されます。このとき、マルチバイト文字の一部が Ascii 文字と一致することはありません。なぜなら、マルチバイト文字の各バイトは、頭の bit が 1 になっています。したがって、 byte 単位で tokenize しても、 `{` や `}` などの記号を見落とすことはありません。
+
+UTF-16 の場合、 Ascii 文字は 2 bytes です。 UTF-16 には『サロゲートペア』によって表される 4 bytes の文字がありますが、やはりこの一部が Ascii 文字と一致することはありません。サロゲートペアでは、各 2 bytes の頭 5 bits が使用されているためです。 2 bytes 単位で tokenize できます。
+
+複数文字を合体させる符号などについては調べていません。
+--
+
+Scan (tokenize) のやり方は、『文脈』に依存することがあります。たとえば、 `&&T` は参照 2 つですが、 `p && q` では `&&` を 1 つトークンとして認識します。しかし、 Lox にはこのような文脈依存の文法はありません (context-free) 。入門にいい感じです。
+
+=== Parser: `[Token] -> AST`
+
+次に、 `Token` 列を文 (`Statement`) の列に変換します。 `Statement` は、コードのデータ表現です。これらの表現を _抽象木_ (_abstract syntax tree_; AST) と呼びます。
+
+==== Abstract syntax tree
+
+AST は任意のコードを表現できます。たとえば、式 stem:[1 + 3 * 2] は、次のような _具体木_ に翻訳できます:
+
+[ditaa,"ditaa/ast_expr"]
+....
+    *-*
+    |+|
+    *-*
+    ^ ^
+    | |
+  *-* *--*
+  |1| |✳︎|
+  *-* *--*
+      ^ ^
+      | |
+    *-* *-*
+    |3| |2|
+    *-* *-*
+....
+
+文よりも先に、このような式を生成できるようにしました。 `Interpreter` がこのデータを走査するときは、評価順などを一切気にすることなく、愚直に実行することができます。
+
+僕は `Box` を使って AST を再帰的な木構造にしました。もっと Rust らしい方法は、 `Vec` に AST のノードを保存して、 index で他のノードを参照する方法です。 http://smallcultfollowing.com/babysteps/blog/2015/04/06/modeling-graphs-in-rust-using-vector-indices/[より進んだ方法] の 1 つに arena や https://github.com/saschagrunert/indextree[indextree] があります。 https://github.com/kvark/froggy[froggy] なども面白いかもしれません。でも `Box` を使うのが一番簡単だと思います。
+
+
+===== AST printer
+
+AST の `pretty_print` をできるようにしました。 stem:[1 + 3 * 2] は `(+ (1 (* 3 2)))` と表現できます。上の図と等価な表現ができており、 Lisp の構文は、 AST の表現そのものであると分かります。
+
+NOTE: この構文は prefix notation (Polish notation) とも言えます。
+
+Pretty printer には、文字列のバッファ (`&mut String`) を引数に取る関数を用意しました。 `impl std::fmt::Write` でも良かったかもしれません。
+
+==== Recursive descent parser
+
+具体木の生成時は、評価順に注意する必要があります。たとえば、 `1 + 2 * 3` は `(+ 1 (* 2 3)` であって `(* (+ 1 2) 3)` ではありません。パーサはこのようなディテールを考慮して書く必要があります。
+
+ところが、パーサのコードは考えることが少なく、文法を書き写したようなコードになりました ( https://craftinginterpreters.com/parsing-expressions.html#recursive-descent-parsing[_recursive descent parser_] )。このやり方では、 *文法を定義することの方が難しいと思います* 。
+
+大部分の文法は、任意の回数繰り返すという再帰で表現されます。再帰には二種類あって、同じ文法を _左再帰_ か _右再帰_ で表すことができます。左再帰は `A = (A +) (A +) .. B` のような形で、右再帰は `A = B (+ A) (+ A) + ..` という形です。左再帰をコードにすると無限ループになるため、右再帰 (右側に再帰) の形で文法を定義します。
+
+右再帰は、高階関数で実装しました。汚いですが:
+
+.Right recursive parsing
+[source,rust]
+----
+    /// Right recursive parse: Expr (Oper Expr)*
+    #[inline]
+    fn rrp<Oper, SubRule, Folder>(
+        &mut self,
+        // parser of recursive part
+        sub_rule: SubRule,
+        delimiters: &[Token],
+        folder: Folder,
+    ) -> Result<Expr>
+    where
+        Token: Into<Option<Oper>>,
+        SubRule: Fn(&mut Self) -> Result<Expr>,
+        Folder: Fn(Expr, Oper, Expr) -> Expr,
+    {
+        let mut expr = sub_rule(self)?;
+        while let Some(token) = self.consume_any_of(delimiters) {
+            let right = sub_rule(self)?;
+            let oper = token.into().unwrap();
+            expr = folder(expr, oper, right);
+        }
+        Ok(expr)
+    }
+----
+
+なんとなくで書けてしまいましたが、もっと洗練できるかもしれません。
+
+パーサ実装のポイントは、 *_error context_* を集めることでした。エラー表示は、言語の主要なインタフェイスであり、ユーザ体験に直接影響します。しかし今回は、コードのソース位置を早々に破棄するなど、失敗が目立ってしまいました。別の機会に洗練させたいと思います。
+
+.Categories of parsers
+[sidebar]
+--
+今回実装したのは top-down のパーサで、 Rust, C#, JavaScript などでも実用されている手法だそうです。一方、アカデミックな世界では、 bottom-up のパーサが人気らしいです。研究のし甲斐があるためだとか (著者の https://corecursive.com/032-bob-nystrom-on-building-an-interpreter/[PodCast] より)。
+
+Recursive descent parser を進化させたものに https://en.wikipedia.org/wiki/Pratt_parser[Pratt parser] というものがあります。先ほど『文法を直接コードに翻訳したかのよう』と書きましたが、こちらは『Token をパーサ関数に関連付ける』そうです。 maktlad 氏が書いた https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html[記事] では、 Pratt parser を押し進め、演算子の結合順位を書くことでパーサを定義できるようにしています。
+--
+
+=== Runtime
+
+AST を走査して、実行できるようにします。
+
+==== Visitor pattern
+
+AST に対する、 https://github.com/rust-unofficial/patterns/blob/master/patterns/visitor.md[Visitor] を用意しました。何度も `match` を書かなくて済むようになります。
+
+[source,rust]
+----
+pub trait ExprVisitor<T> {
+    /// Dispathes a specific sub function to a variant of `Expr`
+    fn visit_expr(&mut self, expr: &Expr) -> T {
+        use Expr::*;
+        match expr {
+            Literal(args) => self.visit_literal_expr(args),
+            Unary(args) => self.visit_unary_expr(args.as_ref()),
+            Binary(args) => self.visit_binary_expr(args.as_ref()),
+            Logic(args) => self.visit_logic_expr(args.as_ref()),
+            Grouping(args) => self.visit_expr(&args.expr),
+            Variable(var) => self.visit_var_expr(var),
+            Assign(args) => self.visit_assign_expr(args.as_ref()),
+            Call(call) => self.visit_call_expr(call.as_ref()),
+            Get(get) => self.visit_get_expr(get.as_ref()),
+            Set(set) => self.visit_set_expr(set.as_ref()),
+            Self_(self_) => self.visit_self_expr(self_),
+        }
+    }
+    // sub functions to one of the variants of `Expr`
+    fn visit_literal_expr(&mut self, literal: &LiteralData) -> T;
+    fn visit_unary_expr(&mut self, unary: &UnaryData) -> T;
+    fn visit_binary_expr(&mut self, binary: &BinaryData) -> T;
+    fn visit_logic_expr(&mut self, logic: &LogicData) -> T;
+    fn visit_var_expr(&mut self, var: &VarUseData) -> T;
+    fn visit_assign_expr(&mut self, assign: &AssignData) -> T;
+    fn visit_call_expr(&mut self, call: &CallData) -> T;
+    fn visit_get_expr(&mut self, get: &GetUseData) -> T;
+    fn visit_set_expr(&mut self, set: &SetUseData) -> T;
+    fn visit_self_expr(&mut self, self_: &SelfData) -> T;
+}
+
+pub trait StmtVisitor<T> {
+    // ~~
+}
+----
+
+==== Object & Environment
+
+AST 上の表現と別に、ランタイム用のオブジェクトを用意しました。
+
+Lox は動的言語なので、すべての値は `enum` にアップキャストして保存しました。これが手痛いコストとして感じられるのが、 Rust の面白いところです。
+
+`Environment` は、変数名を値にマッピングします。基本的には `HashMap<String, Rc<RefCell<runtime::Obj>>>` です。ここで、 Rust の *borrow rules* が致命的に思われましたが、遠慮無い `clone` で所有権の問題を避けました。より高い効率を目指すなら、他の方法を考えなければならないと思います。
+
+NOTE: コードブロックは `Rc` スマートポインタに入れたため、値の `clone` が重すぎるということはありません。
+
+==== Interpreter
+
+AST の実行は、スコープに気を使いますが、主に AST を走査するだけで済みます。 AST の生成と解析の方が重要だったと思います。
+
+NOTE: Lisp の場合は、変数束縛の際、スコープを明示する footnote:[`(let ((name value) (name value)) (|statements here|))`] ため、さらに解析が楽そうです。
+
+===== Return statement
+
+元の本では、例外処理を使って `return` を実装する footnote:[global escape? (大域脱出)] HACK が使われていました。僕は `Result` を使っていたので、 無理なく関数のネストから値を返すことができました。
+
+==== jlox vs loxrs
+
+最後に、 Java と Rust を比較します。
+
+Rust には代数データ型 ( `enum` ) があったおかげで、高効率で、しかも自然なコードを書けました。また、 `clone` や `enum` へのアップキャスト時に、コストをよく意識させられました。
+
+Java に関しては、うーん、、良かった点が思い浮かびません。 Rust が映えるテーマだったため、日頃 (C# で) いかにファジーなプログラミングをしていたか、実感することになりました。 Java は実用的な言語だと思いますが、厳密さが犠牲になっていたところがあり、今後は *精度と抽象* を両立させた言語が人気になると思いました。方向性としては、 Better C++ (Rust など) と Better C (https://odin-lang.org/[Odin] など) があるように見えます。
+
+== Wrapping up
+
+本に沿ってコードを書きながらも、 Rust 向けに洗練する自由がありました。軽めのコード量 (3,000 ~ 4,000 lines) で実際に動くものが仕上がって楽しかったです。
+
+Rust の borrow rules が実装の問題になるかと思われましたが、今回はどんどん `clone` したため大丈夫でした (いいのでしょうか) 。ただし、インタープリタの効率はまだまだなので、今度は Part III を読んで、 https://gameprogrammingpatterns.com/bytecode.html[bytecode VM] を実装したいと思います。
+
+:sectnums!:
+== Appendix
+
+=== A. The author of Crafting Interpreters
+
+http://stuffwithstuff.com/[彼] は https://rephial.org/[Angband] の勝者であり、 https://gameprogrammingpatterns.com/[Game Programming Patterns] の著者であり、 https://dart.dev/[Dart] の開発チームの一員であり（ https://journal.stuffwithstuff.com/2015/09/08/the-hardest-program-ive-ever-written/[例] )、 https://github.com/munificent/hauberk[Hauberk] の開発者であり……
+
+==== Podcast
+
+この本に関するラジオ？　があります。
+
+* https://corecursive.com/032-bob-nystrom-on-building-an-interpreter/[How (and why) to build a programming language with Bob Nystrom]
++
+著者の雰囲気を味わえます。オタクとはかくあるべしという感じ。早口にも親近感が……笑
+
+[quote]
+____
+_"Who wouldn't wanna make a programming language? (It's) *awesome*. Super fun."_
+____
+
+=== B. Resources
+
+==== Repositories I learned from
+
+* https://github.com/munificent/craftinginterpreters[craftinginterpreters]
++
+本のリポジトリです。コード全体が載っており、サイトの生成も見られます。
+
+* https://github.com/rodaine/rlox[rlox]
++
+比較的元の本に忠実な実装です。Part II (A TREE-WALK INTERPRETER) まで。
+
+* https://github.com/mariosangiorgio/rulox[rulox]
++
+上手なやり方が目立つ実装です。Part III (A BYTECODE VIRTUAL MACHINE) に取り組んでいます。
+
+==== Posts about Rust by others
+
+* https://speakerdeck.com/mariosangiorgio/learning-rust-by-crafting-interpreters[Learning Rusty by Crafting Interpreters]
++
+https://github.com/mariosangiorgio/rulox[rulox] の作者のスライドです。大事なことを大体全部言っています。
+
+* https://gendignoux.com/blog/2017/09/05/rust-vs-cpp-ocaml-part1.html[Rust from a C++ and OCaml programmer's perspective (Part 1)]
++
+Rust と OCaml の構文を比較した珍しい記事です。 OCaml は、 Rust の最初のコンパイラを実装した言語です。
+
+* https://thume.ca/2019/04/29/comparing-compilers-in-rust-haskell-c-and-python/[Comparing the Same Project in Rust, Haskell, C++, Python, Scala and OCaml]
++
+コード量に注目して、コンパイラの実装を比較した記事です。コンパイラを作る授業だったそうですが、羨ましいほど楽しそうですね。
+
+* https://thume.ca/2019/04/18/writing-a-compiler-in-rust/[Writing a Compiler in Rust]
++
+上記授業における、記事著者のチームの実装を詳説した記事です。僕の手が届かない範囲のことを書いていてくれて、とても参考になりました。
+
+* http://bfnightly.bracketproductions.com/rustbook/chapter_0.html[Roguelike Tutorial - in Rust]
++
+RLTK ( https://github.com/thebracket/rltk_rs[roguelike toolkit] ) の作者によるチュートリアルです。詳しすぎるので、まだあまり読めていません。 _wave function collapse_ の解説は、ちゃんと読もうと思います。
+
+=== C. Further reading
+
+幸せなことに、まだまだ良い本があります。
+
+* https://craftinginterpreters.com/contents.html[Crafting Interpreters]
++
+この本だ！　……まだ Part III:  A BYTECODE VIRTUAL MACHINE をやってません。この領域は僕にとって *完全なブラックボックス* なので、期待できます。 *Part III からが本番* という気がしてきました。
+
+* https://www.cis.upenn.edu/~bcpierce/tapl/[Types and Programming Languages]
++
+型システムに関する著名な本です。 *理論ができていれば後は実現するだけ* 、という側面を、今回感じる所がありました。やはり読むべき本なのでしょう。
+
+* https://mitpress.mit.edu/sites/default/files/sicp/index.html[Structure and Interpretation of Computer Programs]
++
+著名な古典です。 Scheme で Scheme のインタープリタ、コンパイラすらも作るそうです。楽しそう。遅延評価の実装などにも詳しくなれる見込みがあります。
+
+* https://www.sigbus.info/compilerbook[低レイヤを知りたい人のためのCコンパイラ作成入門]
++
+C で C を実装する本です。稀な良文で、部分的に読むだけでもためになります。全体を読めば、相当な実力が着きそうです。ただ、 *アセンブリなどの低レイヤ* 方面へ向かうべきかは迷います。インタープリタとは打って変わって、コンパイラでは *レジスタ* が主役になるようです。
+
+この先 3 年で 2 冊は読んで行きたいと思います。
+

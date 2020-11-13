@@ -1,0 +1,67 @@
+(
+    base_url: "",
+    src_dir: "src",
+    site_dir: "site",
+
+    authors: ["adbook"],
+    title: "adbook demo site",
+
+    includes: [
+        "static/img",
+        "theme/css",
+        "theme/js",
+        "theme/favicon.svg",
+    ],
+
+    converts: [
+        "404.adoc",
+    ],
+
+    // `asciidoctor` command line options
+    adoc_opts: [
+        ("-a", [
+            // default Handlebars template file, relative to the source directroy
+            "hbs@=theme/hbs/article.hbs",
+
+            // css
+            "linkcss",
+            "stylesdir@={base_url}/theme/css",
+            "stylesheet@=term.css",
+
+            // image
+            "imagesdir@={base_url}/static/img",
+            "imagesoutdir@={src_dir}/static/img",
+
+            // preferences
+            "hardbreaks",
+            "sectnums",
+            "sectnumlevels@=2",
+            "tabside@=4",
+
+            // features
+            "experimental",
+            "stem@=latexmath",
+            "icons@=font",
+
+            // links (available with `{name}` syntax in AsciiDoc files)
+            "adbook=https://github.com/toyboot4e/adbook[adbook]",
+            "asciidoctor=https://asciidoctor.org/[Asciidoctor]",
+            "mdbook=https://github.com/rust-lang/mdBook[mdBook]",
+            "handlebars=https://handlebarsjs.com/[Handlebars]",
+            "prismjs=https://prismjs.com/[Prism.js]",
+
+            "nez=https://github.com/prime31/Nez[Nez]",
+
+            "fna=https://fna-xna.github.io/[FNA]",
+            "xna=https://ja.wikipedia.org/wiki/Microsoft_XNA[XNA]",
+            "fna3d=https://github.com/FNA-XNA/FNA3D[FNA3D]",
+            "rust-fna3d=https://github.com/toyboot4e/rust-fna3d[Rust-FNA3D]",
+
+            "sokol=https://github.com/floooh/sokol[Sokol]",
+
+            "rust=https://www.rust-lang.org/[Rust]",
+            "odin=https://github.com/odin-lang/Odin[Odin]",
+            "jai=https://github.com/BSVino/JaiPrimer[Jai]",
+        ]),
+    ]
+)

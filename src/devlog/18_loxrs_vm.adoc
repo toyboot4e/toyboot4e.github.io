@@ -1,0 +1,5 @@
+= Lang #2: Crafting Interpreters - 2/2
+:book: https://craftinginterpreters.com/contents.html[Crafting Interpreters]
+
+{book} の Part III (A Bytecode Virtual Machine) を Rust でやってみました。
+
