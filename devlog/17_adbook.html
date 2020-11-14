@@ -101,10 +101,10 @@
 <h2 id="_about">1. About</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>三代目 SSG を作りました。 mdBook を目指して adbook と名付けています。</p>
+<p>三代目 SSG を作りました。 mdBook を目指して adbook と名付けています。 <a href="https://toyboot4e.github.io/adbook/index.html">Demo</a></p>
 </div>
 <div class="paragraph">
-<p><a href="https://toyboot4e.github.io/adbook/index.html">Demo</a>. このブログもデモみたいなものですね。</p>
+<p>このブログもデモみたいなものですね。</p>
 </div>
 <div class="paragraph">
 <p>Rust のソースは 2,000 行程度です。 html の生成は Handlebars に頼っています。</p>
@@ -112,10 +112,10 @@
 <div class="sect2">
 <h3 id="_backstory">1.1. Backstory</h3>
 <div class="paragraph">
-<p>AsciiDoc の表現力は魅力的です。ブログは AsciiDoc で書きたいものの、生の AsciiDoc は本や単ページの生成に特化しており、ページ同士のリンクなどには向いていません。したがって <code>asciidoctor</code> の出力を利用した SSG が必要です。</p>
+<p>AsciiDoc の表現力は魅力的です。ブログを AsciiDoc で書きたいものの、生の AsciiDoc は本や単ページの生成に特化しており、ページ同士のリンクなどには向いていません。したがって <code>asciidoctor</code> の出力を利用した SSG (static site generator) が必要です。</p>
 </div>
 <div class="paragraph">
-<p>AsciiDoc を使った SSG は、 <a href="https://gist.github.com/briandominick/e5754cc8438dd9503d936ef65fffbb2d">非公式リンク集</a> に載っています。大半の SSG には、 front matter を YAML で書くことが求められます。しかし、 AsciiDoc には <em>document attribute</em> を設定する構文 (<code>:attr: value</code>) があるので、それを読んでくれた方が嬉しいです。したがって、 SSG を自作しています。</p>
+<p>AsciiDoc を使った SSG は、 <a href="https://gist.github.com/briandominick/e5754cc8438dd9503d936ef65fffbb2d">非公式リンク集</a> に載っています。大半の SSG には、 front matter を YAML で書くことが求められるようです。しかし、 AsciiDoc には <em>document attribute</em> を設定する構文 (<code>:attr: value</code>) があるので、 SSG にはそれを読んでくれた方が嬉しいです。したがって、自分で SSG を用意しています。</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -211,7 +211,7 @@
 </div>
 </div>
 <div class="paragraph">
-<p>分岐やループを使えます。再帰をするには、 partial ファイルからそれ自身を読み込みます。</p>
+<p>分岐やループを使えます。再帰をするには、 partial ファイル (他の <code>.hbs</code> ファイルから読み込まれるファイル) からそれ自身を読み込みます。</p>
 </div>
 <div class="paragraph">
 <p>Rust の <a href="https://docs.rs/handlebars/latest/handlebars/">handlebars</a> を見ると分かるのですが、使うのは簡単でした。最も高いハードルだと思っていたので良かったです。</p>

@@ -97,7 +97,8 @@
     <div id="content" class="article">
         
         <main>
-            <!-- Asciidoctor output --><div id="preamble">
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_about">1. About</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>ブログ用マークアップ言語 booktune を作成中です。現在、 900 行で階層構造を扱えるようになりました。</p>
@@ -109,19 +110,17 @@
 </li>
 </ul>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_background">1. Background</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_background">1.1. Background</h3>
 <div class="paragraph">
 <p><a href="https://asciidoctor.org/">AsciiDoc</a> でブログを書いています。機能的には満足しており、脚注や <em><a href="https://asciidoctor.org/docs/user-manual/#callouts">callout</a></em> なども気軽に書ける、十二分な言語と言えます。しかし、 <strong>拡張</strong> は Ruby で書く必要があり、手ごろな SSG もありません。 <strong>ツールセットとしては扱いづらい</strong> と思います。</p>
 </div>
 <div class="paragraph">
 <p>したがって、 100% の自由を得るには、 <strong>マークアップ言語</strong> と <strong>SSG</strong> の両方を自作する必要があると考えました。それぞれ、 <em>booktune</em> と <em>tunedbook</em> という名前を考えています。</p>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_booktune">1.1. booktune</h3>
+<h3 id="_booktune">1.2. booktune</h3>
 <div class="paragraph">
 <p>booktune は、 AsciiDoc に酷似したマークアップ言語 (となる予定) です。</p>
 </div>
@@ -248,7 +247,7 @@ fn main() {&lt;br&gt;    println!("Hello, world!");&lt;br&gt;}
 </table>
 </div>
 <div class="paragraph">
-<p>もしも木構造などを作りたければ、 visitor 側でやってもらいます。そのときは、 html 要素のツリーのような、 <strong>パース時とは違った文脈で node を作る</strong> と思います。やはり、任意の parse 要素をアップキャストするような <code>enum</code> は要らないと考えました。</p>
+<p>もしも木構造などを作りたければ、 visitor 側でやってもらいます。そのときは、 html 要素のツリーのような、 <strong>パース時とは違った文脈で node を作る</strong> と思います。やはり、任意の要素を表すようなアップキャストは必要ないと考えました。</p>
 </div>
 </div>
 </div>
@@ -283,7 +282,7 @@ fn main() {&lt;br&gt;    println!("Hello, world!");&lt;br&gt;}
 <h2 id="_wrapping_up">3. Wrapping up</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>serde を真似ることで、 outline パーサを綺麗に書くことができました。特に access が活躍しましたし、他の場所でも応用が利くと思います。</p>
+<p>serde を真似ることで、 outline パーサを綺麗に書くことができました。特に access が活躍しました。 Access は他の場面でも応用が利くと思います。</p>
 </div>
 <div class="paragraph">
 <p>ブログや執筆用ツールチェインの作成、出だしは好調です。</p>

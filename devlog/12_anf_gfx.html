@@ -97,18 +97,14 @@
     <div id="content" class="article">
         
         <main>
-            <!-- Asciidoctor output --><div id="preamble">
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>自前の 2D フレームワークが実用に近づいてきました。</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_devlog">1. Devlog</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>前回、 FNA3D でイカちゃんを表示した所からの続きです。</p>
+<p>前回、 <a href="https://github.com/toyboot4e/rust-fna3d">FNA3D</a> でイカちゃんを表示した所からの続きです。</p>
 </div>
 <div class="sect2">
 <h3 id="_rendering_pipeline_overview">1.1. Rendering pipeline overview</h3>
@@ -127,7 +123,7 @@
 <div class="ulist">
 <ul>
 <li>
-<p>GPU が効率的に使えるメモリがあり、 GPU が使用するデータ (頂点データや texture) はそこに入れます。 CPU 側は、 GPU 側メモリへのデータの <em>upload</em> (send/copy) 後は、 CPU 側のメモリを開放しても構いません。普通は開放します。</p>
+<p>GPU が効率的に使えるメモリがあり、 GPU が使用するデータ (頂点データや texture) はそこに入れます。 CPU 側は、 GPU メモリ側へのデータの <em>upload</em> (send/copy) 後は、 CPU 側のメモリを開放しても構いません。普通は開放します。</p>
 </li>
 <li>
 <p><em>Draw call</em> とは、 <code>glDraw**</code> みたいな <code>draw</code> 関数の呼び出し (drawing funtion call) です。これらの関数は、 graphics card 側へ頂点データを送り、 <em>rendering pipeline</em> を <em>kick</em> します (動かします) 。</p>
@@ -147,10 +143,10 @@
 <div class="sect2">
 <h3 id="_refactoring">1.2. Refactoring</h3>
 <div class="paragraph">
-<p><a href="https://github.com/floooh/sokol/blob/master/sokol_gfx.h">sokol_gfx</a> は分かりやすそうです。非常によくコメントされており、多数のデータを束ねる型もあります (<code>sg_bindings</code>, <code>sg_pipeline</code>) <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> 。一方、 FNA3D は不親切で、中々把握できません。</p>
+<p><a href="https://github.com/floooh/sokol/blob/master/sokol_gfx.h">sokol_gfx</a> が分かりやすそうです。非常によくコメントされており、多数のデータを束ねる型もあります (<code>sg_bindings</code>, <code>sg_pipeline</code>) <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> 。一方、 FNA3D は不親切で、中々把握できません。</p>
 </div>
 <div class="paragraph">
-<p>そこで、 <strong>インクリメンタルな開発</strong> に振り切ることにしました。僕が知らない機能、僕が使わない機能は実装されませんし、 <a href="https://www.google.com/search?q=WIP">WIP</a> のコードもありません。『見れば分かる』コードになったと思います。</p>
+<p>そこで、 <strong>インクリメンタルな開発</strong> に振り切ることにしました。僕が知らない機能、僕が使わない機能は実装せず、 <a href="https://www.google.com/search?q=WIP">WIP</a> のコードもありません。『見れば分かる』コードになったと思います。</p>
 </div>
 <div class="paragraph">
 <p>以下のような切り捨てをしました:</p>
@@ -262,10 +258,10 @@ fn example_rendering(dcx: &amp;mut DrawContext, tex: Texture2D) {
 <h2 id="_wrapping_up">3. Wrapping up</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>DrwaContext</code> はオブジェクト指向の API で、他のフレームワークと比べても意外と良い出来になりそうです。</p>
+<p>ANF の <code>DrawContext</code> は builder 風の API で、他のフレームワークと比べても意外と良い出来になりそうです。</p>
 </div>
 <div class="paragraph">
-<p>目下の悩みは、 FNA3D の自動ビルド &amp; 出力への同封です。 <a href="https://github.com/alexcrichton/cmake-rs">cmake-rs</a> でささっと行けるかと思ったのですが、苦戦しています。</p>
+<p>目下の悩みは、 FNA3D の自動ビルドと、出力への同封です。 <a href="https://github.com/alexcrichton/cmake-rs">cmake-rs</a> でささっと行けるかと思ったのですが、苦戦しています。</p>
 </div>
 </div>
 </div>

@@ -97,16 +97,12 @@
     <div id="content" class="article">
         
         <main>
-            <!-- Asciidoctor output --><div id="preamble">
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>ANF フレームワークに 4x4 行列を導入しました。</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_devlog">1. Devlog</h2>
-<div class="sectionbody">
 <div class="sect2">
 <h3 id="_animations">1.1. Animations</h3>
 <div class="paragraph">
@@ -120,18 +116,6 @@
 </div>
 <div class="sect2">
 <h3 id="_transformation_matrices">1.2. Transformation matrices</h3>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-長いです。適当に飛ばしてください。
-</td>
-</tr>
-</table>
-</div>
 <div class="paragraph">
 <p>僕は 2 次元のゲームを作っていますが、 <em>vertex shader</em> には 3 次元座標の変換行列を送る必要があります。これは 4x4 行列です。</p>
 </div>
@@ -261,7 +245,7 @@ T_x &amp; T_y &amp; T_z &amp; 1 \\
 <p>row-major encoding: \(m_{11}, m_{12}, m_{13}, ..\) のデータ順で格納</p>
 </li>
 <li>
-<p>column-major encoding: \(m_{11}, m_{21}, m_{21}, ..\) のデータ順で格納</p>
+<p>column-major encoding: \(m_{11}, m_{21}, m_{31}, ..\) のデータ順で格納</p>
 </li>
 </ul>
 </div>
@@ -284,20 +268,20 @@ T_x &amp; T_y &amp; T_z &amp; 1 \\
 <div class="sect3">
 <h4 id="_summary">Summary</h4>
 <div class="paragraph">
-<p>意味が分からなくなってきたので、目標に立ち返ります。</p>
+<p>目標に立ち返ります。</p>
 </div>
 <div class="ulist checklist">
 <ul class="checklist">
 <li>
 <p><i class="fa fa-check-square-o"></i> 変換行列を計算できる</p>
 <div class="paragraph">
-<p>Row/column-major 表記によって、行列の転置・積の順序の交換が起こる</p>
+<p>Row/column-major 表記によって、行列の転置・積の順序の交換が起こる。</p>
 </div>
 </li>
 <li>
 <p><i class="fa fa-check-square-o"></i> シェーダに正しい行列データを送る</p>
 <div class="paragraph">
-<p>Row/column-major 表記、 row/column-major encoding, 両者の影響で行列データが転置する。 Vertex shader が使う向きでデータを送信するように気を付ける</p>
+<p>Row/column-major 表記、 row/column-major encoding, 両者の影響で行列データが転置する。 Vertex shader が使う向きでデータを送信するように気を付ける。</p>
 </div>
 </li>
 </ul>
@@ -330,12 +314,12 @@ T_x &amp; T_y &amp; T_z &amp; 1 \\
 <h2 id="_random">2. Random</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>あとは雑多に。雑多と言って、今回は本当に多いですね。</p>
+<p>あとは雑多にやっていきます。</p>
 </div>
 <div class="sect2">
 <h3 id="_names">2.1. Names</h3>
 <div class="paragraph">
-<p>ANF で上手く行っているモジュール名を紹介したいと思います。様々なパクリを含みます。</p>
+<p>ANF で良い手応えのあるモジュール名を紹介したいと思います。様々なパクリを含みます。</p>
 </div>
 <div class="ulist">
 <ul>
@@ -385,7 +369,7 @@ T_x &amp; T_y &amp; T_z &amp; 1 \\
 </ul>
 </div>
 <div class="paragraph">
-<p>定数を書くときに、 <code>const fn value()</code> と <code>const VALUE</code> で書き方を迷っています。ひとまず、スネークケースのために <code>const fn</code> を使っています。</p>
+<p>定数を書くときに、 <code>const fn value()</code> と <code>const VALUE</code> で書き方を迷っています。ひとまず、スネークケースのために <code>const fn</code> を使っています。追記: std では <code>const VALUE</code> を使うことになったようです。</p>
 </div>
 </div>
 <div class="sect2">
@@ -413,7 +397,7 @@ T_x &amp; T_y &amp; T_z &amp; 1 \\
 <li>
 <p><a href="https://rxi.itch.io/tilekit">Tilekit</a> (有料, Window/Linux only)</p>
 <div class="paragraph">
-<p><strong>画期的なオートタイリング</strong> をしてくれるエディタで、一見の価値があります。実は <a href="https://github.com/prime31/zig-upaya">Upaya</a> に再実装 (<code>tilescript</code>) があります。  (Upaya: ImGUI で GUI ツールを作るためのリポジトリ、Zig)</p>
+<p><strong>画期的なオートタイリング</strong> をしてくれるエディタで、一見の価値があります。実は <a href="https://github.com/prime31/zig-upaya">Upaya</a> に再実装 (<code>tilescript</code>) があります。  Upaya は ImGUI で GUI ツールを作るためのリポジトリです (Zig) 。</p>
 </div>
 </li>
 <li>
@@ -490,7 +474,7 @@ T_x &amp; T_y &amp; T_z &amp; 1 \\
 <p>Generics な関数を使うと、依存先クレートの再コンパイルが必要なるときもあるそうです。それを避けるのが Rust Analyzer の方針で、具体的な型を引数に取るようにしているだとか。</p>
 </div>
 <div class="paragraph">
-<p>僕は、しばらく使いやすさを優先します。</p>
+<p>僕は、しばらく使いやすさを優先します。 Generics も積極的に使います。</p>
 </div>
 </li>
 </ul>
@@ -499,7 +483,7 @@ T_x &amp; T_y &amp; T_z &amp; 1 \\
 <div class="sect2">
 <h3 id="_zig">2.6. Zig</h3>
 <div class="paragraph">
-<p>僕が追っている開発者が、 Zig のファンになりました。僕の方でも、 <code>comptime</code> など、言語機能を追いたいところです。</p>
+<p>僕が追っている開発者が、 <a href="https://ziglang.org/">Zig</a> のファンになりました。僕の方でも、 <code>comptime</code> など、言語機能を追いたいところです。</p>
 </div>
 <div class="paragraph">
 <p>構文さえ何とかなればな……。僕自身は、この先 5 年は Rust でゲームを作る気がしています。</p>
@@ -511,7 +495,7 @@ T_x &amp; T_y &amp; T_z &amp; 1 \\
 <h2 id="_wrapping_up">3. Wrapping up</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>どうやらゲームが作れそうですよ？！</p>
+<p>なんだかゲームを作れそうな気がしてきました？！</p>
 </div>
 </div>
 </div>
