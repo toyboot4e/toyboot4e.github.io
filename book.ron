@@ -62,6 +62,9 @@
             "rust=https://www.rust-lang.org/[Rust]",
             "odin=https://github.com/odin-lang/Odin[Odin]",
             "jai=https://github.com/BSVino/JaiPrimer[Jai]",
+            "zig=https://ziglang.org/[Zig]",
+
+            "tiled=https://www.mapeditor.org/[Tiled]",
         ]),
     ]
 )

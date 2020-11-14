@@ -1,9 +1,9 @@
 = ANF devlog #3: Pong
 :revdate: Sep 22, 2020
 
-制作中フレームワーク ANF で Pong を作りました。
-
 == Devlog
+
+制作中フレームワーク ANF で Pong を作りました。
 
 === Pong
 

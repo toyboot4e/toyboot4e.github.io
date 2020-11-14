@@ -1,11 +1,11 @@
 = ANF devlog #4: ImGUI
 :revdate: Sep 27, 2020
 
-ANF で ImGUI を導入しました。
-
 == Devlog
 
-Safari から見ると、 mp4 を再生できないのが悩みです。
+ANF フレームワークで ImGUI を導入しました。
+
+ Safari から見ると、 mp4 を再生できないのが悩みです。
 
 === Dear ImGUI!
 

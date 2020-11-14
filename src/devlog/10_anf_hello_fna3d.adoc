@@ -1,9 +1,11 @@
 = ANF devlog #1: Sprite rendering!
 :revdate: Jul 24, 2020
 
+== About
+
 Rust から FNA3D を使います。
 
-== Background
+=== Background
 
 僕はゲーム制作に {nez} を使っていました。 {nez} はオープンソースの 2D フレームワーク (C#) で、 *ソースを読めば中身は何でも分かります* 。
 

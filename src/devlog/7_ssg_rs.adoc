@@ -1,17 +1,17 @@
 = SSG #2: Rust + Asciidoctor
 :revdate: Apr 17, 2020
 
+== About
+
 ブログ生成を bash から Rust に移行しました。
 
-* https://github.com/toyboot4e/devlog[repository] / https://github.com/toyboot4e/devlog/tree/master/ssg_rs[ssg_rs]
+* [.line-through]#https://github.com/toyboot4e/devlog[repository] / https://github.com/toyboot4e/devlog/tree/master/ssg_rs[ssg_rs]# 削除済み
 
 html を木にパースしてから加工しています。 https://handlebarsjs.com/[Handlebars] の使い方を調べるか、 `.adoc` ファイルをテンプレート代わりに使う方向性の方が良かったかもしれません。
 
-NOTE: 追記: 今回作った ssg_rs が良くなかったため、マークアップ言語 + SSG の作成を link:/posts/9_booktune_1.html[始めました]。
+=== Background
 
-== Background
-
-link:/posts/3_blog.html[前回]、 bash を使ってブログを生成しました。十分に機能しましたが、機能追加には厳しいものがありました。したがって、今回はプログラミング言語を使い、柔軟性を高めました。
+link:/devlog/3_blog.html[前回]、 bash を使ってブログを生成しました。十分に機能しましたが、機能追加には厳しいものがありました。したがって、今回はプログラミング言語を使い、柔軟性を高めました。
 
 == impl ssg_rs
 

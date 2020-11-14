@@ -4,8 +4,11 @@
 
 これは toyboot4e のブログです。 link:https://github.com/toyboot4e[GitHub アカウント]
 
+横スクロールします。モバイルからの閲覧は難しいかもしれません。
+
 This is a blog of toyboot4e. link:https://github.com/toyboot4e[GitHub account]
 
-.Neofetch
+=== Neofetch
+
 image::intro/neofetch.png[width=518]
 
