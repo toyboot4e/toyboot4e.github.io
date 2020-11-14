@@ -5,8 +5,10 @@
 
 Asciidoctor を使って、本ブログの html を作成しました。また html/css に入門しました。
 
-* https://github.com/toyboot4e/devlog[スクリプト、原稿ファイル]
-* https://github.com/toyboot4e/toyboot4e.github.io[生成された html]
+* [.line-through]#https://github.com/toyboot4e/devlog[スクリプト、原稿ファイル]#
+* [.line-through]#https://github.com/toyboot4e/toyboot4e.github.io[生成された html]#
+
+WARNING: すでにブログ生成にこのスクリプトは使っていません。
 
 やり方としては、 https://asciidoctor.org[Asciidoctor] で原稿を html に変換し、 bash でヘッダとフッタを追加します。一人で作業する分には、シンプルで悪くないと思います。
 
