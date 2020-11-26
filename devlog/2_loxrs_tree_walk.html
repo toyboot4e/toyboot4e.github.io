@@ -483,7 +483,7 @@ src/
 <p>今回実装したのは top-down のパーサで、 Rust, C#, JavaScript などでも実用されている手法だそうです。一方、アカデミックな世界では、 bottom-up のパーサが人気らしいです。研究のし甲斐があるためだとか (著者の <a href="https://corecursive.com/032-bob-nystrom-on-building-an-interpreter/">PodCast</a> より)。</p>
 </div>
 <div class="paragraph">
-<p>Recursive descent parser を進化させたものに <a href="https://en.wikipedia.org/wiki/Pratt_parser">Pratt parser</a> というものがあります。先ほど『文法を直接コードに翻訳したかのよう』と書きましたが、こちらは『Token をパーサ関数に関連付ける』そうです。 maktlad 氏が書いた <a href="https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html">記事</a> では、 Pratt parser を押し進め、演算子の結合順位を書くことでパーサを定義できるようにしています。</p>
+<p>Recursive descent parser を進化させたものに <a href="https://en.wikipedia.org/wiki/Pratt_parser">Pratt parser</a> があります。こちらでは、演算子の『優先順位』を考えます。</p>
 </div>
 </div>
 </div>
