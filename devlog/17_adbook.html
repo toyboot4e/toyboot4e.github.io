@@ -103,7 +103,17 @@
 <h2 id="_about">1. About</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>三代目 SSG を作りました。 mdBook を目指して adbook と名付けています。 <a href="https://toyboot4e.github.io/adbook/index.html">Demo</a></p>
+<p>三代目 SSG を作りました。 mdBook を目指して adbook と名付けています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://toyboot4e.github.io/adbook/index.html">demo</a></p>
+</li>
+<li>
+<p><a href="https://github.com/toyboot4e/adbook">repository</a></p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
 <p>このブログもデモみたいなものですね。</p>
@@ -126,7 +136,7 @@
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-ちなみに <a href="https://antora.org/">Antora</a> という SSG は、 AsciiDoc に特化していて良さそうなのですが、使い方が難しそうなので試していません。
+ちなみに <a href="https://antora.org/">Antora</a> (SSG の名前) は AsciiDoc に特化していて良さそうなのですが、使い方が難しそうなので試していません。
 </td>
 </tr>
 </table>
@@ -237,13 +247,13 @@
 <h2 id="_wrapping_up">3. Wrapping up</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><a href="https://handlebarsjs.com/">Handlebars</a> を使った html の生成ができました。 <code>async_std</code> のおかげか変換が速いのが良かったと思います。今後、ローグライク本などを書くときなどに、使っていきたいと思います。</p>
+<p><a href="https://handlebarsjs.com/">Handlebars</a> を使った html の生成ができました。 <code>async_std</code> のおかげか、変換が速いのが良かったと思います。 <code>adbook</code> の用途としては、ブログはもちろん、ローグライク本などを書くときなどにも使っていきたいと思います。</p>
 </div>
 <div class="paragraph">
 <p>欠けた機能は、サイドバーにおける現ページのハイライトと、印刷用ページの生成です。特に後者は大変そうなので、もしかしたら実装しないかもしれません。</p>
 </div>
 <div class="paragraph">
-<p>テーマの拡張性は無くて、テンプレートファイルの中では、 Rust 側のコードから注入されるデータしか使用できません。拡張性を確保するには、テーマ毎にスクリプトを用意できるようにする必要があると思います。</p>
+<p>テーマの拡張性は無くて、テンプレートファイルの中では、 Rust 側のコードから注入されるデータしか使用できません。拡張性を確保するには、ユーザスクリプトを実装しないとダメだと思います。</p>
 </div>
 </div>
 </div>
