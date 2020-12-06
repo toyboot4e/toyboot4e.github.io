@@ -41,6 +41,16 @@
     --header-height: 50px;
 }
 
+/* Fix for mobile (height of browser chrome, navigator) */
+body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+}
+
+html {
+  height: -webkit-fill-available;
+}
+
 /* -------------------------------------------------------------------------------- *
  * Document outline
  * -------------------------------------------------------------------------------- */
