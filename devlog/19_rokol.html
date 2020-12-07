@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Rokol devlog #1: Textured cube</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Rokol devlog #1: Textured cube</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/devlog/summary.html">Devlog<ol><li><a href="/devlog/1_self.html">Self-introduction</a>
+    
+</li><li><a href="/devlog/2_loxrs_tree_walk.html">Lang #1: Crafting Interpreters - 1/2</a>
+    
+</li><li><a href="/devlog/3_blog.html">SSG #1: bash + Asciidoctor</a>
+    
+</li><li><a href="/devlog/4_wfc.html">RL #1: Wave function collapse explained</a>
+    
+</li><li><a href="/devlog/5_fov.html">RL #2: Field of view (recursive scanning)</a>
+    
+</li><li><a href="/devlog/6_cli.html">Note #1: Great command line tools</a>
+    
+</li><li><a href="/devlog/7_ssg_rs.html">SSG #2: Rust + Asciidoctor</a>
+    
+</li><li><a href="/devlog/8_minimum_ui.html">Note #2: Minimum UI with full features</a>
+    
+</li><li><a href="/devlog/9_booktune_1.html">booktune #1: outline parser</a>
+    
+</li><li><a href="/devlog/10_anf_hello_fna3d.html">ANF devlog #1: Sprite rendering!</a>
+    
+</li><li><a href="/devlog/11_c_libs.html">Note #3: C libraries and modern C-like langs</a>
+    
+</li><li><a href="/devlog/12_anf_gfx.html">ANF devlog #2: Object-oriented rendering API</a>
+    
+</li><li><a href="/devlog/13_anf_pong.html">ANF devlog #3: Pong</a>
+    
+</li><li><a href="/devlog/14_anf_imgui.html">ANF devlog #4: ImGUI</a>
+    
+</li><li><a href="/devlog/15_anf_transform.html">ANF devlog #5: Transform</a>
+    
+</li><li><a href="/devlog/16_anf_media.html">ANF devlog #6: Media</a>
+    
+</li><li><a href="/devlog/17_adbook.html">SSG #3: adbook</a>
+    
+</li><li><a href="/devlog/18_evil_emacs.html">Note #4: Evil Emacs</a>
+    
+</li><li><a href="/devlog/19_rokol.html">Rokol devlog #1: Textured cube</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">unpublished</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_sokol_and_rokol">1.1. Sokol and Rokol</h3>
+<div class="paragraph">
+<p><a href="https://github.com/floooh/sokol">Sokol</a> の wrapper, <a href="https://github.com/toyboot4e/rokol">Rokol</a> を組み始めました。これは <a href="https://github.com/toyboot4e/rokol">Rokol</a> で表示した立方体です！</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/rokol/texcube-miss.png" alt="texcube miss">
+</div>
+<div class="title">Figure 1. Textured cube</div>
+</div>
+<div class="paragraph">
+<p><span class="big"><strong>どこが！！！</strong></span> (細長い)</p>
+</div>
+<div class="paragraph">
+<p>必死の debug の結果……</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/rokol/texcube.png" alt="texcube">
+</div>
+<div class="title">Figure 2. Textured cube</div>
+</div>
+<div class="paragraph">
+<p>ふー。アスペクト比を間違えていました。 3D 入門です！</p>
+</div>
+<div class="sect3">
+<h4 id="_next">&gt;&gt;&gt; Next</h4>
+<div class="paragraph">
+<p>2D ゲームの方は、バグが深刻で停滞中です。再開にはしばらく時間が必要です。</p>
+</div>
+<div class="paragraph">
+<p>Sokol については、 <a href="https://learnopengl.com/">LearOpenGL</a> の <a href="https://www.geertarien.com/learnopengl-examples-html5/">port</a> を見ていこうと思います。グラフィクスを真面目にやるつもりは無かったのですが、創作する能力が無いぶん、プログラミングに偏りつつあります。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_sokol_api">Sokol API</h4>
+<div class="paragraph">
+<p><a href="https://github.com/floooh/sokol">Sokol</a> の API はモダンな作りでした。『モダン』の意味としては、 OpenGL の wrapper である <a href="https://docs.rs/crayon/0.7.1/crayon/video/index.html">crayon の文章</a> がよく説明してくれると思います。もしくは、 <a href="https://github.com/toyboot4e/rokol">Rokol</a> の <a href="https://github.com/toyboot4e/rokol/tree/gfx/examples">examples</a> を見ていただいても良いかもしれません。</p>
+</div>
+<div class="listingblock">
+<div class="title">Rendering in texture example</div>
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">use rokol::{app as ra, gfx as rg};
+
+/// Update and render one frame
+fn frame(&amp;mut self) {
+    rg::begin_default_pass(&amp;self.pa, ra::width(), ra::height());
+    {
+        rg::apply_pipeline(self.pip); <i class="conum" data-value="1"></i><b>(1)</b>
+        rg::apply_bindings(&amp;self.bind); <i class="conum" data-value="2"></i><b>(2)</b>
+        // base_elem, n_indices, n_instances
+        rg::draw(0, 3, 1); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+    rg::end_pass();
+
+    rg::commit();
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>Pipeline</code> には、シェーダ、 texture, 頂点や index のデータ形式が入っています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>Binding</code> には index/vertex buffer が入っています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>Binding</code> のスライスを描画します。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_learn_more">1.2. Learn more</h3>
+<div class="sect3">
+<h4 id="_a_book">A book!</h4>
+<div class="paragraph">
+<p><a href="https://www.amazon.co.jp/%E3%82%B2%E3%83%BC%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0C-Sanjay-Madhav/dp/4798157619/ref=tmm_pap_swatch_0?_encoding=UTF8&amp;qid=&amp;sr=">ゲームプログラミングC++ (SanjayMadhav)</a> を読み始めました。 SDL でウィンドウを出して、 OpenGL で画面を描く定番でした。座学を挟みつつ、 2D, 3D とステップアップして、音声や入力も追加します。</p>
+</div>
+<div class="paragraph">
+<p>いい文章に触れると、心が洗われるようですね。珍しく翻訳も良かったです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>書籍 + サンプルプロジェクトという形式でした。言語は C++ で、サンプルにはお手製の <code>Math.h</code> が入っています。</p>
+</li>
+<li>
+<p>環境構築についての言及は最小限でした。 <code>cmake</code> ではなく Visual Studio (Windows) と XCode (macOS) を使っているようです。辛い。でも紙面を XCode の話に使っていないので良いと思います。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>サンプルが Linux では動かない気がします。あと OpenGL に特化した本の方が、僕には良かったと思いました。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rust_libaries">1.3. Rust libaries</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/ryanisaacg/golem">golem</a> の <a href="https://docs.rs/golem/latest/golem/">API</a> も参考にします。 quicksilver の開発が止まったので凍結かなと思いますが。</p>
+</li>
+<li>
+<p><a href="https://github.com/not-fl3/miniquad">miniquad</a> は <a href="https://github.com/floooh/sokol">Sokol</a> に影響を受けたライブラリです。ブラウザ (wasm) も考慮されています。 <a href="https://github.com/floooh/sokol">Sokol</a> では隠れたグローバル変数となっていた <code>Context</code> もユーザ側のコードに入るなど、大きな違いも見られます。</p>
+<div class="paragraph">
+<p><a href="https://github.com/not-fl3/miniquad">miniquad</a> はウィンドウ表示に <code>sokol_app.h</code> を使っていましたが、 Windows 版のみウィンドウ表示も Rust で書かれています。いずれ他のプラットフォームでも C 無しで動くようになるかもしれません。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_zig_gamekit">zig-gamekit</h4>
+<div class="paragraph">
+<p>(僕にとって) 待望の <a href="https://github.com/prime31/zig-gamekit">zig-gamekit</a> が公開されました。 Zig に興味ある人にはちょうど良いと思います。</p>
+</div>
+<div class="paragraph">
+<p>zig-gamekit は <a href="https://github.com/prime31/zig-renderkit">zig-renderkit</a> の上に作られています。 <a href="https://github.com/floooh/sokol">Sokol</a>-like な renderer を作ってみたくなったとか。さすが…… 笑　OpenGL と Metal の実装を終えて、今はエディタの制作 (<a href="https://github.com/prime31/zig-upaya">zig-upaya</a>) に戻っているそうです。</p>
+</div>
+<div class="paragraph">
+<p>同氏が <a href="https://github.com/prime31/Nez">Nez</a> を作らなければ、あるいは突如として 3 つの言語で 3 つのフレームワーク (<a href="https://github.com/prime31/via">via</a>, <a href="https://github.com/prime31/Odin-Libs">Odin-Libs</a>, <a href="https://github.com/prime31/zig-gamekit">zig-gamekit</a>)を作らなければ、今の僕はフレームワークを作ろうなんて考えもしませんでした。最高です。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_zig">2. Zig</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://github.com/prime31/zig-gamekit">zig-gamekit</a> を見ていると、 <strong>Zig は誰でも読める</strong> と思いました。 Rust よりも、むしろ Zig の方がゲーム開発において定番の選択肢になり得るような雰囲気があります。チェックしておこうと思います。</p>
+</div>
+<div class="sect2">
+<h3 id="_features">2.1. Features</h3>
+<div class="paragraph">
+<p>Zig には RAII がありません。替わりに、オブジェクトをアロケートしたら、すぐに <code>defer free(obj);</code> とします (スコープを抜けたら <code>free</code> が実行される) 。</p>
+</div>
+<div class="paragraph">
+<p>Zig では custom allocator を自由に設定することができます。普段は general なアロケータを、ファイル IO などではリングバッファを使い、 C に渡すメモリには専用のアロケータを使うようです。</p>
+</div>
+<div class="paragraph">
+<p>Zig の初期値は <a href="https://github.com/ziglang/zig/issues/485">センスが良くて</a> いいですね。型名を <code>.</code> で省略できるのが良いです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_zig_examples">2.2. Zig examples</h3>
+<div class="paragraph">
+<p>zig-gamekit のコードをいくつかハイライトします。</p>
+</div>
+<div class="paragraph">
+<p>Zig では optional と result が組み込み型であり、専用の構文が用意されています:</p>
+</div>
+<div class="listingblock">
+<div class="title">gfx.zig</div>
+<div class="content">
+<pre class="highlight"><code class="language-zig" data-lang="zig">pub fn setShader(shader: ?*Shader) void {
+    const new_shader = shader orelse &amp;global_state.shader; <i class="conum" data-value="1"></i><b>(1)</b>
+    ..
+}
+
+pub fn init() void {
+    state.shader = Shader.initDefaultSpriteShader() catch unreachable; <i class="conum" data-value="2"></i><b>(2)</b>
+    draw.init();
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>orelse</code> で <code>?*Shader</code> (optional pointer to <code>Shader</code>) を <code>*Shader</code> に変換します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>catch</code> で <code>!*Shader</code> (error union of pointer to <code>Shader</code>) がエラーのときの処理を書けます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>catch</code> は <code>catch |err| ..</code> と続けて書くことができます。いいなぁ。</p>
+</div>
+<div class="paragraph">
+<p><code>for</code> や <code>switch</code> では、無名関数のような構文を使います:</p>
+</div>
+<div class="listingblock">
+<div class="title">MultiBatcher::flush (draw)</div>
+<div class="content">
+<pre class="highlight"><code class="language-zig" data-lang="zig">// send data to gpu
+self.mesh.updateVertSlice(self.vert_index);
+
+// bind textures
+for (self.textures) |tid, slot| { <i class="conum" data-value="1"></i><b>(1)</b>
+    if (slot == self.last_texture) break;
+    self.mesh.bindImage(tid, @intCast(c_uint, slot));
+}
+
+// draw
+const quads = @divExact(self.vert_index, 4);
+self.mesh.draw(0, @intCast(c_int, quads * 6));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>switch</code> を使ったコードはありませんでした。 <a href="https://ziglang.org/documentation/master/">Zig Documentation</a> には載っています。</p>
+</div>
+<div class="paragraph">
+<p>Generics の例です:</p>
+</div>
+<div class="listingblock">
+<div class="title">Vec2.zig</div>
+<div class="content">
+<pre class="highlight"><code class="language-zig" data-lang="zig">pub fn Vec(comptime S: usize, comptime T: type) type { <i class="conum" data-value="1"></i><b>(1)</b>
+    return switch (S) {
+        2 =&gt; extern struct { <i class="conum" data-value="2"></i><b>(2)</b>
+            x: T = 0,
+            y: T = 0,
+
+            .. (関数など)
+        },
+        3 =&gt; extern struct {
+            x: T = 0,
+            y: T = 0,
+            z: T = 0,
+            ..
+        },
+        ..
+        else =&gt; @compileError("Vec of size " ++ S ++ " is not supported"),
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Generic な構造体は、関数のような形で実装されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>値も compile-time 定数として受け取ります。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>まだ interface 相当のものが無く、多態性には、構造体のフィールドに関数をセットします。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sokol_fna3d">3. Sokol | FNA3D</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>完全に自分用メモです。</p>
+</div>
+<div class="sect2">
+<h3 id="_fna3d">3.1. FNA3D</h3>
+<div class="paragraph">
+<p><a href="https://github.com/FNA-XNA/FNA3D">FNA3D</a> は <a href="https://fna-xna.github.io/">FNA</a> のグラフィクスライブラリです。ウィンドウを出すには <a href="https://www.libsdl.org/">SDL</a> を使います。 <a href="https://www.libsdl.org/">SDL</a> は対応プラットフォームが多く、機能も充実した『鉄板』みたいです。 <a href="https://www.libsdl.org/">SDL</a> の 2D rendering は、なぜか使われていません。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/FNA-XNA/FNA3D">FNA3D</a> は <code>cmake</code> でビルドすると DLL になります (700 KB ほど) 。バックエンドは、実行時に自動的に選択されます。ユーザはバックエンドを気にする必要がありません。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/FNA-XNA/FNA3D">FNA3D</a> (XNA) は <em>Effect</em> という独自方式でシェーダを管理し、各種シェーダを 1 つのファイル (<code>.fx</code>) に入れます。 <code>.fx</code> ファイルは DirextX9 のシェーダコンパイラ (<code>fxc.exe</code>) (を <code>wine</code> から使うなどして) コンパイルします。 Effect は評判の良くない仕組みですが、 MojoShader のおかげで、 <strong>どのバックエンドでも共通のシェーダファイルを使う</strong> ことができます。そのため、簡単なシェーダには向いていると思います。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+もっとも、結局 OpenGL で良い気がしました。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/FNA-XNA/FNA3D">FNA3D</a> の API は独自のものですが、強いて言うなら DirectX9 に似ているそうです (?) 。 Pipeline や Pass オブジェクトはありません。大半の機能は <code>Device</code> のメソッドのような形で提供されます。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/FNA-XNA/FNA3D">FNA3D</a> のドキュメントはコメントのみです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sokol">3.2. Sokol</h3>
+<div class="paragraph">
+<p><a href="https://github.com/floooh/sokol">Sokol</a> は header-only のライブラリ集です。 <code>sokol_app.h</code> でウィンドウを出して、 <code>sokol_gfx.h</code> で画像を表示します。 <code>sokol_app.h</code> は <strong>ゲームパッドのサポートなどがまだまだ</strong> みたいなので、機能不足かもしれません。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/floooh/sokol">Sokol</a> はプラットフォームに応じてコンパイルします。バックエンドはユーザがコンパイル時に決定し、 D3D11, GlCore33, Metal, WebGPU から選べます。バックエンドに応じて、使える機能が若干変わりますが、コメントを読めば把握できます。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/floooh/sokol">Sokol</a> では、バックエンド毎にシェーダを用意する必要があります。クロスコンパイラが用意されていますが、 C 向けの作り (C のヘッダを出力する) であり、 Rust からは使いやすくありません。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/floooh/sokol">Sokol</a> の API は、 WebGPU などを参考に作られたようです。 Pipeline や Pass といったオブジェクトがあります。 API の背後にはグローバルオブジェクトがあり、 <em>resource</em> はそこに保存されます。ユーザは保存された resource (buffer, image pass, pipeline, shader) への ID を持つことができます。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/floooh/sokol">Sokol</a> はよくコメントが書いており、作者のブログ記事も楽しむことができます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://floooh.github.io/2017/07/29/sokol-gfx-tour.html">A Tour of sokol_gfx.h</a> (Jul 29, 2017)</p>
+</li>
+<li>
+<p><a href="https://floooh.github.io/2019/01/12/sokol-apply-pipeline.html">A small sokol_gfx.h API update</a> (Jan 12, 2019)</p>
+</li>
+<li>
+<p><a href="https://floooh.github.io/2020/04/26/sokol-spring-2020-update.html">Sokol headers: spring 2020 update</a> (Apr 26, 2020)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Header-only ライブラリですが、 Rust から使う場合は、 <code>bindgen</code> の出力を見れば、宣言部分の <code>diff</code> のみを見ることができます。</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>
