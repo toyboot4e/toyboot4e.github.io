@@ -1,7 +1,13 @@
 (
     summary: ("About", "index.adoc"),
     items: [
-        Dir("devlog"),
+        // File("", "./self.adoc"),
+        Dir("anf"),
+        Dir("rokol"),
+        Dir("lang"),
+        Dir("rl"),
+        Dir("ssg"),
+        Dir("note"),
         Dir("read"),
     ],
 )

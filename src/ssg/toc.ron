@@ -1,0 +1,9 @@
+(
+    summary: ("", "./summary.adoc"),
+    items: [
+        File("", "./1_bash.adoc"),
+        File("", "./2_rs.adoc"),
+        File("", "./3_booktune.adoc"),
+        File("", "./4_adbook.adoc"),
+    ],
+)

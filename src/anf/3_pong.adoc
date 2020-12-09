@@ -1,0 +1,128 @@
+= Pong
+:revdate: Sep 22, 2020
+
+== Devlog
+
+制作中フレームワーク ANF で Pong を作りました。
+
+=== Pong
+
+Pong とは、画面端のバー (paddle) でピンポン球を打ち合うゲームです。
+
+まずは paddle を表示しました:
+
+image:13_pong/paddles_1.png[]
+
+おっと、イカちゃんが paddle 役をやってくれるようです！　画面に調和を感じますね。
+
+==== >>> Sub textures enabled
+
+`ika-chan.png` は 12 のイカちゃんが詰まった画像ファイルなので、左右の paddle は、元 texture の sub texture と言えます。
+
+==== Delta time
+
+左のパドルをプレイヤが動かせるようにしたいと思います。パドル位置は stem:[\mathbb{x} = \int \mathbb{v}(t) dt] という積分値ですが、オイラー法によって 1 次式に近似できます:
+
+[stem]
+++++
+\mathbb{x}(t+dt) \sim \mathbb{x}(t) + \mathbb{v}(t) * dt \\
+\mathbb{v}(t+dt) \sim \mathbb{v}(t) + \mathbb{a}(t) * dt
+++++
+
+ここで stem:[dt] を与えるために、 FNA の https://github.com/FNA-XNA/FNA/blob/fda1ef9a2bd520c3424d294baf954d654b46a316/src/Game.cs#L422[ゲームループ] をパクりました。写経は学びと実装を両立できて効率良いですね。
+
+これで、イカちゃんを操作できるようになるはずです:
+
+image:13_pong/paddles_2.png[]
+
+*ンンン*　画面外に行ってしまいました。画面端で止まるように修正します。
+
+==== Bounce
+
+画面端や paddle に当たったボールには反射してもらいます。
+
+video::anf/no_bounce.mp4[]
+
+_おっと_ 反射してくれません。イカちゃん (paddle) の下端に当たり判定が無かったようです。
+
+まあ修正します……
+
+video::anf/bounce.mp4[]
+
+*ヤッター！*
+
+もっと色々やりたかったんですが、詰まったので記事にしました。
+
+== Random
+
+あとは雑多に。
+
+=== Tips on Rust
+
+==== API guideline
+
+https://sinkuu.github.io/api-guidelines/[Rust APIガイドライン] を読む。読みます。
+
+翻訳グループの仕事は素晴らしいですね。
+
+==== Nightly version of `cargo doc`
+
+Nightly 版のドキュメントでは、アイテムのリンクが楽です:
+
+[source,rust]
+----
+//! `cargo +nightly doc` allows these link notations:
+//!
+//! [`X`] and [`A`](crate::a::A)
+
+struct X {}
+
+mod a {
+    struct A {}
+}
+----
+
+https://crates.io/[crates.io] も、 `cargo doc` は nightly 版を使用しています。
+
+=== `build.rs` (build script)
+
+ANF フレームワークのベースには、 https://github.com/toyboot4e/rust-fna3d[Rust-FNA3D] があります。これは、 C ライブラリ FNA3D のラッパーです。 Rust-FNA3D を crates.io に出す前に、以下を自動化したいです:
+
+* [ ] FNA3D が無ければ pull
+* [ ] FNA3D の `CMakeList.txt` にパッチを適用
+* [x] FNA3D がビルドされていなければ、 `cmake` で自動ビルド
+* [ ] Windows でも動く `build.rs` にする
+
+=== Global objects
+
+グローバルなデータの扱い方には、 3 通りあると思います。
+
+==== 1. Big `Context` object
+
+https://docs.rs/ggez/latest/ggez/[ggez] や https://docs.rs/tetra/latest/tetra[tetra] のやり方です。ウィンドウ、画像、音声などを `Context` 入れておきます。フレームワークの関数は `Context` オブジェクトを受け取って機能を発揮します:
+
+[source,rust]
+----
+ggez::graphics::draw(Context, DrawParams)
+----
+
+* この方法では、 `Context` を引数として渡して回ることになります。すると、オブジェクト指向な API を作れないと思います。それはそれで、コンスタントな API となって良いかもしれません。
++
+細部が分からないので、 ggez や tetra の上に作られたフレームワークを見てみたいです。
+
+* https://docs.rs/macroquad/latest/macroquad/[macroquad] では、 `Context` オブジェクトはユーザから隠されており、グローバルオブジェクトとしてフレームワーク内で共有されています。
+
+==== 2. Dynamic map
+
+[.line-through]#https://bevyengine.org/[Bevy] ESC の `Resource` がこれだと思います# うーん？ `HashMap<Type, Box<dyn Any>>` 相当のものを使います。
+
+==== 3. Subclass
+
+XNA では、 `Game` クラスを継承することで、フレームワークを拡張できます。多態性無しでも継承は結構いいんじゃないかと思いました。
+
+ANF では継承をイメージして、 `Game` クラス相当のものをサンプルコードとして提供しようと思います。ユーザは、そのコードを書き換えることでフレームワークを拡張します。継承すべきコードをユーザ側のコードに入れてしまう形です。
+
+== Wrapping up
+
+イカちゃんは http://park2.wakwak.com/~kuribo/[敦煌回廊] (うなうなぎ 様) からお借りしております。カワイイヤッター！
+

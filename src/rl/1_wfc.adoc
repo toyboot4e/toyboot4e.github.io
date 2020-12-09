@@ -1,0 +1,477 @@
+= Wave function collapse explained
+:revdate: Nov 23, 2019 (updated on Jan 24, 2020)
+
+== Story
+
+制約伝播 (constraint propagation) に基づく迷宮生成アルゴリズムを紹介します。
+
+* オリジナル: https://github.com/mxgmn/WaveFunctionCollapse[mxgmn/WaveFunctionCollapse]
+* 僕の実装: https://github.com/toyboot4e/wfc.cs/[toyboot4e/wfc.cs]
+
+なかなか酷い記事になってしまったので、流し読みしてください……
+
+== Introduction
+
+迷宮生成のアルゴリズムは数多く、それぞれ特別な実装を持っています。そして、ほとんどのアルゴリズムは、それぞれの傾向を持ったマップを出力します。しかし、 WFC は少々毛色が異なります。
+
+image::http://i.imgur.com/X3aNDUv.gif[title="demo of WFC with https://github.com/mxgmn/WaveFunctionCollapse/tree/master/samples/Summer[samples/Summer]"]
+
+WFC は、入力と『類似』した出力をランダムに生成します。したがって、入力を変えることで、多様な『雰囲気』のマップが得られます。
+
+NOTE: なお、 WFC は『制約充足問題』の一種であると言われています。
+
+難点は、生成に時間がかかることと、生の出力がゲームマップ向きではないことです。足場を人つながりにするなど、二段階目の加工が必要になります。
+
+== Models of WFC
+
+https://github.com/mxgmn/WaveFunctionCollapse[WFC] のコア・アルゴリズムは、 `Solver` です。 `Solver` は、与えられた `[Pattern]` footnote:[`[Pattern\]` は、 `Pattern` の配列という意味です] を `Pattern` 同士の 『接続性』 (`AdjacencyRule`) に基づいてランダムに配列します。
+
+生成法を変えるには、 `Solver` への入力である `[Pattern]` と `AdjacencyRule` を変えます。すなわち、それらを生成する `Model` を換えます。
+
+[source,haskell]
+----
+Model: Input -> ([Pattern], AdjacencyRule)
+Solver: ([Pattern, AdjacencyRule) -> Map
+----
+
+`Solver` は後回しにして、 `Model` の違いを見てみます。
+
+=== Simple tiled model
+
+==== Pattern = 1x1 (tile)
+
+このモデルでは、 1 つのタイルを pattern として扱います。 1x1 タイル同士の隣接性のみが考慮されます。
+
+==== User input = xml
+
+たとえば先ほどの GIF は、入力 (https://github.com/mxgmn/WaveFunctionCollapse/tree/master/samples/Summer[samples/Summer])  = タイル画像 + 次の xml ファイルです。
+
+.samples/Summer/data.xml
+[source,xml]
+----
+<set size="48" unique="True">
+	<tiles>
+		<tile name="cliff" symmetry="T"/>
+		<tile name="cliffcorner" symmetry="L"/>
+		..
+	</tiles>
+	<neighbors>
+		<neighbor left="cliff 0" right="cliff 0"/>
+		<neighbor left="cliff 2" right="cliffcorner 1"/>
+        ..
+	</neighbors>
+</set>
+----
+
+TIP: ただ、このような設定ファイルを用意するのは大変です。
+
+==== Constraint = adjacency
+
+上の xml で、隣接可能なパタン (タイル) が定義されています。 `Solver` は、タイルの隣接性 (adjacency) を制約として、出力を作ります。
+
+=== Overlapping model
+
+==== Pattern = NxN tiles
+
+このモデルでは、 NxN サイズのタイルの塊を pattern として使います。
+
+==== User input = map
+
+与えられたマップから、 `[Pattern]` と `AdjacencyRule` を作ります。 3x3 のマップを入力としてみましょう。
+
+.source map (3x3)
+[source]
+----
+..#
+.##
+.#.
+----
+
+入力から 2x2 サイズのパタンを抽出します。
+
+.patterns (2x2)
+[source]
+----
+..  .#
+.#  ##
+
+.#  ##
+.#  #.
+----
+
+これらの回転 (rotation) や裏返し (flipping/reflection) も考えてみます（2x2 サイズでは、回転だけでも十分です）。重複したパタンは除きます。
+
+.patterns with rotations and flippings
+[source]
+----
+..  ..  #.  .#
+.#  #.  ..  ..
+
+.#  #.  ##  ##
+##  ##  #.  .#    <-- (duplicated patterns)
+
+.#  ..  #.  ##
+.#  ##  #.  ..
+----
+
+重複を除くと、 12 個のパタンができました。ここで、パタン配置に制約を課します。
+
+==== Constraint = local similarity
+
+Overlapping model では、次のような制約を課します。
+
+TIP: 出力から展開できるパタンの集まりは、入力から展開したパタンの集まりの部分集合である。
+
+たとえば、次のような出力が得られたとします。
+
+.output
+[source]
+----
+...
+.#.
+###
+----
+
+これを 2x2 に分けていくと、次のように 4 パタンに分かれます。これらは、どれも入力から展開できるパタンです。
+
+.Output and patterns extracted
+[source]
+----
+(output)                  (patterns)
+
+                            ..  ..
+  ...        extract        .#  #.
+  .#.    --------------->
+  ###    <---------------   .#  #.
+             overlap        ##  ##
+----
+
+逆に、 4 つのパタンを重ねれば、先ほどの出力に戻ることが分かります。これが overlapping model における制約（満たすべき条件）です。
+
+Local similarity を満たすパタン配列をするためには、パタン同士の `compatibility` を確かめます。重なった部分のタイルが一致するなら、それらのパタンは `compatible` (overlappable) です。そうして作り上げた `AdjacencyRule` を `Solver` に渡します。
+
+`Solver` は、互いに重なり合うことのできる `Pattern` のグリッドを作ります。このグリッドに対して、上図の右から左への加工に相当する操作 (`overlap`) を行うことにより、最終的な出力マップを得ることができます。
+
+==== Example
+
+制約も分かったので、 overlapping model の使用例を見てみましょう。僕が https://github.com/toyboot4e/wfc.cs[実装] した WFC に、迷宮らしき入力を与えてみます。 `#` が壁、 `.` が床を表します。
+
+.Input (16x16)
+[source,txt]
+----
+###.########.###
+###.#####......#
+#.....###......#
+#.....###......#
+#...............
+......###......#
+#.....###......#
+##.######......#
+##.########.####
+##.########.####
+##......##....##
+........##......
+##............##
+##......##....##
+##......####.###
+###.########.###
+----
+
+N=3 で走らせてみると、次のような出力が得られました。入力と似た風になっています。この出力から任意の 3x3 のパタンを取り出すと、それは上の入力マップからも (回転や鏡写しで) 見つけることができます。 local similarity とは、上手い名前だと思いました。
+
+.Output (36x36)
+[source,txt]
+----
+...........##.##.##########.###.####
+...........##.......#######.###.####
+....................####.........###
+...........##.......####.........##.
+#.###.###.###.####.######.###.#####.
+#.###.###.###.####.######.###.######
+#.###.###.....##...######.......####
+................................##..
+.......##.....##...######...........
+.......####.####...######.......##..
+#.###.#####.####...##..########.##..
+#.###.####...########..########.###.
+...##.####...############..####.###.
+...##.####...##..########..##.......
+#.###.#########..##...###..##.......
+#.###.#############...###..##.......
+#..##.###....######...###..#########
+...##.................##############
+#......##....#######.#############..
+#..###.##.##.#######.#############..
+##.###.##.##.#####.....######...##..
+##.##..##.......##.....######...##..
+...##...........##.....######.......
+#......###.###.###..............##..
+#..###.###.###.###.....#######.#####
+######.###.###.###.....#######.#####
+######.###..##.#############.....###
+............##.#############........
+........##..##...##..#######.....##.
+........##.......##..########.#####.
+............###.###..########.#####.
+........##..###.###..####.......###.
+........##.......##..####.......###.
+####.#####..##...##..####.......###.
+####.#########...########.......###.
+##....########...########...........
+----
+
+なお、床は 1 繋がりにはなっておらず、孤立した部分もあります。 *ゲームのマップとしては、そのまま使うことはできません* 。
+
+http://www.cavesofqud.com/[Caves of Qud] は、 WFC を https://gigazine.net/news/20181116-infinite-procedurally-generated-city/[実用]したゲームです。 WFC で円などの形 (segment) を埋めてから、孤立した部分を無くすプロセスを挟んでいるようです。
+
+先ほどの出力を円形に切り出してみると、意味深になります。
+
+[source,txt]
+----
+             .......####            
+          ..........####...         
+         ..##.......####....        
+       ##.###.####.######.###.      
+      ###.###.####.######.###.#     
+     .###.....##...######.......    
+    ............................#   
+    ...##.....##...######........   
+   ....####.####...######.......##  
+  ###.#####.####...##..########.##. 
+  ###.####...########..########.### 
+  .##.####...############..####.### 
+ ..##.####...##..########..##.......
+ .###.#########..##...###..##.......
+ .###.#############...###..##.......
+ ..##.###....######...###..#########
+ ..##.................##############
+ ......##....#######.#############..
+ ..###.##.##.#######.#############..
+ #.###.##.##.#####.....######...##..
+ #.##..##.......##.....######...##..
+ ..##...........##.....######.......
+ ......###.###.###..............##..
+  .###.###.###.###.....#######.#### 
+  ####.###.###.###.....#######.#### 
+  ####.###..##.#############.....## 
+   .........##.#############......  
+    ....##..##...##..#######.....   
+    ....##.......##..########.###   
+     .......###.###..########.##    
+      ..##..###.###..####......     
+       .##.......##..####.....      
+         #..##...##..####...        
+          ####...########..         
+             #...#######
+----
+
+出入り口を付けて、巣穴みたいにしてみたいと思いました。
+
+=== Adjacency model
+
+Overlapping model では、 NxN サイズのパタンをマップから生成しました。 Adjacency model でも同様にします。ただし、制約をパタン同士の *隣接条件* とし、パタンの重なりは考えません。
+
+NOTE: adjacency model というのは *非公式* ですが、比較的メジャな方法なので、名前をつけてみました。
+
+=== Wrapping up
+
+`Solver` はどの model でも共通であり、入力のみが変化します。入力を生成する機構は `Model` と呼ばれ、以下の 3 つを考えました。
+
+.Models of WFC
+[cols="2,2,1,2"]
+|====
+^| model              ^| size of patterns ^| user input ^| constraint
+
+^| simple tiled model ^| 1x1              ^| xml        ^| adjacency
+^| overlapping model  ^| NxN              ^| map        ^| local similarity
+^| adjacency model    ^| NxN              ^| map        ^| adjacency
+|====
+
+同じコア・アルゴリズム (`Solver`) を使っている以上、 `Model` がアルゴリズムのオーダを変えることはできません。ただ、 adjacency model は、 overlapping mode に比べて出力のサイズが小さくなります。なぜなら出力グリッドがパタン同士の重なり部分を含まないためです。
+
+== `Solver([Pattern], AdjacenyRule) -> Grid<Pattern>`
+
+`Model` が定義した `AdjacencyRule` を満たすように `Pattern` のグリッドを作ります。と言っても確実な方法があるわけではなく、『試して上手くいったら採用』という形になります。ただし『こうすればよく上手くいく』という『発見的手法 (heuristic)』に頼ります。
+
+=== The solving loop
+
+出力グリッドを『未確定』の状態で初期化してから、 `Solver` は走ります:
+
+[source,csharp]
+----
+public class Solver {
+    // ~~
+    public bool run() {
+        while (this.numRemainingCells > 0) {
+            var cell = selectNextCellToDecidePattern(); // <1>
+            var pattern = selectStiilAvailablePatternForCell(cell); // <2>
+            decidePatternOfCell(cell, pattern); // <3>
+            this.numRemainingCells -= 1;
+            propagateRemovals(); // <4>
+        } // <5>
+    }
+}
+----
+<1> パタンが未確定のセルを 1 つ選びます (後述の heuristic を使用)。
+<2> そのセルにまだ配置可能なパタンを選びます。
+<3> このセルを選んだパタンで確定し、その他のパタンをセルの配置可能パタンから `remove` します。
+<4> パタンが配置不能になった (`remove` した) 事による影響を *伝播* footnote:[propagate という言葉は制約充足問題ではメジャなようです] (`propagate`) させます。すなわち、配置可能パタンのキャッシュを更新します。
+<5> ループ開始へ戻り、再び次のセルが選ばれます。すべてのセルのパタンを確定させたら終了です。
+
+ただし、配置可能なパタン数が 0 となるセルが出た場合は、失敗です。そのときは、今は最初からやり直すことにしておきます (後述) 。
+
+各手順を詳しく解説します。
+
+==== 1. Selecting "the most constrained" cell (pattern weight heuristic)
+
+未確定のセルから、次にパタンを確定させる0セルを選びます。このとき、発見的手法 (heuristic) として、最も "制約された" セルを選びます。具体的には、パタンが `source` に現れた回数をそのパタンの重み付けとし、重みの総和が最も小さなセルを選びます。
+
+効率のためには、 `BinaryHeap` に重みづけされたセルを入れて 1 つずつ取り出します:
+
+* セル毎に、重さのキャッシュを作ります
+* セルの重み付けが更新されたとき、そのセルを新たに `BinaryHeap` に入れます (これで古いデータよりも先に出てくるようになります)
+* 重みの総和に小さな乱数を足すことで、重みの等しいパタンの選出をランダムにします
+
+==== 2. Selecting a pattern
+
+選んだセルから、配置可能なパタンをランダムに選び、確定させます。そのためには、重み付けされたセルの配列を、一種の https://en.wikipedia.org/wiki/Run-length_encoding[run-length encoding] とみなして、乱数を使って選びます。ただし、配置可能なパタン数が 0 の場合は *失敗* なので注意します (contradicted) 。
+
+==== 3. Constraint propagation
+
+セルのパタンを確定すると、そのセルの周囲に配置可能なパタンが減ります。この変化を追跡するためのステップです。
+
+===== Enabler counts
+
+まず、それぞれのセルについて、 4 方向に向けて、隣接可能なパタン (enabler) の数を追跡することにします。
+
+TIP: `EnablerCounts` は、 `Grid<Dictionary<Direction>>` です。
+
+===== Removals of patterns
+
+あるパタンを `remove` したときに、その影響を、 `EnablerCounts` の変化として周囲のセルに伝播させます。なお、 `enabler` の数が 0 になる方向が出た場合、そのパタンは `remove` されます。したがって、パタンの除去と `EnablerCounts` の更新は再帰的になり得ます。
+
+==== 4. Repeating until solved
+
+pass:[1.] に戻り、次のセルを選びます。やがて全セルを『確定』させるか、どこかのセルに配置可能なパタンが無くなって『失敗』します。
+
+== Improving WFC (overlapping model)
+
+実装の概要を述べました。検討項目を挙げてみます。
+
+=== Impossible input (IMPORTANT)
+
+入力パタンの端のセルには、 `enabler` の数が 0 の方向が存在しえます。しかし、実際に 0 の方向がある場合は、誤った入力を生成してしまうことが知られています (https://github.com/mxgmn/WaveFunctionCollapse/issues/60[#60])footnote:[僕はこれで一ヶ月も悩んでしまいました]。
+
+したがって、現状の WFC は、実質的に *周期的なパタン (periodic input) 以外は受け付けない* と思います。
+
+=== Controlling
+
+==== Periodic input/output (loop, repetation)
+
+出力マップの端から端をループさせ、 local similarity を検査することも考えられます。また、入力からパタンを作るときも、ループさせてパタンを作る方法があります。
+
+前述の通り、 periodic input は ON にした方が無難です。
+
+==== Initial state
+
+出力の一部が定まった入力に対し、 WFC による地形生成を試みます。たぶん頑張ればできます。
+
+==== Global constraint or post processing
+
+マップの端を壁にしたい、孤立した地形を無くしたい、などの制約が思い浮かびます。しかし、 overlapping model で *local similarity 以外の制約を課すのは難しい* です。 WFC 後の *2 段階目の加工* を検討に入れましょう。
+
+=== Performance
+
+`Solver` は *非常に遅い* です。早くても数秒はかかりますし、特に出力サイズを大きくすると、一気に遅くなります。
+
+僕の実装は、メモリの連続性を意識したので、そこまで遅くは無いと思います。しかし、 100x100 の出力には、 14 秒 x 試行回数が必要でした。したがって、 WFC を実用するなら、 *必要な出力サイズを小さくする*、 *予め別スレッドでマップを生成しておく* などの工夫するか、アルゴリズムの改良が必要だと思います。
+
+NOTE: 他の実装は試していません。また、 Release ビルドにすれば、多少は速くなると思います。
+
+==== Adjacency model
+
+Adjacency model は、タイル同士の接続性を考えて配置するモデルでした。 `Solver` への入力を小さくすることになり、結果的にパフォーマンスは改善されます。
+
+==== Backjumping
+
+WFC が失敗したとき、リスタートするのではなく、何らかの方法で復帰・継続させることを考えます。その 1 つが backjumping です。
+
+配置可能なパタンが無くなったセルが見つかったとき、その周辺のパタンをクリアしてから、再配置を試みます。これでリスタート回数を減らすことができれば、 WFC の *処理時間が安定* します。
+
+NOTE: ちなみに、処理の undo は backtracking と呼びます。
+
+== Discussion
+
+=== What is "wave function collapse"?
+
+『波動関数の崩壊』。非常に格好いい名前ですが、ピンと来るようになるまでは、表現が紛らわしいです。量子力学をしている訳でもありません。
+
+Wave function collapse らしき様子は、デモにありました。未解決のセルを、『状態』と称して、配置可能性があるタイルの『重ね合わせ』で表示していました。具体的には、配置可能なタイルの色の期待値として描いています。
+
+image::http://i.imgur.com/X3aNDUv.gif[title="demo of WFC with https://github.com/mxgmn/WaveFunctionCollapse/tree/master/samples/Summer[samples/Summer]"]
+
+しかし、この表示にはさほど意味がありません。波動関数は二乗すると確率になりますが、このぼやけた表示は出現確率を表すのではなくて、もっと間接的な値（まだ配置可能なパタンの分布）を表示したものです。したがって、 WFC には波動関数に相応するものが現れず、 WFC はミスリーディングな名前だったと思います。たぶん……
+
+=== What's special about WFC?
+
+今までは地形や迷宮を直接作り出すアルゴリズムが多かったのですが、 WFC は、ルールに基づいて生成します。これは『制約充足問題』として知られているようですが、迷宮生成に使った人は少なかったのではないでしょうか。
+
+特に、実用的なレベルまでディテールを考え詰めたのが、 WFC の功績なのではないかと思います。
+
+== Wrapping up
+
+簡単 & 強力な新規の自動生成アルゴリズム 『wave function collapse』 を解説する記事でした。 WFC は入力と似た出力を作るため、雑多な地形を作ったり、プロトタイピングには向いています。しかし、出力に特定の制限を加えるのは難しいため、使い方に工夫が必要です。また、大きなマップを作る場合、パフォーマンスが問題になるかもしれません。
+
+https://adventar.org/calendars/4601[カレンダー] の明日の記事は、 ねんど さんの『 http://clockhand.net/blog/index.php/2019/12/22/roguelike-bad-design/[自作ローグライクで失敗したアイデア集と感想。] 』です。楽しみです。
+
+:sectnums!:
+== Appendix
+
+=== A. Resources / links
+
+==== Original
+
+* https://github.com/mxgmn/WaveFunctionCollapse[mxgmn/WaveFunctionCollapse]
++
+　2016/09/30 に公開された、オリジナルのレポジトリです。 2 つのモデルの WFC を実装しています。コードは 1,000 行未満ですが、かなり読みづらいためお勧めしません。
+
+==== In Japan..
+
+* https://gigazine.net/news/20181116-infinite-procedurally-generated-city/[「無限に都市が生成されるアルゴリズム」で生成された都市を自由に歩き回ってみた]
++
+　WFC について言及している日本語の記事です。この動画だけ、若干話題になっていたようです。
+
+==== Overlapping model
+
+* https://gridbugs.org/wave-function-collapse/[Grid Bugs / Procedural Generation with Wave Function Collapse]
++
+　*最も詳しかった解説記事* です。僕の実装は、この記事に基づいています。画像生成の文脈で語られていることには注意してください。
+
+* https://www.youtube.com/watch?v=fnFj3dOKcIQ[Brian Bucklew - Dungeon Generation via Wave Function Collapse]
++
+　http://www.cavesofqud.com/[Caves of Qud] の作者によるトークです。WFC で壁を作ってから、孤立した床を繋いでいます。 *ゲームで実用していて非常に面白いです* 。おすすめです。
+
+==== Adjacency model
+
+* http://bfnightly.bracketproductions.com/rustbook/[Roguelike Tutorial - In Rust]
++
+　ローグライクの作り方を解説した本です。 Adjacency model により、孤立した地形が出ないようにマップ生成を行なっています。
+
+* https://ijdykeman.github.io/ml/2017/10/12/wang-tile-procedural-generation.html[Procedural Worlds from Simple Tiles]
++
+　Adjacency model を解説した記事です。ツールを 5$ で販売しています。
+
+==== Papers
+
+特に良いものが見つかれば、特別にコメントします。
+
+* https://adamsmith.as/papers/wfc_is_constraint_solving_in_the_wild.pdf[WaveFunctionCollapse is constraint solving in the wild]
++
+　WFC がどういうものなのかよく分かります。 *おすすめです* 。 _answer set programming_ が新鮮なので、じっくり読んでみます。
+* https://pdfs.semanticscholar.org/28c3/f4e49ab34e05f03132be508c5e268f93b095.pdf[Generating Paths with WFC]
+　以降は未読です。
+* https://arxiv.org/pdf/1905.05077.pdf[Tile Pattern KL-Divergence for Analysing and Evolving Game Levels]
+* https://www.researchgate.net/publication/334416222_Expanding_Wave_Function_Collapse_with_Growing_Grids_for_Procedural_Content_Generation[Expanding Wave Function Collapse with Growing Grids for Procedural Content Generation.]
+* https://www.researchgate.net/publication/336086804_Automatic_Generation_of_Game_Content_using_a_Graph-based_Wave_Function_Collapse_Algorithm[Automatic Generation of Game Content using a Graph-based Wave Function Collapse Algorithm]
+* Markov chain
+

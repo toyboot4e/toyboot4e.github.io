@@ -2,13 +2,15 @@
 :revdate: unpublished
 :idris: https://www.idris-lang.org/[Idris]
 
+== Books
+
 特定のプログラミング言語に関する本をリストしました。未読の物が多いです。
 
 言語の入門書は、細かい言語仕様から語り始めるものが多い気がします。僕はモジュールの分け方を最初に知りたいので、参考になるリポジトリを探すところが出発点になりがちです。
 
-== Not read
+=== Not read
 
-=== Type-Driven Development with Idris
+==== Type-Driven Development with Idris
 
 [cols="1,3"]
 |====
@@ -21,7 +23,7 @@
 
 純粋関数型言語の実用性、型を第一に考える作法と、 {idris} 言語について書かれているようです。本気で役立つのではないかというワクワク感があります。
 
-=== Modern C
+==== Modern C
 
 [cols="1,3"]
 |====
@@ -34,7 +36,7 @@
 
 C は、どの言語からでも呼べるので重要だと思っています。一冊読んでみるべきだと思って、少しずつ読み進めています。
 
-=== すごいHaskellたのしく学ぼう!
+==== すごいHaskellたのしく学ぼう!
 
 [cols="1,3"]
 |====
@@ -47,7 +49,7 @@ C は、どの言語からでも呼べるので重要だと思っています。
 
 Haskell は、自分でモジュールを作れるようになるまでが長くて挫折中です。パッケージマネジャも決定版が無いみたいでつらい。
 
-=== Land of Lisp
+==== Land of Lisp
 
 [cols="1,3"]
 |====
@@ -62,9 +64,9 @@ Haskell は、自分でモジュールを作れるようになるまでが長く
 
 言語サーバ無しの自作言語を作るとき、静的型を持った Lisp はアリかなと検討しています。
 
-== Finished reading
+=== Finished reading
 
-=== The Rust Programming Language
+==== The Rust Programming Language
 
 [cols="1,3"]
 |====
@@ -87,7 +89,7 @@ Rust について書かれた日本語のブログを探すと、凄い人たち
 
 などなど……。まだまだ気づいていないブログもたくさんありそうです。
 
-== Else
+=== Else
 
 * https://ziglang.org/[Zig]
 * https://odin-lang.org/[Odin]

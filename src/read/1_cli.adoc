@@ -1,9 +1,9 @@
 = Books about command line
 :revdate: Nov 11, 2019
 
-Shell, Vim, Git に関する本をリストしました。
-
 == Books
+
+Shell, Vim, Git に関する本をリストしました。
 
 ===  新しい Linux の教科書
 

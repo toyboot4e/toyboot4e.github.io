@@ -1,0 +1,9 @@
+(
+    summary: ("Notes", "./summary.adoc"),
+    items: [
+        File("", "./1_cli.adoc"),
+        File("", "./2_ui.adoc"),
+        File("", "./3_c_libs.adoc"),
+        File("", "./4_evil.adoc"),
+    ],
+)

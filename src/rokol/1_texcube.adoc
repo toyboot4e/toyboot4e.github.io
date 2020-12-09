@@ -1,0 +1,212 @@
+= Textured cube
+:revdate: unpublished
+:cpp: pass:[C++]
+:macruqoad: https://github.com/not-fl3/macroquad[macroquad]
+:miniquad: https://github.com/not-fl3/miniquad[miniquad]
+:quad-snd: https://github.com/not-fl3/quad-snd[quad-snd]
+
+== Devlog
+
+=== Sokol and Rokol
+
+{sokol} の wrapper, {rokol} を組み始めました。これは {rokol} で表示した立方体です！
+
+.Textured cube
+image::rokol/texcube-miss.png[]
+
+[.big]#*どこが！！！*# (細長い)
+
+必死の debug の結果……
+
+.Textured cube
+image::rokol/texcube.png[]
+
+ふー。アスペクト比を間違えていました。 3D 入門です！
+
+==== >>> Next
+
+2D ゲームの方は、バグが深刻で停滞中です。再開にはしばらく時間が必要です。
+
+Sokol については、 https://learnopengl.com/[LearOpenGL] の https://www.geertarien.com/learnopengl-examples-html5/[port] を見ていこうと思います。グラフィクスを真面目にやるつもりは無かったのですが、創作する能力が無いぶん、プログラミングに偏りつつあります。
+
+==== Sokol API
+
+{sokol} の API はモダンな作りでした。『モダン』の意味としては、 OpenGL の wrapper である https://docs.rs/crayon/0.7.1/crayon/video/index.html[crayon の文章] がよく説明してくれると思います。もしくは、 {rokol} の https://github.com/toyboot4e/rokol/tree/gfx/examples[examples] を見ていただいても良いかもしれません。
+
+.Rendering in texture example
+[source,rust]
+----
+use rokol::{app as ra, gfx as rg};
+
+/// Update and render one frame
+fn frame(&mut self) {
+    rg::begin_default_pass(&self.pa, ra::width(), ra::height());
+    {
+        rg::apply_pipeline(self.pip); // <1>
+        rg::apply_bindings(&self.bind); // <2>
+        // base_elem, n_indices, n_instances
+        rg::draw(0, 3, 1); // <3>
+    }
+    rg::end_pass();
+
+    rg::commit();
+}
+----
+<1> `Pipeline` には、シェーダ、 texture, 頂点や index のデータ形式が入っています。
+<2> `Binding` には index/vertex buffer が入っています。
+<3> `Binding` のスライスを描画します。
+
+=== Learn more
+
+==== A book!
+
+https://www.amazon.co.jp/%E3%82%B2%E3%83%BC%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0C-Sanjay-Madhav/dp/4798157619/ref=tmm_pap_swatch_0?_encoding=UTF8&qid=&sr=[ゲームプログラミングC++ (SanjayMadhav)] を読み始めました。 SDL でウィンドウを出して、 OpenGL で画面を描く定番でした。座学を挟みつつ、 2D, 3D とステップアップして、音声や入力も追加します。
+
+いい文章に触れると、心が洗われるようですね。珍しく翻訳も良かったです。
+
+* 書籍 + サンプルプロジェクトという形式でした。言語は {cpp} で、サンプルにはお手製の `Math.h` が入っています。
+* 環境構築についての言及は最小限でした。 `cmake` ではなく Visual Studio (Windows) と XCode (macOS) を使っているようです。辛い。でも紙面を XCode の話に使っていないので良いと思います。
+
+サンプルが Linux では動かない気がします。あと OpenGL に特化した本の方が、僕には良かったと思いました。
+
+==== Rust libaries
+
+* https://github.com/ryanisaacg/golem[golem] の https://docs.rs/golem/latest/golem/[API] も参考にします。 quicksilver の開発が止まったので凍結かなと思いますが。
+
+* {miniquad} は {sokol} に影響を受けたライブラリです。ブラウザ (wasm) も考慮されています。 {sokol} では隠れたグローバル変数となっていた `Context` もユーザ側のコードに入るなど、大きな違いも見られます。
++
+{miniquad} はウィンドウ表示に `sokol_app.h` を使っていましたが、 Windows 版のみウィンドウ表示も Rust で書かれています。いずれ他のプラットフォームでも C 無しで動くようになるかもしれません。
+
+==== zig-gamekit
+
+(僕にとって) 待望の https://github.com/prime31/zig-gamekit[zig-gamekit] が公開されました。 Zig に興味ある人にはちょうど良いと思います。
+
+zig-gamekit は https://github.com/prime31/zig-renderkit[zig-renderkit] の上に作られています。 {sokol}-like な renderer を作ってみたくなったとか。さすが…… 笑　OpenGL と Metal の実装を終えて、今はエディタの制作 (https://github.com/prime31/zig-upaya[zig-upaya]) に戻っているそうです。
+
+同氏が https://github.com/prime31/Nez[Nez] を作らなければ、あるいは突如として 3 つの言語で 3 つのフレームワーク (https://github.com/prime31/via[via], https://github.com/prime31/Odin-Libs[Odin-Libs], https://github.com/prime31/zig-gamekit[zig-gamekit])を作らなければ、今の僕はフレームワークを作ろうなんて考えもしませんでした。最高です。
+
+== Zig
+
+https://github.com/prime31/zig-gamekit[zig-gamekit] を見ていると、 *Zig は誰でも読める* と思いました。 Rust よりも、むしろ Zig の方がゲーム開発において定番の選択肢になり得るような雰囲気があります。チェックしておこうと思います。
+
+=== Features
+
+Zig には RAII がありません。替わりに、オブジェクトをアロケートしたら、すぐに `defer free(obj);` とします (スコープを抜けたら `free` が実行される) 。
+
+Zig では custom allocator を自由に設定することができます。普段は general なアロケータを、ファイル IO などではリングバッファを使い、 C に渡すメモリには専用のアロケータを使うようです。
+
+Zig の初期値は https://github.com/ziglang/zig/issues/485[センスが良くて] いいですね。型名を `.` で省略できるのが良いです。
+
+=== Zig examples
+
+zig-gamekit のコードをいくつかハイライトします。
+
+Zig では optional と result が組み込み型であり、専用の構文が用意されています:
+
+.gfx.zig
+[source,zig]
+----
+pub fn setShader(shader: ?*Shader) void {
+    const new_shader = shader orelse &global_state.shader; // <1>
+    ..
+}
+
+pub fn init() void {
+    state.shader = Shader.initDefaultSpriteShader() catch unreachable; // <2>
+    draw.init();
+}
+----
+<1> `orelse` で `?*Shader` (optional pointer to `Shader`) を `*Shader` に変換します。
+<2> `catch` で `!*Shader` (error union of pointer to `Shader`) がエラーのときの処理を書けます。
+
+`catch` は `catch |err| ..` と続けて書くことができます。いいなぁ。
+
+`for` や `switch` では、無名関数のような構文を使います:
+
+.MultiBatcher::flush (draw)
+[source,zig]
+----
+// send data to gpu
+self.mesh.updateVertSlice(self.vert_index);
+
+// bind textures
+for (self.textures) |tid, slot| { // <1>
+    if (slot == self.last_texture) break;
+    self.mesh.bindImage(tid, @intCast(c_uint, slot));
+}
+
+// draw
+const quads = @divExact(self.vert_index, 4);
+self.mesh.draw(0, @intCast(c_int, quads * 6));
+----
+<1> イテレータの `for` です。
+
+実は `if let Some(..) = ..` 相当のコードも `if variable |v|` と書けて非常に良いです。
+
+`switch` を使ったコードはありませんでした。 https://ziglang.org/documentation/master/[Zig Documentation] には載っています。
+
+Generics の例です:
+
+.Vec2.zig
+[source,zig]
+----
+pub fn Vec(comptime S: usize, comptime T: type) type { // <1>
+    return switch (S) {
+        2 => extern struct { // <2>
+            x: T = 0,
+            y: T = 0,
+
+            .. (関数など)
+        },
+        3 => extern struct {
+            x: T = 0,
+            y: T = 0,
+            z: T = 0,
+            ..
+        },
+        ..
+        else => @compileError("Vec of size " ++ S ++ " is not supported"),
+    }
+}
+----
+<1> Generic な構造体は、関数のような形で実装されます。
+<2> 値も compile-time 定数として受け取ります。
+
+まだ interface 相当のものが無く、多態性には、構造体のフィールドに関数をセットします。
+
+== Sokol | FNA3D
+
+完全に自分用メモです。
+
+=== FNA3D
+
+{fna3d} は {fna} のグラフィクスライブラリです。ウィンドウを出すには {sdl} を使います。 {sdl} は対応プラットフォームが多く、機能も充実した『鉄板』みたいです。 {sdl} の 2D rendering は、なぜか使われていません。
+
+{fna3d} は `cmake` でビルドすると DLL になります (700 KB ほど) 。バックエンドは、実行時に自動的に選択されます。ユーザはバックエンドを気にする必要がありません。
+
+{fna3d} (XNA) は _Effect_ という独自方式でシェーダを管理し、各種シェーダを 1 つのファイル (`.fx`) に入れます。 `.fx` ファイルは DirextX9 のシェーダコンパイラ (`fxc.exe`) (を `wine` から使うなどして) コンパイルします。 Effect は評判の良くない仕組みですが、 MojoShader のおかげで、 *どのバックエンドでも共通のシェーダファイルを使う* ことができます。そのため、簡単なシェーダには向いていると思います。
+
+NOTE: もっとも、結局 OpenGL で良い気がしました。
+
+{fna3d} の API は独自のものですが、強いて言うなら DirectX9 に似ているそうです (?) 。 Pipeline や Pass オブジェクトはありません。大半の機能は `Device` のメソッドのような形で提供されます。
+
+{fna3d} のドキュメントはコメントのみです。
+
+=== Sokol
+
+{sokol} は header-only のライブラリ集です。 `sokol_app.h` でウィンドウを出して、 `sokol_gfx.h` で画像を表示します。 `sokol_app.h` は *ゲームパッドのサポートなどがまだまだ* みたいなので、機能不足かもしれません。
+
+{sokol} はプラットフォームに応じてコンパイルします。バックエンドはユーザがコンパイル時に決定し、 D3D11, GlCore33, Metal, WebGPU から選べます。バックエンドに応じて、使える機能が若干変わりますが、コメントを読めば把握できます。
+
+{sokol} では、バックエンド毎にシェーダを用意する必要があります。クロスコンパイラが用意されていますが、 C 向けの作り (C のヘッダを出力する) であり、 Rust からは使いやすくありません。
+
+{sokol} の API は、 WebGPU などを参考に作られたようです。 Pipeline や Pass といったオブジェクトがあります。 API の背後にはグローバルオブジェクトがあり、 _resource_ はそこに保存されます。ユーザは保存された resource (buffer, image pass, pipeline, shader) への ID を持つことができます。
+
+{sokol} はよくコメントが書いており、作者のブログ記事も楽しむことができます:
+
+* https://floooh.github.io/2017/07/29/sokol-gfx-tour.html[A Tour of sokol_gfx.h] (Jul 29, 2017)
+* https://floooh.github.io/2019/01/12/sokol-apply-pipeline.html[A small sokol_gfx.h API update] (Jan 12, 2019)
+* https://floooh.github.io/2020/04/26/sokol-spring-2020-update.html[Sokol headers: spring 2020 update] (Apr 26, 2020)
+
+Header-only ライブラリですが、 Rust から使う場合は、 `bindgen` の出力を見れば、宣言部分の `diff` のみを見ることができます。
+

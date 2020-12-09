@@ -1,0 +1,6 @@
+= ANF devlog
+
+== About
+
+{fna3d} の wrapper {rust-fna3d} を作って、使って、 2D ゲームを作ります。
+

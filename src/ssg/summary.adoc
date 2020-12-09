@@ -1,0 +1,8 @@
+= SSG Devlog
+
+== About
+
+静的サイトジェネレータ (SSG) の開発記です。
+
+このブログの原稿は AsciiDoc で書かれており、 html は Asciidoctor の wrapper (SSG) で生成しています。
+

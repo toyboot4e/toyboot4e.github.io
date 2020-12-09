@@ -1,0 +1,135 @@
+= Self-introduction
+:revdate: Nov 10, 2019
+
+== Background
+
+bash, Rust, C#, ターミナル を使ってきました。
+
+これまでのコーディング経験や、周辺環境を書いていきます。
+
+NOTE: 2019 年 11 月に書いた記事です。
+
+== Coding
+
+シングルスレッドでコードの組み立てが出来ます。特殊技術はありませんが、シェルを常用していて、操作 (だけ) こなれていると思います。
+
+=== Line counts
+
+2019/11/10 までに書いたコード行数は、大体次の通りです。
+
+.Line counts (including comments & empty lines)
+[cols="1,3"]
+|===
+| language   | lines
+
+| bash       | 1,000
+| Rust       | 4,000
+| C#         | 7,000
+| Python3    | 1,500
+| JavaScript | 1,000
+| total      | 15,000
+|===
+
+1/3以上は空白やコメントだと思います。
+
+=== Repositories
+
+https://github.com/toyboot4e[GitHub] に置いている（私用の）リポジトリについてコメントします。
+
+* https://github.com/toyboot4e/loxrs[loxrs] (Rust)
++
+http://www.craftinginterpreters.com/[Crafting Interpreters] をRust言語で実践し、 tree-walk interpreter を作りました (link:2_loxrs_tree_walk.html[詳細記事]) 。こんなコードが動きます:
++
+.Example of loxrs program
+[source,rust]
+----
+class Vec2 {
+    fn init(x, y) {
+        @.x = x;
+        @.y = y;
+    }
+
+    fn add(another) {
+        return Vec2(@.x + another.x, @.y + another.y);
+    }
+}
+
+var x = Vec2(1, 2);
+var y = Vec2(3, 4);
+print x.add(y); // (instance (class Vec2) ((x 4), (y 6)))
+----
+
+* https://github.com/toyboot4e/Rot[Rot] (C#)
++
+開発中のローグライク・ゲームです。最も注力してきましたが、まだお見せできません。現状は:
+
+.The roguelike game in development
+image::intro/rot.png[width=50%]
+
+* https://github.com/toyboot4e/noah.bash[noah] (bash)
++
+私用の原稿管理ツールです。名前が、その、お年頃ですね。これを作った動機は、小説家になる感じのサイトに、何か投稿したかったのだと思います。
+
+* https://github.com/toyboot4e/todo[TODO] (JS)
++
+インターンシップで作成した、スマホ向けのタスク管理アプリです。思ったよりも便利だったため、たまに使っています。
+
+.The task management application
+image::intro/todo.png[width=50%]
+
+== Environment
+
+=== dotfiles
+
+設定ファイルをよく書きました。もうこれ以上、便利にする必要を感じないくらいです。
+
+何を思ったのか、設定ファイルの https://toyboot4e.github.io/dotfiles/[解説] まで書いてしまいました。（しかも英語です）。珈琲のお供にどうぞ……？
+
+=== Computer
+
+https://support.apple.com/kb/SP719?locale=en_US&viewlocale=ja_JP[15インチのMacBook Pro] を使用しています。
+
+.output by https://github.com/dylanaraps/neofetch[neofetch]
+image::intro/neofetch.png[width=518]
+
+高価なマシンなので、心の中では『Macさん』と呼んで敬っています。人前では言いませんけれど……。
+
+macOSは、辞書や自動変換などの細かい補助を受けられるOSです。強力なバックアップを持つLinuxとして使っています。性能的には、SSDの恩恵をよく感じます。SSDの中にもグレードがあるらしく、良いパーツを使っているのではないでしょうか。
+
+画面が綺麗で、小さな文字もよく読めます。画面比率は 16:10 と珍しく、しかし合理的だと思います。縦幅の 1/10 がメニューだとすると、メニューは普段、視界に入れないからです。実質的に、常時フルスクリーンとなります。
+
+.Mac-san
+image::intro/mac.png[]
+
+機体をスタンドの上に置き、画面の高さを上げて使っています。キーボードは、トラックパッドが好きなので、本体のものを使っています。外部キーボードを使った方が、姿勢は楽になりますね。
+
+==== Applications
+
+以下のツールを導入すると、 *別の OS を使っているかのように* ユーザ体験が良くなりました。
+
+* https://github.com/koekeishiya/skhd[skhd]: キー入力をシェルコマンドにマッピングしてくれます。 `yabai` の呼び出しや、アプリへのフォーカスに利用しています。
+* https://github.com/koekeishiya/yabai[yabai]: Mac の _tiling window manager_ です。ウィンドウのレイアウトや、フォーカスの切り替えが出来ます。
+* https://pqrs.org/osx/karabiner/[Karabiner-Elements]: キーのリマップができます。 `CapsLock` を `Ctrl+ShiftC+Cmd+Opt` (_hyper key_) にマッピングして、 `skhd` で使う prefix にしています。たとえば、 `CapsLock+x` でターミナルにフォーカスします。
+
+==== Browser
+
+キーボード操作に特化した https://qutebrowser.org/[qutebrowser] を使っています。設定やブックマークは、テキストファイルとして管理されます。
+
+.https://qutebrowser.org/[qutebrowser]
+image::intro/qute.png[]
+
+画像では、ブックマークを検索しています。ブラウザがコマンドラインを内蔵しており、一貫したUIを使うことになります。
+
+=== Gadgets
+
+読書には、第六世代くらいの https://www.amazon.co.jp/Kindle-Paperwhite-%E9%98%B2%E6%B0%B4%E6%A9%9F%E8%83%BD%E6%90%AD%E8%BC%89-WiFi-8GB-%E5%BA%83%E5%91%8A%E3%81%A4%E3%81%8D-%E9%9B%BB%E5%AD%90%E6%9B%B8%E7%B1%8D%E3%83%AA%E3%83%BC%E3%83%80%E3%83%BC/dp/B07HCSQ48P[Kindle Paperwhite] を使っています。電池の持ちが良く、辞書機能などが重宝しています。
+
+Kindle のメリットは、読書時間が増えることです。僕はお風呂に入るとき、 Kindle を持ち込みます。（入るとしばらく出てきません）。
+
+小説も技術書も Kindle で読みます。洋書の _screen pdf_ は 1 文字 1 mm のサイズとなることもありますが、不便なく読んでいます。歳をとったら辛いかも。もちろん、電子書籍なら、フォントサイズを変えられます。
+
+webサイトも Kindle で読みます。 https://p2k.co/[P2K] で電子書籍データに変換し、 Kindle へ送信します。
+
+== Wrapping up
+
+日々コマンドラインの中でコーディングを楽しんでいます。役に立つものは作っておらず、『泥団子をこねている』ようなものかもしれません。でも、それが楽しいので、今後もその調子だと思います。

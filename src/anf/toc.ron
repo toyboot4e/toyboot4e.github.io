@@ -1,0 +1,11 @@
+(
+    summary: ("", "./summary.adoc"),
+    items: [
+        File("", "./1_hello.adoc"),
+        File("", "./2_gfx.adoc"),
+        File("", "./3_pong.adoc"),
+        File("", "./4_imgui.adoc"),
+        File("", "./5_transform.adoc"),
+        File("", "./5_media.adoc"),
+    ],
+)

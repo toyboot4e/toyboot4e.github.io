@@ -1,0 +1,7 @@
+(
+    summary: ("", "./summary.adoc"),
+    items: [
+        File("", "./1_wfc.adoc"),
+        File("", "./2_fov.adoc"),
+    ],
+)

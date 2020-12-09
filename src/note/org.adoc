@@ -1,0 +1,7 @@
+= Note #5: org-mode
+
+== org-mode
+
+
+org-mode は、エディタのサポートが強烈なマークアップ言語です。
+

@@ -1,0 +1,4 @@
+= Prolog via TaPL and vice versa
+
+Qiita に https://qiita.com/h_sakurai/items/fa371bad2c39b6911770[Prolog でわかる TAPL] というシリーズの記事があります。この方は Prolog で簡単に言語を作ってみる方法 - Qiita[Prolog で簡単に言語を作ってみる方法] という記事もアップロードされており、大変興味深いです。
+

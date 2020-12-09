@@ -2,7 +2,9 @@
 
 == Welcome!
 
-これは toyboot4e のブログです。 link:https://github.com/toyboot4e[GitHub account]
+これは toyboot4e のブログです。 This is a devlog of toyboot4e.
+
+link:https://github.com/toyboot4e[GitHub account]
 
 このサイトは横スクロールします。モバイルからの閲覧は難しいかもしれません。
 

@@ -1,0 +1,6 @@
+(
+    summary: ("", "./summary.adoc"),
+    items: [
+        File("", "./1_texcube.adoc"),
+    ],
+)

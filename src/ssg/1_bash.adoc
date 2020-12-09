@@ -1,0 +1,297 @@
+= bash + Asciidoctor
+:revdate: Nov 12, 2019
+
+== Summary
+
+Asciidoctor を使って、本ブログの html を作成しました。また html/css に入門しました。
+
+* [.line-through]#https://github.com/toyboot4e/devlog[スクリプト、原稿ファイル]#
+* [.line-through]#https://github.com/toyboot4e/toyboot4e.github.io[生成された html]#
+
+WARNING: すでにブログ生成にこのスクリプトは使っていません。
+
+やり方としては、 https://asciidoctor.org[Asciidoctor] で原稿を html に変換し、 bash でヘッダとフッタを追加します。一人で作業する分には、シンプルで悪くないと思います。
+
+== Static site generation
+
+始めに、最もシンプルな SSG として、 https://github.com/rust-lang/mdBook[mdbook] を検討しました。これは Rust 言語の https://doc.rust-lang.org/book/[本] に使用されており、見た目も良いと思います。しかし、 *画像に caption を加えられない* 、など markdown の表現力に制限を感じました。したがって、他の markup 言語が必要でした。
+
+=== Markup language
+
+様々な言語が見つかりました。ツールの *選択に迷った時は、ドキュメントが良い環境を選ぶ* ことにしています。 AsciiDoc (処理系は Asciidoctor) に行き着きました。
+
+AsciiDoc には、 _macro_, _block_, _attribute_ といった *一般的な構文* が用意されており、豊富な機能にアクセスできます footnote:[一方で、変な構文もけっこうあります]:
+
+.Syntax example (macros and blocks)
+[%collapsible]
+====
+[source,adoc,subs="+macros"]
+----
+// macros
+image::path[align="center"]
+pass:[kbd:[Ctrl+z]]
+pass:[footnote:[脚注]]
+
+// blocks with attributes
+[source,csharp]
+pass:[----]
+public class TestClass {
+    // code block
+}
+pass:[----]
+
+[quote]
+____
+Shall we dance! // quoting block
+____
+----
+====
+
+.Demo
+[%collapsible]
+====
+とりわけブログに良かった機能は、 https://asciidoctor.org/docs/user-manual/#callouts[callouts] や https://asciidoctor.org/docs/user-manual/#user-footnotes[footnote]footnote:[これが footnote です] (脚注) でした。脚注は今出した通りのもので、 callouts は、次のように表示できます:
+
+.Example of callouts
+[source,sh]
+----
+$ asciidoctor devlog.adoc // <1>
+----
+<1> これが callout です。
+
+[stem]
+++++
+数式も書けます \\
+convert (adoc) := asciidoctor(adoc, extensions) \\
+where\ extensions\ are\ awesome
+++++
+
+kbd:[Enter], kbd:[Ctrl+T] ← キーボードキーです footnote:[見た目がバグってますね]。
+
+https://asciidoctor.org/docs/asciidoctor-diagram/[sciidoctor-diagram] のおかげで、文字データから図を作り出すツールも使用できます。
+
+* マインドマップを https://plantuml.com/[PlantUML] で描いてみました footnote:[下方向にノードが伸びていく https://plantuml.com/wbs-diagram[WBS diagram] というのもあるようです]:
++
+[plantuml.freesize,3_blog_mindmap,svg,width="200%",height="200%"]
+----
+@startmindmap
+
++ toy toy\nbeam
+++ 言語制作
++++_ Crafting Interpreters
++++_ 低レイヤを知りたい人のためのCコンパイラ作成入門
+++ ゲーム開発
+-- UI Nerd
+---_ Text editors
+----_ VSCode
+----_ Sublime Text 3
+----_ NeoVim
+----_ Evil Emacs
+---_ languages
+----_ AsciiDoc
+----_ org-mode
+@endmindmap
+----
++
+箇条書きで書けるのが便利です。上下にノードを伸ばせないのがイマイチです。
+
+* http://ditaa.sourceforge.net/[ditaa] で図も書けます:
++
+.Separation in https://serde.rs/[serde] (maybe it's like this)
+[ditaa, "3_blog_serde"]
+....
+      /---------------------\   /--------------------\
+      |                     |   |                    |
+      |    /-------------\  |   |  /--------------\  |
+      |    |  Serialize  |  |   |  |  Serializer  |  |
+      |    \-------------/  |   |  \--------------/  |
+      |       ^       |     |   |    ^       |       |
+      |       |       v     |   |    |       v       |
++-----+----------+  /-------+---+------\  +----------+---+
+| runtime value  |  | serde data model |  | data format  |
++-----+----------+  \-------+---+------/  +----------+---+
+      |       ^       |     |   |    ^       |       |
+      |       |       v     |   |    |       v       |
+      |    /-------------\  |   |  /--------------\  |
+      |    | Deserialize |  |   |  | Deserializer |  |
+      |    \-------------/  |   |  \--------------/  |
+      | cGRE                |   | c1AB               |
+      \---------------------/   \--------------------/
+....
+====
+
+NOTE: もう 1 点優れているのは、 *本の作成が念頭に置かれている* ことです。 AsciiDoc では、分割ファイルの `include` ができます。
+
+これで、 *記事部分は思い通り作れます* 。後は外枠を補填し、ページとページをリンクで繋げることでサイトとします。
+
+=== Generating html
+
+Asciidoctor を使ったブログ生成の話題は、 SSG (static site generator) に限られていました。大半の SSG には、メタデータを https://asciidoctor.org/docs/user-manual/#static-website-generators[yaml frontmatter として書かされる] ようです。しかし、それでは AsciiDoc 本来の書き味を損うと捉え、 *自力で html を加工* することにしました。
+
+==== Recommended way?
+
+Asciidoctor のツールチェインには、 Ruby で書ける https://github.com/asciidoctor/asciidoctor-extensions-lab[拡張] や https://github.com/asciidoctor/asciidoctor-stylesheet-factory[stylesheet factory] がありました。実際、 https://smijake3.hatenablog.com/entry/2018/12/13/224443[上手く使った人] もいます。しかし、使い方を理解するのが大変そうだったので、今回はパスしました。
+
+==== `.adoc` -> `.html` -> `.html`
+
+Asciidoctor で `.adoc` ファイルを変換すると、記事部分だけのシンプルな `.html` が出力されます。それを bash で変換し、 header, footer を追加しました (https://github.com/toyboot4e/devlog/blob/master/_archived/ssg[ソース])。
+
+WARNING: ただ、何でも bash でやるのは良くないですね。プログラミング言語を使うか、 html の加工にはテンプレート言語を使った方が良かったと思います。
+
+==== Hand-written css
+
+*ターミナル画面の再現* をコンセプトに、 https://github.com/toyboot4e/devlog/blob/master/styles/term.css[css] に着手しました。素人ではあったものの、インターンシップで html/css の経験があったため、概要は理解していました。
+
+まず記事を中央に配置し、ターミナルの配色をコピーしました。それだけで、悪くない画面になりました。その後修正を繰り返し、おそらく細部に問題がありますが、ブログとしては十分だと思います。満足しています。
+
+== Wrapping up
+
+以前はサイトの作り方など知らず、大きな壁に思えたものですが、どうやら *html のファイル構成 ~ サイト* と思って良さそうです。『難しいはずの部分』は、 https://pages.github.com/[GitHub Pages] やブラウザ任せにできました。
+
+https://asciidoctor.org/[Asciidoctor] は得るべき道具だったと思います。今後も、 *サイト・レポート・スライドの作成* に使っていこうと思います。
+
+:sectnums!:
+== Appendix
+
+=== A. Markup languages other than AsciiDoc
+
+https://orgmode.org/[org-mode] にも注目しています。まだ調べている最中ですが、この選択は何らかの trade-off になるという印象です。それだけ Asciidoctor の完成度が高いのだと捉えました。
+
+両言語の表現力は、ほぼ同等に見えます。ただし、 org-mode は *UI とツールが非常に発達* しています。特に Emacs から使うと強力で、 TODO 管理などに向いているようです。任意の設定ファイルを `.org` ファイルに書き込んで、コマンド 1 つで実ファイルにコピーする、みたいな使い方をしている人もいます。この拡張性は Emacs + Emacs Lisp に由来しています。
+
+=== B. Asciidoctor for other than html
+
+ブラウザの印刷機能を使えば、 html から pdf を生成できます。これがレポートの作成に重宝しました。というのも、 AsciiDoc では *分割ファイルの `include` が可能* なため、長い原稿も編集が楽だからです。 Office はもう要らないですね。
+
+拡張機能が豊富なのも、 Asciidoctor の特徴です。 pdf や スライドfootnote:[https://matklad.github.io/2019/05/19/consider-using-asciidoctor-for-your-next-presentation.html[Consider Using Asciidoctor for Your Next Presentation - matklad]]、電子書籍も作れるようです。実際、 https://hackernoon.com/living-the-future-of-technical-writing-2f368bd0a272[ProGit の執筆に使用された] という実績があります。
+
+WARNING: ただし、 html 以外の出力は、スムーズに行かないと思います。 asciidoctor-pdf は、デフォルトのフォントが日本語を含まないなど、様々な問題が出ます。
+
+=== C. Other ways to convert html files
+
+bash で html を加工する必要は無かったはずです。他の方法を検討してみます。
+
+==== Editing an html as a tree
+
+Asciidoctor が作った html を木としてパースし、加工してから、再び html として出力します。これは意外と複雑そうです。
+
+==== Templating engines
+
+ページ外観の html を用意し、そこに記事内容をはめ込みます。これは templating と呼ばれるそうです。
+
+.Pseudo html template
+[source,html]
+----
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+    <!-- 省略 -->
+</head>
+<body>
+    <!-- templates --!>
+    {{header}}      <!-- パンくずリスト --!>
+    {{article}}     <!-- 記事 --!>
+    {{footer}}      <!-- footer !-->
+</body>
+</html>
+----
+
+https://pandoc.org/[pandoc] や https://handlebarsjs.com/[handlebars] が『それっぽい』ツールの気がします。ただし、構文がキメラっぽく見えて苦手に思いました。今回は使いませんでした。
+
+=== D. Getting started with html/css
+
+今回、最も難しかったのは、 html/css を理解することでした。入門書こそ多いのですが、ポイントを掴みにくい仕組みだと思います。
+
+==== Tips
+
+たとえば、こういった情報を集めるのに手間がかかります。
+
+* 常識
+** 静的サイトの *URL は、ファイル構成と一致* します。ルートとなるページは `index.html` で、 `path/to/file.html` が 1 ページに相当します。
+** ルートに `404.html` を置くと、存在しないページにアクセスしたときに表示されます (*GitHub Pages の場合*) 。
+** 自分のコンピュータ上で絶対パス (`/some/url` という形式で書く、サイトのルートからの相対パス) を使うには、 https://developer.mozilla.org/en-US/docs/Learn/Common_questions/set_up_a_local_testing_server[ローカルサーバ] を使います。
+** ブラウザ毎に、デフォルトの CSS 設定があります（余白など）。無効化する方法として、 https://meyerweb.com/eric/tools/css/reset/[Reset CSS] が有名ですが、賛否両論あります。
+
+* 操作
+** Chrome/Firefox で kbd:[Cmd+Shift+c] を押すと、マウスホバーでレイアウトを確認できます。
+
+* 手法
+** このサイトのトップは、 `flexbox` という機能を使ってレイアウトしています。
++
+WARNING: トップ画面は変更しました。要素を横に並べるときに `flex` は便利です。
+** フォントは Google Fonts から取ってくるのが楽ですが、デメリットもあるようです。
+** https://www.mathjax.org/[MathJax] (数式表示) や https://prismjs.com/[Prism.js] (構文ハイライト) が便利な JS だと思います。これらは `<script>` タグを追加することで使用できます。 JS ファイルは、ダウンロードするかネット上のものにリンクします。
+
+NOTE: ブラウザの仕組みが気になったときは、 https://www.html5rocks.com/ja/tutorials/internals/howbrowserswork/[ブラウザの仕組み: 最新ウェブブラウザの内部構造] などが参考になります。意外とテキストエディタに似ているかもしれません。
+
+==== Layout with CSS
+
+簡単に html/css の概要を説明してみようと思います。
+
+まず、ミニマルな html は、次のような構造を持ちます。
+
+.Minimal html
+[source,html]
+----
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>The website</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <!-- page content -->
+  </body>
+</html>
+----
+
+木構造としては以下のような関係と言えます。
+
+[source,html]
+----
+html
+├── head
+│   ├── title
+│   └── link
+└── body
+----
+
+まず、 body の下にデータを足していきます。 `article` を配置し、その下に `header`, `content`, `footer` を作ったとします（手書きで、あるいは markdown などから）。
+
+.Basic html
+[source,html]
+----
+  <body>
+    <div id="article">
+        <div id="header">
+            <!-- content !-->
+        </div>
+        <div id="content">
+            <!-- content !-->
+        </div>
+        <div id="footer">
+            <!-- content !-->
+        </div>
+    </div>
+  </body>
+----
+
+次はレイアウトです。ブラウザは、 css を元に、 html の木を表示します。 css は、 cascading style sheet というだけあって、親要素から子要素へと情報を受け継いで行きます。
+
+そこで、 `article` の横幅を `40rem` (40 文字) くらいに設定すれば、その下に配置された `header`, `content`, `footer` の横幅も制限され、 *行あたり文字数を設定できます* 。
+
+さらに、 `article` の `margin` を `auto` にします。すると、記事を画面中央に配置できます。このブログの基本的なレイアウトは、実にそれだけです。
+
+.Basic layout
+[source,css]
+----
+div#content, div#footnotes>*{
+    max-width:44em;
+    margin:auto;
+}
+----
+
+基本ができたら、後は自力で何とかできると思います。たとえば、画面脇に目次を表示したいとします。ひとまず、 https://www.w3schools.com/howto/howto_css_fixed_sidebar.asp[Fixed Sidebar] を真似れば表示できます。さらにメニューを、横に狭い画面では非表示にするとして、たとえば _media query_ で _https://www.w3schools.com/howto/howto_css_sidebar_responsive.asp[responsive]_ にすることを検討します。この段階まで来たら、『静的サイトを作ることができる』と言って良いのではないでしょうか。
+
+もっとも、『正しい方法』『質の高い html/css 』などを求め始めると、格段に難度は上がりそうです。僕なら https://github.com/rust-lang/mdBook[mdbook] を見てみますが、極めるのは非常に大変そうですね。趣味で良かったです。
+

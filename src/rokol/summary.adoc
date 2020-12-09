@@ -1,0 +1,6 @@
+= Rokol devlog
+
+== About
+
+{sokol} の wrapper {rokol} を作って、使って、 3D ゲームを作ります。
+
