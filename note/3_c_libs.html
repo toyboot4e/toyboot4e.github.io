@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>C libraries and modern C-like langs</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>C libraries and modern C-like langs</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/anf/summary.html">ANF devlog<ol><li><a href="/anf/1_hello.html">Sprite rendering!</a>
+    
+</li><li><a href="/anf/2_gfx.html">Object-oriented rendering API</a>
+    
+</li><li><a href="/anf/3_pong.html">Pong</a>
+    
+</li><li><a href="/anf/4_imgui.html">ImGUI</a>
+    
+</li><li><a href="/anf/5_transform.html">Transform</a>
+    
+</li><li><a href="/anf/6_media.html">Media</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/lang/summary.html">Language dev<ol><li><a href="/lang/1_loxrs_treewalk.html">Crafting Interpreters - 1/2</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rl/summary.html">Roguelike algorithms<ol><li><a href="/rl/1_wfc.html">Wave function collapse explained</a>
+    
+</li><li><a href="/rl/2_fov.html">Field of view (recursive scanning)</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/ssg/summary.html">SSG Devlog<ol><li><a href="/ssg/1_bash.html">bash + Asciidoctor</a>
+    
+</li><li><a href="/ssg/2_rs.html">Rust + Asciidoctor</a>
+    
+</li><li><a href="/ssg/3_booktune.html">Outline parser for booktune</a>
+    
+</li><li><a href="/ssg/4_adbook.html">adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/note/summary.html">Notes<ol><li><a href="/note/1_cli.html">Great command line tools</a>
+    
+</li><li><a href="/note/2_ui.html">Minimum UI with full features</a>
+    
+</li><li><a href="/note/3_c_libs.html">C libraries and modern C-like langs</a>
+    
+</li><li><a href="/note/4_evil.html">Evil Emacs</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Aug 2, 2020</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_about">1. About</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>C ライブラリの分かりやすさが良さそうです。</p>
+</div>
+<div class="sect2">
+<h3 id="_background">1.1. Background</h3>
+<div class="paragraph">
+<p>Nez の作者が <a href="https://github.com/prime31/zig-upaya">Upaya</a> を公開しました。これは <a href="https://github.com/ziglang/zig">Zig</a> 言語から <a href="https://github.com/ocornut/imgui">Dear ImGUI</a> を使って GUI ツールを作るためのリポジトリです。画像は <a href="https://github.com/floooh/sokol">Sokol</a> で出しています。</p>
+</div>
+<div class="paragraph">
+<p>同作者は <a href="https://rxi.itch.io/tilekit">Tilekit</a> のクローン <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> を Upaya で制作したようです。 Electron と比べた場合のメリットは、 <strong>開発環境のシンプルさ</strong> と <strong>アプリの動作速度</strong> だと思います。ただ、 game-in editor が欲しいときは、自分の開発環境を使うことになるので、僕が Upaya を使うことは無さそうです。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Upaya では、マルチウィンドウや組み込みターミナルができないと思います。日本語入力もできないかも……？
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_why_zig_c_libraries">Why Zig + C libraries?</h4>
+<div class="paragraph">
+<p>Upaya は Nez の作者の集大成 <sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> に近いもので、 <strong>理想の言語 + 理想のライブラリ</strong> のような形になっています。この良さを感じるために、 C 言語の周辺を追っていきます。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_c">2. C</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_c_libraries_in_the_wild">2.1. C libraries in the wild</h3>
+<div class="paragraph">
+<p>C ライブラリは使い勝手が良いです。 <strong>少ない依存性</strong> 、 <strong>小さなバイナリ</strong> 、 <strong>動作環境の多さ</strong> などのメリットがあります。この <strong>分かりやすさ</strong> は魅力的で、マイナ環境を追う人たちの共通目的ではないかと思います。</p>
+</div>
+<div class="paragraph">
+<p>C は <strong>他のプログラミング言語からも利用できる</strong> ことも注目点です。ゲームに向いた C ライブラリには、以下のようなものがあります:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/FNA-XNA/FNA3D">FNA3D</a></p>
+<div class="paragraph">
+<p>画像ライブラリです。ウィンドウは <a href="https://www.sdl.com/">SDL</a> で出すことになると思います。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/floooh/sokol">Sokol</a></p>
+<div class="paragraph">
+<p>画像ライブラリです。ウィンドウも出せます。 Header-only です。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/nothings/stb">stb</a></p>
+<div class="paragraph">
+<p>Header-only のライブラリ集です。特に stbi (stb_image) の利用者が多そうです。</p>
+</div>
+</li>
+<li>
+<p><a href="https://sol.gfxile.net/soloud/">SoLoud</a> (C++)</p>
+<div class="paragraph">
+<p>音声ライブラリです。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_machinery">2.2. The machinery</h3>
+<div class="paragraph">
+<p><a href="https://ourmachinery.com/">The Machinery</a> も面白そうなプロジェクトです。これは <strong>3D ゲームエンジンを作るためのツールセット</strong> で、基礎を用意するから <strong>好きにやっちゃってください</strong> ということのようです。特に面白そうなのが、 GUI ツールによる編集が C のソースと完全連動している点で、 <strong>visual scripting とソース編集がシームレス</strong> になっているようです。 <strong>分かりやすい</strong> 。コンセプトは <a href="https://github.com/baku89/glisp">GLisp</a> と似ているのかもしれません。たぶん <a href="https://ourmachinery.com/post/">ブログ</a> に詳しい話が載っています。難点としては、ソースは非公開のようです。また、 Mac 版はまだ無く、僕も試せていません。評判は非常に良いです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_better_c_than_c">2.3. Better C than C</h3>
+<div class="paragraph">
+<p>Rust や D が巨大な C++-like 言語だとすると、最近は C-like な言語にも人気があります。 Hacker news で <a href="https://news.ycombinator.com/item?id=22199942">見た</a> <em>better C than C</em> という言葉が、このトレンドをよく表していると思います。</p>
+</div>
+<div class="paragraph">
+<p>以下は、僕から見た各言語の印象です。 Odin, V を軽く触っただけなので、不正確ですが:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/odin-lang/Odin">Odin</a></p>
+<div class="paragraph">
+<p>名前にフォーカスした構文が特徴的です。たとえば、手続きは <code>my_procedure :: proc() { .. }</code>, 構造体は <code>My_Data :: struct { .. }</code> のように書きます。 <a href="https://github.com/BSVino/JaiPrimer/blob/master/JaiPrimer.md">Jai</a> 言語からインスパイアされたような豊かな機能が揃っている一方、継承やインタフェイスがありません。シンプルかつ低レベルな言語のようで、使用には <strong>C に近い言語観</strong> が要求されそうです。もちろんバイナリを吐きます (LLVM) 。</p>
+</div>
+</li>
+<li>
+<p><a href="https://vlang.io/">V</a></p>
+<div class="paragraph">
+<p>C の単ファイルに変換 (トランスパイル) される言語です。見た目は Go に近いかも。サイトに過剰な表現が入っているようで、外から見ただけでは理想と現実がどうなっているのか分かりませんが、安定した日には期待できると思います。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/ziglang/zig">Zig</a></p>
+<div class="paragraph">
+<p><strong>C との親和性が非常に高い</strong> ようです。 C ライブラリを使うには理想的な言語かもしれません。アロケータをユーザが自由に用意する (メモリ戦略を完全にユーザが決める) など、プログラマの野生が光るような印象です。しかも『 borrow checker 無しで Rust 並の安全性を保証する』という話もあって、 <code>comptime</code> が面白そうです。</p>
+</div>
+<div class="paragraph">
+<p>構文には引っかかりを覚えます。まだまだ開発中で、 Linux 以外では動かない印象です。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Odin は version 1.0 が近いようです。他はまだまだ未完の言語です。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rust_vs_zig">2.4. Rust vs Zig</h3>
+<div class="paragraph">
+<p>Modern C-like な言語と比べると、 Rust には以下のような傾向があるようです:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>アロケータが不自由</p>
+<div class="paragraph">
+<p>Odin, Zig ではユーザがアロケータを設定できます。すると、メモリ戦略をユーザが自由かつ明示的に選べるようになります。 Rust を使っていると、その辺りはコンパイラにお任せとなります。</p>
+</div>
+</li>
+<li>
+<p>依存性が複雑</p>
+<div class="paragraph">
+<p>ライブラリ同士が複雑に依存しており、 1 つのライブラリを <code>Cargo.toml</code> に入れると無数のライブラリが付いてきます。 C の header-only library と比べたら複雑な慣習で、しかも逃れられません。</p>
+</div>
+</li>
+<li>
+<p>Borrow checker がある</p>
+<div class="paragraph">
+<p>Borrow checker を『かい潜る』ために C 言語におけるシンプルさが失われるような感覚、分かる気もします。</p>
+</div>
+</li>
+<li>
+<p>抽象レイヤを作りがち</p>
+<div class="paragraph">
+<p>C 言語を使うと、具体的なコードをたくさん書くことになります。一方で、 Rust では書きやすいコードを書くためのツール (レイヤ) を作ってから、それを使うことになります。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>色々書きましたが、 C を使ってみないとフェアな比較ができないと思います。いつか試したいです。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">3. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>C ライブラリの良さを確認しました。 Zig は C との親和性が非常に高く、 Zig + C ライブラリの組み合わせは理想的らしいです。</p>
+</div>
+<div class="paragraph">
+<p>現在の言語観としては、</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>C#</p>
+<div class="paragraph">
+<p>依存性は class のフィールドへ入れる。データは親への参照を持ちがち</p>
+</div>
+</li>
+<li>
+<p>Rust</p>
+<div class="paragraph">
+<p>依存性は引数で渡す。データはほぼ完全にツリー状</p>
+</div>
+</li>
+<li>
+<p>C</p>
+<div class="paragraph">
+<p>？</p>
+</div>
+</li>
+<li>
+<p>Haskell</p>
+<div class="paragraph">
+<p>？</p>
+</div>
+</li>
+<li>
+<p>Lisp</p>
+<div class="paragraph">
+<p>？</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>少しずつ理想のプログラミングへ近づけそうです。</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. Mac でも動くのが、 Tilekit との違いの 1 つです
+</div>
+<div class="footnote" id="_footnotedef_2">
+<a href="#_footnoteref_2">2</a>. この方は C# が嫌になってきたらしく、半年で 3 つのプログラミング言語 (V, Odin, Zig) を使って 3 つの 2D フレームワークを作りました。僕も確実に影響を受けました。
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

@@ -40,6 +40,8 @@
     
 </li><li><a href="/anf/5_transform.html">Transform</a>
     
+</li><li><a href="/anf/6_media.html">Media</a>
+    
 </li></ol></a>
     
 </li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
@@ -63,6 +65,16 @@
 </li><li><a href="/ssg/3_booktune.html">Outline parser for booktune</a>
     
 </li><li><a href="/ssg/4_adbook.html">adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/note/summary.html">Notes<ol><li><a href="/note/1_cli.html">Great command line tools</a>
+    
+</li><li><a href="/note/2_ui.html">Minimum UI with full features</a>
+    
+</li><li><a href="/note/3_c_libs.html">C libraries and modern C-like langs</a>
+    
+</li><li><a href="/note/4_evil.html">Evil Emacs</a>
     
 </li></ol></a>
     
@@ -164,17 +176,20 @@ fn frame(&amp;mut self) {
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td><code>Pipeline</code> には、シェーダ、 texture, 頂点や index のデータ形式が入っています。</td>
+<td><code>Pipeline</code>: shader, texture slots, index/vertex buffer attributes, render states</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td><code>Binding</code> には index/vertex buffer が入っています。</td>
+<td><code>Binding</code>: index/vertex buffer</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
 <td><code>Binding</code> のスライスを描画します。</td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p><code>Pipeline</code> は巨大なオブジェクト (へのハンドル) で、 <code>RenderState</code> (<code>BlendState</code>, <code>DepthStencilState</code>, <code>RasterizerState</code>) 相当のものを含んでいます。</p>
 </div>
 </div>
 </div>

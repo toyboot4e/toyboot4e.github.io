@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Media</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Media</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/anf/summary.html">ANF devlog<ol><li><a href="/anf/1_hello.html">Sprite rendering!</a>
+    
+</li><li><a href="/anf/2_gfx.html">Object-oriented rendering API</a>
+    
+</li><li><a href="/anf/3_pong.html">Pong</a>
+    
+</li><li><a href="/anf/4_imgui.html">ImGUI</a>
+    
+</li><li><a href="/anf/5_transform.html">Transform</a>
+    
+</li><li><a href="/anf/6_media.html">Media</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/lang/summary.html">Language dev<ol><li><a href="/lang/1_loxrs_treewalk.html">Crafting Interpreters - 1/2</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rl/summary.html">Roguelike algorithms<ol><li><a href="/rl/1_wfc.html">Wave function collapse explained</a>
+    
+</li><li><a href="/rl/2_fov.html">Field of view (recursive scanning)</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/ssg/summary.html">SSG Devlog<ol><li><a href="/ssg/1_bash.html">bash + Asciidoctor</a>
+    
+</li><li><a href="/ssg/2_rs.html">Rust + Asciidoctor</a>
+    
+</li><li><a href="/ssg/3_booktune.html">Outline parser for booktune</a>
+    
+</li><li><a href="/ssg/4_adbook.html">adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/note/summary.html">Notes<ol><li><a href="/note/1_cli.html">Great command line tools</a>
+    
+</li><li><a href="/note/2_ui.html">Minimum UI with full features</a>
+    
+</li><li><a href="/note/3_c_libs.html">C libraries and modern C-like langs</a>
+    
+</li><li><a href="/note/4_evil.html">Evil Emacs</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Oct 8, 2020</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>入力、音声、フォントのライブラリを調達しました。</p>
+</div>
+<div class="sect2">
+<h3 id="_aside">1.1. Aside</h3>
+<div class="paragraph">
+<p>欲しいものほど足りないもので、自分で作ってみようとするのですが、要求が次々と変化していくこともあり、常に役者不足を免れられません…… 笑</p>
+</div>
+<div class="paragraph">
+<p>今は『理想の 2D 用コードベース』が欲しいです。 Minecraft を作って神になる算段も忘れちゃいけません。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_using_c_libraries_from_rust">1.2. Using C libraries from Rust</h3>
+<div class="paragraph">
+<p>C は Rust からでも普通に呼べます。 Borrow rules はガン無視する方向へ心が傾きました。所有権を考慮して wrapper を作るよりも、所有権を無視してポインタをコピーします。</p>
+</div>
+<div class="paragraph">
+<p>メモリ解放を自動化するくらいで良いのではないでしょうか:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">pub struct Device { inner: Rc&lt;DeviceDrop&gt; }
+
+impl Device {
+     pub fn method(&amp;self) { /* no mutable borrow */ }
+}
+
+struct DeviceDrop { raw: *mut ffi::Device }
+impl Drop for DeviceDrop { /* ~~ */}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+マルチスレッドのことは分かりません。 FNA3D の <code>Device</code> はシングルスレッドなので、これでも悪くない気がしています。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>僕は関数をメソッドに変えるところまで手作業で用意しています。ここまでやるかは好みが別れそうです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_crates">1.3. Crates</h3>
+<div class="paragraph">
+<p>一通りのメディアを扱えるようにしました:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/toyboot4e/xdl">XDL</a> (<a href="https://docs.rs/xdl/latest">API</a>)</p>
+<div class="paragraph">
+<p><strong>入力</strong> 用のレイヤを Rust-SDL2 の上に用意しました。直行座標のグリッドマップ向けです。たとえば『方向キー』は <code>Option&lt;Dir8&gt;</code> を返してくれます。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/MoAlyousef/soloud-rs">soloud-rs</a> (<a href="https://docs.rs/soloud/latest/soloud/">API</a>)</p>
+<div class="paragraph">
+<p><strong>音声</strong> に関して評判の良い SoLoud には、 wrapper があったので借りることにしました。</p>
+</div>
+</li>
+<li>
+<p><a href="https://github.com/toyboot4e/fontstash-rs">fontstash-rs</a> (<a href="https://docs.rs/fontstash/latest">API</a>)</p>
+<div class="paragraph">
+<p><strong>フォント</strong> 用 C ライブラリの wrapper を用意しました。また、 FNA3D を使った renderer を用意しました。 <a href="https://github.com/memononen/fontstash">fontstash</a> は stb_truetype の wrapper です。 <a href="https://github.com/nothings/stb">stb</a> 凄いですね</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+わざわざ C ライブラリを使っているのは、 Rust を高レイヤの言語として使うイメージがあったためです。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>なお、以前から用意していたコードとしては:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/toyboot4e/rust-fna3d">Rust-FNA3D</a></p>
+<div class="paragraph">
+<p><strong>グラフィクス API</strong> の wrapper の wrapper です。</p>
+</div>
+</li>
+<li>
+<p><code>anf::engine::{app, draw, lifecycle, time, utils}</code></p>
+<div class="paragraph">
+<p><strong>ゲームループ</strong> と、 drawcall の <strong>batcher</strong> です。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>アセット管理</strong> を足せば、フレームワークの構成要素が大体揃います。今から組み合わせるのが楽しみでなりません。</p>
+</div>
+<div class="paragraph">
+<p>Rust には継承が無いため、一般的なフレームワークを静的に作ることはできないと思うのですが、それは次回に試します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_map">1.4. Map</h3>
+<div class="paragraph">
+<p>ANF フレームワークのサンプルゲームとして、ローグライクを作っています。ちなみに本命もローグライク (Elona ライク) です。</p>
+</div>
+<div class="sect3">
+<h4 id="_block_layer_collision_layer">Block layer (collision layer)</h4>
+<div class="paragraph">
+<p>Tiled マップにセル単位で当たり判定を付けました。マップデータから <code>collision</code> という名前のレイヤを見つけて使用します。コード上の変数名は <code>blocks</code> (短い名前) にしています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>タイルに当たり判定を付けるか、セルに当たり判定を付けるか</p>
+<div class="paragraph">
+<p>タイルセット (Tiled の <code>.tsx</code> ファイル) のタイルに <em>property</em> を設定することで、当たり判定を設定できる気がします。たとえば、壁タイルを『通行不可』とします。</p>
+</div>
+<div class="paragraph">
+<p>しかし、どの道実行時には <code>blocks</code> 変数を作ることになるため、 Tiled の <code>collision</code> レイヤから当たり判定を設定できるのは悪くない機能です。</p>
+</div>
+</li>
+<li>
+<p>タイルに描画順を設定するか、レイヤを描画順として使うか</p>
+<div class="paragraph">
+<p>これはレイヤのみを描画順に使った方が良いと思います。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_cave_generation">Cave generation</h4>
+<div class="paragraph">
+<p><a href="https://gamedevelopment.tutsplus.com/tutorials/generate-random-cave-levels-using-cellular-automata--gamedev-9664">Celluar automata</a> で洞窟の地形生成を行いました。</p>
+</div>
+<div class="paragraph">
+<p>やり方としては、まず適当な確率でマップを初期化します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>..##.#.#.#...#.#.#.#...#..###...
+##...#....##..#.#.#..#.#..####.#
+....#.#..######..#.#..#.....##..
+##.##..##.#.##.#..#.#.##.##..#.#
+####..##..####..##.##.#.##.####.
+..##..#.#..##.#.##.#.####.##....
+.#....##.#.....##..######.#....#
+..#..###.#.#.##.###.#######.#.##
+..###.###..##.##.##..#.....#....
+###....##.##...#....#.#....####.
+.###..##........#.#.#..#.###.#.#
+.#..#...##.####..###.#..##..##.#
+#####..####..####....##.#..#..#.
+....####.....#..##..#.#..##.#..#
+####..##..#.###....###.#.###.##.
+#.##.#..##...#.###...####..##.#.
+##...#....##.##..##.#..####.#.##</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、隣接した床の数に応じて、セルを (壁／床) に変化させます。それを何度か繰り返すと、偏りが生まれて綺麗なマップになります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>......##..........##.......#....
+.....###.........###......###...
+.....#....##......#.......####..
+....#....#####.....#......####..
+##.##..##.####....######.#####..
+####..##..####..##############..
+..##..###..##...############....
+......##.......############.....
+.....####.....#############.....
+..##..###.....#####..#.....#....
+.###...##..................####.
+.###...#.................######.
+.####...##...##.........######..
+.####..###...###.....########...
+.#######.....###....#########...
+.###..##....####....###########.
+####.........###.....##########.
+.#............#........###......</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>ア ラ 素 敵</em></p>
+</div>
+<div class="paragraph">
+<p>もちろん、ゲームマップとして使用するには、さらなる加工が必要です。孤立した地形を <code>A*</code> で繋ぐとか、力技で何とかすべきと思います。できるかな……？</p>
+</div>
+<div class="paragraph">
+<p>今回はこれで楽しみます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_fov_fow">FoV / FoW</h4>
+<div class="paragraph">
+<p>以前 <a href="/posts/5_fov.html">解説</a> を書きました。今回の <a href="https://gist.github.com/toyboot4e/fe62130e19147bfee817b39ad81af226">実装 (gist)</a> も大体同じです。</p>
+</div>
+<div class="paragraph">
+<p>経験値の溜まったカンファタブルゾーンでした。 Rust では <strong>抽象レイヤを薄く書ける</strong> 感覚があって良かったです。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_visualization">1.5. Visualization</h3>
+<div class="paragraph">
+<p>早速表示してみました:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/anf/fov.gif" alt="fov">
+</div>
+<div class="title">Figure 1. Golden Ika-chan</div>
+</div>
+<div class="paragraph">
+<p>ふむ…… <span class="linethrough"><em>この程度か</em></span></p>
+</div>
+<div class="paragraph">
+<p>ここまで来ると、不思議なもので、『普通のゲーム画面を見るような目』が働き出します。単に見劣りする画面に見えてくるですね。初めてイカちゃんを表示したときの感動は無かった……</p>
+</div>
+<div class="sect3">
+<h4 id="_a_game">A game</h4>
+<div class="paragraph">
+<p>というわけで、『それなり以上』の出来にして、おお〜〜と思わなければなりません。</p>
+</div>
+<div class="paragraph">
+<p>タイルの配置や <strong>影の形を滑らかにする</strong> のが検討項目です。幸いあてがあります。きっとグッドなニュースは次回！</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_fow">FoW</h4>
+<div class="paragraph">
+<p>未探索範囲に表示される影のことを <em>fog of war</em> と言います。変な名前なのは、シミュレーションゲーム由来だからだと思います。</p>
+</div>
+<div class="paragraph">
+<p>やってきました:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/anf/fow.gif" alt="fow">
+</div>
+</div>
+<div class="paragraph">
+<p>FoV/FoW を ON にして、狭い通路を通るとドキドキします。</p>
+</div>
+<div class="paragraph">
+<p>元々 Tiled マップを手動で表示していたので、このような追加は簡単でした。マップや FoV / FoW の描画をクロージャを使ったコードにリアァクタリングして、今回はおしまいです。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_random">2. Random</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Rust の tips と興味・関心を置いていくコーナー。油断すると本編よりも長くなります。</p>
+</div>
+<div class="sect2">
+<h3 id="_context">2.1. Context</h3>
+<div class="paragraph">
+<p>僕は Mike 氏の追っかけ (?) をやっています。彼はブログを書かなくなってしまいましたが、コードはバンバン作っています:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/prime31/zig-upaya">zig-upaya</a></p>
+</li>
+<li>
+<p><a href="https://github.com/prime31/via/">via</a></p>
+</li>
+<li>
+<p><a href="https://github.com/prime31/Odin-Libs">Odin-Libs</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>彼は Rust でのゲーム開発に興味が無い様子なので、僕としてはついています。彼の劣化コピーのような作業も、他の言語でやれば意義ある作業です。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_globally_importing_macros">2.2. Globally importing macros</h3>
+<div class="paragraph">
+<p>Rust 2018 からマクロが <code>use</code> で読み込めるように <a href="https://doc.rust-lang.org/edition-guide/rust-2018/macros/macro-changes.html">なりました</a> 。ただし <code>#[macro_use]</code> を使った場合、サブモジュールでもそのマクロがスコープに入るのがメリットです:</p>
+</div>
+<div class="listingblock">
+<div class="title">lib.rs</div>
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">#[macro_use]
+extern crate log;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">sub_module.rs</div>
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">fn test() {
+    info!("not need to write as `log::info!`");
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>mdbook を見て気づきました。 <code>#[macro_use]</code> はレガシーじゃなかったんですね。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_naming">2.3. Naming</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Fov</code> vs <code>FovData</code></p>
+<div class="paragraph">
+<p><code>Fov</code> は trait 名で <code>FovData</code> は構造体名です。</p>
+</div>
+</li>
+<li>
+<p><code>Type::CONSTANT</code> vs <code>Type::constant()</code> (定数)</p>
+<div class="paragraph">
+<p>std でも <a href="https://github.com/rust-lang/rust/issues/73544#issuecomment-691701670">迷っている</a> ようでした。僕は <code>Type::snake_case()</code> 派です。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_borrow_rules">2.4. Borrow rules</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>Vec&lt;T&gt;</code> から複数の (可変) 参照を取るのは難儀します。 Pong では、ポインタを <code>&amp;mut</code> に キャストしました:</p>
+<div class="listingblock">
+<div class="title">Pong</div>
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">let (left, right, ball) = unsafe {
+    (
+        &amp;self.entities[0],
+        &amp;self.entities[1],
+        &amp;mut *(&amp;self.entities[2] as *const Entity as *mut Entity),
+    )
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デリファレンスには <code>unsafe</code> が必要です。</p>
+</div>
+</li>
+<li>
+<p>依存性をオブジェクトに閉じ込めようとして失敗したことがあります。 <code>&amp;mut self</code> を 2 つ同時に作らないように、フィールドを public にしました。結局それは <code>&amp;mut self</code> を取る API に変更できましたが、 <strong>borrow rules が奇跡的に上手くゲーム制作に合致するか否か</strong> 、今後も見ていこうと思います。</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+検討が必要な時点で理想的ではないと思うアナタは Zig へ！　<code>comptime</code> や C へのアクセスが良さそうです。来年くらいには安定しているのかな。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_manual_rendering_immediate_mode">2.5. Manual rendering, immediate mode</h3>
+<div class="paragraph">
+<p>今のところ、 <code>render</code> 関数を手書きしています。『<code>Sprite</code> を配置したら、 <code>z</code> 値に応じて自動的に描画する』という仕組みはありません (<strong>immediate mode</strong>) 。</p>
+</div>
+<div class="paragraph">
+<p>実は手動 rendering は今回初なのですが、かなり気に入っています。昔はとにかく『ピクチャ』 (Sprite) を配置したいツクール脳でした (<strong>retained mode</strong>) 。僕の頭は硬かったようです。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+ここでは <code>render</code> が全自動なら retained mode という風に書きました。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Immediate/retained mode の境界は曖昧なのかなと思います。行列 (拡大・回転・並行移動) くらいはフィールドに持っていても、親子関係を含めた変換のキャッシュは持っていないかもしれません。どこまでデータを保持する (retain) かには幅があると感じます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_music_programming">2.6. Music programming</h3>
+<div class="paragraph">
+<p>Studio One 5 Prime で打ち込みをやっています。意外と曲になって楽しんでいます。音質がね、何とかしたいですね。画力とか筋力の差ぐらい歴然と音質差があります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_signed_distance_field_sdf_fonts">2.7. Signed distance field (SDF) fonts??</h3>
+<div class="paragraph">
+<p><a href="https://github.com/Chlumsky/msdfgen">MSDF</a> というのを教えていただきました。ベクター画像をピクセルデータとして保存しておき、シェーダで動的に decode するようです。データの <strong>事前変換が必要になる</strong> のですが、容量は減りそうです。表現力も十分なはず。冴えてますね！</p>
+</div>
+<div class="paragraph">
+<p>ひとまず Mac で FNA3D のシェーダをコンパイルできるように準備しました (<a href="https://github.com/toyboot4e/fxc">fxc</a>) 。でも、シェーダを書いたこと無いのですよね。</p>
+</div>
+<div class="paragraph">
+<p>先に <a href="https://github.com/toyboot4e/fontstash-rs">fontstash-rs</a> を用意しました。 TTF を表示できます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_tiled">2.8. Tiled</h3>
+<div class="paragraph">
+<p>Tiled を更新したら『プロジェクト』という機能が <a href="https://www.mapeditor.org/2020/06/20/tiled-1-4-0-released.html">実装されていました</a> 。多数ファイルの編集が楽になりそうです。マップデータの内容には影響無いと思います。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://pipoya.net/blog/two-ways-to-use-autotile-in-tiled/">Tiledでウディタとツクールのオートタイルを使う２つの方法 - ぴぽやblog</a></p>
+<div class="paragraph">
+<p>Terrain (地形ブラシ) でオートタイルを扱う方法について書かれています。さすが！</p>
+</div>
+<div class="paragraph">
+<p>タイルの仕様さえ把握できたら、 Image Magick とかでちゃちゃっと画像変換できそうな気がします。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">3. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>一山超えた！　って、さっきも言ってたやんな。何回超える気なん……？　ミスが些細なものかどうかは関係ありません。 <strong>自力で脱出不能な間違い</strong> を大きな壁と感じるようです。</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">First triangle?</div>
+<div class="paragraph">
+<p>振り返ると ImGUI の renderer 実装が辛かった気がします。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/anf/imguika_chan.gif" alt="imguika chan" width="50%">
+</div>
+<div class="title">Figure 2. IMGUIka-chan <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup></div>
+</div>
+<div class="paragraph">
+<p>FNA3D (グラフィクス API) 初見も辛かったはずなんですが、記憶の彼方に行ってしまいました。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>入力・音声・画像と扱えるようになったので、そろそろゲームが作れるかなーと思います。</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. 見たいものがあると作業効率が上がりますよね
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

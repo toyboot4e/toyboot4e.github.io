@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Minimum UI with full features</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Minimum UI with full features</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/anf/summary.html">ANF devlog<ol><li><a href="/anf/1_hello.html">Sprite rendering!</a>
+    
+</li><li><a href="/anf/2_gfx.html">Object-oriented rendering API</a>
+    
+</li><li><a href="/anf/3_pong.html">Pong</a>
+    
+</li><li><a href="/anf/4_imgui.html">ImGUI</a>
+    
+</li><li><a href="/anf/5_transform.html">Transform</a>
+    
+</li><li><a href="/anf/6_media.html">Media</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/lang/summary.html">Language dev<ol><li><a href="/lang/1_loxrs_treewalk.html">Crafting Interpreters - 1/2</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rl/summary.html">Roguelike algorithms<ol><li><a href="/rl/1_wfc.html">Wave function collapse explained</a>
+    
+</li><li><a href="/rl/2_fov.html">Field of view (recursive scanning)</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/ssg/summary.html">SSG Devlog<ol><li><a href="/ssg/1_bash.html">bash + Asciidoctor</a>
+    
+</li><li><a href="/ssg/2_rs.html">Rust + Asciidoctor</a>
+    
+</li><li><a href="/ssg/3_booktune.html">Outline parser for booktune</a>
+    
+</li><li><a href="/ssg/4_adbook.html">adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/note/summary.html">Notes<ol><li><a href="/note/1_cli.html">Great command line tools</a>
+    
+</li><li><a href="/note/2_ui.html">Minimum UI with full features</a>
+    
+</li><li><a href="/note/3_c_libs.html">C libraries and modern C-like langs</a>
+    
+</li><li><a href="/note/4_evil.html">Evil Emacs</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">May 13, 2020</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_about">1. About</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>標準的な UI は込み入っていていて、ユーザの画面を狭くしているという話です。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Qiita で書いた <a href="https://qiita.com/toyboot4e/items/e01bf4c291a3f3b0bd89">アプリのタイトルバーを隠す話</a> の物語的な補足となります。
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_background">1.1. Background</h3>
+<div class="paragraph">
+<p>macOS では、アプリに <a href="https://ja.wikipedia.org/wiki/%E3%83%AA%E3%83%9C%E3%83%B3_(GUI)">リボン</a> がありません。つまり、アプリのタイトルバーには、『ファイル』や『編集』のようなボタンが付いていません。代わりに、画面上部のメニューバーに、今フォーカスしているアプリのボタンが表示されます。多数ウィンドウのリボンが 1 つのメニューバーに集約されるため、画面範囲を節約できます <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> 。</p>
+</div>
+<div class="paragraph">
+<p>この方式には批判もあって、大画面モニタ のユーザには、アプリ毎にボタンが付いていた方が便利だという意見もあります。しかし、リボンの機能はそう使わない上に、メニューバーはキーボード操作が可能です。したがって、メニューバーは、 <strong>余分な UI</strong> を減らしつつ、 <strong>機能へのアクセス</strong> を損なわない、優れた発明だと思います。</p>
+</div>
+<div class="paragraph">
+<p>この体験に味を占め、同種の改善を求めてみました。特にラップトップ機では重要だと思います。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_minimum_ui">2. Using minimum UI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>よく使うアプリから、余分な表示を減らしていきます。削るべき部分は、ウィンドウ上部に集まっていたと思います。</p>
+</div>
+<div class="sect2">
+<h3 id="_minimum_browsers">2.1. Minimum browsers!</h3>
+<div class="paragraph">
+<p>まず、一般的なブラウザの画面を見てみます:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<a class="image" href="/img/8_minimum_ui/chrome.png"><img src="/static/img/8_minimum_ui/chrome.png" alt="chrome"></a>
+</div>
+<div class="title">Figure 1. Google Chrome</div>
+</div>
+<div class="paragraph">
+<p>次に、これは qutebrowser (をかなり設定した) 画面です。アドレスバーは消えました:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<a class="image" href="/img/8_minimum_ui/qute.png"><img src="/static/img/8_minimum_ui/qute.png" alt="qute"></a>
+</div>
+<div class="title">Figure 2. qutebrowser</div>
+</div>
+<div class="paragraph">
+<p>アドレスバーに相当する UI は、ショートカットでポップアップします。したがって、 1 枚目の画面と同じ機能を持ちながら、普段はより広い画面を利用できます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_minimum_terminals">2.2. Minimum terminals!</h3>
+<div class="paragraph">
+<p>タイトルバーを消すと、実質的に <strong>常時フルスクリーン</strong> です:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<a class="image" href="/img/8_minimum_ui/kitty.png"><img src="/static/img/8_minimum_ui/kitty.png" alt="kitty"></a>
+</div>
+<div class="title">Figure 3. Terminal</div>
+</div>
+<div class="paragraph">
+<p>ここまで設定して初めて、『macOS』を使っているという気がしますが……間違いなく錯覚です 笑</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wrapping_up">3. Wrapping up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ナビゲーションが UI の重要ポイントだと思います。キーボードのヘビーユーザになった後では、標準 UI にはかなりの無駄が見つかりました。しかし、 <strong>ユーザがそこまで進歩することを開発者が考慮してくれるわけではない</strong> ので、1 つ 1 つ UI を変更するしかないようです。このとき、好みの設定に移行するのが、 <strong>1 コマンドを走らせるくらい簡単だったら</strong> 助かったと思います <sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> 。</p>
+</div>
+<div class="paragraph">
+<p>改めて、 UI は手に負えないと思いました。特にウィンドウ・タブ・インスタンスの管理に関しては、どのエディタもどの window manager も、理想的ではないと思います。しかし、妥協を可能にする方向性は存在し、それは外部モニタを使うことです。 <strong>広い画面を持っていたなら</strong> 、画面の無駄はさほど問題になりませんし、今とは違った視点で UI に注目しただろうと思います <sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup> 。</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. ラップトップの　Mac は 16:10 サイズの画面で、メニューバーと相性が良いです。メニューバーを除いた範囲が 16:9 (+若干のスペース) となります。
+</div>
+<div class="footnote" id="_footnotedef_2">
+<a href="#_footnoteref_2">2</a>. この種の設定が必要なアプリをたくさん抱えていたので、疲れました。
+</div>
+<div class="footnote" id="_footnotedef_3">
+<a href="#_footnoteref_3">3</a>. と言いつつも、 15.6 inch (MacBook Pro) もなかなか大画面な気はします
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

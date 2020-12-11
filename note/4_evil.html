@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Evil Emacs</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Evil Emacs</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/anf/summary.html">ANF devlog<ol><li><a href="/anf/1_hello.html">Sprite rendering!</a>
+    
+</li><li><a href="/anf/2_gfx.html">Object-oriented rendering API</a>
+    
+</li><li><a href="/anf/3_pong.html">Pong</a>
+    
+</li><li><a href="/anf/4_imgui.html">ImGUI</a>
+    
+</li><li><a href="/anf/5_transform.html">Transform</a>
+    
+</li><li><a href="/anf/6_media.html">Media</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/lang/summary.html">Language dev<ol><li><a href="/lang/1_loxrs_treewalk.html">Crafting Interpreters - 1/2</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rl/summary.html">Roguelike algorithms<ol><li><a href="/rl/1_wfc.html">Wave function collapse explained</a>
+    
+</li><li><a href="/rl/2_fov.html">Field of view (recursive scanning)</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/ssg/summary.html">SSG Devlog<ol><li><a href="/ssg/1_bash.html">bash + Asciidoctor</a>
+    
+</li><li><a href="/ssg/2_rs.html">Rust + Asciidoctor</a>
+    
+</li><li><a href="/ssg/3_booktune.html">Outline parser for booktune</a>
+    
+</li><li><a href="/ssg/4_adbook.html">adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/note/summary.html">Notes<ol><li><a href="/note/1_cli.html">Great command line tools</a>
+    
+</li><li><a href="/note/2_ui.html">Minimum UI with full features</a>
+    
+</li><li><a href="/note/3_c_libs.html">C libraries and modern C-like langs</a>
+    
+</li><li><a href="/note/4_evil.html">Evil Emacs</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Dev 2, 2020</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_text_editors">1. Text editors</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://github.com/toyboot4e/evil-emacs-2020">evil-emacs-2020</a> を公開しました。空の <code>~/.emacs.d</code> を 1 から設定した repository です。 Qiita の <a href="https://qiita.com/advent-calendar/2020/emacs">Emacs Advent Calendar 2020</a> 向けに作成しました。</p>
+</div>
+<div class="paragraph">
+<p>ここでは、各種エディタを振り返っていこうと思います。</p>
+</div>
+<div class="sect2">
+<h3 id="_vscode">1.1. VSCode</h3>
+<div class="paragraph">
+<p>改めて、 VSCode は良いエディタだと思いました。 特に <strong>ターミナルペイン</strong> が良くて、他のエディタには匹敵するものが無いと思います。 VSCodeVim もよくできており、『エディタは VSCode だけ』というのも良いと思います。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/editors/vscode.png" alt="vscode">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sublime">1.2. Sublime</h3>
+<div class="paragraph">
+<p>Sublime は <strong>軽くてセンスの良いエディタ</strong> ですが、拡張に不具合があって僕はダメでした。 Sublime 4 に期待しています。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/editors/sublime.png" alt="sublime">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_neovim">1.3. NeoVim</h3>
+<div class="paragraph">
+<p>以前の僕は、 <a href="https://github.com/neoclide/coc.nvim">NeoVim</a> のユーザでした。 VSCode ユーザの人には、まず <a href="https://github.com/neoclide/coc.nvim">NeoVim</a> に入門するのがお勧めです。 <a href="https://github.com/neoclide/coc.nvim">coc.nvim</a> を使えば、 <a href="https://github.com/neoclide/coc.nvim">NeoVim</a> はほぼ VSCode となります。プラグインの導入も、 <a href="https://github.com/junegunn/vim-plug">vim-plug</a> のおかげで楽々です。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/editors/nvim.png" alt="nvim">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_emacs">1.4. Emacs</h3>
+<div class="paragraph">
+<p>NeoVim から Emacs への移行は、一筋縄とは行きませんでした。 <a href="https://github.com/emacs-evil/evil">Evil</a> の設定自体が大変なのと、 Emacs と Vim の違いも大きかったです。コツを 100 ~ 300 個くらい集めないと移行できません。そのため今回は、 <a href="https://github.com/toyboot4e/evil-emacs-2020">evil-emacs-2020</a> に全コミットを投稿しました。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/editors/emacs.png" alt="emacs">
+</div>
+</div>
+<div class="sect3">
+<h4 id="_distribution">Distribution</h4>
+<div class="paragraph">
+<p>Emacs の設定としては、 <a href="https://www.spacemacs.org/">Spacemacs</a> や <a href="https://github.com/hlissner/doom-emacs">Doom Emacs</a> が有名です。これらも <a href="https://github.com/emacs-evil/evil">Evil</a> (Vim のエミュレーション) を利用しており、 Vim の操作性が再現されています。しかし、 Vim との細かな違いは、自分で修正する必要があります。したがって、 distribution を使う場合も、 <a href="https://github.com/toyboot4e/evil-emacs-2020">evil-emacs-2020</a> は役に立つと思います。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_evil_emacs">Evil Emacs</h4>
+<div class="paragraph">
+<p>エディタ間には、圧倒的な違いは無かったと思います。エディタの移行に生産性はありませんし、やりたい人がやればいいかなという感じです。僕の場合は、隣の芝生が青かったのでやってみました。得るものがあったので、第三第四の Vim が出てこないかなと期待しています。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/onivim/oni2">onivim</a> とか <a href="https://github.com/fox0430/moe">moe</a> はどうなんでしょうか。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_vanila_emacs">Vanila Emacs</h4>
+<div class="paragraph">
+<p>設定無しの Emacs も試してみました。特に面白かったのが、スクロールが半ページ単位 (いわゆる type-writer scroll) だったことです。 Vim ほどスクロール機能が充実していないため、この選択なのだと思いますが、センスの良さを感じました。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_update">2. Update</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Emacs に <code>tab-bar-mode</code> を導入しました。ウィンドウのレイアウトを複数保持できます:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/editors/emacs-tab-bar.png" alt="emacs tab bar">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>centaur-tabs</code>: バッファをグルーピングしたタブバーです。</p>
+</li>
+<li>
+<p><code>neotree</code>: サイドバーです。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ちなみに、この記事の fold です。 <code>z3</code> でレベル 3 まで展開しました:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/editors/emacs-fold.png" alt="emacs fold">
+</div>
+</div>
+<div class="paragraph">
+<p>UI 天国だ……。癒されます。これで <strong>十分な多重化</strong> を手に入れました。</p>
+</div>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>
