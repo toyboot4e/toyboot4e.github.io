@@ -30,6 +30,10 @@
     <nav id="sidebar" class="sidebar">
     <ol><li><a href="/index.html">About</a>
     
+</li><li><a href="/snow_rl/summary.html">SnowRL devlog<ol><li><a href="/snow_rl/1_batcher.html">Batcher</a>
+    
+</li></ol></a>
+    
 </li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
     
 </li></ol></a>
@@ -1212,7 +1216,7 @@ Your browser does not support the video tag.
 <h2 id="_appendix">Appendix</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_a_another_way_to_calculate_fov">A. Another way to calculate FoV</h3>
+<h3 id="_a_another_fov_algorithm">A. Another FoV algorithm</h3>
 <div class="paragraph">
 <p>Robert Nystrom 氏が解説した <a href="https://journal.stuffwithstuff.com/2015/09/07/what-the-hero-sees/">Fov の記事</a> もあります。 Bob いつもありがとう！</p>
 </div>
@@ -1275,15 +1279,27 @@ Your browser does not support the video tag.
 </div>
 </div>
 <div class="sect3">
-<h4 id="_nine_slice_rendering">Nine slice rendering</h4>
+<h4 id="_nine_slice_rendering">Nine slice rendering??</h4>
 <div class="paragraph">
 <p>セル単位の <code>Texture</code> を用意すると、その数は周辺の影との接続の場合の数に等しく、 \(2^8 = 256\) にもなります。そこで、影の rendering を 9 つに分けます。すなわち、中心と八方向です。 <code>adjacency</code> に応じて、それぞれの部分を描きます。</p>
 </div>
+<div class="paragraph">
+<p>と思ったものの、滑らかにならないよなぁ……。</p>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_blur">Blur</h4>
+<div class="paragraph">
+<p>シェーダでぼかします。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_d_transition_of_shadows">D. Transition of shadows</h3>
 <div class="sect3">
 <h4 id="_superpositions">Superpositions</h4>
 <div class="paragraph">
-<p>影の形を変えながら明るさを変化させる必要が出てきます。 2 種類の影をそれぞれの明度で描画して、重ね合わせれば、滑らかに推移すると思います。</p>
+<p>影の形を変えながら明るさを変化させる必要が出てきます。前回の影と今回の影を重ね合わせながら不透明度を変化させれば、滑らかに推移すると思います。</p>
 </div>
 </div>
 </div>
