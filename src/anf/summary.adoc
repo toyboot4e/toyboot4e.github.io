@@ -1,6 +1,8 @@
-= ANF devlog
+= [Arhieved] ANF devlog
 
 == About
 
 {fna3d} の wrapper {rust-fna3d} を作って、使って、 2D ゲームを作ります。
+
+2020/12/13: {sokol} の方が {fna3d} よりも使いやすいと思ってしまったので、この開発は止まります。 SnowRL devlog と Rokol devlog をご覧ください。
 

@@ -52,3 +52,18 @@ https://github.com/onivim/oni2[onivim] とか https://github.com/fox0430/moe[moe
 
 設定無しの Emacs も試してみました。特に面白かったのが、スクロールが半ページ単位 (いわゆる type-writer scroll) だったことです。 Vim ほどスクロール機能が充実していないため、この選択なのだと思いますが、センスの良さを感じました。
 
+== Update
+
+Emacs に `tab-bar-mode` を導入しました。ウィンドウのレイアウトを複数保持できます:
+
+image::editors/emacs-tab-bar.png[]
+
+* `centaur-tabs`: バッファをグルーピングしたタブバーです。
+* `neotree`: サイドバーです。
+
+ちなみに、この記事の fold です。 `z3` でレベル 3 まで展開しました:
+
+image::editors/emacs-fold.png[]
+
+UI 天国だ……。癒されます。これで *十分な多重化* を手に入れました。
+

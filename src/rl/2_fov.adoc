@@ -695,7 +695,7 @@ FoV/FoW は、内部データの更新のタイミングが同じです。そこ
 :sectnums!:
 == Appendix
 
-=== A. Another way to calculate FoV
+=== A. Another FoV algorithm
 
 Robert Nystrom 氏が解説した https://journal.stuffwithstuff.com/2015/09/07/what-the-hero-sees/[Fov の記事] もあります。 Bob いつもありがとう！
 
@@ -722,10 +722,18 @@ WARNING: 未実装のため、草案のみです。
 
 8 方向への影の接続を調べておきます。 bit flags としてメモリに置きます。
 
-==== Nine slice rendering
+==== Nine slice rendering??
 
 セル単位の `Texture` を用意すると、その数は周辺の影との接続の場合の数に等しく、 stem:[2^8 = 256] にもなります。そこで、影の rendering を 9 つに分けます。すなわち、中心と八方向です。 `adjacency` に応じて、それぞれの部分を描きます。
 
+と思ったものの、滑らかにならないよなぁ……。
+
+==== Blur
+
+シェーダでぼかします。
+
+=== D. Transition of shadows
+
 ==== Superpositions
 
-影の形を変えながら明るさを変化させる必要が出てきます。 2 種類の影をそれぞれの明度で描画して、重ね合わせれば、滑らかに推移すると思います。
+影の形を変えながら明るさを変化させる必要が出てきます。前回の影と今回の影を重ね合わせながら不透明度を変化させれば、滑らかに推移すると思います。

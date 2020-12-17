@@ -60,6 +60,11 @@
 
             "sokol=https://github.com/floooh/sokol[Sokol]",
             "rokol=https://github.com/toyboot4e/rokol[Rokol]",
+            "learn-gl=https://learnopengl.com/[Learn OpenGL]",
+            "learn-gl-sokol=https://www.geertarien.com/learnopengl-examples-html5/[Learn OpenGL examples (with Sokol)]",
+
+            "zig-gk=https://github.com/prime31/zig-gamekit[zig-gamekit]",
+            "zig-rk=https://github.com/prime31/zig-renderkit[zig-renderkit]",
 
             "rust=https://www.rust-lang.org/[Rust]",
             "odin=https://github.com/odin-lang/Odin[Odin]",

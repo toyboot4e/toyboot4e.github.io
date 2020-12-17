@@ -25,7 +25,9 @@
 | line-based edit   | `sed`, `gsed` | https://github.com/chmln/sd[sd]
 |====
 
-最低限、 https://github.com/BurntSushi/ripgrep[rg] と https://github.com/sharkdp/fd[fd] は使った方が良いと思います。本当にいいツールなので。 `tree` や `exa -T` の代わりに `fd` + https://github.com/jez/as-tree[as-tree] のコンボもアリです。
+https://github.com/BurntSushi/ripgrep[rg] と https://github.com/sharkdp/fd[fd] は使った方が良いと思います。
+
+ツリー表示には、 `tree` の代わりに `exa -T` か `fd` + https://github.com/jez/as-tree[as-tree] を使います。
 
 他には、 GNU xargs (`gxargs`), GNU awk (`gawk`) や `rename` コマンドをよく使っています。
 
@@ -51,7 +53,7 @@ Vim の fork です。動作が軽く、僕はこちらを使っています。
 
 * https://www.gnu.org/s/emacs/[Emacs]
 +
-https://github.com/emacs-evil/evil[Evil] を入れると Vim になります。実は、起動以外は NeoVim よりも軽快です。ただ、 Evil 特有の不具合やハマりポイントがあって、かなり調整が難しい印象です。また、言語サーバのサポートはかなり弱いと思います (不具合が普通にあります) 。
+https://github.com/emacs-evil/evil[Evil] を入れると Vim になります。実は、起動以外は NeoVim よりも軽快です。ただ、 Evil 特有の不具合やハマりポイントがあって、かなり調整が難しい印象です。また、ユーザ数が少ないため、多少マイナなパッケージを使うと不具合が普通にあります。
 
 === Shells, terminal multiplexers
 

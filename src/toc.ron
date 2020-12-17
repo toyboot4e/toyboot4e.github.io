@@ -2,10 +2,11 @@
     summary: ("About", "index.adoc"),
     items: [
         // File("", "./self.adoc"),
-        Dir("anf"),
+        Dir("snow_rl"),
         Dir("rokol"),
-        Dir("lang"),
+        Dir("anf"),
         Dir("rl"),
+        Dir("lang"),
         Dir("ssg"),
         Dir("note"),
         Dir("read"),

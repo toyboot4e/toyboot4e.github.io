@@ -2,5 +2,6 @@
     summary: ("", "./summary.adoc"),
     items: [
         File("", "./1_texcube.adoc"),
+        // File("", "./2_camera.adoc"),
     ],
 )

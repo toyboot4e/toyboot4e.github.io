@@ -6,6 +6,7 @@
         File("", "./3_pong.adoc"),
         File("", "./4_imgui.adoc"),
         File("", "./5_transform.adoc"),
-        File("", "./5_media.adoc"),
+        File("", "./6_media.adoc"),
+        // File("", "./rl.adoc"),
     ],
 )
