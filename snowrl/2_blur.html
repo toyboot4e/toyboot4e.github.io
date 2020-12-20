@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Gaussian blur</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Gaussian blur</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/snowrl/summary.html">SnowRL devlog<ol><li><a href="/snowrl/1_batcher.html">Batcher</a>
+    
+</li><li><a href="/snowrl/2_blur.html">Gaussian blur</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/anf/summary.html">[Arhieved] ANF devlog<ol><li><a href="/anf/1_hello.html">Sprite rendering!</a>
+    
+</li><li><a href="/anf/2_gfx.html">Object-oriented rendering API</a>
+    
+</li><li><a href="/anf/3_pong.html">Pong</a>
+    
+</li><li><a href="/anf/4_imgui.html">ImGUI</a>
+    
+</li><li><a href="/anf/5_transform.html">Transform</a>
+    
+</li><li><a href="/anf/6_media.html">Media</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rl/summary.html">Roguelike algorithms<ol><li><a href="/rl/1_wfc.html">Wave function collapse explained</a>
+    
+</li><li><a href="/rl/2_fov.html">Field of view (recursive scanning)</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/lang/summary.html">Language dev<ol><li><a href="/lang/1_loxrs_treewalk.html">Crafting Interpreters - 1/2</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/ssg/summary.html">SSG Devlog<ol><li><a href="/ssg/1_bash.html">bash + Asciidoctor</a>
+    
+</li><li><a href="/ssg/2_rs.html">Rust + Asciidoctor</a>
+    
+</li><li><a href="/ssg/3_booktune.html">Outline parser for booktune</a>
+    
+</li><li><a href="/ssg/4_adbook.html">adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/note/summary.html">Notes<ol><li><a href="/note/1_cli.html">Great command line tools</a>
+    
+</li><li><a href="/note/2_ui.html">Minimum UI with full features</a>
+    
+</li><li><a href="/note/3_c_libs.html">C libraries and modern C-like langs</a>
+    
+</li><li><a href="/note/4_evil.html">Evil Emacs</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">unpublished</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>以前の開発 (ANF devlog) から引き継いで、タイルマップと視野を表示しました:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/gauss/fov_nearest.png" alt="fov nearest">
+</div>
+</div>
+<div class="paragraph">
+<p>これはこれで味があるのですが、 <a href="http://ylvania.org/jp/elona">Elona</a> 並のクオリティを目標とすると、疑問の残る手応えと言えます。</p>
+</div>
+<div class="paragraph">
+<p>したがって、この影に <a href="https://learnopengl.com/Advanced-Lighting/Bloom">gaussian blur</a> をかけて、滑らかにします。</p>
+</div>
+<div class="sect2">
+<h3 id="_api_for_off_screen_rendering">1.1. API for off-screen rendering</h3>
+<div class="paragraph">
+<p>Gaussian blur は <em>post processing</em> の一種で、まずテクスチャに影を書き込む必要があります。</p>
+</div>
+<div class="paragraph">
+<p><code>RenderTexture</code> という型を用意しました。 Rendering pass の開始時に、このテクスチャを設定します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">let mut draw = renderer.offscreen(&amp;mut self.shadow_render_texture, .. );</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以降の rendering は、影テクスチャへの書き込みとなるので、影を描きます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">render_fov_shadow(&amp;mut draw, .. );</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>その後、 Learn OpenGL の <a href="https://learnopengl.com/Advanced-Lighting/Bloom">bloom</a> の項からパクったシェーダで gaussian blur をかけます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_blur">1.2. blur</h3>
+<div class="paragraph">
+<p>最終結果です！</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/gauss/final.png" alt="final">
+</div>
+</div>
+<div class="paragraph">
+<p>ここにイカちゃんを投下します！</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/gauss/ika-chan-big.png" alt="ika chan big">
+</div>
+</div>
+<div class="paragraph">
+<p>デカい……笑　バグを修正し、イカちゃんを召喚します！</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/gauss/ika-chan.gif" alt="ika chan">
+</div>
+</div>
+<div class="paragraph">
+<p>かわいい。かわいいなぁ</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_texture_filtering">2. Texture filtering</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>テクスチャの境界で線形補完を行うように設定すると、視野表示は以下のようになりました:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/gauss/fov_linear.png" alt="fov linear">
+</div>
+</div>
+<div class="paragraph">
+<p>左ページの画像と比べると、縁が滑らかに描画されていることが分かります。このまま使っても良いかもしれません。</p>
+</div>
+<div class="paragraph">
+<p>Gaussian blur 後は、補完の有無の差がほとんど分かりませんでした。</p>
+</div>
+<div class="paragraph">
+<p>c.f. <a href="https://learnopengl.com/Getting-started/Textures" class="bare">https://learnopengl.com/Getting-started/Textures</a></p>
+</div>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>
