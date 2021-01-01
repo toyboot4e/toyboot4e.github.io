@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Turn-based game loop</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Turn-based game loop</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/snowrl/summary.html">SnowRL devlog<ol><li><a href="/snowrl/1_batcher.html">Batcher</a>
+    
+</li><li><a href="/snowrl/2_blur.html">Gaussian blur</a>
+    
+</li><li><a href="/snowrl/3_turn_based.html">Turn-based game loop</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/anf/summary.html">[Arhieved] ANF devlog<ol><li><a href="/anf/1_hello.html">Sprite rendering!</a>
+    
+</li><li><a href="/anf/2_gfx.html">Object-oriented rendering API</a>
+    
+</li><li><a href="/anf/3_pong.html">Pong</a>
+    
+</li><li><a href="/anf/4_imgui.html">ImGUI</a>
+    
+</li><li><a href="/anf/5_transform.html">Transform</a>
+    
+</li><li><a href="/anf/6_media.html">Media</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rl/summary.html">Roguelike algorithms<ol><li><a href="/rl/1_wfc.html">Wave function collapse explained</a>
+    
+</li><li><a href="/rl/2_fov.html">Field of view (recursive scanning)</a>
+    
+</li><li><a href="/rl/3_blur.html">Gaussian blur for FoV rendering</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/lang/summary.html">Language dev<ol><li><a href="/lang/1_loxrs_treewalk.html">Crafting Interpreters - 1/2</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/ssg/summary.html">SSG Devlog<ol><li><a href="/ssg/1_bash.html">bash + Asciidoctor</a>
+    
+</li><li><a href="/ssg/2_rs.html">Rust + Asciidoctor</a>
+    
+</li><li><a href="/ssg/3_booktune.html">Outline parser for booktune</a>
+    
+</li><li><a href="/ssg/4_adbook.html">adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/note/summary.html">Notes<ol><li><a href="/note/1_cli.html">Great command line tools</a>
+    
+</li><li><a href="/note/2_ui.html">Minimum UI with full features</a>
+    
+</li><li><a href="/note/3_c_libs.html">C libraries and modern C-like langs</a>
+    
+</li><li><a href="/note/4_evil.html">Evil Emacs</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_summary">1. Summary</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_turn_based_game_loop">1.1. Turn-based game loop</h3>
+<div class="paragraph">
+<p>ターン制を実装しました:</p>
+</div>
+<div class="videoblock">
+<div class="content">
+<iframe width="895" height="431" src="https://www.youtube.com/embed/HzD-e0Wg0xQ?rel=0" frameborder="0" allowfullscreen></iframe>
+</div>
+</div>
+<div class="paragraph">
+<p>今後の開発は、技術よりも創造力の問題になりますね。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_architecture">2. Architecture</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ターン制の設計について書いておきます。</p>
+</div>
+<div class="sect2">
+<h3 id="_overview">2.1. Overview</h3>
+<div class="paragraph">
+<p>このようなデータ配置になりました:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">/// Snow the roguelike game
+#[derive(Debug)
+pub struct SnowRl {
+    /// 画像、入力、音声
+    wcx: WorldContext,
+    /// マップとキャラ
+    world: World,
+    /// ターン制 (後述)
+    game_loop: GameLoop,
+    /// アニメーション
+    anims: AnimPlayer,
+    /// Tick | Anim
+    state: GameState, <i class="conum" data-value="1"></i><b>(1)</b>
+}
+
+/// Tick | Anim
+#[derive(Debug)]
+enum GameState {
+    Tick,
+    Anim,
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>状態が増えたら <code>State</code> オブジェクトの stack にします。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Borrow rules の影響で、必然的にこうなったと思います。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_turn_based_game_loop_2">2.2. Turn-based game loop</h3>
+<div class="paragraph">
+<p>ターン制 <code>GameLoop</code> を <code>tick</code> すると、ゲームの内部状態が『ワンステップ』進行し、 <code>TickResult</code> が返ります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">#[derive(Debug)]
+pub enum TickResult {
+    /// キャラの行動順が回ってきた
+    TakeTurn(ActorIndex),
+    /// 新たなコマンドを実行する
+    Command(Rc&lt;dyn Command&gt;),
+    /// コマンドの実行が 1 フレーム以上かかっている (例: プレイヤの行動決定)
+    ProcessingCommand,
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>TickResult</code> を見てゲームを制御します。 <code>TickResult::Command</code> が帰ってきたら、行動にアニメを割り当てます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">impl SnowRl {
+    fn update_tick(&amp;mut self) -&gt; UpdateResult {
+        loop {
+            let res = self.game_loop.tick(&amp;mut self.world, &amp;mut self.wcx);
+
+            match res {
+                TickResult::TakeTurn(actor) =&gt; {
+                    // 次回 `tick` で `actor` の行動が決まる
+                    // 特に何もしない
+                    continue; <i class="conum" data-value="1"></i><b>(1)</b>
+                }
+                TickResult::Command(cmd) =&gt; {
+                    // 次回 `tick` で `cmd` が実行される
+                    // コマンド実行前に、アニメを割り込ませる
+
+                    let mut acx = AnimContext {
+                        world: &amp;mut self.world,
+                        wcx: &amp;mut self.wcx,
+                    };
+
+                    if let Some(anim) = cmd.gen_anim(&amp;mut acx) {
+                        // 割り当てるべきアニメが存在する場合
+                        self.anims.enqueue_boxed(anim); <i class="conum" data-value="2"></i><b>(2)</b>
+                        // アニメの再生状態へ移行
+                        return UpdateResult::SwitchInThisFrame(GameState::Anim);
+                    }
+
+                    continue;
+                }
+                TickResult::ProcessingCommand =&gt; {
+                    // 行動処理が 1 フレーム以上かかる場合
+                    // (例: プレイヤーの行動を決める場合)
+                    // 次のフレームまで待つ
+                    return UpdateResult::GotoNextFrame;
+                }
+            }
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このコードは単純化されています:</p>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>ここで無限ループにならないような工夫が可能です; プレイヤの行動時は、フレームカウンタが増えていなければ 1 フレームウェイトを入れます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>ここで歩行アニメは可能な限り 1 つのアニメとして処理します (キャラが同時に動いているように見せます) 。歩行アニメを再生するのは、別のアニメが <code>enqueue</code> されるときか、プレイヤが新たなターン (行動順) を取る場合です。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>GameLoop::tick</code> は、 unstable Rust の <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/generators.html">generator</a> を使って実装しました。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_chain_of_actions">2.3. Chain of actions</h3>
+<div class="sect3">
+<h4 id="_command_smaller_events">Command = Smaller events</h4>
+<div class="paragraph">
+<p>キャラの行動は、イベントをイベントに写す形で処理します。大半の行動は、 <code>ChangePosition</code>, <code>GiveDamage</code> のような原始的イベントに帰結します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-haskell" data-lang="haskell">Walk -&gt; Move <i class="conum" data-value="1"></i><b>(1)</b>
+     or
+     -&gt; ChangeDirection
+
+-- (予定):
+Attack -&gt; OnAttack -&gt; Dodge (finish)
+                   or
+                   -&gt; Hit -&gt; GiveDamage (finish)</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>キャラの歩行すら、 1 つの関数で処理するのではなく、 <code>Walk &#8594; Move</code> のような変換を挟みます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>細かいステップ (イベント) に分けるメリットは:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>処理の共通化が単純になる</p>
+</li>
+<li>
+<p>イベント毎に <code>GameLoop</code> が <code>yield</code> する (<code>TickResult</code> を返して <strong>処理を中断する</strong> ) ため、 <strong>アニメの再生を挟むことができる</strong></p>
+</li>
+<li>
+<p>イベント毎に複数の handler を割り当てることができる (CoR; chain-of-responsibility pattern)</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_visualization">Visualization</h4>
+<div class="paragraph">
+<p>今のところ、 <code>Commnad</code> (イベント) に直接アニメを生やしています:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">pub trait Command: fmt::Debug + GenAnim {
+    fn run(&amp;self, ccx: &amp;mut CommandContext) -&gt; CommandResult;
+}
+
+pub trait GenAnim {
+    fn gen_anim(&amp;self, _acx: &amp;mut AnimContext) -&gt; Option&lt;Box&lt;dyn Anim&gt;&gt; {
+        None
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>完全な分離を目指すなら、外部からアニメを割り当てます。すると、たとえば、 GUI と TUI で内部データのコードを共有できます。そんな予定はありませんが……。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_chain_of_responsibility_pattern">Chain-of-responsibility pattern</h4>
+<div class="paragraph">
+<p>複数のイベントハンドラを動的に追加できるようにすれば、ロジックを独立的に追加できます。</p>
+</div>
+<div class="paragraph">
+<p>例えばの話ですが、《ゾンビ系》のロジックを追加するイメージとしては:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">pub struct ZombieSystem; <i class="conum" data-value="1"></i><b>(1)</b>
+
+impl RlSystem for ZombieSystem {
+     fn hook(&amp;mut self, scx: &amp;mut SystemContext) {
+          scx.hook(Self::heal_hook); <i class="conum" data-value="2"></i><b>(2)</b>
+          scx.hook(Self::death_hook);
+     }
+}
+
+impl ZombieSystem {
+     fn heal_hook(&amp;mut self, scx: &amp;mut SystemContext, cmd: &amp;cmd::Heal) -&gt; SystemResult {
+         if is_zombie(&amp;scx.world.actors[cmd.actor]) {
+             SystemResult::alternate(cmd::GiveDamage {
+                 actor: cmd.actor,
+                 amount: cmd.amount,
+             }) <i class="conum" data-value="3"></i><b>(3)</b>
+         } else {
+             SystemResult::None <i class="conum" data-value="4"></i><b>(4)</b>
+         }
+     }
+
+     fn death_hook(&amp;mut self, scx: &amp;mut SystemContext, cmd: &amp;cmd::Death) -&gt; SystemResult {
+         // 死んだら墓オブジェクトを建てる
+     }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>ZombieSystem</code> は《ゾンビ系》に関するロジックを追加する <code>RlSystem</code> (roguelike system) である</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>『回復』イベントに対応したロジックを追加する:</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>ゾンビ系に対する『回復』イベントを『ダメージ付与』に派生させる</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>ゾンビ系以外には何もしない (『回復』はデフォルトで『回復付与』に派生する)</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>アニメやロジックはプラグイン的なコードなので、 <strong>ホットリロード</strong> 可能にできたら開発中に便利そうです。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+これは予定で、今は <code>Command::run</code> を直接生やして使っています。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_commandresult">CommandResult</h4>
+<div class="paragraph">
+<p>まず背景として、 <code>Command::run</code> の返値でイベントのチェインが可能です:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">pub enum CommandResult {
+    Chain(Box&lt;dyn Command&gt;),
+    ..
+}
+
+impl CommandResult {
+    pub fn chain&lt;T: Command + 'static&gt;(cmd: T) -&gt; Self { <i class="conum" data-value="1"></i><b>(1)</b>
+        Self::Chain(Box::new(cmd))
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>なぜか <a href="https://doc.rust-lang.org/rust-by-example/scope/lifetime/static_lifetime.html">'static</a> が必要でした。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_considerations">2.4. Considerations</h3>
+<div class="paragraph">
+<p>まだこの設計は未確定です。検討項目を挙げていきます。</p>
+</div>
+<div class="sect3">
+<h4 id="_need_of_state_machine">Need of state machine?</h4>
+<div class="paragraph">
+<p>単純な行動のチェインでカバーしにくい例があります:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>プレイヤの行動がターンを消費しない行動に帰結した場合、再びプレイヤのターンを開始する (例: 歩かせようとしたら、向き変更だけで終わった)</p>
+<div class="paragraph">
+<p>&#8658; hack で対応しています。ターンを消費しない行動は、終わり際に <code>NotConsumeTurn</code> イベントを発行します。 <code>NotConsumeTurn</code> のアクターがプレイヤだった場合は、 <code>PlayerTurn</code> をチェインします。また、 1 フレーム待つ <code>Anim</code> を入れて、無限ループを防ぎます。</p>
+</div>
+</li>
+<li>
+<p>複数ターンに渡って行動が変化する場合 (例: ダッシュ中は移動コマンドを自動発行する)</p>
+<div class="paragraph">
+<p>&#8658; <code>Behavior</code> オブジェクトを経由して行動を生成すれば良いと思います。 (<code>RunBehavior</code> が ON になっていたら移動コマンドが発行される、など) 。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>また、 <strong>行動の結果を見て次の行動を決める</strong> 場合は、どうしても generator を使いたくなると思います。やはり、まだまだ修正が必要そうですね。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_complete_separation">Complete separation?</h4>
+<div class="paragraph">
+<p>行動処理に必要な依存性が不明です。たとえば、プレイヤの行動を決定するには、入力を受け取る必要があります。</p>
+</div>
+<div class="paragraph">
+<p>今のところ、全ゲームデータが <code>Command::run</code> の引数となっています。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_misc">3. Misc</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_references">3.1. References</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.youtube.com/watch?v=U03XXzcThGU">IRDC US 2015 - Brian Bucklew, Data-Driven Engines of Qud and Sproggiwood - YouTube</a></p>
+<div class="paragraph">
+<p>『行動をイベントのチェインとして扱う』アイデアの元ネタです。プレゼン自体は分かりにくく感じましたが、やっていることが非常に参考になりました。</p>
+</div>
+</li>
+<li>
+<p><a href="https://journal.stuffwithstuff.com/2014/07/15/a-turn-based-game-loop/">A Turn-Based Game Loop – journal.stuffwithstuff.com</a></p>
+<div class="paragraph">
+<p>我らが Bob の記事です。 <code>IEnumerable</code> (C#) を <a href="https://github.com/munificent/amaranth/blob/master/Amaranth.Engine/Classes/Game.cs#L255">ゲームループに使っています</a> 。 <code>CommandResult::alternate</code> みたいな語彙は、彼のコードから頂きました。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_theory_on_graphics">3.2. Theory on graphics?</h3>
+<div class="paragraph">
+<p><a href="https://graphics-programming.org/">Graphics Programming</a> というオンライン・コミュニティで、 Advanced Global Illumination という本の読書会が始まります。内容は大学院レベルの理論で、若干の数学 (微積) と意欲さえあれば、誰でも挑戦可能とされています。一方で、 ray tracing を実践しておいた方が良いとも言われており、なかなかレベルが高そうです。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://www.realtimerendering.com/raytracing/Ray%20Tracing%20in%20a%20Weekend.pdf">Ray tracing in one weekend</a> (PDF)</p>
+</div>
+<div class="paragraph">
+<p>読書会の日程は未定です。内容としては、毎週 50 ページほどの文章を読み、要約を提出したり、議論や質問の機会が得られます。僕はついぞ <strong>理論を修めたことがない</strong> ので、参加してみる予定です。</p>
+</div>
+<div class="paragraph">
+<p>……着いて行けるかな？　僕のレベルでは、初日から厳しいのですよね。</p>
+</div>
+<div class="paragraph">
+<p>ひとまず、 <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html">Ray Tracing in One Weekend</a> を <a href="https://github.com/toyboot4e/ray_trace">実践中</a> です:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/gfx/ray-1.png" alt="ray 1">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_org_mode">3.3. org-mode</h3>
+<div class="paragraph">
+<p>最近は <a href="https://orgmode.org/">org-mode</a> で TODO リストを書いています。タスク管理が続いたのは初めてのことで、 <strong>エディタサポートが無ければ無理だった</strong> と思います。これで計画性を獲得できるのでしょうか？！</p>
+</div>
+<div class="paragraph">
+<p><code>org-mode</code> で書くのはプレインテキストの markup 言語なのですが、折り畳みやチェックリスト操作のショートカットがあります。習熟する必要も無く使用できてお勧めです。</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>
