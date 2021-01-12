@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>FSM and state stack</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>FSM and state stack</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/snowrl/summary.html">SnowRL devlog<ol><li><a href="/snowrl/1_batcher.html">Batcher</a>
+    
+</li><li><a href="/snowrl/2_blur.html">Gaussian blur</a>
+    
+</li><li><a href="/snowrl/3_turn_based.html">Turn-based game loop</a>
+    
+</li><li><a href="/snowrl/4_fsm.html">FSM and state stack</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/anf/summary.html">[Archieved] ANF devlog<ol><li><a href="/anf/1_hello.html">Sprite rendering!</a>
+    
+</li><li><a href="/anf/2_gfx.html">Object-oriented rendering API</a>
+    
+</li><li><a href="/anf/3_pong.html">Pong</a>
+    
+</li><li><a href="/anf/4_imgui.html">ImGUI</a>
+    
+</li><li><a href="/anf/5_transform.html">Transform</a>
+    
+</li><li><a href="/anf/6_media.html">Media</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rl/summary.html">Roguelike algorithms<ol><li><a href="/rl/1_wfc.html">Wave function collapse explained</a>
+    
+</li><li><a href="/rl/2_fov.html">Field of view (recursive scanning)</a>
+    
+</li><li><a href="/rl/3_blur.html">Gaussian blur for FoV rendering</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/lang/summary.html">Language dev<ol><li><a href="/lang/1_loxrs_treewalk.html">Crafting Interpreters - 1/2</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/ssg/summary.html">SSG Devlog<ol><li><a href="/ssg/1_bash.html">bash + Asciidoctor</a>
+    
+</li><li><a href="/ssg/2_rs.html">Rust + Asciidoctor</a>
+    
+</li><li><a href="/ssg/3_booktune.html">Outline parser for booktune</a>
+    
+</li><li><a href="/ssg/4_adbook.html">adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/note/summary.html">Notes<ol><li><a href="/note/1_cli.html">Great command line tools</a>
+    
+</li><li><a href="/note/2_ui.html">Minimum UI with full features</a>
+    
+</li><li><a href="/note/3_c_libs.html">C libraries and modern C-like langs</a>
+    
+</li><li><a href="/note/4_evil.html">Evil Emacs</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>State</code> を足してゲームを拡張できるようになりました。</p>
+</div>
+<div class="paragraph">
+<p>さらに本日……イカちゃんが喋ります (!?)</p>
+</div>
+<div class="sect2">
+<h3 id="_title_screen">1.1. Title screen</h3>
+<div class="sect3">
+<h4 id="_snowing">Snowing!</h4>
+<div class="paragraph">
+<p><a href="https://www.shadertoy.com/view/ldsGDn">Just snow</a> で雪を降らせて見ました:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/title/snow.png" alt="snow">
+</div>
+</div>
+<div class="paragraph">
+<p><a href="https://www.shadertoy.com/">Shadertoy</a> のシェーダは、フルスクリーンの四角形や経過時間を入力として受け取るようになっており、ゲームへの組み込みも簡単です。しかし重そうなので、パーティクルで再実装してみたいと思います (予定) 。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_stack_based_fsm">Stack-based FSM</h4>
+<div class="paragraph">
+<p>ゲーム <code>State</code> をリストしてみました:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>タイトル画面</p>
+</li>
+<li>
+<p>ターン制を進める状態</p>
+<div class="ulist">
+<ul>
+<li>
+<p>アニメを再生する状態 (攻撃アニメ、移動アニメなど)</p>
+</li>
+<li>
+<p>所持品メニュー</p>
+<div class="ulist">
+<ul>
+<li>
+<p>サブメニュー</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>カットシーンを再生する状態</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これを見て考えたこととしては、</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>State</code> には親子関係があります &#8658; <code>State</code> スタックを使うのが自然です。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">/// Stack-based finite state machine
+#[derive(Debug)]
+pub struct Fsm {
+    states: HashMap&lt;TypeId, Box&lt;dyn State&gt;&gt;,
+    stack: Vec&lt;TypeId&gt;,
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>2 つ以上の <code>State</code> が共有するデータがあります &#8658; <code>Global</code> データに入れます。共有しないデータは、それぞれの <code>State</code> オブジェクトに入れます。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">/// Game data shared by more than one [`State`]s
+#[derive(Debug)]
+pub struct Global {
+    pub world: World,
+    pub wcx: WorldContext,
+    pub world_render: WorldRenderer,
+    pub anims: AnimPlayer, <i class="conum" data-value="1"></i><b>(1)</b>
+    pub cutscene_to_play: Option&lt;CutsceneIndex&gt;, <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>状態間でのデータのやり取りは、 <code>Global</code> を読み書きするという形になります。できれば、状態から状態へ直接メッセージを送りたいところですが。</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ゲーム全体のデータとしては:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">/// Snow the roguelike game
+#[derive(Debug)]
+struct SnowRl {
+    gl: fsm::Global,
+    fsm: fsm::Fsm,
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_logo">Logo</h4>
+<div class="paragraph">
+<p>ロゴを GIMP で作成し、仮タイトル完成です:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/title/logo.png" alt="logo">
+</div>
+</div>
+<div class="paragraph">
+<p>Demons' Souls のロゴが格好良かった記憶があるのですが、今見るとそれほどでもありませんでした。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_talk_to_ika_chan">1.2. Talk to Ika-chan!</h3>
+<div class="sect3">
+<h4 id="_interaction">Interaction</h4>
+<div class="paragraph">
+<p>イカちゃんに話しかけるには、会話スクリプトの実行状態と、状態遷移が必要です。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>PlayScript</code> 状態は、ひとまずハードコーディングします。</p>
+</li>
+<li>
+<p>状態遷移に関しては、ターン制 (unstable Rust の generator)が <code>Talk</code> イベントを <code>yield</code> した場合 (<code>Box::downcast_ref</code> で判定) に、 <code>PlayScript</code> 状態へ移行します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>まずは限定された仕組みで動かします。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_nine_slice_sprite">Nine slice sprite</h4>
+<div class="paragraph">
+<p>会話ウィンドウ表示のために、 <a href="https://docs.unity3d.com/ja/2019.4/Manual/9SliceSprites.html">9 スライス</a> を導入します。</p>
+</div>
+<div class="paragraph">
+<p><code>snow2d</code> (自作クレート、非公開) の描画 API は、四辺形の builder と、 <code>OnSpritePush</code> から成っています:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">/// What can be pushed onto [`QuadParamBuilder`]
+pub trait OnSpritePush: Texture2d {
+    /// Set source rectangle (uv values), destination size, rotations, ..
+    fn init_quad(&amp;self, builder: &amp;mut impl QuadParamsBuilder);
+
+    #[inline]
+    fn push_quad&lt;Q: QuadIter&gt;(&amp;self, draw: &amp;mut DrawApiData&lt;Q&gt;, flips: Flips)
+    where
+        Self: Sized,
+    {
+        draw.params
+            .write_to_quad(draw.quad_iter.next_quad_mut(self.img()), self, flips);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>push_quad</code> のデフォルト実装は、 <code>Builder</code> が作った四辺形をそのまま書き込みます。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>NineSliceSprite</code> の場合は、 <code>OnSpritePush::push_quad</code> を実装し、 <code>Builder</code> が作った四辺形を 9 つに分解して書き込みます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_with_ballons">.. with ballons!</h4>
+<div class="paragraph">
+<p>9 スライスに吹き出し (baloon) をくっ付けて表示すれば、キャラが喋っているように見えます。</p>
+</div>
+<div class="paragraph">
+<p>イカちゃんに向かって Enter キーで <code>Interact</code> すると、 <code>PlayScript</code> 状態に遷移します:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/title/talk.png" alt="talk">
+</div>
+</div>
+<div class="paragraph">
+<p>イカちゃん……じゃなぁーい！　 1.5 頭身のどせいさんみたいな生き物が喋っていますね。</p>
+</div>
+<div class="paragraph">
+<p>ちっちゃいなぁ〜。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+ウィンドウ・吹き出し画像は <a href="https://rmgamematerial.wordpress.com/2011/04/10/oldjunk/#more-159">Old Junk (sprites, tiles, etc.) | Soruve&#8217;s Game Materials</a> から。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_todos">1.3. TODOs</h3>
+<div class="paragraph">
+<p>まだまだこれからですね。</p>
+</div>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p><i class="fa fa-square-o"></i> スクリプト (カットシーンを書けるもの) を実装する</p>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p><i class="fa fa-square-o"></i> スクリプトの書式を決める (<a href="https://gamelisp.rs/">GameLisp</a>?)</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> スクリプトからゲームに変更を加える (<code>Event</code> を投げる ?)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> 任意のスクリプトを実行する</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> Tiled のセルや object とスクリプトを関連付ける</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>実装できるのでしょうか？　自信がありません。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_thoughts">2. Thoughts</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_its_an_rpg">2.1. It&#8217;s an RPG!</h3>
+<div class="paragraph">
+<p>僕は Angband で 2 階に降りられないレベルのプレイヤーです。おそらく、僕が作ろうとしているものは、皆さんが思い浮かべる『ローグライク』ではありません。</p>
+</div>
+<div class="paragraph">
+<p>ローグライクをシステムに使う理由は、戦闘などを含めて <strong>マップ上でゲームが進行する</strong> ためです。その『味』が良いと思っています。手書きの一本道を歩いてもらい、恒久死、迷宮の自動生成などは無しの予定です。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_asset">2.2. Asset</h3>
+<div class="sect3">
+<h4 id="_asset_path_generation">Asset path generation</h4>
+<div class="paragraph">
+<p>Asset パスの定数を使えば、実行時に存在しないファイルを読むことを防げます。</p>
+</div>
+<div class="paragraph">
+<p>今回は、  <code>build.rs</code> からパスの定数を生成しました (<a href="https://gist.github.com/toyboot4e/c3ebb86ef6d68e53e74376543ad4d493">gist</a>) 。マクロから生成できた方がポータブルで良いのですが、しばらくマクロ達人にはなれそうもありませせん。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_todo_assetcache">TODO: <code>AssetCache</code></h4>
+<div class="paragraph">
+<p>そろそろアセット管理の仕組みを考えたいです。 Cache と非同期ロードができたら良いと思います。</p>
+</div>
+<div class="paragraph">
+<p><code>ass.rs</code> を <code>asset.rs</code> にリネームしました。『 Ass 管理』……短くて良いと思ったのですが、思ったよりも下ネタなのかなと調査予定です。ミームだと思っていたのですよね。わざわざ調べなくてもいいかな……</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ecs">2.3. ECS?</h3>
+<div class="paragraph">
+<p>ECS が良さそうな予感をメモしておきます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<a href="https://github.com/lowenware/dotrix/">dotrix</a> を参考に、シンプルな ECS / アセット管理を始めても良かったかもしれません。しかし、ブラックボックスが残りそうなので、しばらく非 ECS で作ります。
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_sub_typing">Sub typing?</h4>
+<div class="paragraph">
+<p>Renderer を Z 軸でソートできたら便利です。</p>
+</div>
+<div class="paragraph">
+<p>ECS なら、 <code>ZOrder: Component</code> を元に <code>Entity</code> をソートするか、近いことが簡単にできる……のでしょうか。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_flat_data_automatic_fetch">Flat data &amp; automatic fetch?</h4>
+<div class="paragraph">
+<p>SnowRL の大半のコードが <code>Global</code> 構造体に依存しています。依存性を手に入れるためには、長々と <code>global.field.field.target_field</code> のようにアクセスを書きます。</p>
+</div>
+<div class="paragraph">
+<p>ECS では、関数を書くと、 <code>World</code> から自動的に依存性を <code>fetch</code> して渡してくれる気配があります:</p>
+</div>
+<div class="listingblock">
+<div class="title">Example from <a href="https://bevyengine.org/news/introducing-bevy/">Introducing Bevy</a></div>
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">// Res and ResMut access global resources
+fn system(time: Res&lt;Time&gt;, score: ResMut&lt;Score&gt;) {
+    // do something
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>あるいは <code>Query</code> 経由で依存性を手に入れます。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_clientserver_separation">2.4. Client/server separation?</h3>
+<div class="paragraph">
+<p>様々な分離のパタンがありますが、ゲーム制作における究極の目標は、ネットワーク越しにプレイできる設計なのかなと思います。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://book.veloren.net/">Veloren</a> が良さそうですよね〜</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>
