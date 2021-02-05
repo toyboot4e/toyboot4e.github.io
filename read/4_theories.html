@@ -38,6 +38,8 @@
     
 </li><li><a href="/snowrl/4_fsm.html">FSM and state stack</a>
     
+</li><li><a href="/snowrl/5_pools.html">Pools</a>
+    
 </li></ol></a>
     
 </li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
@@ -125,17 +127,47 @@
 <h2 id="_books">1. Books</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>この先楽しんでいくには、理論的な物が必要な気がしてメモしておきました。それとも、『専門性』が必要だと思ったのでしょうか。</p>
-</div>
-<div class="paragraph">
-<p>言語を作りたいような、 C/C++/Rust/Zig で十分なような……。追い求める物が無いので、イマイチ身が入りません。あえて言うなら、記号を使った表記法を集めてみたい気がします。論理学？</p>
+<p>この先楽しんでいくには、理論的な物が必要な気がします。</p>
 </div>
 <div class="sect2">
-<h3 id="_not_read">1.1. Not read</h3>
+<h3 id="_reading">1.1. Reading</h3>
+<div class="paragraph">
+<p>読んだ本の簡単なメモです。</p>
+</div>
+<div class="sect3">
+<h4 id="_advanced_global_illumination"><a href="https://www.amazon.co.jp/Advanced-Global-Illumination-English-Philip-ebook/dp/B07JN81G8S/ref=sr_1_1?__mk_ja_JP=%E3%82%AB%E3%82%BF%E3%82%AB%E3%83%8A&amp;dchild=1&amp;keywords=advanced+global+illumination&amp;qid=1612059821&amp;sr=8-1">Advanced global illumination</a></h4>
+<div class="paragraph">
+<p>Light transport theory の本です。 Graphics Programming というコミュニティの読書会に参加して読みました。情報の話だと思っていましたが、物理の話だったので、好物として楽しみました。</p>
+</div>
+<div class="paragraph">
+<p>目などのセンサは、光エネルギーの flux (単位は power; energy per time) を感知します。微小面 \(dA\) に入射する flux \(\psi\) は、立体角あたりの flux (radience \(L\)) からの寄与の積分として捉えられます。 \(L\) から \(\psi\) への寄与は、 \(L\) の \(dA\) に対する垂直成分です。これには Lambert&#8217;s cosine law という呼び名が付いていますが、 \(dA\) を通過する体積が \(S \mathbb{v} \cdot \mathbb{n}\) だと思うだけで十分でした。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_測度確率ルベーグ積分"><a href="https://www.amazon.co.jp/dp/B08L3FDL2W/ref=dp-kindle-redirect?_encoding=UTF8&amp;btkr=1">測度・確率・ルベーグ積分</a></h4>
+<div class="paragraph">
+<p>数学らしい用語が出てくる本です。 Advanced global illumination では、偏微分ではなく『<em>Radon-Nikodym derivative</em>』というのが使用されていました。しかしこれを正確に理解するには、『ルベーグ測度』を理解する必要があるみたいなので、この本を読んでみました。</p>
+</div>
+<div class="paragraph">
+<p>区間 <code>[0, 1]</code> からランダムで 1 点を取った時、それが 0 である確率は不明です (1/∞ に見える) 。</p>
+</div>
+<div class="paragraph">
+<p>測度は、集合族の関数であり、 \sigma-加法性を持つものです。確率とは規格化された測度です。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_finished_reading">1.2. Finished reading</h3>
+<div class="paragraph">
+<p>(無し)</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_not_read">1.3. Not read</h3>
 <div class="sect3">
 <h4 id="_computer_science">Computer science</h4>
 <div class="paragraph">
-<p>一冊でも読んだら、僕にしてはよくやったと思います。一冊読めば、次の一冊を求めるようになる、そんな読書を今後に期待したいです。</p>
+<p>今後一冊でも読んだらなら、僕にしてはよくやったと思います。</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -186,6 +218,13 @@
 <div class="paragraph">
 <p>ただ、やはり理論的なものを全く習得していないので、先は長そうです。</p>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p>理論物理学</p>
+</li>
+</ul>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_mathmatics">Mathmatics</h4>
@@ -205,12 +244,6 @@
 </li>
 </ul>
 </div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_finished_reading">1.2. Finished reading</h3>
-<div class="paragraph">
-<p>まだ何も読んでいません。</p>
 </div>
 </div>
 </div>

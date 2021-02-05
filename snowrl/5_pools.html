@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Pools</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Pools</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/snowrl/summary.html">SnowRL devlog<ol><li><a href="/snowrl/1_batcher.html">Batcher</a>
+    
+</li><li><a href="/snowrl/2_blur.html">Gaussian blur</a>
+    
+</li><li><a href="/snowrl/3_turn_based.html">Turn-based game loop</a>
+    
+</li><li><a href="/snowrl/4_fsm.html">FSM and state stack</a>
+    
+</li><li><a href="/snowrl/5_pools.html">Pools</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/anf/summary.html">[Archieved] ANF devlog<ol><li><a href="/anf/1_hello.html">Sprite rendering!</a>
+    
+</li><li><a href="/anf/2_gfx.html">Object-oriented rendering API</a>
+    
+</li><li><a href="/anf/3_pong.html">Pong</a>
+    
+</li><li><a href="/anf/4_imgui.html">ImGUI</a>
+    
+</li><li><a href="/anf/5_transform.html">Transform</a>
+    
+</li><li><a href="/anf/6_media.html">Media</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rl/summary.html">Roguelike algorithms<ol><li><a href="/rl/1_wfc.html">Wave function collapse explained</a>
+    
+</li><li><a href="/rl/2_fov.html">Field of view (recursive scanning)</a>
+    
+</li><li><a href="/rl/3_blur.html">Gaussian blur for FoV rendering</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/lang/summary.html">Language dev<ol><li><a href="/lang/1_loxrs_treewalk.html">Crafting Interpreters - 1/2</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/ssg/summary.html">SSG Devlog<ol><li><a href="/ssg/1_bash.html">bash + Asciidoctor</a>
+    
+</li><li><a href="/ssg/2_rs.html">Rust + Asciidoctor</a>
+    
+</li><li><a href="/ssg/3_booktune.html">Outline parser for booktune</a>
+    
+</li><li><a href="/ssg/4_adbook.html">adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/note/summary.html">Notes<ol><li><a href="/note/1_cli.html">Great command line tools</a>
+    
+</li><li><a href="/note/2_ui.html">Minimum UI with full features</a>
+    
+</li><li><a href="/note/3_c_libs.html">C libraries and modern C-like langs</a>
+    
+</li><li><a href="/note/4_evil.html">Evil Emacs</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">Feb 5, 2021</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_omg">1.1. OMG!</h3>
+<div class="paragraph">
+<p>恐るべきことが起きてしまいました……</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/misc/y-sort.png" alt="y sort">
+</div>
+</div>
+<div class="paragraph">
+<p><strong>イカちゃんデカ過ぎ問題</strong> です。他のキャラを覆い隠す迷惑キャラとなってしまいます。</p>
+</div>
+<div class="paragraph">
+<p>最初から分かっていたはずだろう！！</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_animation">1.2. Animation</h3>
+<div class="paragraph">
+<p>タイトル画面や吹き出しが動きます:</p>
+</div>
+<div class="videoblock">
+<div class="content">
+<video src="/static/img/snow/title/anims.mp4" controls>
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>このイカちゃんは……ビッグな存在になってしまいました。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_new_modules">2. New modules</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_audio">2.1. Audio</h3>
+<div class="paragraph">
+<p><a href="https://github.com/MoAlyousef/soloud-rs">soloud-rs</a> を <code>audio</code> モジュールとして使っています。この際、 <code>audio::asset</code> を追加するなど、 fork せずに (re-exporting のみで) 十分に改造できました。 詳しくは、  <a href="https://qiita.com/toyboot4e/items/c9bac2183405d1fc1c6e">Qiita の記事</a> で解説しています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_assets">2.2. Assets</h3>
+<div class="paragraph">
+<p>アセット管理を始めました:</p>
+</div>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p><i class="fa fa-check-square-o"></i> 同じ画像・音声を二度読み込まない (caching)</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> <code>async</code> ロード</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> ホットリロード</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> <code>serde</code></p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> Sprite sheets などの高度な loader ？？</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>アセットパスについては、文字列をハードコーディングするのが嫌だったので、 <code>build.rs</code> から定数を生成しています。</p>
+</div>
+<div class="sect3">
+<h4 id="_options">Options</h4>
+<div class="paragraph">
+<p><code>AssetCache&lt;T&gt;</code> の実装案としては:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>アセットを <code>Arc&lt;Mutex&lt;T&gt;&gt;</code> に入れる → 採用</p>
+<div class="paragraph">
+<p>TODO: <code>serde</code> の際に重複したオブジェクトを作らない (<a href="https://matklad.github.io/2020/03/22/fast-simple-rust-interner.html">interning</a>) ように気をつけます。</p>
+</div>
+</li>
+<li>
+<p>アセットをプールに入れる</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p><code>Handle&lt;T&gt;</code> を弱参照にする (例: <a href="https://docs.rs/thunderdome/latest/thunderdome">thunderdome</a>)</p>
+</li>
+<li>
+<p><code>Handle&lt;T&gt;</code> を強参照にする (例: <a href="https://docs.rs/froggy/latest/froggy/">froggy</a>, <a href="https://docs.rs/bevy/latest/bevy/asset/index.html">bevy_asset</a>)</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>Handle&lt;T&gt;</code> の参照カウントに必要なのは <code>drop</code> を通知する仕組みです。これは一方的な通信なので、 <code>Arc&lt;Mutex&lt;T&gt;&gt;</code> ではなく <a href="https://doc.rust-lang.org/std/sync/mpsc/">mpsc</a>, <a href="https://docs.rs/crossbeam/latest/crossbeam/">crossbeam</a> または <a href="https://docs.rs/flume/latest/flume/">flume</a> を使用できます。どちらが良いのかは分かりませんが……
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><code>Arena&lt;T&gt;</code> は、 <code>Vec&lt;T&gt;</code> の wrapper です。なぜ生の <code>Vec&lt;T&gt;</code> ではダメなのかは、 <a href="https://docs.rs/generational-arena/latest/generational_arena/">generational_arena</a> に書いてあります。そもそも、 <code>Vec&lt;T&gt;</code> のアイテムを <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.remove">削除</a> すると、他アイテムの位置がズレます。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_hot_reloading">2.3. Hot reloading</h3>
+<div class="paragraph">
+<p>ホットリロードのクレートは、どれも <a href="https://github.com/nagisa/rust_libloading">libloading</a> (<a href="https://docs.rs/libloading/latest/libloading/">API</a>) の wrapper でした。これには <a href="https://github.com/nagisa/rust_libloading/issues/59">macOS でのホットリロードに問題があった</a> ため、対策 (<a href="https://github.com/toyboot4e/hot_crate">hot_crate</a>) しました。</p>
+</div>
+<div class="paragraph">
+<p>TODO: プラグインシステム？　ゲームウィンドウを閉じずにプレイ・開発できたら良いですよね。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ui_sprite_animation_storage">3. UI (sprite / animation storage)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>RPG ツクールの『ピクチャ』みたいな機能になりました。</p>
+</div>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p><i class="fa fa-check-square-o"></i> アニメーション</p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> メモリの自動解放</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> z 軸ソート</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> <code>Transform2d</code> と親子関係</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> <code>Anim</code> のシーケンスなど</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> 自動的に軌跡を表示するような機能？？</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> データ駆動？</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>始めは <code>omgui</code> という名前にしていましたが、 <code>ui</code> に落ち着きました。 OMG!</p>
+</div>
+<div class="sect2">
+<h3 id="_layer">3.1. <code>Layer</code></h3>
+<div class="paragraph">
+<p>Sprite は layer → z 軸の順でソート予定です。ひとまず <code>Layer</code> のみを考えます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">pub struct Layer {
+    pub nodes: Pool&lt;Node&gt;, <i class="conum" data-value="1"></i><b>(1)</b>
+    pub anims: Arena&lt;Anim&gt;, <i class="conum" data-value="2"></i><b>(2)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>Node</code> は <code>Handle</code> がゼロになるまで消滅しません。たとえば、 <code>Node</code> を参照するアニメが生きている限り、 <code>Node</code> は死にません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>アニメは、再生が終わったら自動的に削除されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>Node</code> が <code>Pool</code> に入っている都合上、 <code>Pool</code> 内 <code>Node</code> への <code>WeakHandle</code> をソートする形になると思います。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_node">3.2. <code>Node</code></h3>
+<div class="paragraph">
+<p><code>Node</code> は決め打ちです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">pub struct Node {
+    draw: Draw,
+    params: DrawParams, <i class="conum" data-value="1"></i><b>(1)</b>
+}
+
+pub enum Draw {
+    Sprite(SpriteData),
+    NineSlice(NineSliceSprite),
+}
+
+pub enum DrawParams {
+    pub pos: Vec2f, <i class="conum" data-value="2"></i><b>(2)</b>
+    pub size: Vec2f,
+    pub rot: f32,
+    pub color: Color,
+    pub scales: Vec2f,
+    pub origin: Vec2f,
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>アニメは全 <code>Node</code> 共通の <code>DrawParams</code> を書き換える形で働きます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>未だに独自のベクトル型を使っています。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_anim_tween">3.3. <code>Anim</code> (tween)</h3>
+<div class="sect3">
+<h4 id="_fixed_set_of_animations">Fixed set of animations</h4>
+<div class="paragraph">
+<p><a href="https://docs.rs/enum_dispatch/latest/enum_dispatch/">enum_dispatch</a> で <code>Trait</code> をアップキャストしたような <code>enum</code> を作ります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">#[enum_dispatch]
+pub trait AnimImpl {
+    fn tick(&amp;mut self, dt: Duration);
+    fn is_end(&amp;self) -&gt; bool;
+}
+
+pub struct PosTween { .. }
+impl AnimImpl for PosTween { .. }
+
+pub struct ColorTween { .. }
+impl AnimImpl for ColorTween { .. }
+
+pub struct AlphaTween { .. }
+impl AnimImpl for AlphaTween { .. }
+
+/// One of the [`AnimImpl`] impls
+#[enum_dispatch(AnimImpl)]
+pub enum Anim {
+    PosTween,
+    ColorTween,
+    AlphaTween,
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_tween_builder_animation_builder">Tween builder (animation builder)</h4>
+<div class="paragraph">
+<p>Builder を用意して、最低限の API が整いました:</p>
+</div>
+<div class="listingblock">
+<div class="title">タイトルロゴのアニメ</div>
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">anims
+    .builder()
+    .node(&amp;nodes.logo)
+    .dt(dt)
+    .pos([Self::logo_pos().offset([120.0, 6.0]), Self::logo_pos()])
+    .color([Color::TRANSPARENT, Color::OPAQUE]);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_considerations">3.4. Considerations</h3>
+<div class="sect3">
+<h4 id="_ecs">ECS</h4>
+<div class="paragraph">
+<p><a href="https://github.com/mockersf/bevy_extra/tree/master/bevy_easings">bevy_easing</a> は Bevy Engine 上の tween ライブラリです。 ECS の方が、拡張できて良さそうですね。僕の <code>ui</code> は、特定の <code>Node</code> と <code>Anim</code> しか使用できません。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_flex_layout_library">Flex layout library?</h4>
+<div class="paragraph">
+<p><a href="https://yogalayout.com/">Yoga</a> を読み込んでゲームに使う、という話を見たことがあります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://yogalayout.com/">yoga-rs</a>: 更新停止</p>
+</li>
+<li>
+<p><a href="https://github.com/vislyhq/stretch">stretch</a>: pure Rust な flexbox</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>外部ツールや game-in-editor で UI を作れたら良いですよね。たぶん、今後もハードコーディングしてしますが。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>
