@@ -40,6 +40,10 @@
     
 </li><li><a href="/snowrl/5_pools.html">Pools</a>
     
+</li><li><a href="/snowrl/6_type_objects.html">Type objects</a>
+    
+</li><li><a href="/snowrl/7_gfx.html">Learning graphics</a>
+    
 </li></ol></a>
     
 </li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
@@ -62,7 +66,7 @@
     
 </li><li><a href="/rl/summary.html">Roguelike algorithms<ol><li><a href="/rl/1_wfc.html">Wave function collapse explained</a>
     
-</li><li><a href="/rl/2_fov.html">Field of view (recursive scanning)</a>
+</li><li><a href="/rl/2_fov.html">Field of View &amp; Fog of War</a>
     
 </li><li><a href="/rl/3_blur.html">Gaussian blur for FoV rendering</a>
     
@@ -101,6 +105,8 @@
 </li><li><a href="/read/4_theories.html">Books on theories</a>
     
 </li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li><li><a href="/read/6_agi.html">Advanced Global Illumination</a>
     
 </li></ol></a>
     
@@ -172,7 +178,7 @@
 </table>
 </div>
 <div class="paragraph">
-<p>難点は、生成に時間がかかることと、生の出力がゲームマップ向きではないことです。足場を人つながりにするなど、二段階目の加工が必要になります。</p>
+<p>難点は、生成に時間がかかることと、生の出力がゲームマップ向きではないことです。足場を 1 繋がりにするなど、二段階目の加工が必要になります。</p>
 </div>
 </div>
 </div>
@@ -200,6 +206,18 @@ Solver: ([Pattern, AdjacencyRule) -&gt; Map</code></pre>
 <h4 id="_pattern_1x1_tile">Pattern = 1x1 (tile)</h4>
 <div class="paragraph">
 <p>このモデルでは、 1 つのタイルを pattern として扱います。 1x1 タイル同士の隣接性のみが考慮されます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<strong>実用性がほぼ無いため、飛ばして OK</strong> です。
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect3">
@@ -279,7 +297,7 @@ Solver: ([Pattern, AdjacencyRule) -&gt; Map</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>これらの回転 (rotation) や裏返し (flipping/reflection) も考えてみます（2x2 サイズでは、回転だけでも十分です）。重複したパタンは除きます。</p>
+<p>これらの回転 (rotation) や裏返し (flipping/reflection) も考えてみます（2x2 サイズでは、回転だけでも十分です）。</p>
 </div>
 <div class="listingblock">
 <div class="title">patterns with rotations and flippings</div>
@@ -299,7 +317,7 @@ Solver: ([Pattern, AdjacencyRule) -&gt; Map</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_constraint_local_similarity">Constraint = local similarity</h4>
+<h4 id="_constraint_local_similarity_ovarlapping">Constraint = local similarity / ovarlapping</h4>
 <div class="paragraph">
 <p>Overlapping model では、次のような制約を課します。</p>
 </div>
@@ -310,7 +328,7 @@ Solver: ([Pattern, AdjacencyRule) -&gt; Map</code></pre>
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-出力から展開できるパタンの集まりは、入力から展開したパタンの集まりの部分集合である。
+出力から展開できるパタンの集まりは、入力から展開したパタン集の部分集合である。
 </td>
 </tr>
 </table>
@@ -342,13 +360,7 @@ Solver: ([Pattern, AdjacencyRule) -&gt; Map</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>逆に、 4 つのパタンを重ねれば、先ほどの出力に戻ることが分かります。これが overlapping model における制約（満たすべき条件）です。</p>
-</div>
-<div class="paragraph">
-<p>Local similarity を満たすパタン配列をするためには、パタン同士の <code>compatibility</code> を確かめます。重なった部分のタイルが一致するなら、それらのパタンは <code>compatible</code> (overlappable) です。そうして作り上げた <code>AdjacencyRule</code> を <code>Solver</code> に渡します。</p>
-</div>
-<div class="paragraph">
-<p><code>Solver</code> は、互いに重なり合うことのできる <code>Pattern</code> のグリッドを作ります。このグリッドに対して、上図の右から左への加工に相当する操作 (<code>overlap</code>) を行うことにより、最終的な出力マップを得ることができます。</p>
+<p>これが overlapping model における制約（満たすべき条件）です。また、 <code>Solver</code> は、右図のようにパタンを配置し、重ね合わせることで、左図のような出力を生成します。</p>
 </div>
 </div>
 <div class="sect3">
@@ -535,7 +547,7 @@ adjacency model というのは <strong>非公式</strong> ですが、比較的
 </tbody>
 </table>
 <div class="paragraph">
-<p>同じコア・アルゴリズム (<code>Solver</code>) を使っている以上、 <code>Model</code> がアルゴリズムのオーダを変えることはできません。ただ、 adjacency model は、 overlapping mode に比べて出力のサイズが小さくなります。なぜなら出力グリッドがパタン同士の重なり部分を含まないためです。</p>
+<p>同じコア・アルゴリズム (<code>Solver</code>) を使用しますが、 adjacency model の方が overlapping model よりもグリッドのサイズは小さくなります。</p>
 </div>
 </div>
 </div>
@@ -642,7 +654,7 @@ adjacency model というのは <strong>非公式</strong> ですが、比較的
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-<code>EnablerCounts</code> は、 <code>Grid&lt;Dictionary&lt;Direction&gt;&gt;</code> です。
+<code>EnablerCounts</code> は、 <code>Grid&lt;Dictionary&lt;Direction&gt;&gt;</code> に相当します。
 </td>
 </tr>
 </table>
@@ -771,7 +783,7 @@ adjacency model というのは <strong>非公式</strong> ですが、比較的
 <div class="title">Figure 2. demo of WFC with <a href="https://github.com/mxgmn/WaveFunctionCollapse/tree/master/samples/Summer">samples/Summer</a></div>
 </div>
 <div class="paragraph">
-<p>しかし、この表示にはさほど意味がありません。波動関数は二乗すると確率になりますが、このぼやけた表示は出現確率を表すのではなくて、もっと間接的な値（まだ配置可能なパタンの分布）を表示したものです。したがって、 WFC には波動関数に相応するものが現れず、 WFC はミスリーディングな名前だったと思います。たぶん……</p>
+<p>しかし、この表示にはさほど意味がありません。このぼやけた表示は、現在の配置可能なパタンの分布を示しますが、 <strong>最終的なパタン配置に対してはかなり間接的</strong> な表示と言えます。したがって、 WFC はミスリーディングな名前だったと思います。</p>
 </div>
 </div>
 <div class="sect2">
@@ -875,7 +887,7 @@ adjacency model というのは <strong>非公式</strong> ですが、比較的
 <li>
 <p><a href="https://adamsmith.as/papers/wfc_is_constraint_solving_in_the_wild.pdf">WaveFunctionCollapse is constraint solving in the wild</a></p>
 <div class="paragraph">
-<p>　WFC がどういうものなのかよく分かります。 <strong>おすすめです</strong> 。 <em>answer set programming</em> が新鮮なので、じっくり読んでみます。</p>
+<p>　WFC がどういうものなのかよく分かります。 <strong>おすすめです</strong> 。 <em>Answer set programming</em> が新鮮なので、じっくり読んでみます。と、当時の自分が書いていましたが、全然読んでいません。</p>
 </div>
 </li>
 <li>

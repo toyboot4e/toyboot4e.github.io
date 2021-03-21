@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Type objects</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Type objects</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/snowrl/summary.html">SnowRL devlog<ol><li><a href="/snowrl/1_batcher.html">Batcher</a>
+    
+</li><li><a href="/snowrl/2_blur.html">Gaussian blur</a>
+    
+</li><li><a href="/snowrl/3_turn_based.html">Turn-based game loop</a>
+    
+</li><li><a href="/snowrl/4_fsm.html">FSM and state stack</a>
+    
+</li><li><a href="/snowrl/5_pools.html">Pools</a>
+    
+</li><li><a href="/snowrl/6_type_objects.html">Type objects</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/anf/summary.html">[Archieved] ANF devlog<ol><li><a href="/anf/1_hello.html">Sprite rendering!</a>
+    
+</li><li><a href="/anf/2_gfx.html">Object-oriented rendering API</a>
+    
+</li><li><a href="/anf/3_pong.html">Pong</a>
+    
+</li><li><a href="/anf/4_imgui.html">ImGUI</a>
+    
+</li><li><a href="/anf/5_transform.html">Transform</a>
+    
+</li><li><a href="/anf/6_media.html">Media</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rl/summary.html">Roguelike algorithms<ol><li><a href="/rl/1_wfc.html">Wave function collapse explained</a>
+    
+</li><li><a href="/rl/2_fov.html">Field of View &amp; Fog of War</a>
+    
+</li><li><a href="/rl/3_blur.html">Gaussian blur for FoV rendering</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/lang/summary.html">Language dev<ol><li><a href="/lang/1_loxrs_treewalk.html">Crafting Interpreters - 1/2</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/ssg/summary.html">SSG Devlog<ol><li><a href="/ssg/1_bash.html">bash + Asciidoctor</a>
+    
+</li><li><a href="/ssg/2_rs.html">Rust + Asciidoctor</a>
+    
+</li><li><a href="/ssg/3_booktune.html">Outline parser for booktune</a>
+    
+</li><li><a href="/ssg/4_adbook.html">adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/note/summary.html">Notes<ol><li><a href="/note/1_cli.html">Great command line tools</a>
+    
+</li><li><a href="/note/2_ui.html">Minimum UI with full features</a>
+    
+</li><li><a href="/note/3_c_libs.html">C libraries and modern C-like langs</a>
+    
+</li><li><a href="/note/4_evil.html">Evil Emacs</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>serde の読み方は "sir day" 派が <a href="https://twitter.com/Carols10cents/status/873692427919536131">多かった</a> みたいです。 <span class="line-through">シルディの方が可愛い</span></p>
+</div>
+<div class="paragraph">
+<p><strong>エタるとしたらバグが原因</strong> だと思っていました。バグは無く、大変順調です。</p>
+</div>
+<div class="sect2">
+<h3 id="_titles">1.1. Titles</h3>
+<div class="paragraph">
+<p>ゲームタイトルを考えました:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>SnowRL</strong></p>
+<div class="paragraph">
+<p>当初の方向性を掘り下げるタイトルです。『寒さと厳しさ』が予想できます。しかし、 RL (roguelike) といいつつ RPG 寄りのゲームを予定しており、需要と供給の不一致が起こりそうです。検索性も悪いと思います。</p>
+</div>
+</li>
+<li>
+<p><strong>イカちゃん転生 〜遺伝子編集で世界最強〜</strong></p>
+<div class="paragraph">
+<p><span class="line-through">クソゲー</span> 思い切ったゲームを作るときに使えます。小説・漫画・アニメなど、サブカルで人気な類の命名で、しかも『 <strong>遺伝子編集</strong> 』というメカニクスを期待させます。効果的なタイトルだと思います。</p>
+</div>
+<div class="paragraph">
+<p>ちなみに『遺伝子編集』の実装予定はありません。なぜならイカちゃんが主人公ではないから !!</p>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>懸念もありますが、『SnowRL』で作ります。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_systems">2. Systems</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>色々組みました。 <code>serde</code> 経由でデータを流し込めるようになったのが大きいです。</p>
+</div>
+<div class="sect2">
+<h3 id="_map">2.1. Map</h3>
+<div class="sect3">
+<h4 id="_follow_camera">Follow camera</h4>
+<div class="paragraph">
+<p>主人公に追従 (follow) するカメラを実装します。主人公が <em>deadzone</em> の四角形を出たら、主人公が <em>target</em> 四角形に収まるまで、毎フレームカメラ位置を更新します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">pub fn update_follow_camera( .. ) {
+    camera.pos += lerp_speed * target_delta_position( .. );
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>target_delta_position</code> に関して等式を立てると、指数関数の微分に近似できました (\(\Delta t \rightarrow 0\)) 。 <strong>指数関数の tween は、お得に計算できる</strong> んですね。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_pixel_perfect_shadow">Pixel-perfect shadow</h4>
+<div class="paragraph">
+<p>スクロール中の影に、ちらつき・振動が発生しました。修正は:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>カメラ位置は少数以下を切り捨てる (……必要無いかも？)</p>
+</li>
+<li>
+<p>影サイズを画面サイズ / 4 + 1 にする</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>影サイズが小さいほど、 (Gaussian) blur の度合いが強くなります。今回は 1/4 に縮小していたのですが、カメラ位置 %4 != 0 のとき、影の 1x1 ピクセルが複数のセルをまたぐ形となっていました。これを修正しました。通じるかな……</p>
+</div>
+<div class="videoblock">
+<div class="content">
+<iframe width="895" height="431" src="https://www.youtube.com/embed/h8XE-1vEI8w?rel=0" frameborder="0" allowfullscreen></iframe>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_z_ordering">Z ordering</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>レイヤ 0~99 → キャラ → レイヤ 100~ の順で描画します。</p>
+<div class="paragraph">
+<p>→ イカちゃんが天井の上を歩いていた (上動画) のを修正できました。</p>
+</div>
+</li>
+<li>
+<p>キャラを <code>x 座標 + y 座標 * 10000</code> を基準にソートします。</p>
+<div class="paragraph">
+<p>→ どせいさんモドキ (仮) がイカちゃんの背後に隠れるようになります。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>UI ノードも雑にソートします。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_auto_scroll_for_ui">Auto scroll for UI</h4>
+<div class="paragraph">
+<p>UI レイヤに座標系 (<code>World</code>, <code>Screen</code>) を設定可能としました。会話 UI は、常に <code>World</code> 座標系で描画できます:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="/static/img/snow/title/talk-small.png" alt="talk small" width="328">
+</div>
+<div class="title">Figure 1. スクロールに UI が自動追従！ (View 行列を適用)</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_meta_tiles">Meta tiles</h4>
+<div class="paragraph">
+<p>通行／視界のブロックを、別々のプロパティに分けました。たとえば、畑や切り株は通行のみを遮るのに対して、壁は通行も視界も遮ります:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/tiled/tiled-meta-edit.png" alt="tiled meta edit">
+</div>
+<div class="title">Figure 2. 通行・可視判定の設定</div>
+</div>
+<div class="paragraph">
+<p>メタタイルを設置することで、セルの通行・可視を設定しました。メタタイルには、『カスタムプロパティ』を設定します:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="/static/img/snow/tiled/tiled-meta-tsx.png" alt="tiled meta tsx" height="265px">
+</div>
+<div class="title">Figure 3. メタタイル</div>
+</div>
+<div class="paragraph">
+<p>今回はメタデータをレイヤにしましたが、それぞれのタイルにメタ情報を埋め込むことも可能です。たとえば、壁タイルを通行不能に設定します (ツクール・ウディタ方式) 。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>TODO: 角抜けも設定できた方がいいです。</p>
+</li>
+<li>
+<p>TODO: 2 つの方法のハイブリッドが良いと思います。基本的にはタイル自体にメタ情報を設定し、メタレイヤに書き込みがあれば、優先してそちらの情報を使います。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_text">2.2. Text</h3>
+<div class="sect3">
+<h4 id="_rendering">Rendering</h4>
+<div class="paragraph">
+<p>テキスト表示の基礎について、良い記事がありました:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://raphlinus.github.io/text/2020/10/26/text-layout.html">Text layout is a loose hierarchy of segmentation | Raph Levien’s blog</a> (Oct 26, 2020)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>僕のラフな理解では:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>TTF フォントには <em>glyph</em> のデータが入っている。</p>
+</li>
+<li>
+<p>Glyph は <em>advance width</em> という情報を持つ。これは右隣の文字を配置するときの目安であり、 (一部の) 英語や日本語フォントは advance width (と kerning) を元に十分綺麗に描画できる。</p>
+</li>
+<li>
+<p>Glyph を描画するには、 pixel 画像への <em>rasterizing</em> が必要である。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Rasterize の部分は、 SDF font (SDF: signed distance field) に肩代わりしてもらえます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/libgdx/libgdx/wiki/Distance-field-fonts">Distance field fonts · libgdx/libgdx Wiki</a></p>
+</li>
+<li>
+<p><a href="https://qiita.com/suzuna-honda/items/6f98eee62c64c25e63be">Unityで「まとも」なテキスト描画を行いたい - Qiita</a></p>
+</li>
+<li>
+<p><a href="https://steamcdn-a.akamaihd.net/apps/valve/2007/SIGGRAPH2007_AlphaTestedMagnification.pdf">Valve の論文 (2007 年)</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>SDF なら、任意サイズの文字を描けますし、回転させても綺麗に描けます。 Awesome!　TODO: SDF</p>
+</div>
+<div class="sect4">
+<h5 id="_crates">Crates</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/mooman219/fontdue">fontdue</a></p>
+<div class="paragraph">
+<p>TTF を (SDF ではなく) ピクセル画像にラスタライズして文字を描くためのライブラリです。僕は fontdue に相当する C ライブラリを使っています。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>SDF を使うなら、 <a href="https://github.com/redox-os/rusttype">rusttype</a> や <a href="https://github.com/RazrFalcon/rustybuzz">rustybuzz</a> で文字配置を計算すると良いのでしょうか。よく分かりません。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/servo/font-kit">font-kit</a>: フォントファイルを探す、読み込む</p>
+</li>
+<li>
+<p><a href="https://github.com/kas-gui/kas-text">kas-kit</a>: リッチテキストのシステム</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_drop_shadow">Drop shadow</h4>
+<div class="paragraph">
+<p>文字影を付けてみました:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/title/text-shadow.png" alt="text shadow">
+</div>
+</div>
+<div class="paragraph">
+<p>文字影 → 文字の順で描画しています。文字に不透明度をつける場合は、 depth buffer を使って文字 → 文字影の順で描画するとか、一工夫必要そうです。</p>
+</div>
+<div class="paragraph">
+<p>SDF では <a href="https://github.com/libgdx/libgdx/wiki/Distance-field-fonts#adding-a-drop-shadow">楽々ドロップシャドウ</a> できるようです。シェーダで描けるなら、ストレートで良いですね。 GLSL に弱くて、まだ読めていませんが……</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_font_faces">Font faces</h4>
+<div class="paragraph">
+<p>太文字 (TODO: 斜体) に対応しました。 Regular / bold / italic フォントは、別々の TTF ファイルに分かれており、使用フォントを切り替えるだけで表示できます:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/title/text-bold.png" alt="text bold">
+</div>
+</div>
+<div class="paragraph">
+<p>文字色もいけます:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/title/text-bold-red.png" alt="text bold red">
+</div>
+</div>
+<div class="paragraph">
+<p>このように、スパン <code>[start, end)</code> 毎にテキストの表示方法を変えることができます。ゲームテキストを簡易マークアップ言語で書いておき、この仕組みで表示しようと思います。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+まともなリッチテキストを実装する自信はありません。簡単にします。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_asset_serde">2.3. Asset <code>serde</code></h3>
+<div class="paragraph">
+<p>僕の <code>Asset&lt;T&gt;</code> は <code>Arc&lt;Mutex&lt;T&gt;&gt;</code> の wrapper です。 <code>serde</code> は <code>Rc</code>, <code>Arc</code> の serde に対応していないため、自力で実装します。</p>
+</div>
+<div class="paragraph">
+<p>重複したオブジェクトを作らないためには、 <code>deserialize</code> 中にキャッシュを参照できる必要があります。そのため、 <code>serde</code> を使う直前に、一時的にキャッシュへのアクセスを global or thread-local な場所に置きます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">impl&lt;'de, T: AssetItem&gt; Deserialize&lt;'de&gt; for Asset&lt;T&gt; {
+    fn deserialize&lt;D&gt;(deserializer: D) -&gt; std::result::Result&lt;Self, D::Error&gt;
+    where
+        D: Deserializer&lt;'de&gt;, <i class="conum" data-value="1"></i><b>(1)</b>
+    {
+        // deserialize as PathBuf
+        let path = &lt;PathBuf as Deserialize&gt;::deserialize(deserializer)
+            .map_err(|e| format!("Unable to load asset as `PathBuf`: {}", e))
+            .unwrap();
+
+        // get access to the asset cache from static variable
+        let state = unsafe {
+            DE_STATE
+                .get_mut()
+                .ok_or_else(|| "Unable to find asset cache")
+                .unwrap() <i class="conum" data-value="2"></i><b>(2)</b>
+        };
+
+        // retrieve or load asset
+        let item = state
+            .cache
+            .load_sync(AssetKey::new(&amp;path))
+            .map_err(|e| format!("Error while loading asset at `{}`: {}", path.display(), e))
+            .unwrap(); <i class="conum" data-value="2"></i><b>(2)</b>
+
+        Ok(item)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>deserialize</code> の返り値は <code>D::Result</code> (<code>D: Deseriliazer</code>)です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>そのため、データフォーマットの <code>Error</code> しか返すことができません。ここでは、アセット読み込みの <code>Result</code> を <code>unwrap</code> しています。 FIXME: 非常にお粗末で危険ですが、どうしましょうか。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_type_object_pattern">2.4. Type object pattern</h3>
+<div class="paragraph">
+<p>ゲームにコンテンツを流し込むとき、 <a href="https://gameprogrammingpatterns.com/type-object.html">Type Object</a> パタンを使用できます。要は、データファイルから直接シリアライズされる型が type object だと思います。 Type object は、外部ファイルで定義して、 <code>HashMap</code> に deserialize します:</p>
+</div>
+<div class="listingblock">
+<div class="title">actor_images.ron</div>
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">{
+    // 4 方向画像イカちゃん:
+    "ika-chan": (
+        tex: "ika-chan.png",
+        kind: Dir4,
+    ),
+    // 8 方向画像木星さん (仮):
+    "mokusei-san": (
+        tex: "img/pochi/what.png",
+        kind: Dir8,
+    ),
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">actor_types.ron</div>
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">{
+    // イカちゃんのキャラ情報:
+    "ika-chan": ActorType(
+        img: "ika-chan", // actor_images.ron の "ika-chan" を参照
+        stats: (
+            hp: 200,
+            atk: 50,
+            def: 20,
+        ),
+    ),
+    // 木星さん (仮) のキャラ情報:
+    "mokusei-san": (
+        img: "mokusei-san",
+        stats: (
+            hp: 40,
+            atk: 20,
+            def: 10,
+        ),
+    ),
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで簡単にキャラ配置できます:</p>
+</div>
+<div class="listingblock">
+<div class="title">actors.ron</div>
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">[
+    // イカちゃんを配置:
+    Actor(
+        type: "ika-chan", // actor_types.ron の "ika-chan" を参照
+        pos: (14, 12),
+        dir: S,
+    ),
+    // その他 NPC を配置:
+    // ~~
+]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_platform_dependency">2.5. Platform dependency</h3>
+<div class="paragraph">
+<p><code>sokol_app.h</code> から SDL2 に移行しました。いつでも <code>sokol_app.h</code> に戻れるように、 <code>ScreenState</code> にウィンドウサイズを入れました。これは静的オブジェクトにしても良さそうですね。アンチ Rust っぽいことをしたくなるのはなぜでしょう。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_retained_mode_rendering">2.6. Retained-mode rendering</h3>
+<div class="paragraph">
+<p>攻撃時に、キャラを前後に動かしたいです。キャラ表示を retained-mode にしました (自前の <code>ui</code> モジュールを使います) 。</p>
+</div>
+<div class="paragraph">
+<p>一応前後動はできますが…… <strong>アニメの拡張性</strong> が無くて検討中です。次回 devlog では、キャラを攻撃できるようにします。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_fighting_the_borrow_checker">3. Fighting the borrow checker</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>今回は、 <strong>コードの組み立てが完全に軌道に乗った</strong> 回でした。 ECS は使っていません。</p>
+</div>
+<div class="sect2">
+<h3 id="_non_ecs_in_rust">3.1. Non-ECS in Rust</h3>
+<div class="paragraph">
+<p>長いですが、経緯をお伝えします。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Borrow checker と戦う</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>依存性は引数から受け取る。</p>
+<div class="paragraph">
+<p>OOP では依存性をフィールドに入れがちでした。 Rust でも <code>Rc&lt;RefCell&lt;T&gt;&gt;</code> で変数の共有ができます。しかし、 <code>Rc&lt;RefCell&lt;T&gt;&gt;</code> はアンチパタンのように見えます。したがって、依存性は毎回メソッドの引数から受け取る形にしました。</p>
+</div>
+</li>
+<li>
+<p>Public なフィールドを利用する</p>
+<div class="paragraph">
+<p>複数データを束ねた型があるとします。これには賢いメソッドをつけたくなります。しかし、メソッドはコンテナの <code>&amp;mut</code> を取ります。したがって、コンテナにメソッドを生やすと、上手く行かない場合が多いです (参照ルールのため、 2 つの <code>&amp;mut</code> を取れない) 。</p>
+</div>
+<div class="paragraph">
+<p>替わりに、フィールド毎に <code>&amp;mut</code> を取れる形にします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">// フィールドが public なコンテナ
+pub struct World { pub entities: Entities, pub map: GameMap, .. }
+
+// `&amp;mut world.map` と `&amp;mut world.entities` を同時に取ることができる:
+let layer = &amp;mut world.map.layers[0];
+let new_entity_index = world.entities.insert(Entity { .. });
+
+// 一方で、 `World::layer` や `World::add_entity` を生やすと、 `&amp;mut World` を取ってしまう</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Public フィールドは代入可能なのが問題ですが……代入しなければ良いと思います？！:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">// 代入は想定しない:
+data.entities = World { .. }; // never do this!</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>代入不能だが可変参照は取れるフィールド、というのがあったら尚良いですね。</p>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>データのネストを浅くする</p>
+<div class="paragraph">
+<p>包含で継承を表現するのは避けました; ネストが深くなってしまいます。たとえば <strong><code>Game</code> 基底クラス相当のものは作れません</strong>。替わりに、ゲームループ用の <code>Clock</code> を提供し、ループの組み立てをユーザにやってもらいます。言い換えると、ライブラリを作るに留めて、ユーザにフレームワークを作ってもらうイメージです。</p>
+</div>
+</li>
+<li>
+<p>『ECS の劣化版』という懸念を払拭する</p>
+<div class="paragraph">
+<p>Rust では、変数共有はアンチパタンと思われます。依存性は引数から渡します。しかし、データのネストが深いと、依存性へのアクセスが面倒です。 <code>all_game_data.category_1.sub_category_1.field.data[i]</code> みたいなコードが平然と出て来ます。 ECS なら、自動的に <code>World</code> から依存性を引っ張り出してくれるのに！</p>
+</div>
+<div class="paragraph">
+<p>ゲームデータを <a href="https://gist.github.com/toyboot4e/3aa0c3ca19c0ccd7698d3766ef1cce15">リファクタリング</a> すると、綺麗なコードになりました。ネストは浅めです。複数データを『オブジェクト』にまとめており、周期的な関数呼び出しや、多数データの受け渡しが一括で済ませられます。悪くない！</p>
+</div>
+<div class="paragraph">
+<p>共有される多くのデータは、『受動的データ』の枠に入りました。 <strong>上手くデータを切り分けることができたら</strong> 、 Rust でも『オブジェクト』の概念は有効だと思いました。 C# で培ったマインドセットを、 Rust でも続投中です。</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_cheating_the_borrow_checker">3.2. Cheating the borrow checker</h3>
+<div class="paragraph">
+<p>Borrow checker は仮説です。『これで良いコードが書けるはず』と信じて、大半のコードを構成できました。しかし、たとえば、リストの要素を変更しながらイテレートしたい。そんなとき、あなたならどうしますか？</p>
+</div>
+<div class="paragraph">
+<p>これが私のソリューションです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">for node in &amp;mut cheat(&amp;self.nodes) {
+    Self::apply_transform_rec(node, &amp;mut self.nodes, None);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em><a href="https://gist.github.com/toyboot4e/1b56499999ff6c3b6d4f358d3c62af6c">cheat</a> は安全です。 <a href="https://gist.github.com/toyboot4e/1b56499999ff6c3b6d4f358d3c62af6c">cheat</a> はあなたのコードに柔軟性を与えます。</em></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_messaging">3.3. Messaging?</h3>
+<div class="paragraph">
+<p>僕は <code>cheat</code> を使っていますが、人にお勧めできないとは思っています。上の例では、添字を使うなど、泥臭いコードを書けば zero unsafe にできるはずです。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/mrDIMAS/StationIapetus">StationIapetus</a> (FPS ゲーム) では、変更はメッセージ経由で行うようです。変更が必要になったら、 <code>channel</code> でメッセージを送信します。メッセージ処理は <a href="https://github.com/mrDIMAS/StationIapetus/blob/7a76fc43bbb6cc0866025ff07a46713c2941bc6f/src/level.rs#L1215">ゲームデータのコンテナが行う</a> ようです。</p>
+</div>
+<div class="paragraph">
+<p>工夫次第では、メッセージで borrow checker を攻略できるようですね。<code>channel</code> の替わりに <code>VecDeque</code> を使うことも考えられます。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_misc">4. Misc</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_graphics">4.1. Graphics</h3>
+<div class="sect3">
+<h4 id="_todo_glsl">TODO: GLSL</h4>
+<div class="paragraph">
+<p><a href="https://speckyboy.com/shaders-realistic-special-effects-web-design/">Using Shaders to Create Realistic Special Effects in Web Design</a></p>
+</div>
+<div class="paragraph">
+<p>水滴シェーダとか凄いですね。 <strong>2D ゲームでも演出に使えそう</strong> 。やはりシェーダは書けるようになりたいな〜……</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_agi">AGI</h4>
+<div class="paragraph">
+<p>Advanced Global Illumination という本を読みました。最初は表記法に面食らいましたが、立体角を理解していれば読める本だったと思います。先に理論を理解すれば、 top-down でグラフィクスをやれる……のかな？　そもそもやるのかな……？</p>
+</div>
+<div class="paragraph">
+<p>続く本としては、 <a href="https://graphics.stanford.edu/papers/veach_thesis/">Veach&#8217;s thesis</a> を読み始めています。本当に読むだけになるかもしれませんが……。 AGI では BSDF もあまり出なかったことですし、実践的な本を読んだ方が効率良さそうですね。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_adbook">4.2. <code>adbook</code></h3>
+<div class="paragraph">
+<p>自作 SSG (<a href="https://github.com/toyboot4e/adbook">adbook</a>) で、ビルドのキャッシュを取るようにしました。劇的な効果がありました。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_audio_music_programming">4.3. Audio / music programming</h3>
+<div class="paragraph">
+<p>オーディオ・インターフェース (<a href="https://www.soundhouse.co.jp/products/detail/item/261282">Studio 24c</a>) を書いました。ヘッドフォンを繋ぐと、微妙な違いが現れた……気がします:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>音が潰れなくなった</p>
+</li>
+<li>
+<p>シンバルやギターのシャリシャリ音が綺麗になった</p>
+</li>
+<li>
+<p>多少音量を上げても耳が痛くない</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>高いオーディオ I/F を試すと、劇的に音が変わるらしく、 <a href="https://www.soundhouse.co.jp/en/products/detail/item/205174/">Bavyface Pro</a> が有名だそうです。欲しいな〜……。</p>
+</div>
+<div class="paragraph">
+<p>音源のセールについては、 <a href="https://twitter.com/superdtmbot?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor">超DTM速報</a> というのを教えてもらったので、それを見ています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reference_counted_pool">4.4. Reference-counted pool</h3>
+<div class="paragraph">
+<p>一部で <code>Handle</code> を参照カウントするプールを使っています。 <code>Anim</code> が終了するまで <code>Node</code> を開放しない、というのが主な用途です。</p>
+</div>
+<div class="paragraph">
+<p>ところが <strong>メモリリークの温床</strong> になりかねないことに気づきました (最初から分かっていたはずだろう！) 。 ImGUI で debug したいところです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_misc_misc">4.5. Misc misc</h3>
+<div class="sect3">
+<h4 id="_compilation_time">Compilation time..</h4>
+<div class="paragraph">
+<p><a href="https://github.com/not-fl3/miniquad">miniquad</a> は 10 秒以内でコンパイルできました。憧れますね。</p>
+</div>
+<div class="paragraph">
+<p>たとえ <code>miniquad</code> を使ったとしても、依存性が増えるとコンパイルは遅くなります。多少は <a href="https://qiita.com/toyboot4e/items/2acba3d8ea4821bf0736">早くできます</a> が……</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_stdmarkerphantomdata">std::marker::PhantomData</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://qnighy.hatenablog.com/entry/2018/01/14/220000">PhantomDataまとめ - 簡潔なQ</a></p>
+<div class="paragraph">
+<p><code>PhantomData&lt;T&gt;</code> よりも <code>PhantomData&lt;fn() -> T&gt;</code> の方が無難だそうです。 rust-jp で教えていただきました。</p>
+</div>
+</li>
+<li>
+<p><a href="https://mcarton.github.io/rust-derivative/latest/index.html">derivative</a></p>
+<div class="paragraph">
+<p><code>_marker: PhantomData&lt;fn() &#8594; T&gt;</code> をフィールドに入れると、 <code>#[derive(..)]</code> が上手く働かないのですが、このクレートを使えば <code>PhantomData</code> を無視して <code>Debug, Clone, PartialEq, ..</code> を <code>#[derivatve(..)]</code> できます。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_mod_rs_vs_moudle_name_rs_rust"><code>mod.rs</code> vs <code>moudle_name.rs</code> (Rust)</h4>
+<div class="paragraph">
+<p>僕は未だに <code>mod.rs</code> 派だったりします。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_imgui_rs"><code>imgui-rs</code></h4>
+<div class="paragraph">
+<p><a href="https://github.com/imgui-rs/imgui-rs">imgui-rs</a> は、 <code>im_str!</code> マクロの廃止と <a href="https://github.com/ocornut/imgui/issues/2109">docking branch</a> への対応に向けて開発が進んでいるようです。かなり期待しています。 <a href="https://github.com/aclysma/imgui-inspect">imgui-inspect</a> なんてのもありますし。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/imgui-rs/imgui-rs">imgui-rs</a> は、任意の <em>platform</em> と <em>renderer</em> を組み合わせることで開発環境に組み込めるのですが、やり方が分かりづらくて大変でした。そこで、 <code>Backend</code> を <code>Platform</code> と <code>Renderer</code> の組み合わせで作るクレートを準備中です。生の OpenGL が難しくて、例の用意に時間がかかっています。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>

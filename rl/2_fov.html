@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="">
-    <title>Field of view (recursive scanning)</title>
+    <title>Field of View &amp; Fog of War</title>
     <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
     <script>
         window.addEventListener("DOMContentLoaded", function() {
@@ -24,7 +24,7 @@
             <label for="nav-btn-click">
                 <i class="fa fa-list-ul"></i>
             </label>
-        </div><h1>Field of view (recursive scanning)</h1>
+        </div><h1>Field of View &amp; Fog of War</h1>
         </div>
 
     <nav id="sidebar" class="sidebar">
@@ -39,6 +39,10 @@
 </li><li><a href="/snowrl/4_fsm.html">FSM and state stack</a>
     
 </li><li><a href="/snowrl/5_pools.html">Pools</a>
+    
+</li><li><a href="/snowrl/6_type_objects.html">Type objects</a>
+    
+</li><li><a href="/snowrl/7_gfx.html">Learning graphics</a>
     
 </li></ol></a>
     
@@ -62,7 +66,7 @@
     
 </li><li><a href="/rl/summary.html">Roguelike algorithms<ol><li><a href="/rl/1_wfc.html">Wave function collapse explained</a>
     
-</li><li><a href="/rl/2_fov.html">Field of view (recursive scanning)</a>
+</li><li><a href="/rl/2_fov.html">Field of View &amp; Fog of War</a>
     
 </li><li><a href="/rl/3_blur.html">Gaussian blur for FoV rendering</a>
     
@@ -102,6 +106,8 @@
     
 </li><li><a href="/read/5_novels.html">Novels</a>
     
+</li><li><a href="/read/6_agi.html">Advanced Global Illumination</a>
+    
 </li></ol></a>
     
 </li></ol>
@@ -127,31 +133,30 @@
 <h2 id="_introduction">1. Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>ゲーム用にセル単位の視野 (FoV; field of view) を実装しました。</p>
+<p>キャラの視野をセル単位で計算します:</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="/static/img/fov/render_final.png" alt="render final">
 </div>
-<div class="title">Figure 1. Field of view</div>
+<div class="title">Figure 1. FoV (Field of View)</div>
 </div>
 <div class="paragraph">
-<p>画面に見応えが生まれて良かったです。</p>
+<p>影に Gaussian blur をかけると、こんな見た目になります:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/gauss/ika-chan.gif" alt="ika chan">
+</div>
 </div>
 <div class="paragraph">
-<p>本記事では、 FoV の計算、可視化、アニメーションを扱います。また、 C# でコードを書いて実装します。ついでに FoW (fog of war) も実装しました。</p>
+<p>未探索範囲を暗くするのも、 Gaussian blur にお任せできます:</p>
 </div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-<strong>無駄な文章が多い</strong> 記事となっていました。修正したいです……
-</td>
-</tr>
-</table>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/title/snow.png" alt="snow">
+</div>
+<div class="title">Figure 2. FoW (Fog of War)</div>
 </div>
 </div>
 </div>
@@ -159,15 +164,32 @@
 <h2 id="_how_to_calculate_fov">2. How to calculate FoV</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>ある点から、円形の視野を計算する方法を考えます。</p>
+<p>円形視野の計算方法を考えます。</p>
 </div>
 <div class="sect2">
 <h3 id="_circle_octants">2.1. Circle = octants</h3>
 <div class="paragraph">
-<p>円形視野の計算を、 45 度分の計算 8 回に分けます。このとき、 45 度分の円の部分を、 <code>Octant</code> と呼びます。</p>
+<p>円形視野の計算を、 45 度ずつの計算 8 回に分けます。 8 等分された円の部分を八分円 (<code>Octant</code>) と呼びます。</p>
 </div>
 <div class="paragraph">
 <p><code>Octant</code> ごとに列座標系を取ると、座標成分は <code>(column, row)</code> と表すことができます。たとえば、 <code>(column, row) = (1, 3)</code> は、 1 番目の縦列と 3 番目の横列の交点です。</p>
+</div>
+<div class="paragraph">
+<p>基底ベクトルを用いて、</p>
+</div>
+<div class="stemblock">
+<div class="content">
+\[(x, y) = column \cdot \mathbb{e}_{column} + row \cdot \mathbb{e}_{row}\]
+</div>
+</div>
+<div class="paragraph">
+<p>したがって、 <code>Octant</code> に対して視野計算ができるなら、基底ベクトルを差し替えていくことで、円全体の視野を得ることができます:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/fov/octants.png" alt="octants" width="80%">
+</div>
+<div class="title">Figure 3. Octants A, B, .., H and unit vectors</div>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -176,60 +198,40 @@
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-値としての <code>column</code> (縦列) は、『縦列番号』とも考えられます。 <code>row</code> は横列番号です。
+図では、 y 軸を下向きに取っています。
 </td>
 </tr>
 </table>
-</div>
-<div class="paragraph">
-<p>基底ベクトルを用いて、</p>
-</div>
-<div class="stemblock">
-<div class="content">
-\[(x, y) = column \times columnUnitVec + row \times rowUnitVec\]
-</div>
-</div>
-<div class="paragraph">
-<p>したがって、 <code>Octant</code> に対して視野計算ができるなら、基底ベクトルを差し替えていくことで、円全体の視野を得ることができます。</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/static/img/fov/octants.png" alt="octants" width="80%">
-</div>
-<div class="title">Figure 2. Octants and their names <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup></div>
-</div>
-<div class="paragraph">
-<p>図では、 y 軸を下向きに取っています。</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_scanning_rows">2.2. Scanning rows</h3>
 <div class="paragraph">
-<p><code>Octant.B</code> の場合で、視野の計算を考えてみます。まず、傾き (<code>slope</code>) を \(slope := column / row\) と定義します。すると、 1 つの <code>Octant</code> は、 \(0 \leq slope \leq 1\) の範囲に収まります。</p>
+<p><code>Octant.B</code> の場合で、視野の計算を考えてみます。傾きを \(slope := column / row\) と定義します。 1 つの <code>Octant</code> に対応するセルは、 \(0 \leq slope \leq 1\) の範囲に収まります。</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="/static/img/fov/init.png" alt="init" width="80%">
 </div>
-<div class="title">Figure 3. Field of view in Octant.B</div>
+<div class="title">Figure 4. Field of view in Octant.B</div>
 </div>
 <div class="paragraph">
-<p>壁の影響も、傾きの観点から可視化してみます。</p>
+<p>可視・不可視をピクセル単位で表示します:</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="/static/img/fov/slopes_pixel.png" alt="slopes pixel" width="100%">
 </div>
-<div class="title">Figure 4. Slopes and visibilities (pixel-based)</div>
+<div class="title">Figure 5. Slopes and visibilities (pixel-based)</div>
 </div>
 <div class="paragraph">
-<p>上図では、ピクセル単位で視野範囲を可視化しました。しかし、必要なのはセル単位の視野です。そこで、可視範囲が <strong>セルの中心</strong> を含むとき、そのセルを見ることができるとします。</p>
+<p>ゲームに必要なのはセル単位の視野です。そこで、可視範囲が <strong>セルの中心</strong> を含むとき、そのセルを見ることができるとします:</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="/static/img/fov/slopes_cell.png" alt="slopes cell" width="100%">
 </div>
-<div class="title">Figure 5. Slopes and visibilities (cell-based)</div>
+<div class="title">Figure 6. Slopes and visibilities (cell-based)</div>
 </div>
 <div class="paragraph">
 <p>さらに考えを進めます。視野の計算は、 <code>row</code> の走査に分けることができます:</p>
@@ -238,25 +240,13 @@
 <div class="content">
 <img src="/static/img/fov/scan.png" alt="scan" width="100%">
 </div>
-<div class="title">Figure 6. Scanning an octant</div>
+<div class="title">Figure 7. Scanning an octant</div>
 </div>
 <div class="paragraph">
 <p>縦向きの矢印は、走査 (スキャン) を表しています。スキャンは、傾きの範囲内のセルに対して行われ、スキャンされたセルは視野内にあるとします。</p>
 </div>
 <div class="paragraph">
-<p>スキャン中に壁を見つけると、傾きの範囲を更新したり、スキャンが 2 つに分かれます <sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup>。図では、茶色の矢印が黄色の矢印に分かれました。</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-上図のスキャンの分割は、茶色矢印の傾き範囲の修正 と、黄色矢印の生成 (<code>splitScan</code>) に分けて考えることができます。
-</td>
-</tr>
-</table>
+<p>スキャン中に壁を見つけると、傾きの範囲を更新したり、スキャンが 2 つに分かれます。図では、茶色の矢印が黄色の矢印に分かれました。</p>
 </div>
 </div>
 <div class="sect2">
@@ -268,16 +258,12 @@
 <div class="content">
 <img src="/static/img/fov/scan_example.png" alt="scan example" width="100%">
 </div>
-<div class="title">Figure 7. Scanning a row</div>
+<div class="title">Figure 8. Scanning a row</div>
 </div>
 <div class="paragraph">
-<p><strong>スキャンしたセル</strong> に対応するアクションは 3 通りで、 <strong>直前のセル</strong> が何であったかが影響します。また、 <code>column = 0</code> のセルに対しては、特別なアクションは取りません。</p>
-</div>
-<div class="paragraph">
-<p>これらは、状態遷移表によって表現できます <sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup> :</p>
+<p>このスキャンは、状態遷移で表現できます:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. Actions on scanning a cell</caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -285,26 +271,26 @@
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">state</th>
-<th class="tableblock halign-left valign-top">opaque cell</th>
-<th class="tableblock halign-left valign-top">transparent cell</th>
+<th class="tableblock halign-left valign-top">状態</th>
+<th class="tableblock halign-left valign-top">今回のセルが不透明</th>
+<th class="tableblock halign-left valign-top">今回のセルが透明</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Initial</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">初期状態</p></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">WasTransparent</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">splitScan</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">直前のセルが透明</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">スキャンを分割する</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">WasOpaque</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">直前のセルが不透明</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">updateStartSlope</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">開始傾きを更新する</p></td>
 </tr>
 </tbody>
 </table>
@@ -315,7 +301,7 @@
 <div class="content">
 <img src="/static/img/ditaa/fov_states.png" alt="fov states" width="430" height="182">
 </div>
-<div class="title">Figure 8. Scanning state transition</div>
+<div class="title">Figure 9. Scanning state transition</div>
 </div>
 </div>
 <div class="sect2">
@@ -368,491 +354,42 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="_implementing_fov">3. Implementing FoV</h2>
+<h2 id="_implementation">3. Implementation</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>概要を掴みました。実装します (C#) 。</p>
-</div>
-<div class="paragraph">
-<p>この先は無駄に長いので、ここまでで終了しても十分です。</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-改めて Rust でも <a href="https://gist.github.com/toyboot4e/fe62130e19147bfee817b39ad81af226">実装しました</a>  (2020/10/02) 。以下のコードは、 <strong>細かい部分が間違っている</strong> ことが分かったので、話半分で読んでください……。
-</td>
-</tr>
-</table>
+<p>以前はここに C# 実装を置いていました。興味があったら、 Rust での <a href="https://gist.github.com/toyboot4e/fe62130e19147bfee817b39ad81af226">再実装</a>  (2020/10/02) をご覧ください。</p>
 </div>
 <div class="sect2">
-<h3 id="_definitions">3.1. Definitions</h3>
+<h3 id="_polish">3.1. Polish</h3>
 <div class="paragraph">
-<p>まずはデータを定義します。 <code>Octant</code> と、便利そうなので <code>Vec2i</code> も作ってみました:</p>
-</div>
-<div class="listingblock">
-<div class="title">Fov.cs</div>
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">using System; // Math
-using System.Linq;
-
-namespace MyRoguelikeGame.Utils.Fov {
-
-public enum Octant {
-    // clockwise
-    A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6 , H = 7,
-}
-
-public struct Vec2i {
-    public int x;
-    public int y;
-    public int len =&gt; (int) Math.Sqrt(x * x + y * y);
-
-    public Vec2i(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public static Vec2i operator *(Vec2i v, int c) =&gt; new Vec2i(v.x * c, v.y * c);
-    public static Vec2i operator +(Vec v1, Vec v2) =&gt; new Vec2i(v1.x + v2.x, v1.y + v2.y);
-    public static Vec2i operator -(Vec2i v1, Vec2i v2) =&gt; new Vec2i(v1.x - v2.x, v1.y - v2.y);
-
-    public override string ToString() =&gt; $"({x}, {y})";
-}
-// ~ <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>この記事では、 <code>// ~</code> でコードの省略を表します。</td>
-</tr>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_unit_vectors">Unit vectors</h4>
-<div class="paragraph">
-<p><code>Octant</code> 毎に基底ベクトルを定義します。値は、先に <a href="#_how_to_calculate_fov">図で表した</a> 通りです。</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">public static class OctantExt {
-    // (rowUnitVec, colUnitVec)
-    public static(Vec2i, Vec2i) toUnitVecs(this Octant self) {
-        return unitVecs[(int) self];
-    }
-
-    // [(rowUnitVec, colUnitVec)]
-    static(Vec2i, Vec2i) [] unitVecs = new [] {
-            ((0, -1), (1, 0)),
-            ((1, 0), (0, -1)),
-            ((1, 0), (0, 1)),
-            ((0, 1), (1, 0)),
-            ((0, 1), (-1, 0)),
-            ((-1, 0), (0, 1)),
-            ((-1, 0), (0, -1)),
-            ((0, -1), (-1, 0)),
-        }
-        .Select(vs =&gt; (
-            new Vec2i(vs.Item1.Item1, vs.Item1.Item2),
-            new Vec2i(vs.Item2.Item1, vs.Item2.Item2)))
-        .ToArray();
-    }
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_interfaces">Interfaces</h4>
-<div class="paragraph">
-<p>視野更新を generic にするために、インタフェイスを定義します:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">// interface to update FoV data
-public interface iFovData {
-    void onRefresh(int radius, int originX, int originY);
-    // Only called for points INSIDE a map
-    void light(int x, int y);
-}
-
-// used to scan through a map
-public interface iOpacityMap {
-    bool isOpaeue(int x, int y);
-    bool contains(int x, int y);
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>透明／不透明 (opaque/transparent) という表現をしたのは、『道を塞ぐけれど視野は塞がないセル』を考慮したためです。水晶などが考えられます。</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_entry_point">3.2. Entry point</h3>
-<div class="paragraph">
-<p>円形視野の計算 = それぞれの <code>Octant</code> に対し <code>OctantScanner</code> を作って走らせること です。 <code>OctantScanner</code> は後で定義します。</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">public static class Scanner&lt;Fov, Map&gt;
-        where Fov : iFovData
-        where Map : iOpacityMap {
-    // shared by octant scanners
-    public class ScanContext {
-        public Map map;
-        public Fov fov;
-        public Vec2i origin;
-        public int radius;
-
-        public Vec2i localToWorld(Vec2i local) {
-            return local + this.origin;
-        }
-    }
-
-    public static void refresh(Fov fov, Map map, int originX, int originY, int radius) {
-        fov.onRefresh(radius, originX, originY);
-
-        var cx = new ScanContext {
-            map = map,
-            fov = fov,
-            origin = new Vec2i(originX, originY),
-            radius = radius,
-        };
-
-        fov.light(originX, originY);
-        for (int i = 0; i &lt; 8; i++) {
-            new OctantScanner((Octant) i).scanOctant(cx);
-        }
-    }
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_octant_scanner">3.3. Octant scanner</h3>
-<div class="paragraph">
-<p>1/8 円を走査するためのクラスを定義します。</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">public struct OctantScanner {
-    // (x, y) = (row * rowUnit) + (col * colUnit)
-    Vec2i colUnit;
-    Vec2i rowUnit;
-    float startSlope;
-    float endSlope;
-
-    public OctantScanner(Vec2i rowUnit, Vec2i colUnit, float startSlope, float endSlope) {
-        // ~~ omitted ~~
-    }
-
-    public void scanOctant(ScanContext cx, int startRow = 1) {
-        for (int row = startRow; row &lt;= cx.radius; row++) {
-            if (this.scanRow(row, cx)) break;
-        }
-    }
-
-    // Returns true if finished
-    bool scanRow(int row, ScanContext cx) {
-        // ~~ later implemented ~~
-    }
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>状況設定は完了しました。 <strong>アルゴリズムのコア</strong> は、 <code>row</code> の走査にあります。</p>
-</div>
-<div class="sect3">
-<h4 id="_scanning_a_row">Scanning a row</h4>
-<div class="paragraph">
-<p>列を走査します。 <a href="#_scanning_an_octant">最後の図</a> で解説した通り、状態を上手く使います。傾き計算の <code>Rule</code> クラスは後で解説します。</p>
-</div>
-<div class="listingblock">
-<div class="title">OctantScanner</div>
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">enum RowScanState {
-    Initial,
-    WasOpaque,
-    WasTransparent,
-}
-
-// Returns true if finished
-bool scanRow(int row, ScanContext cx) {
-    var rowVec = this.rowUnit * row;
-    (int fromCol, int toCol) = Rule.colRangeForRow(row, cx.radius, this.startSlope, this.endSlope);
-
-    // finish the scan if the view is completely blocked
-    if (toCol &lt; fromCol) return true;
-
-    { // finish the scan if the row is out of the map
-        var initPos = cx.localToWorld(rowVec);
-        if (!cx.map.contains(initPos.x, initPos.y)) return true;
-    }
-    // ~~</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>これが肝心の走査です:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">    // scanning through the row
-    var state = RowScanState.Initial;
-    for (int col = fromCol; col &lt;= toCol; col++) {
-        var pos = cx.localToWorld(rowVec + this.colUnit * col);
-
-        // skip points out of the map
-        if (!cx.map.contains(pos.x, pos.y)) return false;
-
-        // scan the cell
-        if (cx.map.isOpaeue(pos.x, pos.y)) { <i class="conum" data-value="1"></i><b>(1)</b>
-            if (state == RowScanState.WasTransparent) { <i class="conum" data-value="2"></i><b>(2)</b>
-                this.splitScan(Rule.updateEndSlope(col, row)).scanOctant(cx, row + 1);
-            }
-            state = RowScanState.WasOpaque;
-        } else { <i class="conum" data-value="3"></i><b>(3)</b>
-            if (state == RowScanState.WasOpaque) { <i class="conum" data-value="4"></i><b>(4)</b>
-                this.startSlope = Rule.updateStartSlope(col, row);
-            }
-            state = RowScanState.WasTransparent;
-        }
-
-        cx.fov.light(pos.x, pos.y); <i class="conum" data-value="5"></i><b>(5)</b>
-    }
-
-    return state == RowScanState.WasOpaque;
-}
-
-OctantScanner splitScan(float endSlope) {
-    return new OctantScanner(this.rowUnit, this.colUnit, this.startSlope, endSlope);
-}</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>不透明なセルを見つけた場合、</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>直前に走査したセルが透明だったなら、スキャンを分割します。</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>透明なセルを見つけた場合、</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>直前に走査したセルが不透明だったなら、 <code>startSlope</code> を更新します。</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>どのケースでも、走査したセルは可視化します。</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_slope_calculations">Slope calculations</h4>
-<div class="paragraph">
-<p><code>Rule</code> クラスは式の集まりです。ディテールに影響します。</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">static class Rule {
-    // Range of columns in a row to scan through; [from, to]
-    public static(int, int) colRangeForRow(int row, int radius, float startSlope, float endSlope) {
-        int from = (int) Math.Ceiling(startSlope * row); <i class="conum" data-value="1"></i><b>(1)</b>
-        int to = Math.Min(
-            (int) Math.Floor(endSlope * row), <i class="conum" data-value="1"></i><b>(1)</b>
-            Rule.maxColForRow(row, radius) <i class="conum" data-value="2"></i><b>(2)</b>
-        );
-        return (from, to);
-    }
-
-    public static int maxColForRow(int row, int radius) {
-        // we add 0.5 to the radius so that FoV looks more natural
-        return (int) Math.Sqrt((radius + 0.5) * (radius + 0.5) - row * row); <i class="conum" data-value="2"></i><b>(2)</b>
-    }</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>傾き範囲がセルの中心を通るセルを走査範囲とします。 <code>Math.Ceiling</code> は切り上げ、 <code>Math.Floor</code> は切り捨てをします。</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>走査範囲を円形にします。この補正無しだと、正方形範囲の走査となります。半径に <code>0.5</code> を加える理由は、円が自然な形になるためです (c.f. <a href="https://www.redblobgames.com/grids/circle-drawing/">Circle fill on a grid</a>) 。</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>傾き範囲の更新は、不可視セルのモデル (<a href="#_edge_cases_model_vs_model">Edge cases (□ model vs ◇ model)</a>) に応じて式を変えます。</p>
-</div>
-<div class="sect4">
-<h5 id="_block_model">□ block model</h5>
-<div class="paragraph">
-<p>セルの形を□形だとみなした場合、以下のような式となります:</p>
-</div>
-<div class="listingblock">
-<div class="title">□ rule</div>
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">    // Called after scanning opaque cells
-    public static float updateStartSlope(int col, int row) =&gt;
-        Math.Min(1f,  (col + 0.5f) / (row - 0.5f)); <i class="conum" data-value="1"></i><b>(1)</b>
-    // Called when splitting a scan
-    public static float updateEndSlope(int col, int row) =&gt;
-        (col - 0.5f) / (row + 0.5f); <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>傾き範囲をセルの角に対して更新するため、半セル単位で計算します。 <sup class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnotedef_4" title="View footnote.">4</a>]</sup></td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_block_model_2">◇ block model</h5>
-<div class="paragraph">
-<p>セルの形を◇形だとみなした場合、以下のような式となります:</p>
-</div>
-<div class="listingblock">
-<div class="title">◇ rule</div>
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">    // Called after scanning opaque cells
-    public static float updateStartSlope(int col, int row) =&gt;
-        (col + 0.5f) / row;
-    // Called when splitting a scan
-    public static float updateEndSlope(int col, int row) =&gt;
-        (col - 0.5f) / row;</code></pre>
-</div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-式を差し替え可能にするなら、 <code>Rule</code> を静的クラスではなくオブジェクトにします。 Strategy パタン？
-</td>
-</tr>
-</table>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_polish">3.4. Polish</h3>
-<div class="paragraph">
-<p>ここまでのコードで、視野の計算を行います:</p>
+<p>ざっと FoV を実装すると、以下のようになりました:</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="/static/img/fov/render_init.png" alt="render init" width="110%">
 </div>
-<div class="title">Figure 9. Initial FoV</div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-視野の可視化は次の項で行います。
-</td>
-</tr>
-</table>
+<div class="title">Figure 10. Initial FoV</div>
 </div>
 <div class="paragraph">
-<p>不具合が見つかりました。下の図を見てください。青く囲まれた壁は、その中心が手前の壁に阻まれているため、見えないことになっています。よって走査の対象とならず、傾き範囲の更新も行われません。しかし、この壁の角 (かど) によって、後続のセル (赤い四角) が隠されるべきです。</p>
+<p>不具合が見つかりました。下の図で青く囲まれた壁は、その中心が手前の壁に阻まれているため、見えないことになっています。よって走査の対象とならず、傾き範囲の更新も行われません。しかし、この壁の角 (かど) によって、後続のセル (赤い四角) が隠されるべきです:</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="/static/img/fov/render_issues.png" alt="render issues" width="110%">
 </div>
-<div class="title">Figure 10. Issues</div>
+<div class="title">Figure 11. Issues</div>
 </div>
 <div class="paragraph">
-<p>そこで、部分的に視野に入った壁も、走査対象に入れてしまいます。</p>
-</div>
-<div class="paragraph">
-<p><code>scanRow</code> 末尾の <code>return</code> 直前に、以下を追記します。</p>
-</div>
-<div class="listingblock">
-<div class="title">OctantScanner.scanRow</div>
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">// for an opaque cell that's behind another but whose edge affects the range of the slopes
-var permissiveCol = Rule.colForSlopePermissive(this.endSlope, row); <i class="conum" data-value="1"></i><b>(1)</b>
-if (permissiveCol &gt; toCol) { <i class="conum" data-value="2"></i><b>(2)</b>
-    if (!cx.map.contains(pos.x, pos.y)) {
-        // here we filter cells outside the map
-    } else if (cx.map.isOpaeue(pos.x, pos.y)) { <i class="conum" data-value="3"></i><b>(3)</b>
-        // light it as an artifact (try commenting it out if you think it's too permissive)
-        cx.fov.light(pos.x, pos.y);
-        // and update the range of the slopes
-        this.endSlope = Rule.updateEndSlope(permissiveCol, row);
-        // we do not update `state` here
-    } else {
-        // transparent cells are ignored
-    }
-}</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td><code>Rule</code> に関数を追加しました（後述）。 permissive に計算された <code>col</code> 値に対して、</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>それが走査範囲を拡張するか判定します。さらに、</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>それがマップ内のセルで、不透明なら走査します。</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>Permissive な column は、以下のように計算しました。なぜか複雑な式を使っていますが、普通に切り上げたら良かったと思います。</p>
-</div>
-<div class="listingblock">
-<div class="title">Rule</div>
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">// Used to detect a cell whose center it not in the range
-// but one of whose vertex may hide following cells
-public static int colForSlopePermissive(float slope, int row) {
-    return Math.Min(
-        Rule.maxColForRow(row, radius),
-        (int) Math.Ceiling(slope * (row + 0.5) - 0.500001f)
-    );
-    // We reduced (0.5f + small_amount) not to include a vertex
-    // which is on an `endSlope` e.g. (row, col) = (1, 1),
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>これで、自然な視野になりました。</p>
+<p>そこで、部分的に視野に入った壁も、走査対象に入れてしまいます:</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="/static/img/fov/render_final.png" alt="render final" width="110%">
 </div>
-<div class="title">Figure 11. FoV drawing (final result)</div>
+<div class="title">Figure 12. FoV drawing (final result)</div>
+</div>
+<div class="paragraph">
+<p>これで、自然な視野になりました。</p>
 </div>
 <div class="sect3">
 <h4 id="_edge_cases">Edge cases</h4>
@@ -873,7 +410,7 @@ public static int colForSlopePermissive(float slope, int row) {
 </div>
 </div>
 <div class="paragraph">
-<p>ただしこの場合、 <code>permissiveCol</code> が意図しない範囲にまで広がります。</p>
+<p>ただしこの場合、意図しない範囲も視野に入りました:</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -881,18 +418,7 @@ public static int colForSlopePermissive(float slope, int row) {
 </div>
 </div>
 <div class="paragraph">
-<p>よって、走査を修正します。</p>
-</div>
-<div class="listingblock">
-<div class="title">OctantScanner.scanRow</div>
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">var permissiveCol = Rule.colForSlopePermissive(this.endSlope, row);
-if (permissiveCol &lt; toCol &amp;&amp; state != RowScanState.WasOpaque) {
-    // ~~</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>この修正は、□形の視野への副作用なしで動作しました。</p>
+<p>修正します。</p>
 </div>
 </div>
 </div>
@@ -901,96 +427,21 @@ if (permissiveCol &lt; toCol &amp;&amp; state != RowScanState.WasOpaque) {
 <div class="sect1">
 <h2 id="_visualizing_fov">4. Visualizing FoV</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>視野の可視化を試みます。綺麗な画面を作りこめるのが、グラフィカルなゲームを作るときの特権だと思います。</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-不透明度を含む renderig が上手くいかない場合は、アルファ値の計算を間違えている可能性があります。アルファ値の計算法 (blend mode) には、 <strong>straight alpha</strong> と <strong>premultiplied alpha</strong> があり、使っているフレームワーク（の設定）にあった計算が必要です。
-</td>
-</tr>
-</table>
-</div>
 <div class="sect2">
-<h3 id="_rendering">4.1. Rendering</h3>
+<h3 id="_is_rendering_shadows">4.1. .. is, rendering shadows</h3>
 <div class="paragraph">
-<p>まずは、セル単位で明度を調整する方法を考えます。</p>
-</div>
-<div class="sect3">
-<h4 id="_shadowlight_casting">Shadow/light casting</h4>
-<div class="paragraph">
-<p>セル毎に <strong>影を</strong> 描くことにしました。</p>
-</div>
-<div class="sidebarblock">
-<div class="content">
-<div class="title">Light casting</div>
-<div class="paragraph">
-<p>以下の二案はボツとしました。</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>まずマップ全体に影を描いてから、視野範囲を明るくする方法が考えられます。しかし、 <code>Color</code> の RGB 値は負の数を取れないため、影を描いたときに正確な色情報が失われる恐れがありました。</p>
-</li>
-<li>
-<p>もう 1 つ考えられるのは、影の <code>Texture</code> を作ってから、出力画面に合成する方法です。が、やり方が分からなくて止めました。負荷が増えそうな気もします。</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_how_to_render">How to render</h4>
-<div class="paragraph">
-<p>僕は <code>Renderable</code> の <code>render</code> メソッドを実装しました。他に思いつくのは、 <code>Sprite</code> をセル毎に配置する方法ですが、本質的にはどちらも同じです。</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>Sprite</code> を設置した場合は、 <code>Renderer</code> がそれらを自動的に走査して、セルの明るさに影響を与えます。</p>
-</li>
-<li>
-<p><code>render</code> メソッドを実装する場合は、メソッド中でセルを走査して、明るさを調整します。</p>
-</li>
-</ul>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Immediate mode か retained mode かという差です
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>後は、状態が必要なときに、 <code>Sprite</code> オブジェクトに入れるか、自前のフィールドに入れるかという違いがあります。</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_decaying_shadows">Decaying shadows</h4>
-<div class="paragraph">
-<p>影の濃さを定義する関数 \(f\) を考えます。引数は規格化距離です:</p>
+<p>描くのは影です。規格化距離 (距離 / 視野の半径) から影の濃さを定義します:</p>
 </div>
 <div class="stemblock">
 <div class="content">
-\[dimAlpha = maxDimAlpha * f(distance / radius)\]
+\[shadowAlpha = maxShadowAlpha * f(\frac {distance} {radius})\]
 </div>
 </div>
 <div class="paragraph">
-<p>まず線形の場合ですが、明るさの変化が滑らか過ぎて、セルとセルの境界がはっきりとしませんでした。グリッドベースのゲームにおいては、機能的とは言えません。</p>
+<p>まず \(f\) を 1 次関数にしましたが、明るさの変化が滑らか過ぎて、セルとセルの境界がはっきりとしませんでした。グリッドベースのゲームにおいては、機能的とは言えません。</p>
 </div>
 <div class="paragraph">
-<p>代わりの <a href="https://easings.net/en">補完関数</a> を用います。まず sin カーブが思い浮かびましたが、最も見栄えが良かったのは <code>CubicInOut</code> でした。</p>
+<p>代わりの <a href="https://easings.net/en">補完関数</a> を用います。最も見栄えが良かったのは <code>CubicInOut</code> でした。</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1005,128 +456,10 @@ Immediate mode か retained mode かという差です
 </table>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_interface_for_reading">Interface for reading</h4>
-<div class="paragraph">
-<p><code>iFovData</code> は、視野を更新するためのインタフェイスでした。更新した視野を確認できるように、メソッドを追加します。</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">public interface iFovData {
-    // used to update fov data
-    void onRefresh(int radius, int originX, int originY);
-    void light(int x, int y);
-    // used to visualize fov data
-    bool canSee(int x, int y);
-    Vec2i origin();
-    int radius();
-}</code></pre>
-</div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-あるいは、インタフェイスを分けるのが良いと思います: <code>iFovWrite</code>, <code>iFovRead</code>
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>このインタフェイスに対して <code>FovRenderer</code> を実装し、冒頭の絵を得ました。</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/static/img/fov/render_final.png" alt="render final" width="110%">
-</div>
-<div class="title">Figure 12. FoV drawing</div>
-</div>
-</div>
-</div>
 <div class="sect2">
 <h3 id="_animation">4.2. Animation</h3>
 <div class="paragraph">
-<p>視野が更新されたとき、セルの明度を滑らかに遷移させたいと思います。</p>
-</div>
-<div class="paragraph">
-<p>何らかの方法で、 FoV の変更を追跡する必要があります。また、追跡のためのコストは、セル毎に \(O(1)\) であってほしいと思います。</p>
-</div>
-<div class="sect3">
-<h4 id="_double_buffer_of_fov">Double buffer of FoV</h4>
-<div class="paragraph">
-<p>プレイヤの視野データを 2 つ持ち、交互に更新します。すると、現在の視野データと、前回の視野データが手に入り、セル毎に前回と今回の明るさが分かります。後は経過時間を参照すれば、滑らかに明度を推移させることができます。</p>
-</div>
-<div class="paragraph">
-<p>シンプルだったため採用しました。</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-この方法は、表現力に限界があります。キャラの移動が視野アニメーションの更新よりも速い場合は、違和感が出ると思います。キューに視野データのコピーを入れていく……？
-</td>
-</tr>
-</table>
-</div>
-<div class="sidebarblock">
-<div class="content">
-<div class="title">Ways not in use</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Hash table of changes</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>明度の変更を <code>(x, y)</code> の hash table に入れます。メモリや状態の管理が大変そうなので止めました。</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Grid of states</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>セル毎にアニメーション状態を持たせる方法です。 <code>Sprite</code> を配置するのとほぼ等価であり、最強ですが、ボツとしました。</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">public class FovViewStateForCell {
-    public float previousAlpha;
-    public float targetAlpha;
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>マップ内の全セルに持たせると、無駄が多いです。あるいは、カメラ周辺のセルにのみアニメ状態を持たせることもできますが、複雑になるため止めました。</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_fovrenderer">FovRenderer</h4>
-<div class="paragraph">
-<p><code>(x, y)</code> に関して、可視状態の推移と、プレイヤからの規格化距離が得られるようなインタフェイスを定義します。</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-csharp" data-lang="csharp">// used for fov rendering
-public interface iFovDiff {
-    (bool, float) prevFovFor(int x, int y);
-    (bool, float) currentFovFor(int x, int y);
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>これに対して <code>FovRenderer</code> を実装しました。</p>
+<p>視野データを 2 つ持ちます。経過時間で補間してアニメーションが可能です:</p>
 </div>
 <div class="videoblock">
 <div class="title">FoV animation</div>
@@ -1136,66 +469,33 @@ Your browser does not support the video tag.
 </video>
 </div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_gaussian_blur">4.3. Gaussian blur</h3>
 <div class="paragraph">
-<p>うまく動作しました。</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_fow_fog_of_war">5. FoW (fog of war)</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>さらに FoW を実装します。これは、『未探索』のセルのタイルを非表示にするという機能です。命名は、シミュレーションゲームから来ていると思います。</p>
-</div>
-<div class="paragraph">
-<p>セル毎に <code>bool</code> 値を持たせる配列 <code>fog</code> を用意して実装しました:</p>
+<p>影に Gaussian blur をかけてから、画面に合成します:</p>
 </div>
 <div class="videoblock">
-<div class="title">FoW visualized</div>
 <div class="content">
-<video src="/static/img/fov/fow.mp4" controls>
-Your browser does not support the video tag.
-</video>
+<iframe width="800" height="450" src="https://www.youtube.com/embed/h8XE-1vEI8w?rel=0" frameborder="0" allowfullscreen></iframe>
 </div>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-まだ FoW はアニメーションしません。検討中です
-</td>
-</tr>
-</table>
 </div>
 <div class="paragraph">
-<p>FoV/FoW は、内部データの更新のタイミングが同じです。そこで FoV の wrapper を用意し、 FoV への書き込みと同時に、 FoW への書き込みも行うようにしました。</p>
+<p>アニメーションさせても、それなりに自然です。視野だけでなく、 FoW (fog of war; 未探索範囲の影) も 1 つのテクスチャで表現できました。</p>
 </div>
-<div class="paragraph">
-<p>また、 FoV と FoW を同じイテレーションで描画しました。こちらは <code>FovRenderer</code> に直書きし、名前を <code>ShadowRenderer</code> に改めました。</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_wrapping_up">6. Wrapping up</h2>
+<h2 id="_wrapping_up">5. Wrapping up</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>無理なく実装できました。しばらくは、マップを歩き回るのが楽しくて仕方がないでしょう。しかし、プレイヤの人たちは、この画面を見ても特に感想は無いと思います。みんな僕よりも目が肥えていますし、何より『ゲーム』をプレイしたいはずなので。</p>
+<p>FoV/Fow を表示すると、画面に見応えが出ます。ローグライク以外でも、 FoV/FoW を表示するのはアリだと思います。</p>
 </div>
+<div class="sect2">
+<h3 id="_credits">5.1. Credits</h3>
 <div class="paragraph">
-<p>したがって、コンテンツを作らなければなりません。今後もゲームの完成を目指していきます。</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_credits">7. Credits</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>ねくら さんの作成したタイルセットを使用させていただきました。</p>
+<p>ねくら さんの作成したタイルセットを使用させていただきました:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1208,7 +508,7 @@ Your browser does not support the video tag.
 </ul>
 </div>
 <div class="paragraph">
-<p>また、本記事のアルゴリズムは、以下の記事に基づきました。</p>
+<p>本記事のアルゴリズムは、以下の記事に基づきます:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1221,113 +521,34 @@ Your browser does not support the video tag.
 </ul>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_appendix">Appendix</h2>
-<div class="sectionbody">
 <div class="sect2">
-<h3 id="_a_another_fov_algorithm">A. Another FoV algorithm</h3>
+<h3 id="_appendix">5.2. Appendix</h3>
+<div class="sect3">
+<h4 id="_a_hiding_entities">A. Hiding entities</h4>
 <div class="paragraph">
-<p>Robert Nystrom 氏が解説した <a href="https://journal.stuffwithstuff.com/2015/09/07/what-the-hero-sees/">Fov の記事</a> もあります。 Bob いつもありがとう！</p>
+<p>視野外の <code>Entity</code> を非表示にします。視野の端から出て来た <code>Entity</code> は、</p>
 </div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>経過時間で不透明度を変化させます。</p>
+</li>
+<li>
+<p>TODO: Pixel 単位で_culling_ を行います。 stencil テスト？</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_b_another_fov_algorithm">B. Another FoV algorithm</h4>
 <div class="paragraph">
-<p>こちらの記事では、 <code>Octant</code> 中の <strong>全セル</strong> を走査します。壁を見つけたときは、 <strong>不可視の傾き範囲</strong> <code>shadows</code> を更新します。以降、見つけたセルは、 <code>shadows</code> の範囲に含まれるかで、可視／不可視を判定します。</p>
+<p>Robert Nystrom 氏が解説した <a href="https://journal.stuffwithstuff.com/2015/09/07/what-the-hero-sees/">Fov の記事</a> もあります。こちらの記事では、 <code>Octant</code> 中の <strong>全セル</strong> を走査します。壁を見つけたときは、 <strong>不可視の傾き範囲の集まり</strong> (<code>shadows</code>) を更新します。以降のセルは、 <code>shadows</code> の範囲に含まれるかで、可視／不可視を判定します。</p>
 </div>
 <div class="paragraph">
 <p>傾きの計算式がかなり <a href="https://github.com/munificent/fov/issues/4">独特</a> です。</p>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_b_hiding_entities">B. Hiding entities</h3>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-この項は未実装です
-</td>
-</tr>
-</table>
 </div>
-<div class="paragraph">
-<p>視野外の <code>Entity</code> を非表示にします。視野の端から出て来た <code>Entity</code> に対しては、</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>画像全体の不透明度を滑らかに変化させる　もしくは、</p>
-</li>
-<li>
-<p>視野領域で pixel 単位の <em>culling</em> を行う。やり方？？</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_c_shapes_of_shadows">C. Shapes of shadows</h3>
-<div class="paragraph">
-<p>可視／不可視のセルの境界を、滑らかに繋ぐことができれば、より美しい見た目になります。そのために、影や明かりの形を改良したいと思います。</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-未実装のため、草案のみです。
-</td>
-</tr>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_adjacency">Adjacency</h4>
-<div class="paragraph">
-<p>8 方向への影の接続を調べておきます。 bit flags としてメモリに置きます。</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_nine_slice_rendering">Nine slice rendering??</h4>
-<div class="paragraph">
-<p>セル単位の <code>Texture</code> を用意すると、その数は周辺の影との接続の場合の数に等しく、 \(2^8 = 256\) にもなります。そこで、影の rendering を 9 つに分けます。すなわち、中心と八方向です。 <code>adjacency</code> に応じて、それぞれの部分を描きます。</p>
-</div>
-<div class="paragraph">
-<p>と思ったものの、滑らかにならないよなぁ……。</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_blur">Blur</h4>
-<div class="paragraph">
-<p>シェーダでぼかします。</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_d_transition_of_shadows">D. Transition of shadows</h3>
-<div class="sect3">
-<h4 id="_superpositions">Superpositions</h4>
-<div class="paragraph">
-<p>影の形を変えながら明るさを変化させる必要が出てきます。前回の影と今回の影を重ね合わせながら不透明度を変化させれば、滑らかに推移すると思います。</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="footnotes">
-<hr>
-<div class="footnote" id="_footnotedef_1">
-<a href="#_footnoteref_1">1</a>. 図は <a href="https://www.draw.io/">draw.io</a> で作成しました
-</div>
-<div class="footnote" id="_footnotedef_2">
-<a href="#_footnoteref_2">2</a>. <a href="http://www.roguebasin.com/index.php?title=FOV_using_recursive_shadowcasting">FOV using recursive shadowcasting - Rogue Basin</a>
-</div>
-<div class="footnote" id="_footnotedef_3">
-<a href="#_footnoteref_3">3</a>. <a href="http://www.roguebasin.com/index.php?title=Improved_Shadowcasting_in_Java">Improved Shadowcasting in Java - Rogue Basin</a>
-</div>
-<div class="footnote" id="_footnotedef_4">
-<a href="#_footnoteref_4">4</a>. ただし、 <code>startSlope</code> は <code>1.0</code> 以下に制限します。
 </div>
 </div>
 </main>
