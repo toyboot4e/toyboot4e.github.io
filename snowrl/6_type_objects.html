@@ -118,7 +118,7 @@
         
         
         
-        
+        <span id="revdate">Mar 22, 2021</span>
     </div>
     
 
@@ -594,7 +594,7 @@ let new_entity_index = world.entities.insert(Entity { .. });
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-rust" data-lang="rust">// 代入は想定しない:
-data.entities = World { .. }; // never do this!</code></pre>
+world.entities = entities { .. }; // never do this!</code></pre>
 </div>
 </div>
 <div class="paragraph">
