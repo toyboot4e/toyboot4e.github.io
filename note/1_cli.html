@@ -14,7 +14,7 @@
                 document.getElementById("nav-btn-click").checked = true;
             }
         });
-    </script
+    </script>
 </head>
 
 <body>
@@ -41,6 +41,8 @@
 </li><li><a href="/snowrl/5_pools.html">Pools</a>
     
 </li><li><a href="/snowrl/6_type_objects.html">Type objects</a>
+    
+</li><li><a href="/snowrl/7_combat.html">Combat</a>
     
 </li></ol></a>
     
@@ -103,6 +105,8 @@
 </li><li><a href="/read/4_theories.html">Books on theories</a>
     
 </li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li><li><a href="/read/6_game.html">Books about game development</a>
     
 </li></ol></a>
     
@@ -308,7 +312,7 @@
 <li>
 <p><a href="https://github.com/koekeishiya/skhd">skhd</a></p>
 <div class="paragraph">
-<p>キー入力に応じて、シェルコマンドを実行してくれます。アプリのランチャとして使っており、 <code>yabai</code> コマンドの呼び出しもしています。</p>
+<p>キー入力に応じて、設定したシェルコマンドを実行してくれます。アプリのランチャとして使っており、 <code>yabai</code> コマンドの呼び出しもしています。</p>
 </div>
 </li>
 <li>
@@ -319,9 +323,6 @@
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p>yabai は HACK の塊のような印象があります。 100 % 想定された通り動作すると期待しない方が良いかもしれません。</p>
-</div>
 </div>
 <div class="sect2">
 <h3 id="_markup_languages">2.8. Markup languages</h3>
@@ -330,7 +331,13 @@
 <li>
 <p><a href="https://asciidoctor.org/">Asciidoctor</a></p>
 <div class="paragraph">
-<p>表現力豊かな markup 言語 (AsciiDoc) の実装です。このブログ生成にも <code>asciidoctor</code> が使われています。 org-mode も良さそうです。</p>
+<p>表現力豊かな markup 言語 (AsciiDoc) の実装です。このブログ生成にも <code>asciidoctor</code> が使われています。</p>
+</div>
+</li>
+<li>
+<p>org-mode</p>
+<div class="paragraph">
+<p>Emacs や他のエディタで使用可能なマークアップ言語です。タスク管理や家計簿を書くのに使っています。 Emacs では、エディタサポートが非常に優秀で、折り畳みやテーブルの自動整形が助かっています。</p>
 </div>
 </li>
 <li>
@@ -345,7 +352,7 @@
 <div class="sect2">
 <h3 id="_downloaders">2.9. Downloaders</h3>
 <div class="paragraph">
-<p><code>dl</code> コマンドを作り、与えられた URL に応じて、ダウンローダを割り当てています。</p>
+<p><code>dl</code> コマンドを作り、与えられた URL に応じてダウンローダを割り当てています。</p>
 </div>
 <div class="ulist">
 <ul>
@@ -364,7 +371,7 @@
 <li>
 <p><a href="https://github.com/whiteleaf7/narou/wiki">narou.rb</a> (<code>narou</code>)</p>
 <div class="paragraph">
-<p>小説家になる感じのサイトなどから原稿をダウンロードし、電子書籍に変換してくれます。 pixiv 小説は非対応。</p>
+<p>小説家になる感じのサイトなどからiw html をダウンロードし、電子書籍に変換してくれます。 pixiv 小説は非対応。</p>
 </div>
 </li>
 </ul>
@@ -407,16 +414,41 @@
 </ul>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_terminals">2.11. Terminals</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/alacritty/alacritty">Alacritty</a></p>
+<div class="paragraph">
+<p>描画が最速のターミナルです。プログラミングに使用しています。</p>
+</div>
+</li>
+<li>
+<p><a href="https://sw.kovidgoyal.net/kitty/">Kitty</a></p>
+<div class="paragraph">
+<p>日本語を書くのに使用しています。</p>
+</div>
+</li>
+<li>
+<p>Terminal (macOS)</p>
+<div class="paragraph">
+<p><code>cmus</code> や <code>w3M</code> を常駐させています。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_wrapping_up">3. Wrapping up</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>ターミナルの魅力は、アプリのサンドボックスであることだと思います。 <code>tmux</code> を使えば、思うさま画面分割ができ、文字しか表示されないことは、 <strong>コンスタントなレイアウト</strong> が与えられる意味でメリットと言えます。しかし、これが最高の環境かと言えば、実はグラフィカルな環境が再び覇権を取り戻すのではないかと予想しています (?) 。</p>
+<p>ターミナルの魅力は、アプリのサンドボックスであることだと思います。 <code>tmux</code> を使えば、思うさま画面分割ができ、文字しか表示されないことは、 <strong>コンスタントなレイアウト</strong> が与えられる意味でメリットと言えます。しかし、これが最高の環境かと言えば、実はグラフィカルな環境が再び覇権を取り戻すのではないかと予想しています。 GUI 版 tmux が出てこないかと期待しています。</p>
 </div>
 <div class="paragraph">
-<p>一方で、今日のターミナルは、ほとんど極まっており、今後大きく上回るものが出るかには疑問があります。UI が最高水準に達した後は、人間が進化するしかないのかもしれません。</p>
+<p>一方で、今日のターミナルは極まっており、今後大きく上回るものが出るかには疑問があります。UI が最高水準に達した後は、人間が進化するしかないのかもしれません。</p>
 </div>
 </div>
 </div>

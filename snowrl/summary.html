@@ -14,7 +14,7 @@
                 document.getElementById("nav-btn-click").checked = true;
             }
         });
-    </script
+    </script>
 </head>
 
 <body>
@@ -104,6 +104,8 @@
     
 </li><li><a href="/read/5_novels.html">Novels</a>
     
+</li><li><a href="/read/6_game.html">Books about game development</a>
+    
 </li></ol></a>
     
 </li></ol>
@@ -137,37 +139,37 @@
 <p>これまでに解決してきた問題としては、</p>
 </div>
 <div class="sect3">
-<h4 id="_描画_devlog_1">描画 (devlog #1)</h4>
+<h4 id="_描画_devlog_1_2">描画 (devlog #1, #2)</h4>
 <div class="paragraph">
-<p>Sokol で画像を出せるようにしました。</p>
+<p>OpenGL (の wrapper, Sokol) で画像を出せるようにしました。また、 sprite batcher を作りました。</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_ターン制の実装_devlog_3">ターン制の実装 (devlog #3)</h4>
+<div class="paragraph">
+<p>本来ステートマシンであるゲームデータ上で、複数フレームに渡って逐次的な処理を実行します。</p>
+</div>
+<div class="paragraph">
+<p>ターン制は coroutine で書きました。また、行動を複数の <code>Event</code> に分け、 <code>Event</code> から <code>Event</code> を派生させる形にしました。 <code>Event</code> の発生直後に演出を挟むことが可能です。</p>
+</div>
+<div class="paragraph">
+<p>ゲームの内部状態を 2 つ持って、片側を view, 片側を model にする人も一定数いるようです:</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>本来ステートマシンであるゲームデータ上で、複数フレームに渡って逐次的な処理を実行する。</p>
-<div class="paragraph">
-<p>→ Generator (unstable Rust) を使用して解決。</p>
-</div>
+<p><a href="https://www.boxdragon.se/blog/three-worlds">Three-Worlds Theory: Art or Gameplay? Pick Two. — Box Dragon</a></p>
 </li>
 <li>
-<p>アニメを再生する。</p>
-</li>
-<li>
-<p>拡張性を担保する。</p>
-<div class="paragraph">
-<p>→ キャラの行動をイベントのチェインで表現して解決。</p>
-</div>
+<p><a href="http://www.lancarse.co.jp/blog/?p=194">ターン制RPGを作るときに知っておきたい「ロジックと演出の分離」 – Lancarse Blog</a></p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_依存性へのアクセス_devlog_4">依存性へのアクセス (devlog #4)</h4>
+<h4 id="_依存性へのアクセス_devlog_4_5">依存性へのアクセス (devlog #4, #5)</h4>
 <div class="paragraph">
-<p><code>struct Global</code> に大半のデータを載せることで解決。また、ゲームはスタック式のステートマシンで制御する。</p>
+<p><code>struct Data</code> に大半のデータを載せることで解決しました。また、ゲームはスタック式のステートマシンで制御するします。</p>
 </div>
 <div class="admonitionblock note">
 <table>
