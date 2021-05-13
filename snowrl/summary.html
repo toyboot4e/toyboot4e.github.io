@@ -153,7 +153,7 @@
 <p>ターン制は coroutine で書きました。また、行動を複数の <code>Event</code> に分け、 <code>Event</code> から <code>Event</code> を派生させる形にしました。 <code>Event</code> の発生直後に演出を挟むことが可能です。</p>
 </div>
 <div class="paragraph">
-<p>ゲームの内部状態を 2 つ持って、片側を view, 片側を model にする人も一定数いるようです:</p>
+<p>ゲームの内部状態を 2 つ持って、片側を view, 片側を model にする人も一定数いるようです。変更イベントのキューやグラフを使って view を model に同期します:</p>
 </div>
 <div class="ulist">
 <ul>
