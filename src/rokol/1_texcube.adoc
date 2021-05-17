@@ -21,7 +21,7 @@ image::rokol/texcube-miss.png[]
 .Textured cube
 image::rokol/texcube.png[]
 
-ふー。アスペクト比を間違えていました。 3D 入門です！
+アスペクト比を間違えていました。 3D 入門です！
 
 ==== >>> Next
 

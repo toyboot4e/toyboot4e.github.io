@@ -22,7 +22,7 @@ image::editors/vscode.png[]
 
 === Sublime
 
-Sublime は *軽くてセンスの良いエディタ* ですが、拡張に不具合があって僕はダメでした。 Sublime 4 に期待しています。
+Sublime は *センスの良いエディタ* です。そして Sublime 以上に *動作が軽快* なエディタを知りません。しかし、拡張に不具合があって僕はダメでした。 Sublime 4 に期待しています。
 
 image::editors/sublime.png[]
 
@@ -38,19 +38,21 @@ NeoVim から Emacs への移行は、一筋縄とは行きませんでした。
 
 image::editors/emacs.png[]
 
-==== Distribution
+==== Distributions
 
-Emacs の設定としては、 {spacemacs} や {doom-emacs} が有名です。これらも {evil} (Vim のエミュレーション) を利用しており、 Vim の操作性が再現されています。しかし、 Vim との細かな違いは、自分で修正する必要があります。したがって、 distribution を使う場合も、 {repo} は役に立つと思います。
+Emacs の設定としては、 {spacemacs} や {doom-emacs} が有名です。これらも {evil} (Vim のエミュレーション) を利用しており、 Vim の操作性が再現されています。しかし、 Vim との *細かな違いは、自分で修正する必要があります* 。したがって、 distribution を使う場合も、 {repo} は役に立つと思います。
 
 ==== Evil Emacs
 
-エディタ間には、圧倒的な違いは無かったと思います。エディタの移行に生産性はありませんし、やりたい人がやればいいかなという感じです。僕の場合は、隣の芝生が青かったのでやってみました。得るものがあったので、第三第四の Vim が出てこないかなと期待しています。
+色々と試しましたが、 *エディタ間に圧倒的な違いは無かった* と思います。エディタの移行に生産性はありませんし、やりたい人だけがやればいいかなという感じです。僕の場合は、隣の芝生が青かったのでやってみました。得るものがあったので、第三第四の Vim が出てこないかなと期待しています。
 
-https://github.com/onivim/oni2[onivim] とか https://github.com/fox0430/moe[moe] はどうなんでしょうか。
+https://kakoune.org/[kakoune] は合いませんでした。 https://github.com/onivim/oni2[onivim] とか https://github.com/fox0430/moe[moe] はどうなんでしょうか。
 
 ==== Vanila Emacs
 
-設定無しの Emacs も試してみました。特に面白かったのが、スクロールが半ページ単位 (いわゆる type-writer scroll) だったことです。 Vim ほどスクロール機能が充実していないため、この選択なのだと思いますが、センスの良さを感じました。
+設定無しの Emacs も試してみました。特に面白かったのが、 *スクロールが半ページ単位 (いわゆる type-writer scroll) だった* ことです。 Vim ほどスクロール機能が充実していないため、この選択なのだと思いますが、センスの良さを感じました。
+
+自分が Evil Emacs を使う場合は、 Vim のバインドで事足りるため、結局 1 行単位のスクロールに戻してしまいましたが……。
 
 == Update
 
@@ -65,5 +67,5 @@ image::editors/emacs-tab-bar.png[]
 
 image::editors/emacs-fold.png[]
 
-UI 天国だ……。癒されます。これで *十分な多重化* を手に入れました。
+*UI 天国* だ……。癒されます。ついに *十分な多重化* を手に入れました。
 

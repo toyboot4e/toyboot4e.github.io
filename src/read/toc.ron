@@ -6,5 +6,6 @@
         File("", "./3_langs.adoc"),
         File("", "./4_theories.adoc"),
         File("", "./5_novels.adoc"),
+        File("", "./6_game.adoc"),
     ],
 )

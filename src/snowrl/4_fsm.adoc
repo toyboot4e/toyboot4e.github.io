@@ -1,0 +1,203 @@
+= FSM and state stack
+:revdate: Jan 12, 2021
+
+== Devlog
+
+`State` を足してゲームを拡張できるようになりました。
+
+さらに本日……イカちゃんが喋ります (!?)
+
+=== Title screen
+
+==== Snowing!
+
+https://www.shadertoy.com/view/ldsGDn[Just snow] で雪を降らせて見ました:
+
+image::snow/title/snow.png[]
+
+https://www.shadertoy.com/[Shadertoy] のシェーダは、フルスクリーンの四角形や経過時間を入力として受け取るようになっており、ゲームへの組み込みも簡単です。しかし重そうなので、パーティクルで再実装してみたいと思います (予定) 。
+
+NOTE: フルスクリーンの四角形よりも、フルスクリーンを覆う 1 つの三角形を使った方が、効率が良いそうです。
+
+==== Stack-based FSM
+
+ゲーム `State` をリストしてみました:
+
+* タイトル画面
+* ターン制を進める状態
+** アニメを再生する状態 (攻撃アニメ、移動アニメなど)
+** 所持品メニュー
+*** サブメニュー
+** カットシーンを再生する状態
+
+これを見て考えたこととしては、
+
+* `State` には親子関係があります => `State` スタックを使うのが自然です。
++
+[source,rust]
+----
+/// Stack-based finite state machine
+#[derive(Debug)]
+pub struct Fsm {
+    states: HashMap<TypeId, Box<dyn State>>,
+    stack: Vec<TypeId>,
+}
+----
+
+* 2 つ以上の `State` が共有するデータがあります => `Global` データに入れます。共有しないデータは、それぞれの `State` オブジェクトに入れます。
++
+[source,rust]
+----
+/// Game data shared by more than one [`State`]s
+#[derive(Debug)]
+pub struct Global {
+    pub world: World,
+    pub wcx: WorldContext,
+    pub world_render: WorldRenderer,
+    pub anims: AnimPlayer, // <1>
+    pub cutscene_to_play: Option<CutsceneIndex>, // <1>
+}
+----
+<1> 状態間でのデータのやり取りは、 `Global` を読み書きするという形になります。できれば、状態から状態へ直接メッセージを送りたいところですが。
+
+ゲーム全体のデータとしては:
+
+[source,rust]
+----
+/// Snow the roguelike game
+#[derive(Debug)]
+struct SnowRl {
+    gl: fsm::Global,
+    fsm: fsm::Fsm,
+}
+----
+
+==== Logo
+
+ロゴを GIMP で作成し、仮タイトル完成です:
+
+image::snow/title/logo.png[]
+
+Demons' Souls のロゴが格好良かった記憶があるのですが、今見るとそれほどでもありませんでした。
+
+=== Talk to Ika-chan!
+
+==== Interaction
+
+イカちゃんに話しかけるには、会話スクリプトの実行状態と、状態遷移が必要です。
+
+* `PlayScript` 状態は、ひとまずハードコーディングします。
+* 状態遷移に関しては、ターン制 (unstable Rust の generator)が `Talk` イベントを `yield` した場合 (`Box::downcast_ref` で判定) に、 `PlayScript` 状態へ移行します。
+
+まずは限定された仕組みで動かします。
+
+==== Nine slice sprite
+
+会話ウィンドウ表示のために、 https://docs.unity3d.com/ja/2019.4/Manual/9SliceSprites.html[9 スライス] を導入します。
+
+`snow2d` (自作クレート、非公開) の描画 API は、四辺形の builder と、 `OnSpritePush` から成っています:
+
+[source,rust]
+----
+/// What can be pushed onto [`QuadParamBuilder`]
+pub trait OnSpritePush: Texture2d {
+    /// Set source rectangle (uv values), destination size, rotations, ..
+    fn init_quad(&self, builder: &mut impl QuadParamsBuilder);
+
+    #[inline]
+    fn push_quad<Q: QuadIter>(&self, draw: &mut DrawApiData<Q>, flips: Flips) // <1>
+    where
+        Self: Sized,
+    {
+        draw.params
+            .write_to_quad(draw.quad_iter.next_quad_mut(self.img()), self, flips);
+    }
+}
+----
+<1> `push_quad` のデフォルト実装は、 `Builder` が作った四辺形をそのまま書き込みます。
+
+`NineSliceSprite` の場合は、 `OnSpritePush::push_quad` を実装し、 `Builder` が作った四辺形を 9 つに分解して書き込みます。
+
+==== .. with ballons!
+
+9 スライスに吹き出し (baloon) をくっ付けて表示すれば、キャラが喋っているように見えます。
+
+イカちゃんに向かって Enter キーで `Interact` すると、 `PlayScript` 状態に遷移します:
+
+image::snow/title/talk.png[]
+
+イカちゃん……じゃなぁーい！　 1.5 頭身のどせいさんみたいな生き物が喋っていますね。
+
+ちっちゃいなぁ〜。
+
+NOTE: ウィンドウ・吹き出し画像は https://rmgamematerial.wordpress.com/2011/04/10/oldjunk/#more-159[Old Junk (sprites, tiles, etc.) | Soruve's Game Materials] から。
+
+=== TODOs
+
+まだまだこれからですね。
+
+* [ ] スクリプト (カットシーンを書けるもの) を実装する
+** [ ] スクリプトの書式を決める (https://gamelisp.rs/[GameLisp]?)
+** [ ] スクリプトからゲームに変更を加える (`Event` を投げる ?)
+* [ ] 任意のスクリプトを実行する
+* [ ] Tiled のセルや object とスクリプトを関連付ける
+
+実装できるのでしょうか？　自信がありません。
+
+== Thoughts
+
+=== It's an RPG!
+
+僕は Angband で 2 階に降りられないレベルのプレイヤーです。おそらく、僕が作ろうとしているものは、皆さんが思い浮かべる『ローグライク』ではありません。
+
+ローグライクをシステムに使う理由は、戦闘などを含めて *マップ上でゲームが進行する* ためです。その『味』が良いと思っています。ローグライクと言いつつも、マップは手書きの一本道を歩いてもらおうと思います。
+
+=== Asset
+
+==== Asset path generation
+
+Asset パスの定数を使えば、実行時に存在しないファイルを読むことを防げます。
+
+今回は、  `build.rs` からパスの定数を生成しました (https://gist.github.com/toyboot4e/c3ebb86ef6d68e53e74376543ad4d493[gist]) 。マクロから生成できた方がポータブルで良いのですが、しばらくマクロ達人にはなれそうもありませせん。
+
+==== TODO: `AssetCache`
+
+そろそろアセット管理の仕組みを考えたいです。 Cache と非同期ロードができたら良いと思います。
+
+`ass.rs` を `asset.rs` にリネームしました。『 Ass 管理』……短くて良いと思ったのですが、思ったよりも下ネタなのかなと調査予定です。ミームだと思っていたのですよね。わざわざ調べなくてもいいかな……
+
+=== ECS?
+
+ECS が良さそうな予感をメモしておきます。
+
+NOTE: https://github.com/lowenware/dotrix/[dotrix] を参考に、シンプルな ECS / アセット管理を始めても良かったかもしれません。しかし、ブラックボックスが残りそうなので、しばらく非 ECS で作ります。
+
+==== Sub typing?
+
+Renderer を Z 軸でソートできたら便利です。
+
+ECS なら、 `ZOrder: Component` を元に `Entity` をソートするか、近いことが簡単にできる……のでしょうか。
+
+==== Flat data & automatic fetch?
+
+SnowRL の大半のコードが `Global` 構造体に依存しています。依存性を手に入れるためには、長々と `global.field.field.target_field` のようにアクセスを書きます。
+
+ECS では、関数を書くと、 `World` から自動的に依存性を `fetch` して渡してくれる気配があります:
+
+.Example from https://bevyengine.org/news/introducing-bevy/[Introducing Bevy]
+[source,rust]
+----
+// Res and ResMut access global resources 
+fn system(time: Res<Time>, score: ResMut<Score>) {
+    // do something
+}
+----
+
+あるいは `Query` 経由で依存性を手に入れます。
+
+=== Client/server separation?
+
+様々な分離のパタンがありますが、ゲーム制作における究極の目標は、ネットワーク越しにプレイできる設計なのかなと思います。
+
+https://book.veloren.net/[Veloren] が良さそうですよね〜
+

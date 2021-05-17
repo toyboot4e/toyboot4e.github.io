@@ -1,0 +1,190 @@
+= Pools
+:revdate: Feb 5, 2021
+:froggy: https://docs.rs/froggy/latest/froggy/[froggy]
+:thunderdome: https://docs.rs/thunderdome/latest/thunderdome[thunderdome]
+:bevy-asset: https://docs.rs/bevy/latest/bevy/asset/index.html[bevy_asset]
+
+:mpsc: https://doc.rust-lang.org/std/sync/mpsc/[mpsc]
+:crossbeam: https://docs.rs/crossbeam/latest/crossbeam/[crossbeam]
+:flume: https://docs.rs/flume/latest/flume/[flume]
+
+== Devlog
+
+=== OMG!
+
+恐るべきことが起きてしまいました……
+
+image::snow/misc/y-sort.png[]
+
+*イカちゃんデカ過ぎ問題* です。他のキャラを覆い隠す迷惑キャラとなってしまいます。
+
+最初から分かっていたはずだろう！！
+
+=== Animation
+
+タイトル画面や吹き出しが動きます:
+
+video::snow/title/anims.mp4[]
+
+このイカちゃんは……ビッグな存在になってしまいました。
+
+== New modules
+
+=== Audio
+
+https://github.com/MoAlyousef/soloud-rs[soloud-rs] を `audio` モジュールとして使っています。この際、 `audio::asset` を追加するなど、 fork せずに (re-exporting のみで) 十分に改造できました。 詳しくは、  https://qiita.com/toyboot4e/items/c9bac2183405d1fc1c6e[Qiita の記事] で解説しています。
+
+=== Assets
+
+アセット管理を始めました:
+
+* [x] 同じ画像・音声を二度読み込まない (caching)
+* [ ] `async` ロード
+* [ ] ホットリロード
+* [ ] `serde`
+* [ ] Sprite sheets などの高度な loader ？？
+
+アセットパスについては、文字列をハードコーディングするのが嫌だったので、 `build.rs` から定数を生成しています。
+
+==== Options
+
+`AssetCache<T>` の実装案としては:
+
+. アセットを `Arc<Mutex<T>>` に入れる → 採用
++
+TODO: `serde` の際に重複したオブジェクトを作らない (https://matklad.github.io/2020/03/22/fast-simple-rust-interner.html[interning]) ように気をつけます。
+
+. アセットをプールに入れる
+.. `Handle<T>` を弱参照にする (例: {thunderdome})
+.. `Handle<T>` を強参照にする (例: {froggy}, {bevy-asset})
++
+NOTE: `Handle<T>` の参照カウントに必要なのは `drop` を通知する仕組みです。これは一方的な通信なので、 `Arc<Mutex<T>>` ではなく {mpsc}, {crossbeam} または {flume} を使用できます。どちらが良いのかは分かりませんが……
+
+`Arena<T>` は、 `Vec<T>` の wrapper です。なぜ生の `Vec<T>` ではダメなのかは、 https://docs.rs/generational-arena/latest/generational_arena/[generational_arena] に書いてあります。そもそも、 `Vec<T>` のアイテムを https://doc.rust-lang.org/std/vec/struct.Vec.html#method.remove[削除] すると、他アイテムの位置がズレます。
+
+=== Hot reloading
+
+ホットリロードのクレートは、どれも https://github.com/nagisa/rust_libloading[libloading] (https://docs.rs/libloading/latest/libloading/[API]) の wrapper でした。これには https://github.com/nagisa/rust_libloading/issues/59[macOS でのホットリロードに問題があった] ため、対策 (https://github.com/toyboot4e/hot_crate[hot_crate]) しました。
+
+TODO: プラグインシステム？　ゲームウィンドウを閉じずにプレイ・開発できたら良いですよね。
+
+== UI (sprite / animation storage)
+
+RPG ツクールの『ピクチャ』みたいな機能になりました。
+
+* [x] アニメーション
+* [x] メモリの自動解放
+* [ ] z 軸ソート
+* [ ] `Transform2d` と親子関係
+* [ ] `Anim` のシーケンスなど
+* [ ] 自動的に軌跡を表示するような機能？？
+* [ ] データ駆動？
+
+始めは `omgui` という名前にしていましたが、 `ui` に落ち着きました。 OMG!
+
+=== `Layer`
+
+Sprite は layer → z 軸の順でソート予定です。ひとまず `Layer` のみを考えます:
+
+[source,rust]
+----
+pub struct Layer {
+    pub nodes: Pool<Node>, // <1>
+    pub anims: Arena<Anim>, // <2>
+}
+----
+<1> `Node` は `Handle` の数がゼロになるまで消滅しません。たとえば、 `Node` を参照するアニメが生きている限り、 `Node` は死にません。
+<2> アニメは、再生が終わったら自動的に削除されます。
+
+`Node` が `Pool` に入っている都合上、 `Pool` 内 `Node` への `WeakHandle` をソートする形になると思います。
+
+=== `Node`
+
+`Node` は決め打ちです:
+
+[source,rust]
+----
+pub struct Node {
+    draw: Draw,
+    params: DrawParams, // <1>
+}
+
+pub enum Draw {
+    Sprite(SpriteData),
+    NineSlice(NineSliceSprite),
+}
+
+pub enum DrawParams {
+    pub pos: Vec2f, // <2>
+    pub size: Vec2f,
+    pub rot: f32,
+    pub color: Color,
+    pub scales: Vec2f,
+    pub origin: Vec2f,
+}
+----
+<1> アニメは全 `Node` 共通の `DrawParams` を書き換える形で働きます。
+<2> 未だに独自のベクトル型を使っています。
+
+=== `Anim` (tween)
+
+==== Fixed set of animations
+
+https://docs.rs/enum_dispatch/latest/enum_dispatch/[enum_dispatch] で `Trait` をアップキャストしたような `enum` を作ります:
+
+[source,rust]
+----
+#[enum_dispatch]
+pub trait AnimImpl {
+    fn tick(&mut self, dt: Duration);
+    fn is_end(&self) -> bool;
+}
+
+pub struct PosTween { .. }
+impl AnimImpl for PosTween { .. }
+
+pub struct ColorTween { .. }
+impl AnimImpl for ColorTween { .. }
+
+pub struct AlphaTween { .. }
+impl AnimImpl for AlphaTween { .. }
+
+/// One of the [`AnimImpl`] impls
+#[enum_dispatch(AnimImpl)]
+pub enum Anim {
+    PosTween,
+    ColorTween,
+    AlphaTween,
+}
+----
+
+==== Tween builder (animation builder)
+
+Builder を用意して、最低限の API が整いました:
+
+.タイトルロゴのアニメ
+[source,rust]
+----
+anims
+    .builder()
+    .node(&nodes.logo)
+    .dt(dt)
+    .pos([Self::logo_pos().offset([120.0, 6.0]), Self::logo_pos()])
+    .color([Color::TRANSPARENT, Color::OPAQUE]);
+----
+
+=== Considerations
+
+==== ECS
+
+https://github.com/mockersf/bevy_extra/tree/master/bevy_easings[bevy_easing] は Bevy Engine 上の tween ライブラリです。 ECS の方が、拡張できて良さそうですね。僕の `ui` は、特定の `Node` と `Anim` しか使用できません。
+
+==== Flex layout library?
+
+https://yogalayout.com/[Yoga] を読み込んでゲームに使う、という話を見たことがあります。
+
+* https://yogalayout.com/[yoga-rs]: 更新停止
+* https://github.com/vislyhq/stretch[stretch]: pure Rust な flexbox
+
+外部ツールや game-in-editor で UI を作れたら良いですよね。たぶん、今後もハードコーディングしてしますが。
+

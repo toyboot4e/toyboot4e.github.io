@@ -1,0 +1,35 @@
+= SnowRL devlog
+
+== About
+
+{rokol} を使って 2D ローグライクを作ります。タイトルは『SnowRL』にする予定です。
+
+=== Milestones
+
+これまでに解決してきた問題としては、
+
+==== 描画 (#1, #2)
+
+OpenGL (の wrapper, Sokol) で画像を出せるようにしました。また、 sprite batcher を作りました。
+
+==== ターン制の実装 (#3)
+
+本来ステートマシンであるゲームデータ上で、複数フレームに渡って逐次的な処理を実行します。
+
+ターン制は coroutine で書きました。また、行動を複数の `Event` に分け、 `Event` から `Event` を派生させる形にしました。 `Event` の発生直後に演出を挟むことが可能です。
+
+.Syncing a duplicate world
+[sidebar]
+--
+ゲームの内部状態を 2 つ持って、片側を view, 片側を model にする人も一定数いるようです。変更イベントのキューやグラフを使って view (あるいは view 側に複製してある model) を model に同期します:
+
+* https://www.boxdragon.se/blog/three-worlds[Three-Worlds Theory: Art or Gameplay? Pick Two. — Box Dragon]
+* http://www.lancarse.co.jp/blog/?p=194[ターン制RPGを作るときに知っておきたい「ロジックと演出の分離」 – Lancarse Blog]
+--
+
+==== 依存性へのアクセス (#4, #5)
+
+`struct Data` に大半のデータを載せることで解決しました。また、ゲームはスタック式のステートマシンで制御します。
+
+==== 追加モジュール (#6, #7)
+

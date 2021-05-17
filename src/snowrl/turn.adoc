@@ -1,0 +1,80 @@
+= Roguelike game loop
+
+== Devlog
+
+=== Animations
+
+前回の記事に動画を追加した通り、キャラと影の動きを滑らかにしました。移動前後の状態を持って補間しています:
+
+* キャラ: 移動前後のグリッド座標を持って、 2 点間を補間した位置にキャラを表示します。
+* 視野: 移動前後の視野データを持って、 2 データを補間して (ブラーをかける前の) 影テクスチャを生成します。
+
+Renderer が内部データを `update` の際に確認すれば、アニメとデータが同期されます。ただ、視野は比較が重いので、 dirty flag を立てて変更をマークします。
+
+NOTE: 視野データの更新と同時に renderer 側のデータを書き換えても良いのですが、関心の分離の観点から dirty flag を立てます。
+
+=== A turn-based game loop
+
+ターン制は _generator_ として実装します。 Generator は、 coroutine の中でも _first-class continuation_ を実装したものだと思うのですが、停止・再開時に値の受け渡しが可能です:
+
+[source,rust]
+----
+let res = game_loop.resume(&mut self.game_context);
+----
+
+[source,rust]
+----
+pub struct GameLoop {
+}
+
+impl GameLoop {
+}
+----
+
+あとは、キャラの行動 (`Action`) をいかに処理するかです。簡単のため、 `Action` は `enum` であるとして、次の項へ移ります。
+
+==== Command pattern & ownership
+
+僕は {bob} のフォロワーで、彼の http://journal.stuffwithstuff.com/category/roguelike/[ローグライクの記事] もすべて読んでいます。ただ、彼が提案するゲームループはオブジェクト指向に寄っており、 Rust に適用するには厳しいものがありました。
+
+そこで、以下の動画を参考にします:
+
+https://www.youtube.com/watch?v=U03XXzcThGU[RDC US 2015 - Brian Bucklew, Data-Driven Engines of Qud and Sproggiwood]
+
+基本的には、キャラの行動をデータ (`Command`) として扱うのですが、行動処理をメソッドにするのではなく、外部から割り当てます。割り当てるメソッドは不特定多数 (https://en.wikipedia.org/wiki/Chain-of-responsibility_pattern[chain-of-responsibility]) とし、また、アニメーション用オブジェクトの生成も同時に行います:
+
+[source,rust]
+----
+pub fn handle_action(
+    action: &Action,
+    acx: &mut ActionContext,
+    vcx: &mut VisialContext
+) -> Result<()> {
+    if let Some(anim) = vcx.handle(action) {
+        yield Ok(HandleResult::Animation(anim); // <1>
+    }
+
+    let handlers = acx.handlers_for(action)?;
+    for handler in handlers {
+        let res = handler.handle(action); // <2>
+        if matches!(res, HandleResut::Finished) {
+             return Ok(()); // <3>
+        }
+        yield return res;
+    }
+}
+----
+<1> `Action` に割り当てるアニメーションがあれば、それを返します。アニメの終了後にこのループを再開します。
+<2> `handler` を 1 つずつ割り当てます。
+
+== Notes
+
+=== Coroutines
+
+Stack overflow の https://stackoverflow.com/questions/28977302/how-do-stackless-coroutines-differ-from-stackful-coroutines[回答] の通り、 Boost の解説が良かったです。
+
+上記回答によると、コルーチンのオプショナルな機能としては:
+
+* stackfull: コルーチンをネストした状態で停止・再開が可能です。
+* first-class continuation: 停止・再開時に値の受け渡しが可能です。
+

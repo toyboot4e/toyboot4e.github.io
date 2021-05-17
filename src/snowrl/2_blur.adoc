@@ -1,0 +1,69 @@
+= Gaussian blur
+:revdate: Dec 20, 2020
+:cpp: pass:[C++]
+:macruqoad: https://github.com/not-fl3/macroquad[macroquad]
+:miniquad: https://github.com/not-fl3/miniquad[miniquad]
+:quad-snd: https://github.com/not-fl3/quad-snd[quad-snd]
+
+== Devlog
+
+以前の開発 (ANF devlog) から引き継いで、タイルマップと視野を表示しました:
+
+image::snow/gauss/fov_nearest.png[]
+
+これはこれで味があるのですが、 {elona} 並のクオリティを目標とすると、疑問の残る手応えと言えます。
+
+したがって、この影に https://learnopengl.com/Advanced-Lighting/Bloom[gaussian blur] をかけて、滑らかにします。
+
+=== API for off-screen rendering
+
+Gaussian blur は _post processing_ の一種で、まずテクスチャに影を書き込む必要があります。
+
+`RenderTexture` という型を用意しました。 Rendering pass の開始時に、このテクスチャを設定します:
+
+[source,rust]
+----
+let mut draw = renderer.offscreen(&mut self.shadow_render_texture, .. );
+----
+
+以降の rendering は、影テクスチャへの書き込みとなるので、影を描きます:
+
+[source,rust]
+----
+render_fov_shadow(&mut draw, .. );
+----
+
+その後、 Learn OpenGL の https://learnopengl.com/Advanced-Lighting/Bloom[bloom] の項からパクったシェーダで gaussian blur をかけます。
+
+=== blur
+
+最終結果です！
+
+image::snow/gauss/final.png[]
+
+ここにイカちゃんを投下します！
+
+image::snow/gauss/ika-chan-big.png[]
+
+デカい……笑　バグを修正し、イカちゃんを召喚します！
+
+image::snow/gauss/ika-chan.gif[]
+
+かわいい。かわいいなぁ
+
+video::snow/gauss/anim.mov[]
+
+前後の状態を取って線形補完することで、視野やキャラを滑らかに移動させました。
+
+== Texture filtering
+
+テクスチャの境界で線形補完を行うように設定すると、視野表示は以下のようになりました:
+
+image::snow/gauss/fov_linear.png[]
+
+左ページの画像と比べると、縁が滑らかに描画されていることが分かります。このまま使っても良いかもしれません。
+
+Gaussian blur 後は、補完の有無の差がほとんど分かりませんでした。
+
+c.f. https://learnopengl.com/Getting-started/Textures
+

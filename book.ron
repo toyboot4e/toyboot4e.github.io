@@ -4,9 +4,11 @@
     site_dir: "site",
 
     authors: ["adbook"],
-    title: "adbook demo site",
+    title: "Toy toy beam",
 
+    use_default_theme: false,
     includes: [
+        ".nojekyll",
         "static/img",
         "theme/css",
         "theme/js",
@@ -50,8 +52,6 @@
             "handlebars=https://handlebarsjs.com/[Handlebars]",
             "prismjs=https://prismjs.com/[Prism.js]",
 
-            "nez=https://github.com/prime31/Nez[Nez]",
-
             "sdl=https://www.libsdl.org/[SDL]",
             "xna=https://ja.wikipedia.org/wiki/Microsoft_XNA[XNA]",
             "fna=https://fna-xna.github.io/[FNA]",
@@ -63,6 +63,7 @@
             "learn-gl=https://learnopengl.com/[Learn OpenGL]",
             "learn-gl-sokol=https://www.geertarien.com/learnopengl-examples-html5/[Learn OpenGL examples (with Sokol)]",
 
+            "nez=https://github.com/prime31/Nez[Nez]",
             "zig-gk=https://github.com/prime31/zig-gamekit[zig-gamekit]",
             "zig-rk=https://github.com/prime31/zig-renderkit[zig-renderkit]",
 
@@ -72,6 +73,8 @@
             "zig=https://ziglang.org/[Zig]",
 
             "tiled=https://www.mapeditor.org/[Tiled]",
+            "elona=http://ylvania.org/jp/elona[Elona]",
+            "bob=http://stuffwithstuff.com/[Robert Nystrom]",
         ]),
     ]
 )

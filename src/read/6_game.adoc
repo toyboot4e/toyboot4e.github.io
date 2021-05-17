@@ -1,0 +1,46 @@
+= Books about game development
+:revdate: not published
+:amaranth: https://github.com/munificent/amaranth[Amaranth]
+:hauberk: https://github.com/munificent/hauberk[Hauberk]
+
+== Books
+
+ゲーム・プログラミングに関する読書メモです。
+
+=== Game Programming Patterns
+
+オブジェクト指向の本です。合わせて著者のゲームのコードを読むと、理解が深まります。
+
+* {amaranth}
+* {hauberk}
+
+=== ゲームを動かす技術と発想 R
+
+意外と 3D ゲーム開発には知識が必要無いのではないか、というのが読後の安易な感想でした。
+
+=== Misc (blogs, videos and source code)
+
+* Stuff with Staff, Amaranth, Hauberk
+
+== Graphics
+
+グラフィクスに関する読書メモです。
+
+=== Ray Tracing in One Weekend (Part I)
+
+300 行くらいのコードで 3D に入門できます。
+
+=== Learn OpenGL
+
+数ある OpenGL の本の 1 つです。
+
+=== Advanced Global Illumination
+
+立体角を理解していたら読めます。
+
+四章以降は古い話が多いようで、そこまで読む必要は無かった、というのが正直なところです。
+
+=== Lessig's thesis
+
+throught measure stem:[\mu]
+

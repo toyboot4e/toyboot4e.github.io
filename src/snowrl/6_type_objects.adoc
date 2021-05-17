@@ -1,0 +1,419 @@
+= Type objects
+:revdate: Mar 22, 2021
+:studio-24-c: https://www.soundhouse.co.jp/products/detail/item/261282[Studio 24c]
+:fostex-t20rp-mk3: https://www.amazon.co.jp/Fostex-USA-AMS-T20RPMK3-%E3%83%95%E3%82%A9%E3%82%B9%E3%83%86%E3%82%AF%E3%82%B9MK3%E3%83%97%E3%83%AD%E3%83%95%E3%82%A7%E3%83%83%E3%82%B7%E3%83%A7%E3%83%8A%E3%83%AB%E3%82%B9%E3%82%BF%E3%82%B8%E3%82%AA%E3%83%98%E3%83%83%E3%83%89%E3%83%95%E3%82%A9%E3%83%B3%E3%80%81%E3%82%AA%E3%83%BC%E3%83%97%E3%83%B3/dp/B01686PE3C[Fostex T20RP mk3]
+:gp: https://gameprogrammingpatterns.com/contents.html[Game Programming Patterns]
+:gp-to: https://gameprogrammingpatterns.com/type-object.html[Type Object]
+:amaranth: https://github.com/munificent/amaranth[Amaranth]
+:hauberk: https://github.com/munificent/hauberk[Hauberk]
+:rg3d: https://github.com/mrDIMAS/rg3d[rg3d]
+:cheat: https://gist.github.com/toyboot4e/1b56499999ff6c3b6d4f358d3c62af6c[cheat]
+:imgui-rs: https://github.com/imgui-rs/imgui-rs[imgui-rs]
+:imgui-inspect: https://github.com/aclysma/imgui-inspect[imgui-inspect]
+:glow: https://github.com/grovesNL/glow[glow]
+:genesis: https://github.com/StygianLightning/genesis[genesis]
+
+== Devlog
+
+serde の読み方は "sir day" 派が https://twitter.com/Carols10cents/status/873692427919536131[多かった] みたいです。 [.line-through]#シルディの方が可愛い#
+
+*エタるとしたらバグが原因* だと思っていました。バグは無く、大変順調です。
+
+=== Titles
+
+ゲームタイトルを考えました:
+
+. *SnowRL*
++
+当初の方向性を掘り下げるタイトルです。『寒さと厳しさ』が予想できます。しかし、 RL (roguelike) といいつつ RPG 寄りのゲームを予定しており、需要と供給の不一致が起こりそうです。検索性も悪いと思います。
+
+. *イカちゃん転生 〜遺伝子編集で世界最強〜*
++
+[.line-through]#クソゲー# 思い切ったゲームを作るときに使えます。小説・漫画・アニメなど、サブカルで人気な類の命名で、しかも『 *遺伝子編集* 』というメカニクスを期待させます。効果的なタイトルだと思います。
++
+ちなみに『遺伝子編集』の実装予定はありません。なぜならイカちゃんが主人公ではないから !!
+
+懸念もありますが、『SnowRL』で作ります。
+
+== Systems
+
+色々組みました。 `serde` 経由でデータを流し込めるようになったのが大きいです。
+
+=== Map
+
+==== Follow camera
+
+主人公に追従 (follow) するカメラを実装します。主人公が _deadzone_ の四角形を出たら、主人公が _target_ 四角形に収まるまで、毎フレームカメラ位置を更新します:
+
+[source,rust]
+----
+pub fn update_follow_camera( .. ) {
+    camera.pos += lerp_speed * target_delta_position( .. );
+}
+----
+
+`target_delta_position` に関して等式を立てると、指数関数の微分に近似できました (stem:[\Delta t \rightarrow 0]) 。 *指数関数の tween は、お得に計算できる* んですね。
+
+==== Pixel-perfect shadow
+
+スクロール中の影に、ちらつき・振動が発生しました。修正は:
+
+. カメラ位置は少数以下を切り捨てる (……必要無いかも？)
+. 影サイズを画面サイズ / 4 + 1 にする
+
+影サイズが小さいほど、 (Gaussian) blur の度合いが強くなります。今回は 1/4 に縮小していたのですが、カメラ位置 %4 != 0 のとき、影の 1x1 ピクセルが複数のセルをまたぐ形となっていました。これを修正しました。通じるかな……
+
+video::h8XE-1vEI8w[youtube,width=895,height=431]
+
+==== Z ordering
+
+* レイヤ 0~99 → キャラ → レイヤ 100~ の順で描画します。
++
+→ イカちゃんが天井の上を歩いていた (上動画) のを修正できました。
+
+* キャラを `x 座標 + y 座標 * 10000` を基準にソートします。
++
+→ どせいさんモドキ (仮) がイカちゃんの背後に隠れるようになります。
+
+UI ノードも雑にソートします。
+
+==== Auto scroll for UI
+
+UI レイヤに座標系 (`World`, `Screen`) を設定可能としました。会話 UI は、常に `World` 座標系で描画できます:
+
+.スクロールに UI が自動追従！ (View 行列を適用)
+image::snow/title/talk-small.png[width=328,align="center"]
+
+==== Meta tiles
+
+通行／視界のブロックを、別々のプロパティに分けました。たとえば、畑や切り株は通行のみを遮るのに対して、壁は通行も視界も遮ります:
+
+.通行・可視判定の設定
+image::snow/tiled/tiled-meta-edit.png[]
+
+メタタイルを設置することで、セルの通行・可視を設定しました。メタタイルには、『カスタムプロパティ』を設定します:
+
+.メタタイル
+image::snow/tiled/tiled-meta-tsx.png[height=265px,align="center"]
+
+今回はメタデータをレイヤにしましたが、それぞれのタイルにメタ情報を埋め込むことも可能です。たとえば、壁タイルを通行不能に設定します (ツクール・ウディタ方式) 。
+
+* TODO: 角抜けも設定できた方がいいです。
+* TODO: 2 つの方法のハイブリッドが良いと思います。基本的にはタイル自体にメタ情報を設定し、メタレイヤに書き込みがあれば、優先してそちらの情報を使います。
+
+=== Text
+
+==== Rendering
+
+テキスト表示の基礎について、良い記事がありました:
+
+* https://raphlinus.github.io/text/2020/10/26/text-layout.html[Text layout is a loose hierarchy of segmentation | Raph Levien’s blog] (Oct 26, 2020)
+
+僕のラフな理解では:
+
+* TTF フォントには _glyph_ のデータが入っている。
+* Glyph は _advance width_ という情報を持つ。これは右隣の文字を配置するときの目安であり、 (一部の) 英語や日本語フォントは advance width (と kerning) を元に十分綺麗に描画できる。
+* Glyph を描画するには、 pixel 画像への _rasterizing_ が必要である。
+
+Rasterize の部分は、 SDF font (SDF: signed distance field) に肩代わりしてもらえます:
+
+* https://github.com/libgdx/libgdx/wiki/Distance-field-fonts[Distance field fonts · libgdx/libgdx Wiki]
+* https://qiita.com/suzuna-honda/items/6f98eee62c64c25e63be[Unityで「まとも」なテキスト描画を行いたい - Qiita]
+* https://steamcdn-a.akamaihd.net/apps/valve/2007/SIGGRAPH2007_AlphaTestedMagnification.pdf[Valve の論文 (2007 年)]
+
+SDF なら、任意サイズの文字を描けますし、回転させても綺麗に描けます。 Awesome!　TODO: SDF
+
+===== Crates
+
+* https://github.com/mooman219/fontdue[fontdue]
++
+TTF を (SDF ではなく) ピクセル画像にラスタライズして文字を描くためのライブラリです。僕は fontdue に相当する C ライブラリを使っています。
+
+SDF を使うなら、 https://github.com/redox-os/rusttype[rusttype] や https://github.com/RazrFalcon/rustybuzz[rustybuzz] で文字配置を計算すると良いのでしょうか。よく分かりません。
+
+* https://github.com/servo/font-kit[font-kit]: フォントファイルを探す、読み込む
+* https://github.com/kas-gui/kas-text[kas-text]: リッチテキストのシステム
+
+==== Drop shadow
+
+文字影を付けてみました:
+
+image::snow/title/text-shadow.png[]
+
+文字影 → 文字の順で描画しています。文字に不透明度をつける場合は、 depth buffer を使って文字 → 文字影の順で描画するとか、一工夫必要そうです。
+
+SDF では https://github.com/libgdx/libgdx/wiki/Distance-field-fonts#adding-a-drop-shadow[楽々ドロップシャドウ] できるようです。シェーダで描けるなら、ストレートで良いですね。 GLSL に弱くて、まだコードを読めていませんが……
+
+==== Font faces
+
+太文字 (TODO: 斜体) に対応しました。 Regular / bold / italic フォントは、別々の TTF ファイルに分かれており、使用フォントを切り替えるだけで表示できます:
+
+image::snow/title/text-bold.png[]
+
+文字色もいけます:
+
+image::snow/title/text-bold-red.png[]
+
+このように、スパン `[start, end)` 毎にテキストの表示方法を変えることができます。ゲームテキストを簡易マークアップ言語で書いておき、この仕組みで表示しようと思います。
+
+NOTE: まともなリッチテキストを実装する自信はありません。簡単にします。
+
+=== Asset `serde`
+
+僕の `Asset<T>` は `Arc<Mutex<T>>` の wrapper です。 `serde` は `Rc`, `Arc` の serde に対応していないため、自力で実装します。
+
+重複したオブジェクトを作らないためには、 `deserialize` 中にキャッシュを参照できる必要があります。そのため、 `serde` を使う直前に、一時的にキャッシュへのアクセスを global or thread-local な場所に置きます。
+
+`Deserialize` の実装は以下です:
+
+[source,rust]
+----
+impl<'de, T: AssetItem> Deserialize<'de> for Asset<T> {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: Deserializer<'de>, // <1>
+    {
+        // deserialize as PathBuf
+        let path = <PathBuf as Deserialize>::deserialize(deserializer)
+            .map_err(|e| format!("Unable to load asset as `PathBuf`: {}", e))
+            .unwrap();
+
+        // get access to the asset cache from static variable
+        let state = unsafe {
+            DE_STATE
+                .get_mut()
+                .ok_or_else(|| "Unable to find asset cache")
+                .unwrap() // <2>
+        };
+
+        // retrieve or load asset
+        let item = state
+            .cache
+            .load_sync(AssetKey::new(&path))
+            .map_err(|e| format!("Error while loading asset at `{}`: {}", path.display(), e))
+            .unwrap(); // <2>
+
+        Ok(item)
+    }
+}
+----
+<1>  `deserialize` の返り値は `D::Result` (`D: Deseriliazer`)です。
+<2>  そのため、データフォーマットの `Error` しか返すことができません。ここでは、アセット読み込みの `Result` を `unwrap` しています。 FIXME: 非常にお粗末で危険ですが、どうしましょうか。
+
+=== Type object pattern
+
+ゲームにコンテンツを流し込むとき、 {gp-to} パタンを使用できます。要は、データファイルから直接シリアライズされる型が type object だと思います。 Type object は、外部ファイルで定義して、 `HashMap` に deserialize します:
+
+.actor_images.ron
+[source,rust]
+----
+{
+    // 4 方向画像イカちゃん:
+    "ika-chan": (
+        tex: "ika-chan.png",
+        kind: Dir4,
+    ),
+    // 8 方向画像木星さん (仮):
+    "mokusei-san": (
+        tex: "img/pochi/what.png",
+        kind: Dir8,
+    ),
+}
+----
+
+.actor_types.ron
+[source,rust]
+----
+{
+    // イカちゃんのキャラ情報:
+    "ika-chan": ActorType(
+        img: "ika-chan", // actor_images.ron の "ika-chan" を参照
+        stats: (
+            hp: 200,
+            atk: 50,
+            def: 20,
+        ),
+    ),
+    // 木星さん (仮) のキャラ情報:
+    "mokusei-san": (
+        img: "mokusei-san",
+        stats: (
+            hp: 40,
+            atk: 20,
+            def: 10,
+        ),
+    ),
+}
+----
+
+これで簡単にキャラ配置できます:
+
+.actors.ron
+[source,rust]
+----
+[
+    // イカちゃんを配置:
+    Actor(
+        type: "ika-chan", // actor_types.ron の "ika-chan" を参照
+        pos: (14, 12),
+        dir: S,
+    ),
+    // その他 NPC を配置:
+    // ~~
+]
+----
+
+=== Platform dependency
+
+ウィンドウ表示を `sokol_app.h` から SDL2 に移行しました。いつでも `sokol_app.h` に戻れるように、 `ScreenState` にウィンドウサイズを入れました。これは静的オブジェクトにしても良さそうですね。アンチ Rust っぽいことをしたくなるのはなぜでしょう。
+
+=== Retained-mode rendering
+
+攻撃時に、キャラを前後に動かしたいです。キャラ表示を retained-mode にしました (自前の `ui` モジュールを使います) 。
+
+一応前後動はできますが…… *アニメの拡張性* が無くて検討中です。次回 devlog では、キャラを攻撃できるようにします。
+
+== Fighting the borrow checker
+
+今回は、 *コードの組み立てが完全に軌道に乗った* 回でした。 ECS は使っていません。
+
+=== Non-ECS in Rust
+
+長いですが、経緯をお伝えします。
+
+. Borrow checker と戦う
+
+.. 依存性は引数から受け取る。
++
+OOP では依存性をフィールドに入れがちでした。 Rust でも `Rc<RefCell<T>>` で変数の共有ができます。しかし、 `Rc<RefCell<T>>` はアンチパタンのように見えます。したがって、依存性は毎回メソッドの引数から受け取る形にしました。
+
+.. Public なフィールドを利用する
++
+複数データを束ねた型があるとします。これには賢いメソッドをつけたくなります。しかし、メソッドはコンテナの `&mut` を取ります。したがって、コンテナにメソッドを生やすと、上手く行かない場合が多いです (参照ルールのため、 2 つの `&mut` を取れない) 。
++
+替わりに、フィールド毎に `&mut` を取れる形にします:
++
+[source,rust]
+----
+// フィールドが public なコンテナ
+pub struct World { pub entities: Entities, pub map: GameMap, .. }
+
+// `&mut world.map` と `&mut world.entities` を同時に取ることができる:
+let layer = &mut world.map.layers[0];
+let new_entity_index = world.entities.insert(Entity { .. });
+
+// 一方で、 `World::layer_mut` や `World::add_entity` を生やすと、 `&mut World` を取ってしまう
+----
++
+Public フィールドは代入可能なのが問題ですが……代入しなければ良いと思います？！:
++
+[source,rust]
+----
+// 代入は想定しない:
+world.entities = entities { .. }; // never do this!
+----
++
+代入不能だが可変参照は取れるフィールド、というのがあったら尚良いですね。
+
+. データのネストを浅くする
++
+包含で継承を表現するのは避けました; ネストが深くなってしまいます。たとえば *`Game` 基底クラス相当のものは作れません*。替わりに、ゲームループ用の `Clock` を提供し、ループの組み立てをユーザにやってもらいます。言い換えると、ライブラリを作るに留めて、ユーザにフレームワークを作ってもらうイメージです。
+
+. 『ECS の劣化版』という懸念を払拭する
++
+Rust では、変数共有はアンチパタンと思われます。依存性は引数から渡します。しかし、データのネストが深いと、依存性へのアクセスが面倒です。 `all_game_data.category_1.sub_category_1.field.data[i]` みたいなコードが平然と出て来ます。 ECS なら、自動的に `World` から依存性を引っ張り出してくれるのに！
++
+ゲームデータを https://gist.github.com/toyboot4e/3aa0c3ca19c0ccd7698d3766ef1cce15[リファクタリング] すると、綺麗なコードになりました。ネストは浅めです。複数データを『オブジェクト』にまとめており、周期的な関数呼び出しや、多数データの受け渡しが一括で済ませられます。悪くない！
++
+共有される多くのデータは、『受動的データ』の枠に入りました。 *上手くデータを切り分けることができたら* 、 Rust でも『オブジェクト』の概念は有効だと思いました。 C# で培ったマインドセットを、 Rust でも続投中です。
+
+=== Cheating the borrow checker
+
+Borrow checker は仮説です。『これで良いコードが書けるはず』と信じて、大半のコードを構成できました。しかし、たとえば、リストの要素を変更しながらイテレートしたい。そんなとき、あなたならどうしますか？
+
+これが私のソリューションです:
+
+[source,rust]
+----
+for node in &mut cheat(&self.nodes) {
+    Self::apply_transform_rec(node, &mut self.nodes, None);
+}
+----
+
+_{cheat} は安全です。 {cheat} はあなたのコードに柔軟性を与えます。_
+
+=== Messaging?
+
+僕は `cheat` を使っていますが、人にお勧めできないとは思っています。上の例では、添字を使うなど、泥臭いコードを書けば zero unsafe にできるはずです。
+
+https://github.com/mrDIMAS/StationIapetus[StationIapetus] (FPS ゲーム) では、変更はメッセージ経由で行うようです。変更が必要になったら、 `channel` でメッセージを送信します。メッセージ処理は https://github.com/mrDIMAS/StationIapetus/blob/7a76fc43bbb6cc0866025ff07a46713c2941bc6f/src/level.rs#L1215[ゲームデータのコンテナが行う] ようです。
+
+工夫次第では、メッセージで borrow checker を攻略できるようですね。`channel` の替わりに `VecDeque` を使うことも考えられます。
+
+
+== Misc
+
+=== Graphics
+
+==== TODO: GLSL
+
+https://speckyboy.com/shaders-realistic-special-effects-web-design/[Using Shaders to Create Realistic Special Effects in Web Design]
+
+水滴シェーダとか凄いですね。 *2D ゲームでも演出に使えそう* 。やはりシェーダは書けるようになりたいな〜……
+
+==== AGI
+
+Advanced Global Illumination という本を読みました。最初は表記法に面食らいましたが、立体角を理解していれば読める本だったと思います。先に理論を理解すれば、 top-down でグラフィクスをやれる……のかな？　そもそもやるのかな……？
+
+続く本としては、 https://graphics.stanford.edu/papers/veach_thesis/[Veach's thesis] を読み始めています。本当に読むだけになるかもしれませんが……。 AGI では BSDF もあまり出なかったことですし、実践的な本を読んだ方が効率良さそうですね。
+
+=== `adbook`
+
+自作 SSG ({adbook}) で、ビルドのキャッシュを取るようにしました。劇的な効果がありました。
+
+=== Audio / music programming
+
+オーディオ・インターフェース (https://www.soundhouse.co.jp/products/detail/item/261282[Studio 24c]) を書いました。ヘッドフォンを繋ぐと、微妙な違いが現れた……気がします:
+
+* 音が潰れなくなった
+* シンバルやギターのシャリシャリ音が綺麗になった
+* 多少音量を上げても耳が痛くない
+
+高いオーディオ I/F を試すと、劇的に音が変わるらしく、 https://www.soundhouse.co.jp/en/products/detail/item/205174/[Bavyface Pro] が有名だそうです。欲しいな〜……。
+
+音源のセールについては、 https://twitter.com/superdtmbot?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor[超DTM速報] というのを教えてもらったので、それを見ています。
+
+=== Reference-counted pool
+
+一部で `Handle` を参照カウントするプールを使っています。 `Anim` が終了するまで `Node` を開放しない、というのが主な用途です。
+
+ところが *メモリリークの温床* になりかねないことに気づきました (最初から分かっていたはずだろう！) 。 ImGUI で debug したいところです。
+
+=== Misc misc
+
+==== Compilation time..
+
+https://github.com/not-fl3/miniquad[miniquad] は 10 秒以内でコンパイルできました。憧れますね。
+
+たとえ `miniquad` を使ったとしても、依存性が増えるとコンパイルは遅くなります。多少は https://qiita.com/toyboot4e/items/2acba3d8ea4821bf0736[早くできます] が……
+
+==== std::marker::PhantomData
+
+* https://qnighy.hatenablog.com/entry/2018/01/14/220000[PhantomDataまとめ - 簡潔なQ]
++
+`PhantomData<T>` よりも `PhantomData<fn() pass:[->] T>` の方が無難だそうです。 rust-jp で教えていただきました。
+
+* https://mcarton.github.io/rust-derivative/latest/index.html[derivative]
++
+`_marker: PhantomData<fn() -> T>` をフィールドに入れると、 `\#[derive(..)]` が上手く働かないのですが、このクレートを使えば `PhantomData` を無視して `Debug, Clone, PartialEq, ..` を `#[derivatve(..)]` できます。
+
+==== `mod.rs` vs `moudle_name.rs` (Rust)
+
+僕は未だに `mod.rs` 派だったりします。
+
+==== `imgui-rs`
+
+{imgui-rs} は、 `im_str!` マクロの廃止と https://github.com/ocornut/imgui/issues/2109[docking branch] への対応に向けて開発が進んでいるようです。かなり期待しています。 https://github.com/aclysma/imgui-inspect[imgui-inspect] なんてのもありますし。
+
+{imgui-rs} は、任意の _platform_ と _renderer_ を組み合わせることで開発環境に組み込めるのですが、やり方が分かりづらくて大変でした。そこで、便利クレートを準備中です。生の OpenGL が難しくて、例の用意に時間がかかっています。
+

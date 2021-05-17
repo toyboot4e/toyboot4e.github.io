@@ -1,0 +1,90 @@
+= Camera
+
+== Devlog
+
+=== Learn OpenGL
+
+{learn-gl} を読んでいます。出てきた数学を僕の視点から理解しました。
+
+==== Model, view, projection
+
+[stem]
+++++
+Model:  \mapsto 
+++++
+
+==== LookAt
+
+カメラのモデル行列 (物体をカメラの位置、カメラの向きに変換する行列) は:
+
+[stem]
+++++
+ToCamera :=
+\begin{bmatrix}
+R_x & U_x & Z_x & 0 \\
+R_y & U_y & Z_y & 0 \\
+R_z & U_z & Z_z & 0 \\
+0   & 0   & 0   & 1 \\
+\end{bmatrix}
+
+\begin{bmatrix}
+1 & 0 & 0 & x_{camera} \\
+0 & 1 & 0 & y_{camera} \\
+0 & 0 & 1 & z_{camera} \\
+0 & 0 & 0 & 1 \\
+\end{bmatrix}
+++++
+
+* 左の行列は回転行列です
+* 右の行列は並進行列です
+
+カメラから他の物体を見るには、カメラのモデル行列の逆変換を使います:
+
+[stem]
+++++
+\begin{eqnarray}
+LookAt :&=& ToCamera^{-1} \\
+&=&
+\begin{bmatrix}
+R_x & R_y & R_z & 0 \\
+U_x & U_y & U_z & 0 \\
+D_x & D_y & D_z & 0 \\
+0   & 0   & 0   & 1 \\
+\end{bmatrix}
+
+\begin{bmatrix}
+1 & 0 & 0 & -x_{camera} \\
+0 & 1 & 0 & -y_{camera} \\
+0 & 0 & 1 & -z_{camera} \\
+0 & 0 & 0 & 1 \\
+\end{bmatrix}
+\end{eqnarray}
+++++
+
+* 回転行列の逆変換 (逆行列) は、その転置行列と等しいです:
++
+[stem]
+++++
+\begin{eqnarray}
+\begin{bmatrix}
+    \mathbb{e}_x \\ \mathbb{e}_y \\ \mathbb{e}_y \\
+\end{bmatrix}
+\begin{bmatrix}
+\end{bmatrix}
+&=&
+\mathbb{e}_x \mathbb{e}_x +
+\mathbb{e}_y \mathbb{e}_y +
+\mathbb{e}_z \mathbb{e}_z +
+&=&
+\begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & 1 & 0 \\
+    0 & 0 & 1 \\
+\end{bmatrix}
+\end{eqnarray}
+++++
+
+* 並進行列の逆変換は、逆方向への並進です
+
+回転行列と並進行列は、順序を逆にしても LookAt 行列に変化はありません。
+

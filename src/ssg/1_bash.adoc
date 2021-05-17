@@ -8,7 +8,7 @@ Asciidoctor を使って、本ブログの html を作成しました。また h
 * [.line-through]#https://github.com/toyboot4e/devlog[スクリプト、原稿ファイル]#
 * [.line-through]#https://github.com/toyboot4e/toyboot4e.github.io[生成された html]#
 
-WARNING: すでにブログ生成にこのスクリプトは使っていません。
+WARNING: 既に、この記事のスクリプトはブログ生成に使用していません。ブログの見た目も変化しています。
 
 やり方としては、 https://asciidoctor.org[Asciidoctor] で原稿を html に変換し、 bash でヘッダとフッタを追加します。一人で作業する分には、シンプルで悪くないと思います。
 
@@ -134,7 +134,7 @@ Asciidoctor のツールチェインには、 Ruby で書ける https://github.c
 
 ==== `.adoc` -> `.html` -> `.html`
 
-Asciidoctor で `.adoc` ファイルを変換すると、記事部分だけのシンプルな `.html` が出力されます。それを bash で変換し、 header, footer を追加しました (https://github.com/toyboot4e/devlog/blob/master/_archived/ssg[ソース])。
+Asciidoctor で `.adoc` ファイルを変換すると、記事部分だけのシンプルな `.html` が出力されます。それに bash で header, footer を追加しました (https://github.com/toyboot4e/devlog/blob/master/_archived/ssg[ソース])。
 
 WARNING: ただ、何でも bash でやるのは良くないですね。プログラミング言語を使うか、 html の加工にはテンプレート言語を使った方が良かったと思います。
 

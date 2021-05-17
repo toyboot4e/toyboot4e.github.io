@@ -1,0 +1,131 @@
+= Learning graphics
+:revdate: ?
+:rokol-gl: https://github.com/toyboot4e/rokol_learn_opengl[Rokol Learn OpenGL]
+:vk-guide: https://vkguide.dev/[Vulkan Guide]
+:vk-tut: https://vulkan-tutorial.com/[Vulkan Tutorial]
+:agi: https://www.amazon.co.jp/Advanced-Global-Illumination-Philip-Dutre-dp-1568813074/dp/1568813074/ref=dp_ob_title_bk[Advanced Global Illumination]
+
+:sectnums!:
+== Contents
+
+グラフィクスについての本をいくつか読みました:
+
+. Advanced Global Illumination (物理 + 確率論的数値計算)
+. Ray Tracing in One Weekend Series: いわゆるレイトレ (Rust でやりました)
+. Learn OpenGL: 近似計算 (Rust + Sokol でやりました)
+. Vulkan Guide: おまけ (Zig でやりました)
+
+相変わらず崩壊的な脳みそなので、まともに理解していません。 BRDF から怪しいです。しかし、僕にしてはよくやったじゃないかと思うので、自己満のページを書いていきます。
+
+:sectnums:
+== Learn OpenGL
+
+このページでは {learn-gl} の感想を書きます。 {rokol} でやりました。
+
+=== Chapters
+
+* [x] Ch. 1 Getting started
++
+立方体を出してカメラを動かします。
+* [x] Ch. 2 Ligthing
+* [x] Ch. 3 Model loading
+* [x] Ch. 4 Advanced OpenGL
+* [x] Ch. 5 Advanced lighting
+* [x] Ch. 6 PBR
+
+2D 目的に OpenGL を学ぶなら、適度に順番を入れ替えて読んだ方が良さそうです。
+
+== Advanced Global Illumination (second edition)
+
+Graphics programming の読書会に参加して、グラフィクスの理論的背景を語る本を読みました。実践的な内容は古いのですが、標準的な本らしいです。
+
+理論を学べば、 top-down にグラフィクスをやっていけるのではないか、という期待がありました。立体角を理解していれば大体分かるので、思ったほど無謀な取り組みでもなかったです。
+
+=== Motivation
+
+センサは光エネルギーを感知します。光源から出た光は、任意回の反射を経験してセンサ (目や pixel) に届きます。光源・センサを繋ぐ経路ごとに光を計算することで、センサが感知する光エネルギーを計算できます。
+
+このとき、媒質が真空ならば、光と相互作用しないと考え、 (エネルギー保存則より) センサから逆向きに光を辿ることができます。よって、光源 - 点 - センサのように、経路を 2 つに分解できます。この観点から、センサが受ける光は measurement equation から計算できます。
+
+=== Rendering equation
+
+表面上の点 stem:[x] から方向 stem:[\omega_o] に向かう radiance (surface radiance) stem:[L_0] を考えます。これは、 stem:[x] 自身が (光源の場合) 発する (emissive) 成分 stem:[L_e] と、外部から来た光が点 stem:[x] で反射する (reflectance) 成分 stem:[L_r] に分けることができます:
+
+[stem]
+++++
+\begin{eqnarray}
+L_o(x \rightarrow \omega_o) &=& L_e(x \rightarrow \omega_o) + L_r(x \rightarrow \omega_o)
+\\
+&:=& L_e(x \rightarrow \theta) + (TL)(x \rightarrow \omega_o)
+\end{eqnarray}
+++++
+
+より具体的には:
+
+[stem]
+++++
+\begin{eqnarray}
+L_r(x \rightarrow \omega_o)
+&=& \int_{\Omega} f_r(x, \omega_o \leftarrow \omega_i) L(x \leftarrow \omega_i) cos(N_x, \omega_i) d\sigma(\omega_i)
+\\
+&=& \int_{\Omega} f_r(x, \omega_o \leftarrow \omega_i) dE
+\\
+&=& \int_{\Omega} dL
+\end{eqnarray}
+++++
+
+stem:[f_r := \frac {dL} {dE}] は BRDF (bi-directional reflectance distribution) です。 stem:[dL] が何なのか分かりません。立体角に関する微少量？　に _見える_ のですが、正直厳密なところは分かりません。
+
+stem:[L] と stem:[dE] の関係で cosine 項が出てくるのは _Lambert's cosine law_ という *法則* として知られています。直感的には、微小面 stem:[dA] に入射する光エネルギー stem:[\propto] 入射する光の体積 stem:[\propto dA (cdv cos \theta) \propto cos \theta] です。しかし、厳密な証明だとは思えません。体積の観点から stem:[dE, L] の関係を立式したかったのですが……僕のヘボさでは不可能でした。
+
+NOTE: Exterior products を使って radiance stem:[L] を表現すると、 cosine 項が自明になるらしいですが……？　謎です。
+
+入射光は、別の表面からやってくる光と解釈できます。そのため、立体角の積分を、全表面に関する積分に置き換えることができます。下の図で stem:[r^2 d\sigma = dA cos \theta] です:
+
+image::gfx/sr-dA.png[width=40%,align="center"]
+
+NOTE: これは近似なのですが、微小立体角については正しいと言えるはずです。
+
+よって、反射方程式は:
+
+[stem]
+++++
+\begin{eqnarray}
+L_r(x, \rightarrow \theta) = \int_{S} f_r(x, \theta \leftrightarrow \psi) L(x \leftarrow \psi) cos \omega_i \frac {|cos \omega_i| dA} {|x - r(x, \omega_i)|^2}
+\end{eqnarray}
+++++
+
+=== Measurement equation
+
+光エネルギー保存則より、媒質と光の相互作用が無い (媒質が真空) ならば stem:[L(x \rightarrow \omega) = L(r(x, \omega) \rightarrow - \omega)] 。
+
+Importance
+
+=== Rendering equation (operator formulation)
+
+これで、反射も綺麗に書けました。
+
+=== Ray tracing (path tracing)
+
+Russian roulette というテクニックを使います。
+
+* 反射の計算が無限回になるケースを避ける
+
+==== Stochastic ray tracing
+
+==== Monte Carlo ray tracing
+
+Monte Carlo 法は、収束が遅い計算法なのですが、高次積分に対しては他に有効な計算手法が無いらしく、 ray tracing ではポピュラーな手法となっています。
+
+Importance sampling
+
+== Ray Tracing in One Weekend Serieas
+
+=== Series 1
+
+=== Series 2
+
+=== Series 3
+
+== Vulkan Guide
+

@@ -1,0 +1,13 @@
+(
+    summary: ("", "./summary.adoc"),
+    items: [
+        File("", "./1_batcher.adoc"),
+        File("", "./2_blur.adoc"),
+        File("", "./3_turn_based.adoc"),
+        File("", "./4_fsm.adoc"),
+        File("", "./5_pools.adoc"),
+        File("", "./6_type_objects.adoc"),
+        // File("", "./7_combat.adoc"),
+        // File("", "./crates.adoc"),
+    ],
+)

@@ -1,0 +1,284 @@
+= Turn-based game loop
+:revdate: Jan 1, 2020
+:generator: https://doc.rust-lang.org/beta/unstable-book/language-features/generators.html[generator]
+
+== Summary
+
+=== Turn-based game loop
+
+ターン制を実装しました:
+
+video::HzD-e0Wg0xQ[youtube,width=895,height=431]
+
+今後の開発は、技術よりも創造力の問題になりますね。
+
+== Architecture
+
+ターン制の設計について書いておきます。
+
+=== Overview
+
+このようなデータ配置になりました:
+
+[source,rust]
+----
+/// Snow the roguelike game
+#[derive(Debug)
+pub struct SnowRl {
+    /// 画像、入力、音声
+    wcx: WorldContext,
+    /// マップとキャラ
+    world: World,
+    /// ターン制 (後述)
+    game_loop: GameLoop,
+    /// アニメーション
+    anims: AnimPlayer,
+    /// Tick | Anim
+    state: GameState, // <1>
+}
+
+/// Tick | Anim
+#[derive(Debug)]
+enum GameState {
+    Tick,
+    Anim,
+}
+----
+<1> 状態が増えたら `State` オブジェクトの stack にします。
+
+Borrow rules の影響で、必然的にこうなったと思います。
+
+=== Turn-based game loop
+
+ターン制 `GameLoop` を `tick` すると、ゲームの内部状態が『ワンステップ』進行し、 `TickResult` が返ります:
+
+[source,rust]
+----
+#[derive(Debug)]
+pub enum TickResult {
+    /// キャラの行動順が回ってきた
+    TakeTurn(ActorIndex),
+    /// 新たなコマンドを実行する
+    Command(Rc<dyn Command>),
+    /// コマンドの実行が 1 フレーム以上かかっている (例: プレイヤの行動決定)
+    ProcessingCommand,
+}
+----
+
+`TickResult` を見てゲームを制御します。 `TickResult::Command` が帰ってきたら、行動にアニメを割り当てます:
+
+[source,rust]
+----
+impl SnowRl {
+    fn update_tick(&mut self) -> UpdateResult {
+        loop {
+            let res = self.game_loop.tick(&mut self.world, &mut self.wcx);
+
+            match res {
+                TickResult::TakeTurn(actor) => {
+                    // 次回 `tick` で `actor` の行動が決まる
+                    // 特に何もしない
+                    continue; // <1>
+                }
+                TickResult::Command(cmd) => {
+                    // 次回 `tick` で `cmd` が実行される
+                    // コマンド実行前に、アニメを割り込ませる
+
+                    let mut acx = AnimContext {
+                        world: &mut self.world,
+                        wcx: &mut self.wcx,
+                    };
+
+                    if let Some(anim) = cmd.gen_anim(&mut acx) {
+                        // 割り当てるべきアニメが存在する場合
+                        self.anims.enqueue_boxed(anim); <2>
+                        // アニメの再生状態へ移行
+                        return UpdateResult::SwitchInThisFrame(GameState::Anim);
+                    }
+
+                    continue;
+                }
+                TickResult::ProcessingCommand => {
+                    // 行動処理が 1 フレーム以上かかる場合
+                    // (例: プレイヤーの行動を決める場合)
+                    // 次のフレームまで待つ
+                    return UpdateResult::GotoNextFrame;
+                }
+            }
+        }
+    }
+}
+----
+
+このコードは単純化されています:
+
+<1> ここで無限ループにならないような工夫が可能です; プレイヤの行動時は、フレームカウンタが増えていなければ 1 フレームウェイトを入れます。
+<2> ここで歩行アニメは可能な限り 1 つのアニメとして処理します (キャラが同時に動いているように見せます) 。歩行アニメを再生するのは、別のアニメが `enqueue` されるときか、プレイヤが新たなターン (行動順) を取る場合です。
+
+`GameLoop::tick` は、 unstable Rust の {generator} を使って実装しました。
+
+=== Chain of actions
+
+==== Command = Smaller events
+
+キャラの行動は、イベントをイベントに写す形で処理します。大半の行動は、 `ChangePosition`, `GiveDamage` のような原始的イベントに帰結します:
+
+[source,haskell]
+----
+Walk -> Move // <1>
+     or
+     -> ChangeDirection
+
+-- (予定):
+Attack -> OnAttack -> Dodge (finish)
+                   or
+                   -> Hit -> GiveDamage (finish)
+----
+<1> キャラの歩行すら、 1 つの関数で処理するのではなく、 `Walk -> Move` のような変換を挟みます。
+
+細かいステップ (イベント) に分けるメリットは:
+
+. 処理の共通化が単純になる
+. イベント毎に `GameLoop` が `yield` する (`TickResult` を返して *処理を中断する* ) ため、 *アニメの再生を挟むことができる*
+. イベント毎に複数の handler を割り当てることができる (CoR; chain-of-responsibility pattern)
+
+==== Visualization
+
+今のところ、 `Commnad` (イベント) に直接アニメを生やしています:
+
+[source,rust]
+----
+pub trait Command: fmt::Debug + GenAnim {
+    fn run(&self, ccx: &mut CommandContext) -> CommandResult;
+}
+
+pub trait GenAnim {
+    fn gen_anim(&self, _acx: &mut AnimContext) -> Option<Box<dyn Anim>> {
+        None
+    }
+}
+----
+
+完全な分離を目指すなら、外部からアニメを割り当てます。すると、たとえば、 GUI と TUI で内部データのコードを共有できます。そんな予定はありませんが……。
+
+==== Chain-of-responsibility pattern
+
+複数のイベントハンドラを動的に追加できるようにすれば、ロジックを独立的に追加できます。
+
+例えばの話ですが、《ゾンビ系》のロジックを追加するイメージとしては:
+
+[source,rust]
+----
+pub struct ZombieSystem; // <1>
+
+impl RlSystem for ZombieSystem {
+     fn hook(&mut self, scx: &mut SystemContext) {
+          scx.hook(Self::heal_hook); // <2>
+          scx.hook(Self::death_hook);
+     }
+}
+
+impl ZombieSystem {
+     fn heal_hook(&mut self, scx: &mut SystemContext, cmd: &cmd::Heal) -> SystemResult {
+         if is_zombie(&scx.world.actors[cmd.actor]) {
+             SystemResult::alternate(cmd::GiveDamage {
+                 actor: cmd.actor,
+                 amount: cmd.amount,
+             }) // <3>
+         } else {
+             SystemResult::None // <4>
+         }
+     }
+
+     fn death_hook(&mut self, scx: &mut SystemContext, cmd: &cmd::Death) -> SystemResult {
+         // 死んだら墓オブジェクトを建てる
+     }
+}
+----
+
+<1> `ZombieSystem` は《ゾンビ系》に関するロジックを追加する `RlSystem` (roguelike system) である
+<2> 『回復』イベントに対応したロジックを追加する:
+<3> ゾンビ系に対する『回復』イベントを『ダメージ付与』に派生させる
+<4> ゾンビ系以外には何もしない (『回復』はデフォルトで『回復付与』に派生する)
+
+アニメやロジックはプラグイン的なコードなので、 *ホットリロード* 可能にできたら開発中に便利そうです。
+
+NOTE: これは予定で、今は `Command::run` を直接生やして使っています。
+
+==== CommandResult
+
+`Command::run` の返値でイベントのチェインが可能です:
+
+[source,rust]
+----
+pub enum CommandResult {
+    Chain(Box<dyn Command>),
+    ..
+}
+
+impl CommandResult {
+    pub fn chain<T: Command + 'static>(cmd: T) -> Self { // <1>
+        Self::Chain(Box::new(cmd))
+    }
+}
+----
+
+<1> なぜか https://doc.rust-lang.org/rust-by-example/scope/lifetime/static_lifetime.html['static] が必要でした。
+
+=== Considerations
+
+まだこの設計は未確定です。検討項目を挙げていきます。
+
+==== Need of state machine?
+
+単純な行動のチェインでカバーしにくい例があります:
+
+* プレイヤの行動がターンを消費しない行動に帰結した場合、再びプレイヤのターンを開始する (例: 歩かせようとしたら、向き変更だけで終わった)
++
+=> hack で対応しています。ターンを消費しない行動は、終わり際に `NotConsumeTurn` イベントを発行します。 `NotConsumeTurn` のアクターがプレイヤだった場合は、 `PlayerTurn` をチェインします。また、 1 フレーム待つ `Anim` を入れて、無限ループを防ぎます。
+
+* 複数ターンに渡って行動が変化する場合 (例: ダッシュ中は移動コマンドを自動発行する)
++
+=> `Behavior` オブジェクトを経由して行動を生成すれば良いと思います。 (`RunBehavior` が ON になっていたら移動コマンドが発行される、など) 。
+
+また、 *行動の結果を見て次の行動を決める* 場合は、どうしても generator を使いたくなると思います。やはり、まだまだ修正が必要そうですね。
+
+==== Complete separation?
+
+行動処理に必要な依存性が不明です。たとえば、プレイヤの行動を決定するには、入力を受け取る必要があります。
+
+今のところ、ほぼ全ゲームデータが `Command::run` の引数となっています。大は小を兼ねる？
+
+
+== Misc
+
+=== References
+
+* https://www.youtube.com/watch?v=U03XXzcThGU[IRDC US 2015 - Brian Bucklew, Data-Driven Engines of Qud and Sproggiwood - YouTube]
++
+『行動をイベントのチェインとして扱う』アイデアの元ネタです。プレゼン自体は分かりにくく感じましたが、やっていることが非常に参考になりました。
+
+* https://journal.stuffwithstuff.com/2014/07/15/a-turn-based-game-loop/[A Turn-Based Game Loop – journal.stuffwithstuff.com]
++
+我らが Bob の記事です。 `IEnumerable` (C#) を https://github.com/munificent/amaranth/blob/master/Amaranth.Engine/Classes/Game.cs#L255[ゲームループに使っています] 。 `CommandResult::alternate` みたいな語彙は、彼のコードから頂きました。
+
+=== Theory on graphics?
+
+https://graphics-programming.org/[Graphics Programming] というオンライン・コミュニティで、 Advanced Global Illumination という本の読書会が始まります。内容は大学院レベルの理論で、若干の数学 (微積) と意欲さえあれば、誰でも挑戦可能とされています。一方で、 ray tracing を実践しておいた方が良いとも言われており、なかなかレベルが高そうです。
+
+https://www.realtimerendering.com/raytracing/Ray%20Tracing%20in%20a%20Weekend.pdf[Ray tracing in one weekend] (PDF)
+
+読書会の日程は未定です。内容としては、毎週 50 ページほどの文章を読み、要約を提出したり、議論や質問の機会が得られます。僕はついぞ *理論を修めたことがない* ので、参加してみる予定です。
+
+……着いて行けるかな？　僕のレベルでは、初日から厳しいのですよね。
+
+ひとまず、 https://raytracing.github.io/books/RayTracingInOneWeekend.html[Ray Tracing in One Weekend] を https://github.com/toyboot4e/ray_trace[実践中] です:
+
+image::gfx/ray-1.png[]
+
+=== org-mode
+
+最近は https://orgmode.org/[org-mode] で TODO リストを書いています。タスク管理が続いたのは初めてのことで、 *エディタサポートが無ければ無理だった* と思います。これで計画性を獲得できるのでしょうか？！
+
+`org-mode` で書くのはプレインテキストの markup 言語なのですが、折り畳みやチェックリスト操作のショートカットがあります。習熟する必要も無く使用できてお勧めです。
+

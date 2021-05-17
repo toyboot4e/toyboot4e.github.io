@@ -1,0 +1,146 @@
+= Melee attack
+:revdate: unpublished
+
+== Devlog
+
+非常に順調です……が、困難にも当たりました。 Rust コードのホットリロードを予定していたのですが、依存している C ライブラリがグローバル変数を使用しており、リロードする度に新しいグローバル変数に差し替わってしまいます。しかも、単に以前のグローバル変数をコピーするわけにはいかない (https://github.com/floooh/sokol/issues/91[issue]) ようで、コードのリロードは絶望的な状況です。
+
+=== Melee attack!
+
+攻撃できるようになりました。
+
+=== Runtime inspector
+
+=== How to make a turn-based game
+
+==== Syncing a duplicate world to the source of truth
+
+Discord で流れて来ました: https://www.boxdragon.se/blog/three-worlds[Three-Worlds Theory: Art or Gameplay? Pick Two.]
+
+要約: 内部状態を2つ持っておく。片方は一気に時間を進める。もう片方は演出に使う(変更イベントのキュー／グラフを使って同期する)
+
+http://www.lancarse.co.jp/blog/?p=194[この記事] も似たような内容で、違いとしては、複製を一時的に生成・削除している気がします。
+
+==== Chain of events
+
+僕の現在の実装は、イベントからイベントを派生 (チェイン) させるやり方です。
+
+例: `MeleeAttack` -> `Hit` -> `GiveDamage`
+
+イベントを返す -> 演出を再生 -> 次のイベントをチェイン、という形でターン制を作っています。
+
+=== Note
+
+完全にメモです。
+
+* [x] `AnimSeq` + `AnimGen`
+* [ ] `MeleeAttack`
+** [x] Internals
+** [ ] View (visual/sound effect)
+* [x] Derive macro
+
+** [x] `#[derive(VertexLayout)]`
++
+頂点型のメモリ配置を宣言するメソッドを自動定義
+
+** [x] `#[derive(Inspect)]`
++
+ImGUI の関数呼び出しを自動定義
+
+* [ ] Contents and cutscenes
+** [ ] プラグイン (cdylib) の動的リロード
+** [ ] マップの動的リロード
+
+* [ ] Assets
+** [ ] `scheme:path` 対応
+** [ ] 独自のマップフォーマットを作成
+** [ ] 独自のマップエディタを作成
+
+* [ ] Inventory/equipment
+** [ ] `enum Location { Map(Vec2i), Inventory, Equipment(EquipSlot), Void }`
+** [ ] Entity variants
+
+== Code
+
+=== Retained-mode rendering for actors
+
+今回から、キャラを一般 `Node` として描きます (retained-mode) 。キャラ画像と体力ゲージは、キャラ `Node` からの相対位置で描かれます (transform) 。
+
+==== Attack animation
+
+攻撃アニメ = 前後動 + 命中演出です。順番は:
+
+. キャラが前方に移動する
+. ダメージ値を表示し、 SE を再生する。ただし、その他の処理を止めない (並列、バックグラウンド)
+. キャラが元の位置に移動する
+
+このようなアニメを再生するなら、今後は *複数アニメの逐次／並列実行* が必要です。
+
+==== Use of delay for timeline of animations
+
+アニメのスケジュール法に悩みました。現在は、個々のアニメに *delay* (待機時間) を持たせることで、擬似的にアニメを逐次実行しています:
+
+[source,rust]
+----
+// キャラが前後に移動するアニメを挿入
+anims.insert_seq({ // <1>
+    let (mut seq, mut gen) = (AnimSeq::default(), AnimGen::default());
+    // アニメの builder (AnimGen) を設定:
+    gen.node(&actor.nodes.img)
+        .secs(self.timer.target().as_secs_f32() / 2.0);
+    // キャラを前方に移動
+    seq.append(gen.pos([img_offset, img_offset + dpos]));
+    // 省略: 命中演出 (ダメージ表示などバックグラウンドで表示・再生
+    //                 `seq.duration()` を `delay` 値に使用する)
+    // キャラを後方に移動 (元の位置に戻る)
+    seq.append(gen.pos([img_offset + dpos, img_offset]));
+    seq
+});
+----
+<1> クロージャにすれば `AnimSeq::default()` を省略できます。検討中……
+
+`seq` は前進、後退の 2 アニメで構成されています。 2 つ目のアニメ (後退) は、待機時間の後に再生されます。したがって、 前進 → 後退 の順でアニメが再生されます (前後動) 。
+
+=== Runtime inspector (ImGUI)
+
+==== Procedual macro
+
+==== `#[derive(Inspect)]`
+
+* [ ] Static configuration object?
+* [ ] Debug-only configurations
+* [ ] Type objects
+* [ ] World
+** [ ] Tile map
+** [ ] Actors
+
+=== Misc
+
+* `drain_filter`
+
+== Moving
+
+引っ越しました。これまでは、家賃を削って 50~70 万を稼いできたはず。でも引っ越してみると、相応の犠牲だったなと思います。部屋が広くなっただけで、貴族的生活を謳歌している気分です……笑
+
+=== Better than internet cafe
+
+家が狭かった頃は、わりとネカフェに行きました (節約になってない) 。ネカフェの良さは、テーブルの大きさだったと思います。サイズを測ると、幅 120cm, 奥行き 60cm ほどでした。
+
+同サイズの机を買いました。現在の椅子は https://www.amazon.co.jp/gp/product/B0788L2XRB/ref=ppx_yo_dt_b_asin_title_o08_s00?ie=UTF8&psc=1[GANTZ] です。衣装箪笥がスタンディングデスクになっています。
+
+=== Still on Mac
+
+開発機には MacBook Pro 15.6 を続投しています。以前 mac を買ったのは、最良の自己投資でした。ただ、 3D をやるスペックが無さそうなので、将来的にはハイスペックマシンも欲しいかもです。
+
+=== Guitar
+
+エレキギターを買いました。 PRS Custom 24 SE です。感触がアコースティックギターに近めで、音はエレキっぽいという線で店員さんに選んで頂きました。全く考えてなかったけれど、見た目も格好いいです。
+
+感触と音を両立すると、 12 万円くらいのギターになるそうです。 Custom 24 は割とアコギっぽい方のギターな気がしますが、指練習だけで一生終わる可能性もあるので、それで良いかと考えました。
+
+==== Black history..
+
+ギターを買ったらやろうと思っていました。
+
+曲を作ろうとすれば、録音のために何度も何度も弾き直すことになります。大抵は、リズムがブレブレで録り直し。これでスキルが上がっていくのを感じます。
+

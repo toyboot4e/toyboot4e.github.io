@@ -1,14 +1,49 @@
 = Toy toy beam @ toyboot4e.github.io
+:cr: https://craftinginterpreters.com/contents.html[Crafting Interpreters]
 
 == Welcome!
 
-これは toyboot4e のブログです。 This is a devlog of toyboot4e.
+toyboot4e のブログです。 link:https://github.com/toyboot4e[GitHub account]
 
-link:https://github.com/toyboot4e[GitHub account]
+当サイトは横スクロールします。モバイルからの閲覧は難しいかもしれません。
 
-このサイトは横スクロールします。モバイルからの閲覧は難しいかもしれません。
+=== About
+
+主に Rust を使っています。 PR を出すこともあります (https://github.com/rg3dengine/rg3d/pull/96[1], https://github.com/rg3dengine/rg3d/pull/97[2]) 。
+
+==== ゲーム開発 (Rust)
+
+* https://github.com/toyboot4e/snow2d[snow2d]
++
+制作中の 2D フレームワークです。 SnowRL 専用で、まだ macOS でしかコンパイルできません。
+
+* https://github.com/toyboot4e/snowrl[SnowRL]
++
+制作中のローグライクゲームです。 https://studio.youtube.com/channel/UCqNzSW4mFdpaRFPlU-J4_zA/videos/upload?filter=%5B%5D&sort=%7B%22columnType%22%3A%22date%22%2C%22sortOrder%22%3A%22DESCENDING%22%7D[Youtube] でクリップを公開しています:
+
+video::Q4cyFkutghE[youtube,width="800",height="450"]
+
+見所は……影です！
+
+ここまで 1 年かかりました。画面に三角形を出すところから始め、エンターキーで攻撃できるようになりました。次の 1 年で完成させたいと思います。
+
+==== Qiita
+
+https://qiita.com/toyboot4e/items/aa5b566661e06f0fc5cb[ジョーク記事] や https://qiita.com/toyboot4e/items/e01bf4c291a3f3b0bd89[設定記事] 、 https://qiita.com/toyboot4e/items/ef3a730b482181c018bc[メモ] などを置いています。
+
+==== その他リポジトリ
+
+** {adbook}
++
+本ブログにも使用している SSG です。 `asciidoctor` の出力と handlebars を使っています。動けばヨシ！
+
+** https://github.com/toyboot4e/loxrs[loxrs]
++
+{cr} 前半部を読んで作ったインタープリタです。かなり前に書いたコードなので、色々酷いと思います。
 
 === Neofetch
 
 image::intro/neofetch.png[width=518]
+
+エディタは NeoVim か Evil Emacs です。
 
