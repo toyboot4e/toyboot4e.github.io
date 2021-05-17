@@ -42,8 +42,6 @@
     
 </li><li><a href="/snowrl/6_type_objects.html">Type objects</a>
     
-</li><li><a href="/snowrl/7_combat.html">Combat</a>
-    
 </li></ol></a>
     
 </li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
@@ -311,7 +309,7 @@ pub trait OnSpritePush: Texture2d {
     fn init_quad(&amp;self, builder: &amp;mut impl QuadParamsBuilder);
 
     #[inline]
-    fn push_quad&lt;Q: QuadIter&gt;(&amp;self, draw: &amp;mut DrawApiData&lt;Q&gt;, flips: Flips)
+    fn push_quad&lt;Q: QuadIter&gt;(&amp;self, draw: &amp;mut DrawApiData&lt;Q&gt;, flips: Flips) <i class="conum" data-value="1"></i><b>(1)</b>
     where
         Self: Sized,
     {
@@ -321,12 +319,13 @@ pub trait OnSpritePush: Texture2d {
 }</code></pre>
 </div>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>push_quad</code> のデフォルト実装は、 <code>Builder</code> が作った四辺形をそのまま書き込みます。</p>
-</li>
-</ul>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>push_quad</code> のデフォルト実装は、 <code>Builder</code> が作った四辺形をそのまま書き込みます。</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p><code>NineSliceSprite</code> の場合は、 <code>OnSpritePush::push_quad</code> を実装し、 <code>Builder</code> が作った四辺形を 9 つに分解して書き込みます。</p>
@@ -408,7 +407,7 @@ pub trait OnSpritePush: Texture2d {
 <p>僕は Angband で 2 階に降りられないレベルのプレイヤーです。おそらく、僕が作ろうとしているものは、皆さんが思い浮かべる『ローグライク』ではありません。</p>
 </div>
 <div class="paragraph">
-<p>ローグライクをシステムに使う理由は、戦闘などを含めて <strong>マップ上でゲームが進行する</strong> ためです。その『味』が良いと思っています。手書きの一本道を歩いてもらい、恒久死、迷宮の自動生成などは無しの予定です。</p>
+<p>ローグライクをシステムに使う理由は、戦闘などを含めて <strong>マップ上でゲームが進行する</strong> ためです。その『味』が良いと思っています。ローグライクと言いつつも、マップは手書きの一本道を歩いてもらおうと思います。</p>
 </div>
 </div>
 <div class="sect2">
