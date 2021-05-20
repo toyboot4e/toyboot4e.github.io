@@ -149,16 +149,16 @@
 </div>
 </div>
 <div class="paragraph">
-<p>次回はイカちゃん 🦑 がタコ殴りに遭う絵を撮りたいです！</p>
+<p>次回はイカちゃん 🦑 がタコ殴りに！　遭う、かも</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_no_more_mod_rs">1.2. No more <code>mod.rs</code></h3>
 <div class="paragraph">
-<p>ついに <code>mod.rs</code> を廃止して、 <code>module_name.rs</code> を使い始めました。始めは抵抗感があったのですが、すぐ良さに気づきました。 <strong>コードを読む間、ディレクトリ移動の回数が減りました</strong> 。</p>
+<p><code>mod.rs</code> を廃止して、 <code>module_name.rs</code> を使い始めました。始めは抵抗感があったのですが、すぐ良さに気づきました。 <strong>コードを読む間、ディレクトリ移動の回数が減ります</strong> ね。</p>
 </div>
 <div class="paragraph">
-<p>当時の人は、よくこのクールな方式を思いつきましたね。 Rust で一番好きなところは、式指向とモジュールシステムです。 2 つだった。</p>
+<p>Rust で一番好きなところは、式指向とモジュールシステムです。 2 つだった。当時の人は、よくこのクールな方式を思いつきましたね。</p>
 </div>
 <div class="ulist checklist">
 <ul class="checklist">
@@ -300,13 +300,13 @@ pub struct Vertex {
 <p>！！！！！！？</p>
 </div>
 <div class="paragraph">
-<p>とはいえ、この organization には誰でも気軽に参加できるようです。誰でも rg3d 開発グループの一員となってくれて良い、そんなメッセージを感じて心温まりますね。それが <a href="https://rg3d.rs/">mrDIMAS</a> だ！　彼をサポートしてください。アクティブユーザが数人しかいないエンジンですので、参加者・ユーザがどんどん増えてくれたらと思います。</p>
+<p>とはいえ、この organization には誰でも気軽に参加できるようです。誰でも rg3d 開発グループの一員となってくれて良い、そんなメッセージを感じて心温まりますね。それが <a href="https://rg3d.rs/">mrDIMAS</a> だ！　彼をサポートしてください。また <code>rg3d</code> アクティブユーザが数人しかいないエンジンですので、参加者・ユーザがどんどん増えてくれたらと思います。</p>
 </div>
 <div class="sidebarblock">
 <div class="content">
 <div class="title">Maaaaaaaaaaaaaaaac</div>
 <div class="paragraph">
-<p>ブラウザでも動くようになった <code>rg3d</code> ですが、 <strong>macOS 上では実質動きません</strong> 。 <span class="line-through">そう、僕は <code>rg3d</code> エアプレイなのです</span> mac 上の OpenGL は、パフォーマンスに問題があるようです。現在、 XCode で OpenGL のプロファイルを取る方法を調べていますが、果たして治るかどうか……。修正できない目も大きいです。</p>
+<p>ブラウザでも動くようになった <code>rg3d</code> ですが、 <strong>macOS 上では実質動きません</strong> 。 <span class="line-through">僕は <code>rg3d</code> エアプレイなのです</span> mac 上の OpenGL は、パフォーマンスに問題があるようです。現在、 XCode で OpenGL のプロファイルを取る方法を調べていますが、果たして治るかどうか……。修正できない目も大きいです。</p>
 </div>
 <div class="paragraph">
 <p>SnowRL が完成したら、 Windows を買って <code>rg3d</code> を使ってみたいです。</p>
@@ -320,7 +320,7 @@ pub struct Vertex {
 <p><code>miniquad</code> は爆速コンパイルがウリですので、 <code>syn</code> クレートは入れない方針のようです。なるほど！</p>
 </div>
 <div class="paragraph">
-<p>尖ってますよね。非常に好きです。</p>
+<p>尖ってますよね。好きです。</p>
 </div>
 </div>
 </div>
@@ -336,14 +336,17 @@ pub struct Vertex {
 <div class="sect3">
 <h4 id="_retained_mode_rendering_for_actors">Retained-mode rendering for actors</h4>
 <div class="paragraph">
-<p>今回から、キャラを一般 <code>Node</code> として描きます (retained-mode) 。キャラ画像と体力ゲージは、キャラ <code>Node</code> からの相対位置で描かれます (transform) 。また、 <code>Node</code> のプールを 1 つにして、 <code>Layer</code> を <code>Node</code> のフィールドとしました。</p>
+<p>今回から、キャラを一般 <code>Node</code> として描きます (retained-mode) 。キャラ画像と体力ゲージは、キャラ <code>Node</code> からの相対位置で描かれます (transform) 。また、 <code>Layer</code> を <code>Node</code> のフィールドとし、すべての <code>Node</code> を 1 つの <code>Pool</code> に入れることにしました。</p>
 </div>
 <div class="paragraph">
 <p>今さら？　という感じですよね。大昔の話に思えます。</p>
 </div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_melee_attack_visualized">4.2. Melee attack visualized</h3>
 <div class="sect3">
-<h4 id="_attack_animation">Attack animation</h4>
+<h4 id="_sequantial_animations">Sequantial animations</h4>
 <div class="paragraph">
 <p>攻撃アニメ = 前後動 + 命中演出です。順番は:</p>
 </div>
@@ -365,7 +368,7 @@ pub struct Vertex {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_use_of_delay_for_timeline_of_animations">Use of delay for timeline of animations</h4>
+<h4 id="_use_of_delay">Use of delay</h4>
 <div class="paragraph">
 <p>アニメのスケジュール法に悩みました。現在は、個々のアニメに <strong>delay</strong> (待機時間) を持たせることで、擬似的にアニメを逐次実行しています:</p>
 </div>
@@ -406,7 +409,7 @@ anims.insert_seq({ <i class="conum" data-value="1"></i><b>(1)</b>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_moving">Moving</h2>
+<h2 id="_diary">Diary</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>これはただの日記です。</p>
@@ -443,7 +446,7 @@ anims.insert_seq({ <i class="conum" data-value="1"></i><b>(1)</b>
 <p>数日後、完成した曲を聴き返すと、完全に音が外れていました。コードがメロディと合っていません。音痴なんですよね……</p>
 </div>
 <div class="paragraph">
-<p>ちなみに、一番好きなバンドは Obscura です。ライブも行ったのですよね</p>
+<p>ちなみに、一番好きなバンドは Obscura です。</p>
 </div>
 </div>
 </div>
