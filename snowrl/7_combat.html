@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <title>Melee attack</title>
+    <link rel="icon" href="/theme/favicon.svg"><link rel="stylesheet" href="/theme/css/term.css"><!-- Hide sidebar by default if the window is not so wide -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            if (document.body.clientWidth <= 900) {
+                document.getElementById("nav-btn-click").checked = true;
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <input type="checkbox" id="nav-btn-click" style="display:none;">
+    <div id="header">
+        <div id="nav-btn">
+            <label for="nav-btn-click">
+                <i class="fa fa-list-ul"></i>
+            </label>
+        </div><h1>Melee attack</h1>
+        </div>
+
+    <nav id="sidebar" class="sidebar">
+    <ol><li><a href="/index.html">About</a>
+    
+</li><li><a href="/snowrl/summary.html">SnowRL devlog<ol><li><a href="/snowrl/1_batcher.html">Batcher</a>
+    
+</li><li><a href="/snowrl/2_blur.html">Gaussian blur</a>
+    
+</li><li><a href="/snowrl/3_turn_based.html">Turn-based game loop</a>
+    
+</li><li><a href="/snowrl/4_fsm.html">FSM and state stack</a>
+    
+</li><li><a href="/snowrl/5_pools.html">Pools</a>
+    
+</li><li><a href="/snowrl/6_type_objects.html">Type objects</a>
+    
+</li><li><a href="/snowrl/7_combat.html">Melee attack</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rokol/summary.html">Rokol devlog<ol><li><a href="/rokol/1_texcube.html">Textured cube</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/anf/summary.html">[Archieved] ANF devlog<ol><li><a href="/anf/1_hello.html">Sprite rendering!</a>
+    
+</li><li><a href="/anf/2_gfx.html">Object-oriented rendering API</a>
+    
+</li><li><a href="/anf/3_pong.html">Pong</a>
+    
+</li><li><a href="/anf/4_imgui.html">ImGUI</a>
+    
+</li><li><a href="/anf/5_transform.html">Transform</a>
+    
+</li><li><a href="/anf/6_media.html">Media</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/rl/summary.html">Roguelike algorithms<ol><li><a href="/rl/1_wfc.html">Wave function collapse explained</a>
+    
+</li><li><a href="/rl/2_fov.html">Field of View &amp; Fog of War</a>
+    
+</li><li><a href="/rl/3_blur.html">Gaussian blur for FoV rendering</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/lang/summary.html">Language dev<ol><li><a href="/lang/1_loxrs_treewalk.html">Crafting Interpreters - 1/2</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/ssg/summary.html">SSG Devlog<ol><li><a href="/ssg/1_bash.html">bash + Asciidoctor</a>
+    
+</li><li><a href="/ssg/2_rs.html">Rust + Asciidoctor</a>
+    
+</li><li><a href="/ssg/3_booktune.html">Outline parser for booktune</a>
+    
+</li><li><a href="/ssg/4_adbook.html">adbook</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/note/summary.html">Notes<ol><li><a href="/note/1_cli.html">Great command line tools</a>
+    
+</li><li><a href="/note/2_ui.html">Minimum UI with full features</a>
+    
+</li><li><a href="/note/3_c_libs.html">C libraries and modern C-like langs</a>
+    
+</li><li><a href="/note/4_evil.html">Evil Emacs</a>
+    
+</li></ol></a>
+    
+</li><li><a href="/read/summary.html">Reading<ol><li><a href="/read/1_cli.html">Books about command line</a>
+    
+</li><li><a href="/read/2_write.html">Books about writing</a>
+    
+</li><li><a href="/read/3_langs.html">Books about programming languages</a>
+    
+</li><li><a href="/read/4_theories.html">Books on theories</a>
+    
+</li><li><a href="/read/5_novels.html">Novels</a>
+    
+</li><li><a href="/read/6_game.html">Books about game development</a>
+    
+</li></ol></a>
+    
+</li></ol>
+</nav>
+
+    
+    <div id="dummy-header"></div>
+
+    
+    
+    <div id="adoc-meta">
+        
+        
+        
+        <span id="revdate">May 20, 2021</span>
+    </div>
+    
+
+    <div id="content" class="article">
+        
+        <main>
+            <!-- Asciidoctor output --><div class="sect1">
+<h2 id="_devlog">1. Devlog</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>もう 5 月ですね。お元気にお過ごしでしょうか。</p>
+</div>
+<div class="paragraph">
+<p><strong>……えっ　もう 5 月？</strong></p>
+</div>
+<div class="sect2">
+<h3 id="_melee_attack">1.1. Melee attack!</h3>
+<div class="paragraph">
+<p>攻撃できるようになりました:</p>
+</div>
+<div class="videoblock">
+<div class="content">
+<iframe width="800" height="450" src="https://www.youtube.com/embed/Q4cyFkutghE?rel=0" frameborder="0" allowfullscreen></iframe>
+</div>
+</div>
+<div class="paragraph">
+<p>次回はイカちゃん 🦑 がタコ殴りに遭う絵を撮りたいです！</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_no_more_mod_rs">1.2. No more <code>mod.rs</code></h3>
+<div class="paragraph">
+<p>ついに <code>mod.rs</code> を廃止して、 <code>module_name.rs</code> を使い始めました。始めは抵抗感があったのですが、すぐ良さに気づきました。 <strong>コードを読む間、ディレクトリ移動の回数が減りました</strong> 。</p>
+</div>
+<div class="paragraph">
+<p>当時の人は、よくこのクールな方式を思いつきましたね。 Rust で一番好きなところは、式指向とモジュールシステムです。 2 つだった。</p>
+</div>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p><i class="fa fa-square-o"></i> 当時の <a href="https://github.com/rust-lang/rfcs/pull/2126">RFC</a> を読む。</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> RFC 以前の議論を遡る。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_architecture">2. Architecture</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_how_to_make_a_turn_based_game">2.1. How to make a turn-based game</h3>
+<div class="sect3">
+<h4 id="_chain_of_events">Chain of events</h4>
+<div class="paragraph">
+<p>僕の現在の実装は、イベントからイベントを派生 (チェイン) させるやり方です。</p>
+</div>
+<div class="paragraph">
+<p>例: <code>MeleeAttack</code> &#8594; <code>Hit</code> &#8594; <code>GiveDamage</code></p>
+</div>
+<div class="paragraph">
+<p>イベントを返す &#8594; 演出を再生 &#8594; 次のイベントをチェイン、という形で GUI 付きターン制を作っています。副次的なメリットとしては、イベントハンドラを <a href="https://en.wikipedia.org/wiki/Chain-of-responsibility_pattern">CoR</a> で (ハンドラの stack で) オーバーライド可能です。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_syncing_a_duplicate_world_to_the_source_of_truth">Syncing a duplicate world to the source of truth</h4>
+<div class="paragraph">
+<p>Discord で流れて来ました: <a href="https://www.boxdragon.se/blog/three-worlds">Three-Worlds Theory: Art or Gameplay? Pick Two.</a></p>
+</div>
+<div class="paragraph">
+<p>要約: 内部状態を2つ持っておく。片方は一気に時間を進める。もう片方は演出に使う(変更イベントのキュー／グラフを使って同期する)</p>
+</div>
+<div class="paragraph">
+<p><a href="http://www.lancarse.co.jp/blog/?p=194">この記事</a> も似たような内容で、違いとしては、複製を一時的に生成・削除している気がします。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_hot_reloading_rust_code_and_c_code">2.2. Hot reloading Rust code and C code</h3>
+<div class="paragraph">
+<p>以前、 macOS でも <code>cdylib</code> のホットリロードができる <a href="https://github.com/toyboot4e/hot_crate">hot_crate</a> を用意しました。いざ使用してみると、 <strong>C ライブラリのホットリロードで詰まりました</strong> 。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/floooh/sokol">sokol</a> はグローバル変数を使用しています。 dylib をリロードすると、新たなグローバル変数が確保されて、そちらが使われてしまいます (たぶん) 。新しいグローバル変数を古いグローバル変数で上書きできれば良い (と思う) のですが、何やらうまくいかないようです (<a href="https://github.com/floooh/sokol/issues/91">#91</a>) 。</p>
+</div>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p><i class="fa fa-square-o"></i> #91 を読む</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_custom_derive_macros">3. Custom derive macros</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Derive マクロに入門し、 Qiita に <a href="https://qiita.com/toyboot4e/items/ef3a730b482181c018bc">メモ</a> を出しました。 Procedual macro は declartive macro (<code>macro_rules!</code>) よりも簡単ですね。</p>
+</div>
+<div class="paragraph">
+<p>Qiita 記事はメモなので、何を言っているのか分からないかもしれません。 <strong>以下もメモであることをご了承ください</strong> 。</p>
+</div>
+<div class="sect2">
+<h3 id="_derivevertexlayout_code">3.1. <code>#[derive(VertexLayout)]</code> (<a href="https://github.com/toyboot4e/rokol/blob/master/rokol_derive/src/layout.rs">code</a>)</h3>
+<div class="paragraph">
+<p>OpenGL の vertex attribute に相当する設定を返します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">#[derive(VertexLayout)]
+#[repr(C)]
+pub struct Vertex {
+    pub pos: [f32; 2],
+    pub color: [u8; 4],
+    pub uv: [f32; 2],
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>マクロは以下のコードを展開します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">impl Vertex {
+    pub fn layout() -&gt; rokol::gfx::LayoutDesc {
+        let mut desc = rokol::gfx::LayoutDesc::default();
+        desc.attrs[0].format = rokol::gfx::VertexFormat::Float2; <i class="conum" data-value="1"></i><b>(1)</b>
+        desc.attrs[1].format = rokol::gfx::VertexFormat::UByte4N;
+        desc.attrs[2].format = rokol::gfx::VertexFormat::Float2;
+        desc
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>OpenGL の wrapper を使っているので、シンプルなコードに展開します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>proc-macro 内では、フィールドの型を得ることはできませんが、型のトークン列を得ることができます。そこで、 <code>[f32; 2]</code> のような特定の型のみをサポートしました。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_deriveinspect_wip_code">3.2. <code>#[derive(Inspect)]</code> (WIP <a href="https://github.com/toyboot4e/snow2d/blob/main/snow2d_derive/src/inspect.rs">code</a>)</h3>
+<div class="paragraph">
+<p>ImGUI の runtime inspector をマクロで生成しました:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/static/img/snow/misc/inspector.png" alt="inspector">
+</div>
+</div>
+<div class="paragraph">
+<p>困るのが、 <code>DerefMut&lt;T: Inspect&gt;</code> は <code>Inspect</code> を実装していないことです。また、外部クレートの <code>enum</code> に対して効率的に <code>Inspect</code> を実装する方法も考えています。 <code>macro_rules!</code> から逃げて、関数風の proc macro に入門するかもしれません。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_derivevisit_96_98">3.3. <code>#[derive(Visit)]</code> (<a href="https://github.com/rg3dengine/rg3d/pull/96">#96</a>, <a href="https://github.com/rg3dengine/rg3d/pull/98">#98</a>)</h3>
+<div class="paragraph">
+<p><a href="https://github.com/rg3dengine/rg3d">rg3d</a> は、 <code>serde</code> の代わりに独自の <code>trait Visit</code> を使っています。 <code>Visit</code> の実装が手動だったので、マクロを作って PR を出したところ、無事マージされました。僕も良い訓練になって win-win です。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/rg3dengine/rg3d/tree/master/rg3d-core-derive">rg3d-core-derive</a> はワシが育てた……というのは冗談ですが、間違っていません。そのおかげか、 rg3d の <a href="https://github.com/rg3dengine">GitHub organization</a> に招待されました。</p>
+</div>
+<div class="paragraph">
+<p>！！！！！！？</p>
+</div>
+<div class="paragraph">
+<p>とはいえ、この organization には誰でも気軽に参加できるようです。誰でも rg3d 開発グループの一員となってくれて良い、そんなメッセージを感じて心温まりますね。それが <a href="https://rg3d.rs/">mrDIMAS</a> だ！　彼をサポートしてください。アクティブユーザが数人しかいないエンジンですので、参加者・ユーザがどんどん増えてくれたらと思います。</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Maaaaaaaaaaaaaaaac</div>
+<div class="paragraph">
+<p>ブラウザでも動くようになった <code>rg3d</code> ですが、 <strong>macOS 上では実質動きません</strong> 。 <span class="line-through">そう、僕は <code>rg3d</code> エアプレイなのです</span> mac 上の OpenGL は、パフォーマンスに問題があるようです。現在、 XCode で OpenGL のプロファイルを取る方法を調べていますが、果たして治るかどうか……。修正できない目も大きいです。</p>
+</div>
+<div class="paragraph">
+<p>SnowRL が完成したら、 Windows を買って <code>rg3d</code> を使ってみたいです。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_derivevertexlayout_for_miniquad_203">3.4. <code>#[derive(VertexLayout)]</code> for miniquad (<a href="https://github.com/not-fl3/miniquad/pull/203">#203</a>)</h3>
+<div class="paragraph">
+<p><code>miniquad</code> は爆速コンパイルがウリですので、 <code>syn</code> クレートは入れない方針のようです。なるほど！</p>
+</div>
+<div class="paragraph">
+<p>尖ってますよね。非常に好きです。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_code">4. Code</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>そういえば、諸事情から 2D フレームワークを <a href="https://github.com/toyboot4e/snow2d">公開しました</a> 。</p>
+</div>
+<div class="sect2">
+<h3 id="_improvements">4.1. Improvements</h3>
+<div class="sect3">
+<h4 id="_retained_mode_rendering_for_actors">Retained-mode rendering for actors</h4>
+<div class="paragraph">
+<p>今回から、キャラを一般 <code>Node</code> として描きます (retained-mode) 。キャラ画像と体力ゲージは、キャラ <code>Node</code> からの相対位置で描かれます (transform) 。また、 <code>Node</code> のプールを 1 つにして、 <code>Layer</code> を <code>Node</code> のフィールドとしました。</p>
+</div>
+<div class="paragraph">
+<p>今さら？　という感じですよね。大昔の話に思えます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_attack_animation">Attack animation</h4>
+<div class="paragraph">
+<p>攻撃アニメ = 前後動 + 命中演出です。順番は:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>キャラが前方に移動する</p>
+</li>
+<li>
+<p>ダメージ値を表示し、 SE を再生する。ただし、その他の処理を止めない (並列、バックグラウンド)</p>
+</li>
+<li>
+<p>キャラが元の位置に移動する</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>このようなアニメを再生するなら、今後は <strong>複数アニメの逐次／並列実行</strong> が必要です。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_use_of_delay_for_timeline_of_animations">Use of delay for timeline of animations</h4>
+<div class="paragraph">
+<p>アニメのスケジュール法に悩みました。現在は、個々のアニメに <strong>delay</strong> (待機時間) を持たせることで、擬似的にアニメを逐次実行しています:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-rust" data-lang="rust">// キャラが前後に移動するアニメを挿入
+anims.insert_seq({ <i class="conum" data-value="1"></i><b>(1)</b>
+    let (mut seq, mut gen) = (AnimSeq::default(), AnimGen::default());
+    // アニメの builder (AnimGen) を設定:
+    gen.node(&amp;actor.nodes.img)
+        .secs(self.timer.target().as_secs_f32() / 2.0);
+    // キャラを前方に移動
+    seq.append(gen.pos([img_offset, img_offset + dpos]));
+    // 省略: 命中演出 (ダメージ表示などバックグラウンドで表示・再生
+    //                 `seq.duration()` を `delay` 値に使用する)
+    // キャラを後方に移動 (元の位置に戻る)
+    seq.append(gen.pos([img_offset + dpos, img_offset]));
+    seq
+});</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>クロージャにすれば <code>AnimSeq::default()</code> を省略できます。検討中……</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>seq</code> は前進、後退の 2 アニメで構成されています。 2 つ目のアニメ (後退) は、待機時間の後に再生されます。したがって、 前進 → 後退 の順でアニメが再生されます (前後動) 。</p>
+</div>
+<div class="paragraph">
+<p>冴えないですが、これで演出をハードコーディングします。次回は、スクリプト部分 (キャラの会話など) に取り組んで行く予定です。ホットリロードができなかったので、 GameLisp か自前の AST を試します。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_moving">Moving</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>これはただの日記です。</p>
+</div>
+<div class="paragraph">
+<p>引っ越しました。これまでは、家賃を削って 50~70 万を稼いできたはずです。しかし、引っ越し終わると、相応の犠牲だったなと思います。部屋が広くなっただけで、貴族的生活を謳歌している気分です……笑</p>
+</div>
+<div class="sect2">
+<h3 id="_better_than_internet_cafe">Better than internet cafe</h3>
+<div class="paragraph">
+<p>家が狭かった頃は、わりとネカフェに行きました (節約になってない) 。ネカフェの良さは、テーブルの大きさだったと思います。サイズを測ると、幅 120cm, 奥行き 60cm ほどでした。</p>
+</div>
+<div class="paragraph">
+<p>同サイズの机を買いました。現在の椅子は <a href="https://www.amazon.co.jp/gp/product/B0788L2XRB/ref=ppx_yo_dt_b_asin_title_o08_s00?ie=UTF8&amp;psc=1">GANTZ</a> です。また、衣装箪笥がスタンディングデスクになっています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_guitar">Guitar</h3>
+<div class="paragraph">
+<p>エレキギターを買いました。 PRS Custom 24 SE です。感触がアコースティックギターに近めで、音は若干エレキっぽいという線で店員さんに選んで頂きました。全く考えてなかったけれど、見た目も格好いいです。</p>
+</div>
+<div class="paragraph">
+<p>約 9 万円でした。激しめの音とアコギのフレットを両立するには、 12 万円以上が必要となるそうです。</p>
+</div>
+<div class="sect3">
+<h4 id="_black_history">Black history..</h4>
+<div class="paragraph">
+<p>ギターを買ったら、ボーカロイドをやろうと思っていました。やりました。初音ミクさん (トライアル版) が歌ってくれました。</p>
+</div>
+<div class="paragraph">
+<p>僕はメタルが好きなのですが、弾けるのは 130 BPM の 16 分音符がせいぜいです。ブレブレのリズムを嘆きながら、ありがちなロックを組みました。</p>
+</div>
+<div class="paragraph">
+<p>数日後、完成した曲を聴き返すと、完全に音が外れていました。コードがメロディと合っていません。音痴なんですよね……</p>
+</div>
+<div class="paragraph">
+<p>ちなみに、一番好きなバンドは Obscura です。ライブも行ったのですよね</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+    </div>
+
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            messageStyle: "none",
+            tex2jax: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]],
+                ignoreClass: "nostem|nolatexmath"
+            },
+            asciimath2jax: {
+                delimiters: [["\\$", "\\$"]],
+                ignoreClass: "nostem|noasciimath"
+            },
+            TeX: { equationNumbers: { autoNumber: "none" } }
+        })
+        MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+            MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+                if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+                    data.math.root.display = "block"
+                }
+                return data
+            })
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+    <!-- Prism.js -->
+    
+    <script src="/theme/js/prism.js"></script>
+    
+</body>
+
+</html>
