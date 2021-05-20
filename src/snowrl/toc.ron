@@ -7,7 +7,6 @@
         File("", "./4_fsm.adoc"),
         File("", "./5_pools.adoc"),
         File("", "./6_type_objects.adoc"),
-        // File("", "./7_combat.adoc"),
-        // File("", "./crates.adoc"),
+        File("", "./7_combat.adoc"),
     ],
 )

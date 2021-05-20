@@ -1,17 +1,40 @@
 = Melee attack
-:revdate: unpublished
+:revdate: May 20, 2021
 
 == Devlog
 
-非常に順調です……が、困難にも当たりました。 Rust コードのホットリロードを予定していたのですが、依存している C ライブラリがグローバル変数を使用しており、リロードする度に新しいグローバル変数に差し替わってしまいます。しかも、単に以前のグローバル変数をコピーするわけにはいかない (https://github.com/floooh/sokol/issues/91[issue]) ようで、コードのリロードは絶望的な状況です。
+もう 5 月ですね。お元気にお過ごしでしょうか。
+
+*……えっ　もう 5 月？*
 
 === Melee attack!
 
-攻撃できるようになりました。
+攻撃できるようになりました:
 
-=== Runtime inspector
+video::Q4cyFkutghE[youtube,width="800",height="450"]
+
+次回はイカちゃん 🦑 がタコ殴りに遭う絵を撮りたいです！
+
+=== No more `mod.rs`
+
+ついに `mod.rs` を廃止して、 `module_name.rs` を使い始めました。始めは抵抗感があったのですが、すぐ良さに気づきました。 *コードを読む間、ディレクトリ移動の回数が減りました* 。
+
+当時の人は、よくこのクールな方式を思いつきましたね。 Rust で一番好きなところは、式指向とモジュールシステムです。 2 つだった。
+
+* [ ] 当時の https://github.com/rust-lang/rfcs/pull/2126[RFC] を読む。
+* [ ] RFC 以前の議論を遡る。
+
+== Architecture
 
 === How to make a turn-based game
+
+==== Chain of events
+
+僕の現在の実装は、イベントからイベントを派生 (チェイン) させるやり方です。
+
+例: `MeleeAttack` -> `Hit` -> `GiveDamage`
+
+イベントを返す -> 演出を再生 -> 次のイベントをチェイン、という形で GUI 付きターン制を作っています。副次的なメリットとしては、イベントハンドラを https://en.wikipedia.org/wiki/Chain-of-responsibility_pattern[CoR] で (ハンドラの stack で) オーバーライド可能です。
 
 ==== Syncing a duplicate world to the source of truth
 
@@ -21,50 +44,96 @@ Discord で流れて来ました: https://www.boxdragon.se/blog/three-worlds[Thr
 
 http://www.lancarse.co.jp/blog/?p=194[この記事] も似たような内容で、違いとしては、複製を一時的に生成・削除している気がします。
 
-==== Chain of events
+=== Hot reloading Rust code and C code
 
-僕の現在の実装は、イベントからイベントを派生 (チェイン) させるやり方です。
+以前、 macOS でも `cdylib` のホットリロードができる https://github.com/toyboot4e/hot_crate[hot_crate] を用意しました。いざ使用してみると、 *C ライブラリのホットリロードで詰まりました* 。
 
-例: `MeleeAttack` -> `Hit` -> `GiveDamage`
+https://github.com/floooh/sokol[sokol] はグローバル変数を使用しています。 dylib をリロードすると、新たなグローバル変数が確保されて、そちらが使われてしまいます (たぶん) 。新しいグローバル変数を古いグローバル変数で上書きできれば良い (と思う) のですが、何やらうまくいかないようです (https://github.com/floooh/sokol/issues/91[#91]) 。
 
-イベントを返す -> 演出を再生 -> 次のイベントをチェイン、という形でターン制を作っています。
+* [ ] #91 を読む
 
-=== Note
+== Custom derive macros
 
-完全にメモです。
+Derive マクロに入門し、 Qiita に https://qiita.com/toyboot4e/items/ef3a730b482181c018bc[メモ] を出しました。 Procedual macro は declartive macro (`macro_rules!`) よりも簡単ですね。
 
-* [x] `AnimSeq` + `AnimGen`
-* [ ] `MeleeAttack`
-** [x] Internals
-** [ ] View (visual/sound effect)
-* [x] Derive macro
+Qiita 記事はメモなので、何を言っているのか分からないかもしれません。 *以下もメモであることをご了承ください* 。
 
-** [x] `#[derive(VertexLayout)]`
-+
-頂点型のメモリ配置を宣言するメソッドを自動定義
+=== `#[derive(VertexLayout)]` (https://github.com/toyboot4e/rokol/blob/master/rokol_derive/src/layout.rs[code])
 
-** [x] `#[derive(Inspect)]`
-+
-ImGUI の関数呼び出しを自動定義
+OpenGL の vertex attribute に相当する設定を返します:
 
-* [ ] Contents and cutscenes
-** [ ] プラグイン (cdylib) の動的リロード
-** [ ] マップの動的リロード
+[source,rust]
+----
+#[derive(VertexLayout)]
+#[repr(C)]
+pub struct Vertex {
+    pub pos: [f32; 2],
+    pub color: [u8; 4],
+    pub uv: [f32; 2],
+}
+----
 
-* [ ] Assets
-** [ ] `scheme:path` 対応
-** [ ] 独自のマップフォーマットを作成
-** [ ] 独自のマップエディタを作成
+マクロは以下のコードを展開します:
 
-* [ ] Inventory/equipment
-** [ ] `enum Location { Map(Vec2i), Inventory, Equipment(EquipSlot), Void }`
-** [ ] Entity variants
+[source,rust]
+----
+impl Vertex {
+    pub fn layout() -> rokol::gfx::LayoutDesc {
+        let mut desc = rokol::gfx::LayoutDesc::default();
+        desc.attrs[0].format = rokol::gfx::VertexFormat::Float2; // <1>
+        desc.attrs[1].format = rokol::gfx::VertexFormat::UByte4N;
+        desc.attrs[2].format = rokol::gfx::VertexFormat::Float2;
+        desc
+    }
+}
+----
+<1> OpenGL の wrapper を使っているので、シンプルなコードに展開します。
+
+proc-macro 内では、フィールドの型を得ることはできませんが、型のトークン列を得ることができます。そこで、 `[f32; 2]` のような特定の型のみをサポートしました。
+
+=== `#[derive(Inspect)]` (WIP https://github.com/toyboot4e/snow2d/blob/main/snow2d_derive/src/inspect.rs[code])
+
+ImGUI の runtime inspector をマクロで生成しました:
+
+image::snow/misc/inspector.png[]
+
+困るのが、 `DerefMut<T: Inspect>` は `Inspect` を実装していないことです。また、外部クレートの `enum` に対して効率的に `Inspect` を実装する方法も考えています。 `macro_rules!` から逃げて、関数風の proc macro に入門するかもしれません。
+
+=== `#[derive(Visit)]` (https://github.com/rg3dengine/rg3d/pull/96[#96], https://github.com/rg3dengine/rg3d/pull/98[#98])
+
+{rg3d} は、 `serde` の代わりに独自の `trait Visit` を使っています。 `Visit` の実装が手動だったので、マクロを作って PR を出したところ、無事マージされました。僕も良い訓練になって win-win です。
+
+https://github.com/rg3dengine/rg3d/tree/master/rg3d-core-derive[rg3d-core-derive] はワシが育てた……というのは冗談ですが、間違っていません。そのおかげか、 rg3d の https://github.com/rg3dengine[GitHub organization] に招待されました。
+
+！！！！！！？
+
+とはいえ、この organization には誰でも気軽に参加できるようです。誰でも rg3d 開発グループの一員となってくれて良い、そんなメッセージを感じて心温まりますね。それが https://rg3d.rs/[mrDIMAS] だ！　彼をサポートしてください。アクティブユーザが数人しかいないエンジンですので、参加者・ユーザがどんどん増えてくれたらと思います。
+
+.Maaaaaaaaaaaaaaaac
+[sidebar]
+--
+ブラウザでも動くようになった `rg3d` ですが、 *macOS 上では実質動きません* 。 [.line-through]#そう、僕は `rg3d` エアプレイなのです# mac 上の OpenGL は、パフォーマンスに問題があるようです。現在、 XCode で OpenGL のプロファイルを取る方法を調べていますが、果たして治るかどうか……。修正できない目も大きいです。
+
+SnowRL が完成したら、 Windows を買って `rg3d` を使ってみたいです。
+--
+
+=== `#[derive(VertexLayout)]` for miniquad (https://github.com/not-fl3/miniquad/pull/203[#203])
+
+`miniquad` は爆速コンパイルがウリですので、 `syn` クレートは入れない方針のようです。なるほど！
+
+尖ってますよね。非常に好きです。
 
 == Code
 
-=== Retained-mode rendering for actors
+そういえば、諸事情から 2D フレームワークを https://github.com/toyboot4e/snow2d[公開しました] 。
 
-今回から、キャラを一般 `Node` として描きます (retained-mode) 。キャラ画像と体力ゲージは、キャラ `Node` からの相対位置で描かれます (transform) 。
+=== Improvements
+
+==== Retained-mode rendering for actors
+
+今回から、キャラを一般 `Node` として描きます (retained-mode) 。キャラ画像と体力ゲージは、キャラ `Node` からの相対位置で描かれます (transform) 。また、 `Node` のプールを 1 つにして、 `Layer` を `Node` のフィールドとしました。
+
+今さら？　という感じですよね。大昔の話に思えます。
 
 ==== Attack animation
 
@@ -101,46 +170,34 @@ anims.insert_seq({ // <1>
 
 `seq` は前進、後退の 2 アニメで構成されています。 2 つ目のアニメ (後退) は、待機時間の後に再生されます。したがって、 前進 → 後退 の順でアニメが再生されます (前後動) 。
 
-=== Runtime inspector (ImGUI)
+冴えないですが、これで演出をハードコーディングします。次回は、スクリプト部分 (キャラの会話など) に取り組んで行く予定です。ホットリロードができなかったので、 GameLisp か自前の AST を試します。
 
-==== Procedual macro
-
-==== `#[derive(Inspect)]`
-
-* [ ] Static configuration object?
-* [ ] Debug-only configurations
-* [ ] Type objects
-* [ ] World
-** [ ] Tile map
-** [ ] Actors
-
-=== Misc
-
-* `drain_filter`
-
+:!sectnums:
 == Moving
 
-引っ越しました。これまでは、家賃を削って 50~70 万を稼いできたはず。でも引っ越してみると、相応の犠牲だったなと思います。部屋が広くなっただけで、貴族的生活を謳歌している気分です……笑
+これはただの日記です。
+
+引っ越しました。これまでは、家賃を削って 50~70 万を稼いできたはずです。しかし、引っ越し終わると、相応の犠牲だったなと思います。部屋が広くなっただけで、貴族的生活を謳歌している気分です……笑
 
 === Better than internet cafe
 
 家が狭かった頃は、わりとネカフェに行きました (節約になってない) 。ネカフェの良さは、テーブルの大きさだったと思います。サイズを測ると、幅 120cm, 奥行き 60cm ほどでした。
 
-同サイズの机を買いました。現在の椅子は https://www.amazon.co.jp/gp/product/B0788L2XRB/ref=ppx_yo_dt_b_asin_title_o08_s00?ie=UTF8&psc=1[GANTZ] です。衣装箪笥がスタンディングデスクになっています。
-
-=== Still on Mac
-
-開発機には MacBook Pro 15.6 を続投しています。以前 mac を買ったのは、最良の自己投資でした。ただ、 3D をやるスペックが無さそうなので、将来的にはハイスペックマシンも欲しいかもです。
+同サイズの机を買いました。現在の椅子は https://www.amazon.co.jp/gp/product/B0788L2XRB/ref=ppx_yo_dt_b_asin_title_o08_s00?ie=UTF8&psc=1[GANTZ] です。また、衣装箪笥がスタンディングデスクになっています。
 
 === Guitar
 
-エレキギターを買いました。 PRS Custom 24 SE です。感触がアコースティックギターに近めで、音はエレキっぽいという線で店員さんに選んで頂きました。全く考えてなかったけれど、見た目も格好いいです。
+エレキギターを買いました。 PRS Custom 24 SE です。感触がアコースティックギターに近めで、音は若干エレキっぽいという線で店員さんに選んで頂きました。全く考えてなかったけれど、見た目も格好いいです。
 
-感触と音を両立すると、 12 万円くらいのギターになるそうです。 Custom 24 は割とアコギっぽい方のギターな気がしますが、指練習だけで一生終わる可能性もあるので、それで良いかと考えました。
+約 9 万円でした。激しめの音とアコギのフレットを両立するには、 12 万円以上が必要となるそうです。
 
 ==== Black history..
 
-ギターを買ったらやろうと思っていました。
+ギターを買ったら、ボーカロイドをやろうと思っていました。やりました。初音ミクさん (トライアル版) が歌ってくれました。
 
-曲を作ろうとすれば、録音のために何度も何度も弾き直すことになります。大抵は、リズムがブレブレで録り直し。これでスキルが上がっていくのを感じます。
+僕はメタルが好きなのですが、弾けるのは 130 BPM の 16 分音符がせいぜいです。ブレブレのリズムを嘆きながら、ありがちなロックを組みました。
+
+数日後、完成した曲を聴き返すと、完全に音が外れていました。コードがメロディと合っていません。音痴なんですよね……
+
+ちなみに、一番好きなバンドは Obscura です。ライブも行ったのですよね
 

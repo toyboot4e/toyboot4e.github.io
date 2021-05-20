@@ -75,6 +75,8 @@
             "tiled=https://www.mapeditor.org/[Tiled]",
             "elona=http://ylvania.org/jp/elona[Elona]",
             "bob=http://stuffwithstuff.com/[Robert Nystrom]",
+
+            "rg3d=https://github.com/rg3dengine/rg3d[rg3d]",
         ]),
     ]
 )

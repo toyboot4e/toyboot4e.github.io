@@ -1,7 +1,0 @@
-= Source reading
-
-== Log
-
-https://www.lambdanote.com/collections/n[n月刊ラムダノート] のゲームプログラミング編があればな〜と思いながらブログ記事を漁っています。『ECS 編』を妄想して色々読みました。
-
-

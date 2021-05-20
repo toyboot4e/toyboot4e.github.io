@@ -6,7 +6,6 @@
 :gp-to: https://gameprogrammingpatterns.com/type-object.html[Type Object]
 :amaranth: https://github.com/munificent/amaranth[Amaranth]
 :hauberk: https://github.com/munificent/hauberk[Hauberk]
-:rg3d: https://github.com/mrDIMAS/rg3d[rg3d]
 :cheat: https://gist.github.com/toyboot4e/1b56499999ff6c3b6d4f358d3c62af6c[cheat]
 :imgui-rs: https://github.com/imgui-rs/imgui-rs[imgui-rs]
 :imgui-inspect: https://github.com/aclysma/imgui-inspect[imgui-inspect]
