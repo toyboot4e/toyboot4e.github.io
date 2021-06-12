@@ -1,0 +1,27 @@
+<li>
+    {{~#if this.url~}}
+        {{~#if this.active~}}
+    <a href="{{this.url}}" class="active">
+        {{else}}
+    <a href="{{this.url}}" class="inactive">
+        {{~/if~}}
+    {{~/if~}}
+        {{!-- {{#if this.num}}
+        <strong area-hidden="true">{{this.num}}</strong>
+        " {{this.name}}"
+        {{else}}
+        "{{this.name}}"
+        {{/if}} --}}
+        {{~this.name~}}
+        {{!-- Recursion --}}
+        {{~#if this.children~}}
+        <ol>
+        {{~#each this.children~}}
+            {{> sidebar_item}}
+        {{~/each~}}
+        </ol>
+        {{~/if~}}
+    {{~#if this.url~}}
+    </a>
+    {{/if}}
+</li>
