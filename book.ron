@@ -6,13 +6,10 @@
     authors: ["adbook"],
     title: "Toy toy beam",
 
-    use_default_theme: false,
+    use_default_theme: true,
     includes: [
         ".nojekyll",
         "static/img",
-        "theme/css",
-        "theme/js",
-        "theme/favicon.svg",
     ],
 
     converts: [
