@@ -8,5 +8,6 @@
         File("", "./5_pools.adoc"),
         File("", "./6_type_objects.adoc"),
         File("", "./7_combat.adoc"),
+        // File("", "./8_nav.adoc"),
     ],
 )

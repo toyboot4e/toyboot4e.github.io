@@ -10,8 +10,6 @@
 
 == Devlog
 
-=== OMG!
-
 恐るべきことが起きてしまいました……
 
 image::snow/misc/y-sort.png[]

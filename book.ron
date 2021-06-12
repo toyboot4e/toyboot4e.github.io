@@ -72,6 +72,9 @@
             "jai=https://github.com/BSVino/JaiPrimer[Jai]",
             "zig=https://ziglang.org/[Zig]",
 
+            "go=https://golang.org/[Go]",
+            "ebiten=https://ebiten.org/[ebiten]",
+
             "tiled=https://www.mapeditor.org/[Tiled]",
             "elona=http://ylvania.org/jp/elona[Elona]",
             "bob=http://stuffwithstuff.com/[Robert Nystrom]",
