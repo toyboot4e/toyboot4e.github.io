@@ -69,10 +69,10 @@
       org-html-head (concat "<link rel=\"stylesheet\" href=\"https://cdn.simplecss.org/simple.min.css\">"
                             "\n"
                             "<link rel=\"stylesheet\" href=\"style/style.css\" />"
-                            ;; "\n"
-                            ;; "<link rel=\"stylesheet\" href=\"style/prism.css\" />"
-                            ;; "\n"
-                            ;; "<script src=\"/style/prism.js\" async></script>"
+                            "\n"
+                            "<link rel=\"stylesheet\" href=\"style/prism.css\" />"
+                            "\n"
+                            "<script src=\"/style/prism.js\" async></script>"
                             )
 
       org-html-preamble (with-temp-buffer
