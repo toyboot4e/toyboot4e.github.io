@@ -28,10 +28,10 @@
 
     (require 'ox-publish))
 
-;;; Settings: `https://orgmode.org/org.html#Publishing-options'
-(setq org-publish-project-alist
-      `(("posts"
-         :base-directory "./src"
+;; Attributes for `org-publish-project-alist' below:
+(setq base-attrs
+      ;; backquote and splice operator ,@: `https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html'
+      `(:base-directory "./src"
          :base-extension "org"
          :publishing-directory "./out"
          :recursive t
@@ -46,7 +46,18 @@
          :sitemap-filename "index.org"
          :sitemap-title "Index"
          :sitemap-style list ;; tree
-         :sitemap-sort-files anti-chronologically)
+         :sitemap-sort-files anti-chronologically))
+
+;;; Settings: `https://orgmode.org/org.html#Publishing-options'
+(setq org-publish-project-alist
+      `(
+        ;; build modes:
+        ("release" :components ("static" "release-posts"))
+        ("draft" :components ("static" "draft-posts"))
+
+        ;; components:
+        ("release-posts" ,@base-attrs :exclude ".*\.draft\.org")
+        ("draft-posts" ,@base-attrs)
 
         ("static"
          :base-directory "./src"
@@ -142,7 +153,17 @@
                       plist pub-dir))
 
 ;;; Build
-(org-publish-all t)
+
+;; target mode in the `org-publish-project-alist':
+(setq target-mode (elt argv 1))
+
+(unless target-mode
+    ;; fallback to draft mode
+    (setq target-mode "draft"))
+
+(message (concat "targetting: " target-mode))
+
+(org-publish target-mode t)
 
 (message "Build complete!")
 
