@@ -60,7 +60,7 @@
 
 (setq org-publish-project-alist
       `(
-        ;; build modes:
+        ;; build targets:
         ("release" :components ("static" "release-posts"))
         ("draft" :components ("static" "draft-posts"))
 
@@ -146,8 +146,8 @@
       (link (@ (rel "stylesheet")
                (href "style/prism.css")))
       (script (@ (href "/style/prism.js")
-                 ;; NOTE: It creates `async="async=`. I prefer `async` only, but the value is required for XHTML.
-                 (async))
+                 ;; NOTE: It creates `async=""`. I prefer `async` only, but the value is required for XHTML.
+                 (async ""))
               ;; NOTE: empty body is required for self-closing tag
               "")
       ;; FIXME: remove html tags (especially code tag) from the metadata
@@ -257,16 +257,35 @@
 
 ;;; Build
 
-;; target mode in the `org-publish-project-alist':
-(setq target-mode (elt argv 1))
+(setq build-target "draft")
+(setq force-flag nil)
 
-(unless target-mode
-    ;; fallback to draft mode
-    (setq target-mode "draft"))
+(let ((arg (elt argv 1)))
+    (when arg
+        (when (or (string= arg "r") (string= arg "release"))
+            (setq build-target "release"))
+        (when (or (string= arg "d") (string= arg "draft"))
+            (setq build-target "draft"))
+        (when (or (string= arg "-f") (string= arg "--force"))
+            (setq force-flag t))))
 
-(message (concat "Target: " target-mode))
+;; FIXME: don't repeat twice
+(let ((arg (elt argv 2)))
+    (when arg
+        (when (or (string= arg "r") (string= arg "release"))
+            (setq build-target "release"))
+        (when (or (string= arg "d") (string= arg "draft"))
+            (setq build-target "draft"))
+        (when (or (string= arg "-f") (string= arg "--force"))
+            (setq force-flag t))))
 
-(org-publish target-mode t)
+(message (concat "Target: " build-target " force flag: " (symbol-name force-flag)))
+(message "--------------------------------------------------------------------------------")
 
+(if force-flag
+        (org-publish build-target t)
+    (org-publish build-target))
+
+(message "--------------------------------------------------------------------------------")
 (message "Build complete!")
 
