@@ -30,6 +30,9 @@
     (defun pp-sxml-to-xml (sxml)
         (pp-esxml-to-xml (sxml-to-esxml sxml)))
 
+    ;; Use `<br>' rather than `<br />':
+    (setq org-html-doctype "html5")
+
     ;; ;; TODO: any difference?
     ;; (load-file "ox-slimhtml.el")
 
@@ -76,60 +79,22 @@
          :recursive t
          :publishing-function org-publish-attachment)))
 
-;; HTML_CONTAINER article
-
 ;;; Style
-
-;; Remove `validate' link at the bottom
-(setq org-html-validation-link nil)
-
-;; Remove `<!-- $timestamp -->' from the output HTML
-(setq org-export-time-stamp-file nil)
-
-(setq org-export-with-timestamps t)
 
 ;; Add link to each heading
 (setq org-html-self-link-headlines t)
 
-;; `<DOCTYPE!>' and `<html>'
-(setq org-html-doctype "html5"
-      org-export-default-language "ja")
+;; TODO: any difference?
+;; (setq org-html-html5-fancy t)
 
-;; (setq org-html-container-element "article")
-
-;; Custom theme
-(setq org-html-head-include-scripts nil       ;; Use our own scripts
-      org-html-head-include-default-style nil ;; Use our own styles
-
-      ;; TODO: taken from system crafter
-      org-html-html5-fancy nil
-      org-html-htmlize-output-type 'css
-
-      ;; Thanks:
-      ;; - simple.css: https://github.com/kevquirk/simple.css
-      ;; - Prism.js: https://prismjs.com
-      org-html-head (concat "<link rel=\"stylesheet\" href=\"https://cdn.simplecss.org/simple.min.css\">"
-                            "\n"
-                            "<link rel=\"stylesheet\" href=\"style/style.css\" />"
-                            "\n"
-                            "<link rel=\"stylesheet\" href=\"style/prism.css\" />"
-                            "\n"
-                            "<script src=\"/style/prism.js\" async></script>"
-                            )
-
-      org-html-preamble (with-temp-buffer
-                            (insert-file-contents "src/style/preamble.html")
-                            (buffer-string))
-
-      org-html-postamble (with-temp-buffer
-                             (insert-file-contents "src/style/postamble.html")
-                             (buffer-string)))
+;; Embed CSS without adding class:
+(setq org-html-htmlize-output-type 'css)
 
 ;;; Backend
 
 ;; NOTE:
 ;; - Generate XHTML from SXML using the `esxml' package
-;; - Raw HTML can be embedded into SXML using `*RAW-HTML'
+;; - Raw HTML can be embedded into SXML using `*RAW-STRING*'
 ;; - `org-export-data' returns document property
 
 ;; Returns article link SXML in `Index.html'
@@ -209,69 +174,62 @@
 
 ;; Codeblock filter for `prism.js' support:
 (defun roygbyte/org-html-src-block (src-block _contents info)
-  "Transcode a SRC-BLOCK element from Org to HTML.
+    "Transcode a SRC-BLOCK element from Org to HTML.
   CONTENTS holds the contents of the item.  INFO is a plist holding
   contextual information."
-  (if (org-export-read-attribute :attr_html src-block :textarea)
-      (org-html--textarea-block src-block)
-    (let* ((lang (org-element-property :language src-block))
-           (code (org-html-format-code src-block info))
-           (label (let ((lbl (org-html--reference src-block info t)))
-                    (if lbl (format " id=\"%s\"" lbl) "")))
-           (klipsify  (and  (plist-get info :html-klipsify-src)
-                            (member lang '("javascript" "js"
-                                           "ruby" "scheme" "clojure" "php" "html")))))
-      (if (not lang) (format "<pre class=\"example\"%s>\n%s</pre>" label code)
-        (format "<div class=\"org-src-container\">\n%s%s\n</div>"
-                ;; Build caption.
-                (let ((caption (org-export-get-caption src-block)))
-                  (if (not caption) ""
-                    (let ((listing-number
-                           (format
-                            "<span class=\"listing-number\">%s </span>"
-                            (format
-                             (org-html--translate "Listing %d:" info)
-                             (org-export-get-ordinal
-                              src-block info nil #'org-html--has-caption-p)))))
-                      (format "<label class=\"org-src-name\">%s%s</label>"
-                              listing-number
-                              (org-trim (org-export-data caption info))))))
-                ;; Contents.
-                ;; Changed HTML template to work with Prism.
-                (if klipsify
-                    (format "<pre><code class=\"src language-%s\"%s%s>%s</code></pre>"
-                            lang
-                            label
-                            (if (string= lang "html")
-                                " data-editor-type=\"html\""
-                              "")
-                            code)
-                  (format "<pre><code class=\"src language-%s\"%s>%s</code></pre>"
-                          lang label code)))))))
+    (if (org-export-read-attribute :attr_html src-block :textarea)
+            (org-html--textarea-block src-block)
+        (let* ((lang (org-element-property :language src-block))
+               (code (org-html-format-code src-block info))
+               (label (let ((lbl (org-html--reference src-block info t)))
+                          (if lbl (format " id=\"%s\"" lbl) "")))
+               (klipsify  (and  (plist-get info :html-klipsify-src)
+                                (member lang '("javascript" "js"
+                                               "ruby" "scheme" "clojure" "php" "html")))))
+            (if (not lang) (format "<pre class=\"example\"%s>\n%s</pre>" label code)
+                (format "<div class=\"org-src-container\">\n%s%s\n</div>"
+                        ;; Build caption.
+                        (let ((caption (org-export-get-caption src-block)))
+                            (if (not caption) ""
+                                (let ((listing-number
+                                       (format
+                                        "<span class=\"listing-number\">%s </span>"
+                                        (format
+                                         (org-html--translate "Listing %d:" info)
+                                         (org-export-get-ordinal
+                                          src-block info nil #'org-html--has-caption-p)))))
+                                    (format "<label class=\"org-src-name\">%s%s</label>"
+                                            listing-number
+                                            (org-trim (org-export-data caption info))))))
+                        ;; Contents.
+                        ;; Changed HTML template to work with Prism.
+                        (if klipsify
+                                (format "<pre><code class=\"src language-%s\"%s%s>%s</code></pre>"
+                                        lang
+                                        label
+                                        (if (string= lang "html")
+                                                " data-editor-type=\"html\""
+                                            "")
+                                        code)
+                            (format "<pre><code class=\"src language-%s\"%s>%s</code></pre>"
+                                    lang label code)))))))
 
 (defun my-org-html-publish-to-html (plist filename pub-dir)
-  "Publish an org file to HTML, using the FILENAME as the output directory."
-  (org-publish-org-to 'my-site-html filename
-                      (concat (when (> (length org-html-extension) 0) ".")
-                              (or (plist-get plist :html-extension)
-                                  org-html-extension
-                                  "html"))
-                      plist pub-dir))
+    "Publish an org file to HTML, using the FILENAME as the output directory."
+    (org-publish-org-to 'my-site-html filename
+                        (concat (when (> (length org-html-extension) 0) ".")
+                                (or (plist-get plist :html-extension)
+                                    org-html-extension
+                                    "html"))
+                        plist pub-dir))
 
 (org-export-define-derived-backend
- 'my-site-html
- 'html
- ;; 'slimhtml
+        'my-site-html
+        'html ;; 'slimhtml
 
- :translate-alist
- '((template . my-org-html-template)
-   (src-block . roygbyte/org-html-src-block))
-
- ;; TODO: remove? taken from system crafter
- :options-alist
- '((:page-type "PAGE-TYPE" nil nil t)
-   (:html-use-infojs nil nil nil))
- )
+    :translate-alist
+    '((template . my-org-html-template)
+      (src-block . roygbyte/org-html-src-block)))
 
 ;;; Build
 
