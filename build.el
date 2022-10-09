@@ -55,6 +55,7 @@
                         :auto-sitemap t
                         :sitemap-filename "index.org"
                         :sitemap-title "Index"
+                        :sitemap-format-entry my-org-sitemap-format-entry
                         :sitemap-style list ;; list | tree
                         :sitemap-sort-files anti-chronologically))
 
@@ -131,6 +132,21 @@
 ;; - Raw HTML can be embedded into SXML using `*RAW-HTML'
 ;; - `org-export-data' returns document property
 
+;; Returns article link SXML in `Index.html'
+;; - `entry' = path
+;; - Thanks: `https://miikanissi.com/blog/website-with-emacs/'
+(defun my-org-sitemap-format-entry (entry style project)
+    (cond ((not (directory-name-p entry))
+           (let* ((date (org-publish-find-date entry project)))
+               (format "[[file:%s][%s: %s]]"
+                       entry
+                       (format-time-string "%F" date)
+                       (org-publish-find-title entry project))))
+          ((eq style 'tree)
+           ;; Return only last subdir.
+           (file-name-nondirectory (directory-file-name entry)))
+          (t entry)))
+
 ;; Returns `<head>' SXML
 (defun my-html-head (info)
     ;; TODO: try `esxml-html'.. though it's not on MELPA?
@@ -159,7 +175,7 @@
              (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
              ;; TODO: smaller text with dimmed color
              ;; timestamp
-             (p ,(org-export-data (org-export-get-date info "%B %e, %Y") info))
+             (p ,(org-export-data (org-export-get-date info "%b %e, %Y") info))
              (nav
               (a (@ (href "/")) "Home")
               (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
@@ -167,7 +183,7 @@
 ;; Returns `<footer>' SXML
 (defun my-html-footer (info)
     `(footer
-      (*RAW-STRING* "<p>Design by <a href=\"https://simplecss.org/\">Simple.css</a></p>")
+      (*RAW-STRING* "<p>Site design by <a href=\"https://simplecss.org/\">Simple.css</a></p>")
       (nav
        (a (@ (href "/")) "Home")
        (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
@@ -176,7 +192,9 @@
 (defun my-org-html-template (contents info)
     (concat
      "<!DOCTYPE html>\n"
-     (pp-sxml-to-xml
+     ;; FIXME: `pp' works on `<code>' tag, too
+     ;; (pp-sxml-to-xml
+     (sxml-to-xml
       `(html (@ (lang "ja"))
              ,(my-html-head info)
 
