@@ -1,0 +1,3 @@
+#+TITLE: Index
+
+- [[file:2022-10-09-org-mode-blog.org][2022-10-09: =org-mode= で簡易ブログ生成]]

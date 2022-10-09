@@ -1,0 +1,88 @@
+#+TITLE: =org-mode= で簡易ブログ生成
+#+DATE: <2022-10-09 Sun>
+
+[[https://systemcrafters.cc/][System Crafters]] の投稿を元に =org-mode= で本ブログを生成しました。
+
+SSG の主な機能は =org-publish= にお任せできますが、 HTML 生成は自分でやります。 HTML 生成には [[https://github.com/tali713/esxml][esxml]] (S
+式で書く XHTML) を使用しました。
+
+#+BEGIN_QUOTE
+本当はミラーボールを回したかったですが、力不足だったようです。
+#+END_QUOTE
+
+* 使い方
+
+ファイル構成は以下です:
+
+#+BEGIN_SRC sh
+.
+├── build.el   # ビルドスクリプト + ビルド設定 (ELisp)
+├── out        # サイト
+├── src        # サイトの全ソースファイル
+│   ├── img           # 画像ファイル
+│   ├── index.org     # 索引 (`org-publish` が自動生成する sitemap)
+│   ├── *.org         # 投稿記事
+│   ├── *.draft.org   # 下書き (`release` ビルドの際はビルド対象から除外)
+│   └── style         # CSS, JS やテンプレート HTML
+└── x          # ビルドスクリプトを起動するシェルスクリプト
+#+END_SRC
+
+コマンドラインから =x= スクリプトを実行します:
+
+- =./x release= のような形でビルドすると、 =out/*.html= が生成されます。
+- =./x watch= としておけば、 =.org= ファイルの変更時にリビルドしてくれます。
+
+* 主なリソース
+
+もしも =org-mode= でブログ生成したいという人がいたら、以下のリンクが役に立つかもしれません。
+
+** 入門記事
+
+公式マニュアルが説明不足なので、チュートリアルが重宝します:
+
+- [[https://systemcrafters.net/publishing-websites-with-org-mode/building-the-site/][Build Your Website with Org Mode - System Crafters]]\\
+  =org-publish= と [[https://simplecss.org][Simple.css]] で綺麗なブログを作ります。
+
+- [[https://taingram.org/blog/org-mode-blog.html][Building a Emacs Org - Mode Blog]]\\
+  似た内容ですが ELisp の書き方が参考になります。
+
+** [[https://orgmode.org/org.html][The Org Manual]]
+
+公式マニュアルです。意外に短くて説明不足の感はあります:
+
+- [[https://orgmode.org/manual/Exporting.html][13. Exporting]]
+
+  - [[https://orgmode.org/manual/Exporting.html][13.9 HTML Export]]\\
+    ヘッダ生成などのオプションを設定できます。ただし自由度が低いので、自分で HTML テンプレートを書く
+    のが良いと思います。
+
+  - [[https://orgmode.org/manual/Advanced-Export-Configuration.html][13.17 Advanced Export Configuration]]\\
+    =ox-html= の HTML テンプレートを差し替えることができます。またフィルタ (Unix フィルタのニュアンス)
+    を使ってコードブロックの HTML 変換などをオーバーライドできることがわかります。
+
+- [[https://orgmode.org/manual/Publishing.html][14. Publishing]]\\
+  =org-publish= のオプションを把握することができます。
+
+** HTML 生成の改良
+
+- [[https://github.com/SystemCrafters/systemcrafters.github.io/blob/master/publish.el][publish.el (System Crafters website)]]\\
+ [[https://github.com/tali713/esxml][esxml]] を使ったテンプレート HTML を作成します。
+
+- [[https://www.roygbyte.com/add_syntax_highlighting_to_an_org_publish_project.html][Add syntax highlighting to an org-publish-project]]\\
+  コードブロックを [[https://prismjs.com][Prism.js]] 対応の HTML に変換するフィルタが載っています。
+
+* メモ
+
+- XHTML
+  - XHTML だと =async= のようなフラグは書けない (~async=""~ になる)\\
+    https://stackoverflow.com/a/21800875
+
+- =org-mode=
+  - [[https://orgmode.org/manual/Link-Abbreviations.html][Link Abbreviations]]
+  - Bullet の中に改行を入れたければ、 markdown のように =\\= を書くしかない
+
+- TODOs
+  - [ ] =<title>= タグから =<code>= タグなどを取り除く
+  - [ ] =index.html= をテーブルにする？
+  - [ ] =index.html= でミラーボールを回す
+
