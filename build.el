@@ -156,16 +156,18 @@
 ;; Returns `<header>' SXML
 (defun my-html-header (info)
     `(header (@ (href "/"))
-             (nav
-              (a (@ (href "/")) "toybeam"))
              (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
              ;; TODO: smaller text with dimmed color
              ;; timestamp
-             (p ,(org-export-data (org-export-get-date info "%B %e, %Y") info))))
+             (p ,(org-export-data (org-export-get-date info "%B %e, %Y") info))
+             (nav
+              (a (@ (href "/")) "Home")
+              (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
 
 ;; Returns `<footer>' SXML
 (defun my-html-footer (info)
     `(footer
+      (*RAW-STRING* "<p>Design by <a href=\"https://simplecss.org/\">Simple.css</a></p>")
       (nav
        (a (@ (href "/")) "Home")
        (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
