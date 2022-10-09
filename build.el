@@ -183,7 +183,7 @@
 ;; Returns `<footer>' SXML
 (defun my-html-footer (info)
     `(footer
-      (*RAW-STRING* "<p>Site design by <a href=\"https://simplecss.org/\">Simple.css</a></p>")
+      (*RAW-STRING* "<p>Styled with <a href=\"https://simplecss.org/\">Simple.css</a></p>")
       (nav
        (a (@ (href "/")) "Home")
        (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
@@ -275,7 +275,8 @@
 
 ;;; Build
 
-(setq build-target "draft")
+;; release build by default, ignoring drafts
+(setq build-target "release")
 (setq force-flag nil)
 
 (let ((arg (elt argv 1)))
