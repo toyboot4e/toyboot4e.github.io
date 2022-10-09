@@ -1,4 +1,5 @@
 /out
 .DS_Store
 .blog-build-packages
+**/*.draft.org
 
