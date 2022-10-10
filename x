@@ -1,5 +1,7 @@
 #!/usr/bin/env bash -euE
 
+IFS=$'\n\t'
+
 dir="$(dirname "$0")"
 cd "$dir"
 
@@ -7,20 +9,33 @@ isForceFlag() {
     [[ "${1:-}" == "-f" || "${1:-}" == "--force" ]]
 }
 
-_watch() {
-    echo "start watching.."
-    watchexec -e org -w src --ignore "index.org" "./x release"
-}
-
 _serve() {
     cd out
     python3 -m http.server 8080
+}
+
+_tidy() {
+    echo "tidying all the htmls.."
+    for f in $(fd -e html . out) ; do
+        tidy -i -m -w 160 -ashtml -utf8 "$f" > /dev/null 2>&1
+    done
+}
+
+_watch() {
+    echo "start watching.."
+    watchexec -e org -w src --ignore "index.org" "./x release && ./x tidy"
 }
 
 _main() {
     # serve
     if [ "${1:-}" = "s" ] || [ "${1:-}" = "serve" ] ; then
         _serve "$@"
+        return
+    fi
+
+    # tidy
+    if [ "${1:-}" = "t" ] || [ "${1:-}" = "tidy" ] ; then
+        _tidy "$@"
         return
     fi
 

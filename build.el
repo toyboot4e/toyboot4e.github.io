@@ -20,8 +20,8 @@
         (package-refresh-contents)))
 
 (progn
-    ;; Allow generating code block HTML
-    (package-install 'htmlize)
+    ;; Needed when you need builtin code block highlight
+    ;; (package-install 'htmlize)
 
     ;; Create HTML from S-expressions
     (package-install 'esxml)
@@ -39,8 +39,58 @@
     ;; `pp' formats `<code>' tag contents, too
     ;; (pp-esxml-to-xml (sxml-to-esxml sxml))
 
-    ;; TODO: custom format
-    (sxml-to-xml sxml))
+    ;; custom format
+    ;; (my-pp-esxml-to-xml (sxml-to-esxml sxml))
+
+    (esxml-to-xml (sxml-to-esxml sxml)))
+
+;; Keeps `<code>' tag untouched
+(defun my-pp-esxml-to-xml (esxml)
+    (pcase esxml
+        ((pred stringp)
+         (xml-escape-string esxml))
+        (`(raw-string ,string)
+         (cl-check-type string stringp)
+         string)
+        (`(comment nil ,body)
+         (concat "<!-- " body " -->"))
+
+        ;; code tag
+        (`(,tag ,attrs . ,body)
+         (cl-check-type tag symbol)
+         (cl-check-type attrs attrs)
+         (concat "<" (symbol-name tag)
+                 (when attrs
+                     (concat " " (mapconcat 'esxml--convert-pair attrs " ")))
+                 (if body
+                         (concat ">" (if (cl-every 'stringp body)
+                                             (mapconcat 'identity body " ")
+                                         (concat "\n"
+                                                 (replace-regexp-in-string
+                                                  "^" "  "
+                                                  (mapconcat 'my-pp-esxml-to-xml body "\n"))
+                                                 "\n"))
+                                 "</" (symbol-name tag) ">")
+                     "/>")))
+
+        (`(,tag ,attrs . ,body)
+         (cl-check-type tag symbol)
+         (cl-check-type attrs attrs)
+         (concat "<" (symbol-name tag)
+                 (when attrs
+                     (concat " " (mapconcat 'esxml--convert-pair attrs " ")))
+                 (if body
+                         (concat ">" (if (cl-every 'stringp body)
+                                             (mapconcat 'identity body " ")
+                                         (concat "\n"
+                                                 (replace-regexp-in-string
+                                                  "^" "  "
+                                                  (mapconcat 'my-pp-esxml-to-xml body "\n"))
+                                                 "\n"))
+                                 "</" (symbol-name tag) ">")
+                     "/>")))
+        (_
+         (error "%s is not a valid esxml expression" esxml))))
 
 ;; ;; Example: `=code=' -> `code'
 ;; (defun my-remove-org-markup (org-string)
@@ -129,8 +179,8 @@
 ;; Add link to each heading
 (setq org-html-self-link-headlines t)
 
-;; Embed CSS without adding class:
-(setq org-html-htmlize-output-type 'css)
+;; No need of code highlight
+(setq org-html-htmlize-output-type 'nil)
 
 ;;; Backend (HTML template)
 
@@ -156,7 +206,7 @@
 
 ;; Returns `<head>' SXML
 (defun my-html-head (info)
-    ;; TODO: try `esxml-html'.. though it's not on MELPA?
+    ;; NOTE: `esxml-html' is not on MELPA
     `(head
       (meta (@ (charset "utf-8")))
       ;; (meta (@ (author "toyboot4e")))
@@ -168,7 +218,7 @@
                (href "style/style.css")))
       (link (@ (rel "stylesheet")
                (href "style/prism.css")))
-      (script (@ (href "/style/prism.js")
+      (script (@ (src "/style/prism.js")
                  ;; NOTE: It creates `async=""`. I prefer `async` only, but the value is required for XHTML.
                  (async ""))
               ;; NOTE: empty body is required for self-closing tag
@@ -178,9 +228,7 @@
 
 ;; Returns `<header>' SXML
 (defun my-html-header (info)
-    `(header (@ (href "/"))
-             (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
-             ;; TODO: smaller text with dimmed color
+    `(header (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
              ;; timestamp
              (p ,(org-export-data (org-export-get-date info "%b %e, %Y") info))
              (nav
