@@ -1,5 +1,6 @@
 #+TITLE: =org-mode= で簡易ブログ生成
 #+DATE: <2022-10-09 Sun>
+#+FILETAGS: :blog:emacs:org_mode:
 
 [[https://systemcrafters.cc/][System Crafters]] の投稿を元に =org-mode= で本ブログを生成しました。
 
@@ -46,9 +47,9 @@ SSG の主な機能は =org-publish= にお任せできますが、 HTML 生成�
 - [[https://taingram.org/blog/org-mode-blog.html][Building a Emacs Org - Mode Blog]]\\
   似た内容ですが ELisp の書き方が参考になります。
 
-** [[https://orgmode.org/org.html][The Org Manual]]
+** The Org Manual
 
-公式マニュアルです。意外に短くて説明不足の感はあります:
+[[https://orgmode.org/org.html][The Org Manual]] は意外に短くて説明不足の感はあります:
 
 - [[https://orgmode.org/manual/Exporting.html][13. Exporting]]
 
@@ -64,6 +65,8 @@ SSG の主な機能は =org-publish= にお任せできますが、 HTML 生成�
   =org-publish= のオプションを把握することができます。
 
 ** HTML 生成の改良
+
+HTML 生成をハイジャックすれば完成です:
 
 - [[https://github.com/SystemCrafters/systemcrafters.github.io/blob/master/publish.el][publish.el (System Crafters website)]]\\
  [[https://github.com/tali713/esxml][esxml]] を使ったテンプレート HTML を作成します。
