@@ -27,16 +27,61 @@
     (package-install 'esxml)
     (require 'esxml)
 
-    (defun pp-sxml-to-xml (sxml)
-        (pp-esxml-to-xml (sxml-to-esxml sxml)))
-
     ;; Use `<br>' rather than `<br />':
     (setq org-html-doctype "html5")
 
-    ;; ;; TODO: any difference?
-    ;; (load-file "ox-slimhtml.el")
-
     (require 'ox-publish))
+
+;;; Ingredients
+
+;; Creates final output
+(defun my-sxml-to-xml (sxml)
+    ;; `pp' formats `<code>' tag contents, too
+    ;; (pp-esxml-to-xml (sxml-to-esxml sxml))
+
+    ;; TODO: custom format
+    (sxml-to-xml sxml))
+
+;; ;; Example: `=code=' -> `code'
+;; (defun my-remove-org-markup (org-string)
+;;     ;; TODO: more reliable tool?
+;;     ;; TODO: unescape?
+;;     (my-strip-html (my-org-string-to-html org-string)))
+;; 
+;; (defun my-org-string-to-html (string &optional macros)
+;;     (interactive)
+;;     (with-temp-buffer
+;;         (let ((start (goto-char (point-max))))
+;;             (insert string)
+;;             ;; ?
+;;             (narrow-to-region start (point-max))
+;;             ;; In `*Org HTML Export*' buffer:
+;;             (with-current-buffer (org-html-export-as-html nil nil t t)
+;;                 ;; Strip `<p>\n' and `</p>':
+;;                 (let ((min (+ 4 (point-min))) (max (- (point-max) 5)))
+;;                     (buffer-substring min max))))))
+
+;; Thanks: `http://sachachua.com/notebook/emacs/small-functions.el'
+;; TODO: hide meesage here?:
+(defun my-strip-html (string)
+    (with-temp-buffer
+        (insert string)
+
+        (widen)
+        (goto-char (point-min))
+        (while (re-search-forward "<[^<]*>" (point-max) t)
+            (replace-match "\\1"))
+        (goto-char (point-min))
+        (replace-string "&copy;" "(c)")
+        (goto-char (point-min))
+        (replace-string "&amp;" "&")
+        (goto-char (point-min))
+        (replace-string "&lt;" "<")
+        (goto-char (point-min))
+        (replace-string "&gt;" ">")
+        (goto-char (point-min))
+
+        (buffer-substring-no-properties (point-min) (point-max))))
 
 ;;; Project settings
 
@@ -84,13 +129,10 @@
 ;; Add link to each heading
 (setq org-html-self-link-headlines t)
 
-;; TODO: any difference?
-;; (setq org-html-html5-fancy t)
-
 ;; Embed CSS without adding class:
 (setq org-html-htmlize-output-type 'css)
 
-;;; Backend
+;;; Backend (HTML template)
 
 ;; NOTE:
 ;; - Generate XHTML from SXML using the `esxml' package
@@ -131,8 +173,8 @@
                  (async ""))
               ;; NOTE: empty body is required for self-closing tag
               "")
-      ;; FIXME: remove html tags (especially code tag) from the metadata
-      (title ,(concat (org-export-data (plist-get info :title) info) " - toybeam"))))
+      ;; NOTE: `org-export-data' returns HTML
+      (title (*RAW-STRING* ,(concat (my-strip-html (org-export-data (plist-get info :title) info)) " - toybeam")))))
 
 ;; Returns `<header>' SXML
 (defun my-html-header (info)
@@ -157,9 +199,7 @@
 (defun my-org-html-template (contents info)
     (concat
      "<!DOCTYPE html>\n"
-     ;; FIXME: `pp' works on `<code>' tag, too
-     ;; (pp-sxml-to-xml
-     (sxml-to-xml
+     (my-sxml-to-xml
       `(html (@ (lang "ja"))
              ,(my-html-head info)
 
@@ -171,6 +211,8 @@
 
               ,(my-html-footer info)
               )))))
+
+;;; Backend (filters)
 
 ;; Codeblock filter for `prism.js' support:
 (defun roygbyte/org-html-src-block (src-block _contents info)
@@ -213,6 +255,8 @@
                                         code)
                             (format "<pre><code class=\"src language-%s\"%s>%s</code></pre>"
                                     lang label code)))))))
+
+;;; Backend (setup)
 
 (defun my-org-html-publish-to-html (plist filename pub-dir)
     "Publish an org file to HTML, using the FILENAME as the output directory."
