@@ -85,7 +85,8 @@ HTML 生成をハイジャックすれば完成です:
   - Bullet の中に改行を入れたければ、 markdown のように =\\= を書くしかない
 
 - TODOs
-  - [ ] =<title>= タグから =<code>= タグなどを取り除く
+  - [X] =<title>= タグから =<code>= タグなどを取り除く → [[https://gnu.support/gnu-emacs/emacs-lisp/Emacs-Lisp-strip-html-by-Sacha-Chua-remove-those-tags.html][このコードをコピペ]]
+  - [X] 出力 HTML を整形する → [[http://www.html-tidy.org/][tidy]]
   - [ ] =index.html= をテーブルにする？
   - [ ] =index.html= でミラーボールを回す
 
