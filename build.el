@@ -329,24 +329,22 @@
 (setq build-target "release")
 (setq force-flag nil)
 
-(let ((arg (elt argv 1)))
-    (when arg
-        (when (or (string= arg "r") (string= arg "release"))
-            (setq build-target "release"))
-        (when (or (string= arg "d") (string= arg "draft"))
-            (setq build-target "draft"))
-        (when (or (string= arg "-f") (string= arg "--force"))
-            (setq force-flag t))))
+(when-let ((arg (elt argv 1)))
+    (when (or (string= arg "r") (string= arg "release"))
+        (setq build-target "release"))
+    (when (or (string= arg "d") (string= arg "draft"))
+        (setq build-target "draft"))
+    (when (or (string= arg "-f") (string= arg "--force"))
+        (setq force-flag t)))
 
 ;; FIXME: don't repeat twice
-(let ((arg (elt argv 2)))
-    (when arg
-        (when (or (string= arg "r") (string= arg "release"))
-            (setq build-target "release"))
-        (when (or (string= arg "d") (string= arg "draft"))
-            (setq build-target "draft"))
-        (when (or (string= arg "-f") (string= arg "--force"))
-            (setq force-flag t))))
+(when-let ((arg (elt argv 2)))
+    (when (or (string= arg "r") (string= arg "release"))
+        (setq build-target "release"))
+    (when (or (string= arg "d") (string= arg "draft"))
+        (setq build-target "draft"))
+    (when (or (string= arg "-f") (string= arg "--force"))
+        (setq force-flag t)))
 
 (message (concat "Target: " build-target " force flag: " (symbol-name force-flag)))
 (message "--------------------------------------------------------------------------------")
