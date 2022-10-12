@@ -70,32 +70,22 @@ _main() {
         return
     fi
 
-    arg="$1"
+    cmd="$1"
     shift
 
-    # build
-    if [ "$arg" = "b" ] || [ "$arg" = "build" ] ; then
-        _build "$@"
-        return
-    fi
+    case "$cmd" in
+        'b' | 'build')
+            _build "$@" ;;
 
-    # serve
-    if [ "$arg" = "s" ] || [ "$arg" = "serve" ] ; then
-        _serve "$@"
-        return
-    fi
+        's' | 'serve')
+            _serve "$@" ;;
 
-    # tidy
-    if [ "$arg" = "t" ] || [ "$arg" = "tidy" ] ; then
-        _tidy "$@"
-        return
-    fi
+        't' | 'tidy')
+            _tidy "$@" ;;
 
-    # watch
-    if [ "$arg" = "w" ] || [ "$arg" = "watch" ] ; then
-        _watch "$@"
-        return
-    fi
+        'w' | 'watch')
+            _watch "$@" ;;
+    esac
 }
 
 _main "$@"
