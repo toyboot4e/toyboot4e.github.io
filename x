@@ -9,42 +9,22 @@ isForceFlag() {
     [[ "${1:-}" == "-f" || "${1:-}" == "--force" ]]
 }
 
-_serve() {
-    cd out
-    python3 -m http.server 8080
+_help() {
+    cat <<EOS
+Build script for the devlop
+
+USAGE:
+    ./x [SUB COMMAND]
+
+SUB COMMANDS:
+    build   build the devlog
+    serve   starts HTTP server with `python3`
+    tidy    formats the output HTML files
+    watch   runs `./x build release` on source `.org` file change
+EOS
 }
 
-_tidy() {
-    echo "tidying all the htmls.."
-    for f in $(fd -e html . out) ; do
-        tidy -i -m -w 160 -ashtml -utf8 "$f" > /dev/null 2>&1
-    done
-}
-
-_watch() {
-    echo "start watching.."
-    watchexec -e org -w src --ignore "index.org" "./x release && ./x tidy"
-}
-
-_main() {
-    # serve
-    if [ "${1:-}" = "s" ] || [ "${1:-}" = "serve" ] ; then
-        _serve "$@"
-        return
-    fi
-
-    # tidy
-    if [ "${1:-}" = "t" ] || [ "${1:-}" = "tidy" ] ; then
-        _tidy "$@"
-        return
-    fi
-
-    # watch
-    if [ "${1:-}" = "w" ] || [ "${1:-}" = "watch" ] ; then
-        _watch "$@"
-        return
-    fi
-
+_build() {
     # build (TODO: require explicit `b` argument?)
     if isForceFlag "${1:-}" || isForceFlag "${2:-}" ; then
         echo "cleaning up the output directory"
@@ -64,6 +44,57 @@ _main() {
         emacs -Q --script "./build.el" -- "$1" "$2"
     else
         echo "given too many arguments" 1>&2
+    fi
+}
+
+_serve() {
+    cd out
+    python3 -m http.server 8080
+}
+
+_tidy() {
+    echo "tidying all the htmls.."
+    for f in $(fd -e html . out) ; do
+        tidy -i -m -w 160 -ashtml -utf8 "$f" > /dev/null 2>&1
+    done
+}
+
+_watch() {
+    echo "start watching.."
+    watchexec -e org -w src --ignore "index.org" "./x build --release && ./x tidy"
+}
+
+_main() {
+    if [ $# -eq 0 ] ; then
+        _help
+        return
+    fi
+
+    arg="$1"
+    shift
+
+    # build
+    if [ "$arg" = "b" ] || [ "$arg" = "build" ] ; then
+        _build "$@"
+        return
+    fi
+
+    # serve
+    if [ "$arg" = "s" ] || [ "$arg" = "serve" ] ; then
+        _serve "$@"
+        return
+    fi
+
+    # tidy
+    if [ "$arg" = "t" ] || [ "$arg" = "tidy" ] ; then
+        _tidy "$@"
+        return
+    fi
+
+    # watch
+    if [ "$arg" = "w" ] || [ "$arg" = "watch" ] ; then
+        _watch "$@"
+        return
     fi
 }
 

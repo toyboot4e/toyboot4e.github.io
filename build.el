@@ -329,19 +329,19 @@
 (setq build-target "release")
 (setq force-flag nil)
 
+;; FIXME: don't repeat twice
 (when-let ((arg (elt argv 1)))
-    (cond ((or (string= arg "r") (string= arg "release"))
+    (cond ((or (string= arg "-r") (string= arg "--release"))
            (setq build-target "release"))
-          ((or (string= arg "d") (string= arg "draft"))
+          ((or (string= arg "-d") (string= arg "--draft"))
            (setq build-target "draft"))
           ((or (string= arg "-f") (string= arg "--force"))
            (setq force-flag t))))
 
-;; FIXME: don't repeat twice
 (when-let ((arg (elt argv 2)))
-    (cond ((or (string= arg "r") (string= arg "release"))
+    (cond ((or (string= arg "-r") (string= arg "--release"))
            (setq build-target "release"))
-          ((or (string= arg "d") (string= arg "draft"))
+          ((or (string= arg "-d") (string= arg "--draft"))
            (setq build-target "draft"))
           ((or (string= arg "-f") (string= arg "--force"))
            (setq force-flag t))))
