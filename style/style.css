@@ -3,6 +3,10 @@ body {
     grid-template-columns: 1fr min(50rem, 90%) 1fr;
 }
 
+main p {
+    text-indent: 1em;
+}
+
 body > header {
     padding: 0;
 }
@@ -34,18 +38,23 @@ h1 {
     line-height: 1.2;
 }
 
+h2 a, h3 a, h4 a, h5 a, h6 a {
+    /* remove underlines from self links */
+    text-decoration: none;
+}
+
 body > footer {
     padding: 0;
 }
 
-footer > nav {
+footer > div {
     font-size: 1rem;
     line-height: 2;
     padding: 0;
 }
 
-footer > nav a,
-footer > nav a:visited {
+footer > div a,
+footer > div a:visited {
     margin: 0 0.5rem 1rem 0.5rem;
     border: 1px solid var(--border);
     border-radius: 5px;
@@ -55,7 +64,7 @@ footer > nav a:visited {
     text-decoration: none;
 }
 
-footer > nav a:hover {
+footer > div a:hover {
     border-color: var(--accent);
     color: var(--accent);
     cursor: pointer;
@@ -69,5 +78,9 @@ blockquote > p {
     font-style: normal;
     margin-top: 0.25rem;
     margin-bottom: 0.25rem;
+}
+
+.figure {
+    text-align: center;
 }
 
