@@ -228,20 +228,22 @@
 
 ;; Returns `<header>' SXML
 (defun my-html-header (info)
-    `(header (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
+    `(header (@ (role "banner"))
+             ;; `org-export-data' returns raw HTML
+             (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
              ;; timestamp
              (p ,(org-export-data (org-export-get-date info "%b %e, %Y") info))
-             (nav
-              (a (@ (href "/")) "Home")
-              (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
+             (nav (@ (role "navigation"))
+                  (a (@ (href "/")) "Home")
+                  (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
 
 ;; Returns `<footer>' SXML
 (defun my-html-footer (info)
-    `(footer
-      (*RAW-STRING* "<p>Styled with <a href=\"https://simplecss.org/\">Simple.css</a></p>")
-      (nav
-       (a (@ (href "/")) "Home")
-       (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
+    `(footer (@ (role "contentinfo"))
+             (*RAW-STRING* "<p>Styled with <a href=\"https://simplecss.org/\">Simple.css</a></p>")
+             (div
+              (a (@ (href "/")) "Home")
+              (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
 
 ;; Thanks: `https://github.com/SystemCrafters/systemcrafters.github.io/blob/master/publish.el'
 (defun my-org-html-template (contents info)
@@ -253,9 +255,8 @@
 
              (body
               ,(my-html-header info)
-
-              (main
-               (*RAW-STRING* ,contents))
+              (main (@ (role "main"))
+                    (*RAW-STRING* ,contents))
 
               ,(my-html-footer info)
               )))))
