@@ -11,7 +11,7 @@ isForceFlag() {
 
 _help() {
     cat <<EOS
-Build script for the devlop
+Build script for the devlog
 
 USAGE:
     ./x [SUB COMMAND]

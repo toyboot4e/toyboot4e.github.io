@@ -145,7 +145,7 @@
                         :recursive t
                         ;; Custom function defined below
                         :publishing-function my-org-html-publish-to-html
-                        :section-numbers t
+                        :section-numbers nil
                         :with-author nil
                         :with-creator nil
                         :with-toc nil
@@ -155,7 +155,7 @@
                         :sitemap-title "Index"
                         :sitemap-format-entry my-org-sitemap-format-entry
                         :sitemap-style list ;; list | tree
-                        :sitemap-sort-files anti-chronologically))
+                        :sitemap-sort-files chronologically))
 
 (setq org-publish-project-alist
       `(
@@ -306,6 +306,17 @@
 
 ;;; Backend (setup)
 
+;; Set up `my-site-html' backend:
+(progn
+    (org-export-define-derived-backend
+     'my-site-html
+     'html ;; 'slimhtml
+
+     :translate-alist
+     '((template . my-org-html-template)
+       (src-block . roygbyte/org-html-src-block)))
+    )
+
 (defun my-org-html-publish-to-html (plist filename pub-dir)
     "Publish an org file to HTML, using the FILENAME as the output directory."
     (org-publish-org-to 'my-site-html filename
@@ -315,13 +326,28 @@
                                     "html"))
                         plist pub-dir))
 
-(org-export-define-derived-backend
-        'my-site-html
-        'html ;; 'slimhtml
+;; (progn ;; TODO: handle details block
+;;     (package-install 'org-special-block-extras)
+;;     (require 'org-special-block-extras)
+;;
+;;     ;; needed?:
+;;     (org-special-block-extras-mode)
+;;
+;;     ;; `https://github.com/alhassy/org-special-block-extras/issues/12#issuecomment-1003612876'
+;;     (defun ospe-add-support-for-derived-backend (new-backend parent-backend)
+;;         "See subsequent snippet for a working example use."
+;;         (add-to-list 'org-export-filter-parse-tree-functions
+;;                      `(lambda (tree backend info)
+;;                           (when (eq backend (quote ,new-backend))
+;;                               (org-element-map tree 'export-block
+;;                                   (lambda (el)
+;;                                       (when (string= (org-element-property :type el) (s-upcase (symbol-name (quote ,new-backend))))
+;;                                           (org-element-put-property el :type (s-upcase (symbol-name (quote ,parent-backend))))))))
+;;                           tree))
+;;
+;;         ;; Add `org-special-block-extras' support:
+;;         (ospe-add-support-for-derived-backend 'my-site-html 'html)))
 
-    :translate-alist
-    '((template . my-org-html-template)
-      (src-block . roygbyte/org-html-src-block)))
 
 ;;; Build
 
@@ -348,6 +374,8 @@
 
 (message (concat "Target: " build-target " force flag: " (symbol-name force-flag)))
 (message "--------------------------------------------------------------------------------")
+
+(org-publish-remove-all-timestamps)
 
 (if force-flag
         (org-publish build-target t)
