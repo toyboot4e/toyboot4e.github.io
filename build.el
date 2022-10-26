@@ -36,80 +36,10 @@
 
 ;; Creates final output
 (defun my-sxml-to-xml (sxml)
-    ;; `pp' formats `<code>' tag contents, too
+    ;; NOTE: `pp' formats `<code>' tag contents, too.
     ;; (pp-esxml-to-xml (sxml-to-esxml sxml))
-
-    ;; custom format
-    ;; (my-pp-esxml-to-xml (sxml-to-esxml sxml))
-
+    ;; So I use `exml-to-xml' and run `tidy' after build.
     (esxml-to-xml (sxml-to-esxml sxml)))
-
-;; Keeps `<code>' tag untouched
-(defun my-pp-esxml-to-xml (esxml)
-    (pcase esxml
-        ((pred stringp)
-         (xml-escape-string esxml))
-        (`(raw-string ,string)
-         (cl-check-type string stringp)
-         string)
-        (`(comment nil ,body)
-         (concat "<!-- " body " -->"))
-
-        ;; code tag
-        (`(,tag ,attrs . ,body)
-         (cl-check-type tag symbol)
-         (cl-check-type attrs attrs)
-         (concat "<" (symbol-name tag)
-                 (when attrs
-                     (concat " " (mapconcat 'esxml--convert-pair attrs " ")))
-                 (if body
-                         (concat ">" (if (cl-every 'stringp body)
-                                             (mapconcat 'identity body " ")
-                                         (concat "\n"
-                                                 (replace-regexp-in-string
-                                                  "^" "  "
-                                                  (mapconcat 'my-pp-esxml-to-xml body "\n"))
-                                                 "\n"))
-                                 "</" (symbol-name tag) ">")
-                     "/>")))
-
-        (`(,tag ,attrs . ,body)
-         (cl-check-type tag symbol)
-         (cl-check-type attrs attrs)
-         (concat "<" (symbol-name tag)
-                 (when attrs
-                     (concat " " (mapconcat 'esxml--convert-pair attrs " ")))
-                 (if body
-                         (concat ">" (if (cl-every 'stringp body)
-                                             (mapconcat 'identity body " ")
-                                         (concat "\n"
-                                                 (replace-regexp-in-string
-                                                  "^" "  "
-                                                  (mapconcat 'my-pp-esxml-to-xml body "\n"))
-                                                 "\n"))
-                                 "</" (symbol-name tag) ">")
-                     "/>")))
-        (_
-         (error "%s is not a valid esxml expression" esxml))))
-
-;; ;; Example: `=code=' -> `code'
-;; (defun my-remove-org-markup (org-string)
-;;     ;; TODO: more reliable tool?
-;;     ;; TODO: unescape?
-;;     (my-strip-html (my-org-string-to-html org-string)))
-;; 
-;; (defun my-org-string-to-html (string &optional macros)
-;;     (interactive)
-;;     (with-temp-buffer
-;;         (let ((start (goto-char (point-max))))
-;;             (insert string)
-;;             ;; ?
-;;             (narrow-to-region start (point-max))
-;;             ;; In `*Org HTML Export*' buffer:
-;;             (with-current-buffer (org-html-export-as-html nil nil t t)
-;;                 ;; Strip `<p>\n' and `</p>':
-;;                 (let ((min (+ 4 (point-min))) (max (- (point-max) 5)))
-;;                     (buffer-substring min max))))))
 
 ;; Thanks: `http://sachachua.com/notebook/emacs/small-functions.el'
 ;; TODO: hide meesage here?:
@@ -326,28 +256,6 @@
                                     org-html-extension
                                     "html"))
                         plist pub-dir))
-
-;; (progn ;; TODO: handle details block
-;;     (package-install 'org-special-block-extras)
-;;     (require 'org-special-block-extras)
-;;
-;;     ;; needed?:
-;;     (org-special-block-extras-mode)
-;;
-;;     ;; `https://github.com/alhassy/org-special-block-extras/issues/12#issuecomment-1003612876'
-;;     (defun ospe-add-support-for-derived-backend (new-backend parent-backend)
-;;         "See subsequent snippet for a working example use."
-;;         (add-to-list 'org-export-filter-parse-tree-functions
-;;                      `(lambda (tree backend info)
-;;                           (when (eq backend (quote ,new-backend))
-;;                               (org-element-map tree 'export-block
-;;                                   (lambda (el)
-;;                                       (when (string= (org-element-property :type el) (s-upcase (symbol-name (quote ,new-backend))))
-;;                                           (org-element-put-property el :type (s-upcase (symbol-name (quote ,parent-backend))))))))
-;;                           tree))
-;;
-;;         ;; Add `org-special-block-extras' support:
-;;         (ospe-add-support-for-derived-backend 'my-site-html 'html)))
 
 
 ;;; Build

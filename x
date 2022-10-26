@@ -25,7 +25,7 @@ EOS
 }
 
 _build() {
-    # build (TODO: require explicit `b` argument?)
+    # TODO: Allowing multiple flags in one word: `./x b -rf` for force release rebuild
     if isForceFlag "${1:-}" || isForceFlag "${2:-}" ; then
         echo "cleaning up the output directory"
         if [ -d out ] ; then
