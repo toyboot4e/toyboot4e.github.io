@@ -72,7 +72,7 @@ _set() {
 
         # draft file
         if [ "$ext" == "draft" ] ; then
-            if "$flag" == "-r" ]] ; then
+            if [[ "$flag" == "-r" ]] ; then
                 # remove the `.draft` extension:
                 local g="${f%.draft}"
                 echo "- renaming: \`$f\` => \`$g\`"
@@ -117,7 +117,7 @@ _main() {
     cmd="$1"
     shift
 
-    if [ "$cmd" == 's' || "$cmd" == 'set' ] ; then
+    if [[ "$cmd" == 's' || "$cmd" == 'set' ]] ; then
         _set "$@"
         return
     fi
