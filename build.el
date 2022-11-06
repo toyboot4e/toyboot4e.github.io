@@ -148,10 +148,15 @@
                (href "style/style.css")))
       (link (@ (rel "stylesheet")
                (href "style/prism.css")))
-      (script (@ (src "/style/prism.js")
+      (script (@ (type "text/javascript")
                  ;; NOTE: It creates `async=""`. I prefer `async` only, but the value is required for XHTML.
-                 (async ""))
+                 (async "")
+                 (src "/style/prism.js"))
               ;; NOTE: empty body is required for self-closing tag
+              "")
+      (script (@ (type "text/javascript")
+                 (async "")
+                 (src "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"))
               "")
       ;; NOTE: `org-export-data' returns HTML
       (title (*RAW-STRING* ,(concat (my-strip-html (org-export-data (plist-get info :title) info)) " - toybeam")))))
