@@ -2,44 +2,58 @@
 #+DATE: <2022-10-09 Sun>
 #+FILETAGS: :blog:emacs:org_mode:
 
-[[https://systemcrafters.cc/][System Crafters]] の投稿を元に =org-mode= で本ブログを生成しました。
-
-SSG の主な機能は =org-publish= にお任せできますが、 HTML 生成は自分でやります。 HTML 生成には [[https://github.com/tali713/esxml][esxml]] (S
-式で書く XHTML) を使用しました。
+=org-mode= で本ブログを生成しました ([[https://github.com/toyboot4e/toyboot4e.github.io][リポジトリ]]) 。簡単に紹介します。
 
 #+BEGIN_QUOTE
 本当はミラーボールを回したかったですが、力不足だったようです。
 #+END_QUOTE
 
-* 使い方
+* =org-publish= ベースの SSG
 
-ファイル構成は以下です:
+** 背景
+
+Org はマークアップ言語です。主に Emacs ユーザに利用されています。
+
+Emacs のエディタ拡張 =org-mode= には、 =.org= ファイルを任意のフォーマットに変換するコマンド (=org-publish=) が付属します。これを SSG として利用すると、フラットなサイトを簡単に生成できます。
+
+** ファイル構成
+
+本ブログのファイル構成は以下です:
 
 #+BEGIN_SRC sh
 .
 ├── build.el   # ビルドスクリプト + ビルド設定 (ELisp)
 ├── out        # サイト
 ├── src        # サイトの全ソースファイル
-│   ├── img           # 画像ファイル
-│   ├── index.org     # 索引 (`org-publish` が自動生成する sitemap)
-│   ├── *.org         # 投稿記事
-│   ├── *.draft.org   # 下書き (`release` ビルドの際はビルド対象から除外)
-│   └── style         # CSS, JS やテンプレート HTML
 └── x          # ビルドスクリプトを起動するシェルスクリプト
 #+END_SRC
 
-コマンドラインから =x= スクリプトを実行します:
+=src/= ディレクトリの内容は以下になります。下書きファイルを =*.draft.org= とし、 release ビルド時は無視します:
 
-- =./x release= のような形でビルドすると、 =out/*.html= が生成されます。
-- =./x watch= としておけば、 =.org= ファイルの変更時にリビルドしてくれます。
+#+BEGIN_SRC
+src/
+├── img           # 画像ファイル
+├── index.org     # 索引 ("sitemap". `org-publish` が自動生成する)
+├── *.org         # 投稿記事
+├── *.draft.org   # 下書き (`--release` ビルドの際は無視される)
+└── style         # CSS, JS
+#+END_SRC
+
+** CLI
+
+=x= のサブコマンドを紹介します:
+
+- =./x build=: =src= ディレクトリをビルドします。
+- =./x serve=: ローカルサーバを立ち上げます。
+- =./x watch=: ソースファイルの変更時に自動的にリビルドします。
 
 * 主なリソース
 
-もしも =org-mode= でブログ生成したいという人がいたら、以下のリンクが役に立つかもしれません。
+=org-mode= でブログ生成したいという人がいたら、以下のリンクが役に立つかもしれません。
 
-** 入門記事
+** 参考記事
 
-公式マニュアルが説明不足なので、チュートリアルが重宝します:
+=org-publish= の公式マニュアルが説明不足なので、チュートリアルが重宝します:
 
 - [[https://systemcrafters.net/publishing-websites-with-org-mode/building-the-site/][Build Your Website with Org Mode - System Crafters]]\\
   =org-publish= と [[https://simplecss.org][Simple.css]] で綺麗なブログを作ります。
@@ -47,26 +61,29 @@ SSG の主な機能は =org-publish= にお任せできますが、 HTML 生成�
 - [[https://taingram.org/blog/org-mode-blog.html][Building a Emacs Org - Mode Blog]]\\
   似た内容ですが ELisp の書き方が参考になります。
 
+** ソースコード
+
+- [[https://github.com/SystemCrafters/systemcrafters.github.io/blob/dbeb6b7d8e2cb78d4583454f151f6064a1535efd/publish.el][systemcrafters.github.io/publish.el]]\\
+  [[https://github.com/tali713/esxml][esxml]] を使って S 式で HTML をテンプレートを表現します。
+
 ** The Org Manual
 
-[[https://orgmode.org/org.html][The Org Manual]] は意外に短くて説明不足の感はあります:
+[[https://orgmode.org/org.html][公式マニュアル]] です。意外に短くて説明不足の感はあります:
 
 - [[https://orgmode.org/manual/Exporting.html][13. Exporting]]
 
   - [[https://orgmode.org/manual/Exporting.html][13.9 HTML Export]]\\
-    ヘッダ生成などのオプションを設定できます。ただし自由度が低いので、自分で HTML テンプレートを書く
-    のが良いと思います。
+    ヘッダ生成などのオプションを設定できます。ただし自由度が低いので、自分で HTML テンプレートを書くのが良いと思います。
 
   - [[https://orgmode.org/manual/Advanced-Export-Configuration.html][13.17 Advanced Export Configuration]]\\
-    =ox-html= の HTML テンプレートを差し替えることができます。またフィルタ (Unix フィルタのニュアンス)
-    を使ってコードブロックの HTML 変換などをオーバーライドできることがわかります。
+    =ox-html= の HTML テンプレートを差し替えることができます。またフィルタを使ってコードブロックの HTML 変換などをオーバーライドできることがわかります。
 
 - [[https://orgmode.org/manual/Publishing.html][14. Publishing]]\\
   =org-publish= のオプションを把握することができます。
 
 ** HTML 生成の改良
 
-HTML 生成をハイジャックすれば完成です:
+HTML 生成をハイジャックして完成です:
 
 - [[https://github.com/SystemCrafters/systemcrafters.github.io/blob/master/publish.el][publish.el (System Crafters website)]]\\
  [[https://github.com/tali713/esxml][esxml]] を使ったテンプレート HTML を作成します。
@@ -74,19 +91,15 @@ HTML 生成をハイジャックすれば完成です:
 - [[https://www.roygbyte.com/add_syntax_highlighting_to_an_org_publish_project.html][Add syntax highlighting to an org-publish-project]]\\
   コードブロックを [[https://prismjs.com][Prism.js]] 対応の HTML に変換するフィルタが載っています。
 
-* メモ
+* その他
 
-- XHTML
-  - XHTML だと =async= のようなフラグは書けない (~async=""~ になる)\\
-    https://stackoverflow.com/a/21800875
+** Org 製のブログ
 
-- =org-mode=
-  - [[https://orgmode.org/manual/Link-Abbreviations.html][Link Abbreviations]]
-  - Bullet の中に改行を入れたければ、 markdown のように =\\= を書くしかない
+見かけるたびに追記します。
 
-- TODOs
-  - [X] =<title>= タグから =<code>= タグなどを取り除く → [[https://gnu.support/gnu-emacs/emacs-lisp/Emacs-Lisp-strip-html-by-Sacha-Chua-remove-those-tags.html][このコードをコピペ]]
-  - [X] 出力 HTML を整形する → [[http://www.html-tidy.org/][tidy]]
-  - [ ] =index.html= をテーブルにする？
-  - [ ] =index.html= でミラーボールを回す
+- [[https://m13o.net/][m13o.net]]: =org-publish= 製
+- [[https://taingram.org/blog/][Thomas Ingram]]: =org-publish= 製
+- [[https://systemcrafters.cc/][System Crafters]]: =org-publish= 製？
+- [[https://distro.tube/][Distro Tube]]: =org-export= 製
+- [[https://conao3.com/blog/][Conao3 Note]]: Hugo 製
 
