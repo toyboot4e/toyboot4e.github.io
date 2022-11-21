@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta name="generator" content="HTML Tidy for HTML5 for Apple macOS version 5.8.0">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>org-mode で簡易ブログ生成 - toybeam</title>
+  <meta name="description" content="devlog of toyboot4e">
   <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
   <link rel="stylesheet" href="style/style.css">
   <link rel="stylesheet" href="style/prism.css">
-  <script src="/style/prism.js" async></script>
-  <title>org-mode で簡易ブログ生成 - toybeam</title>
+  <script type="text/javascript" async src="/style/prism.js"></script><!-- MathJax -->
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 <body>
   <header role="banner">
@@ -19,45 +20,65 @@
     </nav>
   </header>
   <main role="main">
-    <p><a href="https://systemcrafters.cc/">System Crafters</a> の投稿を元に <code>org-mode</code> で本ブログを生成しました。</p>
-    <p>SSG の主な機能は <code>org-publish</code> にお任せできますが、 HTML 生成は自分でやります。 HTML 生成には <a href="https://github.com/tali713/esxml">esxml</a> (S 式で書く XHTML)
-    を使用しました。</p>
+    <p><code>org-mode</code> で本ブログを生成しました (<a href="https://github.com/toyboot4e/toyboot4e.github.io">リポジトリ</a>) 。簡単に紹介します。</p>
     <blockquote>
       <p>本当はミラーボールを回したかったですが、力不足だったようです。</p>
     </blockquote>
-    <div id="outline-container-org27f0ff5" class="outline-2">
-      <h2 id="org27f0ff5"><a href="#org27f0ff5">使い方</a></h2>
-      <div class="outline-text-2" id="text-org27f0ff5">
-        <p>ファイル構成は以下です:</p>
-        <div class="org-src-container">
-          <pre><code class="src language-sh">.
+    <div id="outline-container-orgfc6b36e" class="outline-2">
+      <h2 id="orgfc6b36e"><a href="#orgfc6b36e"><code>org-publish</code> ベースの SSG</a></h2>
+      <div class="outline-text-2" id="text-orgfc6b36e"></div>
+      <div id="outline-container-org6d3eb54" class="outline-3">
+        <h3 id="org6d3eb54"><a href="#org6d3eb54">背景</a></h3>
+        <div class="outline-text-3" id="text-org6d3eb54">
+          <p>Org はマークアップ言語です。主に Emacs ユーザに利用されています。</p>
+          <p>Emacs のエディタ拡張 <code>org-mode</code> には、 <code>.org</code> ファイルを任意のフォーマットに変換するコマンド (<code>org-publish</code>) が付属します。これを SSG
+          として利用すると、フラットなサイトを簡単に生成できます。</p>
+        </div>
+      </div>
+      <div id="outline-container-org5a8b43b" class="outline-3">
+        <h3 id="org5a8b43b"><a href="#org5a8b43b">ファイル構成</a></h3>
+        <div class="outline-text-3" id="text-org5a8b43b">
+          <p>本ブログのファイル構成は以下です:</p>
+          <div class="org-src-container">
+            <pre><code class="src language-sh">.
 ├── build.el   # ビルドスクリプト + ビルド設定 (ELisp)
 ├── out        # サイト
 ├── src        # サイトの全ソースファイル
-│   ├── img           # 画像ファイル
-│   ├── index.org     # 索引 (`org-publish` が自動生成する sitemap)
-│   ├── *.org         # 投稿記事
-│   ├── *.draft.org   # 下書き (`release` ビルドの際はビルド対象から除外)
-│   └── style         # CSS, JS やテンプレート HTML
 └── x          # ビルドスクリプトを起動するシェルスクリプト
 </code></pre>
+          </div>
+          <p><code>src/</code> ディレクトリの内容は以下になります。下書きファイルを <code>*.draft.org</code> とし、 release ビルド時は無視します:</p>
+          <pre class="example">
+src/
+├── img           # 画像ファイル
+├── index.org     # 索引 ("sitemap". `org-publish` が自動生成する)
+├── *.org         # 投稿記事
+├── *.draft.org   # 下書き (`--release` ビルドの際は無視される)
+└── style         # CSS, JS
+</pre>
         </div>
-        <p>コマンドラインから <code>x</code> スクリプトを実行します:</p>
-        <ul class="org-ul">
-          <li><code>./x release</code> のような形でビルドすると、 <code>out/*.html</code> が生成されます。</li>
-          <li><code>./x watch</code> としておけば、 <code>.org</code> ファイルの変更時にリビルドしてくれます。</li>
-        </ul>
+      </div>
+      <div id="outline-container-org0372c19" class="outline-3">
+        <h3 id="org0372c19"><a href="#org0372c19">CLI</a></h3>
+        <div class="outline-text-3" id="text-org0372c19">
+          <p><code>x</code> のサブコマンドを紹介します:</p>
+          <ul class="org-ul">
+            <li><code>./x build</code>: <code>src</code> ディレクトリをビルドします。</li>
+            <li><code>./x serve</code>: ローカルサーバを立ち上げます。</li>
+            <li><code>./x watch</code>: ソースファイルの変更時に自動的にリビルドします。</li>
+          </ul>
+        </div>
       </div>
     </div>
-    <div id="outline-container-org5727d36" class="outline-2">
-      <h2 id="org5727d36"><a href="#org5727d36">主なリソース</a></h2>
-      <div class="outline-text-2" id="text-org5727d36">
-        <p>もしも <code>org-mode</code> でブログ生成したいという人がいたら、以下のリンクが役に立つかもしれません。</p>
+    <div id="outline-container-org0a73d01" class="outline-2">
+      <h2 id="org0a73d01"><a href="#org0a73d01">主なリソース</a></h2>
+      <div class="outline-text-2" id="text-org0a73d01">
+        <p><code>org-mode</code> でブログ生成したいという人がいたら、以下のリンクが役に立つかもしれません。</p>
       </div>
-      <div id="outline-container-orga501cd9" class="outline-3">
-        <h3 id="orga501cd9"><a href="#orga501cd9">入門記事</a></h3>
-        <div class="outline-text-3" id="text-orga501cd9">
-          <p>公式マニュアルが説明不足なので、チュートリアルが重宝します:</p>
+      <div id="outline-container-org6819442" class="outline-3">
+        <h3 id="org6819442"><a href="#org6819442">参考記事</a></h3>
+        <div class="outline-text-3" id="text-org6819442">
+          <p><code>org-publish</code> の公式マニュアルが説明不足なので、チュートリアルが重宝します:</p>
           <ul class="org-ul">
             <li>
               <a href="https://systemcrafters.net/publishing-websites-with-org-mode/building-the-site/">Build Your Website with Org Mode - System
@@ -71,21 +92,34 @@
           </ul>
         </div>
       </div>
-      <div id="outline-container-orgac862de" class="outline-3">
-        <h3 id="orgac862de"><a href="#orgac862de">The Org Manual</a></h3>
-        <div class="outline-text-3" id="text-orgac862de">
-          <p><a href="https://orgmode.org/org.html">The Org Manual</a> は意外に短くて説明不足の感はあります:</p>
+      <div id="outline-container-orgf8deec0" class="outline-3">
+        <h3 id="orgf8deec0"><a href="#orgf8deec0">ソースコード</a></h3>
+        <div class="outline-text-3" id="text-orgf8deec0">
+          <ul class="org-ul">
+            <li>
+              <a href=
+              "https://github.com/SystemCrafters/systemcrafters.github.io/blob/dbeb6b7d8e2cb78d4583454f151f6064a1535efd/publish.el">systemcrafters.github.io/publish.el</a><br>
+
+              <a href="https://github.com/tali713/esxml">esxml</a> を使って S 式で HTML をテンプレートを表現します。
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div id="outline-container-org7a9b81d" class="outline-3">
+        <h3 id="org7a9b81d"><a href="#org7a9b81d">The Org Manual</a></h3>
+        <div class="outline-text-3" id="text-org7a9b81d">
+          <p><a href="https://orgmode.org/org.html">公式マニュアル</a> です。意外に短くて説明不足の感はあります:</p>
           <ul class="org-ul">
             <li>
               <a href="https://orgmode.org/manual/Exporting.html">13. Exporting</a>
               <ul class="org-ul">
                 <li>
                   <a href="https://orgmode.org/manual/Exporting.html">13.9 HTML Export</a><br>
-                  ヘッダ生成などのオプションを設定できます。ただし自由度が低いので、自分で HTML テンプレートを書く のが良いと思います。
+                  ヘッダ生成などのオプションを設定できます。ただし自由度が低いので、自分で HTML テンプレートを書くのが良いと思います。
                 </li>
                 <li>
                   <a href="https://orgmode.org/manual/Advanced-Export-Configuration.html">13.17 Advanced Export Configuration</a><br>
-                  <code>ox-html</code> の HTML テンプレートを差し替えることができます。またフィルタ (Unix フィルタのニュアンス) を使ってコードブロックの HTML 変換などをオーバーライドできることがわかります。
+                  <code>ox-html</code> の HTML テンプレートを差し替えることができます。またフィルタを使ってコードブロックの HTML 変換などをオーバーライドできることがわかります。
                 </li>
               </ul>
             </li>
@@ -96,10 +130,10 @@
           </ul>
         </div>
       </div>
-      <div id="outline-container-org134995e" class="outline-3">
-        <h3 id="org134995e"><a href="#org134995e">HTML 生成の改良</a></h3>
-        <div class="outline-text-3" id="text-org134995e">
-          <p>HTML 生成をハイジャックすれば完成です:</p>
+      <div id="outline-container-org20ca713" class="outline-3">
+        <h3 id="org20ca713"><a href="#org20ca713">HTML 生成の改良</a></h3>
+        <div class="outline-text-3" id="text-org20ca713">
+          <p>HTML 生成をハイジャックして完成です:</p>
           <ul class="org-ul">
             <li>
               <a href="https://github.com/SystemCrafters/systemcrafters.github.io/blob/master/publish.el">publish.el (System Crafters website)</a><br>
@@ -114,40 +148,31 @@
         </div>
       </div>
     </div>
-    <div id="outline-container-org5d0a27f" class="outline-2">
-      <h2 id="org5d0a27f"><a href="#org5d0a27f">メモ</a></h2>
-      <div class="outline-text-2" id="text-org5d0a27f">
-        <ul class="org-ul">
-          <li>XHTML
-            <ul class="org-ul">
-              <li>XHTML だと <code>async</code> のようなフラグは書けない (<code>async=""</code> になる)<br>
-                <a href="https://stackoverflow.com/a/21800875">https://stackoverflow.com/a/21800875</a>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <code>org-mode</code>
-            <ul class="org-ul">
-              <li>
-                <a href="https://orgmode.org/manual/Link-Abbreviations.html">Link Abbreviations</a>
-              </li>
-              <li>Bullet の中に改行を入れたければ、 markdown のように <code>\\</code> を書くしかない</li>
-            </ul>
-          </li>
-          <li>TODOs
-            <ul class="org-ul">
-              <li class="on">
-                <code>[X]</code> <code>&lt;title&gt;</code> タグから <code>&lt;code&gt;</code> タグなどを取り除く → <a href=
-                "https://gnu.support/gnu-emacs/emacs-lisp/Emacs-Lisp-strip-html-by-Sacha-Chua-remove-those-tags.html">このコードをコピペ</a>
-              </li>
-              <li class="on">
-                <code>[X]</code> 出力 HTML を整形する → <a href="http://www.html-tidy.org/">tidy</a>
-              </li>
-              <li class="off"><code>[&nbsp;]</code> <code>index.html</code> をテーブルにする？</li>
-              <li class="off"><code>[&nbsp;]</code> <code>index.html</code> でミラーボールを回す</li>
-            </ul>
-          </li>
-        </ul>
+    <div id="outline-container-org5c165ad" class="outline-2">
+      <h2 id="org5c165ad"><a href="#org5c165ad">その他</a></h2>
+      <div class="outline-text-2" id="text-org5c165ad"></div>
+      <div id="outline-container-org3714ed5" class="outline-3">
+        <h3 id="org3714ed5"><a href="#org3714ed5">Org 製のブログ</a></h3>
+        <div class="outline-text-3" id="text-org3714ed5">
+          <p>見かけるたびに追記します。</p>
+          <ul class="org-ul">
+            <li>
+              <a href="https://m13o.net/">m13o.net</a>: <code>org-publish</code> 製
+            </li>
+            <li>
+              <a href="https://taingram.org/blog/">Thomas Ingram</a>: <code>org-publish</code> 製
+            </li>
+            <li>
+              <a href="https://systemcrafters.cc/">System Crafters</a>: <code>org-publish</code> 製？
+            </li>
+            <li>
+              <a href="https://distro.tube/">Distro Tube</a>: <code>org-export</code> 製
+            </li>
+            <li>
+              <a href="https://conao3.com/blog/">Conao3 Note</a>: Hugo 製
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </main>
