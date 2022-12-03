@@ -16,10 +16,10 @@ USAGE:
 
 SUB COMMANDS:
     build   build the devlog
-    serve   starts HTTP server with `python3`
+    serve   starts HTTP server with \`python3\`
     set     sets draft / release state with file name extension
     tidy    formats the output HTML files
-    watch   runs `./x build release` on source `.org` file change
+    watch   runs \`./x build release\` on source \`.org\` file change
 EOS
 }
 
@@ -79,7 +79,7 @@ _set() {
                 mv "$f" "$g"
             else
                 echo "- already a craft: \`$f\`"
-            fi 
+            fi
 
             continue
         fi
@@ -92,14 +92,17 @@ _set() {
             mv "$f" "$g"
         else
             echo "- already a release: \`$f\`"
-        fi 
+        fi
     done
 }
 
 _tidy() {
     echo "tidying all the htmls.."
     for f in $(fd -e html . out) ; do
-        tidy -i -m -w 160 -ashtml -utf8 "$f" > /dev/null 2>&1
+        tidy \
+            --tidy-mark no \
+            -i -m -w 160 \
+            -ashtml -utf8 "$f" > /dev/null 2>&1
     done
 }
 
