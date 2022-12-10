@@ -30,12 +30,17 @@ header > p {
 }
 
 h1 {
-    /* border-bottom: 1px solid rgb(79, 123, 84); */
     text-decoration: underline;
     text-underline-position: under;
     text-decoration-color: rgb(79, 123, 84);
     text-decoration-thickness: 2px;
     line-height: 1.2;
+}
+
+h2 {
+    border-bottom: 1px solid rgb(96, 96, 114);
+    /* border-bottom: 1px solid rgb(126, 131, 152); */
+    padding-bottom: 6px;
 }
 
 h2 a, h3 a, h4 a, h5 a, h6 a {
@@ -71,16 +76,22 @@ footer > div a:hover {
 }
 
 blockquote {
+    font-style: normal;
     margin: 0 1rem 0 1rem;
 }
 
-blockquote > p {
-    font-style: normal;
+blockquote > p:first-child {
     margin-top: 0.25rem;
     margin-bottom: 0.25rem;
 }
 
 .figure {
     text-align: center;
+}
+
+div.WARNING {
+    border-left: 2px solid #d75f5f;
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
 

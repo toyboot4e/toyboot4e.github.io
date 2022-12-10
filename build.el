@@ -5,7 +5,18 @@
 ;; - `https://taingram.org/blog/org-mode-blog.html'
 ;; - `https://www.roygbyte.com/add_syntax_highlighting_to_an_org_publish_project.html'
 
+;; TODO: Custom admonition filter
+
 (setq make-backup-files nil)
+
+;;; Preferences
+
+(progn
+    ;; Prefer hardbreaks
+    (setq org-export-preserve-breaks t)
+
+    ;; TODO: prevent `org-export` from converting whitespaces to tabs
+    (setq org-src-preserve-indentation t))
 
 ;;; Setup
 
@@ -82,7 +93,7 @@
                         ;; `index.html' generation:
                         :auto-sitemap t
                         :sitemap-filename "index.org"
-                        :sitemap-title "Index"
+                        :sitemap-title "toybeam"
                         :sitemap-format-entry my-org-sitemap-format-entry
                         :sitemap-style list ;; list | tree
                         :sitemap-sort-files chronologically))
@@ -142,8 +153,14 @@
       ;; (meta (@ (author "toyboot4e")))
       (meta (@ (name "viewport")
                (content "width=device-width, initial-scale=1")))
+      ;; NOTE: `org-export-data' returns HTML, so we'll remove HTML tags
+      (title (*RAW-STRING* ,(concat (my-strip-html (org-export-data (plist-get info :title) info)) " - toybeam")))
+      (meta (@ (name "description")
+               (content "devlog of toyboot4e")))
+      ;; (link (@ (rel "stylesheet")
+      ;;          (href "https://cdn.simplecss.org/simple.min.css")))
       (link (@ (rel "stylesheet")
-               (href "https://cdn.simplecss.org/simple.min.css")))
+               (href "style/simple.min.css")))
       (link (@ (rel "stylesheet")
                (href "style/style.css")))
       (link (@ (rel "stylesheet")
@@ -154,12 +171,11 @@
                  (src "/style/prism.js"))
               ;; NOTE: empty body is required for self-closing tag
               "")
+      (*RAW-STRING* "<!-- MathJax -->")
       (script (@ (type "text/javascript")
                  (async "")
                  (src "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"))
-              "")
-      ;; NOTE: `org-export-data' returns HTML
-      (title (*RAW-STRING* ,(concat (my-strip-html (org-export-data (plist-get info :title) info)) " - toybeam")))))
+              "")))
 
 ;; Returns `<header>' SXML
 (defun my-html-header (info)
