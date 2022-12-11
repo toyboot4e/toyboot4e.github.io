@@ -24,20 +24,20 @@
     <blockquote>
       <p>本当はミラーボールを回したかったですが、力不足だったようです。<br></p>
     </blockquote>
-    <div id="outline-container-org090c59c" class="outline-2">
-      <h2 id="org090c59c"><a href="#org090c59c"><code>org-publish</code> ベースの SSG</a></h2>
-      <div class="outline-text-2" id="text-org090c59c"></div>
-      <div id="outline-container-org89eb7bb" class="outline-3">
-        <h3 id="org89eb7bb"><a href="#org89eb7bb">背景</a></h3>
-        <div class="outline-text-3" id="text-org89eb7bb">
+    <div id="outline-container-org8e2bcbb" class="outline-2">
+      <h2 id="org8e2bcbb"><a href="#org8e2bcbb"><code>org-publish</code> ベースの SSG</a></h2>
+      <div class="outline-text-2" id="text-org8e2bcbb"></div>
+      <div id="outline-container-org818c86c" class="outline-3">
+        <h3 id="org818c86c"><a href="#org818c86c">背景</a></h3>
+        <div class="outline-text-3" id="text-org818c86c">
           <p>Org はマークアップ言語です。主に Emacs ユーザに利用されています。<br></p>
           <p>Emacs のエディタ拡張 <code>org-mode</code> には、 <code>.org</code> ファイルを任意のフォーマットに変換するコマンド (<code>org-publish</code>) が付属します。これを SSG
           として利用すると、フラットなサイトを簡単に生成できます。<br></p>
         </div>
       </div>
-      <div id="outline-container-org94d5985" class="outline-3">
-        <h3 id="org94d5985"><a href="#org94d5985">ファイル構成</a></h3>
-        <div class="outline-text-3" id="text-org94d5985">
+      <div id="outline-container-orgac62312" class="outline-3">
+        <h3 id="orgac62312"><a href="#orgac62312">ファイル構成</a></h3>
+        <div class="outline-text-3" id="text-orgac62312">
           <p>本ブログのファイル構成は以下です:<br></p>
           <div class="org-src-container">
             <pre><code class="src language-sh">.
@@ -58,9 +58,9 @@ src/
 </pre>
         </div>
       </div>
-      <div id="outline-container-org396d847" class="outline-3">
-        <h3 id="org396d847"><a href="#org396d847">CLI</a></h3>
-        <div class="outline-text-3" id="text-org396d847">
+      <div id="outline-container-orge1967c0" class="outline-3">
+        <h3 id="orge1967c0"><a href="#orge1967c0">CLI</a></h3>
+        <div class="outline-text-3" id="text-orge1967c0">
           <p><code>x</code> のサブコマンドを紹介します:<br></p>
           <ul class="org-ul">
             <li><code>./x build</code>: <code>src</code> ディレクトリをビルドします。<br></li>
@@ -70,14 +70,14 @@ src/
         </div>
       </div>
     </div>
-    <div id="outline-container-orgb0be292" class="outline-2">
-      <h2 id="orgb0be292"><a href="#orgb0be292">主なリソース</a></h2>
-      <div class="outline-text-2" id="text-orgb0be292">
+    <div id="outline-container-org847fe49" class="outline-2">
+      <h2 id="org847fe49"><a href="#org847fe49">主なリソース</a></h2>
+      <div class="outline-text-2" id="text-org847fe49">
         <p><code>org-mode</code> でブログ生成したいという人がいたら、以下のリンクが役に立つかもしれません。<br></p>
       </div>
-      <div id="outline-container-orgefd22a1" class="outline-3">
-        <h3 id="orgefd22a1"><a href="#orgefd22a1">参考記事</a></h3>
-        <div class="outline-text-3" id="text-orgefd22a1">
+      <div id="outline-container-orgd19bb51" class="outline-3">
+        <h3 id="orgd19bb51"><a href="#orgd19bb51">参考記事</a></h3>
+        <div class="outline-text-3" id="text-orgd19bb51">
           <p><code>org-publish</code> の公式マニュアルが説明不足なので、チュートリアルが重宝します:<br></p>
           <ul class="org-ul">
             <li>
@@ -92,9 +92,9 @@ src/
           </ul>
         </div>
       </div>
-      <div id="outline-container-org5ce037f" class="outline-3">
-        <h3 id="org5ce037f"><a href="#org5ce037f">The Org Manual</a></h3>
-        <div class="outline-text-3" id="text-org5ce037f">
+      <div id="outline-container-orgaf5b1e6" class="outline-3">
+        <h3 id="orgaf5b1e6"><a href="#orgaf5b1e6">The Org Manual</a></h3>
+        <div class="outline-text-3" id="text-orgaf5b1e6">
           <p><a href="https://orgmode.org/org.html">公式マニュアル</a> です。意外に短くて説明不足の感はあります:<br></p>
           <ul class="org-ul">
             <li>
@@ -117,14 +117,14 @@ src/
           </ul>
         </div>
       </div>
-      <div id="outline-container-orgcdb8517" class="outline-3">
-        <h3 id="orgcdb8517"><a href="#orgcdb8517">HTML 生成の改良</a></h3>
-        <div class="outline-text-3" id="text-orgcdb8517">
+      <div id="outline-container-org4483078" class="outline-3">
+        <h3 id="org4483078"><a href="#org4483078">HTML 生成の改良</a></h3>
+        <div class="outline-text-3" id="text-org4483078">
           <p>HTML 生成をハイジャックして完成です:<br></p>
           <ul class="org-ul">
             <li>
               <a href="https://github.com/SystemCrafters/systemcrafters.github.io/blob/master/publish.el">publish.el (System Crafters website)</a><br>
-              <a href="https://github.com/tali713/esxml">esxml</a> を使ったテンプレート HTML を作成します。<br>
+              <a href="https://github.com/tali713/esxml">esxml</a> を使ってテンプレート HTML を作成します。<br>
             </li>
             <li>
               <a href="https://www.roygbyte.com/add_syntax_highlighting_to_an_org_publish_project.html">Add syntax highlighting to an
@@ -135,12 +135,12 @@ src/
         </div>
       </div>
     </div>
-    <div id="outline-container-org870638c" class="outline-2">
-      <h2 id="org870638c"><a href="#org870638c">その他</a></h2>
-      <div class="outline-text-2" id="text-org870638c"></div>
-      <div id="outline-container-org12379ee" class="outline-3">
-        <h3 id="org12379ee"><a href="#org12379ee">Org 製のブログ</a></h3>
-        <div class="outline-text-3" id="text-org12379ee">
+    <div id="outline-container-org7f2de4d" class="outline-2">
+      <h2 id="org7f2de4d"><a href="#org7f2de4d">その他</a></h2>
+      <div class="outline-text-2" id="text-org7f2de4d"></div>
+      <div id="outline-container-org8d876fa" class="outline-3">
+        <h3 id="org8d876fa"><a href="#org8d876fa">Org 製のブログ</a></h3>
+        <div class="outline-text-3" id="text-org8d876fa">
           <p>見かけるたびに追記します。<br></p>
           <ul class="org-ul">
             <li>

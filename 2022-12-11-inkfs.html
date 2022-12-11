@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>開発中の 2D フレームワークについて - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="style/simple.min.css"/><link rel="stylesheet" href="style/style.css"/><link rel="stylesheet" href="style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>開発中の 2D フレームワークについて</h1><p>Dec 11, 2022</p><nav role="navigation"><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main"><p>
+<a href="https://qiita.com/advent-calendar/2022/mygameengine">GameEngineDev Advent Calendar 2022</a> 11 日目の記事です。<br>
+</p>
+
+<p>
+開発中の 2D フレームワークについて共有します。<br>
+</p>
+
+<blockquote>
+<p>
+『GameEngineDev』カレンダーの記事ですが、 2D フレームワークに関する投稿となります。スケールが落ちますがご了承ください 🙇<br>
+</p>
+</blockquote>
+
+<div id="outline-container-orge14b5e3" class="outline-2">
+<h2 id="orge14b5e3"><a href="#orge14b5e3">背景</a></h2>
+<div class="outline-text-2" id="text-orge14b5e3">
+</div>
+<div id="outline-container-org3df77ee" class="outline-3">
+<h3 id="org3df77ee"><a href="#org3df77ee">作っているもの</a></h3>
+<div class="outline-text-3" id="text-org3df77ee">
+<p>
+開発中フレームワークの名前は <code>inkfs</code> 🦑 です。ライブラリを組み合わせた程度のものですから、経験者なら 2 週間程度で再現できるでしょう。<br>
+</p>
+
+
+<div id="org4656e78" class="figure">
+<p><img src="./img/gfx/imguika_chan.gif" alt="imguika_chan.gif" width="391px"><br>
+</p>
+<p><span class="figure-number">Figure 1: </span>マスコットです。配布元サイトへのリンクを後日追加します……</p>
+</div>
+
+<p>
+ライブラリが担当するのはメディアの処理で、ウィンドウ・グラフィクス・オーディオ・テキストなどがあたります。その上の薄いレイヤが <code>inkfs</code> です。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3ef3928" class="outline-3">
+<h3 id="org3ef3928"><a href="#org3ef3928">ゲームエンジンとの違い</a></h3>
+<div class="outline-text-3" id="text-org3ef3928">
+<p>
+『ゲームエンジン』は『フレームワーク』よりも大規模な開発が伴っている印象があります。アセット処理の GUI ツールが付属していたり、ブラウザやスマートフォンなど様々なプラットフォームに対応します。<br>
+</p>
+
+<p>
+あるいは低レイヤ寄りのライブラリを自作していたら、『ゲームエンジン』に当たると思います。必要な知識も段違いです。そうした感覚ぼんやり共通されている気がします。<br>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org523492b" class="outline-2">
+<h2 id="org523492b"><a href="#org523492b">主なモジュール</a></h2>
+<div class="outline-text-2" id="text-org523492b">
+<p>
+<code>inkfs</code> 🦑 の主なモジュールを紹介します。<br>
+</p>
+</div>
+
+<div id="outline-container-orgacd69fe" class="outline-3">
+<h3 id="orgacd69fe"><a href="#orgacd69fe">1. ECS (Entity-Component-System)</a></h3>
+<div class="outline-text-3" id="text-orgacd69fe">
+<p>
+<code>inkfs</code> 🦑 は Rust でゲームを作るためのフレームワークです。<br>
+</p>
+
+<p>
+Rust でゲームを作る際は、データの持ち方が重要です。たとえば、<br>
+</p>
+
+<ul class="org-ul">
+<li>グローバル変数<br>
+ゲーム開発に必要なグローバル変数は、描画コンテクストやゲームマップなどです。 Rust に継承はありませんから、コンポジションしようとなります。しかしデータのネストが深くなると、借用の分割も面倒です。<br></li>
+
+<li>キャラデータ<br>
+ロボットや蝙蝠など、異なる種類のキャラクターデータを一括で処理したいことがあります。　<code>trait</code> で抽象するとポインタが増えますし、 <code>trait</code> の組み合わせでうまく表現できなくなる懸念があります。<br></li>
+</ul>
+
+<p>
+これらは Entity-Component-System を使うと一気に解決します。むしろ伝統的なゲームの作り方の方が Rust ではチャレンジングだったりします。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc47870e" class="outline-3">
+<h3 id="orgc47870e"><a href="#orgc47870e">2. Scene graph</a></h3>
+<div class="outline-text-3" id="text-orgc47870e">
+<p>
+<code>inkfs</code> 🦑 のシーングラフは ECS の上に作っています。<br>
+</p>
+
+
+<div id="orge7c8799" class="figure">
+<p><img src="./img/gfx/ui-text.gif" alt="ui-text.gif" width="292px"><br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org917a294" class="outline-4">
+<h4 id="org917a294"><a href="#org917a294">Renderable の共通コンポーネント</a></h4>
+<div class="outline-text-4" id="text-org917a294">
+<p>
+どの rendearble も以下のコンポーネントを持ちます:<br>
+</p>
+
+<ul class="org-ul">
+<li><code>Node</code><br>
+親子関係の連結リストです。<br></li>
+<li><code>Transform</code> (<code>LocalTranform</code> + <code>GlobalTransform</code>)<br></li>
+<li><code>ZOrder</code><br></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org7a4bb4c" class="outline-4">
+<h4 id="org7a4bb4c"><a href="#org7a4bb4c">様々な種類の renderable</a></h4>
+<div class="outline-text-4" id="text-org7a4bb4c">
+<p>
+様々な renderable をコンポーネントで表現できます:<br>
+</p>
+
+<ul class="org-ul">
+<li><code>Primitive</code><br></li>
+<li><code>Sprite</code><br></li>
+<li><code>NineSliceSprite</code><br></li>
+<li><code>Text</code>, <code>RasterText</code><br></li>
+</ul>
+
+<p>
+アニメーションも容易に表現できます。<br>
+</p>
+
+
+<div id="org4cf4dc5" class="figure">
+<p><img src="./img/gfx/dir-tween.gif" alt="dir-tween.gif" width="71px"><br>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga4bead1" class="outline-4">
+<h4 id="orga4bead1"><a href="#orga4bead1">ソート</a></h4>
+<div class="outline-text-4" id="text-orga4bead1">
+<p>
+上の renderable は様々なデータに分かれていますが、頂点データに変えた後には同質のデータです。以下の <code>DrawCall</code> を作成後、 <code>z_order</code> でソートしてから描画しています:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-rust">pub struct DrawCall {
+    pub z_order: ZOrder,
+    pub verts_range: ops::Range&lt;u32&gt;,
+    pub tex_id: rgpu::Id&lt;rgpu::Texture&gt;,
+}
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd2a63e6" class="outline-3">
+<h3 id="orgd2a63e6"><a href="#orgd2a63e6">3. ウィンドウ・入力 (<code>sdl2</code>)</a></h3>
+<div class="outline-text-3" id="text-orgd2a63e6">
+
+<div id="org5550202" class="figure">
+<p><img src="./img/gfx/scale-bug.png" alt="scale-bug.png" width="753px"><br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org57a8676" class="outline-4">
+<h4 id="org57a8676"><a href="#org57a8676">主なウィンドウのライブラリ</a></h4>
+<div class="outline-text-4" id="text-org57a8676">
+<p>
+ウィンドウ表示・入力処理のライブラリとしては SDL や GLFW が有名です。<br>
+</p>
+
+<ul class="org-ul">
+<li>SDL が最も安心な気がします。様々なサブモジュールが付属しますが、『ウィンドウ操作のシェル』のように扱うのが良いとされています。<br></li>
+<li>GLFW は "GL" とありますが OpenGL 以外のユーザも使用できます。僕は使ったことがありません。<br></li>
+<li>Rust 製のライブラリとしては <code>winit</code> もあります。以前は macOS での動きがあまりよく無かったのですが、最近の動向はどうなのか……<br></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org69df3d5" class="outline-4">
+<h4 id="org69df3d5"><a href="#org69df3d5">入力処理</a></h4>
+<div class="outline-text-4" id="text-org69df3d5">
+<p>
+イベント駆動にするか、すべてのキー入力イベントを 1 つの <code>Input</code> オブジェクトに集約すると思います。僕は後者が好みです。<br>
+</p>
+
+<p>
+<code>inkfs</code> 🦑 では主に <a href="https://github.com/FNA-XNA/FNA/tree/master/src/Input">FNA の Input モジュール</a> を参考に、入力状態のダブルバッファを持っています。また『仮想キー』のモジュールを作り、『Enter または Space』のようなキーを定義できるようにしています。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org1c21b08" class="outline-4">
+<h4 id="org1c21b08"><a href="#org1c21b08">FPS カウンター</a></h4>
+<div class="outline-text-4" id="text-org1c21b08">
+<p>
+<a href="https://techblog.kayac.com/approximate-average-fps">平均FPSを楽に近似する</a> にある式を使うと簡単です。<br>
+</p>
+
+<pre class="example">
+僕はなぜか spike の計算が上手くいってないですが……
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org61e3f54" class="outline-3">
+<h3 id="org61e3f54"><a href="#org61e3f54">4. グラフィクス (<code>wgpu</code>)</a></h3>
+<div class="outline-text-3" id="text-org61e3f54">
+<p>
+もくもく<br>
+</p>
+
+
+<div id="org5454558" class="figure">
+<p><img src="./img/gfx/fog-1.png" alt="fog-1.png" width="700px"><br>
+</p>
+</div>
+
+<p>
+やばい<br>
+</p>
+
+
+<div id="orgcabcce1" class="figure">
+<p><img src="./img/gfx/fog-2.png" alt="fog-2.png" width="700px"><br>
+</p>
+</div>
+
+<p>
+<a href="https://github.com/gfx-rs/wgpu">wgpu</a> は <a href="https://sotrh.github.io/learn-wgpu/">Learn Wgpu</a> で見ると簡単なフレームワークのようですが、所有権が絡んで独自の制限がかかります。<br>
+</p>
+</div>
+
+<div id="outline-container-org9713873" class="outline-4">
+<h4 id="org9713873"><a href="#org9713873"><code>wgpu::RenderPass&lt;'w&gt;</code> と借用ルール</a></h4>
+<div class="outline-text-4" id="text-org9713873">
+<p>
+古典的な <code>SpriteBatch</code> は、頂点データの作成と描画関数の呼び出しを交互に行います。しかし <code>wgpu</code> を使っていると、まず頂点データを作成し、それから一気に描画関数を呼び出すという形になりがちです。<br>
+</p>
+
+<blockquote>
+<p>
+この方式は <a href="https://bevyengine.org/news/bevy-0-6/#pipelined-rendering-extract-prepare-queue-render">pipelined rendering</a> に繋がります。<br>
+</p>
+</blockquote>
+
+<p>
+この方式に至るのは、 <code>wgpu::RenderPass&lt;'w&gt;</code> が <code>Drop</code> トレイトを実装するためです。この場合 <a href="https://doc.rust-lang.org/nomicon/dropck.html">Drop Check</a> という強烈な制約がかかり、 <code>RenderPass</code> のメソッドの引数はすべて <code>RenderPass</code> を <code>Drop</code> するまで immutable になる……と思います。この制限下で伝統的な <code>SpriteBatch</code> をそのままポートするのはたぶん無理です。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc97e663" class="outline-4">
+<h4 id="orgc97e663"><a href="#orgc97e663">Bevy Engine から学んだこと</a></h4>
+<div class="outline-text-4" id="text-orgc97e663">
+<p>
+<code>wgpu</code> の典型的な使い方は Bevy Engine から学べます:<br>
+</p>
+
+<ul class="org-ul">
+<li><code>wgpu</code> のデータ型を参照カウントにする<br></li>
+<li>Pipelined rendering<br></li>
+<li>デフォルトの <code>TextureFormat</code> の設定方法<br></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0e5167c" class="outline-4">
+<h4 id="org0e5167c"><a href="#org0e5167c">TODO</a></h4>
+<div class="outline-text-4" id="text-org0e5167c">
+<ul class="org-ul">
+<li>Uniform array<br>
+<code>wgpu</code> の uniform は immutable です。 1 フレームに uniform の更新を複数回実行すると、最後の更新が適用された後の unifrom がそのフレームで使用されます。複数の uniform を持つ方法として uniform array を使ってみたいと思うのですが‥‥<br></li>
+
+<li>Texture array<br>
+Draw call を減らせそうなので気になっています。<br></li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3c23af6" class="outline-3">
+<h3 id="org3c23af6"><a href="#org3c23af6">5. アセット管理</a></h3>
+<div class="outline-text-3" id="text-org3c23af6">
+</div>
+<div id="outline-container-org99632ba" class="outline-4">
+<h4 id="org99632ba"><a href="#org99632ba">共有ポインタ方式</a></h4>
+<div class="outline-text-4" id="text-org99632ba">
+<p>
+共有ポインタ方式です。それそれ眠りたいです。 Rust だと <code>Deref</code> にするのは無理で、毎回 <code>asset.get();</code> のような形で <code>&amp;T</code> を復元します。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org6046e8d" class="outline-4">
+<h4 id="org6046e8d"><a href="#org6046e8d">インデクス方式</a></h4>
+<div class="outline-text-4" id="text-org6046e8d">
+<p>
+アセットのユーザは、アセット配列へのインデクスを持つ形にします。毎回 <code>&amp;assets[asset_handle]</code> のような形で <code>&amp;T</code> を復元します。<br>
+</p>
+
+<p>
+アセット配列をページ制にすれば、ほぼ immutable 配列として扱える気がしますが、詳細をみたことはありません。<br>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1a81aa0" class="outline-3">
+<h3 id="org1a81aa0"><a href="#org1a81aa0">6. フォント描画</a></h3>
+<div class="outline-text-3" id="text-org1a81aa0">
+</div>
+<div id="outline-container-orgcddb2f7" class="outline-4">
+<h4 id="orgcddb2f7"><a href="#orgcddb2f7">方法 1. SDF フォントを用いる</a></h4>
+<div class="outline-text-4" id="text-orgcddb2f7">
+<p>
+<a href="https://github.com/Chlumsky/msdfgen">msdfgen</a>, <a href="https://github.com/Chlumsky/msdf-atlas-gen">msdf-atlas-gen</a> にあるように、フォントの輪郭を画像データで表現し、シェーダで任意のサイズの文字の形を復元することができます。<br>
+</p>
+
+<p>
+やってみました。<br>
+</p>
+
+
+<div id="org5643d80" class="figure">
+<p><img src="./img/gfx/msdf-44-2.png" alt="msdf-44-2.png"><br>
+</p>
+</div>
+
+<p>
+完璧ですね。完璧にヨレヨレです。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd614e14" class="outline-4">
+<h4 id="orgd614e14"><a href="#orgd614e14">方式 2. フォントテクスチャにラスタライズする</a></h4>
+<div class="outline-text-4" id="text-orgd614e14">
+<p>
+MSDF が上手く行かなかったので、 TTF フォントにあるフォントデータを元に、動的に文字の画像データを作ります。 Rust だと <a href="https://github.com/mooman219/fontdue">fontdue</a> が定番です。<br>
+</p>
+
+<p>
+それでは文字を表示してみましょう:<br>
+</p>
+
+
+<div id="org22e7d10" class="figure">
+<p><img src="./img/gfx/font_32px.png" alt="font_32px.png"><br>
+</p>
+</div>
+
+<p>
+文字サイズを上げてみると:<br>
+</p>
+
+
+<div id="orgac14f35" class="figure">
+<p><img src="./img/gfx/font_64px.png" alt="font_64px.png"><br>
+</p>
+</div>
+
+<p>
+急に馴れ馴れしい。フォントテクスチャが飽和した際は、フォントテクスチャをリサイズしなければなりません。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org2c04125" class="outline-4">
+<h4 id="org2c04125"><a href="#org2c04125">マークアップテキスト</a></h4>
+<div class="outline-text-4" id="text-org2c04125">
+<p>
+<code>Markup with :b[bold] text.</code><br>
+</p>
+
+
+<div id="org31ef1de" class="figure">
+<p><img src="./img/gfx/markup-bold.png" alt="markup-bold.png"><br>
+</p>
+</div>
+
+<p>
+<code>Keyboard key :kbd[x]!</code><br>
+</p>
+
+
+<div id="org4b9df70" class="figure">
+<p><img src="./img/gfx/markup-kbd.png" alt="markup-kbd.png"><br>
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3f1568e" class="outline-3">
+<h3 id="org3f1568e"><a href="#org3f1568e">7. 開発者用 UI</a></h3>
+<div class="outline-text-3" id="text-org3f1568e">
+<p>
+ImGUI の SDL サポートやレンダラを実装しました。<br>
+</p>
+
+
+<div id="org146880e" class="figure">
+<p><img src="./img/gfx/omgui.png" alt="omgui.png"><br>
+</p>
+</div>
+
+<p>
+すべてが間違っています。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org0759a10" class="outline-3">
+<h3 id="org0759a10"><a href="#org0759a10">その他</a></h3>
+<div class="outline-text-3" id="text-org0759a10">
+</div>
+<div id="outline-container-org10983f9" class="outline-4">
+<h4 id="org10983f9"><a href="#org10983f9">ブラウザ対応、 Android 対応</a></h4>
+<div class="outline-text-4" id="text-org10983f9">
+<p>
+イベント駆動のゲームループやアセットの非同期ロードなどが必要になりようです。<br>
+</p>
+
+<p>
+今の僕ではまったく力不足です。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge2c4146" class="outline-4">
+<h4 id="orge2c4146"><a href="#orge2c4146">ホットリロードしたい</a></h4>
+<div class="outline-text-4" id="text-orge2c4146">
+<p>
+したいのです。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgaeb8eb8" class="outline-4">
+<h4 id="orgaeb8eb8"><a href="#orgaeb8eb8">コルーチンが欲しい</a></h4>
+<div class="outline-text-4" id="text-orgaeb8eb8">
+<p>
+欲しさのあまり、コルーチンを書くための言語を開発中です。 <a href="https://github.com/salsa-rs/salsa">salsa</a> ベースで言語サーバの機能モリモリの予定です。<br>
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1886588" class="outline-2">
+<h2 id="org1886588"><a href="#org1886588">まとめ</a></h2>
+<div class="outline-text-2" id="text-org1886588">
+<p>
+Rust で 2D フレームワークを作ってきましたが、他人が快適に使えるとは到底思えません。汎用の 2D フレームワークを作る人たちはとんでもないなと思います。<br>
+</p>
+</div>
+</div>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
