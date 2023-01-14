@@ -1,47 +1,46 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Haskell / AtCoder 入門中 - toybeam</title>
-  <meta name="description" content="devlog of toyboot4e">
-  <link rel="stylesheet" href="style/simple.min.css">
-  <link rel="stylesheet" href="style/style.css">
-  <link rel="stylesheet" href="style/prism.css">
-  <script type="text/javascript" async src="/style/prism.js"></script><!-- MathJax -->
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
-</head>
-<body>
-  <header role="banner">
-    <h1>Haskell / AtCoder 入門中</h1>
-    <p>Dec 10, 2022</p>
-    <nav role="navigation">
-      <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
-    </nav>
-  </header>
-  <main role="main">
-    <p><a href="https://qiita.com/advent-calendar/2022/haskell">Haskell Advent Calendar 2022</a> 10 日目の記事です。<br></p>
-    <p>6 月からHaskell で AtCoder を始めました。まだまだ『灰色』 (レート 400 未満) ですが、そろそろ軌道に乗ったので面白かった点をノートしてみます。<br></p>
-    <p>技術的内容は <a href="https://toyboot4e.github.io/haskell-atcoder-notes/">外部サイト (mdBook)</a> に書いたので、合わせてお楽しみください。<br></p>
-    <div class="WARNING" id="orgf232449">
-      <p><b>内容は誤りを含む</b> と思いますが、多めに見ていただけるようお願いします 🙇<br></p>
-    </div>
-    <div id="outline-container-org7787b02" class="outline-2">
-      <h2 id="org7787b02"><a href="#org7787b02">背景</a></h2>
-      <div class="outline-text-2" id="text-org7787b02">
-        <p>欲望が合体しました。<br></p>
-        <ul class="org-ul">
-          <li>Haskell のモナドを使いこなしてみたい<br></li>
-          <li>ABC でレート 1,200 を取れたら凄い<br></li>
-          <li>2 つ同時に達成できたら嬉しい<br></li>
-        </ul>
-      </div>
-      <div id="outline-container-orgf53f42b" class="outline-3">
-        <h3 id="orgf53f42b"><a href="#orgf53f42b">Haskell とは</a></h3>
-        <div class="outline-text-3" id="text-orgf53f42b">
-          <p><a href="https://www.haskell.org/">公式サイト</a> では "<b>An advanced, purely functional programming language</b>" と称していますが、まず構文に目を惹かれます。たとえば:<br></p>
-          <div class="org-src-container">
-            <pre><code class="src language-hs">isPrime :: Int -&gt; Bool
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Haskell / AtCoder 入門中 - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="style/simple.min.css"/><link rel="stylesheet" href="style/style.css"/><link rel="stylesheet" href="style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>Haskell / AtCoder 入門中</h1><p>Dec 10, 2022</p><nav role="navigation"><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main"><p>
+<a href="https://qiita.com/advent-calendar/2022/haskell">Haskell Advent Calendar 2022</a> 10 日目の記事です。<br>
+</p>
+
+<p>
+6 月からHaskell で AtCoder を始めました。まだまだ『灰色』 (レート 400 未満) ですが、そろそろ軌道に乗ったので面白かった点をノートしてみます。<br>
+</p>
+
+<p>
+技術的内容は <a href="https://toyboot4e.github.io/haskell-atcoder-notes/">外部サイト (mdBook)</a>  に書いたので、合わせてお楽しみください。<br>
+</p>
+
+<div class="WARNING" id="orgca8f337">
+<p>
+<b>内容は誤りを含む</b> と思いますが、多めに見ていただけるようお願いします 🙇<br>
+</p>
+
+</div>
+
+<div id="outline-container-org11d562a" class="outline-2">
+<h2 id="org11d562a"><a href="#org11d562a">背景</a></h2>
+<div class="outline-text-2" id="text-org11d562a">
+<p>
+欲望が合体しました。<br>
+</p>
+
+<ul class="org-ul">
+<li>Haskell のモナドを使いこなしてみたい<br></li>
+<li>ABC でレート 1,200 を取れたら凄い<br></li>
+<li>2 つ同時に達成できたら嬉しい<br></li>
+</ul>
+</div>
+
+<div id="outline-container-org7c96300" class="outline-3">
+<h3 id="org7c96300"><a href="#org7c96300">Haskell とは</a></h3>
+<div class="outline-text-3" id="text-org7c96300">
+<p>
+<a href="https://www.haskell.org/">公式サイト</a> では "<b>An advanced, purely functional programming language</b>" と称していますが、まず構文に目を惹かれます。たとえば:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">isPrime :: Int -&gt; Bool
 isPrime n
   | n &lt;= 1 = False
   | n &lt;= 3 = True
@@ -51,120 +50,178 @@ isPrime n
              | n `mod` i == 0 = False
              | otherwise = loop (i + 1)
 </code></pre>
-          </div>
-          <p>このくらいなら読めますが、やがて <a href=
-          "https://twitter.com/search?q=from%3Atanakh%20%E3%83%A2%E3%83%8A%E3%83%89%20%E3%82%BC%E3%83%8E%E3%83%96%E3%83%AC%E3%82%A4%E3%83%89&amp;src=typed_query&amp;f=top">
-          モナド</a> が登場します。モナドが分からなくて、僕は Haskell と疎遠になりました。<br></p>
-        </div>
-      </div>
-      <div id="outline-container-orgae2667f" class="outline-3">
-        <h3 id="orgae2667f"><a href="#orgae2667f">AtCoder Beginner Contest (ABC) とは</a></h3>
-        <div class="outline-text-3" id="text-orgae2667f">
-          <p>ABC は毎週開催の『プログラミング・コンテスト』です。問題を解くプログラムを提出します。低速な解答は <a href="https://atcoder.jp/contests/abc074/glossary?lang=ja">TLE</a> (実行時間の超過) となって受理されませんから、
-          <b>計算量の小さなアルゴリズム</b> を考える必要があります。<br></p>
-          <blockquote>
-            <p>詳しくは <a href="https://speakerdeck.com/e869120/20221122-jing-ji-puroguramingukotohazime">競技プログラミングことはじめ</a> などをご参照ください。<br></p>
-          </blockquote>
-        </div>
-      </div>
-      <div id="outline-container-orgf501855" class="outline-3">
-        <h3 id="orgf501855"><a href="#orgf501855">AtCoder を Haskell で</a></h3>
-        <div class="outline-text-3" id="text-orgf501855">
-          <p><a href="https://atcoder.jp/">AtCoder</a> では数学的素養が問われ、 <a href="https://www.youtube.com/watch?v=vL-IM_PthNc">『考察』の比重が『実装』よりも重い</a>
-          と言われています。でも実装がやりたいのです！　そこで Haskell を使うことにより、難度を『実装 &gt; 考察』に逆転させます。<br></p>
-          <p>Haskell でやる気をハックし、一石二鳥を狙います。<br></p>
-        </div>
-      </div>
-    </div>
-    <div id="outline-container-org9ea1b82" class="outline-2">
-      <h2 id="org9ea1b82"><a href="#org9ea1b82">半年後</a></h2>
-      <div class="outline-text-2" id="text-org9ea1b82">
-        <p>自分に幻滅していました。<br></p>
-      </div>
-      <div id="outline-container-org6f81353" class="outline-3">
-        <h3 id="org6f81353"><a href="#org6f81353">窮地</a></h3>
-        <div class="outline-text-3" id="text-org6f81353"></div>
-        <div id="outline-container-org1a224c6" class="outline-4">
-          <h4 id="org1a224c6"><a href="#org1a224c6">Haskell はダントツで難しい</a></h4>
-          <div class="outline-text-4" id="text-org1a224c6">
-            <p><b>Haskell が書けませんでした</b> 。 API ドキュメントが読めず、コンパイルエラーも分かりませんし、 1 問解くのに 6 時間かかったりします。<br></p>
-          </div>
-        </div>
-        <div id="outline-container-orgc3aee0f" class="outline-4">
-          <h4 id="orgc3aee0f"><a href="#orgc3aee0f">何かを受信した</a></h4>
-          <div class="outline-text-4" id="text-orgc3aee0f">
-            <p>苦し紛れに <a href="https://haskellweekly.news/podcast.html">Haskell Weekly Podcast</a> を聞いていると、みんな <a href=
-            "https://www.haskellcast.com/episode/013-john-wiegley-on-categories-and-compilers">Nix で環境構築して Coq で検証し、 Haskell で実装している</a>
-            ことに気付きます。壁のシミを眺めながら、自分はナードではなかったと呟くことになりました。<br></p>
-          </div>
-        </div>
-      </div>
-      <div id="outline-container-orgedf982e" class="outline-3">
-        <h3 id="orgedf982e"><a href="#orgedf982e">隣人について</a></h3>
-        <div class="outline-text-3" id="text-orgedf982e">
-          <p>AtCoder の Haskell 参加者 (Rated) は僕を含めて <b>6 ~ 8 人</b> 程度です。身勝手な親近感を覚えます。<br></p>
-        </div>
-        <div id="outline-container-org959b3bb" class="outline-4">
-          <h4 id="org959b3bb"><a href="#org959b3bb">隣の Haskell は黒い</a></h4>
-          <div class="outline-text-4" id="text-org959b3bb">
-            <p>誰かの解答を見てみると、 Haskell とは思えない謎のコードを提出、見事 AC (受理) されています。 <b>しかも爆速</b> ！　<a href="https://twitter.com/chokudai/status/1171320026101534720">Tier 3
-            の言語</a> で C++ よりも速いのです。 <b>なによ！！</b><br></p>
-            <p>あるいはコンテスト後の提出を見ると、 1 行で問題を解くコードゴルフが何通りも見られます。 Haskell すきーが伝わってくる気がします。例によって黒魔術なので <b>全く読めません</b> 。<br></p>
-            <p>その他 <code>IntMap</code> 担当、 <code>MVector</code> 担当など、解き方にキャラクター性を感じてしまいます。再帰を使う人、 <code>fold</code> を使う人などの差も見られます。皆かけがえの無い情報源です。<br></p>
-          </div>
-        </div>
-        <div id="outline-container-org4a60d9f" class="outline-4">
-          <h4 id="org4a60d9f"><a href="#org4a60d9f">コミュニティの強さ</a></h4>
-          <div class="outline-text-4" id="text-org4a60d9f">
-            <p>最近では Haskell で ABC の解説を書いてくれる人がいたり、丁寧に質問に答えて頂いたりと、本当に助かっています。 Haskell に入門し、圧倒的な taker に成り下がろう。<br></p>
-          </div>
-        </div>
-      </div>
-      <div id="outline-container-orgfc35d7a" class="outline-3">
-        <h3 id="orgfc35d7a"><a href="#orgfc35d7a">振り返って</a></h3>
-        <div class="outline-text-3" id="text-orgfc35d7a"></div>
-        <div id="outline-container-org8923e2f" class="outline-4">
-          <h4 id="org8923e2f"><a href="#org8923e2f">Haskell は Rust と似ている？</a></h4>
-          <div class="outline-text-4" id="text-org8923e2f">
-            <p>Rust を知っていると、型クラスや関連型は一撃です。プログラムの書き方もどこか似ている気がします。<br></p>
-            <p>とはいえ実際にコードを書くには様々な擦り合わせが必要で、<br></p>
-            <ul class="org-ul">
-              <li>固定長配列が無い<br></li>
-              <li>Or パタンが無い<br></li>
-              <li>変数名の shadowing が基本非推奨<br></li>
-              <li><code>Iterator</code> が無い (Stream fusion が起きるため具体的な型を使用すればよい)<br></li>
-              <li>
-                <a href="http://wiki.haskell.org/OOP_vs_type_classes#Type_can_appear_at_any_place_in_function_signature">型クラスに静的メソッドが無い</a> (<a href=
-                "https://zenn.dev/mod_poppo/books/haskell-type-level-programming/viewer/phantom-types-and-proxy#proxy-%E5%9E%8B">Proxy</a> で『型を渡す』表現はできる)<br>
-              </li>
-            </ul>
-            <p>などの気付きがありました。『無い』ばかりで、有るものには気付いていない気がします。 HKT とか……？<br></p>
-            <p>最近は『型族』『データ族』など未知の概念に出会います。モナドの数も増えてきました。 Haskell の本領発揮は、来年の投稿にご期待ください。<br></p>
-          </div>
-        </div>
-        <div id="outline-container-org22ead32" class="outline-4">
-          <h4 id="org22ead32"><a href="#org22ead32">久しぶりに Rust を触ると</a></h4>
-          <div class="outline-text-4" id="text-org22ead32">
-            <p>関数型言語のユーザは『Rust の構文は汚い』とコメントします。僕はそこまで思いませんが、ポイントフリースタイルで高階関数を書きたい気はしました。『至高の言語 Rust』に綻びが見え始めたかもしれません。<br></p>
-            <p>ポスト Haskell, ポスト Rust で次に出て来た関数型言語こそが大本命かもしれません。しかし Haskell も大変なものであることは感じられてきましたから、これをやり直す人・作り直す人のバイタリティは計り知れません。遅延評価 (Haskell)
-            でもいいじゃないかという気がしてきました。<br></p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id="outline-container-orgdc7c1e4" class="outline-2">
-      <h2 id="orgdc7c1e4"><a href="#orgdc7c1e4">良かった本</a></h2>
-      <div class="outline-text-2" id="text-orgdc7c1e4">
-        <p>今度は本の感想で Haskell 入門を掘り下げてみます。<br></p>
-      </div>
-      <div id="outline-container-orgdbc056d" class="outline-3">
-        <h3 id="orgdbc056d"><a href="#orgdbc056d"></a><a href="https://shop.ohmsha.co.jp/shopdetail/000000001926/">すごいHaskellたのしく学ぼう！</a></h3>
-        <div class="outline-text-3" id="text-orgdbc056d">
-          <p>2012 年出版の Haskell 入門書です。巷で『最も簡単』と謳われていますが <b>十分難しい</b> と思います。<br></p>
-          <p>ともあれ競技プログラミングです。 <b>P244</b> の <code>&lt;$&gt;</code> 演算子を活用すれば、 <a href="https://atcoder.jp/contests/abs/tasks/abc086_a">AtCoder Beginners
-          Selection</a> <a href="https://atcoder.jp/contests/abs/tasks/practice_1">第 1 問</a> が解けるようになります:<br></p>
-          <div class="org-src-container">
-            <pre><code class="src language-hs">module Main (main) where
+</div>
+
+<p>
+このくらいなら読めますが、やがて <a href="https://twitter.com/search?q=from%3Atanakh%20%E3%83%A2%E3%83%8A%E3%83%89%20%E3%82%BC%E3%83%8E%E3%83%96%E3%83%AC%E3%82%A4%E3%83%89&amp;src=typed_query&amp;f=top">モナド</a> が登場します。モナドが分からなくて、僕は Haskell と疎遠になりました。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org389392f" class="outline-3">
+<h3 id="org389392f"><a href="#org389392f">AtCoder Beginner Contest (ABC) とは</a></h3>
+<div class="outline-text-3" id="text-org389392f">
+<p>
+ABC は毎週開催の『プログラミング・コンテスト』です。問題を解くプログラムを提出します。低速な解答は <a href="https://atcoder.jp/contests/abc074/glossary?lang=ja">TLE</a> (実行時間の超過) となって受理されませんから、 <b>計算量の小さなアルゴリズム</b> を考える必要があります。<br>
+</p>
+
+<blockquote>
+<p>
+詳しくは <a href="https://speakerdeck.com/e869120/20221122-jing-ji-puroguramingukotohazime">競技プログラミングことはじめ</a> などをご参照ください。<br>
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgf92d2fd" class="outline-3">
+<h3 id="orgf92d2fd"><a href="#orgf92d2fd">AtCoder を Haskell で</a></h3>
+<div class="outline-text-3" id="text-orgf92d2fd">
+<p>
+<a href="https://atcoder.jp/">AtCoder</a> では数学的素養が問われ、 <a href="https://www.youtube.com/watch?v=vL-IM_PthNc">『考察』の比重が『実装』よりも重い</a> と言われています。でも実装がやりたいのです！　そこで Haskell を使うことにより、難度を『実装 &gt; 考察』に逆転させます。<br>
+</p>
+
+<p>
+Haskell でやる気をハックし、一石二鳥を狙います。<br>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc284b9d" class="outline-2">
+<h2 id="orgc284b9d"><a href="#orgc284b9d">半年後</a></h2>
+<div class="outline-text-2" id="text-orgc284b9d">
+<p>
+自分に幻滅していました。<br>
+</p>
+</div>
+
+<div id="outline-container-orgbdfc143" class="outline-3">
+<h3 id="orgbdfc143"><a href="#orgbdfc143">窮地</a></h3>
+<div class="outline-text-3" id="text-orgbdfc143">
+</div>
+<div id="outline-container-orgdc54db2" class="outline-4">
+<h4 id="orgdc54db2"><a href="#orgdc54db2">Haskell はダントツで難しい</a></h4>
+<div class="outline-text-4" id="text-orgdc54db2">
+<p>
+<b>Haskell が書けませんでした</b> 。 API ドキュメントが読めず、コンパイルエラーも分かりませんし、 1 問解くのに 6 時間かかったりします。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org0898338" class="outline-4">
+<h4 id="org0898338"><a href="#org0898338">何かを受信した</a></h4>
+<div class="outline-text-4" id="text-org0898338">
+<p>
+苦し紛れに <a href="https://haskellweekly.news/podcast.html">Haskell Weekly Podcast</a> を聞いていると、みんな <a href="https://www.haskellcast.com/episode/013-john-wiegley-on-categories-and-compilers">Nix で環境構築して Coq で検証し、 Haskell で実装している</a> ことに気付きます。壁のシミを眺めながら、自分はナードではなかったと呟くことになりました。<br>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org91a0b7d" class="outline-3">
+<h3 id="org91a0b7d"><a href="#org91a0b7d">隣人について</a></h3>
+<div class="outline-text-3" id="text-org91a0b7d">
+<p>
+AtCoder の Haskell 参加者 (Rated) は僕を含めて <b>6 ~ 8 人</b> 程度です。身勝手な親近感を覚えます。<br>
+</p>
+</div>
+
+<div id="outline-container-org9c60e04" class="outline-4">
+<h4 id="org9c60e04"><a href="#org9c60e04">隣の Haskell は黒い</a></h4>
+<div class="outline-text-4" id="text-org9c60e04">
+<p>
+誰かの解答を見てみると、 Haskell とは思えない謎のコードを提出、見事 AC (受理) されています。 <b>しかも爆速</b> ！　<a href="https://twitter.com/chokudai/status/1171320026101534720">Tier 3 の言語</a> で C++ よりも速いのです。 <b>なによ！！</b><br>
+</p>
+
+<p>
+あるいはコンテスト後の提出を見ると、 1 行で問題を解くコードゴルフが何通りも見られます。 Haskell すきーが伝わってくる気がします。例によって黒魔術なので <b>全く読めません</b> 。<br>
+</p>
+
+<p>
+その他 <code>IntMap</code> 担当、 <code>MVector</code> 担当など、解き方にキャラクター性を感じてしまいます。再帰を使う人、 <code>fold</code> を使う人などの差も見られます。皆かけがえの無い情報源です。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgaa8f3d2" class="outline-4">
+<h4 id="orgaa8f3d2"><a href="#orgaa8f3d2">コミュニティの強さ</a></h4>
+<div class="outline-text-4" id="text-orgaa8f3d2">
+<p>
+最近では Haskell で ABC の解説を書いてくれる人がいたり、丁寧に質問に答えて頂いたりと、本当に助かっています。 Haskell に入門し、圧倒的な taker に成り下がろう。<br>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org17affcc" class="outline-3">
+<h3 id="org17affcc"><a href="#org17affcc">振り返って</a></h3>
+<div class="outline-text-3" id="text-org17affcc">
+</div>
+<div id="outline-container-org5a006b4" class="outline-4">
+<h4 id="org5a006b4"><a href="#org5a006b4">Haskell は Rust と似ている？</a></h4>
+<div class="outline-text-4" id="text-org5a006b4">
+<p>
+Rust を知っていると、型クラスや関連型は一撃です。プログラムの書き方もどこか似ている気がします。<br>
+</p>
+
+<p>
+とはいえ実際にコードを書くには様々な擦り合わせが必要で、<br>
+</p>
+
+<ul class="org-ul">
+<li>固定長配列が無い<br></li>
+<li>Or パタンが無い<br></li>
+<li>変数名の shadowing が基本非推奨<br></li>
+<li><code>Iterator</code> が無い (Stream fusion が起きるため具体的な型を使用すればよい)<br></li>
+<li><a href="http://wiki.haskell.org/OOP_vs_type_classes#Type_can_appear_at_any_place_in_function_signature">型クラスに静的メソッドが無い</a> (<a href="https://zenn.dev/mod_poppo/books/haskell-type-level-programming/viewer/phantom-types-and-proxy#proxy-%E5%9E%8B">Proxy</a> で『型を渡す』表現はできる)<br></li>
+</ul>
+
+<p>
+などの気付きがありました。『無い』ばかりで、有るものには気付いていない気がします。 HKT とか……？<br>
+</p>
+
+<p>
+最近は『型族』『データ族』など未知の概念に出会います。モナドの数も増えてきました。 Haskell の本領発揮は、来年の投稿にご期待ください。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org994f97d" class="outline-4">
+<h4 id="org994f97d"><a href="#org994f97d">久しぶりに Rust を触ると</a></h4>
+<div class="outline-text-4" id="text-org994f97d">
+<p>
+関数型言語のユーザは『Rust の構文は汚い』とコメントします。僕はそこまで思いませんが、ポイントフリースタイルで高階関数を書きたい気はしました。『至高の言語 Rust』に綻びが見え始めたかもしれません。<br>
+</p>
+
+<p>
+ポスト Haskell, ポスト Rust で次に出て来た関数型言語こそが大本命かもしれません。しかし Haskell も大変なものであることは感じられてきましたから、これをやり直す人・作り直す人のバイタリティは計り知れません。遅延評価 (Haskell) でもいいじゃないかという気がしてきました。<br>
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3599dcc" class="outline-2">
+<h2 id="org3599dcc"><a href="#org3599dcc">良かった本</a></h2>
+<div class="outline-text-2" id="text-org3599dcc">
+<p>
+今度は本の感想で Haskell 入門を掘り下げてみます。<br>
+</p>
+</div>
+
+<div id="outline-container-orgeb15d6d" class="outline-3">
+<h3 id="orgeb15d6d"><a href="#orgeb15d6d"><a href="https://shop.ohmsha.co.jp/shopdetail/000000001926/">すごいHaskellたのしく学ぼう！</a></a></h3>
+<div class="outline-text-3" id="text-orgeb15d6d">
+<p>
+2012 年出版の Haskell 入門書です。巷で『最も簡単』と謳われていますが <b>十分難しい</b> と思います。<br>
+</p>
+
+<p>
+ともあれ競技プログラミングです。 <b>P244</b> の <code>&lt;$&gt;</code> 演算子を活用すれば、 <a href="https://atcoder.jp/contests/abs/tasks/abc086_a">AtCoder Beginners Selection</a> <a href="https://atcoder.jp/contests/abs/tasks/practice_1">第 1 問</a> が解けるようになります:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">module Main (main) where
 
 main :: IO ()
 main = do
@@ -172,98 +229,148 @@ main = do
   let s = if even (a * b) then "Even" else "Odd"
   putStrLn s
 </code></pre>
-          </div>
-          <p>以上、成果は『A 問題が解けるようになる』です。 B 問題からは、リストを使うと TLE (時間制限超え) になる危険があります。 <b>AtCoder が始まりました</b> 。<br></p>
-        </div>
-      </div>
-      <div id="outline-container-orge686ac6" class="outline-3">
-        <h3 id="orge686ac6"><a href="#orge686ac6"></a><a href="https://booth.pm/ja/items/1577541">Haskellで戦う競技プログラミング 第2版</a></h3>
-        <div class="outline-text-3" id="text-orge686ac6">
-          <p>さっき読んだ 300 ページは何だったのか……？　梯子を外された気がしますが、課金で解決します。幅を利かせて参りましょう (?) 。<br></p>
-          <p><a href="https://blog.miz-ar.info/2019/09/techbookfest7-announce/">著者ブログ</a> に目次があります。 <code>vector</code> を抑えれば B 問題が安定し、 <a href=
-          "https://twitter.com/tanakh/status/1293533213197914113">モナドで失敗する</a> 気持ちも味わえます。 <b>ついに Haskell が始まりました！</b><br></p>
-          <details>
-            <summary>
-              ハイライト
-            </summary>
-            <p>特に嬉しかった情報としては:<br></p>
-            <ul class="org-ul">
-              <li><code>PrimMonad</code> の使い方<br></li>
-              <li>Unboxed array の注意点 (タプルは持てない)<br></li>
-              <li>Unboxed vector の注意点<br>
-                <ul class="org-ul">
-                  <li>タプルも持てる (配列 2 本になる！)<br></li>
-                  <li>2 次元配列の持ち方<br></li>
-                </ul>
-              </li>
-              <li><code>Vector.Generic</code> と他モジュールの関係<br></li>
-              <li>Immutable vector の <code>modify</code> 関数の使い方と <code>vector-algorithms</code> の活用<br></li>
-            </ul>
-            <p>じっくり書いてほしかった内容としては:<br></p>
-            <ul class="org-ul">
-              <li><code>Array</code> の使い方 (<code>Ix</code> の使い方)<br></li>
-              <li><code>State</code> モナドの使い方<br></li>
-              <li>モナドの合成<br></li>
-              <li>データ族について<br></li>
-            </ul>
-          </details>
-          <p>ところで <code>MVector</code> には末尾要素の <code>push</code> がありません。 <code>snoc</code> は \(O(n)\) の操作です。この本を読んだ後でも、 AtCoder の外では全く戦えないことが伺えます。<br></p>
-        </div>
-      </div>
-      <div id="outline-container-org653b64f" class="outline-3">
-        <h3 id="org653b64f"><a href="#org653b64f"></a><a href="https://www.packtpub.com/product/haskell-high-performance-programming/9781786464217">Haskell
-        High Performance Programming</a></h3>
-        <div class="outline-text-3" id="text-org653b64f">
-          <p><b>今年 1 番面白かった本</b> になるかもしれません。話の重要度が高過ぎました。<br></p>
-          <p>たとえば一時変数が GC を妨げるという恐ろしいエピソードがあります:<br></p>
-          <div class="org-src-container">
-            <pre><code class="src language-hs">&gt; Data.list.foldl' (+) 0 [1..10^6]
+</div>
+
+<p>
+以上、成果は『A 問題が解けるようになる』です。 B 問題からは、リストを使うと TLE (時間制限超え) になる危険があります。 <b>AtCoder が始まりました</b> 。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org47a30e6" class="outline-3">
+<h3 id="org47a30e6"><a href="#org47a30e6"><a href="https://booth.pm/ja/items/1577541">Haskellで戦う競技プログラミング 第2版</a></a></h3>
+<div class="outline-text-3" id="text-org47a30e6">
+<p>
+さっき読んだ 300 ページは何だったのか……？　梯子を外された気がしますが、課金で解決します。幅を利かせて参りましょう (?) 。<br>
+</p>
+
+<p>
+<a href="https://blog.miz-ar.info/2019/09/techbookfest7-announce/">著者ブログ</a> に目次があります。 <code>vector</code> を抑えれば B 問題が安定し、 <a href="https://twitter.com/tanakh/status/1293533213197914113">モナドで失敗する</a> 気持ちも味わえます。 <b>ついに Haskell が始まりました！</b><br>
+</p>
+
+<details><summary>ハイライト</summary>
+
+<p>
+特に嬉しかった情報としては:<br>
+</p>
+
+<ul class="org-ul">
+<li><code>PrimMonad</code> の使い方<br></li>
+<li>Unboxed array の注意点 (タプルは持てない)<br></li>
+<li>Unboxed vector の注意点<br>
+<ul class="org-ul">
+<li>タプルも持てる (配列 2 本になる！)<br></li>
+<li>2 次元配列の持ち方<br></li>
+</ul></li>
+<li><code>Vector.Generic</code> と他モジュールの関係<br></li>
+<li>Immutable vector の <code>modify</code> 関数の使い方と <code>vector-algorithms</code> の活用<br></li>
+</ul>
+
+<p>
+じっくり書いてほしかった内容としては:<br>
+</p>
+
+<ul class="org-ul">
+<li><code>Array</code> の使い方 (<code>Ix</code> の使い方)<br></li>
+<li><code>State</code> モナドの使い方<br></li>
+<li>モナドの合成<br></li>
+<li>データ族について<br></li>
+</ul>
+
+</details>
+
+<p>
+ところで <code>MVector</code> には末尾要素の <code>push</code> がありません。 <code>snoc</code> は \(O(n)\) の操作です。この本を読んだ後でも、 AtCoder の外では全く戦えないことが伺えます。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7f9710b" class="outline-3">
+<h3 id="org7f9710b"><a href="#org7f9710b"><a href="https://www.packtpub.com/product/haskell-high-performance-programming/9781786464217">Haskell High Performance Programming</a></a></h3>
+<div class="outline-text-3" id="text-org7f9710b">
+<p>
+<b>今年 1 番面白かった本</b> になるかもしれません。話の重要度が高過ぎました。<br>
+</p>
+
+<p>
+たとえば一時変数が GC を妨げるという恐ろしいエピソードがあります:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">&gt; Data.list.foldl' (+) 0 [1..10^6]
 500000500000
 
 &gt; let xs = [1..10^6] :: [Int]
 &gt; Data.list.foldl' (+) 0 xs
 &lt;interactive&gt;: Heap exhausted;
 </code></pre>
-          </div>
-          <p>実際は最適化のおかげでエラーになりません。結局、アルゴリズム的な失敗の方が遥かに影響が大きいよと P16 にありました。つまり <b>GHC の自慢話</b> を浴びただけです。 <b>例が凶悪</b> 過ぎて不安ですよ！<br></p>
-          <p>内容は『<a href="https://booth.pm/ja/items/1577541">Haskellで戦う競技プログラミング 第2版</a>』に還元される気がします。読んでも読まなくてもいい感じです。もう少しスローペースで詳しく頼むという場合には良いかもしれません。<br></p>
-        </div>
-      </div>
-      <div id="outline-container-orgc34f5db" class="outline-3">
-        <h3 id="orgc34f5db"><a href="#orgc34f5db">競技プログラミングの鉄則</a></h3>
-        <div class="outline-text-3" id="text-orgc34f5db">
-          <p>151 問の問題集です。 <a href="https://atcoder.jp/contests/typical90">典型 90 問</a> が応用力を問うのに対し、本書はアルゴリズムのカバー率を重視しているとか。 <a href=
-          "https://e869120.hatenablog.com/entry/2022/09/08/214552">著者ブログ</a> から目次を確認できます。<br></p>
-          <p><b>難度設定が絶妙</b> です。よく自力で完答できますし、解けなくても丁寧な解答・解説が読めます。これでレベルアップできますよ！<br></p>
-          <p>『鉄則本』に挑むことは、アルゴリズムのテンプレートプログラムを育てる作業でもあります。競技プログラミングが大好きな『盆栽』作業に変わるわけなので、ある意味ゲームチェンジャーですね。このタイミングで出て来てくれたことに御の字です。<br></p>
-        </div>
-      </div>
-    </div>
-    <div id="outline-container-org041378f" class="outline-2">
-      <h2 id="org041378f"><a href="#org041378f">まとめ</a></h2>
-      <div class="outline-text-2" id="text-org041378f">
-        <p>Haskell で AtCoder に参加した結果、世の中には面白い人がたくさんいるという希望を見つけました。自分は大して面白くない現実にも気付きました。<br></p>
-        <p>特に『ナードな自分』というアイデンティティを失ったのが痛く、代わりに『灰色コーダー』 (プログラミングが下手) という客観的な評価が突きつけられます。<br></p>
-        <p>クダを巻いている場合ではありませんでした。テキストエディタを研ぎ澄ますとか、 Haskell でゲームを作るとか。そういった積み重ねの先、今よりも遥かなナードを目指さねばなりません。<br></p>
-        <p>もっと遊ぼう！<br></p>
-      </div>
-      <div id="outline-container-org904df89" class="outline-3">
-        <h3 id="org904df89"><a href="#org904df89">追伸</a></h3>
-        <div class="outline-text-3" id="text-org904df89">
-          <p>さっきの ABC で茶コーダーになっていました。灰色詐欺じゃん……！<br></p>
-          <p>図らずも色変記事になりました。次は DP を学んで緑色を目指します。<br></p>
-          <div id="org1e25c88" class="figure">
-            <p><img src="./img/atcoder/atcoder-brown.png" alt="atcoder-brown.png"><br></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-  <footer role="contentinfo">
-    <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
-    <div>
-      <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
-    </div>
-  </footer>
-</body>
-</html>
+</div>
+
+<p>
+実際は最適化のおかげでエラーになりません。結局、アルゴリズム的な失敗の方が遥かに影響が大きいよと P16 にありました。つまり <b>GHC の自慢話</b> を浴びただけです。 <b>例が凶悪</b> 過ぎて不安ですよ！<br>
+</p>
+
+<p>
+内容は『<a href="https://booth.pm/ja/items/1577541">Haskellで戦う競技プログラミング 第2版</a>』に還元される気がします。読んでも読まなくてもいい感じです。もう少しスローペースで詳しく頼むという場合には良いかもしれません。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge73c430" class="outline-3">
+<h3 id="orge73c430"><a href="#orge73c430">競技プログラミングの鉄則</a></h3>
+<div class="outline-text-3" id="text-orge73c430">
+<p>
+151 問の問題集です。 <a href="https://atcoder.jp/contests/typical90">典型 90 問</a> が応用力を問うのに対し、本書はアルゴリズムのカバー率を重視しているとか。 <a href="https://e869120.hatenablog.com/entry/2022/09/08/214552">著者ブログ</a> から目次を確認できます。<br>
+</p>
+
+<p>
+<b>難度設定が絶妙</b> です。よく自力で完答できますし、解けなくても丁寧な解答・解説が読めます。これでレベルアップできますよ！<br>
+</p>
+
+<p>
+『鉄則本』に挑むことは、アルゴリズムのテンプレートプログラムを育てる作業でもあります。競技プログラミングが大好きな『盆栽』作業に変わるわけなので、ある意味ゲームチェンジャーですね。このタイミングで出て来てくれたことに御の字です。<br>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org94df179" class="outline-2">
+<h2 id="org94df179"><a href="#org94df179">まとめ</a></h2>
+<div class="outline-text-2" id="text-org94df179">
+<p>
+Haskell で AtCoder に参加した結果、世の中には面白い人がたくさんいるという希望を見つけました。自分は大して面白くない現実にも気付きました。<br>
+</p>
+
+<p>
+特に『ナードな自分』というアイデンティティを失ったのが痛く、代わりに『灰色コーダー』 (プログラミングが下手) という客観的な評価が突きつけられます。<br>
+</p>
+
+<p>
+クダを巻いている場合ではありませんでした。テキストエディタを研ぎ澄ますとか、 Haskell でゲームを作るとか。そういった積み重ねの先、今よりも遥かなナードを目指さねばなりません。<br>
+</p>
+
+<p>
+もっと遊ぼう！<br>
+</p>
+</div>
+
+<div id="outline-container-org4e33048" class="outline-3">
+<h3 id="org4e33048"><a href="#org4e33048">追伸</a></h3>
+<div class="outline-text-3" id="text-org4e33048">
+<p>
+さっきの ABC で茶コーダーになっていました。灰色詐欺じゃん……！<br>
+</p>
+
+<p>
+図らずも色変記事になりました。次は DP を学んで緑色を目指します。<br>
+</p>
+
+
+<div id="org3cd865d" class="figure">
+<p><img src="./img/atcoder/atcoder-brown.png" alt="atcoder-brown.png"><br>
+</p>
+</div>
+</div>
+</div>
+</div>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
