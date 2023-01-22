@@ -1,0 +1,48 @@
+#+TITLE: NixOS の環境構築
+#+DATE: <2023-03-05 Sun>
+#+LINK: nix-direnv https://github.com/nix-community/nix-direnv
+
+* インプット
+
+BIOS? UEFI?
+
+標準テキスト CentOS 7
+
+* 設定
+
+** 主なセットアップ
+
+*** ネットワーク
+
+*** BIOS の更新とドライバ類
+
+*** 日本語入力 (mozc)
+
+*** 日本語入力 (SKK)
+
+*** WM / DE
+
+*** rofi, raner, ..
+
+** 主な設定
+
+*** ユーザ環境
+
+=nix-shell= を使うと =shell.nix= や =default.nix= で定義された環境の下でシェルを実行できます。ビルド環境としては便利な場合もありますが、普段使いでは不便です。
+
+**** =home-manager=
+
+通常のパッケージマネジャと同様、
+
+**** =nix-direnv=
+
+[[https://direnv.net/][direnv]] は、 =.envrc= ファイルが設置されたディレクトリ以下で =PATH= を書き換えるツールです。 [[nix-direnv][nix-direnv]] では、 =.envrc= から =shell.nix= や =default.nix= が利用できます。
+
+*** Nix Flakes
+
+*** =configuration.nix=, =config.nix=
+
+*** dotfiles
+
+* まとめ
+

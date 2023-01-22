@@ -61,11 +61,6 @@ src/
 - [[https://taingram.org/blog/org-mode-blog.html][Building a Emacs Org - Mode Blog]]\\
   似た内容ですが ELisp の書き方が参考になります。
 
-** ソースコード
-
-- [[https://github.com/SystemCrafters/systemcrafters.github.io/blob/dbeb6b7d8e2cb78d4583454f151f6064a1535efd/publish.el][systemcrafters.github.io/publish.el]]\\
-  [[https://github.com/tali713/esxml][esxml]] を使って S 式で HTML をテンプレートを表現します。
-
 ** The Org Manual
 
 [[https://orgmode.org/org.html][公式マニュアル]] です。意外に短くて説明不足の感はあります:
@@ -86,7 +81,7 @@ src/
 HTML 生成をハイジャックして完成です:
 
 - [[https://github.com/SystemCrafters/systemcrafters.github.io/blob/master/publish.el][publish.el (System Crafters website)]]\\
- [[https://github.com/tali713/esxml][esxml]] を使ったテンプレート HTML を作成します。
+ [[https://github.com/tali713/esxml][esxml]] を使ってテンプレート HTML を作成します。
 
 - [[https://www.roygbyte.com/add_syntax_highlighting_to_an_org_publish_project.html][Add syntax highlighting to an org-publish-project]]\\
   コードブロックを [[https://prismjs.com][Prism.js]] 対応の HTML に変換するフィルタが載っています。
