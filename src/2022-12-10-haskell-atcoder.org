@@ -1,0 +1,260 @@
+#+TITLE: Haskell / AtCoder 入門中
+#+DATE: <2022-12-10 Sat>
+#+OPTIONS: broken-links:t
+#+LINK: haskell https://www.haskell.org/
+#+LINK: monad  https://twitter.com/search?q=from%3Atanakh%20%E3%83%A2%E3%83%8A%E3%83%89%20%E3%82%BC%E3%83%8E%E3%83%96%E3%83%AC%E3%82%A4%E3%83%89&src=typed_query&f=top
+#+LINK: atcoder https://atcoder.jp/
+
+[[https://qiita.com/advent-calendar/2022/haskell][Haskell Advent Calendar 2022]] 10 日目の記事です。
+
+6 月からHaskell で AtCoder を始めました。まだまだ『灰色』 (レート 400 未満) ですが、そろそろ軌道に乗ったので面白かった点をノートしてみます。
+
+技術的内容は [[https://toyboot4e.github.io/haskell-atcoder-notes/][外部サイト (mdBook)]]  に書いたので、合わせてお楽しみください。
+
+#+BEGIN_WARNING
+*内容は誤りを含む* と思いますが、多めに見ていただけるようお願いします 🙇
+#+END_WARNING
+
+* 背景
+
+欲望が合体しました。
+
+- Haskell のモナドを使いこなしてみたい
+- ABC でレート 1,200 を取れたら凄い
+- 2 つ同時に達成できたら嬉しい
+
+** Haskell とは
+
+[[haskell][公式サイト]] では "*An advanced, purely functional programming language*" と称していますが、まず構文に目を惹かれます。たとえば:
+
+#+BEGIN_SRC hs
+isPrime :: Int -> Bool
+isPrime n
+  | n <= 1 = False
+  | n <= 3 = True
+  | otherwise = loop 2
+    where
+      loop i | i >= n = True
+             | n `mod` i == 0 = False
+             | otherwise = loop (i + 1)
+#+END_SRC
+
+このくらいなら読めますが、やがて [[monad][モナド]] が登場します。モナドが分からなくて、僕は Haskell と疎遠になりました。
+
+# #+BEGIN_EXPORT html
+# <blockquote class="twitter-tweet tw-align-center"><p lang="ja" dir="ltr">モナドがないと弱すぎる時の僕 <a href="https://twitter.com/hashtag/%E3%82%BC%E3%83%8E%E3%83%96%E3%83%AC%E3%82%A4%E3%83%89?src=hash&amp;ref_src=twsrc%5Etfw">#ゼノブレイド</a> <a href="https://twitter.com/hashtag/XenobladeChronicles?src=hash&amp;ref_src=twsrc%5Etfw">#XenobladeChronicles</a> <a href="https://twitter.com/hashtag/NintendoSwitch?src=hash&amp;ref_src=twsrc%5Etfw">#NintendoSwitch</a> <a href="https://t.co/2zNUWX3nSk">pic.twitter.com/2zNUWX3nSk</a></p>&mdash; Hideyuki Tanaka (@tanakh) <a href="https://twitter.com/tanakh/status/1293535375927828486?ref_src=twsrc%5Etfw">August 12, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+# 
+# <p style="text-align:center">モナドが無いと弱すぎる時の tanakh 氏</p>
+# #+END_EXPORT
+
+** AtCoder Beginner Contest (ABC) とは
+
+ABC は毎週開催の『プログラミング・コンテスト』です。問題を解くプログラムを提出します。低速な解答は [[https://atcoder.jp/contests/abc074/glossary?lang=ja][TLE]] (実行時間の超過) となって受理されませんから、 *計算量の小さなアルゴリズム* を考える必要があります。
+
+# なお競技中は、ネット検索など外部情報の利用が許されています (AtCoder の場合) 。替え玉が勝負を分けます。
+
+#+BEGIN_QUOTE
+詳しくは [[https://speakerdeck.com/e869120/20221122-jing-ji-puroguramingukotohazime][競技プログラミングことはじめ]] などをご参照ください。
+#+END_QUOTE
+
+** AtCoder を Haskell で
+
+[[atcoder][AtCoder]] では数学的素養が問われ、 [[https://www.youtube.com/watch?v=vL-IM_PthNc][『考察』の比重が『実装』よりも重い]] と言われています。でも実装がやりたいのです！　そこで Haskell を使うことにより、難度を『実装 > 考察』に逆転させます。
+
+Haskell でやる気をハックし、一石二鳥を狙います。
+
+* 半年後
+
+自分に幻滅していました。
+
+** 窮地
+
+*** Haskell はダントツで難しい
+
+*Haskell が書けませんでした* 。 API ドキュメントが読めず、コンパイルエラーも分かりませんし、 1 問解くのに 6 時間かかったりします。
+
+*** 何かを受信した
+
+苦し紛れに [[https://haskellweekly.news/podcast.html][Haskell Weekly Podcast]] を聞いていると、みんな [[https://www.haskellcast.com/episode/013-john-wiegley-on-categories-and-compilers][Nix で環境構築して Coq で検証し、 Haskell で実装している]] ことに気付きます。壁のシミを眺めながら、自分はナードではなかったと呟くことになりました。
+
+** 隣人について
+
+AtCoder の Haskell 参加者 (Rated) は僕を含めて *6 ~ 8 人* 程度です。身勝手な親近感を覚えます。
+
+*** 隣の Haskell は黒い
+
+誰かの解答を見てみると、 Haskell とは思えない謎のコードを提出、見事 AC (受理) されています。 *しかも爆速* ！　[[https://twitter.com/chokudai/status/1171320026101534720][Tier 3 の言語]] で C++ よりも速いのです。 *なによ！！*
+
+あるいはコンテスト後の提出を見ると、 1 行で問題を解くコードゴルフが何通りも見られます。 Haskell すきーが伝わってくる気がします。例によって黒魔術なので *全く読めません* 。
+
+その他 =IntMap= 担当、 =MVector= 担当など、解き方にキャラクター性を感じてしまいます。再帰を使う人、 =fold= を使う人などの差も見られます。皆かけがえの無い情報源です。
+
+*** コミュニティの強さ
+
+最近では Haskell で ABC の解説を書いてくれる人がいたり、丁寧に質問に答えて頂いたりと、本当に助かっています。 Haskell に入門し、圧倒的な taker に成り下がろう。
+
+** 振り返って
+
+*** Haskell は Rust と似ている？
+
+Rust を知っていると、型クラスや関連型は一撃です。プログラムの書き方もどこか似ている気がします。
+
+とはいえ実際にコードを書くには様々な擦り合わせが必要で、
+
+- 固定長配列が無い
+- Or パタンが無い
+- 変数名の shadowing が基本非推奨
+- =Iterator= が無い (Stream fusion が起きるため具体的な型を使用すればよい)
+- [[http://wiki.haskell.org/OOP_vs_type_classes#Type_can_appear_at_any_place_in_function_signature][型クラスに静的メソッドが無い]] ([[https://zenn.dev/mod_poppo/books/haskell-type-level-programming/viewer/phantom-types-and-proxy#proxy-%E5%9E%8B][Proxy]] で『型を渡す』表現はできる)
+
+などの気付きがありました。『無い』ばかりで、有るものには気付いていない気がします。 HKT とか……？
+
+最近は『型族』『データ族』など未知の概念に出会います。モナドの数も増えてきました。 Haskell の本領発揮は、来年の投稿にご期待ください。
+
+*** 久しぶりに Rust を触ると
+
+関数型言語のユーザは『Rust の構文は汚い』とコメントします。僕はそこまで思いませんが、ポイントフリースタイルで高階関数を書きたい気はしました。『至高の言語 Rust』に綻びが見え始めたかもしれません。
+
+ポスト Haskell, ポスト Rust で次に出て来た関数型言語こそが大本命かもしれません。しかし Haskell も大変なものであることは感じられてきましたから、これをやり直す人・作り直す人のバイタリティは計り知れません。遅延評価 (Haskell) でもいいじゃないかという気がしてきました。
+
+* 良かった本
+
+今度は本の感想で Haskell 入門を掘り下げてみます。
+
+** [[https://shop.ohmsha.co.jp/shopdetail/000000001926/][すごいHaskellたのしく学ぼう！]]
+
+2012 年出版の Haskell 入門書です。巷で『最も簡単』と謳われていますが *十分難しい* と思います。
+
+ともあれ競技プログラミングです。 *P244* の =<$>= 演算子を活用すれば、 [[https://atcoder.jp/contests/abs/tasks/abc086_a][AtCoder Beginners Selection]] [[https://atcoder.jp/contests/abs/tasks/practice_1][第 1 問]] が解けるようになります:
+
+#+BEGIN_SRC hs
+module Main (main) where
+
+main :: IO ()
+main = do
+  [a, b] <- map read . words <$> getLine :: IO [Int]
+  let s = if even (a * b) then "Even" else "Odd"
+  putStrLn s
+#+END_SRC
+
+以上、成果は『A 問題が解けるようになる』です。 B 問題からは、リストを使うと TLE (時間制限超え) になる危険があります。 *AtCoder が始まりました* 。
+
+** [[https://booth.pm/ja/items/1577541][Haskellで戦う競技プログラミング 第2版]]
+
+さっき読んだ 300 ページは何だったのか……？　梯子を外された気がしますが、課金で解決します。幅を利かせて参りましょう (?) 。
+
+[[https://blog.miz-ar.info/2019/09/techbookfest7-announce/][著者ブログ]] に目次があります。 =vector= を抑えれば B 問題が安定し、 [[https://twitter.com/tanakh/status/1293533213197914113][モナドで失敗する]] 気持ちも味わえます。 *ついに Haskell が始まりました！*
+
+#+BEGIN_EXPORT html
+<details><summary>ハイライト</summary>
+#+END_EXPORT
+
+特に嬉しかった情報としては:
+
+- =PrimMonad= の使い方
+- Unboxed array の注意点 (タプルは持てない)
+- Unboxed vector の注意点
+  - タプルも持てる (配列 2 本になる！)
+  - 2 次元配列の持ち方
+- =Vector.Generic= と他モジュールの関係
+- Immutable vector の =modify= 関数の使い方と =vector-algorithms= の活用
+
+じっくり書いてほしかった内容としては:
+
+- =Array= の使い方 (=Ix= の使い方)
+- =State= モナドの使い方
+- モナドの合成
+- データ族について
+
+#+BEGIN_EXPORT html
+</details>
+#+END_EXPORT
+
+ところで =MVector= には末尾要素の =push= がありません。 =snoc= は $O(n)$ の操作です。この本を読んだ後でも、 AtCoder の外では全く戦えないことが伺えます。
+
+** [[https://www.packtpub.com/product/haskell-high-performance-programming/9781786464217][Haskell High Performance Programming]]
+
+*今年 1 番面白かった本* になるかもしれません。話の重要度が高過ぎました。
+
+たとえば一時変数が GC を妨げるという恐ろしいエピソードがあります:
+
+#+BEGIN_SRC hs
+> Data.list.foldl' (+) 0 [1..10^6]
+500000500000
+
+> let xs = [1..10^6] :: [Int]
+> Data.list.foldl' (+) 0 xs
+<interactive>: Heap exhausted;
+#+END_SRC
+
+実際は最適化のおかげでエラーになりません。結局、アルゴリズム的な失敗の方が遥かに影響が大きいよと P16 にありました。つまり *GHC の自慢話* を浴びただけです。 *例が凶悪* 過ぎて不安ですよ！
+
+内容は『[[https://booth.pm/ja/items/1577541][Haskellで戦う競技プログラミング 第2版]]』に還元される気がします。読んでも読まなくてもいい感じです。もう少しスローペースで詳しく頼むという場合には良いかもしれません。
+
+** 競技プログラミングの鉄則
+
+151 問の問題集です。 [[https://atcoder.jp/contests/typical90][典型 90 問]] が応用力を問うのに対し、本書はアルゴリズムのカバー率を重視しているとか。 [[https://e869120.hatenablog.com/entry/2022/09/08/214552][著者ブログ]] から目次を確認できます。
+
+*難度設定が絶妙* です。よく自力で完答できますし、解けなくても丁寧な解答・解説が読めます。これでレベルアップできますよ！
+
+『鉄則本』に挑むことは、アルゴリズムのテンプレートプログラムを育てる作業でもあります。競技プログラミングが大好きな『盆栽』作業に変わるわけなので、ある意味ゲームチェンジャーですね。このタイミングで出て来てくれたことに御の字です。
+
+# 問題の難易度は ★ の数で表現されています。基本問題は本の中に、他の問題は [[https://github.com/E869120/kyopro-tessoku][GitHub の]] editorial に難易度が記載されています。
+# 
+# 著者によると、 ★ と diff との対応は以下となります:
+# 
+# | 星     | 対応の diff    |
+# |--------+----------------|
+# | ★      | 灰色           |
+# | ★★     | 灰色           |
+# | ★★★    | 灰色上位〜茶色 |
+# | ★★★★   | 茶色上位〜緑色 |
+# | ★★★★★  | 緑色上位〜水色 |
+# | ★★★★★★ | 水色上位〜     |
+# 
+# つまり……たった 1 冊で水色まで行ける可能性すらあるっていうこと……？
+
+** COMMENT その他の本
+# 
+# 色々買った自慢です:
+# 
+# - [[https://book.mynavi.jp/ec/products/detail/id=22672][プログラミングコンテストチャレンジブック (第2版)]]\\
+#   『鉄則本』が無かった時代には、検索で最上位に来た本でした。しかし実態は *最高難度* の本だったので積んでいます。ラスボスだったか。。
+# - [[https://gihyo.jp/book/2022/978-4-297-12521-9][問題解決のための「アルゴリズム×数学」が基礎からしっかり身につく本]]\\
+#   2 分探索の最大計算量が $log_2 N$ であると聞いてピンと来ないなら買うべきです。今では『鉄則本』が上位互換だと思います。
+# - [[https://www.lambdanote.com/products/haskell][プログラミングHaskell 第2版]]\\
+#   『すごい H 本』と似た立ち位置の本です。復習に利用しています。 =Applicative= に部分適用が絡まると途端に分からない。。
+# - [[https://shop.ohmsha.co.jp/shopdetail/000000004066/][関数プログラミング 珠玉のアルゴリズムデザイン]]\\
+#   『運算』と『等式論証』を活かし、 Haskell で高効率なアルゴリズムを構築します。全 30 題。難しい……
+# - [[https://tatsu-zine.com/books/thinking-functionally-with-haskell][Haskellによる関数プログラミングの思考法]]\\
+#   『運算』と『等式論証』のイージー版です。 1 つ 1 つ証明しながらアルゴリズムを考えるのは難しいのでは……？　積んでいます。
+
+# ** その他メモ
+#
+#  - Haskell のコードゴルフ\\
+#    読み解けば、 Haskell の言語仕様に詳しくなれる気がします。興味があります。
+#
+#  - [[https://kazu-yamamoto.hatenablog.jp/entry/20140206/1391666962][Real World Haskell の古いところ]]\\
+#    同書の一番読みたい部分が 2014 年時点で古くなっていたことにショックを受けました。詳しい Haskell の本を募集しています。
+#
+#  - 『レーティングは強さの対数』\\
+#    スーパープログラマの言葉のようです。僕が水色になるには 10 倍の強さが必要です。
+
+* まとめ
+
+Haskell で AtCoder に参加した結果、世の中には面白い人がたくさんいるという希望を見つけました。自分は大して面白くない現実にも気付きました。
+
+特に『ナードな自分』というアイデンティティを失ったのが痛く、代わりに『灰色コーダー』 (プログラミングが下手) という客観的な評価が突きつけられます。
+
+クダを巻いている場合ではありませんでした。テキストエディタを研ぎ澄ますとか、 Haskell でゲームを作るとか。そういった積み重ねの先、今よりも遥かなナードを目指さねばなりません。
+
+もっと遊ぼう！
+
+** 追伸
+
+さっきの ABC で茶コーダーになっていました。灰色詐欺じゃん……！
+
+図らずも色変記事になりました。次は DP を学んで緑色を目指します。
+
+[[./img/atcoder/atcoder-brown.png]]
+

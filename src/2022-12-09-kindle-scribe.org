@@ -1,0 +1,66 @@
+#+TITLE: Kindle Scribe の購入を正当化する
+#+DATE: <2022-12-09 Sat>
+#+LINK: apecs https://hackage.haskell.org/package/apecs
+
+* 背景
+
+[[https://www.amazon.co.jp/dp/B09BSMBWXD/ref=dp_iou_view_product?ie=UTF8&psc=1][Kindle Scribe]] を購入しました。 E-ink ディスプレイ 10.2 インチ、これは *オライリー本のサイズ* に匹敵します。とうとう紙が要らない時代にやって来ました！
+
+iPad (動画) や Shokz (音声) と異なって、 Kindle Scribe (本) は既製の Kindle や紙と競合します。本当に買う価値があったのか？　自身の行動を振り返ってみます。
+
+* Kindle Scribe でやったこと
+
+画面が大きいと、気軽に PDF を読むことができます。 PDF が読めるとなると……
+
+** 簡単な論文を読んだ
+
+Haskell を使ったゲーム開発は論文になるのですね。貴重な情報を取り込みます。
+
+[[https://github.com/jonascarpay/apecs/blob/master/apecs/prepub.pdf][Apecs: A Type-Driven Entity-Component-System Framework]] を読みました。正式な論文なのかは分かりませんが (論文を書いたことが無い) 、高品質なブログ記事という趣です。
+
+[[apecs][Apecs]] は [[https://github.com/amethyst/specs][SPECS]] に影響を与えたという風に書いてあります。そうだったのか……？　あまり具体的なコードを読まずに全体の流れを知ることができますから、エアプに適しています。 [[apecs][Apecs]] のチュートリアルを読むよりも、この論文 (?) を読む方が負荷が軽いのです。どちらかと言えば、 Apecs は最小構成の ECS 実装であることが分かりました。
+
+読後は [[https://is.muni.cz/th/zedur/Game_development_in_Haskell_Archive.pdf][Game Development in Haskell]] を読んでいます。 [[apecs][Apecs]] を使ったり、独自ライブラリでゲームを作る内容ですから、ぜひとも読みたいコンテンツでしたが、実際は 1 ページも読んでいませんでした。 Kindle Scribe があればページが進みます。
+
+** 積み本崩しが進む……かも
+
+読みかけの PDF がありますが、なんとなく読む気がしない。 Kindle Scribe によってその状況が打破でき……そうです。 3 年後には！
+
+- [[https://www.lua.org/doc/jucs05.pdf][The implementation of Lua 5]]\\
+  言語実装のお供に！
+- [[https://www.manning.com/books/type-driven-development-with-idris][Type-Driven Development with Idris]]\\
+  関数型言語の本が尽きたら！
+- [[https://nostarch.com/rust-rustaceans][Rust for Rustacians]]\\
+  その次に！
+
+** ebook を探すようになった
+
+新しいコンテンツは電子書籍で探します。技術書は特に出版社から直接購入できる場合が多いです。
+
+*** ラムダノート
+
+[[https://www.lambdanote.com/collections/frontpage][ラムダノート]] の [[https://www.lambdanote.com/products/peering][ピアリング戦記]] を読んでいます。まず internetworking という言葉を知らなかった時点で面白い。時雨堂のセールに感謝です。
+
+*** O'Reilly Japan
+
+[[https://www.oreilly.co.jp/books/9784873118789/][Real World HTTP ミニ版]] を読んでいます。なんと無料！　前書きが全文暗記したいほど面白いので『間違いない』と思います。これも Kindle Scra (略)
+
+[[https://www.oreilly.co.jp/ebook/#all_titles][O'Reilly Japan の ebook]] を見てニヤニヤする時間を得ました。表紙一覧が見えないことに苦しみを覚えますが、 [[https://github.com/ericchiang/pup][pup]] がなんとかしてくれました。
+
+- [[https://www.oreilly.co.jp/books/9784873119977/][Go 言語による分散サービス]] の表紙が面白い
+# - 細密画？の表紙シリーズがある ([[https://www.oreilly.co.jp/books/9784873114484/][リバースエンジニアリング]] など)
+- [[https://www.oreilly.co.jp/books/9784873119595/][並行プログラミング入門]] の表紙は [[Https://www.oreilly.co.jp/books/9784873116891/][Haskellによる並列・並行プログラミング]] の流れを継いでいた
+- [[https://www.oreilly.co.jp/books/9784873116020/][例題で学ぶ微分方程式]] など [[https://www.oreilly.co.jp/books/math/][数学の本]] がある
+
+*** BOOTH
+
+[[https://booth.pm/ja/search/haskell][BOOTH で『Haskell』と検索]] すると、我らが『Haskell で戦う競技プログラミング入門』はもちろん、λ計算や圏論への道も開かれていることが分かります。
+
+技術同人誌の売り場は BOOTH から Zenn に移行しています。 Zenn のコンテンツは基本ダウンロードできませんから、少し考える必要があります。
+
+* まとめ
+
+Kindle Scribe では他の本に移動するのが面倒なので、まず 1 ページを読んでしまいます。 1 ページ読めばこちらのものです。
+
+論文を読み始めたのは意外な収穫でした。フォーマット変換が不要な分だけ、ブログ記事よりもお手軽なのです。新鮮なコンテンツを味わっていきたいと思います。
+
