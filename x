@@ -1,4 +1,7 @@
-#!/usr/bin/env bash -euE
+#!/usr/bin/env bash
+
+set -euE
+set -o pipefail
 
 IFS=$'\n\t'
 dir="$(dirname "$0")"
