@@ -1,3 +1,9 @@
+/*
+Changes
+- Do not set source code colors (prefering `Prism.js` styling)
+- Use dark theme by default
+*/
+
 /* Global variables. */
 :root {
   /* Set sans-serif & mono fonts */
@@ -7,20 +13,20 @@
   --mono-font: Consolas, Menlo, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
 
   /* Default (light) theme */
-  --bg: #fff;
-  --accent-bg: #f5f7ff;
-  --text: #212121;
-  --text-light: #585858;
-  --border: #898EA4;
-  --accent: #0d47a1;
-  --code: #d81b60;
-  --preformatted: #444;
-  --marked: #ffdd33;
-  --disabled: #efefef;
+  /* --bg: #fff; */
+  /* --accent-bg: #f5f7ff; */
+  /* --text: #212121; */
+  /* --text-light: #585858; */
+  /* --border: #898EA4; */
+  /* --accent: #0d47a1; */
+  /* --code: #d81b60; */
+  /* --preformatted: #444; */
+  /* --marked: #ffdd33; */
+  /* --disabled: #efefef; */
 }
 
 /* Dark theme */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) { */
   :root {
     color-scheme: dark;
     --bg: #212121;
@@ -37,7 +43,7 @@
   video {
     opacity: 0.8;
   }
-}
+/* } */
 
 /* Reset box-sizing */
 *, *::before, *::after {
