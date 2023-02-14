@@ -9,13 +9,13 @@
 </p>
 </blockquote>
 
-<div id="outline-container-orga6d200d" class="outline-2">
-<h2 id="orga6d200d"><a href="#orga6d200d"><code>org-publish</code> ベースの SSG</a></h2>
-<div class="outline-text-2" id="text-orga6d200d">
+<div id="outline-container-orgd31d251" class="outline-2">
+<h2 id="orgd31d251"><a href="#orgd31d251"><code>org-publish</code> ベースの SSG</a></h2>
+<div class="outline-text-2" id="text-orgd31d251">
 </div>
-<div id="outline-container-orgd955086" class="outline-3">
-<h3 id="orgd955086"><a href="#orgd955086">背景</a></h3>
-<div class="outline-text-3" id="text-orgd955086">
+<div id="outline-container-org10f9dcd" class="outline-3">
+<h3 id="org10f9dcd"><a href="#org10f9dcd">背景</a></h3>
+<div class="outline-text-3" id="text-org10f9dcd">
 <p>
 Org はマークアップ言語です。主に Emacs ユーザに利用されています。<br>
 </p>
@@ -26,9 +26,9 @@ Emacs のエディタ拡張 <code>org-mode</code> には、 <code>.org</code> �
 </div>
 </div>
 
-<div id="outline-container-org28bc4e3" class="outline-3">
-<h3 id="org28bc4e3"><a href="#org28bc4e3">ファイル構成</a></h3>
-<div class="outline-text-3" id="text-org28bc4e3">
+<div id="outline-container-orgbe75e66" class="outline-3">
+<h3 id="orgbe75e66"><a href="#orgbe75e66">ファイル構成</a></h3>
+<div class="outline-text-3" id="text-orgbe75e66">
 <p>
 本ブログのファイル構成は以下です:<br>
 </p>
@@ -46,20 +46,21 @@ Emacs のエディタ拡張 <code>org-mode</code> には、 <code>.org</code> �
 <code>src/</code> ディレクトリの内容は以下になります。下書きファイルを <code>*.draft.org</code> とし、 release ビルド時は無視します:<br>
 </p>
 
-<pre class="example">
-src/
+<div class="org-src-container">
+<pre><code class="src language-sh">src/
 ├── img           # 画像ファイル
 ├── index.org     # 索引 ("sitemap". `org-publish` が自動生成する)
 ├── *.org         # 投稿記事
 ├── *.draft.org   # 下書き (`--release` ビルドの際は無視される)
 └── style         # CSS, JS
-</pre>
+</code></pre>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org2967b58" class="outline-3">
-<h3 id="org2967b58"><a href="#org2967b58">CLI</a></h3>
-<div class="outline-text-3" id="text-org2967b58">
+<div id="outline-container-org08898ce" class="outline-3">
+<h3 id="org08898ce"><a href="#org08898ce">CLI</a></h3>
+<div class="outline-text-3" id="text-org08898ce">
 <p>
 <code>x</code> のサブコマンドを紹介します:<br>
 </p>
@@ -73,17 +74,17 @@ src/
 </div>
 </div>
 
-<div id="outline-container-org7870602" class="outline-2">
-<h2 id="org7870602"><a href="#org7870602">主なリソース</a></h2>
-<div class="outline-text-2" id="text-org7870602">
+<div id="outline-container-orgf34c8dd" class="outline-2">
+<h2 id="orgf34c8dd"><a href="#orgf34c8dd">主なリソース</a></h2>
+<div class="outline-text-2" id="text-orgf34c8dd">
 <p>
 <code>org-mode</code> でブログ生成したいという人がいたら、以下のリンクが役に立つかもしれません。<br>
 </p>
 </div>
 
-<div id="outline-container-orge688311" class="outline-3">
-<h3 id="orge688311"><a href="#orge688311">参考記事</a></h3>
-<div class="outline-text-3" id="text-orge688311">
+<div id="outline-container-org1899cf3" class="outline-3">
+<h3 id="org1899cf3"><a href="#org1899cf3">参考記事</a></h3>
+<div class="outline-text-3" id="text-org1899cf3">
 <p>
 <code>org-publish</code> の公式マニュアルが説明不足なので、チュートリアルが重宝します:<br>
 </p>
@@ -98,9 +99,9 @@ src/
 </div>
 </div>
 
-<div id="outline-container-orge5c6641" class="outline-3">
-<h3 id="orge5c6641"><a href="#orge5c6641">The Org Manual</a></h3>
-<div class="outline-text-3" id="text-orge5c6641">
+<div id="outline-container-org55a8502" class="outline-3">
+<h3 id="org55a8502"><a href="#org55a8502">The Org Manual</a></h3>
+<div class="outline-text-3" id="text-org55a8502">
 <p>
 <a href="https://orgmode.org/org.html">公式マニュアル</a> です。意外に短くて説明不足の感はあります:<br>
 </p>
@@ -122,9 +123,9 @@ src/
 </div>
 </div>
 
-<div id="outline-container-org1973e2e" class="outline-3">
-<h3 id="org1973e2e"><a href="#org1973e2e">HTML 生成の改良</a></h3>
-<div class="outline-text-3" id="text-org1973e2e">
+<div id="outline-container-org4aac3ec" class="outline-3">
+<h3 id="org4aac3ec"><a href="#org4aac3ec">HTML 生成の改良</a></h3>
+<div class="outline-text-3" id="text-org4aac3ec">
 <p>
 HTML 生成をハイジャックして完成です:<br>
 </p>
@@ -140,13 +141,13 @@ HTML 生成をハイジャックして完成です:<br>
 </div>
 </div>
 
-<div id="outline-container-orgc9d615c" class="outline-2">
-<h2 id="orgc9d615c"><a href="#orgc9d615c">その他</a></h2>
-<div class="outline-text-2" id="text-orgc9d615c">
+<div id="outline-container-org5a23d6c" class="outline-2">
+<h2 id="org5a23d6c"><a href="#org5a23d6c">その他</a></h2>
+<div class="outline-text-2" id="text-org5a23d6c">
 </div>
-<div id="outline-container-org2feed5a" class="outline-3">
-<h3 id="org2feed5a"><a href="#org2feed5a">Org 製のブログ</a></h3>
-<div class="outline-text-3" id="text-org2feed5a">
+<div id="outline-container-orgb336939" class="outline-3">
+<h3 id="orgb336939"><a href="#orgb336939">Org 製のブログ</a></h3>
+<div class="outline-text-3" id="text-orgb336939">
 <p>
 見かけるたびに追記します。<br>
 </p>

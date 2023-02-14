@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>25 万円の PC 組み立て - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="style/simple.min.css"/><link rel="stylesheet" href="style/style.css"/><link rel="stylesheet" href="style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>25 万円の PC 組み立て</h1><p>Feb 14, 2023</p><nav role="navigation"><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main"><p>
+前回購入した PC パーツが届きました。 PC を組み立てて Linux 環境を整えます。贅沢最高！　NixOS の詳しい話は別の記事で書きます。<br>
+</p>
+
+<div id="outline-container-org40629d6" class="outline-2">
+<h2 id="org40629d6"><a href="#org40629d6">準備</a></h2>
+<div class="outline-text-2" id="text-org40629d6">
+<p>
+少し買い物をします。<br>
+</p>
+
+<ul class="org-ul">
+<li>ドライバ<br>
+<ol class="org-ol">
+<li>普通のプラスドライバ<br></li>
+<li>精密ドライバ (M.2 SSD の装着に)<br></li>
+</ol></li>
+
+<li>USB<br>
+<ol class="org-ol">
+<li>Linux の起動ディスク用 (<a href="https://nixos.org/">NixOS</a> を入れます)<br></li>
+<li>データの移動用 (マザーボードの BIOS 更新ファイルなど)<br></li>
+</ol></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgca7e547" class="outline-2">
+<h2 id="orgca7e547"><a href="#orgca7e547">新環境構築</a></h2>
+<div class="outline-text-2" id="text-orgca7e547">
+<p>
+届いたのはダンボール 2 箱で、一方には PC ケースが、もう一方にはパーツ類が入っています。どちらも電子レンジより軽い！　気軽に所有できそうです。<br>
+</p>
+</div>
+
+<div id="outline-container-orgec707ca" class="outline-3">
+<h3 id="orgec707ca"><a href="#orgec707ca">PC 組み立て・起動</a></h3>
+<div class="outline-text-3" id="text-orgec707ca">
+<p>
+組み立て手順は <a href="https://www.dospara.co.jp/5info/cts_pc_setup.html">ドスパラの組み立てマニュアル</a> に従いました。細かい方法は製品付属の説明書を参照します。あらゆる過程で引っかかったので、組み立てだけで 5 時間以上かかりました。<br>
+</p>
+
+<p>
+絶望ポイントを抜粋します:<br>
+</p>
+
+<ol class="org-ol">
+<li>CPU 装着の向きが分からない<br></li>
+<li>CPU ファンの固定台がマザーボードに取り付けられない<br></li>
+<li>M.2 SSD 装着のための精密ドライバが無い<br></li>
+<li>GPU とマザーボードの接続方法が分からない<br></li>
+<li>配線のやり方が分からない<br></li>
+<li>電源が付かない<br></li>
+<li>映像が出ない<br></li>
+</ol>
+
+<details><summary>対策</summary>
+<ol class="org-ol">
+<li>持ち上げた蓋の方に印がありました。<br></li>
+<li>台の足を広げれば良かったです。<br></li>
+<li>大きなドライバで M.2 SSD を装着しました。ネジ穴を潰しそうになりました。<br></li>
+<li>ケースへの取り付けとマザーボードへの取り付けが同時でした。<br></li>
+<li>電源から各パーツにケーブルを繋ぐだけでした。<br></li>
+<li>フロントパネルの電源ボタンを押していませんでした。<br></li>
+<li>GPU を取り外すと映像が出ました。また BIOS を更新すると GPU から映像を出せるようになりました。謎です。<br></li>
+</ol>
+</details>
+
+<p>
+ずいぶん苦労しましたが、次からはスムーズになると思います。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org70a5bed" class="outline-3">
+<h3 id="org70a5bed"><a href="#org70a5bed">BIOS の設定</a></h3>
+<div class="outline-text-3" id="text-org70a5bed">
+<p>
+起動後、 BIOS を更新・設定変更します。<br>
+</p>
+
+<ul class="org-ul">
+<li>BIOS の更新<br>
+<a href="https://jp.msi.com/support/technical_details/MB_BIOS_Update">MSI マザーボードの BIOS 更新方法</a> を参考に M-Flash を実施しました。<br></li>
+
+<li>USB ブートの有効化<br>
+インストールディスク (USB) から起動できるように設定します。<br></li>
+
+<li>Secure boot の無効化<br>
+インストールディスクには UEFI の署名が無いとかで、一時的に secure boot は無効にする必要がありました。<br></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org1cfa58a" class="outline-3">
+<h3 id="org1cfa58a"><a href="#org1cfa58a">NixOS のセットアップ</a></h3>
+<div class="outline-text-3" id="text-org1cfa58a">
+</div>
+<div id="outline-container-orgb8a997b" class="outline-4">
+<h4 id="orgb8a997b"><a href="#orgb8a997b">主なリソース</a></h4>
+<div class="outline-text-4" id="text-orgb8a997b">
+<p>
+公式マニュアルや Youtube が詳しいので、インストールまではあまり困りません。<br>
+</p>
+
+<ul class="org-ul">
+<li><a href="https://nixos.org/manual/nixos/stable/">NixOS manual</a><br></li>
+<li><a href="https://github.com/MatthiasBenaets/nixos-config">MatthiasBenaets / nixos-config</a><br></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0762b57" class="outline-4">
+<h4 id="org0762b57"><a href="#org0762b57">主な設定</a></h4>
+<div class="outline-text-4" id="text-org0762b57">
+<p>
+ベター Ubuntu のつもりで無難に設定しましたが、中々思い通りにはなりません。たとえば Kitty ターミナルで日本語入力するには、 <code>fcitx5</code> を有効にする必要がありますが、まだ成功していません。<br>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">設定項目</th>
+<th scope="col" class="org-left">設定内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Display manager</td>
+<td class="org-left">LightDM (デフォルト)</td>
+</tr>
+
+<tr>
+<td class="org-left">WM</td>
+<td class="org-left">i3 (+ <code>rofi</code>)</td>
+</tr>
+
+<tr>
+<td class="org-left">DE</td>
+<td class="org-left">なし</td>
+</tr>
+
+<tr>
+<td class="org-left">日本語入力</td>
+<td class="org-left">fcitx4 + mozc</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-org7c7c25b" class="outline-4">
+<h4 id="org7c7c25b"><a href="#org7c7c25b">SSD の破損</a></h4>
+<div class="outline-text-4" id="text-org7c7c25b">
+<p>
+3D ゲームをプレイしていたら、 SSD が二度と起動しなくなりました。 2 回 NixOS をインストールすることになるとは……！　10 日ぐらいは設定に忙殺されました。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc007010" class="outline-4">
+<h4 id="orgc007010"><a href="#orgc007010">開発環境構築</a></h4>
+<div class="outline-text-4" id="text-orgc007010">
+<p>
+競プロ環境の構築に失敗しました。 Python 製ツールをグローバル環境にインストールできず、調べものも進んでいません。万事そんな具合です。<br>
+</p>
+
+<p>
+Rust に関しては <a href="https://github.com/nix-community/fenix">fenix</a> を使うと簡単でした。 Rust 関係はこの PC でも開発できそうです。<br>
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgeae2f5f" class="outline-2">
+<h2 id="orgeae2f5f"><a href="#orgeae2f5f">まとめ</a></h2>
+<div class="outline-text-2" id="text-orgeae2f5f">
+<p>
+さすが高スペック PC, ビルドが速い！　1 日が 24.5 時間になったかのようです。エディタの起動すら高速になりました。モニタを買い足せば、もっと快適になるでしょう。<br>
+</p>
+
+<p>
+MBP がクラムシェルから解放されました。 iPad は便利ですが、 mac はさらに便利です。 mac を手に入れ直したような気分にもなりました。<br>
+</p>
+
+<p>
+さらに 15 インチのサブモニタ、および Kindle Scribe をアームで宙に置いています。贅沢のカンストが見えてきました。<br>
+</p>
+</div>
+</div>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
