@@ -30,7 +30,7 @@ Emacs のエディタ拡張 =org-mode= には、 =.org= ファイルを任意の
 
 =src/= ディレクトリの内容は以下になります。下書きファイルを =*.draft.org= とし、 release ビルド時は無視します:
 
-#+BEGIN_SRC
+#+BEGIN_SRC sh
 src/
 ├── img           # 画像ファイル
 ├── index.org     # 索引 ("sitemap". `org-publish` が自動生成する)
