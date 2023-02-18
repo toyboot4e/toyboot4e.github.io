@@ -44,7 +44,7 @@ MacBook Pro (Mid 2015) のバッテリーが膨張していました。蓋が閉
 | 項目         | 購入品                      | 値段   | 備考                             |
 |--------------+-----------------------------+--------+----------------------------------|
 | CPU          | Intel Core i7 12700K        | 60,000 | [[https://browser.geekbench.com/processors/intel-core-i7-12700k][スコア 1,907 / 14,188]]            |
-| GPU          | GeForce RTX 3070 Ti         | 75,000 | [[https://www.videocardbenchmark.net/gpu.php?gpu=GeForce+RTX+3070+Ti&id=4413][スコア 23,712]]                    |
+| GPU          | GeForce RTX 3070            | 75,000 | [[https://www.videocardbenchmark.net/gpu.php?gpu=GeForce+RTX+3070&id=4283][スコア 22466]]                     |
 | メモリ       | Curucial CT2K32G4DFD83      | 25,000 | 32GB x 2, UDIMM, DDR4-3200       |
 | ストレージ   | ADATA AGAMMIXS50L-1T-C      | 20,000 | 1 TB, M.2 2280 PCIe Gen 4.0 NVMe |
 | マザーボード | MAG B660 TOMAHAWK WIFI DDR4 | 30,000 | ATX, B660                        |

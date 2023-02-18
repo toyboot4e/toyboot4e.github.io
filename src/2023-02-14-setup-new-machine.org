@@ -33,6 +33,7 @@
 5. 配線のやり方が分からない
 6. 電源が付かない
 7. 映像が出ない
+8. Bluetooth が繋がらない
 
 #+BEGIN_EXPORT html
 <details><summary>対策</summary>
@@ -44,6 +45,7 @@
 5. 電源から各パーツにケーブルを繋ぐだけでした。
 6. フロントパネルの電源ボタンを押していませんでした。
 7. GPU を取り外すと映像が出ました。また BIOS を更新すると GPU から映像を出せるようになりました。謎です。
+8. マザーボード付属のアンテナを付けていませんでした。
 #+BEGIN_EXPORT html
 </details>
 #+END_EXPORT
@@ -61,13 +63,13 @@
   インストールディスク (USB) から起動できるように設定します。
 
 - Secure boot の無効化
-  インストールディスクには UEFI の署名が無いとかで、一時的に secure boot は無効にする必要がありました。
+  インストールディスクには UEFI の署名が無いとかで、一時的に secure boot を無効にする必要がありました。
 
 ** NixOS のセットアップ
 
 *** 主なリソース
 
-公式マニュアルや Youtube が詳しいので、インストールまではあまり困りません。
+公式マニュアルや Youtube が詳しいので、インストールまではあまり困りません。 =/etc/nixos/configuration.nix= を編集し、 OS の設定をします。
 
 - [[https://nixos.org/manual/nixos/stable/][NixOS manual]]
 - [[https://github.com/MatthiasBenaets/nixos-config][MatthiasBenaets / nixos-config]]
@@ -78,6 +80,7 @@
 
 | 設定項目        | 設定内容             |
 |-----------------+----------------------|
+| Window system   | X                    |
 | Display manager | LightDM (デフォルト) |
 | WM              | i3 (+ =rofi=)          |
 | DE              | なし                 |
@@ -85,13 +88,19 @@
 
 *** SSD の破損
 
-3D ゲームをプレイしていたら、 SSD が二度と起動しなくなりました。 2 回 NixOS をインストールすることになるとは……！　10 日ぐらいは設定に忙殺されました。
+3D ゲームをプレイしていたら、 SSD が二度と起動しなくなりました。 2 回 NixOS をインストールすることになるとは……！　10 日ぐらい設定に忙殺されて、まともに眠れませんでした。
 
 *** 開発環境構築
 
-競プロ環境の構築に失敗しました。 Python 製ツールをグローバル環境にインストールできず、調べものも進んでいません。万事そんな具合です。
+NixOS には独自の制限があり、整備されたレール以外は途端に難しくなります。たとえばグローバルインストールは基本できませんし、ライブラリのリンクには =shell.nix= や =default.nix= が必要です。
 
-Rust に関しては [[https://github.com/nix-community/fenix][fenix]] を使うと簡単でした。 Rust 関係はこの PC でも開発できそうです。
+まずは制限を把握するところからですね。現在は、急場凌ぎで以下の環境を使用しています。
+
+- Haskell (競プロ環境)\\
+  =ghcup= が利用できません。また =nixpkgs= には =ghc883= が無いので、 GHC 8.8.4 を使って凌いでいます。
+
+- Rust (ゲーム開発)\\
+  =rustup= が利用できません。ただ [[https://github.com/nix-community/fenix][fenix]] を使えば、ほぼグローバルインストールになりました。リンクには [[https://github.com/bevyengine/bevy/blob/d2963267ba632a1b845aa843370f170f85633b13/docs/linux_dependencies.md#nix][Bevy Engine の =shell.nix=]] を参考にし、 [[https://github.com/nix-community/nix-direnv][nix-direnv]] で =PATH= に入れます。 [[https://bevyengine.org/learn/book/getting-started/setup/][リンカーを LLD に変更する]] のも忘れずに。 [[https://github.com/mozilla/sccache][sccache]] の代わりはまだ候補を絞れていません。
 
 * まとめ
 
