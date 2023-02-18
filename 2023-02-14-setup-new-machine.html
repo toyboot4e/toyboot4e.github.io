@@ -3,9 +3,9 @@
 前回購入した PC パーツが届きました。 PC を組み立てて Linux 環境を整えます。贅沢最高！　NixOS の詳しい話は別の記事で書きます。<br>
 </p>
 
-<div id="outline-container-org17f03d4" class="outline-2">
-<h2 id="org17f03d4"><a href="#org17f03d4">準備</a></h2>
-<div class="outline-text-2" id="text-org17f03d4">
+<div id="outline-container-orga683faf" class="outline-2">
+<h2 id="orga683faf"><a href="#orga683faf">準備</a></h2>
+<div class="outline-text-2" id="text-orga683faf">
 <p>
 少し買い物をします。<br>
 </p>
@@ -26,17 +26,17 @@
 </div>
 </div>
 
-<div id="outline-container-org7bb2cfe" class="outline-2">
-<h2 id="org7bb2cfe"><a href="#org7bb2cfe">新環境構築</a></h2>
-<div class="outline-text-2" id="text-org7bb2cfe">
+<div id="outline-container-org9c4f3ec" class="outline-2">
+<h2 id="org9c4f3ec"><a href="#org9c4f3ec">新環境構築</a></h2>
+<div class="outline-text-2" id="text-org9c4f3ec">
 <p>
 届いたのはダンボール 2 箱で、一方には PC ケースが、もう一方にはパーツ類が入っています。どちらも電子レンジより軽い！　気軽に所有できそうです。<br>
 </p>
 </div>
 
-<div id="outline-container-org3fd58ec" class="outline-3">
-<h3 id="org3fd58ec"><a href="#org3fd58ec">PC 組み立て・起動</a></h3>
-<div class="outline-text-3" id="text-org3fd58ec">
+<div id="outline-container-orgce688bf" class="outline-3">
+<h3 id="orgce688bf"><a href="#orgce688bf">PC 組み立て・起動</a></h3>
+<div class="outline-text-3" id="text-orgce688bf">
 <p>
 組み立て手順は <a href="https://www.dospara.co.jp/5info/cts_pc_setup.html">ドスパラの組み立てマニュアル</a> に従いました。細かい方法は製品付属の説明書を参照します。あらゆる過程で引っかかったので、組み立てだけで 5 時間以上かかりました。<br>
 </p>
@@ -53,6 +53,7 @@
 <li>配線のやり方が分からない<br></li>
 <li>電源が付かない<br></li>
 <li>映像が出ない<br></li>
+<li>Bluetooth が繋がらない<br></li>
 </ol>
 
 <details><summary>対策</summary>
@@ -64,6 +65,7 @@
 <li>電源から各パーツにケーブルを繋ぐだけでした。<br></li>
 <li>フロントパネルの電源ボタンを押していませんでした。<br></li>
 <li>GPU を取り外すと映像が出ました。また BIOS を更新すると GPU から映像を出せるようになりました。謎です。<br></li>
+<li>マザーボード付属のアンテナを付けていませんでした。<br></li>
 </ol>
 </details>
 
@@ -73,9 +75,9 @@
 </div>
 </div>
 
-<div id="outline-container-orgd0aac65" class="outline-3">
-<h3 id="orgd0aac65"><a href="#orgd0aac65">BIOS の設定</a></h3>
-<div class="outline-text-3" id="text-orgd0aac65">
+<div id="outline-container-org92d2e09" class="outline-3">
+<h3 id="org92d2e09"><a href="#org92d2e09">BIOS の設定</a></h3>
+<div class="outline-text-3" id="text-org92d2e09">
 <p>
 起動後、 BIOS を更新・設定変更します。<br>
 </p>
@@ -88,20 +90,20 @@
 インストールディスク (USB) から起動できるように設定します。<br></li>
 
 <li>Secure boot の無効化<br>
-インストールディスクには UEFI の署名が無いとかで、一時的に secure boot は無効にする必要がありました。<br></li>
+インストールディスクには UEFI の署名が無いとかで、一時的に secure boot を無効にする必要がありました。<br></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org165e813" class="outline-3">
-<h3 id="org165e813"><a href="#org165e813">NixOS のセットアップ</a></h3>
-<div class="outline-text-3" id="text-org165e813">
+<div id="outline-container-orga08dcb9" class="outline-3">
+<h3 id="orga08dcb9"><a href="#orga08dcb9">NixOS のセットアップ</a></h3>
+<div class="outline-text-3" id="text-orga08dcb9">
 </div>
-<div id="outline-container-orgfb37fc3" class="outline-4">
-<h4 id="orgfb37fc3"><a href="#orgfb37fc3">主なリソース</a></h4>
-<div class="outline-text-4" id="text-orgfb37fc3">
+<div id="outline-container-orgdc1f6c6" class="outline-4">
+<h4 id="orgdc1f6c6"><a href="#orgdc1f6c6">主なリソース</a></h4>
+<div class="outline-text-4" id="text-orgdc1f6c6">
 <p>
-公式マニュアルや Youtube が詳しいので、インストールまではあまり困りません。<br>
+公式マニュアルや Youtube が詳しいので、インストールまではあまり困りません。 <code>/etc/nixos/configuration.nix</code> を編集し、 OS の設定をします。<br>
 </p>
 
 <ul class="org-ul">
@@ -111,9 +113,9 @@
 </div>
 </div>
 
-<div id="outline-container-org1d7da99" class="outline-4">
-<h4 id="org1d7da99"><a href="#org1d7da99">主な設定</a></h4>
-<div class="outline-text-4" id="text-org1d7da99">
+<div id="outline-container-org9aa9112" class="outline-4">
+<h4 id="org9aa9112"><a href="#org9aa9112">主な設定</a></h4>
+<div class="outline-text-4" id="text-org9aa9112">
 <p>
 ベター Ubuntu のつもりで無難に設定しましたが、中々思い通りにはなりません。たとえば Kitty ターミナルで日本語入力するには、 <code>fcitx5</code> を有効にする必要がありますが、まだ成功していません。<br>
 </p>
@@ -133,6 +135,11 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td class="org-left">Window system</td>
+<td class="org-left">X</td>
+</tr>
+
 <tr>
 <td class="org-left">Display manager</td>
 <td class="org-left">LightDM (デフォルト)</td>
@@ -157,33 +164,41 @@
 </div>
 </div>
 
-<div id="outline-container-orge44d61a" class="outline-4">
-<h4 id="orge44d61a"><a href="#orge44d61a">SSD の破損</a></h4>
-<div class="outline-text-4" id="text-orge44d61a">
+<div id="outline-container-org673124f" class="outline-4">
+<h4 id="org673124f"><a href="#org673124f">SSD の破損</a></h4>
+<div class="outline-text-4" id="text-org673124f">
 <p>
-3D ゲームをプレイしていたら、 SSD が二度と起動しなくなりました。 2 回 NixOS をインストールすることになるとは……！　10 日ぐらいは設定に忙殺されました。<br>
+3D ゲームをプレイしていたら、 SSD が二度と起動しなくなりました。 2 回 NixOS をインストールすることになるとは……！　10 日ぐらい設定に忙殺されて、まともに眠れませんでした。<br>
 </p>
 </div>
 </div>
 
-<div id="outline-container-orgd3c8e53" class="outline-4">
-<h4 id="orgd3c8e53"><a href="#orgd3c8e53">開発環境構築</a></h4>
-<div class="outline-text-4" id="text-orgd3c8e53">
+<div id="outline-container-org4c0eb0d" class="outline-4">
+<h4 id="org4c0eb0d"><a href="#org4c0eb0d">開発環境構築</a></h4>
+<div class="outline-text-4" id="text-org4c0eb0d">
 <p>
-競プロ環境の構築に失敗しました。 <code>ghc 8.8.4</code> が <code>nixpkgs</code> にはありません。 NixOS の厳しい制限を脱獄できず、万事そんな感じです。<br>
+NixOS には独自の制限があり、整備されたレール以外は途端に難しくなります。たとえばグローバルインストールは基本できませんし、ライブラリのリンクには <code>shell.nix</code> や <code>default.nix</code> が必要です。<br>
 </p>
 
 <p>
-Rust に関しては <a href="https://github.com/nix-community/fenix">fenix</a> を使うと簡単でした。 Rust 関係はこの PC でも開発できそうです。<br>
+まずは制限を把握するところからですね。現在は、急場凌ぎで以下の環境を使用しています。<br>
 </p>
+
+<ul class="org-ul">
+<li>Haskell (競プロ環境)<br>
+<code>ghcup</code> が利用できません。また <code>nixpkgs</code> には <code>ghc883</code> が無いので、 GHC 8.8.4 を使って凌いでいます。<br></li>
+
+<li>Rust (ゲーム開発)<br>
+<code>rustup</code> が利用できません。ただ <a href="https://github.com/nix-community/fenix">fenix</a> を使えば、ほぼグローバルインストールになりました。リンクには <a href="https://github.com/bevyengine/bevy/blob/d2963267ba632a1b845aa843370f170f85633b13/docs/linux_dependencies.md#nix">Bevy Engine の <code>shell.nix</code></a> を参考にし、 <a href="https://github.com/nix-community/nix-direnv">nix-direnv</a> で <code>PATH</code> に入れます。 <a href="https://bevyengine.org/learn/book/getting-started/setup/">リンカーを LLD に変更する</a> のも忘れずに。 <a href="https://github.com/mozilla/sccache">sccache</a> の代わりはまだ候補を絞れていません。<br></li>
+</ul>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org1eac2bc" class="outline-2">
-<h2 id="org1eac2bc"><a href="#org1eac2bc">まとめ</a></h2>
-<div class="outline-text-2" id="text-org1eac2bc">
+<div id="outline-container-org916d007" class="outline-2">
+<h2 id="org916d007"><a href="#org916d007">まとめ</a></h2>
+<div class="outline-text-2" id="text-org916d007">
 <p>
 さすが高スペック PC, ビルドが速い！　1 日が 24.5 時間になったかのようです。エディタの起動すら高速になりました。モニタを買い足せば、もっと快適になるでしょう。<br>
 </p>
