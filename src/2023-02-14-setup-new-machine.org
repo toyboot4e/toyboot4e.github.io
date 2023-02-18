@@ -2,7 +2,9 @@
 #+DATE: <2023-02-14 Tue>
 #+LINK: nixos https://nixos.org/
 
-前回購入した PC パーツが届きました。 PC を組み立てて Linux 環境を整えます。贅沢最高！　NixOS の詳しい話は別の記事で書きます。
+前回購入した PC パーツが届きました。 PC を組み立てて Linux 環境を整えます。
+
+贅沢最高！
 
 * 準備
 
@@ -78,13 +80,8 @@
 
 ベター Ubuntu のつもりで無難に設定しましたが、中々思い通りにはなりません。たとえば Kitty ターミナルで日本語入力するには、 =fcitx5= を有効にする必要がありますが、まだ成功していません。
 
-| 設定項目        | 設定内容             |
-|-----------------+----------------------|
-| Window system   | X                    |
-| Display manager | LightDM (デフォルト) |
-| WM              | i3 (+ =rofi=)          |
-| DE              | なし                 |
-| 日本語入力      | fcitx4 + mozc        |
+#+CAPTION: =neofetch=
+[[./img/2023-02-neofetch.png]]
 
 *** SSD の破損
 
