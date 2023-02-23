@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Linux distribution の選択について - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="style/simple.min.css"/><link rel="stylesheet" href="style/style.css"/><link rel="stylesheet" href="style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>Linux distribution の選択について</h1><p>Feb 23, 2023</p><nav role="navigation"><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main"><p>
+昔 <a href="https://nixos.org/">NixOS</a> に触っていたのは、ベター Ubuntu として使えると勘違いしたためです。結局難しすぎて返り討ちに遭いました。<br>
+</p>
+
+<p>
+現在改めて NixOS を使用しているのは、 Nix への期待があるためです。また他にあり得た選択肢について書いていきます。<br>
+</p>
+
+<div id="outline-container-org4525619" class="outline-2">
+<h2 id="org4525619"><a href="#org4525619">Linux distribution の選択について</a></h2>
+<div class="outline-text-2" id="text-org4525619">
+<p>
+Linux 初心者によるエアプとなります。ご了承ください。<br>
+</p>
+</div>
+
+<div id="outline-container-orgbbec819" class="outline-3">
+<h3 id="orgbbec819"><a href="#orgbbec819">Arch Linux</a></h3>
+<div class="outline-text-3" id="text-orgbbec819">
+<p>
+Linux distribution の中では <a href="https://archlinux.org/">Arch Linux</a> が一際輝く存在です。設定ファイルを自分で編集しようという人たちが好んで使用し、強力なコミュニティを築いています。<br>
+</p>
+
+<p>
+特に <a href="https://wiki.archlinux.org/">ArchWiki</a> が情報の宝庫として知られています。他の distribution の使用者も、まず第一に ArchWiki を参照するようです。ある種、 Linux の標準を作り出している貫禄があります。<br>
+</p>
+
+<p>
+Arch Linux と言えば、最新パッケージを定期的にリリースする <b><b>rolling release</b></b> が特徴的です。常に最新のプログラムを利用できる上、小マメにシステムを更新すれば、巨大なバージョンアップに苦しむこともありません。しかし最新のパッケージはよく『壊れている』ので、自力で環境を直す気概が必要です。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org448942d" class="outline-3">
+<h3 id="org448942d"><a href="#org448942d">Arch Linux 系 distribution</a></h3>
+<div class="outline-text-3" id="text-org448942d">
+<p>
+Manjaro は Arch ベースの distribution です。 Manjaro のパッケージは Arch のパッケージの 1 週間遅れで配布され、すでに Arch ユーザの手で初期不良の修正等が行われた状態で配信されます。<br>
+</p>
+
+<p>
+Manjaro, EndeavaurOS, Arco を始め、 Arch ベースの distribution は強い人気を集めています。僕も本来は Manjaro あたりが一番身の丈に合っている気がします。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga43763c" class="outline-3">
+<h3 id="orga43763c"><a href="#orga43763c">NixOS の特異性について</a></h3>
+<div class="outline-text-3" id="text-orga43763c">
+<p>
+NixOS では、設定ファイルを編集することで宣言的に環境構築できます。またそれぞれのパッケージのビルドには <b><b>Nix</b></b> が使用され、依存性を記述した再現可能性の高いビルドが実施されます。<br>
+</p>
+
+<p>
+それだけ聞くと、むしろ他の OS を選択する理由が無いかのようですが、実際には Nix で管理されていないプログラムが利用できなくなるため、ハイリスクな選択です。<br>
+</p>
+
+<p>
+Nix 管理外のプログラムが利用できない理由は、正直把握していないですが、動的ライブラリへのリンクが困難なことが一役買っている気がします。いずれにせよ、いつか自分で derivation (Nix を用いたビルド手順) を書く必要があると思います。<br>
+</p>
+
+<p>
+Nix が書けるようになると、何でも Nix を経由してビルドするようになるかもしれません。また設定ファイル全体を Nix Flakes で管理するなどの遊びの余地もあります。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org103776f" class="outline-3">
+<h3 id="org103776f"><a href="#org103776f">Arch Linux vs NixOS?</a></h3>
+<div class="outline-text-3" id="text-org103776f">
+<p>
+NixOS においては、間接的なレイヤで設定を実施することで、望んだ効果が半ば自動的に反映されます。しかしその内部的な挙動を知るためには、より下のレイヤまで降りていかねばなりません。またいずれは間接レイヤ等を自力で構築する必要性が生まれます。<br>
+</p>
+
+<p>
+一方 Arch Linux を使うと、より生に近い Linux に触れることができます。また ArchWiki の内容を直接取り込んで設定できるので、素直に邁進していけると思います。<br>
+</p>
+
+<p>
+つまり Arch と NixOS を両方やらねればならないという気がしています。気の遠い話です。。<br>
+</p>
+</div>
+</div>
+</div>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
