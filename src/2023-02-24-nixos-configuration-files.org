@@ -1,0 +1,116 @@
+#+TITLE: NixOS の設定ファイルとプロファイル
+#+DATE: <2023-02-24 Thu>
+#+LINK: nix-direnv https://github.com/nix-community/nix-direnv
+#+LINK: nixos https://nixos.org/
+#+LINK: flakes https://nixos.wiki/wiki/Flakes
+#+LINK: home-manager https://nixos.wiki/wiki/Home_Manager
+
+例の 25 万円の PC には [[nixos][NixOS]] をインストールしました。すでに一ヶ月以上四苦八苦していますが、永住するつもりで末永く取り組んでいこうと思います。
+
+* NixOS の設定方法
+
+** 設定ファイル
+
+NixOS における設定方法は、主に 3 種類あります:
+
+1. システム全体の設定 (=/run/current-system=)\\
+   =/etc/nixos/configuration.nix= を編集して設定します。
+
+2. ユーザ毎の設定 (=~/.nix-profile=)
+   =nix-env= またはその wrapper で設定します。
+
+   1. =nix-env=\\
+      ユーザ毎に =nix-env= コマンドでパッケージをインストールできます。手続き的です。 =nix-env= は直接使用せず、次項の =home-manager= を使うことが推奨されています。
+
+   2. [[home-manager][home-manager]] \\
+    =nix-env= の宣言的なバージョンです。ユーザ毎の設定を宣言的に記述できます。 =~/.config/nixpkgs/home.nix= を編集するか、 =/etc/nixos/configuration.nix= からも設定できます。
+
+3. プロジェクト毎の設定\\
+   =default.nix= や =shell.nix= を書いて設定します。
+
+   1. =nix-shell= (=nix-shell --pure=)
+      - =nix-shell= は、現在の環境に追加でパッケージを読み込んでシェルを作ります。
+      - =nix-shell --pure= は、設定ファイルに記述されたパッケージのみを取り込んだ純粋な環境のシェルを作ります。
+
+   2. [[nix-direnv][nix-direnv]]
+      =nix-direnv= を使用すると、現在のシェルに =default.nix= や =shell.nix= で宣言されたパッケージを (自動で) ロードできます。
+
+#+begin_quote
+[[flakes][Flakes]] を導入すれば話は変わってくるようですが、まだそれは調べられていません。
+#+end_quote
+
+** 設定ファイルを現環境に反映するとは
+
+通常の Linux では、 [[https://linuc.org/study/knowledge/543/][/usr]] 以下にツールをインストールします。一方 NixOS のファイル構成は [[https://nixos.wiki/wiki/Overview_of_the_NixOS_Linux_distribution#Internals][LSB (Linux Standard Base) から外れています]] 。
+
+NixOS の =/usr= はほぼ空です:
+
+#+begin_src sh
+$ ls /usr
+bin/
+#+end_src
+
+=bin/= の中もスカスカでした:
+
+#+BEGIN_SRC sh
+$ ls /bin
+@sh
+
+$ ls /usr/bin
+@env
+#+END_SRC
+
+しかし実際には多数のコマンドをインストールしています。
+
+* NixOS における環境
+
+** バイナリはどこへ？
+
+調べると、 =bash= は =/run/current-system= の下にありました。これが『現環境』に相当します:
+
+#+begin_src sh
+$ which bash
+/run/current-system/sw/bin/bash
+#+end_src
+
+また =/run/current-system= とは、『プロファイル』への symlink です:
+
+#+begin_src sh
+$ realpath /run/current-system
+/nix/store/zzzmz1yzhd0p648h447f7lwn18mhw4xz-nixos-system-nixos-22.11.2050.cc4bb87f545
+#+end_src
+
+** プロファイルはどこに？
+
+プロファイルの実体は =/nix/store= に保存され、プロファイルへの symlink が =/nix/var/nix/profiles= に保存されます。設定を反映するというのは、新しいプロファイルを作成し、現環境として反映されるプロファイルを更新するということになります。
+
+System-wide なプロファイルの symlink を見てます:
+
+#+begin_src sh
+$ realpath /run/current-system
+/nix/store/zzzmz1yzhd0p648h447f7lwn18mhw4xz-nixos-system-nixos-22.11.2050.cc4bb87f545
+
+$ realpath /nix/var/nix/profiles/system
+/nix/store/zzzmz1yzhd0p648h447f7lwn18mhw4xz-nixos-system-nixos-22.11.2050.cc4bb87f545
+#+end_src
+
+ユーザ毎のプロファイルも確認します:
+
+#+begin_src sh
+$ realpath ~/.nix-profile
+/nix/store/6xbn0yjfz44rn7r11q402hddgprrwbsa-user-environment
+
+$ realpath /nix/var/nix/profiles/per-user/tbm/profile
+/nix/store/6xbn0yjfz44rn7r11q402hddgprrwbsa-user-environment
+#+end_src
+
+どちらも =/nix/var/nix/profiles= 以下の最新プロファイルと一致しました。
+
+** シェルの wrapper
+
+特に設定を書いていないのに =/run/current-system/sw/bin= がシェルのパスに入っていたということは、 =nixpkgs= 上のシェルには何らかの細工が成されているはずです。
+
+* まとめ
+
+バイナリとパスについては、だいたいイメージできました。動的ライブラリ (共有ライブラリ) はまだちょっと分かりません。
+
