@@ -6,3 +6,5 @@
 - [[file:2022-12-11-ecs-storages.org][2022-12-11: Entity-Component-System の 3種類のストレージ]]
 - [[file:2023-01-14-buy-new-machine.org][2023-01-14: 25 万円で PC パーツ購入]]
 - [[file:2023-02-14-setup-new-machine.org][2023-02-14: 25 万円の PC 組み立て]]
+- [[file:2023-02-23-nixos-and-other-distros.org][2023-02-23: Linux distribution の選択について]]
+- [[file:2023-02-24-nixos-configuration-files.org][2023-02-24: NixOS の設定ファイルとプロファイル]]
