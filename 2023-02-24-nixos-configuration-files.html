@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>NixOS の設定ファイルとプロファイル - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="style/simple.min.css"/><link rel="stylesheet" href="style/style.css"/><link rel="stylesheet" href="style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>NixOS の設定ファイルとプロファイル</h1><p>Feb 24, 2023</p><nav role="navigation"><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main"><p>
+例の 25 万円の PC には <a href="https://nixos.org/">NixOS</a> をインストールしました。すでに一ヶ月以上四苦八苦していますが、永住するつもりで末永く取り組んでいこうと思います。<br>
+</p>
+
+<div id="outline-container-org3a7a484" class="outline-2">
+<h2 id="org3a7a484"><a href="#org3a7a484">NixOS の設定方法</a></h2>
+<div class="outline-text-2" id="text-org3a7a484">
+</div>
+<div id="outline-container-org5a08b5d" class="outline-3">
+<h3 id="org5a08b5d"><a href="#org5a08b5d">設定ファイル</a></h3>
+<div class="outline-text-3" id="text-org5a08b5d">
+<p>
+NixOS における設定方法は、主に 3 種類あります:<br>
+</p>
+
+<ol class="org-ol">
+<li>システム全体の設定 (<code>/run/current-system</code>)<br>
+<code>/etc/nixos/configuration.nix</code> を編集して設定します。<br></li>
+
+<li>ユーザ毎の設定 (<code>~/.nix-profile</code>)<br>
+<code>nix-env</code> またはその wrapper で設定します。<br>
+
+<ol class="org-ol">
+<li><code>nix-env</code><br>
+ユーザ毎に <code>nix-env</code> コマンドでパッケージをインストールできます。手続き的です。 <code>nix-env</code> は直接使用せず、次項の <code>home-manager</code> を使うことが推奨されています。<br></li>
+
+<li><a href="https://nixos.wiki/wiki/Home_Manager">home-manager</a> <br>
+<code>nix-env</code> の宣言的なバージョンです。ユーザ毎の設定を宣言的に記述できます。 <code>~/.config/nixpkgs/home.nix</code> を編集するか、 <code>/etc/nixos/configuration.nix</code> からも設定できます。<br></li>
+</ol></li>
+
+<li>プロジェクト毎の設定<br>
+<code>default.nix</code> や <code>shell.nix</code> を書いて設定します。<br>
+
+<ol class="org-ol">
+<li><code>nix-shell</code> (<code>nix-shell --pure</code>)<br>
+<ul class="org-ul">
+<li><code>nix-shell</code> は、現在の環境に追加でパッケージを読み込んでシェルを作ります。<br></li>
+<li><code>nix-shell --pure</code> は、設定ファイルに記述されたパッケージのみを取り込んだ純粋な環境のシェルを作ります。<br></li>
+</ul></li>
+
+<li><a href="https://github.com/nix-community/nix-direnv">nix-direnv</a><br>
+<code>nix-direnv</code> を使用すると、現在のシェルに <code>default.nix</code> や <code>shell.nix</code> で宣言されたパッケージを (自動で) ロードできます。<br></li>
+</ol></li>
+</ol>
+
+<blockquote>
+<p>
+<a href="https://nixos.wiki/wiki/Flakes">Flakes</a> を導入すれば話は変わってくるようですが、まだそれは調べられていません。<br>
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgb12cc4c" class="outline-3">
+<h3 id="orgb12cc4c"><a href="#orgb12cc4c">設定ファイルを現環境に反映するとは</a></h3>
+<div class="outline-text-3" id="text-orgb12cc4c">
+<p>
+通常の Linux では、 <a href="https://linuc.org/study/knowledge/543/">/usr</a> 以下にツールをインストールします。一方 NixOS のファイル構成は <a href="https://nixos.wiki/wiki/Overview_of_the_NixOS_Linux_distribution#Internals">LSB (Linux Standard Base) から外れています</a> 。<br>
+</p>
+
+<p>
+NixOS の <code>/usr</code> はほぼ空です:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-sh">$ ls /usr
+bin/
+</code></pre>
+</div>
+
+<p>
+<code>bin/</code> の中もスカスカでした:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-sh">$ ls /bin
+@sh
+
+$ ls /usr/bin
+@env
+</code></pre>
+</div>
+
+<p>
+しかし実際には多数のコマンドをインストールしています。<br>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org81cbf9d" class="outline-2">
+<h2 id="org81cbf9d"><a href="#org81cbf9d">NixOS における環境</a></h2>
+<div class="outline-text-2" id="text-org81cbf9d">
+</div>
+<div id="outline-container-org90f2b9f" class="outline-3">
+<h3 id="org90f2b9f"><a href="#org90f2b9f">バイナリはどこへ？</a></h3>
+<div class="outline-text-3" id="text-org90f2b9f">
+<p>
+調べると、 <code>bash</code> は <code>/run/current-system</code> の下にありました。これが『現環境』に相当します:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-sh">$ which bash
+/run/current-system/sw/bin/bash
+</code></pre>
+</div>
+
+<p>
+また <code>/run/current-system</code> とは、『プロファイル』への symlink です:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-sh">$ realpath /run/current-system
+/nix/store/zzzmz1yzhd0p648h447f7lwn18mhw4xz-nixos-system-nixos-22.11.2050.cc4bb87f545
+</code></pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org59e9378" class="outline-3">
+<h3 id="org59e9378"><a href="#org59e9378">プロファイルはどこに？</a></h3>
+<div class="outline-text-3" id="text-org59e9378">
+<p>
+プロファイルの実体は <code>/nix/store</code> に保存され、プロファイルへの symlink が <code>/nix/var/nix/profiles</code> に保存されます。設定を反映するというのは、新しいプロファイルを作成し、現環境として反映されるプロファイルを更新するということになります。<br>
+</p>
+
+<p>
+System-wide なプロファイルの symlink を見てます:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-sh">$ realpath /run/current-system
+/nix/store/zzzmz1yzhd0p648h447f7lwn18mhw4xz-nixos-system-nixos-22.11.2050.cc4bb87f545
+
+$ realpath /nix/var/nix/profiles/system
+/nix/store/zzzmz1yzhd0p648h447f7lwn18mhw4xz-nixos-system-nixos-22.11.2050.cc4bb87f545
+</code></pre>
+</div>
+
+<p>
+ユーザ毎のプロファイルも確認します:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-sh">$ realpath ~/.nix-profile
+/nix/store/6xbn0yjfz44rn7r11q402hddgprrwbsa-user-environment
+
+$ realpath /nix/var/nix/profiles/per-user/tbm/profile
+/nix/store/6xbn0yjfz44rn7r11q402hddgprrwbsa-user-environment
+</code></pre>
+</div>
+
+<p>
+どちらも <code>/nix/var/nix/profiles</code> 以下の最新プロファイルと一致しました。<br>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3ca54e6" class="outline-3">
+<h3 id="org3ca54e6"><a href="#org3ca54e6">シェルの wrapper</a></h3>
+<div class="outline-text-3" id="text-org3ca54e6">
+<p>
+特に設定を書いていないのに <code>/run/current-system/sw/bin</code> がシェルのパスに入っていたということは、 <code>nixpkgs</code> 上のシェルには何らかの細工が成されているはずです。<br>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb031236" class="outline-2">
+<h2 id="orgb031236"><a href="#orgb031236">まとめ</a></h2>
+<div class="outline-text-2" id="text-orgb031236">
+<p>
+バイナリとパスについては、だいたいイメージできました。動的ライブラリ (共有ライブラリ) はまだちょっと分かりません。<br>
+</p>
+</div>
+</div>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
