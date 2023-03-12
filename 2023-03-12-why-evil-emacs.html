@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Evil Emacs における多重化 - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="style/simple.min.css"/><link rel="stylesheet" href="style/style.css"/><link rel="stylesheet" href="style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>Evil Emacs における多重化</h1><p>Mar 12, 2023</p><nav role="navigation"><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<div id="outline-container-org9663c7d" class="outline-2">
-<h2 id="org9663c7d"><a href="#org9663c7d">背景</a></h2>
-<div class="outline-text-2" id="text-org9663c7d">
+<div id="outline-container-org29de296" class="outline-2">
+<h2 id="org29de296"><a href="#org29de296">背景</a></h2>
+<div class="outline-text-2" id="text-org29de296">
 <p>
 僕はエディタに拘りがありません。 Vim キーバインドさえあれば何でも良いのです。<br>
 </p>
@@ -50,9 +50,9 @@
 </div>
 </div>
 
-<div id="outline-container-org4998b37" class="outline-2">
-<h2 id="org4998b37"><a href="#org4998b37">主な workflow</a></h2>
-<div class="outline-text-2" id="text-org4998b37">
+<div id="outline-container-org840d41b" class="outline-2">
+<h2 id="org840d41b"><a href="#org840d41b">主な workflow</a></h2>
+<div class="outline-text-2" id="text-org840d41b">
 <p>
 僕の環境は多重化に力が入っています。多重化には 3 段階あります。<br>
 </p>
@@ -68,15 +68,15 @@
 </p>
 </div>
 
-<div id="outline-container-org9a63c36" class="outline-3">
-<h3 id="org9a63c36"><a href="#org9a63c36">ターミナルの多重化</a></h3>
-<div class="outline-text-3" id="text-org9a63c36">
+<div id="outline-container-orgdaae125" class="outline-3">
+<h3 id="orgdaae125"><a href="#orgdaae125">ターミナルの多重化</a></h3>
+<div class="outline-text-3" id="text-orgdaae125">
 <p>
 <code>tmux</code> を使うと、ターミナルの画面分割ができます。マルチタブ機能もあります。<br>
 </p>
 
 
-<div id="org9e30c32" class="figure">
+<div id="org00c20ab" class="figure">
 <p><img src="./img/2023-03-terminal.png" alt="2023-03-terminal.png"><br>
 </p>
 <p><span class="figure-number">Figure 1: </span><code>tmux</code> で画面分割</p>
@@ -87,7 +87,7 @@
 </p>
 
 
-<div id="org98b1de6" class="figure">
+<div id="orgf385e15" class="figure">
 <p><img src="./img/2023-03-tmux.png" alt="2023-03-tmux.png"><br>
 </p>
 <p><span class="figure-number">Figure 2: </span><code>demo</code> session の下に <code>ABC</code>, <code>dotfiles</code>, <code>ranger</code> タブがぶら下がっている</p>
@@ -95,15 +95,15 @@
 </div>
 </div>
 
-<div id="outline-container-orgff6ee5c" class="outline-3">
-<h3 id="orgff6ee5c"><a href="#orgff6ee5c">Emacs の多重化</a></h3>
-<div class="outline-text-3" id="text-orgff6ee5c">
+<div id="outline-container-org017a7ae" class="outline-3">
+<h3 id="org017a7ae"><a href="#org017a7ae">Emacs の多重化</a></h3>
+<div class="outline-text-3" id="text-org017a7ae">
 <p>
 ターミナルの中で Emacs を起動します。 Emacs の中でも画面分割が可能です。<br>
 </p>
 
 
-<div id="orga542488" class="figure">
+<div id="org0ed16c1" class="figure">
 <p><img src="./img/2023-03-windows.png" alt="2023-03-windows.png"><br>
 </p>
 <p><span class="figure-number">Figure 3: </span>画面分割</p>
@@ -118,7 +118,7 @@
 </p>
 
 
-<div id="org3053c0b" class="figure">
+<div id="org1f98dbb" class="figure">
 <p><img src="./img/2023-03-tabs.png" alt="2023-03-tabs.png"><br>
 </p>
 <p><span class="figure-number">Figure 4: </span>マルチ・マルチタブ</p>
@@ -126,15 +126,15 @@
 </div>
 </div>
 
-<div id="outline-container-org0b95f70" class="outline-3">
-<h3 id="org0b95f70"><a href="#org0b95f70">Emacs のウィジェット</a></h3>
-<div class="outline-text-3" id="text-org0b95f70">
+<div id="outline-container-orgf329a04" class="outline-3">
+<h3 id="orgf329a04"><a href="#orgf329a04">Emacs のウィジェット</a></h3>
+<div class="outline-text-3" id="text-orgf329a04">
 <p>
 サイドバーにはプログラムのアウトラインを表示することもできます。僕はハードコアな環境を求めているわけではなく、リッチで優しい UI が好きです。<br>
 </p>
 
 
-<div id="org92156f1" class="figure">
+<div id="org60fe2c3" class="figure">
 <p><img src="./img/2023-03-imenu.gif" alt="2023-03-imenu.gif"><br>
 </p>
 <p><span class="figure-number">Figure 5: </span><code>imenu</code> (アウトライン表示)</p>
@@ -145,7 +145,7 @@
 </p>
 
 
-<div id="org867ffd5" class="figure">
+<div id="org3f48fea" class="figure">
 <p><img src="./img/2023-03-magit.png" alt="2023-03-magit.png"><br>
 </p>
 <p><span class="figure-number">Figure 6: </span><code>magit</code> (Git クライアント)</p>
@@ -153,22 +153,22 @@
 </div>
 </div>
 
-<div id="outline-container-org669a8e5" class="outline-3">
-<h3 id="org669a8e5"><a href="#org669a8e5">Emacs における検索</a></h3>
-<div class="outline-text-3" id="text-org669a8e5">
+<div id="outline-container-org415a5e2" class="outline-3">
+<h3 id="org415a5e2"><a href="#org415a5e2">Emacs における検索</a></h3>
+<div class="outline-text-3" id="text-org415a5e2">
 <p>
 ファジー検索とプレビュー機能も欠かせません。 Emacs もこうした機能は得意です。<br>
 </p>
 
 
-<div id="orge219f1a" class="figure">
+<div id="org8028549" class="figure">
 <p><img src="./img/2023-03-find-file.png" alt="2023-03-find-file.png"><br>
 </p>
 <p><span class="figure-number">Figure 7: </span>ファイル検索 (<code>find-file</code>)</p>
 </div>
 
 
-<div id="orgf8cc31c" class="figure">
+<div id="orgecd4252" class="figure">
 <p><img src="./img/2023-03-grep.png" alt="2023-03-grep.png"><br>
 </p>
 <p><span class="figure-number">Figure 8: </span><code>grep</code></p>
@@ -177,9 +177,9 @@
 </div>
 </div>
 
-<div id="outline-container-org3fcd31d" class="outline-2">
-<h2 id="org3fcd31d"><a href="#org3fcd31d">まとめ</a></h2>
-<div class="outline-text-2" id="text-org3fcd31d">
+<div id="outline-container-org3aa7d98" class="outline-2">
+<h2 id="org3aa7d98"><a href="#org3aa7d98">まとめ</a></h2>
+<div class="outline-text-2" id="text-org3aa7d98">
 <p>
 僕はエディタの表面的な部分に関心があったので、結果的に Emacs に流れました。 Emacs は <code>Notepad++++++++++++++</code> として使っています。<br>
 </p>
