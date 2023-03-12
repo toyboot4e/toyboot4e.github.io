@@ -1,0 +1,195 @@
+#+TITLE: NixOS でデスクトップ環境構築 (X + i3)
+#+DATE: <2023-03-12 Sun>
+#+LINK: arch https://archlinux.org/
+#+LINK: arch-wiki https://wiki.archlinux.org/
+#+LINK: direnv https://direnv.net/
+#+LINK: flakes https://nixos.wiki/wiki/Flakes
+#+LINK: home-manager https://nixos.wiki/wiki/Home_Manager
+#+LINK: neofetch https://github.com/dylanaraps/neofetch
+#+LINK: nix-1p https://github.com/tazjin/nix-1p
+#+LINK: nix-direnv https://github.com/nix-community/nix-direnv
+#+LINK: nixos https://nixos.org/
+
+NixOS をメイン機として使えるようになりました。主な設定を紹介します。
+
+#+CAPTION: デスクトップ画面 (普通です)
+[[./img/2023-03-desktop.png]]
+
+* 背景
+
+NixOS を [[https://nixos.org/download.html][minimal ISO image]] からインストールした場合、コンソール画面が立ち上がります。 GUI 環境の構築には、以下のような設定が必要です。
+
+#+BEGIN_EXPORT html
+<details><summary>GUI 環境の選択</summary>
+#+END_EXPORT
+
+[[https://wiki.archlinux.jp/index.php/Xorg][X Window System]] または [[https://wiki.archlinux.jp/index.php/Wayland][Wayland]] を有効化して GUI ウィンドウを有効化します。
+
+この選択はシステム全体の設定に影響する分岐点です。世の流れは Wayland に向かっていますが、未だハマり所が多そうなので、この記事では枯れた X を使用します。
+
+#+BEGIN_EXPORT html
+</details>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<details><summary>WM / DE の導入</summary>
+#+END_EXPORT
+
+X の上には WM (window manager) や DE (desktop environment) を載せることができます。 WM を導入すると、ワークスペースなどの概念が利用できるようになります。 DE を導入すると、 WM の機能に加え、デバイス類の GUI や Dock が入ります。
+
+#+BEGIN_EXPORT html
+</details>
+#+END_EXPORT
+
+DE に欠点があるとすれば、カスタマイズが難しくなることです。この記事では WM ([[https://wiki.archlinux.org/title/i3][i3wm]])  の上から DE に匹敵する環境を作っていきます。
+
+* NixOS の設定
+
+** neofetch
+
+25 万円の PC 環境を誇示します。 Intel i7-12700 でビルドすると速い！
+
+#+CAPTION: [[neofetch][neofetch]]
+[[./img/2023-03-neofetch.png]]
+
+#+BEGIN_EXPORT html
+<details><summary>デバイス類の設定</summary>
+#+END_EXPORT
+
+まずはハード面を有効化します。
+
+- ネットワーク (Wifi)
+  [[https://nixos.org/nixos/manual/][NixOS manual]] に従って =network-manager= を有効化しました。
+
+- [[https://nixos.wiki/wiki/Nvidia][Nvidia driver]]
+  フラグ ON で有効化しました。画面のちらつきがあり Troubleshooting の項も設定しました。虹色の輝きは抑えられていません。
+
+- [[https://nixos.wiki/wiki/Bluetooth][Bluetooth]]
+  NixOS の bluetooth モジュールを有効化しました。 =bluetooth-manager= が GUI です。 Airpods Pro のペアリングが解けるようになって直せていません。
+
+- ディスプレイ
+  =xrandr= を毎回手動で走らせています。 DPI はモニタ固有の値のはずですが、なぜか DPI の設定が狂うので困ります。また DPI の値を変更すると、 =i3= やブラウザ類のフォントサイズが変わります。
+
+- オーディオ
+  [[https://nixos.wiki/wiki/ALSA][sound]] が =alsa= に相当します。 [[https://nixos.wiki/wiki/PulseAudio][pulseaudio]] も設定しました。 =pavucontrol= が GUI です。 TUI を探しています……
+
+#+BEGIN_QUOTE
+未だ完全な設定とは言えません。やはり DE を使うのが無難です。
+#+END_QUOTE
+
+#+BEGIN_EXPORT html
+</details>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<details><summary>基本設定</summary>
+#+END_EXPORT
+
+普通のデスクトップ環境へ近づけていきます。
+
+- [[https://nixos.org/manual/nixos/stable/options.html#opt-console.enable][console]]
+  X が起動していないときのフォントの設定です。 4K モニタを使っているので、フォントサイズを上げました。
+
+- [[https://nixos.wiki/wiki/Fonts][Fonts]]
+  =noto-fonts-cjk= などを入れます。
+
+- [[https://wiki.archlinux.org/title/XDG_Base_Directory][XDG]]
+  [[https://nixos.wiki/wiki/Environment_variables][XDG パスの設定]] 、 [[https://wiki.archlinux.org/title/XDG_Base_Directory][mimeapp の設定]] (ファイル種別とアプリの関連付け) を行いました。
+
+- mount / unmount  用コマンドと自動マウント
+  =sudo= でマウントすると一般ユーザがアクセスできなくなります。 [[https://wiki.archlinux.org/title/udisks][udisksctrl]] でマウントすれば一般ユーザでもアクセスできます。 [[https://github.com/coldfix/udiskie/wiki/Usage][udiskie]] で自動マウントできるそうです。
+
+- 日本語入力 ([[https://wiki.archlinux.jp/index.php/Fcitx][fctix]], =fcitx-mozc=)
+  [[https://ykonomi.hatenablog.com/entry/2021/04/27/022803][NixOSマシンを自分好みにカスタマイズする]] のおかげで設定できました。英字・日本語の切り替えは macOS と同様のキーバインディングにしています。
+
+#+BEGIN_EXPORT html
+</details>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<details open><summary>X11 + i3 + sxhkd</summary>
+#+END_EXPORT
+
+- Xorg: [[https://nixos.wiki/wiki/Keyboard_Layout_Customization][Keyboard Layout Customization]]
+  X の設定方法を調べると、 Nix 経由の設定方法も分かります。日本語キー配列を設定したり、 CapsLock を Ctrl キーにしました。
+
+- [[https://i3wm.org/][i3wm]] の設定
+  - ウィンドウの枠を非表示に変更
+  - 一部のアプリを常に floating に変更
+
+- [[https://github.com/vivien/i3blocks][i3blocks]], [[https://github.com/vivien/i3blocks-contribo][i3blocks-contrib]]
+  画面上部のステータスバーを作ります。
+
+- [[https://github.com/davatorium/rofi][rofi]]
+  ポップアップ表示できる =dmenu=!　アプリ起動に使います (=drun=) 。
+
+- [[https://wiki.archlinux.org/title/Sxhkd][sxhkd]]
+  =i3/config= の =bind-sym= よりも簡単にキーバインドを設定できます。また =bind-sym= で =xdotool= のキーバインドを設定すると正常に動作しませんが、 =sxhkd= 経由の起動なら問題ありません。
+
+- =xdotool=
+  Floating window の出し入れに使っています (後述) 。
+
+#+BEGIN_EXPORT html
+</details>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<details open><summary>その他アプリ</summary>
+#+END_EXPORT
+
+- =flameshot=, =import=
+  スクリーンショットを取れるようにします。
+
+- [[https://github.com/ranger/ranger][ranger]] + [[https://github.com/mwh/dragon][dragon]]
+  =ranger= は TUI のファイルビューワーで、画像のプレビューもできます。 =dragon= で画像をプレビューすれば、ブラウザにドラッグ & ドロップすることもできます。
+
+- [[https://help.gnome.org/users/evince/stable/][Evince]]
+  PDF 閲覧に利用します。
+
+- [[https://mpv.io/][mpv]] + [[https://github.com/CogentRedTester/mpv-file-browser][mpv-file-browser]] + [[https://github.com/mpv-player/mpv/issues/6576#issuecomment-992109756][prev のバグ対策]]
+  動画再生に利用します。
+
+- [[https://www.gimp.org/][GIMP]]
+  画像編集に利用します。
+
+- [[https://www.blender.org/][Blender]]
+  *動画編集に* 利用します。起動画面に Video Editing があるのは凄い。
+
+- [[https://www.bitwig.com/][Bitwig Studio]]
+  Linux でも使える有償の DAW です。癖は強いのですが良さそうです。購入検討中……
+
+#+CAPTION: Bitwig Studio
+[[./img/2023-03-bitwig.png]]
+
+#+BEGIN_EXPORT html
+</details>
+#+END_EXPORT
+
+* まとめ
+
+Xorg と =i3wm= で普通のデスクトップ環境を構築しました。特に =xdotool= で floating window を出し入れできるようになったので満足しています。
+
+#+CAPTION: x11-screen
+#+BEGIN_SRC sh
+#!/usr/bin/env -S bash -euE
+
+# X11 scratchpad
+# Thanks: https://github.com/jdpedersen1/scripts/blob/main/scratch
+
+# TODO: `--class` or `--title`
+matcher="$2"
+oninit="$3"
+
+if [ "$1" == "--class" ] ; then
+  xdotool search --onlyvisible --class "$matcher" windowunmap \
+      || xdotool search --class "$matcher" windowmap \
+      || $oninit &
+elif [ "$1" == "--title" ] ; then
+  xdotool search --onlyvisible --name "$matcher" windowunmap \
+      || xdotool search --name "$matcher" windowmap \
+      || $oninit &
+else
+  echo "unknown arg1" 1>&2
+fi
+#+END_SRC
+
