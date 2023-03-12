@@ -256,5 +256,5 @@ Haskell で AtCoder に参加した結果、世の中には面白い人がたく
 
 図らずも色変記事になりました。次は DP を学んで緑色を目指します。
 
-[[./img/atcoder/atcoder-brown.png]]
+[[./img/atcoder/2022-12-atcoder-brown.png]]
 

@@ -32,7 +32,7 @@
 
 # #+ATTR_HTML: :width 601px
 # #+caption: big-array.png
-[[./img/toecs/big-array.png]]
+[[./img/2023-12-toecs-big-array.png]]
 
 # #+BEGIN_QUOTE
 # 本当はコンポーネントを縦列にすると、データベースとの対応が取れて良い比喩になるのですが……
@@ -44,7 +44,7 @@
 
 こちらは詳しくないため、図だけ載せます:
 
-[[./img/toecs/archetype-storage.png]]
+[[./img/2023-12-toecs-archetype-storage.png]]
 
 - Component セット毎に archetype ストレージを作成します
   - Archetype ストレージの内部実装は ={ Vec<A>, Vec<B>, .. }= のような形です (SoA: struct of arrays)
@@ -77,7 +77,7 @@ pub struct World {
 
 そこで =SparseSet<T>= においては、コンポーネント配列を連続した配列に入れます (=Vec<T>=) 。また =Entity= からコンポーネント配列への添字アクセスの間接層を追加します (=Vec<Option<DenseIndex>>=):
 
-[[./img/toecs/sparse-set.png]]
+[[./img/2023-12-toecs-sparse-set.png]]
 
 より詳しく実装を解説します。
 
@@ -105,13 +105,13 @@ pub struct Entity {
 
 =Entity= 経由のアクセスは添字のマッピングを経由するため、メモリ局所性が落ちてしまいます。最速でイテレーションするためには、『グループ』という仕組みを使います。グループ化された =Entity= のコンポーネントには、すべて共通の =DenseIndex= からアクセスできます:
 
-[[./img/toecs/groups.png]]
+[[./img/2023-12-toecs-groups.png]]
 
 これは =Entity= を削除したり、 =Entity= にコンポーネントを追加・削除する際のグループの更新処理で実現されます:
 
-[[./img/toecs/group-sync.png]]
+[[./img/2023-12-toecs-group-sync.png]]
 
-[[./img/toecs/group-unsync.png]]
+[[./img/2023-12-toecs-group-unsync.png]]
 
 *** =Entity= の挿入と削除について
 
@@ -119,15 +119,15 @@ pub struct Entity {
 
 例として以下の初期状態を考えます:
 
-[[./img/toecs/free-slot.png]]
+[[./img/2023-12-toecs-free-slot.png]]
 
 初期状態からデータを追加した後は:
 
-[[./img/toecs/free-slot-insert.png]]
+[[./img/2023-12-toecs-free-slot-insert.png]]
 
 初期状態からデータを削除した後は:
 
-[[./img/toecs/free-slot-remove.png]]
+[[./img/2023-12-toecs-free-slot-remove.png]]
 
 *** =Entity= の削除について
 

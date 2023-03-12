@@ -8,3 +8,5 @@
 - [[file:2023-02-14-setup-new-machine.org][2023-02-14: 25 万円の PC 組み立て]]
 - [[file:2023-02-23-nixos-and-other-distros.org][2023-02-23: Linux distribution の選択について]]
 - [[file:2023-02-24-nixos-configuration-files.org][2023-02-24: NixOS の設定ファイルとプロファイル]]
+- [[file:2023-03-12-nixos-desktop.org][2023-03-12: NixOS でデスクトップ環境構築 (X + i3)]]
+- [[file:2023-03-12-why-evil-emacs.org][2023-03-12: Evil Emacs における多重化]]
