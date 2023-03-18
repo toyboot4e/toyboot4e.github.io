@@ -33,12 +33,12 @@
 
 ;; --------------------------------------------------------------------------------
 ;; Changes I (toyboot4e) made:
-;; - Use `<code>' tag for =verbatim=s.
-;; - Changed `ox-slimhtml-headline' to give constant IDs and to create hyperlinks.
-;; - Changed `ox-slimhtml-headline' to respect `:org-html-toplevel-hlevel', which
-;;   is not the default option of `ox-slimthml'.
-;; - Changed the `ox-slimhtml' backend to derive `ox-html' backend. This is for
-;;   tables, images and so on.
+;; - `ox-slimhtml-bold': Use `<code>' tag for =verbatim=s.
+;; - `ox-slimhtml-headline': Give constant IDs and to create hyperlinks.
+;; - `ox-slimhtml-headline': Respect `:org-html-toplevel-hlevel', which is not the
+;;   default option of `ox-slimthml'.
+;; - `ox-slimhtml' backend: derive `ox-html' backend, mainly for tables.
+;; - `ox-slimhtml-link': Supply default content
 ;; --------------------------------------------------------------------------------
 
 ;;; Code:
@@ -169,28 +169,28 @@ Sections are child elements of org headlines;
 CONTENTS is the text of the link.
 INFO is a plist holding contextual information."
   (if (ox-slimhtml--immediate-child-of-p link 'link) (org-element-property :raw-link link)
-    (if (not contents) (format "<em>%s</em>" (org-element-property :path link))
-      (let ((link-type (org-element-property :type link))
-            (href (org-element-property :raw-link link))
-            (attributes (if (ox-slimhtml--immediate-child-of-p link 'paragraph)
-                            (ox-slimhtml--attr (org-export-get-parent link))
-                          ""))
-            (element "<a href=\"%s\"%s>%s</a>"))
-        (cond ((string= "file" link-type)
-               (let ((html-extension (or (plist-get info :html-extension) ""))
-                     (use-abs-url (plist-get info :html-link-use-abs-url))
-                     (link-org-files-as-html (plist-get info :html-link-org-as-html))
-                     (path (or (org-element-property :path link) "")))
-                 (format element
-                         (concat (if (and use-abs-url (file-name-absolute-p path)) "file:" "")
-                                 (if (and link-org-files-as-html (string= "org" (downcase (or (file-name-extension path) ""))))
-                                     (if (and html-extension (not (string= "" html-extension)))
-                                         (concat (file-name-sans-extension path) "." html-extension)
-                                       (file-name-sans-extension path))
-                                   path))
-                         attributes contents)))
-              (t
-               (format element href attributes contents)))))))
+    (unless contents (setq contents (org-element-property :raw-link link)))
+    (let ((link-type (org-element-property :type link))
+          (href (org-element-property :raw-link link))
+          (attributes (if (ox-slimhtml--immediate-child-of-p link 'paragraph)
+                          (ox-slimhtml--attr (org-export-get-parent link))
+                        ""))
+          (element "<a href=\"%s\"%s>%s</a>"))
+      (cond ((string= "file" link-type)
+             (let ((html-extension (or (plist-get info :html-extension) ""))
+                   (use-abs-url (plist-get info :html-link-use-abs-url))
+                   (link-org-files-as-html (plist-get info :html-link-org-as-html))
+                   (path (or (org-element-property :path link) "")))
+               (format element
+                       (concat (if (and use-abs-url (file-name-absolute-p path)) "file:" "")
+                               (if (and link-org-files-as-html (string= "org" (downcase (or (file-name-extension path) ""))))
+                                   (if (and html-extension (not (string= "" html-extension)))
+                                       (concat (file-name-sans-extension path) "." html-extension)
+                                     (file-name-sans-extension path))
+                                 path))
+                       attributes contents)))
+            (t
+             (format element href attributes contents))))))
 
 ;; plain lists
 ;; #+BEGIN_EXAMPLE
@@ -518,10 +518,11 @@ Return output file name."
    ;; (inner-template . ox-slimhtml-inner-template)
    (italic . ox-slimhtml-italic)
    (item . org-html-item)
-   ;; (link . ox-slimhtml-link)
+   (link . ox-slimhtml-link)
    (paragraph . ox-slimhtml-paragraph)
    (plain-list . ox-slimhtml-plain-list)
-   (plain-text . ox-slimhtml-plain-text)
+   ;; Respect `org-export-preserve-breaks':
+   ;; (plain-text . ox-slimhtml-plain-text)
    (section . ox-slimhtml-section)
    (special-block . ox-slimhtml-special-block)
    (src-block . ox-slimhtml-src-block)
