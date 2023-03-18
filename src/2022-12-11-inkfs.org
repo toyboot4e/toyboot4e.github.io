@@ -17,7 +17,7 @@
 
 #+ATTR_HTML: :width 391px
 #+CAPTION: 画像の配布元サイトへのリンクを後日追加します……
-[[./img/gfx/imguika_chan.gif]]
+[[./img/2022-12-gfx-imguika_chan.gif]]
 
 ライブラリが担当するのはメディアの処理で、ウィンドウ・インプット・グラフィクス・テキスト・オーディオなどがあたります。その上の薄いレイヤが =inkfs= です。
 
@@ -50,7 +50,7 @@ Rust でゲームを作る際は、データの持ち方が重要です。たと
 =inkfs= 🦑 のシーングラフは ECS の上に作っています。
 
 #+ATTR_HTML: :width 292px
-[[./img/gfx/ui-text.gif]]
+[[./img/2022-12-gfx-ui-text.gif]]
 
 *** Renderable の共通コンポーネント
 
@@ -73,7 +73,7 @@ Rust でゲームを作る際は、データの持ち方が重要です。たと
 アニメーションも容易に表現できます。
 
 #+ATTR_HTML: :width 71px
-[[./img/gfx/dir-tween.gif]]
+[[./img/2022-12-gfx-dir-tween.gif]]
 
 *** ソート
 
@@ -90,7 +90,7 @@ pub struct DrawCall {
 ** 3. ウィンドウ・入力 (=sdl2=)
 
 #+ATTR_HTML: :width 753px
-[[./img/gfx/scale-bug.png]]
+[[./img/2022-12-gfx-scale-bug.png]]
 
 *** 主なウィンドウのライブラリ
 
@@ -119,12 +119,12 @@ pub struct DrawCall {
 もくもく
 
 #+ATTR_HTML: :width 700px
-[[./img/gfx/fog-1.png]]
+[[./img/2022-12-gfx-fog-1.png]]
 
 やばい
 
 #+ATTR_HTML: :width 700px
-[[./img/gfx/fog-2.png]]
+[[./img/2022-12-gfx-fog-2.png]]
 
 [[https://github.com/gfx-rs/wgpu][wgpu]] は [[https://sotrh.github.io/learn-wgpu/][Learn Wgpu]] で見ると簡単なフレームワークのようですが、所有権が絡んで独自の制限がかかります。
 
@@ -176,7 +176,7 @@ pub struct DrawCall {
 
 やってみました。
 
-[[./img/gfx/msdf-44-2.png]]
+[[./img/2022-12-gfx-msdf-44-2.png]]
 
 完璧ですね。完璧にヨレヨレです。
 
@@ -186,11 +186,11 @@ MSDF が上手く行かなかったので、 TTF のフォントデータを元�
 
 それでは文字を表示してみましょう:
 
-[[./img/gfx/font_32px.png]]
+[[./img/2022-12-gfx-font_32px.png]]
 
 文字サイズを上げてみると:
 
-[[./img/gfx/font_64px.png]]
+[[./img/2022-12-gfx-font_64px.png]]
 
 急に馴れ馴れしい。フォントテクスチャが飽和した際は、フォントテクスチャをリサイズしなければなりません。
 
@@ -198,17 +198,17 @@ MSDF が上手く行かなかったので、 TTF のフォントデータを元�
 
 =Markup with :b[bold] text.=
 
-[[./img/gfx/markup-bold.png]]
+[[./img/2022-12-gfx-markup-bold.png]]
 
 =Keyboard key :kbd[x]!=
 
-[[./img/gfx/markup-kbd.png]]
+[[./img/2022-12-gfx-markup-kbd.png]]
 
 ** 7. 開発者用 UI
 
 ImGUI の SDL サポートやレンダラを実装しました。
 
-[[./img/gfx/omgui.png]]
+[[./img/2022-12-gfx-omgui.png]]
 
 すべてが間違っています。
 
