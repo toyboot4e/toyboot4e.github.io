@@ -31,9 +31,41 @@
 ;; different problem - but to provide a small set of components for
 ;; easier customization of HTML output from org.
 
+;; --------------------------------------------------------------------------------
+;; Changes I (toyboot4e) made:
+;; - Use `<code>' tag for =verbatim=s.
+;; - Changed `ox-slimhtml-headline' to give constant IDs and to create hyperlinks.
+;; - Changed `ox-slimhtml-headline' to respect `:org-html-toplevel-hlevel', which
+;;   is not the default option of `ox-slimthml'.
+;; - Changed the `ox-slimhtml' backend to derive `ox-html' backend. This is for
+;;   tables, images and so on.
+;; --------------------------------------------------------------------------------
+
 ;;; Code:
 (require 'ox-html)
 (require 'cl-lib)
+
+;; Thanks: `http://sachachua.com/notebook/emacs/small-functions.el'
+;; TODO: hide meesage here?:
+(defun slimhtml-strip-html (string)
+    (with-temp-buffer
+        (insert string)
+
+        (widen)
+        (goto-char (point-min))
+        (while (re-search-forward "<[^<]*>" (point-max) t)
+            (replace-match "\\1"))
+        (goto-char (point-min))
+        (replace-string "&copy;" "(c)")
+        (goto-char (point-min))
+        (replace-string "&amp;" "&")
+        (goto-char (point-min))
+        (replace-string "&lt;" "<")
+        (goto-char (point-min))
+        (replace-string "&gt;" ">")
+        (goto-char (point-min))
+
+        (buffer-substring-no-properties (point-min) (point-max))))
 
 ;; formatting
 ;; #+BEGIN_EXAMPLE
@@ -63,7 +95,7 @@ CONTENTS is nil.
 INFO is a plist holding contextual information."
   (let ((contents (org-html-encode-plain-text
                    (org-element-property :value verbatim))))
-    (when contents (format "<kbd>%s</kbd>" contents))))
+    (when contents (format "<code>%s</code>" contents))))
 
 ;; headlines
 ;; #+BEGIN_EXAMPLE
@@ -84,7 +116,9 @@ INFO is a plist holding contextual information."
 CONTENTS is the section as defined under the HEADLINE.
 INFO is a plist holding contextual information."
   (let* ((text (org-export-data (org-element-property :title headline) info))
-         (level (org-export-get-relative-level headline info))
+         (idText (slimhtml-strip-html text))
+         (level (+ (org-export-get-relative-level headline info)
+                   (1- (plist-get info :html-toplevel-hlevel))))
          (attributes (org-element-property :ATTR_HTML headline))
          (container (org-element-property :HTML_CONTAINER headline))
          (container-class (and container (org-element-property :HTML_CONTAINER_CLASS headline))))
@@ -97,7 +131,8 @@ INFO is a plist holding contextual information."
      (when (and container (not (string= "" container)))
        (format "<%s%s>" container (if container-class (format " class=\"%s\"" container-class) "")))
      (if (not (org-export-low-level-p headline info))
-         (format "<h%d%s>%s</h%d>%s" level (or attributes "") text level (or contents ""))
+         ;; (format "<h%d%s>%s</h%d>%s" level (or attributes "") text level (or contents ""))
+         (format "<h%d%s id=\"%s\"><a href=\"#%s\">%s</a></h%d>%s" level (or attributes "") idText idText text level (or contents ""))
        (concat
         (when (org-export-first-sibling-p headline info) "<ul>")
         (format "<li>%s%s</li>" text (or contents ""))
@@ -469,8 +504,11 @@ Return output file name."
                         pub-dir)))
 
 ;; org-export backend definition
-(org-export-define-backend
+;; (org-export-define-backend
+(org-export-define-derived-backend
  'slimhtml
+ 'html
+ :translate-alist
  '((bold . ox-slimhtml-bold)
    (example-block . ox-slimhtml-example-block)
    (export-block . ox-slimhtml-export-block)
@@ -479,7 +517,7 @@ Return output file name."
    (inner-template . ox-slimhtml-inner-template)
    (italic . ox-slimhtml-italic)
    (item . org-html-item)
-   (link . ox-slimhtml-link)
+   ;; (link . ox-slimhtml-link)
    (paragraph . ox-slimhtml-paragraph)
    (plain-list . ox-slimhtml-plain-list)
    (plain-text . ox-slimhtml-plain-text)
@@ -506,7 +544,10 @@ Return output file name."
    (:html-header "HTML_HEADER" nil "" newline)
    (:html-footer "HTML_FOOTER" nil "" newline)
    (:html-title "HTML_TITLE" nil "%t" t)
-   (:html-body-attr "HTML_BODY_ATTR" nil "" t)))
+   (:html-body-attr "HTML_BODY_ATTR" nil "" t)
+   ;; (:html-toplevel-hlevel nil nil org-html-toplevel-hlevel)
+   )
+ )
 
 ;;;###autoload
 (defun ox-slimhtml-export-as-html
