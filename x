@@ -1,6 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env -S bash -euE
 
-set -euE
 set -o pipefail
 
 IFS=$'\n\t'
