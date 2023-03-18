@@ -21,7 +21,7 @@ SUB COMMANDS:
     clean   cleans the output directory
     serve   starts HTTP server with \`python3\`
     set     sets draft / release state with file name extension
-    tidy    formats the output HTML files
+    format  formats the output HTML files
     watch   runs \`./x build release\` on source \`.org\` file change
 EOS
 }
@@ -104,22 +104,17 @@ _set() {
     done
 }
 
-_tidy() {
-    echo "tidying all the htmls.."
-    for f in $(fd -e html . out) ; do
-        tidy \
-            --tidy-mark no \
-            -i -m -w 160 \
-            -ashtml -utf8 "$f" > /dev/null 2>&1
-    done
+_format() {
+    echo "formatting all the htmls.."
+    npx prettier --write out/*.html
 }
 
 _watch() {
     echo "start watching.."
     if [[ "${1:-}" == "-d" || "${1:-}" == "--draft" ]] ; then
-        watchexec -e org -w src --ignore "index.org" "./x build --debug && ./x tidy"
+        watchexec -e org -w src --ignore "index.org" "./x build --debug && ./x format"
     elif [[ -z "${1:-}" || "${1:-}" == "-r" || "${1:-}" == "--release" ]] ; then
-        watchexec -e org -w src --ignore "index.org" "./x build --release && ./x tidy"
+        watchexec -e org -w src --ignore "index.org" "./x build --release && ./x format"
     fi
 }
 
@@ -140,7 +135,8 @@ _main() {
     cd "$dir"
     case "$cmd" in
         'b' | 'build')
-            _build "$@" ;;
+            _build "$@"
+            _format ;;
 
         'c' | 'clean')
 	    _clean ;;
@@ -148,8 +144,8 @@ _main() {
         'serve')
             _serve "$@" ;;
 
-        't' | 'tidy')
-            _tidy "$@" ;;
+        'f' | 'format')
+            _format "$@" ;;
 
         'w' | 'watch')
 	    _clean
