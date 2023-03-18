@@ -19,6 +19,7 @@ USAGE:
 
 SUB COMMANDS:
     build   build the devlog
+    clean   cleans the output directory
     serve   starts HTTP server with \`python3\`
     set     sets draft / release state with file name extension
     tidy    formats the output HTML files
@@ -47,6 +48,11 @@ _build() {
     else
         echo "given too many arguments" 1>&2
     fi
+}
+
+_clean() {
+    echo "cleaning up the \`out/\` directory.."
+    rm -rf out/* > /dev/null 2>&1
 }
 
 _serve() {
@@ -111,7 +117,11 @@ _tidy() {
 
 _watch() {
     echo "start watching.."
-    watchexec -e org -w src --ignore "index.org" "./x build --release && ./x tidy"
+    if [[ "${1:-}" == "-d" || "${1:-}" == "--draft" ]] ; then
+        watchexec -e org -w src --ignore "index.org" "./x build --release && ./x tidy"
+    elif [[ -z "${1:-}" || "${1:-}" == "-r" || "${1:-}" == "--release" ]] ; then
+        watchexec -e org -w src --ignore "index.org" "./x build --release && ./x tidy"
+    fi
 }
 
 _main() {
@@ -133,6 +143,9 @@ _main() {
         'b' | 'build')
             _build "$@" ;;
 
+        'c' | 'clean')
+	    _clean ;;
+
         'serve')
             _serve "$@" ;;
 
@@ -140,6 +153,7 @@ _main() {
             _tidy "$@" ;;
 
         'w' | 'watch')
+	    _clean
             _watch "$@" ;;
 
         *)
