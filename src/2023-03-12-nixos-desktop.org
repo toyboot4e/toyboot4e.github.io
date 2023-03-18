@@ -169,7 +169,7 @@ DE に欠点があるとすれば、カスタマイズが難しくなること�
 
 Xorg と =i3wm= で普通のデスクトップ環境を構築しました。特に =xdotool= で floating window を出し入れできるようになったので満足しています。
 
-#+CAPTION: x11-screen
+#+CAPTION: x11-pad
 #+BEGIN_SRC sh
 #!/usr/bin/env -S bash -euE
 
