@@ -118,7 +118,7 @@ _tidy() {
 _watch() {
     echo "start watching.."
     if [[ "${1:-}" == "-d" || "${1:-}" == "--draft" ]] ; then
-        watchexec -e org -w src --ignore "index.org" "./x build --release && ./x tidy"
+        watchexec -e org -w src --ignore "index.org" "./x build --debug && ./x tidy"
     elif [[ -z "${1:-}" || "${1:-}" == "-r" || "${1:-}" == "--release" ]] ; then
         watchexec -e org -w src --ignore "index.org" "./x build --release && ./x tidy"
     fi
