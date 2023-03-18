@@ -3,13 +3,13 @@
 例の 25 万円の PC には <a href="https://nixos.org/">NixOS</a> をインストールしました。すでに一ヶ月以上四苦八苦していますが、永住するつもりで末永く取り組んでいこうと思います。<br>
 </p>
 
-<div id="outline-container-org2c97b84" class="outline-2">
-<h2 id="org2c97b84"><a href="#org2c97b84">NixOS の設定方法</a></h2>
-<div class="outline-text-2" id="text-org2c97b84">
+<div id="outline-container-org2f5c9a2" class="outline-2">
+<h2 id="org2f5c9a2"><a href="#org2f5c9a2">NixOS の設定方法</a></h2>
+<div class="outline-text-2" id="text-org2f5c9a2">
 </div>
-<div id="outline-container-org98a7c3d" class="outline-3">
-<h3 id="org98a7c3d"><a href="#org98a7c3d">設定ファイル</a></h3>
-<div class="outline-text-3" id="text-org98a7c3d">
+<div id="outline-container-orgd236926" class="outline-3">
+<h3 id="orgd236926"><a href="#orgd236926">設定ファイル</a></h3>
+<div class="outline-text-3" id="text-orgd236926">
 <p>
 NixOS における設定方法は、主に 3 種類あります:<br>
 </p>
@@ -52,9 +52,9 @@ NixOS における設定方法は、主に 3 種類あります:<br>
 </div>
 </div>
 
-<div id="outline-container-org0964a64" class="outline-3">
-<h3 id="org0964a64"><a href="#org0964a64">設定ファイルを現環境に反映するとは</a></h3>
-<div class="outline-text-3" id="text-org0964a64">
+<div id="outline-container-org27392bd" class="outline-3">
+<h3 id="org27392bd"><a href="#org27392bd">設定ファイルを現環境に反映するとは</a></h3>
+<div class="outline-text-3" id="text-org27392bd">
 <p>
 通常の Linux では、 <a href="https://linuc.org/study/knowledge/543/">/usr</a> 以下にツールをインストールします。一方 NixOS のファイル構成は <a href="https://nixos.wiki/wiki/Overview_of_the_NixOS_Linux_distribution#Internals">LSB (Linux Standard Base) から外れています</a> 。<br>
 </p>
@@ -89,13 +89,13 @@ $ ls /usr/bin
 </div>
 </div>
 
-<div id="outline-container-orgc85e986" class="outline-2">
-<h2 id="orgc85e986"><a href="#orgc85e986">NixOS における環境</a></h2>
-<div class="outline-text-2" id="text-orgc85e986">
+<div id="outline-container-org1d25b2c" class="outline-2">
+<h2 id="org1d25b2c"><a href="#org1d25b2c">NixOS における環境</a></h2>
+<div class="outline-text-2" id="text-org1d25b2c">
 </div>
-<div id="outline-container-orgf4d8c5e" class="outline-3">
-<h3 id="orgf4d8c5e"><a href="#orgf4d8c5e">バイナリはどこへ？</a></h3>
-<div class="outline-text-3" id="text-orgf4d8c5e">
+<div id="outline-container-orgecf1a08" class="outline-3">
+<h3 id="orgecf1a08"><a href="#orgecf1a08">バイナリはどこへ？</a></h3>
+<div class="outline-text-3" id="text-orgecf1a08">
 <p>
 調べると、 <code>bash</code> は <code>/run/current-system</code> の下にありました。これが『現環境』に相当します:<br>
 </p>
@@ -118,9 +118,9 @@ $ ls /usr/bin
 </div>
 </div>
 
-<div id="outline-container-orgdbec31e" class="outline-3">
-<h3 id="orgdbec31e"><a href="#orgdbec31e">プロファイルはどこに？</a></h3>
-<div class="outline-text-3" id="text-orgdbec31e">
+<div id="outline-container-orgfc92ead" class="outline-3">
+<h3 id="orgfc92ead"><a href="#orgfc92ead">プロファイルはどこに？</a></h3>
+<div class="outline-text-3" id="text-orgfc92ead">
 <p>
 プロファイルの実体は <code>/nix/store</code> に保存され、プロファイルへの symlink が <code>/nix/var/nix/profiles</code> に保存されます。設定を反映するというのは、新しいプロファイルを作成し、現環境として反映されるプロファイルを更新するということになります。<br>
 </p>
@@ -157,9 +157,9 @@ $ realpath /nix/var/nix/profiles/per-user/tbm/profile
 </div>
 </div>
 
-<div id="outline-container-orgc3dca22" class="outline-3">
-<h3 id="orgc3dca22"><a href="#orgc3dca22">シェルの wrapper</a></h3>
-<div class="outline-text-3" id="text-orgc3dca22">
+<div id="outline-container-orgcac658d" class="outline-3">
+<h3 id="orgcac658d"><a href="#orgcac658d">シェルの wrapper</a></h3>
+<div class="outline-text-3" id="text-orgcac658d">
 <p>
 特に設定を書いていないのに <code>/run/current-system/sw/bin</code> がシェルのパスに入っていたということは、 <code>nixpkgs</code> 上のシェルには何らかの細工が成されているはずです。<br>
 </p>
@@ -167,9 +167,9 @@ $ realpath /nix/var/nix/profiles/per-user/tbm/profile
 </div>
 </div>
 
-<div id="outline-container-orgc06bc82" class="outline-2">
-<h2 id="orgc06bc82"><a href="#orgc06bc82">まとめ</a></h2>
-<div class="outline-text-2" id="text-orgc06bc82">
+<div id="outline-container-org7e35e68" class="outline-2">
+<h2 id="org7e35e68"><a href="#org7e35e68">まとめ</a></h2>
+<div class="outline-text-2" id="text-org7e35e68">
 <p>
 バイナリとパスについては、だいたいイメージできました。動的ライブラリ (共有ライブラリ) はまだちょっと分かりません。<br>
 </p>

@@ -4,15 +4,15 @@ NixOS をメイン機として使えるようになりました。主な設定�
 </p>
 
 
-<div id="orgb6fdbfe" class="figure">
+<div id="orge663d27" class="figure">
 <p><img src="./img/2023-03-desktop.png" alt="2023-03-desktop.png"><br>
 </p>
 <p><span class="figure-number">Figure 1: </span>デスクトップ画面 (普通です)</p>
 </div>
 
-<div id="outline-container-org5af9d9c" class="outline-2">
-<h2 id="org5af9d9c"><a href="#org5af9d9c">背景</a></h2>
-<div class="outline-text-2" id="text-org5af9d9c">
+<div id="outline-container-org3b07b21" class="outline-2">
+<h2 id="org3b07b21"><a href="#org3b07b21">背景</a></h2>
+<div class="outline-text-2" id="text-org3b07b21">
 <p>
 NixOS を <a href="https://nixos.org/download.html">minimal ISO image</a> からインストールした場合、コンソール画面が立ち上がります。 GUI 環境の構築には、以下のような設定が必要です。<br>
 </p>
@@ -43,19 +43,19 @@ DE に欠点があるとすれば、カスタマイズが難しくなること�
 </div>
 </div>
 
-<div id="outline-container-org69be9cd" class="outline-2">
-<h2 id="org69be9cd"><a href="#org69be9cd">NixOS の設定</a></h2>
-<div class="outline-text-2" id="text-org69be9cd">
+<div id="outline-container-org81a3b8f" class="outline-2">
+<h2 id="org81a3b8f"><a href="#org81a3b8f">NixOS の設定</a></h2>
+<div class="outline-text-2" id="text-org81a3b8f">
 </div>
-<div id="outline-container-orgd639a78" class="outline-3">
-<h3 id="orgd639a78"><a href="#orgd639a78">neofetch</a></h3>
-<div class="outline-text-3" id="text-orgd639a78">
+<div id="outline-container-org969fc4b" class="outline-3">
+<h3 id="org969fc4b"><a href="#org969fc4b">neofetch</a></h3>
+<div class="outline-text-3" id="text-org969fc4b">
 <p>
 25 万円の PC 環境を誇示します。 Intel i7-12700 でビルドすると速い！<br>
 </p>
 
 
-<div id="orgc50243d" class="figure">
+<div id="orgb40aafa" class="figure">
 <p><img src="./img/2023-03-neofetch.png" alt="2023-03-neofetch.png"><br>
 </p>
 <p><span class="figure-number">Figure 2: </span><a href="https://github.com/dylanaraps/neofetch">neofetch</a></p>
@@ -170,7 +170,7 @@ Linux でも使える有償の DAW です。癖は強いのですが良さそう
 </ul>
 
 
-<div id="orgbc4eb5f" class="figure">
+<div id="org6880c40" class="figure">
 <p><img src="./img/2023-03-bitwig.png" alt="2023-03-bitwig.png"><br>
 </p>
 <p><span class="figure-number">Figure 3: </span>Bitwig Studio</p>
@@ -181,15 +181,15 @@ Linux でも使える有償の DAW です。癖は強いのですが良さそう
 </div>
 </div>
 
-<div id="outline-container-orga1ba1b9" class="outline-2">
-<h2 id="orga1ba1b9"><a href="#orga1ba1b9">まとめ</a></h2>
-<div class="outline-text-2" id="text-orga1ba1b9">
+<div id="outline-container-org63265ba" class="outline-2">
+<h2 id="org63265ba"><a href="#org63265ba">まとめ</a></h2>
+<div class="outline-text-2" id="text-org63265ba">
 <p>
 Xorg と <code>i3wm</code> で普通のデスクトップ環境を構築しました。特に <code>xdotool</code> で floating window を出し入れできるようになったので満足しています。<br>
 </p>
 
 <div class="org-src-container">
-<label class="org-src-name"><span class="listing-number">Listing 1: </span>x11-screen</label><pre><code class="src language-sh">#!/usr/bin/env -S bash -euE
+<label class="org-src-name"><span class="listing-number">Listing 1: </span>x11-pad</label><pre><code class="src language-sh">#!/usr/bin/env -S bash -euE
 
 # X11 scratchpad
 # Thanks: https://github.com/jdpedersen1/scripts/blob/main/scratch

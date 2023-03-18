@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Entity-Component-System の 3種類のストレージ - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="style/simple.min.css"/><link rel="stylesheet" href="style/style.css"/><link rel="stylesheet" href="style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>Entity-Component-System の 3種類のストレージ</h1><p>Dec 11, 2022</p><nav role="navigation"><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<div id="outline-container-orgc02e793" class="outline-2">
-<h2 id="orgc02e793"><a href="#orgc02e793">背景</a></h2>
-<div class="outline-text-2" id="text-orgc02e793">
+<div id="outline-container-orgabb07c4" class="outline-2">
+<h2 id="orgabb07c4"><a href="#orgabb07c4">背景</a></h2>
+<div class="outline-text-2" id="text-orgabb07c4">
 <p>
 <a href="https://en.wikipedia.org/wiki/Entity_component_system">Entity-Component-System</a> (以下 ECS) はゲーム開発で有名な設計です。特に Rust では借用ルールとの兼ね合いが楽になるため、最もメジャーなゲームの作り方となっています。<br>
 </p>
@@ -12,9 +12,9 @@
 </p>
 </div>
 
-<div id="outline-container-orgccb13e3" class="outline-3">
-<h3 id="orgccb13e3"><a href="#orgccb13e3">元ネタ</a></h3>
-<div class="outline-text-3" id="text-orgccb13e3">
+<div id="outline-container-orga3ba162" class="outline-3">
+<h3 id="orga3ba162"><a href="#orga3ba162">元ネタ</a></h3>
+<div class="outline-text-3" id="text-orga3ba162">
 <p>
 この記事は、以下の記事の解説を図にした (つもり) のものです。独自の解釈は入っていますが、自分で考えた方法ではありません:<br>
 </p>
@@ -29,19 +29,19 @@
 </div>
 </div>
 
-<div id="outline-container-orgde5ad59" class="outline-2">
-<h2 id="orgde5ad59"><a href="#orgde5ad59">3 種類の ECS ストレージ</a></h2>
-<div class="outline-text-2" id="text-orgde5ad59">
+<div id="outline-container-org8155e4a" class="outline-2">
+<h2 id="org8155e4a"><a href="#org8155e4a">3 種類の ECS ストレージ</a></h2>
+<div class="outline-text-2" id="text-org8155e4a">
 </div>
-<div id="outline-container-org144840d" class="outline-3">
-<h3 id="org144840d"><a href="#org144840d">実装 1: <code>Vec&lt;Option&lt;T&gt;&gt;</code></a></h3>
-<div class="outline-text-3" id="text-org144840d">
+<div id="outline-container-org76070e9" class="outline-3">
+<h3 id="org76070e9"><a href="#org76070e9">実装 1: <code>Vec&lt;Option&lt;T&gt;&gt;</code></a></h3>
+<div class="outline-text-3" id="text-org76070e9">
 <p>
 まずは ECS の概念図を説明します。コンポーネント配列 (横列) に対し、 <code>Entity</code> は添字に相当します:<br>
 </p>
 
 
-<div id="orgd87db9d" class="figure">
+<div id="org0293e58" class="figure">
 <p><img src="./img/2023-12-toecs-big-array.png" alt="2023-12-toecs-big-array.png"><br>
 </p>
 </div>
@@ -52,15 +52,15 @@
 </div>
 </div>
 
-<div id="outline-container-orgac1972e" class="outline-3">
-<h3 id="orgac1972e"><a href="#orgac1972e">実装 2: <code>Archetype</code></a></h3>
-<div class="outline-text-3" id="text-orgac1972e">
+<div id="outline-container-org0210417" class="outline-3">
+<h3 id="org0210417"><a href="#org0210417">実装 2: <code>Archetype</code></a></h3>
+<div class="outline-text-3" id="text-org0210417">
 <p>
 こちらは詳しくないため、図だけ載せます:<br>
 </p>
 
 
-<div id="org549cb00" class="figure">
+<div id="org013a05a" class="figure">
 <p><img src="./img/2023-12-toecs-archetype-storage.png" alt="2023-12-toecs-archetype-storage.png"><br>
 </p>
 </div>
@@ -91,9 +91,9 @@
 </div>
 </div>
 
-<div id="outline-container-org0cb71e7" class="outline-3">
-<h3 id="org0cb71e7"><a href="#org0cb71e7">実装 3: <code>SparseSet&lt;T&gt;</code></a></h3>
-<div class="outline-text-3" id="text-org0cb71e7">
+<div id="outline-container-orge42174d" class="outline-3">
+<h3 id="orge42174d"><a href="#orge42174d">実装 3: <code>SparseSet&lt;T&gt;</code></a></h3>
+<div class="outline-text-3" id="text-orge42174d">
 <blockquote>
 <p>
 <a href="https://zenn.dev/toyboot4e/books/making-toy-ecs">Zenn の投稿</a> の焼き直しです。詳しい解説ではなく、内容が伝わらないと思いますので、改稿を考えています。<br>
@@ -115,7 +115,7 @@
 </p>
 
 
-<div id="org49f2547" class="figure">
+<div id="orgc7e52a3" class="figure">
 <p><img src="./img/2023-12-toecs-sparse-set.png" alt="2023-12-toecs-sparse-set.png"><br>
 </p>
 </div>
@@ -125,9 +125,9 @@
 </p>
 </div>
 
-<div id="outline-container-orge817611" class="outline-4">
-<h4 id="orge817611"><a href="#orge817611">世代番号</a></h4>
-<div class="outline-text-4" id="text-orge817611">
+<div id="outline-container-org5e022b9" class="outline-4">
+<h4 id="org5e022b9"><a href="#org5e022b9">世代番号</a></h4>
+<div class="outline-text-4" id="text-org5e022b9">
 <p>
 <code>Entity</code> は、いわゆる generational index です:<br>
 </p>
@@ -146,9 +146,9 @@
 </div>
 </div>
 
-<div id="outline-container-orgdfb4782" class="outline-4">
-<h4 id="orgdfb4782"><a href="#orgdfb4782">グルーピング処理</a></h4>
-<div class="outline-text-4" id="text-orgdfb4782">
+<div id="outline-container-org115ab64" class="outline-4">
+<h4 id="org115ab64"><a href="#org115ab64">グルーピング処理</a></h4>
+<div class="outline-text-4" id="text-org115ab64">
 <p>
 <code>SparseSet&lt;T&gt;</code> から要素を取得するメソッドは 2 つです:<br>
 </p>
@@ -165,7 +165,7 @@
 </p>
 
 
-<div id="orgad8b5d9" class="figure">
+<div id="org02f6900" class="figure">
 <p><img src="./img/2023-12-toecs-groups.png" alt="2023-12-toecs-groups.png"><br>
 </p>
 </div>
@@ -175,22 +175,22 @@
 </p>
 
 
-<div id="orga206505" class="figure">
+<div id="org764acd4" class="figure">
 <p><img src="./img/2023-12-toecs-group-sync.png" alt="2023-12-toecs-group-sync.png"><br>
 </p>
 </div>
 
 
-<div id="org5a618c7" class="figure">
+<div id="org3b8e069" class="figure">
 <p><img src="./img/2023-12-toecs-group-unsync.png" alt="2023-12-toecs-group-unsync.png"><br>
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org93ee26e" class="outline-4">
-<h4 id="org93ee26e"><a href="#org93ee26e"><code>Entity</code> の挿入と削除について</a></h4>
-<div class="outline-text-4" id="text-org93ee26e">
+<div id="outline-container-org7e8751c" class="outline-4">
+<h4 id="org7e8751c"><a href="#org7e8751c"><code>Entity</code> の挿入と削除について</a></h4>
+<div class="outline-text-4" id="text-org7e8751c">
 <p>
 空きスロットの連結リストを管理すると、 <code>Entity</code> の挿入を\(O(1)\) の処理にできます。<br>
 </p>
@@ -200,7 +200,7 @@
 </p>
 
 
-<div id="org0a6aca6" class="figure">
+<div id="org2df92f2" class="figure">
 <p><img src="./img/2023-12-toecs-free-slot.png" alt="2023-12-toecs-free-slot.png"><br>
 </p>
 </div>
@@ -210,7 +210,7 @@
 </p>
 
 
-<div id="org0a7d31d" class="figure">
+<div id="org1f022ea" class="figure">
 <p><img src="./img/2023-12-toecs-free-slot-insert.png" alt="2023-12-toecs-free-slot-insert.png"><br>
 </p>
 </div>
@@ -220,16 +220,16 @@
 </p>
 
 
-<div id="orga79b38a" class="figure">
+<div id="org23fe91b" class="figure">
 <p><img src="./img/2023-12-toecs-free-slot-remove.png" alt="2023-12-toecs-free-slot-remove.png"><br>
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgb4be837" class="outline-4">
-<h4 id="orgb4be837"><a href="#orgb4be837"><code>Entity</code> の削除について</a></h4>
-<div class="outline-text-4" id="text-orgb4be837">
+<div id="outline-container-org824d3b3" class="outline-4">
+<h4 id="org824d3b3"><a href="#org824d3b3"><code>Entity</code> の削除について</a></h4>
+<div class="outline-text-4" id="text-org824d3b3">
 <p>
 Rust の <code>Vec::remove</code> は要素のシフトを起こす \(O(n)\) の処理です。 <code>Vec::swap_remove</code> は、末尾の要素と入れ替えてから削除しますから \(O(1)\) の処理で済みます。<br>
 </p>
@@ -242,9 +242,9 @@ Rust の <code>Vec::remove</code> は要素のシフトを起こす \(O(n)\) の
 </div>
 </div>
 
-<div id="outline-container-orgb84aa70" class="outline-2">
-<h2 id="orgb84aa70"><a href="#orgb84aa70">まとめ</a></h2>
-<div class="outline-text-2" id="text-orgb84aa70">
+<div id="outline-container-org3f0335c" class="outline-2">
+<h2 id="org3f0335c"><a href="#org3f0335c">まとめ</a></h2>
+<div class="outline-text-2" id="text-org3f0335c">
 <p>
 ざっと解説しましたが、あまりにも粗い説明だったと思います。時間があるときに書き直したいです。<br>
 </p>
