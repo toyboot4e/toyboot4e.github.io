@@ -28,24 +28,24 @@
       <p>
         例の 25 万円の PC には
         <a href="https://nixos.org/">NixOS</a>
-        をインストールしました。すでに一ヶ月以上四苦八苦していますが、永住するつもりで末永く取り組んでいこうと思います。
+        をインストールしました。すでに一ヶ月以上四苦八苦していますが、永住するつもりで末永く取り組んでいこうと思います。<br />
       </p>
 
       <h2 id="NixOS の設定方法">
         <a href="#NixOS の設定方法">NixOS の設定方法</a>
       </h2>
       <h3 id="設定ファイル"><a href="#設定ファイル">設定ファイル</a></h3>
-      <p>NixOS における設定方法は、主に 3 種類あります:</p>
+      <p>NixOS における設定方法は、主に 3 種類あります:<br /></p>
 
       <ol>
         <li>
           システム全体の設定 (<code>/run/current-system</code>)<br />
-          <code>/etc/nixos/configuration.nix</code> を編集して設定します。
+          <code>/etc/nixos/configuration.nix</code> を編集して設定します。<br />
         </li>
 
         <li>
-          ユーザ毎の設定 (<code>~/.nix-profile</code>)
-          <code>nix-env</code> またはその wrapper で設定します。
+          ユーザ毎の設定 (<code>~/.nix-profile</code>)<br />
+          <code>nix-env</code> またはその wrapper で設定します。<br />
 
           <ol>
             <li>
@@ -54,7 +54,7 @@
               <code>nix-env</code>
               コマンドでパッケージをインストールできます。手続き的です。
               <code>nix-env</code> は直接使用せず、次項の
-              <code>home-manager</code> を使うことが推奨されています。
+              <code>home-manager</code> を使うことが推奨されています。<br />
             </li>
 
             <li>
@@ -63,7 +63,8 @@
               <code>nix-env</code>
               の宣言的なバージョンです。ユーザ毎の設定を宣言的に記述できます。
               <code>~/.config/nixpkgs/home.nix</code> を編集するか、
-              <code>/etc/nixos/configuration.nix</code> からも設定できます。
+              <code>/etc/nixos/configuration.nix</code>
+              からも設定できます。<br />
             </li>
           </ol>
         </li>
@@ -71,19 +72,19 @@
         <li>
           プロジェクト毎の設定<br />
           <code>default.nix</code> や
-          <code>shell.nix</code> を書いて設定します。
+          <code>shell.nix</code> を書いて設定します。<br />
 
           <ol>
             <li>
-              <code>nix-shell</code> (<code>nix-shell --pure</code>)
+              <code>nix-shell</code> (<code>nix-shell --pure</code>)<br />
               <ul>
                 <li>
                   <code>nix-shell</code>
-                  は、現在の環境に追加でパッケージを読み込んでシェルを作ります。
+                  は、現在の環境に追加でパッケージを読み込んでシェルを作ります。<br />
                 </li>
                 <li>
                   <code>nix-shell --pure</code>
-                  は、設定ファイルに記述されたパッケージのみを取り込んだ純粋な環境のシェルを作ります。
+                  は、設定ファイルに記述されたパッケージのみを取り込んだ純粋な環境のシェルを作ります。<br />
                 </li>
               </ul>
             </li>
@@ -91,11 +92,11 @@
             <li>
               <a href="https://github.com/nix-community/nix-direnv"
                 >nix-direnv</a
-              >
+              ><br />
               <code>nix-direnv</code> を使用すると、現在のシェルに
               <code>default.nix</code> や
               <code>shell.nix</code> で宣言されたパッケージを (自動で)
-              ロードできます。
+              ロードできます。<br />
             </li>
           </ol>
         </li>
@@ -104,7 +105,7 @@
       <blockquote>
         <p>
           <a href="https://nixos.wiki/wiki/Flakes">Flakes</a>
-          を導入すれば話は変わってくるようですが、まだそれは調べられていません。
+          を導入すれば話は変わってくるようですが、まだそれは調べられていません。<br />
         </p>
       </blockquote>
 
@@ -121,10 +122,10 @@
           href="https://nixos.wiki/wiki/Overview_of_the_NixOS_Linux_distribution#Internals"
           >LSB (Linux Standard Base) から外れています</a
         >
-        。
+        。<br />
       </p>
 
-      <p>NixOS の <code>/usr</code> はほぼ空です:</p>
+      <p>NixOS の <code>/usr</code> はほぼ空です:<br /></p>
 
       <div class="org-src-container">
         <pre><code class="src language-sh">$ ls /usr
@@ -132,7 +133,7 @@ bin/
 </code></pre>
       </div>
 
-      <p><code>bin/</code> の中もスカスカでした:</p>
+      <p><code>bin/</code> の中もスカスカでした:<br /></p>
 
       <div class="org-src-container">
         <pre><code class="src language-sh">$ ls /bin
@@ -143,7 +144,7 @@ $ ls /usr/bin
 </code></pre>
       </div>
 
-      <p>しかし実際には多数のコマンドをインストールしています。</p>
+      <p>しかし実際には多数のコマンドをインストールしています。<br /></p>
 
       <h2 id="NixOS における環境">
         <a href="#NixOS における環境">NixOS における環境</a>
@@ -154,7 +155,7 @@ $ ls /usr/bin
       <p>
         調べると、 <code>bash</code> は
         <code>/run/current-system</code>
-        の下にありました。これが『現環境』に相当します:
+        の下にありました。これが『現環境』に相当します:<br />
       </p>
 
       <div class="org-src-container">
@@ -165,7 +166,7 @@ $ ls /usr/bin
 
       <p>
         また <code>/run/current-system</code> とは、『プロファイル』への symlink
-        です:
+        です:<br />
       </p>
 
       <div class="org-src-container">
@@ -181,10 +182,10 @@ $ ls /usr/bin
         プロファイルの実体は
         <code>/nix/store</code> に保存され、プロファイルへの symlink が
         <code>/nix/var/nix/profiles</code>
-        に保存されます。設定を反映するというのは、新しいプロファイルを作成し、現環境として反映されるプロファイルを更新するということになります。
+        に保存されます。設定を反映するというのは、新しいプロファイルを作成し、現環境として反映されるプロファイルを更新するということになります。<br />
       </p>
 
-      <p>System-wide なプロファイルの symlink を見てます:</p>
+      <p>System-wide なプロファイルの symlink を見てます:<br /></p>
 
       <div class="org-src-container">
         <pre><code class="src language-sh">$ realpath /run/current-system
@@ -195,7 +196,7 @@ $ realpath /nix/var/nix/profiles/system
 </code></pre>
       </div>
 
-      <p>ユーザ毎のプロファイルも確認します:</p>
+      <p>ユーザ毎のプロファイルも確認します:<br /></p>
 
       <div class="org-src-container">
         <pre><code class="src language-sh">$ realpath ~/.nix-profile
@@ -209,7 +210,7 @@ $ realpath /nix/var/nix/profiles/per-user/tbm/profile
       <p>
         どちらも
         <code>/nix/var/nix/profiles</code>
-        以下の最新プロファイルと一致しました。
+        以下の最新プロファイルと一致しました。<br />
       </p>
 
       <h3 id="シェルの wrapper">
@@ -219,13 +220,14 @@ $ realpath /nix/var/nix/profiles/per-user/tbm/profile
         特に設定を書いていないのに
         <code>/run/current-system/sw/bin</code>
         がシェルのパスに入っていたということは、
-        <code>nixpkgs</code> 上のシェルには何らかの細工が成されているはずです。
+        <code>nixpkgs</code>
+        上のシェルには何らかの細工が成されているはずです。<br />
       </p>
 
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
         バイナリとパスについては、だいたいイメージできました。動的ライブラリ
-        (共有ライブラリ) はまだちょっと分かりません。
+        (共有ライブラリ) はまだちょっと分かりません。<br />
       </p>
     </main>
     <footer role="contentinfo">

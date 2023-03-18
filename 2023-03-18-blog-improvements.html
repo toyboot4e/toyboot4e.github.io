@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>org-mode 製ブログの改良 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="style/simple.min.css" />
+    <link rel="stylesheet" href="style/style.css" />
+    <link rel="stylesheet" href="style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1><code>org-mode</code> 製ブログの改良</h1>
+      <p>Mar 18, 2023</p>
+      <nav role="navigation">
+        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="背景"><a href="#背景">背景</a></h2>
+      <p>
+        <a href="./2022-10-09-org-mode-blog.html">前の投稿</a> で作った
+        <code>org-mode</code> 製 SSG を改良します。マイナな変更が多いです。<br />
+      </p>
+
+      <h2 id="改良点"><a href="#改良点">改良点</a></h2>
+      <h3 id="表現力の強化"><a href="#表現力の強化">表現力の強化</a></h3>
+      <h4 id="トップページ (sitemap)">
+        <a href="#トップページ (sitemap)">トップページ (sitemap)</a>
+      </h4>
+      <p>変更前は、日付が <code>&lt;a&gt;</code> タグの中にありました:<br /></p>
+
+      <p>
+        <img
+          src="./img/2023-03-sitemap-1.png"
+          alt="2023-03-sitemap-1.png"
+          width="407px"
+        /><br />
+      </p>
+
+      <p>変更後、日付を <code>&lt;a&gt;</code> タグから分離しました:<br /></p>
+
+      <p>
+        <img
+          src="./img/2023-03-sitemap-2.png"
+          alt="2023-03-sitemap-2.png"
+          width="407px"
+        /><br />
+      </p>
+
+      <h4 id="図"><a href="#図">図</a></h4>
+      <p>
+        ASCII から画像生成するツールを導入しました。 AsciiDoc
+        でもお馴染みでした。<br />
+      </p>
+
+      <h5 id="ditaa">
+        <a href="#ditaa"><a href="https://ditaa.sourceforge.net/">ditaa</a></a>
+      </h5>
+      <div class="org-src-container">
+        <pre><code class="src language-ditaa">+--------------+
+| Hello World! |
++--------------+
+</code></pre>
+      </div>
+
+      <p><img src="./img/2023-03-ditaa.png" alt="2023-03-ditaa.png" /><br /></p>
+
+      <h5 id="plantuml">
+        <a href="#plantuml"
+          ><a
+            href="https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-plantuml.html"
+            >plantuml</a
+          ></a
+        >
+      </h5>
+      <div class="org-src-container">
+        <pre><code class="src language-plantuml">Bob -&gt;&gt; Alice : Hello World!
+</code></pre>
+      </div>
+
+      <p>
+        <img
+          src="./img//2023-03-plantuml.png"
+          alt="2023-03-plantuml.png"
+        /><br />
+      </p>
+
+      <h5 id="graphviz">
+        <a href="#graphviz"><a href="https://graphviz.org/">graphviz</a></a>
+      </h5>
+      <div class="org-src-container">
+        <pre><code class="src language-dot">strict graph {
+  a -- b
+  a -- b
+  b -- a [color=blue]
+}
+</code></pre>
+      </div>
+
+      <p>
+        <img src="./img/2023-03-graphvi.png" alt="2023-03-graphvi.png" /><br />
+      </p>
+
+      <p>用意しましたが、今後のブログで 1 回使うかどうか……。<br /></p>
+
+      <h3 id="html 出力を綺麗に">
+        <a href="#html 出力を綺麗に">html 出力を綺麗に</a>
+      </h3>
+      <h4 id="prettier で html を整形する">
+        <a href="#prettier で html を整形する"
+          ><code>prettier</code> で html を整形する</a
+        >
+      </h4>
+      <p>自分でも html の確認が楽になりました:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ npm install prettier
+$ npx prettier -- --write out/*.htm
+</code></pre>
+      </div>
+
+      <h4 id="ox-slimhtml を ox-html と併用する">
+        <a href="#ox-slimhtml を ox-html と併用する"
+          ><code>ox-slimhtml</code> を <code>ox-html</code> と併用する</a
+        >
+      </h4>
+      <p>
+        <a href="https://github.com/balddotcat/ox-slimhtml">ox-slimhtml</a> は
+        500 行程度の html バックエンドです。
+        <code>ox-html</code> と比べてシンプルな html を吐くのが特徴的です。<br />
+      </p>
+
+      <p>
+        カスタマイズが簡単だったので、見出しの <code>id</code> タグを定数
+        (見出しの名前)
+        に変更しました。ただ初期状態ではテーブルに対応していなかったため、
+        <code>ox-html</code> をベースに、一部のフィルタを
+        <code>ox-slimhtml</code> で上書きする形に変更しました
+        (<code>org-export-define-derived-backend</code>) 。<br />
+      </p>
+
+      <h2 id="感想"><a href="#感想">感想</a></h2>
+      <p>
+        最近の自作ブログ界隈 (?) では、既成の SSG を使うか、
+        <a href="https://matklad.github.io/">matklad</a> 氏のように Deno
+        で実装するのがイケている気がします。一方
+        <code>org-export</code> を使った場合、 <code>org-mode</code> の設定と
+        SSG の調整を 1 つの言語で完結させられるのが良いです。<br />
+      </p>
+
+      <p>
+        結局必要な機能は多く無いので、何を使っても問題ありません。たまたま
+        <code>org-export</code> を楽しめているのは、 Emacs を始めた利点の 1
+        つです。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div>
+        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </div>
+    </footer>
+  </body>
+</html>

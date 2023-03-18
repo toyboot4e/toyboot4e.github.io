@@ -28,62 +28,29 @@
       <h2 id="背景"><a href="#背景">背景</a></h2>
       <p>
         僕はエディタに拘りがありません。 Vim
-        キーバインドさえあれば何でも良いのです。
+        キーバインドさえあれば何でも良いのです。<br />
       </p>
 
       <p>
         しかし Emacs の workflow
         は一皮剥けている気がします。ここでは『多重化』の観点から僕の Emacs
-        を紹介します。
+        を紹介します。<br />
       </p>
 
-      <table>
-        <colgroup>
-          <col class="org-left" />
-
-          <col class="org-left" />
-        </colgroup>
-        <thead>
-          <tr>
-            <th scope="col" class="org-left">エディタ</th>
-            <th scope="col" class="org-left">僕にとっては</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="org-left">VSCode</td>
-            <td class="org-left"><code>Notepad++++++++</code></td>
-          </tr>
-
-          <tr>
-            <td class="org-left">Sublime</td>
-            <td class="org-left"><code>Notepad++++++++</code></td>
-          </tr>
-
-          <tr>
-            <td class="org-left">Vim</td>
-            <td class="org-left"><code>Nodepad++++++++++++</code></td>
-          </tr>
-
-          <tr>
-            <td class="org-left">Emacs</td>
-            <td class="org-left"><code>Notepad++++++++++++++</code></td>
-          </tr>
-        </tbody>
-      </table>
-
       <h2 id="主な workflow"><a href="#主な workflow">主な workflow</a></h2>
-      <p>僕の環境は多重化に力が入っています。多重化には 3 段階あります。</p>
+      <p>
+        僕の環境は多重化に力が入っています。多重化には 3 段階あります。<br />
+      </p>
 
       <ol>
-        <li>画面分割</li>
-        <li>マルチタブ</li>
-        <li>マルチ・マルチタブ</li>
+        <li>画面分割<br /></li>
+        <li>マルチタブ<br /></li>
+        <li>マルチ・マルチタブ<br /></li>
       </ol>
 
       <p>
         僕は Emacs
-        をターミナルから起動するので、ターミナルの多重化から説明します。
+        をターミナルから起動するので、ターミナルの多重化から説明します。<br />
       </p>
 
       <h3 id="ターミナルの多重化">
@@ -91,80 +58,92 @@
       </h3>
       <p>
         <code>tmux</code>
-        を使うと、ターミナルの画面分割ができます。マルチタブ機能もあります。
+        を使うと、ターミナルの画面分割ができます。マルチタブ機能もあります。<br />
       </p>
 
-      <p><img src="./img/2023-03-terminal.png" alt="2023-03-terminal.png" /></p>
+      <p>
+        <img
+          src="./img/2023-03-terminal.png"
+          alt="2023-03-terminal.png"
+        /><br />
+      </p>
 
       <p>
         画面下部の <code>ABC</code>, <code>dotfiles</code>,
         <code>ranger</code> というのがタブです。マルチタブを持つ
         <span class="underline">session</span>
-        も多重化できます。マルチ・マルチタブです。
+        も多重化できます。マルチ・マルチタブです。<br />
       </p>
 
-      <p><img src="./img/2023-03-tmux.png" alt="2023-03-tmux.png" /></p>
+      <p><img src="./img/2023-03-tmux.png" alt="2023-03-tmux.png" /><br /></p>
 
       <h3 id="Emacs の多重化"><a href="#Emacs の多重化">Emacs の多重化</a></h3>
       <p>
-        ターミナルの中で Emacs を起動します。 Emacs の中でも画面分割が可能です。
+        ターミナルの中で Emacs を起動します。 Emacs
+        の中でも画面分割が可能です。<br />
       </p>
 
-      <p><img src="./img/2023-03-windows.png" alt="2023-03-windows.png" /></p>
+      <p>
+        <img src="./img/2023-03-windows.png" alt="2023-03-windows.png" /><br />
+      </p>
 
       <p>
         最上部の <code>config</code>, <code>ABC</code>,
         <code>Server</code>
-        にお気づきでしょうか。これらがマルチ・マルチタブであり、プロジェクトの切り替えに相当します。
+        にお気づきでしょうか。これらがマルチ・マルチタブであり、プロジェクトの切り替えに相当します。<br />
       </p>
 
-      <p><code>Server</code> タブに切り替えてみました:</p>
+      <p><code>Server</code> タブに切り替えてみました:<br /></p>
 
-      <p><img src="./img/2023-03-tabs.png" alt="2023-03-tabs.png" /></p>
+      <p><img src="./img/2023-03-tabs.png" alt="2023-03-tabs.png" /><br /></p>
 
       <h3 id="Emacs のウィジェット">
         <a href="#Emacs のウィジェット">Emacs のウィジェット</a>
       </h3>
       <p>
         サイドバーにはプログラムのアウトラインを表示することもできます。僕はハードコアな環境を求めているわけではなく、リッチで優しい
-        UI が好きです。
+        UI が好きです。<br />
       </p>
 
-      <p><img src="./img/2023-03-imenu.gif" alt="2023-03-imenu.gif" /></p>
+      <p><img src="./img/2023-03-imenu.gif" alt="2023-03-imenu.gif" /><br /></p>
 
       <p>
         ついでに <code>magit</code> にも触れておきます。
         <code>magit</code> と言えば Emacs の killer feature です。
         <code>git add</code> を始め、 <code>rebase</code>, <code>squash</code> /
-        <code>fixup</code> のような複雑な操作も比較的簡単にガイドしてくれます。
+        <code>fixup</code>
+        のような複雑な操作も比較的簡単にガイドしてくれます。<br />
       </p>
 
-      <p><img src="./img/2023-03-magit.png" alt="2023-03-magit.png" /></p>
+      <p><img src="./img/2023-03-magit.png" alt="2023-03-magit.png" /><br /></p>
 
       <h3 id="Emacs における検索">
         <a href="#Emacs における検索">Emacs における検索</a>
       </h3>
       <p>
         ファジー検索とプレビュー機能も欠かせません。 Emacs
-        もこうした機能は得意です。
+        もこうした機能は得意です。<br />
       </p>
 
       <p>
-        <img src="./img/2023-03-find-file.png" alt="2023-03-find-file.png" />
+        <img
+          src="./img/2023-03-find-file.png"
+          alt="2023-03-find-file.png"
+        /><br />
       </p>
 
-      <p><img src="./img/2023-03-grep.png" alt="2023-03-grep.png" /></p>
+      <p><img src="./img/2023-03-grep.png" alt="2023-03-grep.png" /><br /></p>
 
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
         僕はエディタの表面的な部分に関心があったので、結果的に Emacs
         に流れました。 Emacs は
-        <code>Notepad++++++++++++++</code> として使っています。
+        <code>Notepad++++++++++++++</code> として使っています。<br />
       </p>
 
       <p>
         なぜ他のエディタを使わないのか聞かれたときは、上記のような多重化機能が他のエディタには無い
-        (と認識している) からと答えるつもりです。
+        (と認識している) からと答えるつもりです。<br />
       </p>
     </main>
     <footer role="contentinfo">
