@@ -1,84 +1,133 @@
 <!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Entity-Component-System の 3種類のストレージ - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="style/simple.min.css"/><link rel="stylesheet" href="style/style.css"/><link rel="stylesheet" href="style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>Entity-Component-System の 3種類のストレージ</h1><p>Dec 11, 2022</p><nav role="navigation"><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<div id="outline-container-orgabb07c4" class="outline-2">
-<h2 id="orgabb07c4"><a href="#orgabb07c4">背景</a></h2>
-<div class="outline-text-2" id="text-orgabb07c4">
-<p>
-<a href="https://en.wikipedia.org/wiki/Entity_component_system">Entity-Component-System</a> (以下 ECS) はゲーム開発で有名な設計です。特に Rust では借用ルールとの兼ね合いが楽になるため、最もメジャーなゲームの作り方となっています。<br>
-</p>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entity-Component-System の 3種類のストレージ - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="style/simple.min.css" />
+    <link rel="stylesheet" href="style/style.css" />
+    <link rel="stylesheet" href="style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>Entity-Component-System の 3種類のストレージ</h1>
+      <p>Dec 11, 2022</p>
+      <nav role="navigation">
+        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="背景"><a href="#背景">背景</a></h2>
+      <p>
+        <a href="https://en.wikipedia.org/wiki/Entity_component_system"
+          >Entity-Component-System</a
+        >
+        (以下 ECS) はゲーム開発で有名な設計です。特に Rust
+        では借用ルールとの兼ね合いが楽になるため、最もメジャーなゲームの作り方となっています。
+      </p>
 
-<p>
-この記事では ECS の内部実装、特にデータの保存方法を紹介します。また主に Rust ユーザの目線でコメントします。<br>
-</p>
-</div>
+      <p>
+        この記事では ECS の内部実装、特にデータの保存方法を紹介します。また主に
+        Rust ユーザの目線でコメントします。
+      </p>
 
-<div id="outline-container-orga3ba162" class="outline-3">
-<h3 id="orga3ba162"><a href="#orga3ba162">元ネタ</a></h3>
-<div class="outline-text-3" id="text-orga3ba162">
-<p>
-この記事は、以下の記事の解説を図にした (つもり) のものです。独自の解釈は入っていますが、自分で考えた方法ではありません:<br>
-</p>
+      <h3 id="元ネタ"><a href="#元ネタ">元ネタ</a></h3>
+      <p>
+        この記事は、以下の記事の解説を図にした (つもり)
+        のものです。独自の解釈は入っていますが、自分で考えた方法ではありません:
+      </p>
 
-<ul class="org-ul">
-<li><a href="https://skypjack.github.io/2019-02-14-ecs-baf-part-1/">ECS back and forth</a> シリーズ<br>
-<a href="https://github.com/skypjack/entt">EnTT</a> の解説です。 Sparse set ベースの実装の解説に当たります。<br></li>
-<li><a href="https://ajmmertens.medium.com/building-an-ecs-1-types-hierarchies-and-prefabs-9f07666a1e9d">Building an ECS</a> シリーズ<br>
-<a href="https://github.com/SanderMertens/flecs">flecs</a> の解説です。 Archetype ベースの実装の解説に当たります。<br></li>
-</ul>
-</div>
-</div>
-</div>
+      <ul>
+        <li>
+          <a href="https://skypjack.github.io/2019-02-14-ecs-baf-part-1/"
+            >ECS back and forth</a
+          >
+          シリーズ
+          <a href="https://github.com/skypjack/entt">EnTT</a> の解説です。
+          Sparse set ベースの実装の解説に当たります。
+        </li>
+        <li>
+          <a
+            href="https://ajmmertens.medium.com/building-an-ecs-1-types-hierarchies-and-prefabs-9f07666a1e9d"
+            >Building an ECS</a
+          >
+          シリーズ
+          <a href="https://github.com/SanderMertens/flecs">flecs</a>
+          の解説です。 Archetype ベースの実装の解説に当たります。
+        </li>
+      </ul>
 
-<div id="outline-container-org8155e4a" class="outline-2">
-<h2 id="org8155e4a"><a href="#org8155e4a">3 種類の ECS ストレージ</a></h2>
-<div class="outline-text-2" id="text-org8155e4a">
-</div>
-<div id="outline-container-org76070e9" class="outline-3">
-<h3 id="org76070e9"><a href="#org76070e9">実装 1: <code>Vec&lt;Option&lt;T&gt;&gt;</code></a></h3>
-<div class="outline-text-3" id="text-org76070e9">
-<p>
-まずは ECS の概念図を説明します。コンポーネント配列 (横列) に対し、 <code>Entity</code> は添字に相当します:<br>
-</p>
+      <h2 id="3 種類の ECS ストレージ">
+        <a href="#3 種類の ECS ストレージ">3 種類の ECS ストレージ</a>
+      </h2>
+      <h3 id="実装 1: Vec<Option<T>>">
+        <a href="#実装 1: Vec<Option<T>>"
+          >実装 1: <code>Vec&lt;Option&lt;T&gt;&gt;</code></a
+        >
+      </h3>
+      <p>
+        まずは ECS の概念図を説明します。コンポーネント配列 (横列) に対し、
+        <code>Entity</code> は添字に相当します:
+      </p>
 
+      <p>
+        <img
+          src="./img/2023-12-toecs-big-array.png"
+          alt="2023-12-toecs-big-array.png"
+        />
+      </p>
 
-<div id="org0293e58" class="figure">
-<p><img src="./img/2023-12-toecs-big-array.png" alt="2023-12-toecs-big-array.png"><br>
-</p>
-</div>
+      <p>
+        それぞれのコンポーネントは optional ですから、
+        <code>Vec&lt;Option&lt;T&gt;&gt;</code>
+        をコンポーネントストレージにするのが ECS の最も簡単な実装です。
+      </p>
 
-<p>
-それぞれのコンポーネントは optional ですから、 <code>Vec&lt;Option&lt;T&gt;&gt;</code> をコンポーネントストレージにするのが ECS の最も簡単な実装です。<br>
-</p>
-</div>
-</div>
+      <h3 id="実装 2: Archetype">
+        <a href="#実装 2: Archetype">実装 2: <code>Archetype</code></a>
+      </h3>
+      <p>こちらは詳しくないため、図だけ載せます:</p>
 
-<div id="outline-container-org0210417" class="outline-3">
-<h3 id="org0210417"><a href="#org0210417">実装 2: <code>Archetype</code></a></h3>
-<div class="outline-text-3" id="text-org0210417">
-<p>
-こちらは詳しくないため、図だけ載せます:<br>
-</p>
+      <p>
+        <img
+          src="./img/2023-12-toecs-archetype-storage.png"
+          alt="2023-12-toecs-archetype-storage.png"
+        />
+      </p>
 
+      <ul>
+        <li>
+          Component セット毎に archetype ストレージを作成します
+          <ul>
+            <li>
+              Archetype ストレージの内部実装は
+              <code>{ Vec&lt;A&gt;, Vec&lt;B&gt;, .. }</code> のような形です
+              (SoA: struct of arrays)
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>Entity</code> に対する component
+          の追加・削除に高速で対応するためキャッシュを作ります。
+        </li>
+      </ul>
 
-<div id="org013a05a" class="figure">
-<p><img src="./img/2023-12-toecs-archetype-storage.png" alt="2023-12-toecs-archetype-storage.png"><br>
-</p>
-</div>
+      <p>
+        実際、 archetype ベースの ECS
+        <a href="https://github.com/Ralith/hecs">hecs</a> の
+        <code>World</code> は以下のような構造体です:
+      </p>
 
-<ul class="org-ul">
-<li>Component セット毎に archetype ストレージを作成します<br>
-<ul class="org-ul">
-<li>Archetype ストレージの内部実装は <code>{ Vec&lt;A&gt;, Vec&lt;B&gt;, .. }</code> のような形です (SoA: struct of arrays)<br></li>
-</ul></li>
-<li><code>Entity</code> に対する component の追加・削除に高速で対応するためキャッシュを作ります。<br></li>
-</ul>
-
-<p>
-実際、 archetype ベースの ECS <a href="https://github.com/Ralith/hecs">hecs</a> の <code>World</code> は以下のような構造体です:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-rust">pub struct World {
+      <div class="org-src-container">
+        <pre><code class="src language-rust">pub struct World {
     entities: Entities,
     archetypes: ArchetypeSet,
     bundle_to_archetype: TypeIdMap&lt;u32&gt;,
@@ -87,167 +136,194 @@
     id: u64,
 }
 </code></pre>
-</div>
-</div>
-</div>
+      </div>
 
-<div id="outline-container-orge42174d" class="outline-3">
-<h3 id="orge42174d"><a href="#orge42174d">実装 3: <code>SparseSet&lt;T&gt;</code></a></h3>
-<div class="outline-text-3" id="text-orge42174d">
-<blockquote>
-<p>
-<a href="https://zenn.dev/toyboot4e/books/making-toy-ecs">Zenn の投稿</a> の焼き直しです。詳しい解説ではなく、内容が伝わらないと思いますので、改稿を考えています。<br>
-</p>
-</blockquote>
+      <h3 id="実装 3: SparseSet<T>">
+        <a href="#実装 3: SparseSet<T>"
+          >実装 3: <code>SparseSet&lt;T&gt;</code></a
+        >
+      </h3>
+      <blockquote>
+        <p>
+          <a href="https://zenn.dev/toyboot4e/books/making-toy-ecs"
+            >Zenn の投稿</a
+          >
+          の焼き直しです。詳しい解説ではなく、内容が伝わらないと思いますので、改稿を考えています。
+        </p>
+      </blockquote>
 
-<p>
-コンポーネント配列を <code>Vec&lt;Option&lt;T&gt;&gt;</code> にすると、空のコンポーネントスロットが大量にメモリを占領するかもしれません。またイテレーションの効率も落ちます。<br>
-</p>
+      <p>
+        コンポーネント配列を
+        <code>Vec&lt;Option&lt;T&gt;&gt;</code>
+        にすると、空のコンポーネントスロットが大量にメモリを占領するかもしれません。またイテレーションの効率も落ちます。
+      </p>
 
-<blockquote>
-<p>
-空きスロットがあるとキャッシュミスが増えます。また密で連続な配列に対するループは SIMD になる可能性があるそうです。<br>
-</p>
-</blockquote>
+      <blockquote>
+        <p>
+          空きスロットがあるとキャッシュミスが増えます。また密で連続な配列に対するループは
+          SIMD になる可能性があるそうです。
+        </p>
+      </blockquote>
 
-<p>
-そこで <code>SparseSet&lt;T&gt;</code> においては、コンポーネント配列を連続した配列に入れます (<code>Vec&lt;T&gt;</code>) 。また <code>Entity</code> からコンポーネント配列への添字アクセスの間接層を追加します (<code>Vec&lt;Option&lt;DenseIndex&gt;&gt;</code>):<br>
-</p>
+      <p>
+        そこで
+        <code>SparseSet&lt;T&gt;</code>
+        においては、コンポーネント配列を連続した配列に入れます
+        (<code>Vec&lt;T&gt;</code>) 。また
+        <code>Entity</code>
+        からコンポーネント配列への添字アクセスの間接層を追加します
+        (<code>Vec&lt;Option&lt;DenseIndex&gt;&gt;</code>):
+      </p>
 
+      <p>
+        <img
+          src="./img/2023-12-toecs-sparse-set.png"
+          alt="2023-12-toecs-sparse-set.png"
+        />
+      </p>
 
-<div id="orgc7e52a3" class="figure">
-<p><img src="./img/2023-12-toecs-sparse-set.png" alt="2023-12-toecs-sparse-set.png"><br>
-</p>
-</div>
+      <p>より詳しく実装を解説します。</p>
 
-<p>
-より詳しく実装を解説します。<br>
-</p>
-</div>
+      <h4 id="世代番号"><a href="#世代番号">世代番号</a></h4>
+      <p><code>Entity</code> は、いわゆる generational index です:</p>
 
-<div id="outline-container-org5e022b9" class="outline-4">
-<h4 id="org5e022b9"><a href="#org5e022b9">世代番号</a></h4>
-<div class="outline-text-4" id="text-org5e022b9">
-<p>
-<code>Entity</code> は、いわゆる generational index です:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-rust">pub struct Entity {
+      <div class="org-src-container">
+        <pre><code class="src language-rust">pub struct Entity {
     raw_index: u32,
     generation: u32,
 }
 </code></pre>
-</div>
+      </div>
 
-<p>
-<code>Entity</code> を削除する度、スロットの世代番号がインクリメントされます。削除された <code>Entity</code> は古い世代番号を持っているため、無効な <code>Entity</code> として扱われます。<br>
-</p>
-</div>
-</div>
+      <p>
+        <code>Entity</code>
+        を削除する度、スロットの世代番号がインクリメントされます。削除された
+        <code>Entity</code> は古い世代番号を持っているため、無効な
+        <code>Entity</code> として扱われます。
+      </p>
 
-<div id="outline-container-org115ab64" class="outline-4">
-<h4 id="org115ab64"><a href="#org115ab64">グルーピング処理</a></h4>
-<div class="outline-text-4" id="text-org115ab64">
-<p>
-<code>SparseSet&lt;T&gt;</code> から要素を取得するメソッドは 2 つです:<br>
-</p>
+      <h4 id="グルーピング処理">
+        <a href="#グルーピング処理">グルーピング処理</a>
+      </h4>
+      <p>
+        <code>SparseSet&lt;T&gt;</code> から要素を取得するメソッドは 2 つです:
+      </p>
 
-<ul class="org-ul">
-<li><code>fn get_by_sparse(&amp;self, entity: Entity) -&gt; Option&lt;&amp;T&gt;</code><br>
-<code>Entity</code> 経由のアクセス (<code>SparseIndex</code> 経由のアクセス) です。こちらは低速です。<br></li>
-<li><code>fn get_by_dense(&amp;self, dense: DenseIndex) -&gt; Option&lt;&amp;T&gt;</code><br>
-生配列経由のアクセスです。こちらは最速です。<br></li>
-</ul>
+      <ul>
+        <li>
+          <code
+            >fn get_by_sparse(&amp;self, entity: Entity) -&gt;
+            Option&lt;&amp;T&gt;</code
+          >
+          <code>Entity</code> 経由のアクセス (<code>SparseIndex</code>
+          経由のアクセス) です。こちらは低速です。
+        </li>
+        <li>
+          <code
+            >fn get_by_dense(&amp;self, dense: DenseIndex) -&gt;
+            Option&lt;&amp;T&gt;</code
+          >
+          生配列経由のアクセスです。こちらは最速です。
+        </li>
+      </ul>
 
-<p>
-<code>Entity</code> 経由のアクセスは添字のマッピングを経由するため、メモリ局所性が落ちてしまいます。最速でイテレーションするためには、『グループ』という仕組みを使います。グループ化された <code>Entity</code> のコンポーネントには、すべて共通の <code>DenseIndex</code> からアクセスできます:<br>
-</p>
+      <p>
+        <code>Entity</code>
+        経由のアクセスは添字のマッピングを経由するため、メモリ局所性が落ちてしまいます。最速でイテレーションするためには、『グループ』という仕組みを使います。グループ化された
+        <code>Entity</code> のコンポーネントには、すべて共通の
+        <code>DenseIndex</code> からアクセスできます:
+      </p>
 
+      <p>
+        <img
+          src="./img/2023-12-toecs-groups.png"
+          alt="2023-12-toecs-groups.png"
+        />
+      </p>
 
-<div id="org02f6900" class="figure">
-<p><img src="./img/2023-12-toecs-groups.png" alt="2023-12-toecs-groups.png"><br>
-</p>
-</div>
+      <p>
+        これは <code>Entity</code> を削除したり、
+        <code>Entity</code>
+        にコンポーネントを追加・削除する際のグループの更新処理で実現されます:
+      </p>
 
-<p>
-これは <code>Entity</code> を削除したり、 <code>Entity</code> にコンポーネントを追加・削除する際のグループの更新処理で実現されます:<br>
-</p>
+      <p>
+        <img
+          src="./img/2023-12-toecs-group-sync.png"
+          alt="2023-12-toecs-group-sync.png"
+        />
+      </p>
 
+      <p>
+        <img
+          src="./img/2023-12-toecs-group-unsync.png"
+          alt="2023-12-toecs-group-unsync.png"
+        />
+      </p>
 
-<div id="org764acd4" class="figure">
-<p><img src="./img/2023-12-toecs-group-sync.png" alt="2023-12-toecs-group-sync.png"><br>
-</p>
-</div>
+      <h4 id="Entity の挿入と削除について">
+        <a href="#Entity の挿入と削除について"
+          ><code>Entity</code> の挿入と削除について</a
+        >
+      </h4>
+      <p>
+        空きスロットの連結リストを管理すると、
+        <code>Entity</code> の挿入を\(O(1)\) の処理にできます。
+      </p>
 
+      <p>例として以下の初期状態を考えます:</p>
 
-<div id="org3b8e069" class="figure">
-<p><img src="./img/2023-12-toecs-group-unsync.png" alt="2023-12-toecs-group-unsync.png"><br>
-</p>
-</div>
-</div>
-</div>
+      <p>
+        <img
+          src="./img/2023-12-toecs-free-slot.png"
+          alt="2023-12-toecs-free-slot.png"
+        />
+      </p>
 
-<div id="outline-container-org7e8751c" class="outline-4">
-<h4 id="org7e8751c"><a href="#org7e8751c"><code>Entity</code> の挿入と削除について</a></h4>
-<div class="outline-text-4" id="text-org7e8751c">
-<p>
-空きスロットの連結リストを管理すると、 <code>Entity</code> の挿入を\(O(1)\) の処理にできます。<br>
-</p>
+      <p>初期状態からデータを追加した後は:</p>
 
-<p>
-例として以下の初期状態を考えます:<br>
-</p>
+      <p>
+        <img
+          src="./img/2023-12-toecs-free-slot-insert.png"
+          alt="2023-12-toecs-free-slot-insert.png"
+        />
+      </p>
 
+      <p>初期状態からデータを削除した後は:</p>
 
-<div id="org2df92f2" class="figure">
-<p><img src="./img/2023-12-toecs-free-slot.png" alt="2023-12-toecs-free-slot.png"><br>
-</p>
-</div>
+      <p>
+        <img
+          src="./img/2023-12-toecs-free-slot-remove.png"
+          alt="2023-12-toecs-free-slot-remove.png"
+        />
+      </p>
 
-<p>
-初期状態からデータを追加した後は:<br>
-</p>
+      <h4 id="Entity の削除について">
+        <a href="#Entity の削除について"><code>Entity</code> の削除について</a>
+      </h4>
+      <p>
+        Rust の <code>Vec::remove</code> は要素のシフトを起こす \(O(n)\)
+        の処理です。
+        <code>Vec::swap_remove</code>
+        は、末尾の要素と入れ替えてから削除しますから \(O(1)\) の処理で済みます。
+      </p>
 
+      <p>
+        また先ほどのグループの更新処理のため、コンポーネントの追加・削除処理は別種のコンポーネント配列も書き換えることになります。そのため
+        <code>Entity</code> やコンポーネントの追加には
+        <code>&amp;mut World</code> を要求するのが無難です。
+      </p>
 
-<div id="org1f022ea" class="figure">
-<p><img src="./img/2023-12-toecs-free-slot-insert.png" alt="2023-12-toecs-free-slot-insert.png"><br>
-</p>
-</div>
-
-<p>
-初期状態からデータを削除した後は:<br>
-</p>
-
-
-<div id="org23fe91b" class="figure">
-<p><img src="./img/2023-12-toecs-free-slot-remove.png" alt="2023-12-toecs-free-slot-remove.png"><br>
-</p>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org824d3b3" class="outline-4">
-<h4 id="org824d3b3"><a href="#org824d3b3"><code>Entity</code> の削除について</a></h4>
-<div class="outline-text-4" id="text-org824d3b3">
-<p>
-Rust の <code>Vec::remove</code> は要素のシフトを起こす \(O(n)\) の処理です。 <code>Vec::swap_remove</code> は、末尾の要素と入れ替えてから削除しますから \(O(1)\) の処理で済みます。<br>
-</p>
-
-<p>
-また先ほどのグループの更新処理のため、コンポーネントの追加・削除処理は別種のコンポーネント配列も書き換えることになります。そのため <code>Entity</code> やコンポーネントの追加には <code>&amp;mut World</code> を要求するのが無難です。<br>
-</p>
-</div>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org3f0335c" class="outline-2">
-<h2 id="org3f0335c"><a href="#org3f0335c">まとめ</a></h2>
-<div class="outline-text-2" id="text-org3f0335c">
-<p>
-ざっと解説しましたが、あまりにも粗い説明だったと思います。時間があるときに書き直したいです。<br>
-</p>
-</div>
-</div>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
+      <p>
+        ざっと解説しましたが、あまりにも粗い説明だったと思います。時間があるときに書き直したいです。
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div>
+        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </div>
+    </footer>
+  </body>
+</html>

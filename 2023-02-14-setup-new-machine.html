@@ -1,184 +1,236 @@
 <!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>25 万円の PC 組み立て - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="style/simple.min.css"/><link rel="stylesheet" href="style/style.css"/><link rel="stylesheet" href="style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>25 万円の PC 組み立て</h1><p>Feb 14, 2023</p><nav role="navigation"><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main"><p>
-前回購入した PC パーツが届きました。 PC を組み立てて Linux 環境を整えます。<br>
-</p>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>25 万円の PC 組み立て - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="style/simple.min.css" />
+    <link rel="stylesheet" href="style/style.css" />
+    <link rel="stylesheet" href="style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>25 万円の PC 組み立て</h1>
+      <p>Feb 14, 2023</p>
+      <nav role="navigation">
+        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <p>
+        前回購入した PC パーツが届きました。 PC を組み立てて Linux
+        環境を整えます。
+      </p>
 
-<p>
-贅沢最高！<br>
-</p>
+      <p>贅沢最高！</p>
 
-<div id="outline-container-org6874887" class="outline-2">
-<h2 id="org6874887"><a href="#org6874887">準備</a></h2>
-<div class="outline-text-2" id="text-org6874887">
-<p>
-少し買い物をします。<br>
-</p>
+      <h2 id="準備"><a href="#準備">準備</a></h2>
+      <p>少し買い物をします。</p>
 
-<ul class="org-ul">
-<li>ドライバ<br>
-<ol class="org-ol">
-<li>普通のプラスドライバ<br></li>
-<li>精密ドライバ (M.2 SSD の装着に)<br></li>
-</ol></li>
+      <ul>
+        <li>
+          ドライバ
+          <ol>
+            <li>普通のプラスドライバ</li>
+            <li>精密ドライバ (M.2 SSD の装着に)</li>
+          </ol>
+        </li>
 
-<li>USB<br>
-<ol class="org-ol">
-<li>Linux の起動ディスク用 (<a href="https://nixos.org/">NixOS</a> を入れます)<br></li>
-<li>データの移動用 (マザーボードの BIOS 更新ファイルなど)<br></li>
-</ol></li>
-</ul>
-</div>
-</div>
+        <li>
+          USB
+          <ol>
+            <li>
+              Linux の起動ディスク用 (<a href="https://nixos.org/">NixOS</a>
+              を入れます)
+            </li>
+            <li>データの移動用 (マザーボードの BIOS 更新ファイルなど)</li>
+          </ol>
+        </li>
+      </ul>
 
-<div id="outline-container-orga2764e7" class="outline-2">
-<h2 id="orga2764e7"><a href="#orga2764e7">新環境構築</a></h2>
-<div class="outline-text-2" id="text-orga2764e7">
-<p>
-届いたのはダンボール 2 箱で、一方には PC ケースが、もう一方にはパーツ類が入っています。どちらも電子レンジより軽い！　気軽に所有できそうです。<br>
-</p>
-</div>
+      <h2 id="新環境構築"><a href="#新環境構築">新環境構築</a></h2>
+      <p>
+        届いたのはダンボール 2 箱で、一方には PC
+        ケースが、もう一方にはパーツ類が入っています。どちらも電子レンジより軽い！　気軽に所有できそうです。
+      </p>
 
-<div id="outline-container-org147f271" class="outline-3">
-<h3 id="org147f271"><a href="#org147f271">PC 組み立て・起動</a></h3>
-<div class="outline-text-3" id="text-org147f271">
-<p>
-組み立て手順は <a href="https://www.dospara.co.jp/5info/cts_pc_setup.html">ドスパラの組み立てマニュアル</a> に従いました。細かい方法は製品付属の説明書を参照します。あらゆる過程で引っかかったので、組み立てだけで 5 時間以上かかりました。<br>
-</p>
+      <h3 id="PC 組み立て・起動">
+        <a href="#PC 組み立て・起動">PC 組み立て・起動</a>
+      </h3>
+      <p>
+        組み立て手順は
+        <a href="https://www.dospara.co.jp/5info/cts_pc_setup.html"
+          >ドスパラの組み立てマニュアル</a
+        >
+        に従いました。細かい方法は製品付属の説明書を参照します。あらゆる過程で引っかかったので、組み立てだけで
+        5 時間以上かかりました。
+      </p>
 
-<p>
-絶望ポイントを抜粋します:<br>
-</p>
+      <p>絶望ポイントを抜粋します:</p>
 
-<ol class="org-ol">
-<li>CPU 装着の向きが分からない<br></li>
-<li>CPU ファンの固定台がマザーボードに取り付けられない<br></li>
-<li>M.2 SSD 装着のための精密ドライバが無い<br></li>
-<li>GPU とマザーボードの接続方法が分からない<br></li>
-<li>配線のやり方が分からない<br></li>
-<li>電源が付かない<br></li>
-<li>映像が出ない<br></li>
-<li>Bluetooth が繋がらない<br></li>
-</ol>
+      <ol>
+        <li>CPU 装着の向きが分からない</li>
+        <li>CPU ファンの固定台がマザーボードに取り付けられない</li>
+        <li>M.2 SSD 装着のための精密ドライバが無い</li>
+        <li>GPU とマザーボードの接続方法が分からない</li>
+        <li>配線のやり方が分からない</li>
+        <li>電源が付かない</li>
+        <li>映像が出ない</li>
+        <li>Bluetooth が繋がらない</li>
+      </ol>
 
-<details><summary>対策</summary>
-<ol class="org-ol">
-<li>持ち上げた蓋の方に印がありました。<br></li>
-<li>台の足を広げれば良かったです。<br></li>
-<li>大きなドライバで M.2 SSD を装着しました。ネジ穴を潰しそうになりました。<br></li>
-<li>ケースへの取り付けとマザーボードへの取り付けが同時でした。<br></li>
-<li>電源から各パーツにケーブルを繋ぐだけでした。<br></li>
-<li>フロントパネルの電源ボタンを押していませんでした。<br></li>
-<li>GPU を取り外すと映像が出ました。また BIOS を更新すると GPU から映像を出せるようになりました。謎です。<br></li>
-<li>マザーボード付属のアンテナを付けていませんでした。<br></li>
-</ol>
-</details>
+      <details>
+        <summary>対策</summary>
+        <ol>
+          <li>持ち上げた蓋の方に印がありました。</li>
+          <li>台の足を広げれば良かったです。</li>
+          <li>
+            大きなドライバで M.2 SSD
+            を装着しました。ネジ穴を潰しそうになりました。
+          </li>
+          <li>ケースへの取り付けとマザーボードへの取り付けが同時でした。</li>
+          <li>電源から各パーツにケーブルを繋ぐだけでした。</li>
+          <li>フロントパネルの電源ボタンを押していませんでした。</li>
+          <li>
+            GPU を取り外すと映像が出ました。また BIOS を更新すると GPU
+            から映像を出せるようになりました。謎です。
+          </li>
+          <li>マザーボード付属のアンテナを付けていませんでした。</li>
+        </ol>
+      </details>
 
-<p>
-ずいぶん苦労しましたが、次からはスムーズになると思います。<br>
-</p>
-</div>
-</div>
+      <p>ずいぶん苦労しましたが、次からはスムーズになると思います。</p>
 
-<div id="outline-container-org58c7a1d" class="outline-3">
-<h3 id="org58c7a1d"><a href="#org58c7a1d">BIOS の設定</a></h3>
-<div class="outline-text-3" id="text-org58c7a1d">
-<p>
-起動後、 BIOS を更新・設定変更します。<br>
-</p>
+      <h3 id="BIOS の設定"><a href="#BIOS の設定">BIOS の設定</a></h3>
+      <p>起動後、 BIOS を更新・設定変更します。</p>
 
-<ul class="org-ul">
-<li>BIOS の更新<br>
-<a href="https://jp.msi.com/support/technical_details/MB_BIOS_Update">MSI マザーボードの BIOS 更新方法</a> を参考に M-Flash を実施しました。<br></li>
+      <ul>
+        <li>
+          BIOS の更新
+          <a href="https://jp.msi.com/support/technical_details/MB_BIOS_Update"
+            >MSI マザーボードの BIOS 更新方法</a
+          >
+          を参考に M-Flash を実施しました。
+        </li>
 
-<li>USB ブートの有効化<br>
-インストールディスク (USB) から起動できるように設定します。<br></li>
+        <li>
+          USB ブートの有効化 インストールディスク (USB)
+          から起動できるように設定します。
+        </li>
 
-<li>Secure boot の無効化<br>
-インストールディスクには UEFI の署名が無いとかで、一時的に secure boot を無効にする必要がありました。<br></li>
-</ul>
-</div>
-</div>
+        <li>
+          Secure boot の無効化 インストールディスクには UEFI
+          の署名が無いとかで、一時的に secure boot
+          を無効にする必要がありました。
+        </li>
+      </ul>
 
-<div id="outline-container-org316f81d" class="outline-3">
-<h3 id="org316f81d"><a href="#org316f81d">NixOS のセットアップ</a></h3>
-<div class="outline-text-3" id="text-org316f81d">
-</div>
-<div id="outline-container-orgb14ffeb" class="outline-4">
-<h4 id="orgb14ffeb"><a href="#orgb14ffeb">主なリソース</a></h4>
-<div class="outline-text-4" id="text-orgb14ffeb">
-<p>
-公式マニュアルや Youtube が詳しいので、インストールまではあまり困りません。 <code>/etc/nixos/configuration.nix</code> を編集し、 OS の設定をします。<br>
-</p>
+      <h3 id="NixOS のセットアップ">
+        <a href="#NixOS のセットアップ">NixOS のセットアップ</a>
+      </h3>
+      <h4 id="主なリソース"><a href="#主なリソース">主なリソース</a></h4>
+      <p>
+        公式マニュアルや Youtube
+        が詳しいので、インストールまではあまり困りません。
+        <code>/etc/nixos/configuration.nix</code> を編集し、 OS の設定をします。
+      </p>
 
-<ul class="org-ul">
-<li><a href="https://nixos.org/manual/nixos/stable/">NixOS manual</a><br></li>
-<li><a href="https://github.com/MatthiasBenaets/nixos-config">MatthiasBenaets / nixos-config</a><br></li>
-</ul>
-</div>
-</div>
+      <ul>
+        <li>
+          <a href="https://nixos.org/manual/nixos/stable/">NixOS manual</a>
+        </li>
+        <li>
+          <a href="https://github.com/MatthiasBenaets/nixos-config"
+            >MatthiasBenaets / nixos-config</a
+          >
+        </li>
+      </ul>
 
-<div id="outline-container-orgf3a8f6b" class="outline-4">
-<h4 id="orgf3a8f6b"><a href="#orgf3a8f6b">主な設定</a></h4>
-<div class="outline-text-4" id="text-orgf3a8f6b">
-<p>
-ベター Ubuntu のつもりで無難に設定しましたが、中々思い通りにはなりません。たとえば Kitty ターミナルで日本語入力するには、 <code>fcitx5</code> を有効にする必要がありますが、まだ成功していません。<br>
-</p>
+      <h4 id="主な設定"><a href="#主な設定">主な設定</a></h4>
+      <p>
+        ベター Ubuntu
+        のつもりで無難に設定しましたが、中々思い通りにはなりません。たとえば
+        Kitty ターミナルで日本語入力するには、
+        <code>fcitx5</code> を有効にする必要がありますが、まだ成功していません。
+      </p>
 
+      <p><img src="./img/2023-02-neofetch.png" alt="2023-02-neofetch.png" /></p>
 
-<div id="org5c9f86b" class="figure">
-<p><img src="./img/2023-02-neofetch.png" alt="2023-02-neofetch.png"><br>
-</p>
-<p><span class="figure-number">Figure 1: </span><code>neofetch</code></p>
-</div>
-</div>
-</div>
+      <h4 id="SSD の破損"><a href="#SSD の破損">SSD の破損</a></h4>
+      <p>
+        3D ゲームをプレイしていたら、 SSD が二度と起動しなくなりました。 2 回
+        NixOS をインストールすることになるとは……！　10
+        日ぐらい設定に忙殺されて、まともに眠れませんでした。
+      </p>
 
-<div id="outline-container-org8e33764" class="outline-4">
-<h4 id="org8e33764"><a href="#org8e33764">SSD の破損</a></h4>
-<div class="outline-text-4" id="text-org8e33764">
-<p>
-3D ゲームをプレイしていたら、 SSD が二度と起動しなくなりました。 2 回 NixOS をインストールすることになるとは……！　10 日ぐらい設定に忙殺されて、まともに眠れませんでした。<br>
-</p>
-</div>
-</div>
+      <h4 id="開発環境構築"><a href="#開発環境構築">開発環境構築</a></h4>
+      <p>
+        NixOS
+        には独自の制限があり、整備されたレール以外は途端に難しくなります。たとえばグローバルインストールは基本できませんし、ライブラリのリンクには
+        <code>shell.nix</code> や <code>default.nix</code> が必要です。
+      </p>
 
-<div id="outline-container-orgc7e8081" class="outline-4">
-<h4 id="orgc7e8081"><a href="#orgc7e8081">開発環境構築</a></h4>
-<div class="outline-text-4" id="text-orgc7e8081">
-<p>
-NixOS には独自の制限があり、整備されたレール以外は途端に難しくなります。たとえばグローバルインストールは基本できませんし、ライブラリのリンクには <code>shell.nix</code> や <code>default.nix</code> が必要です。<br>
-</p>
+      <p>
+        まずは制限を把握するところからですね。現在は、急場凌ぎで以下の環境を使用しています。
+      </p>
 
-<p>
-まずは制限を把握するところからですね。現在は、急場凌ぎで以下の環境を使用しています。<br>
-</p>
+      <ul>
+        <li>
+          Haskell (競プロ環境)<br />
+          <code>ghcup</code> が利用できません。また <code>nixpkgs</code> には
+          <code>ghc883</code> が無いので、 GHC 8.8.4 を使って凌いでいます。
+        </li>
 
-<ul class="org-ul">
-<li>Haskell (競プロ環境)<br>
-<code>ghcup</code> が利用できません。また <code>nixpkgs</code> には <code>ghc883</code> が無いので、 GHC 8.8.4 を使って凌いでいます。<br></li>
+        <li>
+          Rust (ゲーム開発)<br />
+          <code>rustup</code> が利用できません。ただ
+          <a href="https://github.com/nix-community/fenix">fenix</a>
+          を使えば、ほぼグローバルインストールになりました。リンクには
+          <a
+            href="https://github.com/bevyengine/bevy/blob/d2963267ba632a1b845aa843370f170f85633b13/docs/linux_dependencies.md#nix"
+            >Bevy Engine の <code>shell.nix</code></a
+          >
+          を参考にし、
+          <a href="https://github.com/nix-community/nix-direnv">nix-direnv</a>
+          で <code>PATH</code> に入れます。
+          <a href="https://bevyengine.org/learn/book/getting-started/setup/"
+            >リンカーを LLD に変更する</a
+          >
+          のも忘れずに。
+          <a href="https://github.com/mozilla/sccache">sccache</a>
+          の代わりは、まだ候補を絞れていません。
+        </li>
+      </ul>
 
-<li>Rust (ゲーム開発)<br>
-<code>rustup</code> が利用できません。ただ <a href="https://github.com/nix-community/fenix">fenix</a> を使えば、ほぼグローバルインストールになりました。リンクには <a href="https://github.com/bevyengine/bevy/blob/d2963267ba632a1b845aa843370f170f85633b13/docs/linux_dependencies.md#nix">Bevy Engine の <code>shell.nix</code></a> を参考にし、 <a href="https://github.com/nix-community/nix-direnv">nix-direnv</a> で <code>PATH</code> に入れます。 <a href="https://bevyengine.org/learn/book/getting-started/setup/">リンカーを LLD に変更する</a> のも忘れずに。 <a href="https://github.com/mozilla/sccache">sccache</a> の代わりは、まだ候補を絞れていません。<br></li>
-</ul>
-</div>
-</div>
-</div>
-</div>
+      <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
+      <p>
+        さすが高スペック PC, ビルドが速い！　1 日が 24.5
+        時間になったかのようです。エディタの起動すら高速になりました。モニタを買い足せば、もっと快適になるでしょう。
+      </p>
 
-<div id="outline-container-orge160903" class="outline-2">
-<h2 id="orge160903"><a href="#orge160903">まとめ</a></h2>
-<div class="outline-text-2" id="text-orge160903">
-<p>
-さすが高スペック PC, ビルドが速い！　1 日が 24.5 時間になったかのようです。エディタの起動すら高速になりました。モニタを買い足せば、もっと快適になるでしょう。<br>
-</p>
+      <p>
+        MBP がクラムシェルから解放されました。 iPad は便利ですが、 mac
+        はさらに便利です。 mac を手に入れ直したような気分にもなりました。
+      </p>
 
-<p>
-MBP がクラムシェルから解放されました。 iPad は便利ですが、 mac はさらに便利です。 mac を手に入れ直したような気分にもなりました。<br>
-</p>
-
-<p>
-さらに 15 インチのサブモニタ、および Kindle Scribe をアームで宙に置いています。贅沢のカンストが見えてきました。<br>
-</p>
-</div>
-</div>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>
+        さらに 15 インチのサブモニタ、および Kindle Scribe
+        をアームで宙に置いています。贅沢のカンストが見えてきました。
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div>
+        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </div>
+    </footer>
+  </body>
+</html>
