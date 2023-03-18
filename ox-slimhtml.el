@@ -36,7 +36,7 @@
 ;; - `ox-slimhtml-bold': Use `<code>' tag for =verbatim=s.
 ;; - `ox-slimhtml-headline': Give constant IDs and to create hyperlinks.
 ;; - `ox-slimhtml-headline': Respect `:org-html-toplevel-hlevel', which is not the
-;;   default option of `ox-slimthml'.
+;;   default option of `ox-slimthml'. Do not downgrade low level headings to lists.
 ;; - `ox-slimhtml' backend: derive `ox-html' backend, mainly for tables.
 ;; - `ox-slimhtml-link': Supply default content
 ;; --------------------------------------------------------------------------------
@@ -130,13 +130,13 @@ INFO is a plist holding contextual information."
     (concat
      (when (and container (not (string= "" container)))
        (format "<%s%s>" container (if container-class (format " class=\"%s\"" container-class) "")))
-     (if (not (org-export-low-level-p headline info))
+     ;; (if (not (org-export-low-level-p headline info))
          ;; (format "<h%d%s>%s</h%d>%s" level (or attributes "") text level (or contents ""))
          (format "<h%d%s id=\"%s\"><a href=\"#%s\">%s</a></h%d>%s" level (or attributes "") idText idText text level (or contents ""))
-       (concat
-        (when (org-export-first-sibling-p headline info) "<ul>")
-        (format "<li>%s%s</li>" text (or contents ""))
-        (when (org-export-last-sibling-p headline info) "</ul>")))
+       ;; (concat
+       ;;  (when (org-export-first-sibling-p headline info) "<ul>")
+       ;;  (format "<li>%s%s</li>" text (or contents ""))
+       ;;  (when (org-export-last-sibling-p headline info) "</ul>")))
      (when (and container (not (string= "" container)))
        (format "</%s>" (cl-subseq container 0 (cl-search " " container)))))))
 
@@ -518,7 +518,8 @@ Return output file name."
    ;; (inner-template . ox-slimhtml-inner-template)
    (italic . ox-slimhtml-italic)
    (item . org-html-item)
-   (link . ox-slimhtml-link)
+   ;; Allow image links:
+   ;; (link . ox-slimhtml-link)
    (paragraph . ox-slimhtml-paragraph)
    (plain-list . ox-slimhtml-plain-list)
    ;; Respect `org-export-preserve-breaks':
