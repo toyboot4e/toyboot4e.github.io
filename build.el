@@ -20,6 +20,8 @@
     ;; Prefer hardbreaks
     (setq org-export-preserve-breaks t)
 
+    ;; TODO: Evaluate code blocks with babel on export
+
     ;; TODO: prevent `org-export` from converting whitespaces to tabs
     (setq org-src-preserve-indentation t))
 

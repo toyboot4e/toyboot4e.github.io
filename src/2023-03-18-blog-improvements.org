@@ -1,0 +1,85 @@
+#+TITLE: =org-mode= 製ブログの改良
+#+DATE: <2023-03-18 Sat>
+
+* 背景
+
+[[./2022-10-09-org-mode-blog.html][前の投稿]] で作った =org-mode= 製 SSG を改良します。マイナな変更が多いです。
+
+* 改良点
+
+** 表現力の強化
+
+*** トップページ (sitemap)
+
+変更前は、日付が =<a>= タグの中にありました:
+
+#+attr_html: :width 407px
+[[./img/2023-03-sitemap-1.png]]
+
+変更後、日付を =<a>= タグから分離しました:
+
+#+attr_html: :width 407px
+[[./img/2023-03-sitemap-2.png]]
+
+*** 図
+
+ASCII から画像生成するツールを導入しました。 AsciiDoc でもお馴染みでした。
+
+**** [[https://ditaa.sourceforge.net/][ditaa]]
+
+# :exports results
+# https://orgmode.org/manual/Exporting-Code-Blocks.html
+
+#+BEGIN_SRC ditaa :file ./img/2023-03-ditaa.png :cmdline -r
++--------------+
+| Hello World! |
++--------------+
+#+END_SRC
+
+[[./img/2023-03-ditaa.png]]
+
+**** [[https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-plantuml.html][plantuml]]
+
+#+begin_src plantuml :file ./img/2023-03-plantuml.png
+Bob ->> Alice : Hello World!
+#+end_src
+
+[[./img//2023-03-plantuml.png]]
+
+**** [[https://graphviz.org/][graphviz]]
+
+#+BEGIN_SRC dot :file ./img/2023-03-graphvi.png
+strict graph {
+  a -- b
+  a -- b
+  b -- a [color=blue]
+}
+#+END_SRC
+
+[[./img/2023-03-graphvi.png]]
+
+用意しましたが、今後のブログで 1 回使うかどうか……。
+
+** html 出力を綺麗に
+
+*** =prettier= で html を整形する
+
+自分でも html の確認が楽になりました:
+
+#+begin_src sh
+$ npm install prettier
+$ npx prettier -- --write out/*.htm
+#+end_src
+
+*** =ox-slimhtml= を =ox-html= と併用する
+
+[[https://github.com/balddotcat/ox-slimhtml][ox-slimhtml]] は 500 行程度の html バックエンドです。 =ox-html= と比べてシンプルな html を吐くのが特徴的です。
+
+カスタマイズが簡単だったので、見出しの =id= タグを定数 (見出しの名前) に変更しました。ただ初期状態ではテーブルに対応していなかったため、 =ox-html= をベースに、一部のフィルタを =ox-slimhtml= で上書きする形に変更しました (=org-export-define-derived-backend=) 。
+
+* 感想
+
+最近の自作ブログ界隈 (?) では、既成の SSG を使うか、 [[https://matklad.github.io/][matklad]] 氏のように Deno で実装するのがイケている気がします。一方 =org-export= を使った場合、 =org-mode= の設定と SSG の調整を 1 つの言語で完結させられるのが良いです。
+
+結局必要な機能は多く無いので、何を使っても問題ありません。たまたま =org-export= を楽しめているのは、 Emacs を始めた利点の 1 つです。
+
