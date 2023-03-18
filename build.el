@@ -139,15 +139,18 @@
 ;; - Raw HTML can be embedded into SXML using `*RAW-STRING*'
 ;; - `org-export-data' returns document property
 
+;; NOTE: This is a hack for using `@@html .. @@' literal in sitemap entries:
+(push '("sitemap-date" . "@@html:<date class=\"sitemap-date\">$1</date>@@") org-export-global-macros)
+
 ;; Returns article link SXML in `Index.html'
 ;; - `entry' = path
 ;; - Thanks: `https://miikanissi.com/blog/website-with-emacs/'
 (defun my-org-sitemap-format-entry (entry style project)
     (cond ((not (directory-name-p entry))
            (let* ((date (org-publish-find-date entry project)))
-               (format "[[file:%s][%s: %s]]"
-                       entry
+               (format "{{{sitemap-date(%s)}}} [[file:%s][%s]]"
                        (format-time-string "%F" date)
+                       entry
                        (org-publish-find-title entry project))))
           ((eq style 'tree)
            ;; Return only last subdir.
