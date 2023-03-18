@@ -514,7 +514,8 @@ Return output file name."
    (export-block . ox-slimhtml-export-block)
    (export-snippet . ox-slimhtml-export-snippet)
    (headline . ox-slimhtml-headline)
-   (inner-template . ox-slimhtml-inner-template)
+   ;; Do not create `<div>' aggressively:
+   ;; (inner-template . ox-slimhtml-inner-template)
    (italic . ox-slimhtml-italic)
    (item . org-html-item)
    ;; (link . ox-slimhtml-link)
