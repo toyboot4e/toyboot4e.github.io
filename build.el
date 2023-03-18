@@ -4,10 +4,15 @@
 ;; - `https://systemcrafters.net/publishing-websites-with-org-mode/building-the-site/'
 ;; - `https://taingram.org/blog/org-mode-blog.html'
 ;; - `https://www.roygbyte.com/add_syntax_highlighting_to_an_org_publish_project.html'
+;; - `https://github.com/balddotcat/ox-slimhtml'
+
 
 ;; TODO: Custom admonition filter
 
 (setq make-backup-files nil)
+
+(setq my-base-backend 'slimhtml)
+;; (setq my-base-backend 'html)
 
 ;;; Preferences
 
@@ -37,6 +42,10 @@
     ;; Create HTML from S-expressions
     (package-install 'esxml)
     (require 'esxml)
+
+    ;; Local package downloaded from: `https://github.com/balddotcat/ox-slimhtml'
+    (add-to-list 'load-path (expand-file-name default-directory))
+    (require 'ox-slimhtml)
 
     ;; Use `<br>' rather than `<br />':
     (setq org-html-doctype "html5")
@@ -215,6 +224,7 @@
 ;;; Backend (filters)
 
 ;; Codeblock filter for `prism.js' support:
+;; `https://www.roygbyte.com/add_syntax_highlighting_to_an_org_publish_project.html'
 (defun roygbyte/org-html-src-block (src-block _contents info)
     "Transcode a SRC-BLOCK element from Org to HTML.
   CONTENTS holds the contents of the item.  INFO is a plist holding
@@ -259,15 +269,13 @@
 ;;; Backend (setup)
 
 ;; Set up `my-site-html' backend:
-(progn
-    (org-export-define-derived-backend
-     'my-site-html
-     'html ;; 'slimhtml
+(org-export-define-derived-backend
+        'my-site-html
+        my-base-backend
 
-     :translate-alist
-     '((template . my-org-html-template)
-       (src-block . roygbyte/org-html-src-block)))
-    )
+    :translate-alist
+    '((template . my-org-html-template)
+      (src-block . roygbyte/org-html-src-block)))
 
 (defun my-org-html-publish-to-html (plist filename pub-dir)
     "Publish an org file to HTML, using the FILENAME as the output directory."
