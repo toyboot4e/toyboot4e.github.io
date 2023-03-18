@@ -1,0 +1,234 @@
+#+TITLE: 開発中の 2D フレームワークについて
+#+DATE: <2022-12-11 Sun>
+
+[[https://qiita.com/advent-calendar/2022/mygameengine][GameEngineDev Advent Calendar 2022]] 11 日目の記事です。
+
+開発中の 2D フレームワークについて共有します。
+
+#+BEGIN_QUOTE
+『GameEngineDev』カレンダーの記事ですが、 2D フレームワークに関する投稿となります。スケールが落ちますがご了承ください 🙇
+#+END_QUOTE
+
+* 背景
+
+** 作っているもの
+
+開発中フレームワークの名前は =inkfs= 🦑 です。ライブラリを組み合わせた程度のものですから、経験者なら 2 週間程度で再現できるでしょう。
+
+#+ATTR_HTML: :width 391px
+#+CAPTION: 画像の配布元サイトへのリンクを後日追加します……
+[[./img/gfx/imguika_chan.gif]]
+
+ライブラリが担当するのはメディアの処理で、ウィンドウ・インプット・グラフィクス・テキスト・オーディオなどがあたります。その上の薄いレイヤが =inkfs= です。
+
+** ゲームエンジンとの違い
+
+『ゲームエンジン』は『フレームワーク』よりも大規模な開発が伴っている印象があります。アセット処理の GUI ツールが付属していたり、ブラウザやスマートフォンなど様々なプラットフォームに対応します。
+
+あるいは低レイヤ寄りのライブラリを自作していたら、『ゲームエンジン』に当たると思います。必要な知識も段違いです。そうした感覚がぼんやり共通されている気がします。
+
+* 主なモジュール
+
+=inkfs= 🦑 の主なモジュールを紹介します。
+
+** 1. ECS (Entity-Component-System)
+
+=inkfs= 🦑 は Rust でゲームを作るためのフレームワークです。
+
+Rust でゲームを作る際は、データの持ち方が重要です。たとえば、
+
+- グローバル変数\\
+  ゲーム開発に必要なグローバル変数は、描画コンテクストやゲームマップなどです。 Rust に継承はありませんから、コンポジションしようとなります。しかしデータのネストが深くなると、借用の分割も面倒です。
+
+- キャラデータ\\
+  ロボットや蝙蝠など、異なる種類のキャラクターデータを一括で処理したいことがあります。　=trait= で抽象するとポインタが増えますし、 =trait= の組み合わせでうまく表現できなくなる懸念があります。
+
+これらは Entity-Component-System を使うと一気に解決します。むしろ伝統的なゲームの作り方の方が Rust ではチャレンジングだったりします。
+
+** 2. Scene graph
+
+=inkfs= 🦑 のシーングラフは ECS の上に作っています。
+
+#+ATTR_HTML: :width 292px
+[[./img/gfx/ui-text.gif]]
+
+*** Renderable の共通コンポーネント
+
+どの rendearble も以下のコンポーネントを持ちます:
+
+- =Node=
+  親子関係の連結リストです。
+- =Transform= (=LocalTranform= + =GlobalTransform=)
+- =ZOrder=
+
+*** 様々な種類の renderable
+
+様々な renderable をコンポーネントで表現できます:
+
+- =Primitive=
+- =Sprite=
+- =NineSliceSprite=
+- =Text=, =RasterText=
+
+アニメーションも容易に表現できます。
+
+#+ATTR_HTML: :width 71px
+[[./img/gfx/dir-tween.gif]]
+
+*** ソート
+
+上の renderable は様々なデータに分かれていますが、頂点データに変えた後には同質のデータです。以下の =DrawCall= を作成後、 =z_order= でソートしてから描画しています:
+
+#+BEGIN_SRC rust
+pub struct DrawCall {
+    pub z_order: ZOrder,
+    pub verts_range: ops::Range<u32>,
+    pub tex_id: rgpu::Id<rgpu::Texture>,
+}
+#+END_SRC
+
+** 3. ウィンドウ・入力 (=sdl2=)
+
+#+ATTR_HTML: :width 753px
+[[./img/gfx/scale-bug.png]]
+
+*** 主なウィンドウのライブラリ
+
+ウィンドウ表示・入力処理のライブラリとしては SDL や GLFW が有名です。
+
+- SDL が最も安心な気がします。様々なサブモジュールが付属しますが、『ウィンドウ操作のシェル』のように扱うのが良いとされています。
+- GLFW は "GL" とありますが OpenGL 以外のユーザも使用できます。僕は使ったことがありません。
+- Rust 製のライブラリとしては =winit= もあります。以前は macOS での動きがあまりよく無かったのですが、最近の動向はどうなのか……
+
+*** 入力処理
+
+イベント駆動にするか、すべてのキー入力イベントを 1 つの =Input= オブジェクトに集約すると思います。僕は後者が好みです。
+
+=inkfs= 🦑 では主に [[https://github.com/FNA-XNA/FNA/tree/master/src/Input][FNA の Input モジュール]] を参考に、入力状態のダブルバッファを持っています。また『仮想キー』のモジュールを作り、『Enter または Space』のようなキーを定義できるようにしています。
+
+*** FPS カウンター
+
+[[https://techblog.kayac.com/approximate-average-fps][平均FPSを楽に近似する]] にある式を使うと簡単です。
+
+#+BEGIN_SRC
+僕はなぜか spike の計算が上手くいってないですが……
+#+END_SRC
+
+** 4. グラフィクス (=wgpu=)
+
+もくもく
+
+#+ATTR_HTML: :width 700px
+[[./img/gfx/fog-1.png]]
+
+やばい
+
+#+ATTR_HTML: :width 700px
+[[./img/gfx/fog-2.png]]
+
+[[https://github.com/gfx-rs/wgpu][wgpu]] は [[https://sotrh.github.io/learn-wgpu/][Learn Wgpu]] で見ると簡単なフレームワークのようですが、所有権が絡んで独自の制限がかかります。
+
+*** =wgpu::RenderPass<'w>= と借用ルール
+
+古典的な =SpriteBatch= は、頂点データの作成と描画関数の呼び出しを交互に行います。しかし =wgpu= を使っていると、まず頂点データを作成し、それから一気に描画関数を呼び出すという形になりがちです。
+
+#+BEGIN_QUOTE
+この方式は [[https://bevyengine.org/news/bevy-0-6/#pipelined-rendering-extract-prepare-queue-render][pipelined rendering]] に繋がります。
+#+END_QUOTE
+
+この方式に至るのは、 =wgpu::RenderPass<'w>= が =Drop= トレイトを実装するためです。この場合 [[https://doc.rust-lang.org/nomicon/dropck.html][Drop Check]] という強烈な制約がかかり、 =RenderPass= のメソッドの引数はすべて =RenderPass= を =Drop= するまで immutable になる……と思います。この制限下で伝統的な =SpriteBatch= をそのままポートするのはたぶん無理です。
+
+*** Bevy Engine から学んだこと
+
+=wgpu= の典型的な使い方は Bevy Engine から学べます:
+
+- =wgpu= のデータ型を共有ポインタにする
+- Pipelined rendering
+- デフォルトの =TextureFormat= の設定方法
+
+*** TODO
+
+- Uniform array
+  =wgpu= の uniform は immutable です。 1 フレームに uniform の更新を複数回実行すると、最後の更新が適用された後の unifrom がそのフレームで使用されます。複数の uniform を持つ方法として uniform array を使ってみたいと思うのですが‥‥
+
+- Texture array
+  Draw call を減らせそうなので気になっています。
+
+** 5. アセット管理
+
+同じテクスチャを 2 回ロードしないようする、そんなリソースのキャッシュを作成します。主に 2 種類の実装が思いつきます。
+
+*** 共有ポインタ方式
+
+共有ポインタ方式です。 Rust だと =Deref= にするのは無理で、毎回 =asset.get();= のような形で =&T= を復元します。
+
+*** インデクス方式
+
+アセットのユーザは、アセット配列へのインデクスを持つ形にします。毎回 =&assets[asset_handle]= のような形で =&T= を復元します。
+
+アセット配列をページ制にすれば、ほぼ immutable 配列として扱える気がしますが、詳細をみたことはありません。
+
+** 6. フォント描画
+
+*** 方法 1. SDF フォントを用いる
+
+[[https://github.com/Chlumsky/msdfgen][msdfgen]], [[https://github.com/Chlumsky/msdf-atlas-gen][msdf-atlas-gen]] にあるように、フォントの輪郭を画像データで表現し、シェーダで任意のサイズの文字の形を復元することができます。
+
+やってみました。
+
+[[./img/gfx/msdf-44-2.png]]
+
+完璧ですね。完璧にヨレヨレです。
+
+*** 方式 2. フォントテクスチャにラスタライズする
+
+MSDF が上手く行かなかったので、 TTF のフォントデータを元に、動的に文字の画像データを作ります。 Rust だと [[https://github.com/mooman219/fontdue][fontdue]] が定番です。
+
+それでは文字を表示してみましょう:
+
+[[./img/gfx/font_32px.png]]
+
+文字サイズを上げてみると:
+
+[[./img/gfx/font_64px.png]]
+
+急に馴れ馴れしい。フォントテクスチャが飽和した際は、フォントテクスチャをリサイズしなければなりません。
+
+*** マークアップテキスト
+
+=Markup with :b[bold] text.=
+
+[[./img/gfx/markup-bold.png]]
+
+=Keyboard key :kbd[x]!=
+
+[[./img/gfx/markup-kbd.png]]
+
+** 7. 開発者用 UI
+
+ImGUI の SDL サポートやレンダラを実装しました。
+
+[[./img/gfx/omgui.png]]
+
+すべてが間違っています。
+
+** その他
+
+*** ブラウザ対応、 Android 対応
+
+イベント駆動のゲームループやアセットの非同期ロードなどが必要になりようです。
+
+今の僕ではまったく力不足です。
+
+*** ホットリロードしたい
+
+したいのですが……
+
+*** コルーチンが欲しい
+
+欲しさのあまり、コルーチンを書くための言語を開発中です。 [[https://github.com/salsa-rs/salsa][salsa]] ベースで言語サーバの機能モリモリの予定です。
+
+* まとめ
+
+Rust で 2D フレームワークを作ってきましたが、他人が快適に使えるとは到底思えません。汎用の 2D フレームワークを作る人たちはとんでもないなと思います。
+
