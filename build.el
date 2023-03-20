@@ -105,6 +105,7 @@
                         :auto-sitemap t
                         :sitemap-filename "index.org"
                         :sitemap-title "toybeam"
+                        :sitemap-function my-org-sitemap-function
                         :sitemap-format-entry my-org-sitemap-format-entry
                         :sitemap-style list ;; list | tree
                         :sitemap-sort-files chronologically))
@@ -136,21 +137,17 @@
 
 ;;; Backend (HTML template)
 
-;; NOTE:
-;; - Generate XHTML from SXML using the `esxml' package
-;; - Raw HTML can be embedded into SXML using `*RAW-STRING*'
-;; - `org-export-data' returns document property
+(defun my-org-sitemap-function (title list)
+    (let* ((f (lambda (entry) (format "- %s" (car entry))))
+           (xs (mapconcat f (cdr list) "\n")))
+        (concat "#+TITLE: " title "\n\n"
+                "#+ATTR_HTML: :class sitemap" "\n"
+                xs)))
 
-;; NOTE: This is a hack for using `@@html .. @@' literal in sitemap entries:
-(push '("sitemap-date" . "@@html:<date class=\"sitemap-date\">$1</date>@@") org-export-global-macros)
-
-;; Returns article link SXML in `Index.html'
-;; - `entry' = path
-;; - Thanks: `https://miikanissi.com/blog/website-with-emacs/'
 (defun my-org-sitemap-format-entry (entry style project)
     (cond ((not (directory-name-p entry))
            (let* ((date (org-publish-find-date entry project)))
-               (format "{{{sitemap-date(%s)}}} [[file:%s][%s]]"
+               (format "@@html:<date>%s</date>@@ [[file:%s][%s]]"
                        (format-time-string "%F" date)
                        entry
                        (org-publish-find-title entry project))))
