@@ -520,7 +520,8 @@ Return output file name."
    (item . org-html-item)
    ;; Allow image links:
    ;; (link . ox-slimhtml-link)
-   (paragraph . ox-slimhtml-paragraph)
+   ;; Allow `#+CAPTION':
+   ;; (paragraph . ox-slimhtml-paragraph)
    (plain-list . ox-slimhtml-plain-list)
    ;; Respect `org-export-preserve-breaks':
    ;; (plain-text . ox-slimhtml-plain-text)
