@@ -280,16 +280,29 @@
                             (format "<pre><code class=\"src language-%s\"%s>%s</code></pre>"
                                     lang label code)))))))
 
+;; Ovewrite the wrap image function and remove `id' attribute for the `<figure>' tag:
+(defun org-html--wrap-image (contents info &optional caption label)
+    (let ((html5-fancy (org-html--html5-fancy-p info)))
+        (format (if html5-fancy "\n<figure>\n%s%s\n</figure>"
+	                "\n<div class=\"figure\">\n%s%s\n</div>")
+	            ;; NOTE: `id' attribute for `<figure>' is removed
+	            (if html5-fancy contents (format "<p>%s</p>" contents))
+	            (if (not (org-string-nw-p caption)) ""
+	                (format (if html5-fancy "\n<figcaption>%s</figcaption>"
+			                    "\n<p>%s</p>")
+		                    caption)))))
+
 ;;; Backend (setup)
 
 ;; Set up `my-site-html' backend:
 (org-export-define-derived-backend
-        'my-site-html
-        my-base-backend
+ 'my-site-html
+ my-base-backend
 
-    :translate-alist
-    '((template . my-org-html-template)
-      (src-block . roygbyte/org-html-src-block)))
+ :translate-alist
+ '((template . my-org-html-template)
+   (src-block . roygbyte/org-html-src-block)
+   ))
 
 (defun my-org-html-publish-to-html (plist filename pub-dir)
     "Publish an org file to HTML, using the FILENAME as the output directory."
