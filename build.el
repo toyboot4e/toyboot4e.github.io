@@ -91,34 +91,41 @@
 ;; See also: `https://orgmode.org/org.html#Publishing-options'
 (setq base-attrs
       ;; backquote and splice operator ,@: `https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html'
-      `(:base-directory "./src"
-                        :base-extension "org"
-                        :publishing-directory "./out"
-                        :recursive t
-                        ;; Custom function defined below
-                        :publishing-function my-org-html-publish-to-html
-                        :section-numbers nil
-                        :with-author nil
-                        :with-creator nil
-                        :with-toc nil
-                        ;; `index.html' generation:
-                        :auto-sitemap t
-                        :sitemap-filename "index.org"
-                        :sitemap-title "toybeam"
-                        :sitemap-function my-org-sitemap-function
-                        :sitemap-format-entry my-org-sitemap-format-entry
-                        :sitemap-style list ;; list | tree
-                        :sitemap-sort-files chronologically))
+      `(
+        :base-extension "org"
+        :publishing-directory "./out"
+        ;; :recursive t
+        ;; Custom function defined below
+        :publishing-function my-org-html-publish-to-html
+        :section-numbers nil
+        :with-author nil
+        :with-creator nil
+        :with-toc nil
+        ;; `index.html' generation:
+        :auto-sitemap t
+        :sitemap-filename "index.org"
+        :sitemap-title "toybeam"
+        :sitemap-function my-org-sitemap-function
+        :sitemap-format-entry my-org-sitemap-format-entry
+        ;; :sitemap-style list ;; list | tree
+        ;; REMARK: It doesn't take effect. See the sort in `my-org-sitemap-function'.
+        :sitemap-sort-files antichronologically))
 
 (setq org-publish-project-alist
       `(
         ;; build targets:
         ("release" :components ("static" "release-posts"))
-        ("draft" :components ("static" "draft-posts"))
+        ("draft" :components ("static" "release-posts" "draft-posts"))
 
         ;; components:
-        ("release-posts" ,@base-attrs :exclude ".*\.draft\.org")
-        ("draft-posts" ,@base-attrs)
+        ("release-posts" ,@base-attrs
+         :base-directory "./src/"
+         ;; :exclude ".*"
+         ;; :include ,(mapcar (lambda (x) (concat "./src/" x)) (directory-files "./src" nil "\\.org$"))
+         )
+        ("draft-posts" ,@base-attrs
+         :base-directory "./draft"
+         )
 
         ("static"
          :base-directory "./src"
@@ -139,7 +146,9 @@
 
 (defun my-org-sitemap-function (title list)
     (let* ((f (lambda (entry) (format "- %s" (car entry))))
-           (xs (mapconcat f (cdr list) "\n")))
+           ;; Alphabetical sort:
+           (list2 (sort (mapcar f (cdr list)) #'string<))
+           (xs (mapconcat 'identity list2 "\n")))
         (concat "#+TITLE: " title "\n\n"
                 "#+ATTR_HTML: :class sitemap" "\n"
                 xs)))
