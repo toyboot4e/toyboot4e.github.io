@@ -49,8 +49,11 @@
     (add-to-list 'load-path (expand-file-name default-directory))
     (require 'ox-slimhtml)
 
-    ;; Use `<br>' rather than `<br />':
+    ;; Use `<br>' rather than `<br />'.
     (setq org-html-doctype "html5")
+
+    ;; Prefer `<figure>' tag to <div>', etc.
+    (setq org-html-html5-fancy t)
 
     (require 'ox-publish))
 
@@ -109,7 +112,7 @@
         :sitemap-format-entry my-org-sitemap-format-entry
         ;; :sitemap-style list ;; list | tree
         ;; REMARK: It doesn't take effect. See the sort in `my-org-sitemap-function'.
-        :sitemap-sort-files antichronologically))
+        :sitemap-sort-files chronologically))
 
 (setq org-publish-project-alist
       `(
