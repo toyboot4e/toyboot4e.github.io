@@ -78,12 +78,12 @@
         <code>Entity</code> は添字に相当します:<br />
       </p>
 
-      <p>
+      <figure>
         <img
           src="./img/2023-12-toecs-big-array.png"
           alt="2023-12-toecs-big-array.png"
         /><br />
-      </p>
+      </figure>
 
       <p>
         それぞれのコンポーネントは optional ですから、
@@ -96,12 +96,12 @@
       </h3>
       <p>こちらは詳しくないため、図だけ載せます:<br /></p>
 
-      <p>
+      <figure>
         <img
           src="./img/2023-12-toecs-archetype-storage.png"
           alt="2023-12-toecs-archetype-storage.png"
         /><br />
-      </p>
+      </figure>
 
       <ul>
         <li>
@@ -175,12 +175,12 @@
         (<code>Vec&lt;Option&lt;DenseIndex&gt;&gt;</code>):<br />
       </p>
 
-      <p>
+      <figure>
         <img
           src="./img/2023-12-toecs-sparse-set.png"
           alt="2023-12-toecs-sparse-set.png"
         /><br />
-      </p>
+      </figure>
 
       <p>より詳しく実装を解説します。<br /></p>
 
@@ -235,12 +235,12 @@
         <code>DenseIndex</code> からアクセスできます:<br />
       </p>
 
-      <p>
+      <figure>
         <img
           src="./img/2023-12-toecs-groups.png"
           alt="2023-12-toecs-groups.png"
         /><br />
-      </p>
+      </figure>
 
       <p>
         これは <code>Entity</code> を削除したり、
@@ -248,19 +248,19 @@
         にコンポーネントを追加・削除する際のグループの更新処理で実現されます:<br />
       </p>
 
-      <p>
+      <figure>
         <img
           src="./img/2023-12-toecs-group-sync.png"
           alt="2023-12-toecs-group-sync.png"
         /><br />
-      </p>
+      </figure>
 
-      <p>
+      <figure>
         <img
           src="./img/2023-12-toecs-group-unsync.png"
           alt="2023-12-toecs-group-unsync.png"
         /><br />
-      </p>
+      </figure>
 
       <h4 id="Entity の挿入と削除について">
         <a href="#Entity の挿入と削除について"
@@ -274,30 +274,30 @@
 
       <p>例として以下の初期状態を考えます:<br /></p>
 
-      <p>
+      <figure>
         <img
           src="./img/2023-12-toecs-free-slot.png"
           alt="2023-12-toecs-free-slot.png"
         /><br />
-      </p>
+      </figure>
 
       <p>初期状態からデータを追加した後は:<br /></p>
 
-      <p>
+      <figure>
         <img
           src="./img/2023-12-toecs-free-slot-insert.png"
           alt="2023-12-toecs-free-slot-insert.png"
         /><br />
-      </p>
+      </figure>
 
       <p>初期状態からデータを削除した後は:<br /></p>
 
-      <p>
+      <figure>
         <img
           src="./img/2023-12-toecs-free-slot-remove.png"
           alt="2023-12-toecs-free-slot-remove.png"
         /><br />
-      </p>
+      </figure>
 
       <h4 id="Entity の削除について">
         <a href="#Entity の削除について"><code>Entity</code> の削除について</a>

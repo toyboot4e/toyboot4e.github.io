@@ -8,7 +8,7 @@ main p {
 }
 
 /* sitemap article list */
-date.sitemap-date {
+.sitemap date {
     font-size: 0.9em;
     color: var(text-light);
     padding-right: 0.5em;
