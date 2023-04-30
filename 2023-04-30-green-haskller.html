@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AtCoder 緑到達 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="style/simple.min.css" />
+    <link rel="stylesheet" href="style/style.css" />
+    <link rel="stylesheet" href="style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>AtCoder 緑到達</h1>
+      <p>Apr 30, 2023</p>
+      <nav role="navigation">
+        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <p>
+        Haskell で AtCoder を初めて 11 ヶ月、レーティング 800 を超えました！<br />
+      </p>
+
+      <h2 id="背景"><a href="#背景">背景</a></h2>
+      <h3 id="前回までのあらすじ">
+        <a href="#前回までのあらすじ">前回までのあらすじ</a>
+      </h3>
+      <p>
+        AtCoder
+        を始める以前、自分の実力はレーティング『緑』に匹敵すると思っていました。実際に取り組んでみると、レーティング『灰』の日々が続きます。<br />
+      </p>
+
+      <p>
+        さらに周りを見回すと、僕より遥かにナードな Haskeller
+        が目に入り、アイデンティティが崩壊します。プログラミングができずナードでもないなんて、僕は一体……<br />
+      </p>
+
+      <p>
+        やがて
+        <a href="https://book.mynavi.jp/ec/products/detail/id=131288">鉄則本</a>
+        登場が登場し、入茶できました (<a
+          href="https://toyboot4e.github.io/2022-12-10-haskell-atcoder.html"
+          >入茶記事</a
+        >)
+        。競プロはアルゴリズムの盆栽であると捉え直すことで、競プロ自体にもモチベーションが湧きました。<br />
+      </p>
+
+      <h3 id="今回のあらすじ"><a href="#今回のあらすじ">今回のあらすじ</a></h3>
+      <p>
+        手続型 Haskell
+        の使用機会が増えて来ました。ネストが深くなりがちで、可読性とパフォーマンスの両立は厳しいです。
+        Haskell に <code>continue</code> や
+        <code>return</code> が無いのが原因だと思います。<br />
+      </p>
+
+      <p>
+        久しぶりに Rust を書くと、最強のモナドが ON
+        になっているようなもので、全く抵抗無くコードを書けました。全く抵抗無く 5
+        重ネストを書いた時には愕然としました。<br />
+      </p>
+
+      <p>
+        何かを手に入れるということは、何かを失うことなのかもしれない。俺たちの盆栽はこれからだ……！<br />
+      </p>
+
+      <h2 id="ランダム"><a href="#ランダム">ランダム</a></h2>
+      <h3 id="手続型 Haskell 最大のコツとは">
+        <a href="#手続型 Haskell 最大のコツとは"
+          >手続型 Haskell 最大のコツとは</a
+        >
+      </h3>
+      <p>手続型のコードを削除することです。<br /></p>
+
+      <h3 id="月刊 競技プログラミングは役に立つのか">
+        <a href="#月刊 競技プログラミングは役に立つのか"
+          >月刊 競技プログラミングは役に立つのか</a
+        >
+      </h3>
+      <p>
+        僕のレベルでは役に立ちません。むしろ社会では 2,000 行のスパゲッティを 8
+        時間でナポリタンに作り替えるような能力が求められています。せやかて工藤、絡まったままや！<br />
+      </p>
+
+      <h3 id="過去問はすべて典型である">
+        <a href="#過去問はすべて典型である">過去問はすべて典型である</a>
+      </h3>
+      <p>
+        AtCoder
+        界隈では『典型』という言葉が頻出します。この問題は典型、この解法は典型、この考察は典型……。振り返ると、むしろ典型ではない問題を知りません。<br />
+      </p>
+
+      <p>
+        おそらく過去問と類題はすべて『典型』です。典型ができたらとっくに水色コーダーになっていますよ！　典型をこそやっていきます。<br />
+      </p>
+
+      <h3 id="AtCoder のレーティングと実力感">
+        <a href="#AtCoder のレーティングと実力感"
+          >AtCoder のレーティングと実力感</a
+        >
+      </h3>
+      <p>
+        AtCoder プレイヤーの実力は
+        <a href="https://chokudai.hatenablog.com/entry/2019/02/11/155904"
+          >Chokudai さんのブログ</a
+        >
+        で語られています。主観的には以下となります:<br />
+      </p>
+
+      <table>
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">レーティング</th>
+            <th scope="col" class="org-left">実力感</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">灰 (0 ~ 400)</td>
+            <td class="org-left">プログラミングが苦手？</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">茶 (400 ~ 800)</td>
+            <td class="org-left">普通に優秀</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">緑 (800 ~ 1,200)</td>
+            <td class="org-left">校内偏差値 60 前後</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">水 (1,200 ~ 1,600)</td>
+            <td class="org-left">校内偏差値 65 前後</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">青 (1,600 ~ 2,000)</td>
+            <td class="org-left">校内偏差値 70 前後</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">黄 (2,000 ~ 2,400)</td>
+            <td class="org-left">レックウザ</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        『校内』は Haskller のレーティングからイメージしています。緑後半の
+        Haskeller たちが偏差値 65 くらいのイメージです。<br />
+      </p>
+
+      <h3 id="わしのテンプレートは 1,800 行あるぞ">
+        <a href="#わしのテンプレートは 1,800 行あるぞ"
+          >わしのテンプレートは 1,800 行あるぞ</a
+        >
+      </h3>
+      <p>ふぉっふぉっふぉ<br /></p>
+
+      <h3 id="他人の Haskell から学ぶべきなのか">
+        <a href="#他人の Haskell から学ぶべきなのか"
+          >他人の Haskell から学ぶべきなのか</a
+        >
+      </h3>
+      <p>
+        僕の Haskell は競プロ専用であり、非常に限定されたサブセットです。新しい
+        Haskell
+        を人から吸収すべきだと思いますが、今のところ失敗に終わっています。<br />
+      </p>
+
+      <ol>
+        <li>
+          リスト達人 (緑後半の人たち)<br />
+          Richard Bird の系譜です。
+          <strong>強い</strong>
+          。この手のコードは頑張れば読めますが、実際真似すると TLE
+          しがちです。難しい。<br />
+        </li>
+
+        <li>
+          手続型 Haskell でぶっち切りの優勝 (レックウザ)<br />
+          由来から謎です。どう頑張っても読めません。やがて Haskell は AtCoder で
+          2 番目に速い言語だったことに気付き天啓を受けます。 Haskell は AtCoder
+          ガチ言語だったかもしれない。<br />
+        </li>
+      </ol>
+
+      <figure>
+        <img
+          src="./img/2023-04-haskell-is-second-the-fastest.png"
+          alt="2023-04-haskell-is-second-the-fastest.png"
+        /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 1: </span>Haskell は C++ よりも速い
+        </figcaption>
+      </figure>
+
+      <h3 id="Haskell は AtCoder ガチ言語だったかもしれない">
+        <a href="#Haskell は AtCoder ガチ言語だったかもしれない"
+          >Haskell は AtCoder ガチ言語だったかもしれない</a
+        >
+      </h3>
+      <p>
+        Haskell は競プロ (アルゴリズム)
+        限定だと減点要素が見つかりません。ライブラリも優秀ですし、水色までは全く障害の無い言語だと思います。<br />
+      </p>
+
+      <p>
+        ユーザが使いこなせるかは別の問題ですが、ナードにとって Haskell
+        はハンディにならないでしょう。だから半年灰色だったのは純粋な実力不足なのだ……！<br />
+      </p>
+
+      <h3 id="AC 1,000 問に替わる願掛け">
+        <a href="#AC 1,000 問に替わる願掛け">AC 1,000 問に替わる願掛け</a>
+      </h3>
+      <p>
+        AtCoder で 1,000 問解けば、水色コーダーになれると言われています。根拠は
+        <a href="https://twitter.com/e869120/status/1428342253961895938"
+          >解いた問題数とレーティングの統計</a
+        >
+        です。そうか、 1,000 問解けば良かったのか！<br />
+      </p>
+
+      <p>でも 1,000 問は厳し過ぎませんか…… (´･_･`)<br /></p>
+
+      <p>
+        これからは水 diff を 100
+        問解いたら水色コーダーになれることにします。このシステムだと、僕は 3
+        ヶ月以内に水色コーダーになれるのでした。めでたしめでたし。<br />
+      </p>
+
+      <h3 id="2023, AtCoder 期待の新星">
+        <a href="#2023, AtCoder 期待の新星">2023, AtCoder 期待の新星</a>
+      </h3>
+      <p>
+        <a href="https://atcoder.jp/contests/language-test-202301"
+          >2023 年の AtCoder 言語環境更新</a
+        >
+        がやって来ます！　Rust, Haskell, Common Lisp や OCaml
+        のバージョンアップが入り、 V, Zig など新規言語も投入されます。<br />
+      </p>
+
+      <p>
+        最大の注目株は
+        <a
+          href="https://atcoder.jp/contests/language-test-202301/submissions/40386158"
+          >Emacs Lisp です</a
+        >。他の言語が次々に <code>exit</code>,
+        <code>return</code> する中、一人だけ
+        <code>kill-emacs</code>
+        してプロセスを終了します。この奇行、見逃せない。<br />
+      </p>
+
+      <h3 id="AtCoder に課金する方法">
+        <a href="#AtCoder に課金する方法">AtCoder に課金する方法</a>
+      </h3>
+      <p>
+        <a href="https://past.atcoder.jp/">PAST</a> (アルゴリズム実技検定)
+        上級を目指して 6 月に受験してみます。覚えてられるかな……。<br />
+      </p>
+
+      <h3 id="アルゴリズムとデータ構造 とは">
+        <a href="#アルゴリズムとデータ構造 とは"
+          >アルゴリズムとデータ構造 とは</a
+        >
+      </h3>
+      <p>
+        これまでの競プロ経験では、リスト・配列・木しか出て来ませんでした。もっと魔法的な何かがあるのではないかと思っています。<br />
+      </p>
+
+      <p>
+        『高度典型』には『Mo』『HL
+        分解』など未知のアルゴリズムが登場するそうです。ここまで来ればきっと魔法的なので楽しみにしています。<br />
+      </p>
+
+      <h3 id="ヒューリスティック">
+        <a href="#ヒューリスティック">ヒューリスティック</a>
+      </h3>
+      <p>
+        連休はビームを打とうと思います。もとい、『ビームサーチ』『焼きなまし法』を始めとした『ヒューリスティック』的技法に取り組んでみたいと思います。<br />
+      </p>
+
+      <p>
+        ヒューリスティックは今でも十分魔法的に見えます。例えば巡回セールスマン問題にいい感じの解を出したりできるようになるのか……！　期待です。<br />
+      </p>
+
+      <h3 id="Kindle Scribe が良いです">
+        <a href="#Kindle Scribe が良いです">Kindle Scribe が良いです</a>
+      </h3>
+      <p>
+        Thunder
+        本を読んだりコンテスト中のノートにしています。ここマウントポイントです。<br />
+      </p>
+
+      <h3 id="まだ何も達成していない">
+        <a href="#まだ何も達成していない">まだ何も達成していない</a>
+      </h3>
+      <p>
+        今回のコンテストでも全探索が解けませんでした。半年間の灰色コーダーは伊達じゃないのだ……！<br />
+      </p>
+
+      <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
+      <p>緑になったのでエアロバイクを買います。<br /></p>
+
+      <figure>
+        <img
+          src="./img/2023-04-atcoder-green-rating.png"
+          alt="2023-04-atcoder-green-rating.png"
+        /><br />
+      </figure>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div>
+        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </div>
+    </footer>
+  </body>
+</html>
