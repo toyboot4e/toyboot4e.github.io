@@ -1,0 +1,135 @@
+#+TITLE: Keyball 44 下準備
+#+DATE: <2023-07-30 Mon>
+
+* 背景
+
+** 物欲
+
+3 年ほど前、 4K モニタを買いました。モニタの最大の効果は、解像度以上に姿勢の改善です。同じ効果が期待できるのが、左右に分かれた分割キーボードでした。
+
+分割キーボードには大手メーカーによる量産品が (ほぼ) ありません。いわゆる『自作キーボード』を買って組み立てる必要があります。
+
+** 遊舎工房
+
+去年の秋頃、 [[https://yushakobo.jp/][遊舎工房]] に赴きました。自作キーボードと言えばここしかありません。
+
+様々なキーボードを触った限りでは、 [[https://shop.yushakobo.jp/products/lily58-pro?_pos=1&_sid=31bfe983d&_ss=r][Lily58 Pro]] と [[https://shop.yushakobo.jp/products/5358?_pos=2&_sid=7883fc4ac&_ss=r][Keyball61]] が良かったです。見た目が良く、打鍵感も良く、なによりも体が楽になるなら 3 万円ぐらいの価値は十分あります。
+
+特にマウス不要となる Keyball61 を買うことにしました。
+
+** Keyball44
+
+Keyball61 は、あまりの人気のため入荷後 30 秒で売り切れてしまいます。 10 ヶ月経っても購入できません。ただ今回は [[https://shirogane-lab.net/items/64b7a006eb6dbe00346cd0c5][Keyball44]] の方を注文できたので、どんなキーボードにしたいか考えてみます。
+
+* 構想
+
+おもちゃのような見た目にしたいと思います。イメージを固めるため、人の投稿を覗いてみます。
+
+** シンプル
+
+当初はこういう配色を考えていました。これが一番好きなのですが、標準で似たキットがあるので悩みどころです。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">届いてキーキャップつけたkeyball君！<br>なかなかに可愛いんじゃないの？<a href="https://twitter.com/hashtag/keyball?src=hash&amp;ref_src=twsrc%5Etfw">#keyball</a> <a href="https://t.co/Tr98I55gYi">pic.twitter.com/Tr98I55gYi</a></p>&mdash; らけ@うちガジェ (@wynn_sma) <a href="https://twitter.com/wynn_sma/status/1666649565213376513?ref_src=twsrc%5Etfw">June 8, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+これはカッコいい。文字キー以外でアクセントを付けるのがセオリーのようです。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">昨日も家庭内隔離だったので一気に作っちゃいました。全キー一発で反応してくれて嬉しい。Kailh Chocのキースイッチだけ間に合わなかったので、親指部分は仮。 <a href="https://twitter.com/hashtag/Keyball61?src=hash&amp;ref_src=twsrc%5Etfw">#Keyball61</a> <a href="https://twitter.com/hashtag/Keyball?src=hash&amp;ref_src=twsrc%5Etfw">#Keyball</a> <a href="https://t.co/8bmifqoYLW">pic.twitter.com/8bmifqoYLW</a></p>&mdash; Papi Tamakoke (@papitamakoke) <a href="https://twitter.com/papitamakoke/status/1685520590722252800?ref_src=twsrc%5Etfw">July 30, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+** おもちゃっぽく
+
+キー数が少ないとおもちゃっぽさが増すので、 Keyball44 はコンセプトに合うかもしれません。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">keyball44用のキーボード台、現状これで使用感確かめ中。<br>テンティング角度:20°→15°<br>チルト角度:15°<br><br>これで小指奥位置のキーキャップを高めにすればだいぶ使いやすくなってきた。<br><br>どう肉抜きすればUnderglowLEDが綺麗に見えるのかは、今後も要検討ですね。<a href="https://twitter.com/hashtag/keyball?src=hash&amp;ref_src=twsrc%5Etfw">#keyball</a> <a href="https://t.co/8dwCqmD9Zt">pic.twitter.com/8dwCqmD9Zt</a></p>&mdash; ザキ (@tz_ak) <a href="https://twitter.com/tz_ak/status/1624052962669600773?ref_src=twsrc%5Etfw">February 10, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+** ユニーク
+
+タイプライター風のキーキャップが基盤？ を強調していてカッコいいです。金玉もいいですね。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Keyball61 完成した。かなりいい感じ。裏もロゴの入った基板が見えててカッコいい。手元のキーはロープロに切り替えたり試行錯誤したい<a href="https://twitter.com/hashtag/%E8%87%AA%E4%BD%9C%E3%82%AD%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89?src=hash&amp;ref_src=twsrc%5Etfw">#自作キーボード</a> <a href="https://twitter.com/hashtag/Keyball?src=hash&amp;ref_src=twsrc%5Etfw">#Keyball</a> <a href="https://twitter.com/hashtag/DailyCraftKeyboard?src=hash&amp;ref_src=twsrc%5Etfw">#DailyCraftKeyboard</a> <a href="https://t.co/OnBY4hHdqQ">pic.twitter.com/OnBY4hHdqQ</a></p>&mdash; ma2ge⛓ (@ma2ge) <a href="https://twitter.com/ma2ge/status/1653310761220071426?ref_src=twsrc%5Etfw">May 2, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+シャーベットなキーキャップもあるようです。いい感じ。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">cerakey届いたー<br>だいぶいい感じ<br>レジンでホームポジションつけてもらった<br>こちらもしっくり<a href="https://twitter.com/hashtag/cerakey?src=hash&amp;ref_src=twsrc%5Etfw">#cerakey</a> <a href="https://twitter.com/hashtag/keyball?src=hash&amp;ref_src=twsrc%5Etfw">#keyball</a> <a href="https://t.co/ZXORKA5jbl">pic.twitter.com/ZXORKA5jbl</a></p>&mdash; ぷりずむ (@prsmpict) <a href="https://twitter.com/prsmpict/status/1645950357863038976?ref_src=twsrc%5Etfw">April 12, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+透明なキーキャップでゲーミング仕様に。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Keyball44を透明のキーキャップで組みましたー！いい感じに光ってくれてかなりいい感じです✨<a href="https://twitter.com/hashtag/keyball?src=hash&amp;ref_src=twsrc%5Etfw">#keyball</a> <a href="https://twitter.com/hashtag/%E8%87%AA%E4%BD%9C%E3%82%AD%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89?src=hash&amp;ref_src=twsrc%5Etfw">#自作キーボード</a> <a href="https://t.co/9Oc3PWLlr4">pic.twitter.com/9Oc3PWLlr4</a></p>&mdash; MANA (@mana_gadget) <a href="https://twitter.com/mana_gadget/status/1612793256118714370?ref_src=twsrc%5Etfw">January 10, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+** Gopher くん
+
+これが欲しいのですが、もう買えないかもしれません。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Gopherキーキャップとても良い <a href="https://t.co/h2JuN42zY2">pic.twitter.com/h2JuN42zY2</a></p>&mdash; uji (@uji_rb) <a href="https://twitter.com/uji_rb/status/1501157341177135105?ref_src=twsrc%5Etfw">March 8, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">きのこ &amp; Gopher キーキャップ<br>Sen Keycaps <a href="https://twitter.com/senkeycaps?ref_src=twsrc%5Etfw">@senkeycaps</a> さんの作品です<br>ちっこいのに作りこみが凄い！！<br>キーボードがGopher君で賑やかになりました<br><br>Kochi Keyboard <a href="https://twitter.com/kochikbd?ref_src=twsrc%5Etfw">@kochikbd</a> さんで購入しました <a href="https://t.co/Mfdo8FtIpD">pic.twitter.com/Mfdo8FtIpD</a></p>&mdash; Center Half (@cenrerkita) <a href="https://twitter.com/cenrerkita/status/1345980001246609411?ref_src=twsrc%5Etfw">January 4, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">今週はあまり作業が進まずでしたが、花よりだんGopherキーキャップの色違いを作りました🍡今日<a href="https://twitter.com/kochikbd?ref_src=twsrc%5Etfw">@kochikbd</a> さんのお店で出品予定です。Dukeキーキャップと蓄光きのこキーキャップの在庫もあります〜。 <a href="https://t.co/x7V3apRto3">pic.twitter.com/x7V3apRto3</a></p>&mdash; Sen Keycaps (@senkeycaps) <a href="https://twitter.com/senkeycaps/status/1355364402225049604?ref_src=twsrc%5Etfw">January 30, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+* 今後の方針
+
+** キースイッチ・キーキャップ
+
+打鍵感と見た目が決まります。
+
+- [X] キースイッチ
+  標準的なものにします。数多のキーボード歴を持つ [[https://publish.obsidian.md/naoya/My+favorite+key+switches][Naoya さんの 投稿]] を参考に、 [[https://nuphy.com/products/nuphy-night-breeze-switches][NuPhy Night Breeze Switches]] を注文しました。 Numpy っぽいスペルも良い感じではないでしょうか (?) 。
+
+- [ ] キーキャップ
+  配色のパターンが出尽くしている気がして、形や模様が特殊なものを選ぶことにしました。 [[https://taneyats.booth.pm/items/4020198][白玉プロファイル]] が欲しいのですが、品切れとなっています。 3D プリンターに挑戦するしかないのでしょうか (保留) 。
+
+** ProMicro
+
+端子が決まります。適当に買います。
+
+- [ ] ProMicro 2 個 (マイコン基盤のみ)
+- [ ] Micro USB ケーブル？
+
+** LED
+
+実装しません。
+
+** アクセサリ
+
+[[https://www.youtube.com/watch?v=QC791UY_M6Y][理想の書斎づくりの keyball 動画]] を参考に買ってみます。
+
+- [X] [[https://www.amazon.co.jp/TRRS-%E3%83%A1%E3%82%BF%E3%83%AB%E3%82%B1%E3%83%BC%E3%83%96%E3%83%AB-%E8%87%AA%E4%BD%9C%E3%82%AD%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89%E7%94%A8-keyball-metalcable/dp/B0C9WNBFS7][TRRS メタルケーブル 0.8m]]
+- [ ] 34mm トラックボール 1 個
+- [X] [[https://www.amazon.co.jp/Manfrotto-%E3%83%9F%E3%83%8B%E4%B8%89%E8%84%9A-POCKET-%E3%83%96%E3%83%A9%E3%83%83%E3%82%AF-MP3-BK/dp/B00GTLFHT8][Manfrotto 三脚]]
+
+** 組み立て用装備
+
+[[https://docs.dailycraft.jp/contents/guide/tool.html#%E3%81%AF%E3%82%93%E3%81%9F%E3%82%99%E4%BB%98%E3%81%91%E3%81%AB%E5%BF%85%E8%A6%81%E3%81%AA%E3%82%82%E3%81%AE][自作キーボード組み立てに必要な工具 | Daily Craft Keyboard]] を参考に購入したいと思います。結構高いのでケチるか迷います。
+
+- [ ] はんだごて (LED を実装する場合は温度調整可能なもの)
+- [ ] はんだ (LED を実装する場合は低融点のものが有効)
+- [X] M2 精密ドライバー
+- [X] ピンセット
+- [X] カッター
+- [X] 紙やすり 150 番
+
+また [[https://pub.nikkan.co.jp/book/b10021722.html][カラー版 目で見てナットク! はんだ付け作業]] を購入したので、じっくり読んでみようと思います。
+
+* まとめ
+
+白玉キャップが品切れで悩んでいます。自分で 3D プリントすれば白以外のキャップも作れるはずですが、何度もプリンターを借りに出るのは面倒くさいという状況です。
+
+工具等は順次取り寄せたいと思います。はんだごては二度と使わない可能性があるので、ケチるべきか悩みます。
+

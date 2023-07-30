@@ -1,7 +1,7 @@
 #+TITLE: AtCoder 緑到達
 #+DATE: <2023-04-30 Sun>
 
-Haskell で AtCoder を初めて 11 ヶ月、レーティング 800 を超えました！
+Haskell で AtCoder を始めて 11 ヶ月、レーティング 800 を超えました！
 
 * 背景
 
@@ -11,7 +11,7 @@ AtCoder を始める以前、自分の実力はレーティング『緑』に匹
 
 さらに周りを見回すと、僕より遥かにナードな Haskeller が目に入り、アイデンティティが崩壊します。プログラミングができずナードでもないなんて、僕は一体……
 
-やがて [[https://book.mynavi.jp/ec/products/detail/id=131288][鉄則本]] 登場が登場し、入茶できました ([[https://toyboot4e.github.io/2022-12-10-haskell-atcoder.html][入茶記事]]) 。競プロはアルゴリズムの盆栽であると捉え直すことで、競プロ自体にもモチベーションが湧きました。
+やがて [[https://book.mynavi.jp/ec/products/detail/id=131288][鉄則本]] が登場し、入茶できました ([[https://toyboot4e.github.io/2022-12-10-haskell-atcoder.html][入茶記事]]) 。競プロはアルゴリズムの盆栽であると捉え直すことで、競プロ自体にもモチベーションが湧きました。
 
 ** 今回のあらすじ
 
