@@ -1,4 +1,4 @@
-#+TITLE: AtCoder 緑到達
+#+TITLE: Haskell / AtCoder 緑到達
 #+DATE: <2023-04-30 Sun>
 
 Haskell で AtCoder を始めて 11 ヶ月、レーティング 800 を超えました！
