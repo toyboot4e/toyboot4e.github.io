@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Keyball 44 組み立て - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="style/simple.min.css" />
+    <link rel="stylesheet" href="style/style.css" />
+    <link rel="stylesheet" href="style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>Keyball 44 組み立て</h1>
+      <p>Aug 19, 2023</p>
+      <nav role="navigation">
+        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="背景"><a href="#背景">背景</a></h2>
+      <p>
+        <a href="./2023-07-31-keyball44-prepare.html">前回の投稿</a> で
+        <a href="https://shirogane-lab.net/items/64b7a006eb6dbe00346cd0c5"
+          >Keyball 44</a
+        >
+        の注文に成功し、お洒落なキーボード画像を多数拝見しました。今回はその他の購買と組み立てをやっていきます。<br />
+      </p>
+
+      <figure>
+        <img
+          src="./img/2023-08-keyball44.jpg"
+          alt="2023-08-keyball44.jpg"
+        /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 1: </span>完成品 (右手部分)
+        </figcaption>
+      </figure>
+
+      <h3 id="情報収集"><a href="#情報収集">情報収集</a></h3>
+      <p>
+        <a href="https://rebuild.fm/352/">Rebuild: 352</a>
+        のキーボード談義を理解できるようになりました。まだまだキーボード界のハイエンドは更新が続いているそうで、
+        keyball への期待も高まります。<br />
+      </p>
+
+      <p>
+        工作器具の検討のため、
+        <a href="https://pub.nikkan.co.jp/book/b10021722.html"
+          >カラー版 目で見てナットク! はんだ付け作業</a
+        >
+        を読みました。温度調整機能を持ったはんだごて (4,000 円)
+        を買う決心がつきました。<br />
+      </p>
+
+      <p>
+        キーキャップは
+        <a href="https://taneyats.booth.pm/items/4020198">白玉プロファイル</a>
+        が品切れとなっていましたが、作者様に連絡を取り今月中に入荷されると伺いました。金玉と白玉、奇跡の共演が幕を開けます。<br />
+      </p>
+
+      <h2 id="購買活動"><a href="#購買活動">購買活動</a></h2>
+      <h3 id="部品の選択"><a href="#部品の選択">部品の選択</a></h3>
+      <h4 id="キースイッチ・キーキャップ">
+        <a href="#キースイッチ・キーキャップ">キースイッチ・キーキャップ</a>
+      </h4>
+      <p>
+        予定通り購入できました。白玉プロファイル以外は一般的で無難な選択だと思います。<br />
+      </p>
+
+      <table>
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">物品</th>
+            <th scope="col" class="org-left">規格</th>
+            <th scope="col" class="org-left">必要量</th>
+            <th scope="col" class="org-left">型式</th>
+            <th scope="col" class="org-left">値段</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">スイッチ</td>
+            <td class="org-left">CherryMX</td>
+            <td class="org-left">39 個</td>
+            <td class="org-left">
+              <a href="https://nuphy.com/products/nuphy-night-breeze-switches"
+                >NuPhy Night Breeze Switches</a
+              >
+            </td>
+            <td class="org-left">7,126 円 (110 個)</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">キャップ</td>
+            <td class="org-left">CherryMX</td>
+            <td class="org-left">39 個</td>
+            <td class="org-left">
+              <a href="https://taneyats.booth.pm/items/4020198"
+                >白玉プロファイル</a
+              >
+            </td>
+            <td class="org-left">5,600 円 (48 個)</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">スイッチ</td>
+            <td class="org-left">Choc V1</td>
+            <td class="org-left">5 個</td>
+            <td class="org-left">
+              <a href="https://talpkeyboard.net/items/6365b66df3de5c668a24204a"
+                >Kailh Choc V1 Red</a
+              >
+            </td>
+            <td class="org-left">300 円 (5 個)</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">キャップ</td>
+            <td class="org-left">Choc V1</td>
+            <td class="org-left">5 個</td>
+            <td class="org-left">
+              <a href="https://talpkeyboard.net/items/5b6e58d2ef843f729500006f"
+                >XDA PBT ブランク キーキャップ</a
+              >
+            </td>
+            <td class="org-left">330 円 (6 個)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4 id="ProMicro (マインコン)">
+        <a href="#ProMicro (マインコン)">ProMicro (マインコン)</a>
+      </h4>
+      <p>
+        『ATmega32U4』を買うのが無難なようです (<a
+          href="https://hikalium.hatenablog.jp/entry/2021/12/31/150738"
+          >参考</a
+        >) 。<br />
+      </p>
+
+      <ul>
+        <li class="off">
+          <code>[&#xa0;]</code> Type C:
+          <a href="https://talpkeyboard.net/items/62e24e6f8a0bd07fe2d38137"
+            >Pro Micro ATmega32U4-MU 5V/16MHz/USB-C(互換品/青)</a
+          ><br />
+          売り切れでした。<br />
+        </li>
+
+        <li class="on">
+          <code>[X]</code> MicroB:
+          <a href="https://talpkeyboard.net/items/61f4604eacbcb036350954b6"
+            >Pro Micro ATmega32U4 5V/16MHz/MicroB(互換品/青)</a
+          ><br />
+          Type C が売り切れだったため、こちらを買いました。<br />
+        </li>
+      </ul>
+
+      <h4 id="その他"><a href="#その他">その他</a></h4>
+      <table>
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">もの</th>
+            <th scope="col" class="org-left">買ったもの</th>
+            <th scope="col" class="org-left">値段</th>
+            <th scope="col" class="org-left">備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">玉</td>
+            <td class="org-left">
+              <a
+                href="https://www.amazon.co.jp/gp/product/B0857K5255/ref=ppx_yo_dt_b_asin_title_o02_s01?ie=UTF8&amp;th=1"
+                >ペリックス</a
+              >
+            </td>
+            <td class="org-left">1,500</td>
+            <td class="org-left">金色</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">TRPS ケーブル</td>
+            <td class="org-left">
+              <a
+                href="https://www.amazon.co.jp/gp/product/B0C9WNBFS7/ref=ppx_yo_dt_b_asin_title_o02_s00?ie=UTF8&amp;psc=1"
+                >ノーブランド品</a
+              >
+            </td>
+            <td class="org-left">980?</td>
+            <td class="org-left">&#xa0;</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">マイクロ USB ケーブル</td>
+            <td class="org-left">
+              <a
+                href="https://www.amazon.co.jp/gp/product/B0871ZKR8C/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&amp;th=1"
+                >Rampow</a
+              >
+            </td>
+            <td class="org-left">650</td>
+            <td class="org-left">Type B (ProMicro と同様)</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">三脚</td>
+            <td class="org-left">
+              <a
+                href="https://www.manfrotto.com/jp-ja/pocket-support-large-black-mp3-bk/"
+                >Manfrotto POCKET 三脚 L</a
+              >
+            </td>
+            <td class="org-left">3,000?</td>
+            <td class="org-left">テンティング用</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="工作器具"><a href="#工作器具">工作器具</a></h3>
+      <p>
+        ほぼ
+        <a
+          href="https://docs.dailycraft.jp/contents/guide/tool.html#%E3%81%AF%E3%82%93%E3%81%9F%E3%82%99%E4%BB%98%E3%81%91%E3%81%AB%E5%BF%85%E8%A6%81%E3%81%AA%E3%82%82%E3%81%AE"
+          >自作キーボード組み立てに必要な工具 | Daily Craft Keyboard</a
+        >
+        の通り購入しました。工具だけでも１万円くらいかかりますね。<br />
+      </p>
+
+      <h4 id="工具"><a href="#工具">工具</a></h4>
+      <table>
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">もの</th>
+            <th scope="col" class="org-left">買ったもの</th>
+            <th scope="col" class="org-right">値段</th>
+            <th scope="col" class="org-left">備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">はんだごて</td>
+            <td class="org-left">
+              <a href="https://www.hakko.com/japan/products/hakko_fx600.html"
+                >白光 FX600</a
+              >
+            </td>
+            <td class="org-right">4,000</td>
+            <td class="org-left">温度調整機能付き</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">小手先クリーナー</td>
+            <td class="org-left">
+              <a href="https://www.hakko.com/japan/products/hakko_599b.html"
+                >白光 B599</a
+              >
+            </td>
+            <td class="org-right">650</td>
+            <td class="org-left">ワイヤータイプ</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">こて台</td>
+            <td class="org-left">
+              <a href="https://ec.hakko.com/products/detail/3933"
+                >白光 FX300-81</a
+              >
+            </td>
+            <td class="org-right">700</td>
+            <td class="org-left">スポンジは別売 (買っていない)</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">こて先</td>
+            <td class="org-left">
+              <a href="https://ec.hakko.com/products/detail/4181"
+                >白光 T18-2C</a
+              >
+            </td>
+            <td class="org-right">500</td>
+            <td class="org-left">竹槍のような形状</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">０番＋精密ドライバー</td>
+            <td class="org-left">
+              <a
+                href="https://www.amazon.co.jp/%E3%83%99%E3%83%83%E3%82%BB%E3%83%AB-VESSEL-%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD-%E3%83%89%E3%83%A9%E3%82%A4%E3%83%90%E3%83%BC-0%C3%97100/dp/B0016VA0CU/ref=sr_1_1?__mk_ja_JP=%E3%82%AB%E3%82%BF%E3%82%AB%E3%83%8A&amp;crid=2G3S1UQ09DFB5&amp;keywords=%E3%83%99%E3%83%83%E3%82%BB%E3%83%AB%28VESSEL%29+%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD+%E3%83%89%E3%83%A9%E3%82%A4%E3%83%90%E3%83%BC+%E7%B2%BE%E5%AF%86+%E3%83%8D%E3%82%B8%E7%94%A8+%2B0%C3%97100+9900&amp;qid=1690897479&amp;s=diy&amp;sprefix=%E3%83%99%E3%83%83%E3%82%BB%E3%83%AB+vessel+%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD+%E3%83%89%E3%83%A9%E3%82%A4%E3%83%90%E3%83%BC+%E7%B2%BE%E5%AF%86+%E3%83%8D%E3%82%B8%E7%94%A8+0+100+9900+%2Cdiy%2C197&amp;sr=1-1"
+                >ベッセル(VESSEL)</a
+              >
+            </td>
+            <td class="org-right">550</td>
+            <td class="org-left">M.2 SSD のためのドライバーと同様</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">ピンセット</td>
+            <td class="org-left">
+              <a
+                href="https://www.amazon.co.jp/gp/product/B000TGFODS/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&amp;psc=1"
+                >HOSAN</a
+              >
+            </td>
+            <td class="org-right">620</td>
+            <td class="org-left">&#xa0;</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">カッター</td>
+            <td class="org-left">
+              <a href="https://www.goot.co.jp/products/detail/yn_10"
+                >goot 精密ニッパー</a
+              >
+            </td>
+            <td class="org-right">1,700</td>
+            <td class="org-left">カッターがあればカッターで良い</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4 id="消耗品"><a href="#消耗品">消耗品</a></h4>
+      <table>
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">もの</th>
+            <th scope="col" class="org-left">買ったもの</th>
+            <th scope="col" class="org-right">値段</th>
+            <th scope="col" class="org-left">備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">はんだ</td>
+            <td class="org-left">
+              <a
+                href="https://www.amazon.co.jp/gp/product/B0029LGAMA/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&amp;psc=1"
+                >goot</a
+              >
+            </td>
+            <td class="org-right">330</td>
+            <td class="org-left">&#xa0;</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">フラックスクリーナー</td>
+            <td class="org-left">
+              <a
+                href="https://www.amazon.co.jp/gp/product/B01GROTPEE/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&amp;th=1"
+                >サンハヤト</a
+              >
+            </td>
+            <td class="org-right">623</td>
+            <td class="org-left">ハンダ付けの後の掃除に必要です</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">マスキングテープ</td>
+            <td class="org-left">
+              <a
+                href="https://www.amazon.co.jp/gp/product/B01K1GRY7Y/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&amp;th=1"
+                >カモ井加工紙</a
+              >
+            </td>
+            <td class="org-right">500</td>
+            <td class="org-left">&#xa0;</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">150番手くらいの紙やすり</td>
+            <td class="org-left">
+              <a
+                href="https://www.amazon.co.jp/gp/product/B01ARIERF8/ref=ppx_yo_dt_b_asin_title_o05_s00?ie=UTF8&amp;th=1"
+                >KAKURI</a
+              >
+            </td>
+            <td class="org-right">300</td>
+            <td class="org-left">&#xa0;</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">作業マット</td>
+            <td class="org-left">
+              <a
+                href="https://www.amazon.co.jp/gp/product/B08F3GDS9Q/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&amp;th=1"
+                >ノーブランド品</a
+              >
+            </td>
+            <td class="org-right">1,900</td>
+            <td class="org-left">無くても良かったです</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">キーキャップ引き抜き工具</td>
+            <td class="org-left">
+              <a
+                href="https://www.amazon.co.jp/gp/product/B07CNRQJBD/ref=ppx_yo_dt_b_asin_title_o04_s00?ie=UTF8&amp;psc=1"
+                >KAUMO</a
+              >
+            </td>
+            <td class="org-right">520</td>
+            <td class="org-left">&#xa0;</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="実装"><a href="#実装">実装</a></h2>
+      <p>
+        バーニング我が家が怖過ぎて可燃物を取り除きした。はんだごての電源抜き忘れにも気を付けます。<br />
+      </p>
+
+      <h3 id="トラブルシューティング">
+        <a href="#トラブルシューティング">トラブルシューティング</a>
+      </h3>
+      <p>組み立てながら、たくさんやらかしました。<br /></p>
+
+      <ol>
+        <li>
+          はんだごての温度調整ダイヤルが固すぎる<br />
+          <strong>ダイヤルが逆向きに取り付けられていた</strong>
+          ことが判明しました。時計回りに回るじゃん！<br />
+        </li>
+
+        <li>
+          ダイオードの向きが分からない<br />
+          裸眼だとみえるのですが、それは‥‥<br />
+        </li>
+
+        <li>
+          キーソケットの取り付け向きがよく分からない<br />
+          ガイドをよく読みましょう。<br />
+        </li>
+
+        <li>
+          <strong>基盤を両方左手向きに実装してしまった</strong><br />
+          ガイドをよく見ましょう‥‥！！<br />
+        </li>
+
+        <li>
+          Keyball を PC が認識しない<br />
+          リセットボタンを押してしばらく待機すると繋がりました。<br />
+        </li>
+
+        <li>
+          Remap で Keyball にプログラムを流し込めない<br />
+          これもリセットボタンを押すと解決しました。<br />
+        </li>
+
+        <li>
+          Remap でキーボードを選ぶと could not open と出る<br />
+          <a href="https://twitter.com/157w_allian/status/1584069408434946048"
+            >Twitter の通り</a
+          >
+          <code>sudo chmod 666 /dev/hidraw*</code>
+          でひとまず開けるようになりました。 <code>hidraw</code> とは‥‥<br />
+        </li>
+
+        <li>
+          キーの通電確認方法が分からない<br />
+          Remap の Test Matric mode から確認します。<br />
+        </li>
+
+        <li>
+          一部キーの反応が無い<br />
+          ダイオードの付け忘れ、片足のハンダ付け忘れ、ハンダ不良
+          (真横から見ると浮いている) などがありました。<br />
+        </li>
+
+        <li>
+          親指キーの反応が無い<br />
+          ロープロファイルのキーを使う場合、アクリル板を付けては行けません‥‥！！<br />
+        </li>
+      </ol>
+
+      <h2 id="感想"><a href="#感想">感想</a></h2>
+      <p>
+        Keyball 44
+        を組み立てました。『簡単工作キット』に相当する商品だったと思いますが、
+        20 時間近くかかってしまって大変でした。<br />
+      </p>
+
+      <p>
+        未刻印のキーキャップは初で、ホームポジション・ブラインドタッチに挑戦しています。白玉プロファイルは指のフィットする面積が広く、広々とした感じがとても良いと思います。<br />
+      </p>
+
+      <p>
+        今までのキーボードとは明らかに別物ですが、明らかに良いものであるとは感じていません。キー数が減って手首を動かさなくて済むようになりましたが、却ってタイピング速度は激減しました。半年後、どのような感想を持つかが楽しみです。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div>
+        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </div>
+    </footer>
+  </body>
+</html>
