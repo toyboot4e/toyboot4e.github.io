@@ -16,3 +16,4 @@
 - @@html:<date>2023-04-30</date>@@ [[file:2023-04-30-green-haskller.org][Haskell / AtCoder 緑到達]]
 - @@html:<date>2023-05-06</date>@@ [[file:2023-05-06-exercise-bike.org][エアロバイクを買ってみた]]
 - @@html:<date>2023-07-30</date>@@ [[file:2023-07-31-keyball44-prepare.org][Keyball 44 下準備]]
+- @@html:<date>2023-08-19</date>@@ [[file:2023-08-19-keyball44-build.org][Keyball 44 組み立て]]

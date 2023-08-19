@@ -1,0 +1,125 @@
+#+TITLE: Keyball 44 組み立て
+#+DATE: <2023-08-19 Sat>
+
+* 背景
+
+[[./2023-07-31-keyball44-prepare.html][前回の投稿]] で [[https://shirogane-lab.net/items/64b7a006eb6dbe00346cd0c5][Keyball 44]] の注文に成功し、お洒落なキーボード画像を多数拝見しました。今回はその他の購買と組み立てをやっていきます。
+
+#+CAPTION: 完成品 (右手部分)
+[[./img/2023-08-keyball44.jpg]]
+
+** 情報収集
+
+[[https://rebuild.fm/352/][Rebuild: 352]] のキーボード談義を理解できるようになりました。まだまだキーボード界のハイエンドは更新が続いているそうで、 keyball への期待も高まります。
+
+工作器具の検討のため、 [[https://pub.nikkan.co.jp/book/b10021722.html][カラー版 目で見てナットク! はんだ付け作業]] を読みました。温度調整機能を持ったはんだごて (4,000 円) を買う決心がつきました。
+
+キーキャップは [[https://taneyats.booth.pm/items/4020198][白玉プロファイル]] が品切れとなっていましたが、作者様に連絡を取り今月中に入荷されると伺いました。金玉と白玉、奇跡の共演が幕を開けます。
+
+* 購買活動
+
+** 部品の選択
+
+*** キースイッチ・キーキャップ
+
+予定通り購入できました。白玉プロファイル以外は一般的で無難な選択だと思います。
+
+| 物品     | 規格     | 必要量 | 型式                          | 値段              |
+|----------+----------+--------+-------------------------------+-------------------|
+| スイッチ | CherryMX | 39 個  | [[https://nuphy.com/products/nuphy-night-breeze-switches][NuPhy Night Breeze Switches]]   | 7,126 円 (110 個) |
+| キャップ | CherryMX | 39 個  | [[https://taneyats.booth.pm/items/4020198][白玉プロファイル]]              | 5,600 円 (48 個)  |
+| スイッチ | Choc V1  | 5 個   | [[https://talpkeyboard.net/items/6365b66df3de5c668a24204a][Kailh Choc V1 Red]]             | 300 円 (5 個)     |
+| キャップ | Choc V1  | 5 個   | [[https://talpkeyboard.net/items/5b6e58d2ef843f729500006f][XDA PBT ブランク キーキャップ]] | 330 円 (6 個)     |
+
+*** ProMicro (マインコン)
+
+『ATmega32U4』を買うのが無難なようです ([[https://hikalium.hatenablog.jp/entry/2021/12/31/150738][参考]]) 。
+
+- [ ] Type C: [[https://talpkeyboard.net/items/62e24e6f8a0bd07fe2d38137][Pro Micro ATmega32U4-MU 5V/16MHz/USB-C(互換品/青)]]
+  売り切れでした。
+
+- [X] MicroB: [[https://talpkeyboard.net/items/61f4604eacbcb036350954b6][Pro Micro ATmega32U4 5V/16MHz/MicroB(互換品/青)]]
+  Type C が売り切れだったため、こちらを買いました。
+
+*** その他
+
+| もの                  | 買ったもの              | 値段   | 備考                     |
+|-----------------------+-------------------------+--------+--------------------------|
+| 玉                    | [[https://www.amazon.co.jp/gp/product/B0857K5255/ref=ppx_yo_dt_b_asin_title_o02_s01?ie=UTF8&th=1][ペリックス]]              | 1,500  | 金色                     |
+| TRPS ケーブル         | [[https://www.amazon.co.jp/gp/product/B0C9WNBFS7/ref=ppx_yo_dt_b_asin_title_o02_s00?ie=UTF8&psc=1][ノーブランド品]]          | 980?   |                          |
+| マイクロ USB ケーブル | [[https://www.amazon.co.jp/gp/product/B0871ZKR8C/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&th=1][Rampow]]                  | 650    | Type B (ProMicro と同様) |
+| 三脚                  | [[https://www.manfrotto.com/jp-ja/pocket-support-large-black-mp3-bk/][Manfrotto POCKET 三脚 L]] | 3,000? | テンティング用           |
+
+** 工作器具
+
+ほぼ [[https://docs.dailycraft.jp/contents/guide/tool.html#%E3%81%AF%E3%82%93%E3%81%9F%E3%82%99%E4%BB%98%E3%81%91%E3%81%AB%E5%BF%85%E8%A6%81%E3%81%AA%E3%82%82%E3%81%AE][自作キーボード組み立てに必要な工具 | Daily Craft Keyboard]] の通り購入しました。工具だけでも１万円くらいかかりますね。
+
+*** 工具
+
+| もの                 | 買ったもの        |  値段 | 備考                             |
+|----------------------+-------------------+-------+----------------------------------|
+| はんだごて           | [[https://www.hakko.com/japan/products/hakko_fx600.html][白光 FX600]]        | 4,000 | 温度調整機能付き                 |
+| 小手先クリーナー     | [[https://www.hakko.com/japan/products/hakko_599b.html][白光 B599]]         |   650 | ワイヤータイプ                   |
+| こて台               | [[https://ec.hakko.com/products/detail/3933][白光 FX300-81]]     |   700 | スポンジは別売 (買っていない)    |
+| こて先               | [[https://ec.hakko.com/products/detail/4181][白光 T18-2C]]       |   500 | 竹槍のような形状                 |
+| ０番＋精密ドライバー | [[https://www.amazon.co.jp/%E3%83%99%E3%83%83%E3%82%BB%E3%83%AB-VESSEL-%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD-%E3%83%89%E3%83%A9%E3%82%A4%E3%83%90%E3%83%BC-0%C3%97100/dp/B0016VA0CU/ref=sr_1_1?__mk_ja_JP=%E3%82%AB%E3%82%BF%E3%82%AB%E3%83%8A&crid=2G3S1UQ09DFB5&keywords=%E3%83%99%E3%83%83%E3%82%BB%E3%83%AB%28VESSEL%29+%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD+%E3%83%89%E3%83%A9%E3%82%A4%E3%83%90%E3%83%BC+%E7%B2%BE%E5%AF%86+%E3%83%8D%E3%82%B8%E7%94%A8+%2B0%C3%97100+9900&qid=1690897479&s=diy&sprefix=%E3%83%99%E3%83%83%E3%82%BB%E3%83%AB+vessel+%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD+%E3%83%89%E3%83%A9%E3%82%A4%E3%83%90%E3%83%BC+%E7%B2%BE%E5%AF%86+%E3%83%8D%E3%82%B8%E7%94%A8+0+100+9900+%2Cdiy%2C197&sr=1-1][ベッセル(VESSEL)]]  |   550 | M.2 SSD のためのドライバーと同様 |
+| ピンセット           | [[https://www.amazon.co.jp/gp/product/B000TGFODS/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1][HOSAN]]             |   620 |                                  |
+| カッター             | [[https://www.goot.co.jp/products/detail/yn_10][goot 精密ニッパー]] | 1,700 | カッターがあればカッターで良い   |
+
+*** 消耗品
+
+| もの                     | 買ったもの     |  値段 | 備考                           |
+|--------------------------+----------------+-------+--------------------------------|
+| はんだ                   | [[https://www.amazon.co.jp/gp/product/B0029LGAMA/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&psc=1][goot]]           |   330 |                                |
+| フラックスクリーナー     | [[https://www.amazon.co.jp/gp/product/B01GROTPEE/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&th=1][サンハヤト]]     |   623 | ハンダ付けの後の掃除に必要です |
+| マスキングテープ         | [[https://www.amazon.co.jp/gp/product/B01K1GRY7Y/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&th=1][カモ井加工紙]]   |   500 |                                |
+| 150番手くらいの紙やすり  | [[https://www.amazon.co.jp/gp/product/B01ARIERF8/ref=ppx_yo_dt_b_asin_title_o05_s00?ie=UTF8&th=1][KAKURI]]         |   300 |                                |
+| 作業マット               | [[https://www.amazon.co.jp/gp/product/B08F3GDS9Q/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&th=1][ノーブランド品]] | 1,900 | 無くても良かったです           |
+| キーキャップ引き抜き工具 | [[https://www.amazon.co.jp/gp/product/B07CNRQJBD/ref=ppx_yo_dt_b_asin_title_o04_s00?ie=UTF8&psc=1][KAUMO]]          |   520 |                                |
+
+* 実装
+
+バーニング我が家が怖過ぎて可燃物を取り除きした。はんだごての電源抜き忘れにも気を付けます。
+
+** トラブルシューティング
+
+組み立てながら、たくさんやらかしました。
+
+1. はんだごての温度調整ダイヤルが固すぎる
+  *ダイヤルが逆向きに取り付けられていた* ことが判明しました。時計回りに回るじゃん！
+
+2. ダイオードの向きが分からない
+  裸眼だとみえるのですが、それは‥‥
+
+3. キーソケットの取り付け向きがよく分からない
+  ガイドをよく読みましょう。
+
+4. *基盤を両方左手向きに実装してしまった*
+  ガイドをよく見ましょう‥‥！！
+
+5. Keyball を PC が認識しない
+   リセットボタンを押してしばらく待機すると繋がりました。
+
+6. Remap で Keyball にプログラムを流し込めない
+  これもリセットボタンを押すと解決しました。
+
+7. Remap でキーボードを選ぶと could not open と出る
+  [[https://twitter.com/157w_allian/status/1584069408434946048][Twitter の通り]] =sudo chmod 666 /dev/hidraw*= でひとまず開けるようになりました。 =hidraw= とは‥‥
+
+8. キーの通電確認方法が分からない
+  Remap の Test Matric mode から確認します。
+
+9. 一部キーの反応が無い
+  ダイオードの付け忘れ、片足のハンダ付け忘れ、ハンダ不良 (真横から見ると浮いている) などがありました。
+
+10. 親指キーの反応が無い
+  ロープロファイルのキーを使う場合、アクリル板を付けては行けません‥‥！！
+
+* 感想
+
+Keyball 44 を組み立てました。『簡単工作キット』に相当する商品だったと思いますが、 20 時間近くかかってしまって大変でした。
+
+未刻印のキーキャップは初で、ホームポジション・ブラインドタッチに挑戦しています。白玉プロファイルは指のフィットする面積が広く、広々とした感じがとても良いと思います。
+
+今までのキーボードとは明らかに別物ですが、明らかに良いものであるとは感じていません。キー数が減って手首を動かさなくて済むようになりましたが、却ってタイピング速度は激減しました。半年後、どのような感想を持つかが楽しみです。
+
