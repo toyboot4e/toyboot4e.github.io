@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Haskell / AtCoder 入水！ - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="style/simple.min.css" />
+    <link rel="stylesheet" href="style/style.css" />
+    <link rel="stylesheet" href="style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>Haskell / AtCoder 入水！</h1>
+      <p>Sep 10, 2023</p>
+      <nav role="navigation">
+        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <p>AtCoder でレーティング 1,200 を超えました！　自慢します。<br /></p>
+
+      <h2 id="レーティング関係">
+        <a href="#レーティング関係">レーティング関係</a>
+      </h2>
+      <h3 id="推移"><a href="#推移">推移</a></h3>
+      <p>開始〜『入水』まで 15 ヶ月かかりました。長期戦でした。<br /></p>
+
+      <figure>
+        <img
+          src="./img/2023-09-rating-1230.png"
+          alt="2023-09-rating-1230.png"
+          width="600px"
+        /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 1: </span>水色レーティング到達
+          (入水)
+        </figcaption>
+      </figure>
+
+      <p>
+        各所でユーザ名が水色表示となりました。すっかり嬉ピクミンと化しています。<br />
+      </p>
+
+      <figure>
+        <img
+          src="./img/2023-09-light-blue-problems-1.png"
+          alt="2023-09-light-blue-problems-1.png"
+          width="750px"
+        /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 2: </span
+          >水色になると『成った』感があります
+        </figcaption>
+      </figure>
+
+      <p>
+        『入水』は多くのプレイヤーが掲げる目標であり、『入水記事』も人気コンテンツです。好き勝手書いていきますよ！<br />
+      </p>
+
+      <h3 id="手応え"><a href="#手応え">手応え</a></h3>
+      <p>
+        AtCoder を始めて以来、巨大な万力でも回し続けたような気持ちです。 1mm
+        も進まないまま今日の自分をミキサーにかける、そんな無念の連続でした。<br />
+      </p>
+
+      <p>
+        それでも
+        <strong>お前はプログラミングが下手だ</strong>
+        と突きつけてくる世界の輝かしいことと来たら！　どうにも目を逸らすことができず、水色までやって来れました。<br />
+      </p>
+
+      <h3 id="水色レーティングの位置">
+        <a href="#水色レーティングの位置">水色レーティングの位置</a>
+      </h3>
+      <p>
+        レーティング 1,230 は AtCoder のアクティブユーザ全体の上位 7.5%
+        、茶色レーティング以上で見ると上位 25 %
+        程度にあたります。分母を絞ればゴロゴロいるわけですが、上澄みなのは間違いありません。
+        <a
+          href="https://dic.nicovideo.jp/a/%E7%A8%80%E3%81%AB%E3%82%88%E3%81%8F%E3%81%82%E3%82%8B"
+          >稀によくいる</a
+        >
+        レベルです。<br />
+      </p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          ユーザ数と順位
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">レーティングの範囲</th>
+            <th scope="col" class="org-left">僕の順位</th>
+            <th scope="col" class="org-left">該当ユーザ数</th>
+            <th scope="col" class="org-left">僕の順位 / 該当ユーザ数 [%]</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">灰〜 (0 以上)</td>
+            <td class="org-left">7,684</td>
+            <td class="org-left">104,331</td>
+            <td class="org-left"><strong>7.37%</strong></td>
+          </tr>
+
+          <tr>
+            <td class="org-left">茶〜 (400 以上)</td>
+            <td class="org-left">7,684</td>
+            <td class="org-left">28,927</td>
+            <td class="org-left"><strong>26.6%</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="モチベーション"><a href="#モチベーション">モチベーション</a></h3>
+      <p>
+        入緑〜入水の間では、超美麗ライブラリ
+        <a href="https://github.com/cojna/iota">cojna/iota</a>
+        を読んだり、動的計画法を (表面上) immutable
+        に解くのが至上の楽しみになりました。面白そうなものを探し続けた価値があったと思います。<br />
+      </p>
+
+      <h3 id="これまでで一番の収穫">
+        <a href="#これまでで一番の収穫">これまでで一番の収穫</a>
+      </h3>
+      <p>
+        半年間灰色コーダーの時期がありました。
+        <a href="./2022-12-10-haskell-atcoder.html">入茶記事</a>
+        の通り散々でしたが、あれが良かったと思います。<br />
+      </p>
+
+      <p>
+        クダを巻くことに比べたら、自分の実力に絶望する方が正常です。今後もそうした転換を図りたいものです。<br />
+      </p>
+
+      <h3 id="今後の訓練"><a href="#今後の訓練">今後の訓練</a></h3>
+      <p>
+        今より上のレーティングを目指すためには、基礎学力が足りません。今さらですが、進学校レベルの高校数学をやろうかと思います。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a href="https://ts-webstore.net/?pid=120607757"
+            >マスター・オブ・整数</a
+          ><br />
+        </li>
+        <li>
+          <a href="https://ts-webstore.net/?pid=120607635"
+            >マスター・オブ・場合の数</a
+          ><br />
+        </li>
+      </ul>
+
+      <p>学部教養レベルの数学も使いたいですが、遠いです。<br /></p>
+
+      <h3 id="使用言語"><a href="#使用言語">使用言語</a></h3>
+      <p>
+        僕が Haskell を使わなかった場合の if
+        は、過去の活動を遡って確認できました。 4 回 AtCoder に挑戦し、いつも 1
+        日で挫折しました。<br />
+      </p>
+
+      <figure>
+        <img
+          src="./img/2023-09-if-i-used-rust-for-atcoder.png"
+          alt="2023-09-if-i-used-rust-for-atcoder.png"
+        /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 3: </span>過去の提出
+        </figcaption>
+      </figure>
+
+      <p>
+        僕のような例は多数派のはずです。むしろ Haskell
+        無しで競プロにハマれる方が、特殊な才能 (面白いものを見つける嗅覚)
+        がある気がします。<br />
+      </p>
+
+      <h2 id="人々"><a href="#人々">人々</a></h2>
+      <p>Haskell / AtCoder 周辺の人々への関心を書きます。<br /></p>
+
+      <h3 id="閲覧環境"><a href="#閲覧環境">閲覧環境</a></h3>
+      <p>
+        茶色時代 (<a
+          href="https://toyboot4e.github.io/2023-04-30-green-haskller.html"
+          >入緑記事</a
+        >) とは打って変わって、コンテスト後に人の Haskell
+        を読むのが一番の楽しみとなりました。<br />
+      </p>
+
+      <p>
+        毎回フォームで言語指定するのが面倒くさくて、 Haskell
+        の提出を検索するリンクを常駐表示させてみました:<br />
+      </p>
+
+      <figure>
+        <img
+          src="./img/2023-09-atcoder-with-haskell-links.png"
+          alt="2023-09-atcoder-with-haskell-links.png"
+        /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 4: </span
+          >ブラウザ拡張で画面左に検索リンクを表示
+        </figcaption>
+      </figure>
+
+      <p>
+        これで相当快適になりました。
+        <a
+          href="https://gist.github.com/toyboot4e/c0bfc60025382c5b6c0b7f5de28e78ad"
+          >一応ソースも置いておきます (Gist)</a
+        >
+        。<br />
+      </p>
+
+      <h3 id="隣の Haskeller"><a href="#隣の Haskeller">隣の Haskeller</a></h3>
+      <p>
+        AtCoder / Haskell 周りのイカれたメンバーを勝手に紹介するぜ！ (常態)<br />
+      </p>
+
+      <ul>
+        <li>
+          Dr. Haskell<br />
+          盆栽が上手い。高度な抽象化により、多数の問題が共通の構造を持つことを示す。速度よりもフレームワークを重視する一方、最速実装の収集にも余念が無い。我々
+          (?) にモテる。<br />
+        </li>
+
+        <li>
+          Mr. Haskell<br />
+          常連中の常連。ほとんどすべての AtCoder
+          アルゴリズムコンテストに出場されており、一方的な親近感を禁じ得ない。きっと
+          5 年後も居てくださる。<br />
+        </li>
+
+        <li>
+          Mr. OCaml<br />
+          OCaml の方 (Haskell は特に関係無い)
+          。コードへの熱意、類稀なナードさ、まさかの OCaml
+          など表面情報だけでも関心を惹かれて止まない。僕にモテる。<br />
+        </li>
+
+        <li>
+          Mr. Enthuiast<br />
+          とにかく考察が上手い。よく上手な計算方法を人々の 🧠
+          にインストールしている。再帰でコンテストを破壊するなどの面白エピソードが多く、我々
+          (?) にモテる。<br />
+        </li>
+
+        <li>
+          Mr. Curious<br />
+          おそらく遊び上手。 Rust と Haskell
+          を持ち替えつつ試行錯誤する様子が伺える。パイプライン演算子などを定義して自身の思考に言語を寄せていくスタイルが参考になる。僕にモテる。<br />
+        </li>
+
+        <li>
+          Mr. 100% Haskell<br />
+          正統派 Haskeller. リストや <code>IntMap</code> の扱いが非常に上手く、
+          ABC の解説投稿が参考になる。しかしシンプルな Haskell
+          とはそう簡単に真似できるものではない。自然と我々 (?)
+          の尊敬を集める。<br />
+        </li>
+
+        <li>
+          Mr. Tired<br />
+          おそらく数値計算の方。あたかも当然の顔をして Haskell
+          を書くが、本気を出すときは Fortran である。まさかの Fortran
+          である。とても気になる。<br />
+        </li>
+
+        <li>
+          Mr. Migrator<br />
+          おそらく Haskell 練習中のお方。 Common Lisp をやり込んだため、次は
+          Haskell ということなのか。密な訓練をされているため、 Rated
+          再開の日は遠くないのかもしれないし、別の意図があるのかもしれない。やはり気になる。<br />
+        </li>
+
+        <li>
+          Mr. 異常精進<br />
+          黄 diff や Ex 問題さえも upsolve
+          する異常精進の鬼。きっとアルゴリズムの頂を見たことがある。 Codeforces
+          でも通用しそうなスタイルで気になる。<br />
+        </li>
+
+        <li>
+          Haskell きゃっと<br />
+          Codeforces
+          からの刺客。たま〜に現れて流石の成績を残し去っていく。絵がかわいい。<br />
+        </li>
+
+        <li>
+          Haskell すきー星人<br />
+          <code>vector</code> 派 Haskeller. Haskell を好き過ぎる余り、 E
+          問題であろうとコードゴルフをねじ通してしまうことがある。超美麗ライブラリを公開しており、我々
+          (?) にモテる。<br />
+        </li>
+
+        <li>
+          殺せんせー<br />
+          初めて見たとき、それが Haskell とは思えなかった。基本 toyboot4e の 10
+          倍速いコードを提出する。実は Haskell で C++
+          をぶち抜くことに快感を覚えている。<br />
+          マッハ 20 黄色レーティングの超生物。とにかく面白くて我々 (?)
+          にモテる。初心者の質問に 300 点満点の返信を送るスーパーハッカーの 1
+          人でもある。<br />
+        </li>
+      </ul>
+
+      <h3 id="隣にいない Haskeller">
+        <a href="#隣にいない Haskeller">隣にいない Haskeller</a>
+      </h3>
+      <ul>
+        <li>
+          序盤の問題だけ Haskell で提出する人たち<br />
+          皆ウォッチしています。<br />
+        </li>
+
+        <li>
+          昔 Haskell を使っていた人たち／ ABC に参加していた人たち<br />
+          過去の提出を参考にしています。<br />
+        </li>
+
+        <li>
+          既に高レーティングにも関わらず Haskell に持ち替えようとする人たち<br />
+          凄過ぎる。。楽しみです。<br />
+        </li>
+
+        <li>
+          AHC 参加者<br />
+          いません。 Lisper はポツポツいます。<br />
+        </li>
+      </ul>
+
+      <h3 id="僕"><a href="#僕">僕</a></h3>
+      <p>
+        最近の僕はエキセントリックな面々に近づいており、『実行速度でソートして 1
+        ページ目の提出に現れる (下図)』『ライブラリ全体を 1 行にフォーマットする
+        (<a href="https://atcoder.jp/contests/abc187/submissions/45308829"
+          >提出例</a
+        >)』『Emacs Lisp の束の間
+        <a href="https://kenkoooo.com/atcoder/#/lang">Language Owner</a>
+        になる』などを達成し、インターネットっぽくなりつつあります。<br />
+      </p>
+
+      <figure>
+        <img
+          src="./img/2023-09-second-fastest-language-haskell.png"
+          alt="2023-09-second-fastest-language-haskell.png"
+        /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 5: </span
+          ><a
+            href="./2023-04-30-green-haskller.html#%E4%BB%96%E4%BA%BA%E3%81%AE%20Haskell%20%E3%81%8B%E3%82%89%E5%AD%A6%E3%81%B6%E3%81%B9%E3%81%8D%E3%81%AA%E3%81%AE%E3%81%8B"
+            >AtCoder で 2 番目に速い言語 Haskell</a
+          >
+          を自分がやる日が来るとは……！
+        </figcaption>
+      </figure>
+
+      <h2 id="盆栽"><a href="#盆栽">盆栽</a></h2>
+      <p>最後に経験値やライブラリの話を書きます。<br /></p>
+
+      <h3 id="典型盆栽"><a href="#典型盆栽">典型盆栽</a></h3>
+      <p>
+        手札が揃いました。コンテスト中は、ほぼ定型的なプログラムしか書かなくなってきたと思います。
+        15 ヶ月経って慣れました。<br />
+      </p>
+
+      <p>
+        問題演習は、自分自身に正しいインプットを施して来たかの確認作業という面があります。これは『盆栽』と呼んでしまって良いでしょう。<br />
+      </p>
+
+      <h3 id="Haskell である意味が無い">
+        <a href="#Haskell である意味が無い">Haskell である意味が無い</a>
+      </h3>
+      <p>
+        残念な点としては、 Haskell らしい Haskell
+        を書かなくなりました。結局、一部を手続き型プログラミングにすると、速くて便利でバグが減ると感じています。<br />
+      </p>
+
+      <p>
+        しかし
+        <a href="https://atcoder.jp/contests/dp/submissions/43974852"
+          >久しぶりに Rust を書くと『関数型言語 Rust』ができたりする (提出例:
+          ナップサック問題)</a
+        >
+        ので、 Haskell
+        のおかげでプログラミングの幅が広がったのは間違いありません。<br />
+      </p>
+
+      <p>
+        また Haskell
+        自体、ポイントフリースタイルで関数合成できるのを爽快に感じます。 Haskell
+        でない意味も無いならば、引き続き Haskell を使って行こうかと思います。<br />
+      </p>
+
+      <h3 id="AtCoder をいつ止めるのか">
+        <a href="#AtCoder をいつ止めるのか">AtCoder をいつ止めるのか</a>
+      </h3>
+      <p>
+        日々の訓練が自然消滅するまではダラダラやっていこうと思います。 DP
+        くらいは黄 diff の問題も解けるくらいやり込みたいです。<br />
+      </p>
+
+      <h2 id="終わりに"><a href="#終わりに">終わりに</a></h2>
+      <p>入水時点の興味・関心を書きました。輝かしい日々でした。<br /></p>
+
+      <figure>
+        <img
+          src="./img/2023-09-light-blue-performances.png"
+          alt="2023-09-light-blue-performances.png"
+        /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 6: </span>パフォーマンス (<a
+            href="https://atcoder-charts.netlify.app/#/"
+            >AtCoder Charts</a
+          >)
+        </figcaption>
+      </figure>
+
+      <figure>
+        <img
+          src="./img/2023-09-light-blue-heatmap.png"
+          alt="2023-09-light-blue-heatmap.png"
+        /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 7: </span>Heatmap
+        </figcaption>
+      </figure>
+
+      <figure>
+        <img
+          src="./img/2023-09-light-blue-problems-3.png"
+          alt="2023-09-light-blue-problems-3.png"
+        /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 8: </span>入水したくて水 diff
+          解きまくり
+        </figcaption>
+      </figure>
+
+      <figure>
+        <img
+          src="./img/2023-09-light-blue-problems-4.png"
+          alt="2023-09-light-blue-problems-4.png"
+        /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 9: </span>ABC 389 問, 他 273 問
+          (?), 計 662 問を解いた
+        </figcaption>
+      </figure>
+
+      <figure>
+        <img
+          src="./img/2023-09-light-blue-problems-2.png"
+          alt="2023-09-light-blue-problems-2.png"
+        /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 10: </span>解いた ABC の内訳
+        </figcaption>
+      </figure>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div>
+        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </div>
+    </footer>
+  </body>
+</html>
