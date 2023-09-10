@@ -110,9 +110,9 @@ pub struct DrawCall {
 
 [[https://techblog.kayac.com/approximate-average-fps][平均FPSを楽に近似する]] にある式を使うと簡単です。
 
-#+BEGIN_SRC
+#+BEGIN_QUOTE
 僕はなぜか spike の計算が上手くいってないですが……
-#+END_SRC
+#+END_QUOTE
 
 ** 4. グラフィクス (=wgpu=)
 
