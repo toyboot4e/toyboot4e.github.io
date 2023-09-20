@@ -292,6 +292,11 @@
 			                    "\n<p>%s</p>")
 		                    caption)))))
 
+;; `#+BEGIN_CENTER' block
+(defun my-org-html-center-block (center-block contents info)
+    ;; `org-center' -> `text-center'
+    (format "<div class=\"text-center\">\n%s</div>" contents))
+
 ;; Do not convert `/index.html' into `file:///index.html', really
 (defun my-org-html-link (link desc info)
     "Transcode a LINK object from Org to HTML.
@@ -494,6 +499,7 @@ INFO is a plist holding contextual information.  See
  :translate-alist
  '((template . my-org-html-template)
    (src-block . roygbyte/org-html-src-block)
+   (center-block . my-org-html-center-block)
    (link . my-org-html-link)
    ))
 
