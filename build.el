@@ -183,11 +183,11 @@
       ;; (link (@ (rel "stylesheet")
       ;;          (href "https://cdn.simplecss.org/simple.min.css")))
       (link (@ (rel "stylesheet")
-               (href "style/simple.min.css")))
+               (href "/style/simple.min.css")))
       (link (@ (rel "stylesheet")
-               (href "style/style.css")))
+               (href "/style/style.css")))
       (link (@ (rel "stylesheet")
-               (href "style/prism.css")))
+               (href "/style/prism.css")))
       (script (@ (type "text/javascript")
                  ;; NOTE: It creates `async=""`. I prefer `async` only, but the value is required for XHTML.
                  (async "")
@@ -208,7 +208,7 @@
              ;; timestamp
              (p ,(org-export-data (org-export-get-date info "%b %e, %Y") info))
              (nav (@ (role "navigation"))
-                  (a (@ (href "/")) "Home")
+                  (a (@ (href "/index.html")) "Home")
                   (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
 
 ;; Returns `<footer>' SXML
@@ -216,7 +216,7 @@
     `(footer (@ (role "contentinfo"))
              (*RAW-STRING* "<p>Styled with <a href=\"https://simplecss.org/\">Simple.css</a></p>")
              (div
-              (a (@ (href "/")) "Home")
+              (a (@ (href "/index.html")) "Home")
               (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
 
 ;; Thanks: `https://github.com/SystemCrafters/systemcrafters.github.io/blob/master/publish.el'
