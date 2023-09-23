@@ -41,6 +41,9 @@
     ;; Needed when you need builtin code block highlight
     ;; (package-install 'htmlize)
 
+    ;; `seq-*' functions
+    (require 'seq)
+
     ;; Create HTML from S-expressions
     (package-install 'esxml)
     (require 'esxml)
@@ -105,15 +108,8 @@
         :with-author nil
         :with-creator nil
         :with-toc nil
-        ;; `index.html' generation:
-        :auto-sitemap t
-        :sitemap-filename "index.org"
-        :sitemap-title "toybeam"
-        :sitemap-function my-org-sitemap-function
-        :sitemap-format-entry my-org-sitemap-format-entry
-        ;; :sitemap-style list ;; list | tree
-        ;; REMARK: It doesn't take effect. See the sort in `my-org-sitemap-function'.
-        :sitemap-sort-files chronologically))
+        ;; Prefer manual `index.html' generation:
+        :auto-sitemap nil))
 
 (setq org-publish-project-alist
       `(
@@ -124,11 +120,13 @@
         ;; components:
         ("release-posts" ,@base-attrs
          :base-directory "./src/"
-         ;; :exclude ".*"
+         :recursive t
          ;; :include ,(mapcar (lambda (x) (concat "./src/" x)) (directory-files "./src" nil "\\.org$"))
          )
+
         ("draft-posts" ,@base-attrs
          :base-directory "./draft"
+         :recursive t
          )
 
         ("static"
@@ -147,27 +145,6 @@
 (setq org-html-htmlize-output-type 'nil)
 
 ;;; Backend (HTML template)
-
-(defun my-org-sitemap-function (title list)
-    (let* ((f (lambda (entry) (format "- %s" (car entry))))
-           ;; Alphabetical sort:
-           (list2 (sort (mapcar f (cdr list)) #'string<))
-           (xs (mapconcat 'identity list2 "\n")))
-        (concat "#+TITLE: " title "\n\n"
-                "#+ATTR_HTML: :class sitemap" "\n"
-                xs)))
-
-(defun my-org-sitemap-format-entry (entry style project)
-    (cond ((not (directory-name-p entry))
-           (let* ((date (org-publish-find-date entry project)))
-               (format "@@html:<date>%s</date>@@ [[file:%s][%s]]"
-                       (format-time-string "%F" date)
-                       entry
-                       (org-publish-find-title entry project))))
-          ((eq style 'tree)
-           ;; Return only last subdir.
-           (file-name-nondirectory (directory-file-name entry)))
-          (t entry)))
 
 ;; Returns `<head>' SXML
 (defun my-html-head (info)
@@ -472,8 +449,8 @@ INFO is a plist holding contextual information.  See
 	          (format "<a href=\"#%s\" %s%s>%s</a>"
 		              fragment
 		              (format "class=\"coderef\" onmouseover=\"CodeHighlightOn(this, \
-'%s');\" onmouseout=\"CodeHighlightOff(this, '%s');\""
-			                  fragment fragment)
+                                                                               '%s');\" onmouseout=\"CodeHighlightOff(this, '%s');\""
+	                          fragment fragment)
 		              attributes
 		              (format (org-export-get-coderef-format path desc)
 			                  (org-export-resolve-coderef path info)))))
@@ -490,6 +467,68 @@ INFO is a plist holding contextual information.  See
          ;; No path, only description.  Try to do something useful.
          (t
           (format "<i>%s</i>" desc)))))
+
+;;; Manual sitemap (`index.org') generation
+
+;; Returns something like:
+;; ((keyword (:key "DATE" :value "<2023-09-17 Sat>" :begin 20 :end 45 :post-blank 0 :post-affiliated 20 ...)))
+;; Thanks: <https://emacs.stackexchange.com/questions/21713/how-to-get-property-values-from-org-file-headers>
+(defun my-org-global-props (property &optional buffer)
+    "Get the plists of global org properties of current buffer."
+    (with-current-buffer (or buffer (current-buffer))
+        (org-element-map (org-element-parse-buffer) 'keyword
+            (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
+
+;; `my-org-global-prop-value' => `2023-09-17 Sat'
+(defun my-org-global-prop-value (key)
+    "Get global org property KEY of current buffer."
+    (org-element-property :value (car (my-org-global-props key))))
+
+(defun my-org-read-prop (org-file key)
+    (with-temp-buffer
+        (insert-file-contents org-file)
+        (my-org-global-prop-value key)))
+
+;; Parses an `org-file' headline and returns an org line as a link.
+(defun my-parse-headlines (org-file link-path)
+    (let* ((title (or (my-org-read-prop org-file "TITLE") "<none>"))
+           ;; `<2023-01-01 Sat>' => `2023-01-01'
+           (date-string (substring (or (my-org-read-prop org-file "DATE") (concat "<" (format-time-string "%F") ">")) 1 11)))
+        (format "@@html:<date>%s</date>@@ [[file:%s][%s]]" date-string link-path title)))
+
+;; Generates `index.org'
+(defun my-generate-sitemap (base-dir page-title)
+    (let* ((files (seq-filter (lambda (s) (not (string-match "index.org" s)))
+                              (directory-files-recursively base-dir "\.org$")))
+           ;; NOTE: here `base-dir' is treated as a regex (unfortunately)
+           (files2 (mapcar (lambda (s) (string-trim-left s base-dir)) files))
+
+           ;; Org-mode file links:
+           (list (mapcar (lambda (link-path)
+                             (format "- %s" (my-parse-headlines (concat base-dir link-path) link-path))) files2))
+           ;; Alphabetically sorted:
+           (list2 (sort list #'string<))
+
+           ;; Filter & stringify
+           (to-lines (lambda (xs) (mapconcat #'identity xs "\n")))
+           (devlog (funcall to-lines (seq-filter (lambda (s) (not (string-match "diary/" s))) list2)))
+           (diary (funcall to-lines (seq-filter (lambda (s) (string-match "diary/" s)) list2))))
+        (concat "#+TITLE: " page-title "\n"
+                "\n"
+
+                ;; "#+BEGIN_CENTER" "\n"
+                ;; "[[/index.html][devlog]] | [[/diary/index.org][diary]]" "\n"
+                ;; "#+END_CENTER" "\n"
+                "* devlog" "\n"
+                "#+ATTR_HTML: :class sitemap" "\n"
+                devlog "\n"
+                "\n"
+
+                "* diary" "\n"
+                "#+ATTR_HTML: :class sitemap" "\n"
+                diary "\n"
+                )))
+
 ;;; Backend (setup)
 
 ;; Set up `my-site-html' backend:
@@ -501,8 +540,7 @@ INFO is a plist holding contextual information.  See
  '((template . my-org-html-template)
    (src-block . roygbyte/org-html-src-block)
    (center-block . my-org-html-center-block)
-   (link . my-org-html-link)
-   ))
+   (link . my-org-html-link)))
 
 (defun my-org-html-publish-to-html (plist filename pub-dir)
     "Publish an org file to HTML, using the FILENAME as the output directory."
@@ -541,6 +579,16 @@ INFO is a plist holding contextual information.  See
 (message "--------------------------------------------------------------------------------")
 
 (org-publish-remove-all-timestamps)
+
+(message "Generating `index.org`..")
+(pcase build-target
+    ("draft" (let ((index-org-string (my-generate-sitemap "draft" "toybeam"))
+                   (index-org-path "draft/index.org"))
+                 (with-temp-file index-org-path (insert index-org-string))))
+    ("release" (let ((index-org-string (my-generate-sitemap "src" "toybeam"))
+                     (index-org-path "src/index.org"))
+                   (with-temp-file index-org-path (insert index-org-string))))
+    (_ (error "build target wrong?")))
 
 (if force-flag
         (org-publish build-target t)
