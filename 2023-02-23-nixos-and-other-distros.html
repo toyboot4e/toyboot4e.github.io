@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Linux distribution の選択について - toybeam</title>
     <meta name="description" content="devlog of toyboot4e" />
-    <link rel="stylesheet" href="style/simple.min.css" />
-    <link rel="stylesheet" href="style/style.css" />
-    <link rel="stylesheet" href="style/prism.css" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -21,13 +21,12 @@
       <h1>Linux distribution の選択について</h1>
       <p>Feb 23, 2023</p>
       <nav role="navigation">
-        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
       </nav>
     </header>
     <main role="main">
       <p>
-        昔 <a href="https://nixos.org/">NixOS</a> に触っていたのは、ベター
-        Ubuntu
+        昔 <a href="https://nixos.org/">NixOS</a> に触っていたのは、ベター Ubuntu
         として使えると勘違いしたためです。結局難しすぎて返り討ちに遭いました。<br />
       </p>
 
@@ -37,9 +36,7 @@
       </p>
 
       <h2 id="Linux distribution の選択について">
-        <a href="#Linux distribution の選択について"
-          >Linux distribution の選択について</a
-        >
+        <a href="#Linux distribution の選択について">Linux distribution の選択について</a>
       </h2>
       <p>Linux 初心者によるエアプとなります。ご了承ください。<br /></p>
 
@@ -52,9 +49,8 @@
 
       <p>
         特に
-        <a href="https://wiki.archlinux.org/">ArchWiki</a>
-        が情報の宝庫として知られています。他の distribution
-        の使用者も、まず第一に ArchWiki を参照するようです。ある種、 Linux
+        <a href="https://wiki.archlinux.org/">ArchWiki</a> が情報の宝庫として知られています。他の
+        distribution の使用者も、まず第一に ArchWiki を参照するようです。ある種、 Linux
         の標準を作り出している貫禄があります。<br />
       </p>
 
@@ -68,15 +64,14 @@
         <a href="#Arch Linux 系 distribution">Arch Linux 系 distribution</a>
       </h3>
       <p>
-        Manjaro は Arch ベースの distribution です。 Manjaro のパッケージは Arch
-        のパッケージの 1 週間遅れで配布され、すでに Arch
+        Manjaro は Arch ベースの distribution です。 Manjaro のパッケージは Arch のパッケージの 1
+        週間遅れで配布され、すでに Arch
         ユーザの手で初期不良の修正等が行われた状態で配信されます。<br />
       </p>
 
       <p>
         Manjaro, EndeavaurOS, Arco を始め、 Arch ベースの distribution
-        は強い人気を集めています。僕も本来は Manjaro
-        あたりが一番身の丈に合っている気がします。<br />
+        は強い人気を集めています。僕も本来は Manjaro あたりが一番身の丈に合っている気がします。<br />
       </p>
 
       <h3 id="NixOS の特異性について">
@@ -90,8 +85,7 @@
       </p>
 
       <p>
-        それだけ聞くと、むしろ他の OS
-        を選択する理由が無いかのようですが、実際には Nix
+        それだけ聞くと、むしろ他の OS を選択する理由が無いかのようですが、実際には Nix
         で管理されていないプログラムが利用できなくなるため、ハイリスクな選択です。<br />
       </p>
 
@@ -103,34 +97,28 @@
 
       <p>
         Nix が書けるようになると、何でも Nix
-        を経由してビルドするようになるかもしれません。また設定ファイル全体を Nix
-        Flakes で管理するなどの遊びの余地もあります。<br />
+        を経由してビルドするようになるかもしれません。また設定ファイル全体を Nix Flakes
+        で管理するなどの遊びの余地もあります。<br />
       </p>
 
-      <h3 id="Arch Linux vs NixOS?">
-        <a href="#Arch Linux vs NixOS?">Arch Linux vs NixOS?</a>
-      </h3>
+      <h3 id="Arch Linux vs NixOS?"><a href="#Arch Linux vs NixOS?">Arch Linux vs NixOS?</a></h3>
       <p>
         NixOS
         においては、間接的なレイヤで設定を実施することで、望んだ効果が半ば自動的に反映されます。しかしその内部的な挙動を知るためには、より下のレイヤまで降りていかねばなりません。またいずれは間接レイヤ等を自力で構築する必要性が生まれます。<br />
       </p>
 
       <p>
-        一方 Arch Linux を使うと、より生に近い Linux
-        に触れることができます。また ArchWiki
+        一方 Arch Linux を使うと、より生に近い Linux に触れることができます。また ArchWiki
         の内容を直接取り込んで設定できるので、素直に邁進していけると思います。<br />
       </p>
 
       <p>
-        つまり Arch と NixOS
-        を両方やらねればならないという気がしています。気の遠い話です。。<br />
+        つまり Arch と NixOS を両方やらねればならないという気がしています。気の遠い話です。。<br />
       </p>
     </main>
     <footer role="contentinfo">
       <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
-      <div>
-        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
-      </div>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
     </footer>
   </body>
 </html>

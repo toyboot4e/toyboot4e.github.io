@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Evil Emacs における多重化 - toybeam</title>
     <meta name="description" content="devlog of toyboot4e" />
-    <link rel="stylesheet" href="style/simple.min.css" />
-    <link rel="stylesheet" href="style/style.css" />
-    <link rel="stylesheet" href="style/prism.css" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -21,26 +21,20 @@
       <h1>Evil Emacs における多重化</h1>
       <p>Mar 12, 2023</p>
       <nav role="navigation">
-        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
       </nav>
     </header>
     <main role="main">
       <h2 id="背景"><a href="#背景">背景</a></h2>
-      <p>
-        僕はエディタに拘りがありません。 Vim
-        キーバインドさえあれば何でも良いのです。<br />
-      </p>
+      <p>僕はエディタに拘りがありません。 Vim キーバインドさえあれば何でも良いのです。<br /></p>
 
       <p>
-        しかし Emacs の workflow
-        は一皮剥けている気がします。ここでは『多重化』の観点から僕の Emacs
+        しかし Emacs の workflow は一皮剥けている気がします。ここでは『多重化』の観点から僕の Emacs
         を紹介します。<br />
       </p>
 
       <h2 id="主な workflow"><a href="#主な workflow">主な workflow</a></h2>
-      <p>
-        僕の環境は多重化に力が入っています。多重化には 3 段階あります。<br />
-      </p>
+      <p>僕の環境は多重化に力が入っています。多重化には 3 段階あります。<br /></p>
 
       <ol>
         <li>画面分割<br /></li>
@@ -48,60 +42,43 @@
         <li>マルチ・マルチタブ<br /></li>
       </ol>
 
-      <p>
-        僕は Emacs
-        をターミナルから起動するので、ターミナルの多重化から説明します。<br />
-      </p>
+      <p>僕は Emacs をターミナルから起動するので、ターミナルの多重化から説明します。<br /></p>
 
-      <h3 id="ターミナルの多重化">
-        <a href="#ターミナルの多重化">ターミナルの多重化</a>
-      </h3>
+      <h3 id="ターミナルの多重化"><a href="#ターミナルの多重化">ターミナルの多重化</a></h3>
       <p>
-        <code>tmux</code>
-        を使うと、ターミナルの画面分割ができます。マルチタブ機能もあります。<br />
+        <code>tmux</code> を使うと、ターミナルの画面分割ができます。マルチタブ機能もあります。<br />
       </p>
 
       <figure>
-        <img
-          src="./img/2023-03-terminal.png"
-          alt="2023-03-terminal.png"
-        /><br />
+        <img src="./img/2023-03-terminal.png" alt="2023-03-terminal.png" /><br />
 
         <figcaption>
-          <span class="figure-number">Figure 1: </span
-          ><code>tmux</code> で画面分割
+          <span class="figure-number">Figure 1: </span><code>tmux</code> で画面分割
         </figcaption>
       </figure>
 
       <p>
         画面下部の <code>ABC</code>, <code>dotfiles</code>,
         <code>ranger</code> というのがタブです。マルチタブを持つ
-        <span class="underline">session</span>
-        も多重化できます。マルチ・マルチタブです。<br />
+        <span class="underline">session</span> も多重化できます。マルチ・マルチタブです。<br />
       </p>
 
       <figure>
         <img src="./img/2023-03-tmux.png" alt="2023-03-tmux.png" /><br />
 
         <figcaption>
-          <span class="figure-number">Figure 2: </span><code>demo</code> session
-          の下に <code>ABC</code>, <code>dotfiles</code>,
-          <code>ranger</code> タブがぶら下がっている
+          <span class="figure-number">Figure 2: </span><code>demo</code> session の下に
+          <code>ABC</code>, <code>dotfiles</code>, <code>ranger</code> タブがぶら下がっている
         </figcaption>
       </figure>
 
       <h3 id="Emacs の多重化"><a href="#Emacs の多重化">Emacs の多重化</a></h3>
-      <p>
-        ターミナルの中で Emacs を起動します。 Emacs
-        の中でも画面分割が可能です。<br />
-      </p>
+      <p>ターミナルの中で Emacs を起動します。 Emacs の中でも画面分割が可能です。<br /></p>
 
       <figure>
         <img src="./img/2023-03-windows.png" alt="2023-03-windows.png" /><br />
 
-        <figcaption>
-          <span class="figure-number">Figure 3: </span>画面分割
-        </figcaption>
+        <figcaption><span class="figure-number">Figure 3: </span>画面分割</figcaption>
       </figure>
 
       <p>
@@ -115,14 +92,10 @@
       <figure>
         <img src="./img/2023-03-tabs.png" alt="2023-03-tabs.png" /><br />
 
-        <figcaption>
-          <span class="figure-number">Figure 4: </span>マルチ・マルチタブ
-        </figcaption>
+        <figcaption><span class="figure-number">Figure 4: </span>マルチ・マルチタブ</figcaption>
       </figure>
 
-      <h3 id="Emacs のウィジェット">
-        <a href="#Emacs のウィジェット">Emacs のウィジェット</a>
-      </h3>
+      <h3 id="Emacs のウィジェット"><a href="#Emacs のウィジェット">Emacs のウィジェット</a></h3>
       <p>
         サイドバーにはプログラムのアウトラインを表示することもできます。僕はハードコアな環境を求めているわけではなく、リッチで優しい
         UI が好きです。<br />
@@ -132,60 +105,44 @@
         <img src="./img/2023-03-imenu.gif" alt="2023-03-imenu.gif" /><br />
 
         <figcaption>
-          <span class="figure-number">Figure 5: </span
-          ><code>imenu</code> (アウトライン表示)
+          <span class="figure-number">Figure 5: </span><code>imenu</code> (アウトライン表示)
         </figcaption>
       </figure>
 
       <p>
-        ついでに <code>magit</code> にも触れておきます。
-        <code>magit</code> と言えば Emacs の killer feature です。
-        <code>git add</code> を始め、 <code>rebase</code>, <code>squash</code> /
-        <code>fixup</code>
-        のような複雑な操作も比較的簡単にガイドしてくれます。<br />
+        ついでに <code>magit</code> にも触れておきます。 <code>magit</code> と言えば Emacs の killer
+        feature です。 <code>git add</code> を始め、 <code>rebase</code>, <code>squash</code> /
+        <code>fixup</code> のような複雑な操作も比較的簡単にガイドしてくれます。<br />
       </p>
 
       <figure>
         <img src="./img/2023-03-magit.png" alt="2023-03-magit.png" /><br />
 
         <figcaption>
-          <span class="figure-number">Figure 6: </span><code>magit</code> (Git
-          クライアント)
+          <span class="figure-number">Figure 6: </span><code>magit</code> (Git クライアント)
         </figcaption>
       </figure>
 
-      <h3 id="Emacs における検索">
-        <a href="#Emacs における検索">Emacs における検索</a>
-      </h3>
-      <p>
-        ファジー検索とプレビュー機能も欠かせません。 Emacs
-        もこうした機能は得意です。<br />
-      </p>
+      <h3 id="Emacs における検索"><a href="#Emacs における検索">Emacs における検索</a></h3>
+      <p>ファジー検索とプレビュー機能も欠かせません。 Emacs もこうした機能は得意です。<br /></p>
 
       <figure>
-        <img
-          src="./img/2023-03-find-file.png"
-          alt="2023-03-find-file.png"
-        /><br />
+        <img src="./img/2023-03-find-file.png" alt="2023-03-find-file.png" /><br />
 
         <figcaption>
-          <span class="figure-number">Figure 7: </span>ファイル検索
-          (<code>find-file</code>)
+          <span class="figure-number">Figure 7: </span>ファイル検索 (<code>find-file</code>)
         </figcaption>
       </figure>
 
       <figure>
         <img src="./img/2023-03-grep.png" alt="2023-03-grep.png" /><br />
 
-        <figcaption>
-          <span class="figure-number">Figure 8: </span><code>grep</code>
-        </figcaption>
+        <figcaption><span class="figure-number">Figure 8: </span><code>grep</code></figcaption>
       </figure>
 
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
-        僕はエディタの表面的な部分に関心があったので、結果的に Emacs
-        に流れました。 Emacs は
+        僕はエディタの表面的な部分に関心があったので、結果的に Emacs に流れました。 Emacs は
         <code>Notepad++++++++++++++</code> として使っています。<br />
       </p>
 
@@ -196,9 +153,7 @@
     </main>
     <footer role="contentinfo">
       <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
-      <div>
-        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
-      </div>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
     </footer>
   </body>
 </html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>org-mode 製ブログの改良 (2) - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1><code>org-mode</code> 製ブログの改良 (2)</h1>
+      <p>Sep 23, 2023</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="背景"><a href="#背景">背景</a></h2>
+      <p>
+        このブログは <code>org-mode</code> の機能を使って生成されています。 HTML テンプレートは
+        <a href="https://github.com/tali713/esxml">esxml</a> で書いて、 SSG としては
+        <code>org-publish</code> を使っています。<br />
+      </p>
+
+      <p>
+        日記の追加に伴って、
+        <code>index.html</code>
+        の生成をテコ入れしました。また原稿ファイルで使える便利構文を追加しました。<br />
+      </p>
+
+      <h2 id="改造機能"><a href="#改造機能">改造機能</a></h2>
+      <h3 id="diary/ ディレクトリの追加">
+        <a href="#diary/ ディレクトリの追加"><code>diary/</code> ディレクトリの追加</a>
+      </h3>
+      <p>サブディレクトリに日記ファイルを置けるようにしました:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-sh">.
+├── build.el
+├── out
+├── src        # devlog
+│   └── diary  # diary
+└── x
+</code></pre>
+      </div>
+
+      <p>
+        <code>index.html</code> は <code>devlog</code> と <code>diary</code> 毎に
+        <code>&lt;h2&gt;</code> タグで区切られるようになりました。日記では、主に ABC
+        (毎週開催の競技プログラミングのコンテスト) の感想を書く予定です。<br />
+      </p>
+
+      <h3 id="#+BEGIN_DETAILS">
+        <a href="##+BEGIN_DETAILS"><code>#+BEGIN_DETAILS</code></a>
+      </h3>
+      <p>
+        <code>org-mode</code> の文書では <code>#+BEGIN_*</code>,
+        <code>#+END_*</code> で囲ったテキストを『ブロック』とみなして変換できます。<br />
+      </p>
+
+      <p>
+        今回 <code>#+BEGIN_DETAILS</code> という <em>special block</em> (custom block)
+        を追加しました。 <code>&lt;details&gt;</code> タグを簡単に記述できるようになりました。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span>変換前 (<code>org-mode</code>)</label
+        >
+        <pre><code class="src language-org-mode">#+BEGIN_DETAILS 個々にタイトル
+折りたたみ表示
+#+END_DETAILS
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span>変換後 (<code>html</code>)</label
+        >
+        <pre><code class="src language-html">&lt;details&gt;
+&lt;summary&gt;個々にタイトル&lt;/summary&gt;
+折りたたみ表示
+&lt;/details&gt;
+</code></pre>
+      </div>
+
+      <p>今後追加したい block があれば、同様に対応できます。<br /></p>
+
+      <h3 id="絶対パスを使って .org ファイルにリンクできるように">
+        <a href="#絶対パスを使って .org ファイルにリンクできるように"
+          >絶対パスを使って <code>.org</code> ファイルにリンクできるように</a
+        >
+      </h3>
+      <p>
+        <code>[[/index.html][トップページ]]</code> のようにリンクを書くと
+        <code>&lt;a href="file:///index.html"&gt;トップページ&lt;/a&gt;</code>
+        が出力される悲劇を修正しました。<br />
+      </p>
+
+      <p>
+        その他に <code>#+BEGIN_CENTER</code> の html 出力を調整するなど、ツギハギしています。<br />
+      </p>
+
+      <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
+      <p>
+        相変わらず手のかかるブログですが、
+        <code>org-publish</code> が異常に柔軟なおかげで何とかなっています。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

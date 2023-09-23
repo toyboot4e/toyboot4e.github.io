@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>開発中の 2D フレームワークについて - toybeam</title>
     <meta name="description" content="devlog of toyboot4e" />
-    <link rel="stylesheet" href="style/simple.min.css" />
-    <link rel="stylesheet" href="style/style.css" />
-    <link rel="stylesheet" href="style/prism.css" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -21,7 +21,7 @@
       <h1>開発中の 2D フレームワークについて</h1>
       <p>Dec 11, 2022</p>
       <nav role="navigation">
-        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
       </nav>
     </header>
     <main role="main">
@@ -37,8 +37,7 @@
       <blockquote>
         <p>
           『GameEngineDev』カレンダーの記事ですが、 2D
-          フレームワークに関する投稿となります。スケールが落ちますがご了承ください
-          🙇<br />
+          フレームワークに関する投稿となります。スケールが落ちますがご了承ください 🙇<br />
         </p>
       </blockquote>
 
@@ -85,22 +84,16 @@
       <p><code>inkfs</code> 🦑 の主なモジュールを紹介します。<br /></p>
 
       <h3 id="1. ECS (Entity-Component-System)">
-        <a href="#1. ECS (Entity-Component-System)"
-          >1. ECS (Entity-Component-System)</a
-        >
+        <a href="#1. ECS (Entity-Component-System)">1. ECS (Entity-Component-System)</a>
       </h3>
-      <p>
-        <code>inkfs</code> 🦑 は Rust
-        でゲームを作るためのフレームワークです。<br />
-      </p>
+      <p><code>inkfs</code> 🦑 は Rust でゲームを作るためのフレームワークです。<br /></p>
 
       <p>Rust でゲームを作る際は、データの持ち方が重要です。たとえば、<br /></p>
 
       <ul>
         <li>
           グローバル変数<br />
-          ゲーム開発に必要なグローバル変数は、描画コンテクストやゲームマップなどです。
-          Rust
+          ゲーム開発に必要なグローバル変数は、描画コンテクストやゲームマップなどです。 Rust
           に継承はありませんから、コンポジションしようとなります。しかしデータのネストが深くなると、借用の分割も面倒です。<br />
         </li>
 
@@ -110,8 +103,7 @@
             >trait</code
           >
           で抽象するとポインタが増えますし、
-          <code>trait</code>
-          の組み合わせでうまく表現できなくなる懸念があります。<br />
+          <code>trait</code> の組み合わせでうまく表現できなくなる懸念があります。<br />
         </li>
       </ul>
 
@@ -122,9 +114,7 @@
       </p>
 
       <h3 id="2. Scene graph"><a href="#2. Scene graph">2. Scene graph</a></h3>
-      <p>
-        <code>inkfs</code> 🦑 のシーングラフは ECS の上に作っています。<br />
-      </p>
+      <p><code>inkfs</code> 🦑 のシーングラフは ECS の上に作っています。<br /></p>
 
       <figure>
         <img
@@ -135,9 +125,7 @@
       </figure>
 
       <h4 id="Renderable の共通コンポーネント">
-        <a href="#Renderable の共通コンポーネント"
-          >Renderable の共通コンポーネント</a
-        >
+        <a href="#Renderable の共通コンポーネント">Renderable の共通コンポーネント</a>
       </h4>
       <p>どの rendearble も以下のコンポーネントを持ちます:<br /></p>
 
@@ -147,8 +135,7 @@
           親子関係の連結リストです。<br />
         </li>
         <li>
-          <code>Transform</code> (<code>LocalTranform</code> +
-          <code>GlobalTransform</code>)<br />
+          <code>Transform</code> (<code>LocalTranform</code> + <code>GlobalTransform</code>)<br />
         </li>
         <li><code>ZOrder</code><br /></li>
       </ul>
@@ -179,8 +166,7 @@
       <p>
         上の renderable
         は様々なデータに分かれていますが、頂点データに変えた後には同質のデータです。以下の
-        <code>DrawCall</code> を作成後、
-        <code>z_order</code> でソートしてから描画しています:<br />
+        <code>DrawCall</code> を作成後、 <code>z_order</code> でソートしてから描画しています:<br />
       </p>
 
       <div class="org-src-container">
@@ -193,9 +179,7 @@
       </div>
 
       <h3 id="3. ウィンドウ・入力 (sdl2)">
-        <a href="#3. ウィンドウ・入力 (sdl2)"
-          >3. ウィンドウ・入力 (<code>sdl2</code>)</a
-        >
+        <a href="#3. ウィンドウ・入力 (sdl2)">3. ウィンドウ・入力 (<code>sdl2</code>)</a>
       </h3>
       <figure>
         <img
@@ -208,9 +192,7 @@
       <h4 id="主なウィンドウのライブラリ">
         <a href="#主なウィンドウのライブラリ">主なウィンドウのライブラリ</a>
       </h4>
-      <p>
-        ウィンドウ表示・入力処理のライブラリとしては SDL や GLFW が有名です。<br />
-      </p>
+      <p>ウィンドウ表示・入力処理のライブラリとしては SDL や GLFW が有名です。<br /></p>
 
       <ul>
         <li>
@@ -222,8 +204,7 @@
           以外のユーザも使用できます。僕は使ったことがありません。<br />
         </li>
         <li>
-          Rust 製のライブラリとしては <code>winit</code> もあります。以前は
-          macOS
+          Rust 製のライブラリとしては <code>winit</code> もあります。以前は macOS
           での動きがあまりよく無かったのですが、最近の動向はどうなのか……<br />
         </li>
       </ul>
@@ -231,24 +212,19 @@
       <h4 id="入力処理"><a href="#入力処理">入力処理</a></h4>
       <p>
         イベント駆動にするか、すべてのキー入力イベントを 1 つの
-        <code>Input</code>
-        オブジェクトに集約すると思います。僕は後者が好みです。<br />
+        <code>Input</code> オブジェクトに集約すると思います。僕は後者が好みです。<br />
       </p>
 
       <p>
         <code>inkfs</code> 🦑 では主に
-        <a href="https://github.com/FNA-XNA/FNA/tree/master/src/Input"
-          >FNA の Input モジュール</a
-        >
+        <a href="https://github.com/FNA-XNA/FNA/tree/master/src/Input">FNA の Input モジュール</a>
         を参考に、入力状態のダブルバッファを持っています。また『仮想キー』のモジュールを作り、『Enter
         または Space』のようなキーを定義できるようにしています。<br />
       </p>
 
       <h4 id="FPS カウンター"><a href="#FPS カウンター">FPS カウンター</a></h4>
       <p>
-        <a href="https://techblog.kayac.com/approximate-average-fps"
-          >平均FPSを楽に近似する</a
-        >
+        <a href="https://techblog.kayac.com/approximate-average-fps">平均FPSを楽に近似する</a>
         にある式を使うと簡単です。<br />
       </p>
 
@@ -257,28 +233,18 @@
       </blockquote>
 
       <h3 id="4. グラフィクス (wgpu)">
-        <a href="#4. グラフィクス (wgpu)"
-          >4. グラフィクス (<code>wgpu</code>)</a
-        >
+        <a href="#4. グラフィクス (wgpu)">4. グラフィクス (<code>wgpu</code>)</a>
       </h3>
       <p>もくもく<br /></p>
 
       <figure>
-        <img
-          src="./img/2022-12-gfx-fog-1.png"
-          alt="2022-12-gfx-fog-1.png"
-          width="700px"
-        /><br />
+        <img src="./img/2022-12-gfx-fog-1.png" alt="2022-12-gfx-fog-1.png" width="700px" /><br />
       </figure>
 
       <p>やばい<br /></p>
 
       <figure>
-        <img
-          src="./img/2022-12-gfx-fog-2.png"
-          alt="2022-12-gfx-fog-2.png"
-          width="700px"
-        /><br />
+        <img src="./img/2022-12-gfx-fog-2.png" alt="2022-12-gfx-fog-2.png" width="700px" /><br />
       </figure>
 
       <p>
@@ -294,8 +260,7 @@
       </h4>
       <p>
         古典的な
-        <code>SpriteBatch</code>
-        は、頂点データの作成と描画関数の呼び出しを交互に行います。しかし
+        <code>SpriteBatch</code> は、頂点データの作成と描画関数の呼び出しを交互に行います。しかし
         <code>wgpu</code>
         を使っていると、まず頂点データを作成し、それから一気に描画関数を呼び出すという形になりがちです。<br />
       </p>
@@ -315,8 +280,7 @@
         この方式に至るのは、 <code>wgpu::RenderPass&lt;'w&gt;</code> が
         <code>Drop</code> トレイトを実装するためです。この場合
         <a href="https://doc.rust-lang.org/nomicon/dropck.html">Drop Check</a>
-        という強烈な制約がかかり、
-        <code>RenderPass</code> のメソッドの引数はすべて
+        という強烈な制約がかかり、 <code>RenderPass</code> のメソッドの引数はすべて
         <code>RenderPass</code> を <code>Drop</code> するまで immutable
         になる……と思います。この制限下で伝統的な
         <code>SpriteBatch</code> をそのままポートするのはたぶん無理です。<br />
@@ -325,9 +289,7 @@
       <h4 id="Bevy Engine から学んだこと">
         <a href="#Bevy Engine から学んだこと">Bevy Engine から学んだこと</a>
       </h4>
-      <p>
-        <code>wgpu</code> の典型的な使い方は Bevy Engine から学べます:<br />
-      </p>
+      <p><code>wgpu</code> の典型的な使い方は Bevy Engine から学べます:<br /></p>
 
       <ul>
         <li><code>wgpu</code> のデータ型を共有ポインタにする<br /></li>
@@ -341,8 +303,8 @@
           Uniform array<br />
           <code>wgpu</code> の uniform は immutable です。 1 フレームに uniform
           の更新を複数回実行すると、最後の更新が適用された後の unifrom
-          がそのフレームで使用されます。複数の uniform を持つ方法として uniform
-          array を使ってみたいと思うのですが‥‥<br />
+          がそのフレームで使用されます。複数の uniform を持つ方法として uniform array
+          を使ってみたいと思うのですが‥‥<br />
         </li>
 
         <li>
@@ -351,30 +313,22 @@
         </li>
       </ul>
 
-      <h3 id="5. アセット管理">
-        <a href="#5. アセット管理">5. アセット管理</a>
-      </h3>
+      <h3 id="5. アセット管理"><a href="#5. アセット管理">5. アセット管理</a></h3>
       <p>
-        同じテクスチャを 2
-        回ロードしないようする、そんなリソースのキャッシュを作成します。主に 2
+        同じテクスチャを 2 回ロードしないようする、そんなリソースのキャッシュを作成します。主に 2
         種類の実装が思いつきます。<br />
       </p>
 
-      <h4 id="共有ポインタ方式">
-        <a href="#共有ポインタ方式">共有ポインタ方式</a>
-      </h4>
+      <h4 id="共有ポインタ方式"><a href="#共有ポインタ方式">共有ポインタ方式</a></h4>
       <p>
-        共有ポインタ方式です。 Rust だと
-        <code>Deref</code> にするのは無理で、毎回
-        <code>asset.get();</code> のような形で
-        <code>&amp;T</code> を復元します。<br />
+        共有ポインタ方式です。 Rust だと <code>Deref</code> にするのは無理で、毎回
+        <code>asset.get();</code> のような形で <code>&amp;T</code> を復元します。<br />
       </p>
 
       <h4 id="インデクス方式"><a href="#インデクス方式">インデクス方式</a></h4>
       <p>
         アセットのユーザは、アセット配列へのインデクスを持つ形にします。毎回
-        <code>&amp;assets[asset_handle]</code> のような形で
-        <code>&amp;T</code> を復元します。<br />
+        <code>&amp;assets[asset_handle]</code> のような形で <code>&amp;T</code> を復元します。<br />
       </p>
 
       <p>
@@ -382,9 +336,7 @@
         配列として扱える気がしますが、詳細をみたことはありません。<br />
       </p>
 
-      <h3 id="6. フォント描画">
-        <a href="#6. フォント描画">6. フォント描画</a>
-      </h3>
+      <h3 id="6. フォント描画"><a href="#6. フォント描画">6. フォント描画</a></h3>
       <h4 id="方法 1. SDF フォントを用いる">
         <a href="#方法 1. SDF フォントを用いる">方法 1. SDF フォントを用いる</a>
       </h4>
@@ -397,10 +349,7 @@
       <p>やってみました。<br /></p>
 
       <figure>
-        <img
-          src="./img/2022-12-gfx-msdf-44-2.png"
-          alt="2022-12-gfx-msdf-44-2.png"
-        /><br />
+        <img src="./img/2022-12-gfx-msdf-44-2.png" alt="2022-12-gfx-msdf-44-2.png" /><br />
       </figure>
 
       <p>完璧ですね。完璧にヨレヨレです。<br /></p>
@@ -413,62 +362,42 @@
       <p>
         MSDF が上手く行かなかったので、 TTF
         のフォントデータを元に、動的に文字の画像データを作ります。 Rust だと
-        <a href="https://github.com/mooman219/fontdue">fontdue</a>
-        が定番です。<br />
+        <a href="https://github.com/mooman219/fontdue">fontdue</a> が定番です。<br />
       </p>
 
       <p>それでは文字を表示してみましょう:<br /></p>
 
       <figure>
-        <img
-          src="./img/2022-12-gfx-font_32px.png"
-          alt="2022-12-gfx-font_32px.png"
-        /><br />
+        <img src="./img/2022-12-gfx-font_32px.png" alt="2022-12-gfx-font_32px.png" /><br />
       </figure>
 
       <p>文字サイズを上げてみると:<br /></p>
 
       <figure>
-        <img
-          src="./img/2022-12-gfx-font_64px.png"
-          alt="2022-12-gfx-font_64px.png"
-        /><br />
+        <img src="./img/2022-12-gfx-font_64px.png" alt="2022-12-gfx-font_64px.png" /><br />
       </figure>
 
       <p>
         急に馴れ馴れしい。フォントテクスチャが飽和した際は、フォントテクスチャをリサイズしなければなりません。<br />
       </p>
 
-      <h4 id="マークアップテキスト">
-        <a href="#マークアップテキスト">マークアップテキスト</a>
-      </h4>
+      <h4 id="マークアップテキスト"><a href="#マークアップテキスト">マークアップテキスト</a></h4>
       <p><code>Markup with :b[bold] text.</code><br /></p>
 
       <figure>
-        <img
-          src="./img/2022-12-gfx-markup-bold.png"
-          alt="2022-12-gfx-markup-bold.png"
-        /><br />
+        <img src="./img/2022-12-gfx-markup-bold.png" alt="2022-12-gfx-markup-bold.png" /><br />
       </figure>
 
       <p><code>Keyboard key :kbd[x]!</code><br /></p>
 
       <figure>
-        <img
-          src="./img/2022-12-gfx-markup-kbd.png"
-          alt="2022-12-gfx-markup-kbd.png"
-        /><br />
+        <img src="./img/2022-12-gfx-markup-kbd.png" alt="2022-12-gfx-markup-kbd.png" /><br />
       </figure>
 
       <h3 id="7. 開発者用 UI"><a href="#7. 開発者用 UI">7. 開発者用 UI</a></h3>
       <p>ImGUI の SDL サポートやレンダラを実装しました。<br /></p>
 
-      <figure>
-        <img
-          src="./img/2022-12-gfx-omgui.png"
-          alt="2022-12-gfx-omgui.png"
-        /><br />
-      </figure>
+      <figure><img src="./img/2022-12-gfx-omgui.png" alt="2022-12-gfx-omgui.png" /><br /></figure>
 
       <p>すべてが間違っています。<br /></p>
 
@@ -476,20 +405,14 @@
       <h4 id="ブラウザ対応、 Android 対応">
         <a href="#ブラウザ対応、 Android 対応">ブラウザ対応、 Android 対応</a>
       </h4>
-      <p>
-        イベント駆動のゲームループやアセットの非同期ロードなどが必要になりようです。<br />
-      </p>
+      <p>イベント駆動のゲームループやアセットの非同期ロードなどが必要になりようです。<br /></p>
 
       <p>今の僕ではまったく力不足です。<br /></p>
 
-      <h4 id="ホットリロードしたい">
-        <a href="#ホットリロードしたい">ホットリロードしたい</a>
-      </h4>
+      <h4 id="ホットリロードしたい"><a href="#ホットリロードしたい">ホットリロードしたい</a></h4>
       <p>したいのですが……<br /></p>
 
-      <h4 id="コルーチンが欲しい">
-        <a href="#コルーチンが欲しい">コルーチンが欲しい</a>
-      </h4>
+      <h4 id="コルーチンが欲しい"><a href="#コルーチンが欲しい">コルーチンが欲しい</a></h4>
       <p>
         欲しさのあまり、コルーチンを書くための言語を開発中です。
         <a href="https://github.com/salsa-rs/salsa">salsa</a>
@@ -498,16 +421,13 @@
 
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
-        Rust で 2D
-        フレームワークを作ってきましたが、他人が快適に使えるとは到底思えません。汎用の
-        2D フレームワークを作る人たちはとんでもないなと思います。<br />
+        Rust で 2D フレームワークを作ってきましたが、他人が快適に使えるとは到底思えません。汎用の 2D
+        フレームワークを作る人たちはとんでもないなと思います。<br />
       </p>
     </main>
     <footer role="contentinfo">
       <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
-      <div>
-        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
-      </div>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
     </footer>
   </body>
 </html>

@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>NixOS でデスクトップ環境構築 (X + i3) - toybeam</title>
     <meta name="description" content="devlog of toyboot4e" />
-    <link rel="stylesheet" href="style/simple.min.css" />
-    <link rel="stylesheet" href="style/style.css" />
-    <link rel="stylesheet" href="style/prism.css" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -21,20 +21,17 @@
       <h1>NixOS でデスクトップ環境構築 (X + i3)</h1>
       <p>Mar 12, 2023</p>
       <nav role="navigation">
-        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
       </nav>
     </header>
     <main role="main">
-      <p>
-        NixOS をメイン機として使えるようになりました。主な設定を紹介します。<br />
-      </p>
+      <p>NixOS をメイン機として使えるようになりました。主な設定を紹介します。<br /></p>
 
       <figure>
         <img src="./img/2023-03-desktop.png" alt="2023-03-desktop.png" /><br />
 
         <figcaption>
-          <span class="figure-number">Figure 1: </span>デスクトップ画面
-          (普通です)
+          <span class="figure-number">Figure 1: </span>デスクトップ画面 (普通です)
         </figcaption>
       </figure>
 
@@ -48,50 +45,40 @@
 
       <details>
         <summary>GUI 環境の選択</summary>
-
         <p>
-          <a href="https://wiki.archlinux.jp/index.php/Xorg">X Window System</a>
-          または
-          <a href="https://wiki.archlinux.jp/index.php/Wayland">Wayland</a>
-          を有効化して GUI ウィンドウを有効化します。<br />
+          <a href="https://wiki.archlinux.jp/index.php/Xorg">X Window System</a> または
+          <a href="https://wiki.archlinux.jp/index.php/Wayland">Wayland</a> を有効化して GUI
+          ウィンドウを有効化します。<br />
         </p>
 
         <p>
           この選択はシステム全体の設定に影響する分岐点です。世の流れは Wayland
-          に向かっていますが、未だハマり所が多そうなので、この記事では枯れた X
-          を使用します。<br />
+          に向かっていますが、未だハマり所が多そうなので、この記事では枯れた X を使用します。<br />
         </p>
       </details>
 
       <details>
         <summary>WM / DE の導入</summary>
-
         <p>
-          X の上には WM (window manager) や DE (desktop environment)
-          を載せることができます。 WM
-          を導入すると、ワークスペースなどの概念が利用できるようになります。 DE
-          を導入すると、 WM の機能に加え、デバイス類の GUI や Dock
-          が入ります。<br />
+          X の上には WM (window manager) や DE (desktop environment) を載せることができます。 WM
+          を導入すると、ワークスペースなどの概念が利用できるようになります。 DE を導入すると、 WM
+          の機能に加え、デバイス類の GUI や Dock が入ります。<br />
         </p>
       </details>
 
       <p>
-        DE に欠点があるとすれば、カスタマイズが難しくなることです。この記事では
-        WM (<a href="https://wiki.archlinux.org/title/i3">i3wm</a>) の上から DE
-        に匹敵する環境を作っていきます。<br />
+        DE に欠点があるとすれば、カスタマイズが難しくなることです。この記事では WM (<a
+          href="https://wiki.archlinux.org/title/i3"
+          >i3wm</a
+        >) の上から DE に匹敵する環境を作っていきます。<br />
       </p>
 
       <h2 id="NixOS の設定"><a href="#NixOS の設定">NixOS の設定</a></h2>
       <h3 id="neofetch"><a href="#neofetch">neofetch</a></h3>
-      <p>
-        25 万円の PC 環境を誇示します。 Intel i7-12700 でビルドすると速い！<br />
-      </p>
+      <p>25 万円の PC 環境を誇示します。 Intel i7-12700 でビルドすると速い！<br /></p>
 
       <figure>
-        <img
-          src="./img/2023-03-neofetch.png"
-          alt="2023-03-neofetch.png"
-        /><br />
+        <img src="./img/2023-03-neofetch.png" alt="2023-03-neofetch.png" /><br />
 
         <figcaption>
           <span class="figure-number">Figure 2: </span
@@ -101,7 +88,6 @@
 
       <details>
         <summary>デバイス類の設定</summary>
-
         <p>まずはハード面を有効化します。<br /></p>
 
         <ul>
@@ -119,45 +105,37 @@
 
           <li>
             <a href="https://nixos.wiki/wiki/Bluetooth">Bluetooth</a><br />
-            NixOS の bluetooth モジュールを有効化しました。
-            <code>bluetooth-manager</code> が GUI です。 Airpods Pro
-            のペアリングが解けるようになって直せていません。<br />
+            NixOS の bluetooth モジュールを有効化しました。 <code>bluetooth-manager</code> が GUI
+            です。 Airpods Pro のペアリングが解けるようになって直せていません。<br />
           </li>
 
           <li>
             ディスプレイ<br />
             <code>xrandr</code> を毎回手動で走らせています。 DPI
-            はモニタ固有の値のはずですが、なぜか DPI
-            の設定が狂うので困ります。また DPI の値を変更すると、
-            <code>i3</code> やブラウザ類のフォントサイズが変わります。<br />
+            はモニタ固有の値のはずですが、なぜか DPI の設定が狂うので困ります。また DPI
+            の値を変更すると、 <code>i3</code> やブラウザ類のフォントサイズが変わります。<br />
           </li>
 
           <li>
             オーディオ<br />
-            <a href="https://nixos.wiki/wiki/ALSA">sound</a> が
-            <code>alsa</code> に相当します。
-            <a href="https://nixos.wiki/wiki/PulseAudio">pulseaudio</a>
-            も設定しました。 <code>pavucontrol</code> が GUI です。 TUI
-            を探しています……<br />
+            <a href="https://nixos.wiki/wiki/ALSA">sound</a> が <code>alsa</code> に相当します。
+            <a href="https://nixos.wiki/wiki/PulseAudio">pulseaudio</a> も設定しました。
+            <code>pavucontrol</code> が GUI です。 TUI を探しています……<br />
           </li>
         </ul>
 
         <blockquote>
-          <p>
-            未だ完全な設定とは言えません。やはり DE を使うのが無難です。<br />
-          </p>
+          <p>未だ完全な設定とは言えません。やはり DE を使うのが無難です。<br /></p>
         </blockquote>
       </details>
 
       <details>
         <summary>基本設定</summary>
-
         <p>普通のデスクトップ環境へ近づけていきます。<br /></p>
 
         <ul>
           <li>
-            <a
-              href="https://nixos.org/manual/nixos/stable/options.html#opt-console.enable"
+            <a href="https://nixos.org/manual/nixos/stable/options.html#opt-console.enable"
               >console</a
             ><br />
             X が起動していないときのフォントの設定です。 4K
@@ -170,22 +148,15 @@
           </li>
 
           <li>
-            <a href="https://wiki.archlinux.org/title/XDG_Base_Directory">XDG</a
-            ><br />
-            <a href="https://nixos.wiki/wiki/Environment_variables"
-              >XDG パスの設定</a
-            >
-            、
-            <a href="https://wiki.archlinux.org/title/XDG_Base_Directory"
-              >mimeapp の設定</a
-            >
+            <a href="https://wiki.archlinux.org/title/XDG_Base_Directory">XDG</a><br />
+            <a href="https://nixos.wiki/wiki/Environment_variables">XDG パスの設定</a> 、
+            <a href="https://wiki.archlinux.org/title/XDG_Base_Directory">mimeapp の設定</a>
             (ファイル種別とアプリの関連付け) を行いました。<br />
           </li>
 
           <li>
             mount / unmount 用コマンドと自動マウント<br />
-            <code>sudo</code>
-            でマウントすると一般ユーザがアクセスできなくなります。
+            <code>sudo</code> でマウントすると一般ユーザがアクセスできなくなります。
             <a href="https://wiki.archlinux.org/title/udisks">udisksctrl</a>
             でマウントすれば一般ユーザでもアクセスできます。
             <a href="https://github.com/coldfix/udiskie/wiki/Usage">udiskie</a>
@@ -193,9 +164,8 @@
           </li>
 
           <li>
-            日本語入力 (<a href="https://wiki.archlinux.jp/index.php/Fcitx"
-              >fctix</a
-            >, <code>fcitx-mozc</code>)<br />
+            日本語入力 (<a href="https://wiki.archlinux.jp/index.php/Fcitx">fctix</a>,
+            <code>fcitx-mozc</code>)<br />
             <a href="https://ykonomi.hatenablog.com/entry/2021/04/27/022803"
               >NixOSマシンを自分好みにカスタマイズする</a
             >
@@ -205,18 +175,16 @@
         </ul>
       </details>
 
-      <details open>
+      <details>
         <summary>X11 + i3 + sxhkd</summary>
-
         <ul>
           <li>
             Xorg:
             <a href="https://nixos.wiki/wiki/Keyboard_Layout_Customization"
               >Keyboard Layout Customization</a
             ><br />
-            X の設定方法を調べると、 Nix
-            経由の設定方法も分かります。日本語キー配列を設定したり、 CapsLock を
-            Ctrl キーにしました。<br />
+            X の設定方法を調べると、 Nix 経由の設定方法も分かります。日本語キー配列を設定したり、
+            CapsLock を Ctrl キーにしました。<br />
           </li>
 
           <li>
@@ -229,16 +197,14 @@
 
           <li>
             <a href="https://github.com/vivien/i3blocks">i3blocks</a>,
-            <a href="https://github.com/vivien/i3blocks-contribo"
-              >i3blocks-contrib</a
-            ><br />
+            <a href="https://github.com/vivien/i3blocks-contribo">i3blocks-contrib</a><br />
             画面上部のステータスバーを作ります。<br />
           </li>
 
           <li>
             <a href="https://github.com/davatorium/rofi">rofi</a><br />
-            ポップアップ表示できる <code>dmenu</code>!　アプリ起動に使います
-            (<code>drun</code>) 。<br />
+            ポップアップ表示できる <code>dmenu</code>!　アプリ起動に使います (<code>drun</code>)
+            。<br />
           </li>
 
           <li>
@@ -246,8 +212,7 @@
             <code>i3/config</code> の
             <code>bind-sym</code> よりも簡単にキーバインドを設定できます。また
             <code>bind-sym</code> で
-            <code>xdotool</code>
-            のキーバインドを設定すると正常に動作しませんが、
+            <code>xdotool</code> のキーバインドを設定すると正常に動作しませんが、
             <code>sxhkd</code> 経由の起動なら問題ありません。<br />
           </li>
 
@@ -258,9 +223,8 @@
         </ul>
       </details>
 
-      <details open>
+      <details>
         <summary>その他アプリ</summary>
-
         <ul>
           <li>
             <code>flameshot</code>, <code>import</code><br />
@@ -270,26 +234,20 @@
           <li>
             <a href="https://github.com/ranger/ranger">ranger</a> +
             <a href="https://github.com/mwh/dragon">dragon</a><br />
-            <code>ranger</code> は TUI
-            のファイルビューワーで、画像のプレビューもできます。
-            <code>dragon</code> で画像をプレビューすれば、ブラウザにドラッグ
-            &amp; ドロップすることもできます。<br />
+            <code>ranger</code> は TUI のファイルビューワーで、画像のプレビューもできます。
+            <code>dragon</code> で画像をプレビューすれば、ブラウザにドラッグ &amp;
+            ドロップすることもできます。<br />
           </li>
 
           <li>
-            <a href="https://help.gnome.org/users/evince/stable/">Evince</a
-            ><br />
+            <a href="https://help.gnome.org/users/evince/stable/">Evince</a><br />
             PDF 閲覧に利用します。<br />
           </li>
 
           <li>
             <a href="https://mpv.io/">mpv</a> +
-            <a href="https://github.com/CogentRedTester/mpv-file-browser"
-              >mpv-file-browser</a
-            >
-            +
-            <a
-              href="https://github.com/mpv-player/mpv/issues/6576#issuecomment-992109756"
+            <a href="https://github.com/CogentRedTester/mpv-file-browser">mpv-file-browser</a> +
+            <a href="https://github.com/mpv-player/mpv/issues/6576#issuecomment-992109756"
               >prev のバグ対策</a
             ><br />
             動画再生に利用します。<br />
@@ -302,37 +260,30 @@
 
           <li>
             <a href="https://www.blender.org/">Blender</a><br />
-            <strong>動画編集に</strong> 利用します。起動画面に Video Editing
-            があるのは凄い。<br />
+            <strong>動画編集に</strong> 利用します。起動画面に Video Editing があるのは凄い。<br />
           </li>
 
           <li>
             <a href="https://www.bitwig.com/">Bitwig Studio</a><br />
-            Linux でも使える有償の DAW
-            です。癖は強いのですが良さそうです。購入検討中……<br />
+            Linux でも使える有償の DAW です。癖は強いのですが良さそうです。購入検討中……<br />
           </li>
         </ul>
 
         <figure>
           <img src="./img/2023-03-bitwig.png" alt="2023-03-bitwig.png" /><br />
 
-          <figcaption>
-            <span class="figure-number">Figure 3: </span>Bitwig Studio
-          </figcaption>
+          <figcaption><span class="figure-number">Figure 3: </span>Bitwig Studio</figcaption>
         </figure>
       </details>
 
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
         Xorg と <code>i3wm</code> で普通のデスクトップ環境を構築しました。特に
-        <code>xdotool</code> で floating window
-        を出し入れできるようになったので満足しています。<br />
+        <code>xdotool</code> で floating window を出し入れできるようになったので満足しています。<br />
       </p>
 
       <div class="org-src-container">
-        <label class="org-src-name"
-          ><span class="listing-number">Listing 1: </span>x11-pad</label
-        >
+        <label class="org-src-name"><span class="listing-number">Listing 1: </span>x11-pad</label>
         <pre><code class="src language-sh">#!/usr/bin/env -S bash -euE
 
 # X11 scratchpad
@@ -358,9 +309,7 @@ fi
     </main>
     <footer role="contentinfo">
       <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
-      <div>
-        <a href="/">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
-      </div>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
     </footer>
   </body>
 </html>
