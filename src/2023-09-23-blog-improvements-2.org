@@ -1,0 +1,59 @@
+#+TITLE: =org-mode= 製ブログの改良 (2)
+#+DATE: <2023-09-23 Sat>
+
+* 背景
+
+このブログは =org-mode= の機能を使って生成されています。 HTML テンプレートは [[https://github.com/tali713/esxml][esxml]] で書いて、 SSG としては =org-publish= を使っています。
+
+日記の追加に伴って、 =index.html= の生成をテコ入れしました。また原稿ファイルで使える便利構文を追加しました。
+
+* 改造機能
+
+** =diary/= ディレクトリの追加
+
+サブディレクトリに日記ファイルを置けるようにしました:
+
+#+BEGIN_SRC sh
+.
+├── build.el
+├── out
+├── src        # devlog
+│   └── diary  # diary
+└── x
+#+END_SRC
+
+=index.html= は =devlog= と =diary= 毎に =<h2>= タグで区切られるようになりました。日記では、主に ABC (毎週開催の競技プログラミングのコンテスト) の感想を書く予定です。
+
+** =#+BEGIN_DETAILS=
+
+=org-mode= の文書では =#+BEGIN_*=, =#+END_*= で囲ったテキストを『ブロック』とみなして変換できます。
+
+今回 =#+BEGIN_DETAILS= という /special block/ (custom block) を追加しました。 =<details>= タグを簡単に記述できるようになりました。
+
+#+CAPTION: 変換前 (=org-mode=)
+#+BEGIN_SRC org-mode
+#+BEGIN_DETAILS 個々にタイトル
+折りたたみ表示
+#+END_DETAILS
+#+END_SRC
+
+#+CAPTION: 変換後 (=html=)
+#+BEGIN_SRC html
+<details>
+<summary>個々にタイトル</summary>
+折りたたみ表示
+</details>
+#+END_SRC
+
+今後追加したい block があれば、同様に対応できます。
+
+** 絶対パスを使って =.org= ファイルにリンクできるように
+
+~[[/index.html][トップページ]]~ のようにリンクを書くと ~<a href="file:///index.html">トップページ</a>~ が出力される悲劇を修正しました。
+
+その他に =#+BEGIN_CENTER= の html 出力を調整するなど、ツギハギしています。
+
+* まとめ
+
+相変わらず手のかかるブログですが、 =org-publish= が異常に柔軟なおかげで何とかなっています。
+
