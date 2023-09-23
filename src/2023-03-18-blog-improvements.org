@@ -1,4 +1,4 @@
-#+TITLE: =org-mode= 製ブログの改良
+#+TITLE: =org-mode= 製ブログの改良 (1)
 #+DATE: <2023-03-18 Sat>
 
 * 背景
