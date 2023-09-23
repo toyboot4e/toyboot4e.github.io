@@ -275,6 +275,29 @@
     ;; `org-center' -> `text-center'
     (format "<div class=\"text-center\">\n%s</div>" contents))
 
+;; `#+BEGIN_DETAILS' special block
+(defun my-org-html-details-block (details-block contents info)
+    ;; `PARAMETER' part of `#+BEGIN_DETAILS PARAMETERS' is not parsed, as described in:
+    ;; <https://m13o.jp/202205062036>
+    ;; So let's handle it manually. You know (I didn't know), current buffer is the `org' file!
+    (let* ((block-begin (org-element-property :begin details-block))
+           (contents-begin (org-element-property :contents-begin details-block))
+           (block-line (buffer-substring block-begin contents-begin))
+           ;; Remove `#+BEGIN_DETAILS':
+           (title (string-trim (substring block-line (length "#+BEGIN_DETAILS")))))
+        (format "<details>
+<summary>%s</summary>
+%s
+</details>" title contents)))
+
+;; Special block (custom block) handler dispatcher
+(defun my-org-html-special-block (special-block contents info)
+    (let* ((block-type (org-element-property :type special-block)))
+        (cond ((or (string= block-type "details") (string= block-type "DETAILS"))
+               (my-org-html-details-block special-block contents info))
+              (t ;; fallback
+               (org-html-special-block special-block contents info)))))
+
 ;; Do not convert `/index.html' into `file:///index.html', really
 (defun my-org-html-link (link desc info)
     "Transcode a LINK object from Org to HTML.
@@ -479,7 +502,12 @@ INFO is a plist holding contextual information.  See
         (org-element-map (org-element-parse-buffer) 'keyword
             (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
 
-;; `my-org-global-prop-value' => `2023-09-17 Sat'
+;; `my-org-global-prop-value "DATE"' => `2023-09-17 Sat'
+(defun my-org-global-prop-value (key)
+    "Get global org property KEY of current buffer."
+    (org-element-property :value (car (my-org-global-props key))))
+
+;; `my-org-read-prop "./example.org" "DATE"' => `2023-09-17 Sat'
 (defun my-org-global-prop-value (key)
     "Get global org property KEY of current buffer."
     (org-element-property :value (car (my-org-global-props key))))
@@ -538,9 +566,10 @@ INFO is a plist holding contextual information.  See
 
  :translate-alist
  '((template . my-org-html-template)
+   (link . my-org-html-link)
    (src-block . roygbyte/org-html-src-block)
    (center-block . my-org-html-center-block)
-   (link . my-org-html-link)))
+   (special-block . my-org-html-special-block)))
 
 (defun my-org-html-publish-to-html (plist filename pub-dir)
     "Publish an org file to HTML, using the FILENAME as the output directory."
