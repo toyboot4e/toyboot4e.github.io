@@ -67,26 +67,27 @@
     (esxml-to-xml (sxml-to-esxml sxml)))
 
 ;; Thanks: `http://sachachua.com/notebook/emacs/small-functions.el'
-;; TODO: hide meesage here?:
 (defun my-strip-html (string)
-    (with-temp-buffer
-        (insert string)
+    ;; suppress messages:
+    (cl-letf (((symbol-function 'message) #'ignore))
+        (with-temp-buffer
+            (insert string)
 
-        (widen)
-        (goto-char (point-min))
-        (while (re-search-forward "<[^<]*>" (point-max) t)
-            (replace-match "\\1"))
-        (goto-char (point-min))
-        (replace-string "&copy;" "(c)")
-        (goto-char (point-min))
-        (replace-string "&amp;" "&")
-        (goto-char (point-min))
-        (replace-string "&lt;" "<")
-        (goto-char (point-min))
-        (replace-string "&gt;" ">")
-        (goto-char (point-min))
+            (widen)
+            (goto-char (point-min))
+            (while (re-search-forward "<[^<]*>" (point-max) t)
+                (replace-match "\\1"))
+            (goto-char (point-min))
+            (replace-string "&copy;" "(c)")
+            (goto-char (point-min))
+            (replace-string "&amp;" "&")
+            (goto-char (point-min))
+            (replace-string "&lt;" "<")
+            (goto-char (point-min))
+            (replace-string "&gt;" ">")
+            (goto-char (point-min))
 
-        (buffer-substring-no-properties (point-min) (point-max))))
+            (buffer-substring-no-properties (point-min) (point-max)))))
 
 ;;; Project settings
 
