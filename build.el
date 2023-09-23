@@ -282,9 +282,12 @@
     ;; So let's handle it manually. You know (I didn't know), current buffer is the `org' file!
     (let* ((block-begin (org-element-property :begin details-block))
            (contents-begin (org-element-property :contents-begin details-block))
-           (block-line (buffer-substring block-begin contents-begin))
-           ;; Remove `#+BEGIN_DETAILS':
-           (title (string-trim (substring block-line (length "#+BEGIN_DETAILS")))))
+           ;; NOTE: `-1' for removing the newline character:
+           (block-line (buffer-substring block-begin (- contents-begin 1)))
+           ;; Remove `#+BEGIN_DETAILS' and convert to html:
+           (title-with-p (org-export-string-as (string-trim (substring block-line (length "#+BEGIN_DETAILS"))) 'html t))
+           ;; Remove the surrounding `<p>' tags:
+           (title (substring title-with-p 3 -5)))
         (format "<details>
 <summary>%s</summary>
 %s
