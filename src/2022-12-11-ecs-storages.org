@@ -30,13 +30,7 @@
 
 まずは ECS の概念図を説明します。コンポーネント配列 (横列) に対し、 =Entity= は添字に相当します:
 
-# #+ATTR_HTML: :width 601px
-# #+caption: big-array.png
 [[./img/2023-12-toecs-big-array.png]]
-
-# #+BEGIN_QUOTE
-# 本当はコンポーネントを縦列にすると、データベースとの対応が取れて良い比喩になるのですが……
-# #+END_QUOTE
 
 それぞれのコンポーネントは optional ですから、 =Vec<Option<T>>= をコンポーネントストレージにするのが ECS の最も簡単な実装です。
 

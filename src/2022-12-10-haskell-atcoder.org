@@ -41,12 +41,6 @@ isPrime n
 
 このくらいなら読めますが、やがて [[monad][モナド]] が登場します。モナドが分からなくて、僕は Haskell と疎遠になりました。
 
-# #+BEGIN_EXPORT html
-# <blockquote class="twitter-tweet tw-align-center"><p lang="ja" dir="ltr">モナドがないと弱すぎる時の僕 <a href="https://twitter.com/hashtag/%E3%82%BC%E3%83%8E%E3%83%96%E3%83%AC%E3%82%A4%E3%83%89?src=hash&amp;ref_src=twsrc%5Etfw">#ゼノブレイド</a> <a href="https://twitter.com/hashtag/XenobladeChronicles?src=hash&amp;ref_src=twsrc%5Etfw">#XenobladeChronicles</a> <a href="https://twitter.com/hashtag/NintendoSwitch?src=hash&amp;ref_src=twsrc%5Etfw">#NintendoSwitch</a> <a href="https://t.co/2zNUWX3nSk">pic.twitter.com/2zNUWX3nSk</a></p>&mdash; Hideyuki Tanaka (@tanakh) <a href="https://twitter.com/tanakh/status/1293535375927828486?ref_src=twsrc%5Etfw">August 12, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
-# 
-# <p style="text-align:center">モナドが無いと弱すぎる時の tanakh 氏</p>
-# #+END_EXPORT
-
 ** AtCoder Beginner Contest (ABC) とは
 
 ABC は毎週開催の『プログラミング・コンテスト』です。問題を解くプログラムを提出します。低速な解答は [[https://atcoder.jp/contests/abc074/glossary?lang=ja][TLE]] (実行時間の超過) となって受理されませんから、 *計算量の小さなアルゴリズム* を考える必要があります。
@@ -145,9 +139,7 @@ main = do
 
 [[https://blog.miz-ar.info/2019/09/techbookfest7-announce/][著者ブログ]] に目次があります。 =vector= を抑えれば B 問題が安定し、 [[https://twitter.com/tanakh/status/1293533213197914113][モナドで失敗する]] 気持ちも味わえます。 *ついに Haskell が始まりました！*
 
-#+BEGIN_EXPORT html
-<details><summary>ハイライト</summary>
-#+END_EXPORT
+#+BEGIN_DETAILS ハイライト
 
 特に嬉しかった情報としては:
 
@@ -166,9 +158,7 @@ main = do
 - モナドの合成
 - データ族について
 
-#+BEGIN_EXPORT html
-</details>
-#+END_EXPORT
+#+END_DETAILS
 
 ところで =MVector= には末尾要素の =push= がありません。 =snoc= は $O(n)$ の操作です。この本を読んだ後でも、 AtCoder の外では全く戦えないことが伺えます。
 
@@ -198,47 +188,6 @@ main = do
 *難度設定が絶妙* です。よく自力で完答できますし、解けなくても丁寧な解答・解説が読めます。これでレベルアップできますよ！
 
 『鉄則本』に挑むことは、アルゴリズムのテンプレートプログラムを育てる作業でもあります。競技プログラミングが大好きな『盆栽』作業に変わるわけなので、ある意味ゲームチェンジャーですね。このタイミングで出て来てくれたことに御の字です。
-
-# 問題の難易度は ★ の数で表現されています。基本問題は本の中に、他の問題は [[https://github.com/E869120/kyopro-tessoku][GitHub の]] editorial に難易度が記載されています。
-# 
-# 著者によると、 ★ と diff との対応は以下となります:
-# 
-# | 星     | 対応の diff    |
-# |--------+----------------|
-# | ★      | 灰色           |
-# | ★★     | 灰色           |
-# | ★★★    | 灰色上位〜茶色 |
-# | ★★★★   | 茶色上位〜緑色 |
-# | ★★★★★  | 緑色上位〜水色 |
-# | ★★★★★★ | 水色上位〜     |
-# 
-# つまり……たった 1 冊で水色まで行ける可能性すらあるっていうこと……？
-
-** COMMENT その他の本
-# 
-# 色々買った自慢です:
-# 
-# - [[https://book.mynavi.jp/ec/products/detail/id=22672][プログラミングコンテストチャレンジブック (第2版)]]\\
-#   『鉄則本』が無かった時代には、検索で最上位に来た本でした。しかし実態は *最高難度* の本だったので積んでいます。ラスボスだったか。。
-# - [[https://gihyo.jp/book/2022/978-4-297-12521-9][問題解決のための「アルゴリズム×数学」が基礎からしっかり身につく本]]\\
-#   2 分探索の最大計算量が $log_2 N$ であると聞いてピンと来ないなら買うべきです。今では『鉄則本』が上位互換だと思います。
-# - [[https://www.lambdanote.com/products/haskell][プログラミングHaskell 第2版]]\\
-#   『すごい H 本』と似た立ち位置の本です。復習に利用しています。 =Applicative= に部分適用が絡まると途端に分からない。。
-# - [[https://shop.ohmsha.co.jp/shopdetail/000000004066/][関数プログラミング 珠玉のアルゴリズムデザイン]]\\
-#   『運算』と『等式論証』を活かし、 Haskell で高効率なアルゴリズムを構築します。全 30 題。難しい……
-# - [[https://tatsu-zine.com/books/thinking-functionally-with-haskell][Haskellによる関数プログラミングの思考法]]\\
-#   『運算』と『等式論証』のイージー版です。 1 つ 1 つ証明しながらアルゴリズムを考えるのは難しいのでは……？　積んでいます。
-
-# ** その他メモ
-#
-#  - Haskell のコードゴルフ\\
-#    読み解けば、 Haskell の言語仕様に詳しくなれる気がします。興味があります。
-#
-#  - [[https://kazu-yamamoto.hatenablog.jp/entry/20140206/1391666962][Real World Haskell の古いところ]]\\
-#    同書の一番読みたい部分が 2014 年時点で古くなっていたことにショックを受けました。詳しい Haskell の本を募集しています。
-#
-#  - 『レーティングは強さの対数』\\
-#    スーパープログラマの言葉のようです。僕が水色になるには 10 倍の強さが必要です。
 
 * まとめ
 

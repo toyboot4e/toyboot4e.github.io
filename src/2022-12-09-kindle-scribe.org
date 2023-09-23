@@ -48,7 +48,6 @@ iPad (動画) や Shokz (音声) と異なって、 Kindle Scribe (本) は既�
 [[https://www.oreilly.co.jp/ebook/#all_titles][O'Reilly Japan の ebook]] を見てニヤニヤする時間を得ました。表紙一覧が見えないことに苦しみを覚えますが、 [[https://github.com/ericchiang/pup][pup]] がなんとかしてくれました。
 
 - [[https://www.oreilly.co.jp/books/9784873119977/][Go 言語による分散サービス]] の表紙が面白い
-# - 細密画？の表紙シリーズがある ([[https://www.oreilly.co.jp/books/9784873114484/][リバースエンジニアリング]] など)
 - [[https://www.oreilly.co.jp/books/9784873119595/][並行プログラミング入門]] の表紙は [[Https://www.oreilly.co.jp/books/9784873116891/][Haskellによる並列・並行プログラミング]] の流れを継いでいた
 - [[https://www.oreilly.co.jp/books/9784873116020/][例題で学ぶ微分方程式]] など [[https://www.oreilly.co.jp/books/math/][数学の本]] がある
 

@@ -60,7 +60,7 @@ _serve() {
 
 _format() {
     echo "formatting all the htmls.."
-    npx prettier --write out/*.html
+    npx prettier --print-width 100 --write out/*.html
 }
 
 _watch() {

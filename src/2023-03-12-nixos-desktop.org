@@ -19,27 +19,15 @@ NixOS をメイン機として使えるようになりました。主な設定�
 
 NixOS を [[https://nixos.org/download.html][minimal ISO image]] からインストールした場合、コンソール画面が立ち上がります。 GUI 環境の構築には、以下のような設定が必要です。
 
-#+BEGIN_EXPORT html
-<details><summary>GUI 環境の選択</summary>
-#+END_EXPORT
-
+#+BEGIN_DETAILS GUI 環境の選択
 [[https://wiki.archlinux.jp/index.php/Xorg][X Window System]] または [[https://wiki.archlinux.jp/index.php/Wayland][Wayland]] を有効化して GUI ウィンドウを有効化します。
 
 この選択はシステム全体の設定に影響する分岐点です。世の流れは Wayland に向かっていますが、未だハマり所が多そうなので、この記事では枯れた X を使用します。
+#+END_DETAILS
 
-#+BEGIN_EXPORT html
-</details>
-#+END_EXPORT
-
-#+BEGIN_EXPORT html
-<details><summary>WM / DE の導入</summary>
-#+END_EXPORT
-
+#+BEGIN_DETAILS WM / DE の導入
 X の上には WM (window manager) や DE (desktop environment) を載せることができます。 WM を導入すると、ワークスペースなどの概念が利用できるようになります。 DE を導入すると、 WM の機能に加え、デバイス類の GUI や Dock が入ります。
-
-#+BEGIN_EXPORT html
-</details>
-#+END_EXPORT
+#+END_DETAILS
 
 DE に欠点があるとすれば、カスタマイズが難しくなることです。この記事では WM ([[https://wiki.archlinux.org/title/i3][i3wm]])  の上から DE に匹敵する環境を作っていきます。
 
@@ -52,10 +40,7 @@ DE に欠点があるとすれば、カスタマイズが難しくなること�
 #+CAPTION: [[neofetch][neofetch]]
 [[./img/2023-03-neofetch.png]]
 
-#+BEGIN_EXPORT html
-<details><summary>デバイス類の設定</summary>
-#+END_EXPORT
-
+#+BEGIN_DETAILS デバイス類の設定
 まずはハード面を有効化します。
 
 - ネットワーク (Wifi)
@@ -77,14 +62,9 @@ DE に欠点があるとすれば、カスタマイズが難しくなること�
 未だ完全な設定とは言えません。やはり DE を使うのが無難です。
 #+END_QUOTE
 
-#+BEGIN_EXPORT html
-</details>
-#+END_EXPORT
+#+END_DETAILS
 
-#+BEGIN_EXPORT html
-<details><summary>基本設定</summary>
-#+END_EXPORT
-
+#+BEGIN_DETAILS 基本設定
 普通のデスクトップ環境へ近づけていきます。
 
 - [[https://nixos.org/manual/nixos/stable/options.html#opt-console.enable][console]]
@@ -101,15 +81,9 @@ DE に欠点があるとすれば、カスタマイズが難しくなること�
 
 - 日本語入力 ([[https://wiki.archlinux.jp/index.php/Fcitx][fctix]], =fcitx-mozc=)
   [[https://ykonomi.hatenablog.com/entry/2021/04/27/022803][NixOSマシンを自分好みにカスタマイズする]] のおかげで設定できました。英字・日本語の切り替えは macOS と同様のキーバインディングにしています。
+#+END_DETAILS
 
-#+BEGIN_EXPORT html
-</details>
-#+END_EXPORT
-
-#+BEGIN_EXPORT html
-<details open><summary>X11 + i3 + sxhkd</summary>
-#+END_EXPORT
-
+#+BEGIN_DETAILS X11 + i3 + sxhkd
 - Xorg: [[https://nixos.wiki/wiki/Keyboard_Layout_Customization][Keyboard Layout Customization]]
   X の設定方法を調べると、 Nix 経由の設定方法も分かります。日本語キー配列を設定したり、 CapsLock を Ctrl キーにしました。
 
@@ -128,15 +102,9 @@ DE に欠点があるとすれば、カスタマイズが難しくなること�
 
 - =xdotool=
   Floating window の出し入れに使っています (後述) 。
+#+END_DETAILS
 
-#+BEGIN_EXPORT html
-</details>
-#+END_EXPORT
-
-#+BEGIN_EXPORT html
-<details open><summary>その他アプリ</summary>
-#+END_EXPORT
-
+#+BEGIN_DETAILS その他アプリ
 - =flameshot=, =import=
   スクリーンショットを取れるようにします。
 
@@ -161,9 +129,7 @@ DE に欠点があるとすれば、カスタマイズが難しくなること�
 #+CAPTION: Bitwig Studio
 [[./img/2023-03-bitwig.png]]
 
-#+BEGIN_EXPORT html
-</details>
-#+END_EXPORT
+#+END_DETAILS
 
 * まとめ
 

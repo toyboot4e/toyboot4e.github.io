@@ -68,7 +68,7 @@ strict graph {
 
 #+begin_src sh
 $ npm install prettier
-$ npx prettier -- --write out/*.htm
+$ npx prettier --print-width 100 --write out/*.htm
 #+end_src
 
 *** =ox-slimhtml= を =ox-html= と併用する
