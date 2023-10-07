@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 323, CAREER SKILLS - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 323, CAREER SKILLS</h1><p>Oct  8, 2023</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
+<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="訓練"><a href="#訓練">訓練</a></h3><p>
+<a href="https://atcoder.jp/contests/abc114/tasks/abc114_c">ABC 114 C</a> を解いて進数変換の関数をライブラリに追加した。同じ値であっても、何桁の数であると解釈するかで意味が異なることに気付けた。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc322/tasks/abc322_f">ABC 322 F</a> を解いた。遅延セグメント木にふんだんに情報を載せる度胸が問われる気がした。<br>
+</p>
+
+<h3 id="ABC 323"><a href="#ABC 323">ABC 323</a></h3><p>
+<a href="https://atcoder.jp/contests/abc323">ABC 323</a> に参加した。 4 ヶ月前にも同じような回があったので、特に山も谷も無かった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc323/tasks/abc323_a">A 問題</a> では <code>VU.enumFromStepN 1 2 8</code> か <code>[1, 3 .. 15]</code> を使うべきだった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc323/tasks/abc323_b">B 問題</a> では <code>(Down cnt, i)</code> をキーにソートした。 C++ でも <code>make_pair(-cnt, i);</code> のようにタプルを作ってソートするらしい。競プロ界隈の外では、これを空で書ける人はあまりいない気がする。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc323/tasks/abc323_c">C 問題</a> は貪欲だった。競プロを始める前はこの辺の問題が限界だった気がする。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc323/tasks/abc323_d">D 問題</a> も貪欲だった。複雑なキーを優先度に使ったが、昇順に試せば良かった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc323/tasks/abc323_e">E 問題</a> は普通の DP だった。手続き型言語なら配列とループを使う。 Haskell においても同様に、ただし見かけ上ユーザ側のコードが純粋になる関数を作ってあった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc323/tasks/abc323_f">F 問題</a> は倉庫番だった。 C か D 問題で出てもおかしくないが、正しく解ける気がしない。<br>
+</p>
+
+<h2 id="読書"><a href="#読書">読書</a></h2><p>
+<a href="https://bookplus.nikkei.com/atcl/catalog/18/P55740/">CAREER SKILLS</a> を 70% まで読んだ。アルゴリズムとデータ構造に関して、『大多数のソフトウェア開発者は、気の毒なくらいこの分野の能力が低すぎる。』 (P34) とあった。僕自身、もう少しできないといけない気がする。<br>
+</p>
+
+<p>
+ユニットテストが仕様であるなどの常識を補填できた。気楽に読めたのは中盤までで、チーム開発の章では急に重みが増した。自分の責任と呼べる範囲があまりに広い。<br>
+</p>
+
+<h2 id="Misc"><a href="#Misc">Misc</a></h2><p>
+<a href="https://hackage.haskell.org/package/QuickCheck">QuickCheck</a> の動画作成のため、実況の文字起こしと合成音声による読み上げを試そうとした。<br>
+</p>
+
+<h3 id="whisper"><a href="#whisper"><code>whisper</code></a></h3><p>
+ぼそぼそっと喋って <a href="https://github.com/ggerganov/whisper.cpp"><code>whisper-cpp</code></a> (<code>large</code> モデル) で文字起こしした:<br>
+</p>
+
+<blockquote>
+<p>
+[00:00:00.000 &#x2013;&gt; 00:00:16.000]  はい、現在、ウィスパーを使って自分の音声をエキストファイルに文字起こしして、それをさらに合成音声に喋ってもらうというのをやってもらいたいと思っています。<br>
+[00:00:16.000 &#x2013;&gt; 00:00:32.000]  合成音声のいいところは、たぶん時間補完が効くだろうというところで、例えば早回しにして再生したりとか遅くして再生したりするときも、補完をすればかなり聞き取りやすくなるんじゃないかなという気がしています。<br>
+[00:00:32.000 &#x2013;&gt; 00:00:44.000]  だから人間だったらスピード1で喋ったり、スピード2で喋ったりというのをその場でやり直してくれるみたいな、合成音声はやり直してくれるんじゃないかなというふうに思っています。<br>
+[00:00:44.000 &#x2013;&gt; 00:01:03.000]  発話し直す。だから単に元のデータを倍速再生するとかってなったらクオリティが下がってしまうけれど、そのスピードで聞くための音を改めて作り直して再生できるというのが合成音声の強みなんじゃないかなと思っています。<br>
+</p>
+</blockquote>
+
+<p>
+かなり良い精度で破綻した喋りを再現されてしまった。あまりにも簡単過ぎる。<br>
+</p>
+
+<p>
+VRAM の大きな (&gt; 10 GB) GPU があれば、 <code>large</code> モデルでもリアルタイムの文字起こしができるらしい。この程度の夢は庶民の手の内なのかと感動した。<br>
+</p>
+
+<h3 id="Blender Text to Speech"><a href="#Blender Text to Speech">Blender Text to Speech</a></h3><p>
+上のように作成したテキストを合成音声に読み上げてほしい。また動画編集ソフトとの連携が取れてほしい。<br>
+</p>
+
+<p>
+実は Linux で最も実用的な動画編集速度は Blender らしい。そこで <a href="https://www.youtube.com/watch?v=dB4xzx1406I">Blender Text to Speech (Youtube)</a> で合成音声による再生を試みたが、 <code>libespeak.so.1</code> へのリンクに失敗して停滞した。 NixOS が難し過ぎる、、<br>
+</p>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
