@@ -24,3 +24,5 @@
 * diary
 #+ATTR_HTML: :class sitemap
 - @@html:<date>2023-09-24</date>@@ [[file:/diary/2023-09-24.org][ABC 321, 入門監視]]
+- @@html:<date>2023-10-01</date>@@ [[file:/diary/2023-10-01.org][ABC 322, AHC 024, 入門監視]]
+- @@html:<date>2023-10-08</date>@@ [[file:/diary/2023-10-08.org][ABC 323, CAREER SKILLS]]

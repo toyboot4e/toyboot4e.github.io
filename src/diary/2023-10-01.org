@@ -1,0 +1,100 @@
+#+TITLE: ABC 322, AHC 024, 入門監視
+#+DATE: <2023-10-01 Sun>
+
+* 競技プログラミング
+
+** AHC 024
+
+先週日曜に [[https://atcoder.jp/contests/ahc024][AHC 024]] に参加した。トポロジーを保って格子上の図形を縮小せよという問題だったと思う。たとえば以下の『地図』が与えられる:
+
+#+CAPTION: seed 77777720 (地図)
+#+ATTR_HTML: :width 450
+[[./img/2023-10-01-ahc-024-seed77777720-org.png]]
+
+それぞれの『区』の隣接関係を保ったまま、地図全体を小さな面積に圧縮すると高いスコアが与えられる。ただし内部に穴を開けてはならない。
+
+しばらく悩んだが、外縁の区のセルを削ることしかできなかった。歯は立つが食い破れず？
+
+#+CAPTION: seed 77777720 (変形後)
+#+ATTR_HTML: :width 450
+[[./img/2023-10-01-ahc-024-seed77777720-result.png]]
+
+左上に注目すると、 3 行 4 列目のセルが橋になっている。このようなセルを削ると WA になるため気を遣った:
+
+#+CAPTION: seed 77777720 (変形後 拡大)
+[[./img/2023-10-01-ahc-024-seed77777720-result-leftup.png]]
+
+#+BEGIN_DETAILS 削って良いセルの判定方法 (Chokudai さん)
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">8近傍だけで連結性を良い感じに確保し続ける典型みたいなのあるから置いとくね。今回は連結性維持の関係で下は要らないけど、下のテク結構大事な問題もおおめ。<br>焼きなましはこれでやって最後0.1秒で連結性厳密にして山登りとかするとほんのり伸びる印象<a href="https://twitter.com/hashtag/AHC024?src=hash&amp;ref_src=twsrc%5Etfw">#AHC024</a> <a href="https://t.co/7AoBAlusUR">pic.twitter.com/7AoBAlusUR</a></p>&mdash; chokudai(高橋 直大)@AtCoder社長 (@chokudai) <a href="https://twitter.com/chokudai/status/1706124817915908481?ref_src=twsrc%5Etfw">September 25, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+#+END_DETAILS
+
+** 訓練
+
+引き続き [[https://atcoder-tags.herokuapp.com/][AtCoder Tags]] で [[https://atcoder-tags.herokuapp.com/tag_search/Dynamic-Programming][青 diff DP を探して]] 解いた。 [[https://atcoder.jp/contests/abc247/tasks/abc247_f][数え上げの問題]] で計算式を整理できずに途方に暮れたが、フィボナッチ数列に近かったらしい。
+
+思えば、愚直解を作って答えを並べれば良かった。数学的考察は抜きに、法則性は見つけられたはず。似た経験も 1 つや 2 つではない。
+
+したがって、今回の ABC では『愚直解を余分に作る実装力』をテーマにしたい。数学的能力を期待するのはその後でも遅くない。
+
+** ABC 322
+
+[[https://atcoder.jp/contests/abc322][ABC 322]] に参加した。実況を録画したので、文字起こし〜読み上げまでを自動化して遊んでみたい。 Siri でさえピッチを下げると快適になるのだから、合成音声には可能性を感じる。
+
+| 順位  | パフォーマンス | レーティング変化 |
+|-------+----------------+------------------|
+| 2,327 | 1,036          | 1,261 (-14)      |
+
+[[https://atcoder.jp/contests/abc322/tasks/abc322_a][A 問題]] では =zipWith3= で長さ 3 の窓を左端から右へ流した。
+
+[[https://atcoder.jp/contests/abc322/tasks/abc322_b][B 問題]] では添字で混乱した。実は =isPrefixOf=, =isSuffixOf= という関数があったらしい。
+
+[[https://atcoder.jp/contests/abc322/tasks/abc322_c][C 問題]] では状態を持って右から左へ走査したが、状態管理で戸惑った。実は単なる =map= で計算できたので、次は stateless に解く発想を持ちたい。
+
+[[https://atcoder.jp/contests/abc322/tasks/abc322_d][D 問題]] では全探索すると $10^8$ 程度になって間に合わないと思ったが、テストケースが弱めで助かった。枝刈りできるようなので復習したい。
+
+#+CAPTION: 回転は 2 段階に分けて捉えるのが良さそう
+#+ATTR_HTML: :width 492
+[[./img/2023-10-01-rotate-90.png]]
+
+それでも 45 分で解けて大して悪くない。 A 〜 C で 20 分使った方がまずかった。
+
+[[https://atcoder.jp/contests/abc322/tasks/abc322_e][E 問題]] では進数変換のバグが取れなかった。苦手分野なのでライブラリ化しておきたい。
+
+[[https://atcoder.jp/contests/abc322/tasks/abc322_f][F 問題]] では遅延セグメント木が出たらしい。最大流も ABC で出るようになったし、順当に PAST 上級を目指していけば良い気がする。青 diff DP と PAST をやろう。
+
+* 読書
+
+[[https://www.oreilly.co.jp/books/9784873118642/][入門監視]] を読み終えた。しばしば過去の考察を引用する展開が熱い。ネットワーク監視はプロトコルがレガシーで最悪というのも面白かった。
+
+React の本を買い、 8 ページ読んで投げ出してしまった。文語として校正してほしい。
+
+気を取り直して [[https://gihyo.jp/book/2019/978-4-297-10463-4][数学から創るジェネラティブアート]] を読み始めた。数式を使って迫力のある絵を描けるみたい。ミラーボールも回せるようになるだろうか。
+
+* Misc
+
+記事を書くのに [[https://github.com/minad/tempel][tempel]] スニペットが大活躍した。特に ABC の番号を書けば、すべての問題へのリンクを生成してくれるのが助かった。
+
+スニペットの定義ファイルでは、以下のように S 式が並ぶ。これが (スニペット名 → スニペット内容) のマップとなるのだから冴えている。インデントが無い上に変数を自然と書ける。
+
+#+BEGIN_SRC elisp
+;; `src' スニペット
+(src "#+BEGIN_SRC " (p "hs") n> "#+END_SRC")
+
+;; `abc' スニペット
+(abc "[[https://atcoder.jp/contests/abc"  (p "300" no) "][ABC " (s no) "]] に参加した。
+
+[[https://atcoder.jp/contests/abc" (s no) "/tasks/abc" (s no) "_a][A 問題]] では
+
+[[https://atcoder.jp/contests/abc" (s no) "/tasks/abc" (s no) "_b][B 問題]] では
+
+[[https://atcoder.jp/contests/abc" (s no) "/tasks/abc" (s no) "_c][C 問題]] では
+
+[[https://atcoder.jp/contests/abc" (s no) "/tasks/abc" (s no) "_d][D 問題]] では
+
+[[https://atcoder.jp/contests/abc" (s no) "/tasks/abc" (s no) "_e][E 問題]] では
+
+[[https://atcoder.jp/contests/abc" (s no) "/tasks/abc" (s no) "_f][F 問題]] では")
+#+END_SRC
+
