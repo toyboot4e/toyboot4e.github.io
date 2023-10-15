@@ -1,0 +1,166 @@
+#+TITLE: ARC 166, ABC 324, AHC 025, CAREER SKILLS
+#+DATE: <2023-10-15 Sun>
+
+* 競技プログラミング
+
+** 訓練
+
+Notion の問題表に [[https://www.notion.so/4b5218fd066141d38a11a08f6fe1b2a7?v=dc0f0b2f701d4f04a5f8a21e1c502586][時系列の view を追加した]] 。これで正確に振り返りできる。
+
+*** 青 diff DP
+
+青 diff DP を 7 問解いて、 diff 1,600 ~ 1,700 の青 diff DP がすべて埋まった (計 13 問) 。最近の問題ほど、深く考察しなければ解けない傾向がある。自然と [[https://www.youtube.com/channel/UCL8EOznhSyreT9O0-KFxgZQ][Kotatsugame]] スタイルの怒涛の実装フェーズを再現したくなる。
+
+Haskell では関数適用が右から左に評価される都合上、左から右へ一挙に書くのは難しい。何気ない 1 行でも、式全体を脳内メモリに載せてからコードを書き始める必要がある。
+
+#+BEGIN_SRC hs
+-- 何気ない 1 行 (3 番目に大きい奇数を選び出す)
+(VU.! 2) . VU.modify (VAI.sortBy (comparing Down)) $ VU.filter (== odd) xs
+#+END_SRC
+
+まだまだ実装でモタつくし、タイプミスは見苦しい。今回のコンテストでは、淀み無い実装を志したい。
+
+** ARC 166
+
+[[https://atcoder.jp/contests/arc166][ARC 166]] に参加した。
+
+A 問題では操作 3 で文字 =A= を任意の数だけ右へ動かせることに気が付いた。こうした『ギャグ』らしき着眼点が問われる出題が多そうだ。
+
+B 問題では全探索で TLE となり、丁寧な貪欲法で AC した。 B 問題で緑 diff は珍しい。集合 DP と瞬時に見破って実装した人も多かったようだ。
+
+C 問題は数え上げの問題だった。解説を読んでも詰められない箇所があり、 upsolve できていない。実は愚直解を数列として [[https://oeis.org/][OEIS]] に投げれば答えが浮かび上がるらしいが……
+
+B 問題を畳み込み・集合 DP で upsolve した。 $s \in \mathrm{Power} \{ A, B, C \}$ に大して $dp[|s|]$ を $\gcd s$ の倍数がこれまでに存在した場合の最小コストとする。畳み込み操作は新たな数をいずれかの $\gcd s$ の倍数とすることであり、すべての場合を試して各状態の =min= を更新していく。
+
+** ABC 324
+
+[[https://atcoder.jp/contests/abc324][ABC 324]] に参加した。 A, B, C の 3 完で大敗だった。
+
+*** 解き方
+
+[[https://atcoder.jp/contests/abc324/tasks/abc324_a][A 問題]] では開始時スクリプトのおかげで Haskell 界の first AC を取ることができた。スクリプトは Misc に記載する。
+
+[[https://atcoder.jp/contests/abc324/tasks/abc324_b][B 問題]] では素因数分解を使ったところ TLE した。素因数分解の最悪計算量は $O(\sqrt N)$ 程度であるため、 $N$ が大きいと停止しなくなる。反射で解くなと言われた気がした。
+
+[[https://atcoder.jp/contests/abc324/tasks/abc324_c][C 問題]] では丁寧に場合分けして解いた。 =ByteString= の関数を調べる良い機会となった。 =ByteString= 同士の比較には [[https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Char8.html#v:zipWith][zipWith]] が役立った。 =ByteString= の中の 1 文字を除去するためには、まず [[https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Char8.html#v:splitAt][splitAt]] や [[https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Char8.html#v:span][span]] で 2 分割し、片側から 1 文字消してから再度連結 (=<>=) すれば良かった。
+
+[[https://atcoder.jp/contests/abc324/tasks/abc324_d][D 問題]] では全探索は定数倍込みで $O(10^8)$ 程度と判断して避けてしまった。定数倍高速化のため埋め込みを試すも、スタック領域が足りず断念。実は全探索での計算量は $O(10^7)$ 程度だったため、全探索で upsolve した。 1 桁読み違えてるじゃん〜〜
+
+[[https://atcoder.jp/contests/abc324/tasks/abc324_e][E 問題]] では何重にも誤解があり解けなかった。まず読解の誤りとして、部分列を連続部分列と読んだり、 i, j が互いに異なると思い込んでいた。実装の沼も多く、正しく問題を整理してシンプルに解けるようにならないと厳しい。
+
+別解も確認したい。
+
+*** 振り返り
+
+思い込みの強さが結果に現れた。脱却方法を考えたい。
+
+まず問題に取り組む際は、別人格に切り替えたつもりで考察やコードを確認したい。作家が得意そう。意識すれば習得できると思う。
+
+次に『[[https://ts-webstore.net/?pid=120607635][マスター・オブ・場合の数]]』を解き始めた。場合の数は、 (答えを見ない限り) 自分が正しい答えを出せたのか検証できない。しかもパターンマッチでは解きにくい。バイアスを免れた明晰な頭脳が要求される訓練になる。
+
+*** レーティングの上げ方に関して
+
+コンテストの参加回数を増やすほど、レーティングの収束は速まる。つまり ARC に出たほうが速くレーティングが上がると思う。うおお [[https://atcoder.jp/contests/arc167][ARC 167]] 出るぞ
+
+** AHC 025
+
+[[https://atcoder.jp/contests/ahc025][AHC 025]] に参加している。 7 時間のコンテストだと思いこんでいたが、 8 日間のコンテストだった。こうしたミスは仕組みでは防止できない。労働を受け入れろ……！　あるいは AI を装備したい。
+
+コンテストが終わるまで感想は書けない。
+
+* 読書
+
+** 色々
+
+[[https://bookplus.nikkei.com/atcl/catalog/18/P55740/][CAREER SKILLS]] を 85% まで読んだ (+ 15%) 。 (社会的な) 人間の価値はその人間が作ったネットワークで決まる、など目を背けたくなる話も多いが、エッセイとして読めば楽しめる。 [[https://bookplus.nikkei.com/atcl/catalog/16/P51550/][SOFTWARE SKILLS]] も購入した。
+
+積み本の [[https://www.crackingthecodinginterview.com/][CRACKING the CODING INTERVIEW]] をちらちらと見た。最終章の Advanced Topics の中にトポロジカルソートが入っていて、茶色コーダー時代に通った道なんだよなと思う。今読むなら『[[https://twitter.com/recuraki/status/1611647410249535488][競技プログラマーハンドブック]]』の方が面白そうだった。
+
+[[https://note.com/honeshabri/][骨しゃぶり書簡]] で渋々おすすめされていた [[https://www.amazon.co.jp/%E3%81%82%E3%81%AA%E3%81%9F%E3%82%92%E5%A4%A9%E6%89%8D%E3%81%AB%E3%81%99%E3%82%8B%E3%82%B9%E3%83%9E%E3%83%BC%E3%83%88%E3%83%8E%E3%83%BC%E3%83%88%E3%83%BB%E9%9B%BB%E5%AD%90%E7%89%88%E3%83%97%E3%83%A9%E3%82%B9-%E5%B2%A1%E7%94%B0%E6%96%97%E5%8F%B8%E5%A4%AB-FREEex-ebook/dp/B00E4U62PO][あなたを天才にするスマートノート・電子版プラス]] を 40% までお風呂で聴いた。プレゼンが上手いので話の構造を抽出してみたい。来週の自分に期待。
+
+そろそろハンズオンもやりたい。 [[https://gihyo.jp/book/2022/978-4-297-13034-3][リアルタイムグラフィックスの数学]] は [[https://www.shadertoy.com/][Shadertoy]] で使われるような full-screen quad のフラグメントシェーダを題材にした本で、ノイズと SDF を扱うらしい。数式で絵が書けると、時間補完で動かせる気がして良さそう。
+
+Haskell で 2D 描画をやるならまず [[https://github.com/benl23x5/gloss][gloss]] だが、昨年以来更新が止まっている。既に保守モードなのだろうか。
+
+* Misc
+
+** ナード業務
+
+*** 開始時スクリプト
+
+コンテスト開始時のセットアップ用スクリプトを書いた。僅か 10 秒の差を生む程度で、実用的な効果は無い。一応ソース: [[https://github.com/toyboot4e/abc-hs/blob/e0bae9927fb1025bb9024c639977560b6ed01731/go][=go= スクリプト (=bash=)]]
+
+#+CAPTION: =acc= 実行、 =tmux= の pane 分割、 =cd=, エディタの起動を 1 コマンドに
+[[./img/2023-10-15-go.gif]]
+
+AA は [[http://www.figlet.org/][figlet]] が表示してくれた。 =figlet= は映えるのに、エディタの起動画面で台無しだ。改良の余地がある。
+
+*** ダークテーマ
+
+ブラウザ拡張 (Stylus/Stylish) でユーザ定義の CSS を追加できる。人が書いた CSS を元に、 AtCoder をダークテーマに変更してみた。
+
+#+CAPTION: ヘッダの border は綺麗にしたい
+[[./img/2023-10-15-stylus-for-atcoder.png]]
+
+エディタとのコントラスト差が減り、目に優しくなったと思う。逆にエディタをライトテーマに変えても良かった。
+
+** モダンエディタと繰り返し操作
+
+[[https://github.com/meow-edit/meow][meow]] / [[https://github.com/mawww/kakoune][kakoune]] / [[https://github.com/helix-editor/helix][helix]] などのモダンエディタでは、まず範囲選択を行い、次に操作を決める。特に範囲選択はカーソル移動の際に自動で行われるため、 =move -> action= と称される ([[https://github.com/mawww/kakoune/wiki/Migrating-from-Vim][Migrating from Vim - Kakkoune]]) 。
+
+一方 Vim では、操作対象を最後に決める。この操作順序は =.= キーによる繰り返し操作 (ドットリピート) と相性が良く好まれる。 3 単語消すなら =dw..= の 4 タイプ。日常生活が小さなマクロで満ちている。
+
+#+CAPTION: Normal モードに置ける Vim の操作単位 (要出典……)
+#+BEGIN_SRC text
+count? operator count? (motion | text-object)
+#+END_SRC
+
+例外的に visual mode では操作対象を前置できるが、選択範囲が文字単位で記録されるため、『単語』などの範囲情報が持つ意味は失われてしまう。したがってドットリピートと相性が悪く、アンチパタンとして認識されている。
+
+*** helix
+
+モダンエディタは、 =move -> action= とドットリピートの折り合いを付けたのだろうか。 [[https://github.com/helix-editor/helix][helix]] をエアプして確かめてみよう。
+
+=vimtutor= 的なものがあった。 [[https://github.com/helix-editor/helix/pull/898][Implement hx --tutor and :tutor to load tutor.txt #898]]
+
+#+BEGIN_SRC sh
+$ hx --tutor
+#+END_SRC
+
+=helix= では挿入文字や範囲選択をリピートできるが、 Vim の =.= のように任意の編集操作を繰り返す機能は無かった ([[https://github.com/helix-editor/helix/issues/501][#501]]) 。 =wc= をリピートしたければ、明示的にマクロをレコーディングするしかないと思う。
+
+[[https://pragprog.com/titles/dnvim2/practical-vim-second-edition/][Practical Vim]] の読者としては、ドットリピートの無い環境への移行は考えにくい。その他キー操作も、モードを上手く使ったからこそ Vim よりもタイプ数が増えている。
+
+| 操作           | キーバインディング | 備考           |
+|----------------+--------------------+----------------|
+| 行頭へ移動     | =gh=                 | =g= は [[https://docs.helix-editor.com/keymap.html#goto-mode][goto mode]] |
+| 行末へ移動     | =gl=                 | =g= は [[https://docs.helix-editor.com/keymap.html#goto-mode][goto mode]] |
+| 1 行スクロール | =zj=                 | =z= は [[https://docs.helix-editor.com/keymap.html#view-mode][view mode]] |
+| 1 行スクロール | =zk=                 | =z= は [[https://docs.helix-editor.com/keymap.html#view-mode][view mode]] |
+
+NeoVim が強過ぎて、凄いのが来たという感じではない。ただ開発側は圧倒的に楽しいだろうから、その空気が羨ましい。
+
+その他乗り遅れたものとしては [[https://github.com/zellij-org/zellij][zellij]] や [[https://www.nushell.sh/][Nushell]], [[https://zenn.dev/zenwerk/scraps/8099db9e44119e][Pijul]] などがある。あまり分かったようなことは言えない。
+
+** 応用情報技術者試験 (AP)
+
+訓練は……無だった。心の病気かも知れない。
+
+午前試験は国語力で乗り切った。他のページに SMTP はメールのプロトコルとあるので除外、のような小細工を重ねると十分解ける。解き方が酷過ぎる。
+
+午後試験では、そもそも出題側が国語力を問うてきた。対応する文章を抜き出せ、行間を読み取れ、問題文を正しく読め。本当にその出題で良いのだろうか。
+
+合格できたかはかなり不安。教本・問題集は買っていたので、追々ちゃんと復習したい。
+
+** Blender VSE (video sequence editor)
+
+[[https://docs.blender.org/manual/en/2.80/video_editing/sequencer/strips/introduction.html][Blender VSE]] を動画編集ソフトとして、読み上げ環境を整えたい。
+
+VSE には 32 の /channel/ があり、 channel 上には複数の [[https://docs.blender.org/manual/en/2.80/video_editing/sequencer/strips/introduction.html][/strip/]] を配置できる。音楽編集ソフトにおける channel と track の関係に似ている。ただし VSE における channel 番号は Z 軸に相当するため、用途だけではなく画面配置に応じて channel 分けをすることになりそうだ。
+
+字幕データは [[https://docs.blender.org/manual/en/2.80/video_editing/sequencer/strips/text.html][Text Strips]] として表現できる。字幕データ、あるいは text strip の集まりは、 =.srt= ([[https://en.wikipedia.org/wiki/SubRip][SubRip]] subTitle) ファイルとして import/export できる。これは [[https://github.com/openai/whisper][Whisper]] のテキスト出力と似ていて、簡単に変換できる。
+
+字幕データが動画の主体となる場合は、アドオンの [[https://github.com/tin2tin/Subtitle_Editor][tin2tin/Subtitle\under{}Editor]] を入れれば満足の行く UI になりそうだ。この人の [[https://www.youtube.com/watch?v=qche1JokH5Y][Youtube]] も参考にしたい。
+
+後は字幕を合成音声に読み上げてもらうだけ。リアルタイム再生が理想的だが、text strips を元に audio strips を生成するのでも構わない。 =espeak= は既にアドオンがあるが、日本語音声が入っていなかった。 [[https://voicevox.hiroshiba.jp/][VOICEVOX]] の [[https://github.com/noir55/voicevox_cli_client][CLI client]] (非公式？) などを試してみたい。
+
