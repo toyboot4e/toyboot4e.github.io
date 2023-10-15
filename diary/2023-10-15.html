@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ARC 166, AHC 025, CAREER SKILLS - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ARC 166, AHC 025, CAREER SKILLS</h1><p>Oct 15, 2023</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
+<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="訓練"><a href="#訓練">訓練</a></h3><p>
+Notion の問題表に <a href="https://www.notion.so/4b5218fd066141d38a11a08f6fe1b2a7?v=dc0f0b2f701d4f04a5f8a21e1c502586">時系列の view を追加した</a> 。これで正確に振り返りできる。<br>
+</p>
+
+<h4 id="青 diff DP"><a href="#青 diff DP">青 diff DP</a></h4><p>
+青 diff DP を 7 問解いて、 diff 1,600 ~ 1,700 の青 diff DP がすべて埋まった (計 13 問) 。最近の問題ほど、深く考察しなければ解けない傾向がある。自然と <a href="https://www.youtube.com/channel/UCL8EOznhSyreT9O0-KFxgZQ">Kotatsugame</a> スタイルの怒涛の実装フェーズを再現したくなる。<br>
+</p>
+
+<p>
+Haskell では関数適用が右から左に評価される都合上、左から右へ一挙に書くのは難しい。何気ない 1 行でも、式全体を脳内メモリに載せてからコードを書き始める必要がある。<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">-- 何気ない 1 行 (3 番目に大きい奇数を選び出す)
+(VU.! 2) . VU.modify (VAI.sortBy (comparing Down)) $ VU.filter (== odd) xs
+</code></pre>
+</div>
+
+<p>
+まだまだ実装でモタつくし、タイプミスは見苦しい。今回のコンテストでは、淀み無い実装を志したい。<br>
+</p>
+
+<h3 id="ARC 166"><a href="#ARC 166">ARC 166</a></h3><p>
+<a href="https://atcoder.jp/contests/arc166">ARC 166</a> に参加した。<br>
+</p>
+
+<p>
+A 問題では操作 3 で文字 <code>A</code> を任意の数だけ右へ動かせることに気が付いた。こうした『ギャグ』らしき着眼点が問われる出題が多そうだ。<br>
+</p>
+
+<p>
+B 問題では全探索で TLE となり、丁寧な貪欲法で AC した。 B 問題で緑 diff は珍しい。集合 DP と瞬時に見破って実装した人も多かったようだ。<br>
+</p>
+
+<p>
+C 問題は数え上げの問題だった。解説を読んでも詰められない箇所があり、 upsolve できていない。解説動画を見よう。<br>
+</p>
+
+<blockquote>
+<p>
+実は愚直解を数列として <a href="https://oeis.org/">OEIS</a> に投げれば答えが浮かび上がるらしいが……<br>
+</p>
+</blockquote>
+
+<p>
+B 問題を畳み込み・集合 DP で upsolve した。 \(s \in \mathrm{Power} \{ A, B, C \}\) に大して \(dp[|s|]\) を \(\gcd s\) の倍数がこれまでに存在した最小コストとする。畳み込み操作は新たな数をいずれかの \(\gcd s\) の倍数とすることであり、すべての場合を試して各状態の <code>min</code> を更新していく。<br>
+</p>
+
+<h3 id="ABC 324"><a href="#ABC 324">ABC 324</a></h3><p>
+<a href="https://atcoder.jp/contests/abc324">ABC 324</a> に参加した。 ABC 3 完で大敗だった。<br>
+</p>
+
+<h4 id="解き方"><a href="#解き方">解き方</a></h4><p>
+<a href="https://atcoder.jp/contests/abc324/tasks/abc324_a">A 問題</a> では開始時スクリプトのおかげで Haskell 界の first AC を取ることができた。スクリプトは Misc に記載する。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc324/tasks/abc324_b">B 問題</a> では素因数分解を使ったところ TLE した。素因数分解の最悪計算量は \(O(\sqrt N)\) 程度であるため、 \(N\) が大きいと停止しなくなる。反射で解くなと言われた気がした。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc324/tasks/abc324_c">C 問題</a> では丁寧に場合分けして解いた。 <code>ByteString</code> の関数を調べる良い機会となった。 <code>ByteString</code> 同士の比較には <a href="https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Char8.html#v:zipWith">zipWith</a> が役立った。 <code>ByteString</code> の中の 1 文字を除去するためには、まず <a href="https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Char8.html#v:splitAt">splitAt</a> や <a href="https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Char8.html#v:span">span</a> で 2 分割し、片方から 1 文字消してから再度連結 (<code>&lt;&gt;</code>) すれば良かった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc324/tasks/abc324_d">D 問題</a> では全探索は定数倍込みで \(O(10^8)\) 程度と判断して避けてしまった。定数倍高速化のため埋め込みを試すも、スタック領域が足りず断念。実は全探索での計算量は \(O(10^7)\) 程度だったため、全探索で upsolve した。 1 桁読み違えてるじゃん〜〜<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc324/tasks/abc324_e">E 問題</a> では何重にも誤解があり解けなかった。まず読解の誤りとして、部分列を連続部分列と読んだり、 i, j が互いに異なると思い込んでいた。実装の沼も多く、正しく問題を整理してシンプルに解けるようにならないと厳しい。<br>
+</p>
+
+<p>
+別解も確認したい。<br>
+</p>
+
+<h4 id="振り返り"><a href="#振り返り">振り返り</a></h4><p>
+思い込みの強さが結果に現れた。脱却方法を考えたい。<br>
+</p>
+
+<p>
+まず問題に取り組む際は、別人格に切り替えたつもりで考察やコードを確認したい。意識し続ければ、いずれできるようになる。作家が得意そう。<br>
+</p>
+
+<p>
+次に『<a href="https://ts-webstore.net/?pid=120607635">マスター・オブ・場合の数</a>』を解き始めた。場合の数は、 (答えを見ない限り) 自分が正しい答えを出せたのか検証できない。しかもパターンマッチでは解きにくい。まさにバイアスを免れた明晰な頭脳が要求される訓練となる。<br>
+</p>
+
+<h4 id="レーティングの上げ方に関して"><a href="#レーティングの上げ方に関して">レーティングの上げ方に関して</a></h4><p>
+コンテストの参加回数を増やすほど、レーティングの収束は速まる。つまり ARC に出たほうが速くレーティングが上がると思う。うおお <a href="https://atcoder.jp/contests/arc167">ARC 167</a> 出るぞ<br>
+</p>
+
+<h3 id="AHC 025"><a href="#AHC 025">AHC 025</a></h3><p>
+<a href="https://atcoder.jp/contests/ahc025">AHC 025</a> に参加している。 7 時間のコンテストだと思いこんでいたが、 8 日間のコンテストだった。こうしたミスは仕組みでは防止できない。労働を受け入れろ……！<br>
+</p>
+
+<p>
+コンテストが終わるまで感想は書けない。<br>
+</p>
+
+<h2 id="読書"><a href="#読書">読書</a></h2><h3 id="色々"><a href="#色々">色々</a></h3><p>
+<a href="https://bookplus.nikkei.com/atcl/catalog/18/P55740/">CAREER SKILLS</a> を 85% まで読んだ (+ 15%) 。 (社会的な) 人間の価値はその人間が作ったネットワークで決まる、など目を背けたくなる話も多いが、エッセイとして読んでいるため楽しめる。 <a href="https://bookplus.nikkei.com/atcl/catalog/16/P51550/">SOFTWARE SKILLS</a> も購入しておいた。<br>
+</p>
+
+<p>
+積み本の <a href="https://www.crackingthecodinginterview.com/">CRACKING the CODING INTERVIEW</a> をちらちらと見た。最終章の Advanced Topics の中にトポロジカルソートが入っていて、茶色コーダー時代に通った道なんだよなと思う。今読むなら『<a href="https://twitter.com/recuraki/status/1611647410249535488">競技プログラマーハンドブック</a>』の方が面白そうだった。<br>
+</p>
+
+<p>
+<a href="https://note.com/honeshabri/">骨しゃぶり書簡</a> で渋々おすすめされていた <a href="https://www.amazon.co.jp/%E3%81%82%E3%81%AA%E3%81%9F%E3%82%92%E5%A4%A9%E6%89%8D%E3%81%AB%E3%81%99%E3%82%8B%E3%82%B9%E3%83%9E%E3%83%BC%E3%83%88%E3%83%8E%E3%83%BC%E3%83%88%E3%83%BB%E9%9B%BB%E5%AD%90%E7%89%88%E3%83%97%E3%83%A9%E3%82%B9-%E5%B2%A1%E7%94%B0%E6%96%97%E5%8F%B8%E5%A4%AB-FREEex-ebook/dp/B00E4U62PO">あなたを天才にするスマートノート・電子版プラス</a> を 40% までお風呂で聴いた。プレゼンが上手いので話の構造を抽出してみたい。来週の自分に期待。<br>
+</p>
+
+<p>
+そろそろハンズオンもやりたい。 <a href="https://gihyo.jp/book/2022/978-4-297-13034-3">リアルタイムグラフィックスの数学</a> は <a href="https://www.shadertoy.com/">Shadertoy</a> で使われるような full-screen quad のフラグメントシェーダを題材にした本で、ノイズと SDF を扱うらしい。数式で絵が書けると、時間補完で動かせる気がして良さそう。<br>
+</p>
+
+<p>
+Haskell で 2D 描画をやるならまず <a href="https://github.com/benl23x5/gloss">gloss</a> だが、昨年以来更新が止まっている。既に保守モードなのだろうか。<br>
+</p>
+
+<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="ナード業務"><a href="#ナード業務">ナード業務</a></h3><h4 id="開始時スクリプト"><a href="#開始時スクリプト">開始時スクリプト</a></h4><p>
+コンテスト開始時のセットアップ用スクリプトを書いた。僅か 10 秒の差を生む程度で、実用的な効果は無い。一応ソース: <a href="https://github.com/toyboot4e/abc-hs/blob/e0bae9927fb1025bb9024c639977560b6ed01731/go"><code>go</code> スクリプト (<code>bash</code>)</a><br>
+</p>
+
+
+<figure>
+<img src="./img/2023-10-15-go.gif" alt="2023-10-15-go.gif"><br>
+
+<figcaption><span class="figure-number">Figure 1: </span><code>acc</code> 実行、 <code>tmux</code> の pane 分割、 <code>cd</code>, エディタの起動を 1 コマンドに</figcaption>
+</figure>
+
+<p>
+AA は <a href="http://www.figlet.org/">figlet</a> が表示してくれた。 <code>figlet</code> は映えるのに、エディタの起動画面で台無しだ。改良の余地がある。<br>
+</p>
+
+<h4 id="ダークテーマ"><a href="#ダークテーマ">ダークテーマ</a></h4><p>
+ブラウザ拡張 (Stylus/Stylish) でユーザ定義の CSS を追加できる。人が書いた CSS を元に、 AtCoder をダークテーマに変更してみた。<br>
+</p>
+
+
+<figure>
+<img src="./img/2023-10-15-stylus-for-atcoder.png" alt="2023-10-15-stylus-for-atcoder.png"><br>
+
+<figcaption><span class="figure-number">Figure 2: </span>ヘッダの border は綺麗にしたい</figcaption>
+</figure>
+
+<p>
+エディタとのコントラスト差が減り、目に優しくなったと思う。逆にエディタをライトテーマに変えても良かった。<br>
+</p>
+
+<h3 id="モダンエディタと繰り返し操作"><a href="#モダンエディタと繰り返し操作">モダンエディタと繰り返し操作</a></h3><p>
+Haskell の関数適用はメソッドチェインの逆順であると考えていると、ふいにエディタのことを思い起こした。<br>
+</p>
+
+<p>
+<a href="https://github.com/meow-edit/meow">meow</a> / <a href="https://github.com/mawww/kakoune">kakoune</a> / <a href="https://github.com/helix-editor/helix">helix</a> などのモダンエディタでは、まず範囲選択を行い、次に操作を決める。特に範囲選択はカーソル移動の際に自動で行われるため、 <code>move -&gt; action</code> と称される (<a href="https://github.com/mawww/kakoune/wiki/Migrating-from-Vim">Migrating from Vim - Kakkoune</a>) 。<br>
+</p>
+
+<p>
+一方 Vim では、操作対象を最後に決める。この操作順序は <code>.</code> キーによる繰り返し操作 (ドットリピート) と相性が良く好まれる。 3 単語消すなら <code>dw . .</code> だ。日常生活が小さなマクロで溢れている。<br>
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 1: </span>Normal モードに置ける Vim の操作単位 (要出典……)</label><pre><code class="src language-text">count? operator count? (motion | text object)
+</code></pre>
+</div>
+
+<p>
+例外的に visual mode では操作対象を前置できるが、文字単位で選択範囲が記録されるため、『単語』などの範囲情報の持つ意味は失われてしまう。したがってドットリピートと相性が悪く、アンチパタンとして認識されている。<br>
+</p>
+
+<h4 id="helix"><a href="#helix">helix</a></h4><p>
+モダンエディタは、 <code>move -&gt; action</code> とドットリピートの折り合いを付けたのだろうか。 <a href="https://github.com/helix-editor/helix">helix</a> をエアプして確かめてみよう。<br>
+</p>
+
+<p>
+<code>vimtutor</code> 的なものがあった。 <a href="https://github.com/helix-editor/helix/pull/898">Implement hx &#x2013;tutor and :tutor to load tutor.txt #898</a><br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-sh">$ hx --tutor
+</code></pre>
+</div>
+
+<p>
+<code>helix</code> では挿入文字や範囲選択をリピートできるが、 Vim の <code>.</code> のように任意の編集操作を繰り返す機能は無かった (<a href="https://github.com/helix-editor/helix/issues/501">#501</a>) 。 <code>wc</code> をリピートしたければ、明示的にマクロをレコードするしかないと思う。それは、不便すぎるな……！　と、レッドコーダーの口調を真似してみた。<br>
+</p>
+
+<p>
+<a href="https://pragprog.com/titles/dnvim2/practical-vim-second-edition/">Practical Vim</a> の読者としては、ドットリピートの無い環境への移行は考えにくい。その他キー操作も、モードを上手く使ったからこそ Vim よりもタイプ数が増えている。<br>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">操作</th>
+<th scope="col" class="org-left">キーバインディング</th>
+<th scope="col" class="org-left">備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">行頭へ移動</td>
+<td class="org-left"><code>gh</code></td>
+<td class="org-left"><code>g</code> は <a href="https://docs.helix-editor.com/keymap.html#goto-mode">goto mode</a></td>
+</tr>
+
+<tr>
+<td class="org-left">行末へ移動</td>
+<td class="org-left"><code>gl</code></td>
+<td class="org-left"><code>g</code> は <a href="https://docs.helix-editor.com/keymap.html#goto-mode">goto mode</a></td>
+</tr>
+
+<tr>
+<td class="org-left">1 行スクロール</td>
+<td class="org-left"><code>zj</code></td>
+<td class="org-left"><code>z</code> は <a href="https://docs.helix-editor.com/keymap.html#view-mode">view mode</a></td>
+</tr>
+
+<tr>
+<td class="org-left">1 行スクロール</td>
+<td class="org-left"><code>zk</code></td>
+<td class="org-left"><code>z</code> は <a href="https://docs.helix-editor.com/keymap.html#view-mode">view mode</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>
+NeoVim が強過ぎて、ユーザ視点では凄いのが来たという感じではない。ただ作り手にとっては圧倒的に楽しいだろう。 I use Emacs btw.<br>
+</p>
+
+<p>
+その他乗り遅れたものとしては <a href="https://github.com/zellij-org/zellij">zellij</a> や <a href="https://www.nushell.sh/">Nushell</a>, <a href="https://zenn.dev/zenwerk/scraps/8099db9e44119e">Pijul</a> などがある。あまり分かったようなことは言えない。<br>
+</p>
+
+<h3 id="応用情報技術者試験 (AP)"><a href="#応用情報技術者試験 (AP)">応用情報技術者試験 (AP)</a></h3><p>
+訓練は……無だった。心の病気かも知れない。<br>
+</p>
+
+<p>
+午前試験は国語力で乗り切った。他のページに SMTP はメールのプロトコルとあるので除外、のような小細工を重ねると十分解ける。解き方が酷過ぎる。<br>
+</p>
+
+<p>
+午後試験では、そもそも出題側が国語力を問うてきた。対応する文章を抜き出せ、行間を読み取れ、問題文を正しく読め。本当にその出題で良いのだろうか。<br>
+</p>
+
+<p>
+合格できたかはかなり不安。教本・問題集は買っていたので、追々ちゃんと復習したい。<br>
+</p>
+
+<h3 id="Blender VSE (video sequence editor)"><a href="#Blender VSE (video sequence editor)">Blender VSE (video sequence editor)</a></h3><p>
+<a href="https://docs.blender.org/manual/en/2.80/video_editing/sequencer/strips/introduction.html">Blender VSE</a> を動画編集ソフトとして、読み上げ環境を整えたい。<br>
+</p>
+
+<p>
+VSE には 32 の <em>channel</em> があり、 channel 上には複数の <a href="https://docs.blender.org/manual/en/2.80/video_editing/sequencer/strips/introduction.html"><em>strip</em></a> を配置できる。音楽編集ソフトにおける channel と track の関係に似ている。ただし VSE における channel 番号は Z 軸に相当するため、用途だけではなく画面配置に応じて channel 分けをすることになりそうだ。<br>
+</p>
+
+<p>
+字幕データは <a href="https://docs.blender.org/manual/en/2.80/video_editing/sequencer/strips/text.html">Text Strips</a> として表現できる。字幕データ、あるいは text strip の集まりは、 <code>.srt</code> (<a href="https://en.wikipedia.org/wiki/SubRip">SubRip</a> subTitle) ファイルとして import/export できる。これは <a href="https://github.com/openai/whisper">Whisper</a> のテキスト出力と似ていて、簡単に変換できる。<br>
+</p>
+
+<p>
+字幕データが動画の主体となる場合は、アドオンの <a href="https://github.com/tin2tin/Subtitle_Editor">tin2tin/Subtitle_Editor</a> を入れれば満足の行く UI になりそうだ。この人の Youtube も参考にしたい。<br>
+</p>
+
+<p>
+後は字幕を合成音声に読み上げてもらうだけ。リアルタイム再生が理想的だが、text strips を元に audio strips を生成するのでも構わない。 <code>espeak</code> は既にアドオンがあるが、日本語音声が入っていなかった。 <a href="https://voicevox.hiroshiba.jp/">VOICEVOX</a> の <a href="https://github.com/noir55/voicevox_cli_client">CLI client</a> (非公式？) などを試してみたい。<br>
+</p>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
