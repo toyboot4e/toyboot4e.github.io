@@ -35,21 +35,15 @@ B 問題では全探索で TLE となり、丁寧な貪欲法で AC した。 B 
 </p>
 
 <p>
-C 問題は数え上げの問題だった。解説を読んでも詰められない箇所があり、 upsolve できていない。解説動画を見よう。<br>
+C 問題は数え上げの問題だった。解説を読んでも詰められない箇所があり、 upsolve できていない。実は愚直解を数列として <a href="https://oeis.org/">OEIS</a> に投げれば答えが浮かび上がるらしいが……<br>
 </p>
 
-<blockquote>
 <p>
-実は愚直解を数列として <a href="https://oeis.org/">OEIS</a> に投げれば答えが浮かび上がるらしいが……<br>
-</p>
-</blockquote>
-
-<p>
-B 問題を畳み込み・集合 DP で upsolve した。 \(s \in \mathrm{Power} \{ A, B, C \}\) に大して \(dp[|s|]\) を \(\gcd s\) の倍数がこれまでに存在した最小コストとする。畳み込み操作は新たな数をいずれかの \(\gcd s\) の倍数とすることであり、すべての場合を試して各状態の <code>min</code> を更新していく。<br>
+B 問題を畳み込み・集合 DP で upsolve した。 \(s \in \mathrm{Power} \{ A, B, C \}\) に大して \(dp[|s|]\) を \(\gcd s\) の倍数がこれまでに存在した場合の最小コストとする。畳み込み操作は新たな数をいずれかの \(\gcd s\) の倍数とすることであり、すべての場合を試して各状態の <code>min</code> を更新していく。<br>
 </p>
 
 <h3 id="ABC 324"><a href="#ABC 324">ABC 324</a></h3><p>
-<a href="https://atcoder.jp/contests/abc324">ABC 324</a> に参加した。 ABC 3 完で大敗だった。<br>
+<a href="https://atcoder.jp/contests/abc324">ABC 324</a> に参加した。 A, B, C の 3 完で大敗だった。<br>
 </p>
 
 <h4 id="解き方"><a href="#解き方">解き方</a></h4><p>
@@ -61,7 +55,7 @@ B 問題を畳み込み・集合 DP で upsolve した。 \(s \in \mathrm{Power}
 </p>
 
 <p>
-<a href="https://atcoder.jp/contests/abc324/tasks/abc324_c">C 問題</a> では丁寧に場合分けして解いた。 <code>ByteString</code> の関数を調べる良い機会となった。 <code>ByteString</code> 同士の比較には <a href="https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Char8.html#v:zipWith">zipWith</a> が役立った。 <code>ByteString</code> の中の 1 文字を除去するためには、まず <a href="https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Char8.html#v:splitAt">splitAt</a> や <a href="https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Char8.html#v:span">span</a> で 2 分割し、片方から 1 文字消してから再度連結 (<code>&lt;&gt;</code>) すれば良かった。<br>
+<a href="https://atcoder.jp/contests/abc324/tasks/abc324_c">C 問題</a> では丁寧に場合分けして解いた。 <code>ByteString</code> の関数を調べる良い機会となった。 <code>ByteString</code> 同士の比較には <a href="https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Char8.html#v:zipWith">zipWith</a> が役立った。 <code>ByteString</code> の中の 1 文字を除去するためには、まず <a href="https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Char8.html#v:splitAt">splitAt</a> や <a href="https://hackage.haskell.org/package/bytestring-0.11.3.1/docs/Data-ByteString-Char8.html#v:span">span</a> で 2 分割し、片側から 1 文字消してから再度連結 (<code>&lt;&gt;</code>) すれば良かった。<br>
 </p>
 
 <p>
@@ -81,11 +75,11 @@ B 問題を畳み込み・集合 DP で upsolve した。 \(s \in \mathrm{Power}
 </p>
 
 <p>
-まず問題に取り組む際は、別人格に切り替えたつもりで考察やコードを確認したい。意識し続ければ、いずれできるようになる。作家が得意そう。<br>
+まず問題に取り組む際は、別人格に切り替えたつもりで考察やコードを確認したい。作家が得意そう。意識すれば習得できると思う。<br>
 </p>
 
 <p>
-次に『<a href="https://ts-webstore.net/?pid=120607635">マスター・オブ・場合の数</a>』を解き始めた。場合の数は、 (答えを見ない限り) 自分が正しい答えを出せたのか検証できない。しかもパターンマッチでは解きにくい。まさにバイアスを免れた明晰な頭脳が要求される訓練となる。<br>
+次に『<a href="https://ts-webstore.net/?pid=120607635">マスター・オブ・場合の数</a>』を解き始めた。場合の数は、 (答えを見ない限り) 自分が正しい答えを出せたのか検証できない。しかもパターンマッチでは解きにくい。バイアスを免れた明晰な頭脳が要求される訓練になる。<br>
 </p>
 
 <h4 id="レーティングの上げ方に関して"><a href="#レーティングの上げ方に関して">レーティングの上げ方に関して</a></h4><p>
@@ -93,7 +87,7 @@ B 問題を畳み込み・集合 DP で upsolve した。 \(s \in \mathrm{Power}
 </p>
 
 <h3 id="AHC 025"><a href="#AHC 025">AHC 025</a></h3><p>
-<a href="https://atcoder.jp/contests/ahc025">AHC 025</a> に参加している。 7 時間のコンテストだと思いこんでいたが、 8 日間のコンテストだった。こうしたミスは仕組みでは防止できない。労働を受け入れろ……！<br>
+<a href="https://atcoder.jp/contests/ahc025">AHC 025</a> に参加している。 7 時間のコンテストだと思いこんでいたが、 8 日間のコンテストだった。こうしたミスは仕組みでは防止できない。労働を受け入れろ……！　あるいは AI を装備したい。<br>
 </p>
 
 <p>
@@ -101,7 +95,7 @@ B 問題を畳み込み・集合 DP で upsolve した。 \(s \in \mathrm{Power}
 </p>
 
 <h2 id="読書"><a href="#読書">読書</a></h2><h3 id="色々"><a href="#色々">色々</a></h3><p>
-<a href="https://bookplus.nikkei.com/atcl/catalog/18/P55740/">CAREER SKILLS</a> を 85% まで読んだ (+ 15%) 。 (社会的な) 人間の価値はその人間が作ったネットワークで決まる、など目を背けたくなる話も多いが、エッセイとして読んでいるため楽しめる。 <a href="https://bookplus.nikkei.com/atcl/catalog/16/P51550/">SOFTWARE SKILLS</a> も購入しておいた。<br>
+<a href="https://bookplus.nikkei.com/atcl/catalog/18/P55740/">CAREER SKILLS</a> を 85% まで読んだ (+ 15%) 。 (社会的な) 人間の価値はその人間が作ったネットワークで決まる、など目を背けたくなる話も多いが、エッセイとして読めば楽しめる。 <a href="https://bookplus.nikkei.com/atcl/catalog/16/P51550/">SOFTWARE SKILLS</a> も購入した。<br>
 </p>
 
 <p>
@@ -151,24 +145,20 @@ AA は <a href="http://www.figlet.org/">figlet</a> が表示してくれた。 <
 </p>
 
 <h3 id="モダンエディタと繰り返し操作"><a href="#モダンエディタと繰り返し操作">モダンエディタと繰り返し操作</a></h3><p>
-Haskell の関数適用はメソッドチェインの逆順であると考えていると、ふいにエディタのことを思い起こした。<br>
-</p>
-
-<p>
 <a href="https://github.com/meow-edit/meow">meow</a> / <a href="https://github.com/mawww/kakoune">kakoune</a> / <a href="https://github.com/helix-editor/helix">helix</a> などのモダンエディタでは、まず範囲選択を行い、次に操作を決める。特に範囲選択はカーソル移動の際に自動で行われるため、 <code>move -&gt; action</code> と称される (<a href="https://github.com/mawww/kakoune/wiki/Migrating-from-Vim">Migrating from Vim - Kakkoune</a>) 。<br>
 </p>
 
 <p>
-一方 Vim では、操作対象を最後に決める。この操作順序は <code>.</code> キーによる繰り返し操作 (ドットリピート) と相性が良く好まれる。 3 単語消すなら <code>dw . .</code> だ。日常生活が小さなマクロで溢れている。<br>
+一方 Vim では、操作対象を最後に決める。この操作順序は <code>.</code> キーによる繰り返し操作 (ドットリピート) と相性が良く好まれる。 3 単語消すなら <code>dw..</code> の 4 タイプ。日常生活が小さなマクロで満ちている。<br>
 </p>
 
 <div class="org-src-container">
-<label class="org-src-name"><span class="listing-number">Listing 1: </span>Normal モードに置ける Vim の操作単位 (要出典……)</label><pre><code class="src language-text">count? operator count? (motion | text object)
+<label class="org-src-name"><span class="listing-number">Listing 1: </span>Normal モードに置ける Vim の操作単位 (要出典……)</label><pre><code class="src language-text">count? operator count? (motion | text-object)
 </code></pre>
 </div>
 
 <p>
-例外的に visual mode では操作対象を前置できるが、文字単位で選択範囲が記録されるため、『単語』などの範囲情報の持つ意味は失われてしまう。したがってドットリピートと相性が悪く、アンチパタンとして認識されている。<br>
+例外的に visual mode では操作対象を前置できるが、選択範囲が文字単位で記録されるため、『単語』などの範囲情報が持つ意味は失われてしまう。したがってドットリピートと相性が悪く、アンチパタンとして認識されている。<br>
 </p>
 
 <h4 id="helix"><a href="#helix">helix</a></h4><p>
@@ -185,7 +175,7 @@ Haskell の関数適用はメソッドチェインの逆順であると考えて
 </div>
 
 <p>
-<code>helix</code> では挿入文字や範囲選択をリピートできるが、 Vim の <code>.</code> のように任意の編集操作を繰り返す機能は無かった (<a href="https://github.com/helix-editor/helix/issues/501">#501</a>) 。 <code>wc</code> をリピートしたければ、明示的にマクロをレコードするしかないと思う。それは、不便すぎるな……！　と、レッドコーダーの口調を真似してみた。<br>
+<code>helix</code> では挿入文字や範囲選択をリピートできるが、 Vim の <code>.</code> のように任意の編集操作を繰り返す機能は無かった (<a href="https://github.com/helix-editor/helix/issues/501">#501</a>) 。 <code>wc</code> をリピートしたければ、明示的にマクロをレコーディングするしかないと思う。<br>
 </p>
 
 <p>
@@ -237,7 +227,7 @@ Haskell の関数適用はメソッドチェインの逆順であると考えて
 </table>
 
 <p>
-NeoVim が強過ぎて、ユーザ視点では凄いのが来たという感じではない。ただ作り手にとっては圧倒的に楽しいだろう。 I use Emacs btw.<br>
+NeoVim が強過ぎて、凄いのが来たという感じではない。ただ開発側は圧倒的に楽しいだろうから、その空気が羨ましい。<br>
 </p>
 
 <p>
@@ -273,7 +263,7 @@ VSE には 32 の <em>channel</em> があり、 channel 上には複数の <a hr
 </p>
 
 <p>
-字幕データが動画の主体となる場合は、アドオンの <a href="https://github.com/tin2tin/Subtitle_Editor">tin2tin/Subtitle_Editor</a> を入れれば満足の行く UI になりそうだ。この人の Youtube も参考にしたい。<br>
+字幕データが動画の主体となる場合は、アドオンの <a href="https://github.com/tin2tin/Subtitle_Editor">tin2tin/Subtitle_Editor</a> を入れれば満足の行く UI になりそうだ。この人の <a href="https://www.youtube.com/watch?v=qche1JokH5Y">Youtube</a> も参考にしたい。<br>
 </p>
 
 <p>
