@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blender VSE + Whisper + VOICEVOX - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>Blender VSE + Whisper + VOICEVOX</h1>
+      <p>Oct 15, 2023</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="背景"><a href="#背景">背景</a></h2>
+      <h3 id="合成音声が本を読んでくれる時代">
+        <a href="#合成音声が本を読んでくれる時代">合成音声が本を読んでくれる時代</a>
+      </h3>
+      <p>
+        僕は iPad の読み上げ機能 (Siri)
+        をよく使います。本が尽きることはありませんから、コンスタントに良い体験ができています。合成音声最高！<br />
+      </p>
+
+      <p>
+        特にピッチを下げて早回しにすると快適だったのでおすすめします。叩きつけるような喋り方は実質
+        <a href="https://archspire.bandcamp.com/album/bleed-the-future">Archspire</a>
+        です。ヘドバンが止まりません。<br />
+      </p>
+
+      <h3 id="合成音声の使い道"><a href="#合成音声の使い道">合成音声の使い道</a></h3>
+      <p>
+        合成音声は実況動画に使用されることが多いです。匿名性を保って情報共有できますし、ちょっとした実演にも向いているでしょう。<br />
+      </p>
+
+      <p>
+        しかし編集コストは馬鹿になりません。たった 10 分の『ゆっくり実況』のために 10
+        時間も編集していれば、丸々一週間が潰れてしまいます。<br />
+      </p>
+
+      <p>
+        より簡単な編集方法としては、まず実況動画を撮影し、後から合成音声に差し替えれば良いでしょう。やってみます。<br />
+      </p>
+
+      <h3 id="デモ"><a href="#デモ">デモ</a></h3>
+      <p>AtCoder 実況動画を作ってみました:<br /></p>
+
+      <iframe
+        width="640"
+        height="480"
+        src="https://www.youtube-nocookie.com/embed/gXcvBzptjIM?si=KdaNjJUDBhcWUasp"
+        title="YouTube video player"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+      ></iframe>
+
+      <p>
+        編集時間は 1
+        時間程度です。文字起こしや字幕挿入はスクリプトから行いました。以降で方法を解説します。<br />
+      </p>
+
+      <h2 id="使用ツール"><a href="#使用ツール">使用ツール</a></h2>
+      <h3 id="Blender VSE"><a href="#Blender VSE">Blender VSE</a></h3>
+      <p>
+        動画編集には
+        <a href="https://docs.blender.org/manual/en/2.79/editors/vse/index.html"
+          >Blender VSE (Video Sequence Editor)</a
+        >
+        を使用します。起動画面にも <code>Video Editing</code> の文字が輝き、意外にも 3D
+        モデリングツールの主要機能の 1 です。<br />
+      </p>
+
+      <figure>
+        <img
+          src="./img/2023-10-blender-startup.png"
+          alt="2023-10-blender-startup.png"
+          width="400px"
+        /><br />
+
+        <figcaption><span class="figure-number">Figure 1: </span>起動画面</figcaption>
+      </figure>
+
+      <p>
+        スクリプティングのサポートが強力で、 Python
+        から字幕や音声を挿入できます。今回の使用目的に最も合致したツールだったと思います。<br />
+      </p>
+
+      <h3 id="Whisper"><a href="#Whisper">Whisper</a></h3>
+      <p>
+        OpenAI の音声認識ソフトです。コマンドラインから音声ファイルの文字起こしができます。<br />
+      </p>
+
+      <p>
+        複数の実装があります (<a href="https://github.com/openai/whisper"><code>whisper</code></a
+        >, <code>faster-whisper</code>, <code>whisper-cpp</code>, <code>whisper-ctranslate</code>)
+        。今回は whisper-cpp を使用しました。<br />
+      </p>
+
+      <p>
+        RAM の大きな (&gt; 10GB) GPU
+        があれば、録音と同時に文字起こしができるようです。いい時代です。<br />
+      </p>
+
+      <h3 id="VOICEVOX ENGINE"><a href="#VOICEVOX ENGINE">VOICEVOX ENGINE</a></h3>
+      <p>
+        <a href="https://github.com/VOICEVOX/voicevox_engine">VOICEVOX ENGINE</a>
+        が読み上げのソフトウェアです。ずんだもん等で有名です。<br />
+      </p>
+
+      <p>
+        実行するとローカルサーバが立ち上がるので、音声ファイル生成のリクエストを投げれば
+        <code>.wav</code> ファイルが生成されます。これも簡単で良いですね。<br />
+      </p>
+
+      <h2 id="ワークフロー"><a href="#ワークフロー">ワークフロー</a></h2>
+      <h3 id="Blender VSE 入門"><a href="#Blender VSE 入門">Blender VSE 入門</a></h3>
+      <p>Blender VSE の初期画面は以下です。ゴタついています。<br /></p>
+
+      <figure>
+        <img src="./img/2023-10-blender-vse.png" alt="2023-10-blender-vse.png" /><br />
+
+        <figcaption><span class="figure-number">Figure 2: </span>初期配置</figcaption>
+      </figure>
+
+      <p>
+        <a href="https://github.com/tin2tin">tin2tin</a> 氏の
+        <a href="https://www.youtube.com/watch?v=qche1JokH5Y">Youtube</a>
+        に従って画面を調整します。上部画面を
+        <code>Sequencer &amp; Preview</code> 表示にして、ドラッグ操作を行えば次の通りです。<br />
+      </p>
+
+      <figure>
+        <img
+          src="./img/2023-10-blender-vse-simpler.png"
+          alt="2023-10-blender-vse-simpler.png"
+        /><br />
+
+        <figcaption><span class="figure-number">Figure 3: </span>調整後</figcaption>
+      </figure>
+
+      <p>
+        右上の字幕一覧は、同じく <code>tin2tin</code> 氏の
+        <a href="https://github.com/tin2tin/Subtitle_Editor">Subtitle_Editor</a>
+        アドオンです。クリックで字幕の表示位置までジャンプしたり、文章も直接編集できます。課金したいレベルで良いです。<br />
+      </p>
+
+      <h3 id="Whisper で文字起こし"><a href="#Whisper で文字起こし">Whisper で文字起こし</a></h3>
+      <p><code>whisper-cpp</code> を使って実況動画を文字起こししました:<br /></p>
+
+      <pre class="example">
+[00:00:00.000 --&gt; 00:00:03.000]  ABC325をやります
+[00:00:03.000 --&gt; 00:00:07.000]  早速画面が壊れてなんなんですけども
+</pre
+      >
+
+      <p>字幕ファイル形式 (<code>.srt</code>) に変換すれば以下の通りです:<br /></p>
+
+      <pre class="example">
+1
+00:00:00,000 --&gt; 00:00:03,000
+ABC325をやります
+
+2
+00:00:03,000 --&gt; 00:00:07,000
+早速画面が壊れてなんなんですけども
+</pre
+      >
+
+      <p>これを Blender で読み込めば、字幕が生成されます。後は音声を挿入するだけです。<br /></p>
+
+      <blockquote>
+        <p>
+          <a href="https://github.com/ggerganov/whisper.cpp">whisper-cpp</a>
+          の呼び出し方は、次の記事を参考にしました:
+          <a href="https://masatler.hatenablog.com/entry/2023/01/25/001332"
+            >作業ログ：音声認識の新時代・Whisper.cppの使用方法 - 虎（牛）龍未酉2.1</a
+          >
+          。<br />
+        </p>
+      </blockquote>
+
+      <h3 id="VOICEVOX ENGINE 入門"><a href="#VOICEVOX ENGINE 入門">VOICEVOX ENGINE 入門</a></h3>
+      <p>
+        <code>docker</code> で
+        <a href="https://github.com/VOICEVOX/voicevox_engine">VOICEVOX/voicevox_engine</a>
+        を起動します。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ # CPU 版:
+$ docker pull voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+$ docker run --rm --gpus all -p '127.0.0.1:50021:50021' voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+</code></pre>
+      </div>
+
+      <p>
+        起動後は
+        <a href="http://127.0.0.1:50021/docs">http://127.0.0.1:50021/docs</a>
+        にアクセスできるようになり、
+        <a href="https://github.com/VOICEVOX/voicevox_engine">README</a>
+        の通り音声ファイルを生成できるようになります。音声ファイルの生成は Blender
+        から行いましょう。<br />
+      </p>
+
+      <details>
+        <summary>メモ: NixOS で GPU 版の起動失敗</summary>
+        <p>
+          <a
+            href="https://nixos.org/manual/nixos/unstable/options#opt-virtualisation.docker.enableNvidia"
+            >enableNvidia</a
+          >
+          オプションオプションも試しましたが効果無し。 NixOS 分からない……！<br />
+        </p>
+
+        <div class="org-src-container">
+          <label class="org-src-name"
+            ><span class="listing-number">Listing 1: </span
+            ><code>/etc/nixos/configuraton.nix</code></label
+          >
+          <pre><code class="src language-nix"># Docker: &lt;https://nixos.wiki/wiki/Docker&gt;
+virtualisation = {
+  docker = {
+    enable = true;
+    enableNvidia = true;
+    rootless = {
+      enable = true;
+      # $DOCKER_HOST
+      setSocketVariable = true;
+    };
+  };
+};
+</code></pre>
+        </div>
+      </details>
+
+      <h3 id="Blender Python API"><a href="#Blender Python API">Blender Python API</a></h3>
+      <p>
+        先駆者がいました！　助かりました。
+        <a href="https://qiita.com/SaitoTsutomu/items/b2ff4b45ffe578ec23a4"
+          >BlenderでVOICEVOXの音声をPythonで追加 - Qiita</a
+        ><br />
+      </p>
+
+      <p>
+        ターミナルから Blender を起動します。 Shift + F11 でスクリプトエディタを開き、 Python API
+        (<a href="https://docs.blender.org/api/current/bpy.types.SequenceEditor.html"
+          >Sequence Editor</a
+        >, <a href="https://docs.blender.org/api/current/bpy.types.Sequence.html">Sequence</a>)
+        を参考にスクリプトを書きます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-python">import bpy
+
+# VSE (video sequence editor) を取得:
+se = bpy.context.scene.sequence_editor
+
+# 選択された字幕に対し
+for s in filter(lambda s: s.select and s.type == 'TEXT', se.sequences_all):
+  # 文字内容や開始時間を表示する
+  print(s.text, s.frame_start, s.frame_duration)
+</code></pre>
+      </div>
+
+      <p>実行 (Alt-p) してみました。出力がターミナルに流れます:<br /></p>
+
+      <pre class="example">
+Text 98.0 1
+</pre
+      >
+
+      <p>
+        字幕の文字内容や開始位置を取得できています。後は VOICEVOX ENGINE で音声ファイルを生成し、
+        <code>se.new_sound</code> で適切な位置に挿入します。実況動画の完成です。<br />
+      </p>
+
+      <h2 id="課題"><a href="#課題">課題</a></h2>
+      <p>上のワークフローでは以下の問題が発生しました。<br /></p>
+
+      <h3 id="Whisper"><a href="#Whisper">Whisper</a></h3>
+      <p>読み上げ文章の 10% 程度は修正が必要でした。<br /></p>
+
+      <ul>
+        <li>
+          同音異義語<br />
+          『移す』と『写す』などで誤変換が現れました。<br />
+        </li>
+
+        <li>
+          俗語や用語、固有名詞への対応が弱い<br />
+          たとえば『競プロ』『Haskell』などは謎の言葉に置き換わりました。<br />
+        </li>
+
+        <li>
+          英単語に弱い<br />
+          <code>accumarray</code> など英語の関数名が謎の言葉に置き換わりました。<br />
+        </li>
+      </ul>
+
+      <h3 id="VOICEVOX"><a href="#VOICEVOX">VOICEVOX</a></h3>
+      <p>
+        字幕と読みが一致しない場合があります。たとえば『word』を『ダブリューオーアールディー』と読んでしまいました。<br />
+      </p>
+
+      <h3 id="Blender VSE"><a href="#Blender VSE">Blender VSE</a></h3>
+      <p>初期フォントだと中国語の字体になりました。まだ修正方法は探していません。<br /></p>
+
+      <p>
+        Unicode
+        が字体を区別しないのは問題ですが、字体くらい変わってもコンテツは変わらないという気もします。<br />
+      </p>
+
+      <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
+      <p>
+        Blender VSE + Whisper + VOICEVOX
+        のワークフローを組み立てました。編集時間ゼロとは行きませんでしたが、簡素な動画なら編集の 90%
+        を自動化できたと思います。<br />
+      </p>
+
+      <p>今後も実演動画を作る際には使っていくかもしれません。<br /></p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
