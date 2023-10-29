@@ -240,10 +240,10 @@ writeSTRef (STRef var#) val = ST $ \s1# -&gt;
 </div>
 
 <p>
-そして <code>writeMutVar#</code> の関数定義は <code>base</code> パッケージに無かった。 <a href="https://stackoverflow.com/a/5773136">How are mutable arrays implemented in Haskell?</a> を見ると、 <code>writeMutVar#</code> を始めとした primitive な操作は <a href="https://gitlab.haskell.org/ghc/ghc/-/wikis/commentary/prim-ops">prim-ops</a> に定義されているらしい。<br>
+そして <code>writeMutVar#</code> の関数定義は <code>base</code> パッケージに無かった。 <a href="https://stackoverflow.com/a/5773136">How are mutable arrays implemented in Haskell?</a> を見ると、 <code>writeMutVar#</code> を始めとした primitive な操作は <a href="https://gitlab.haskell.org/ghc/ghc/-/wikis/commentary/prim-ops">prim-ops</a> に定義されているらしい。その実装は Haskell ではない。<br>
 </p>
 
-<h3 id="以上"><a href="#以上">以上</a></h3><p>
+<h3 id="まとめ"><a href="#まとめ">まとめ</a></h3><p>
 <code>IO</code> は <code>State</code> と同じく純粋な Haskell として定義されているが、ランタイム中の？非純粋な関数 (<code>prim-ops</code>) に触れられる点が特別であったと認識できた。<br>
 </p>
 
