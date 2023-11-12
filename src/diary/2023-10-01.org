@@ -1,4 +1,4 @@
-#+TITLE: ABC 322, AHC 024, 入門監視
+#+TITLE: ABC 322, AHC 024, 入門監視 / Tempel
 #+DATE: <2023-10-01 Sun>
 
 * 競技プログラミング

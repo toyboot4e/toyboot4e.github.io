@@ -1,0 +1,204 @@
+#+TITLE: ABC 326, AHC 025, Thunder 本 / IO, ST, State
+#+DATE: <2023-10-29 Sun>
+
+* 競技プログラミング
+
+** 訓練
+
+先週の [[https://atcoder.jp/contests/abc325/tasks/abc325_e][ABC 325 E]] を upsolve した。 Dijkstra の典型だったが TLE した。人の提出を真似て枝刈りをすると AC になった。
+
+[[https://www.slideshare.net/yosupo/ss-46612984][色々なダイクストラ高速化 (yosupo 氏)]] を見ると、枝刈りによって『何十倍も速くなる問題も』あるという (P15) 。オーダーは変わらないと思っていたが……？？
+
+青 diff DP を 3 問解いた。 TEE を見ると約 2 ヶ月の周期性があったので脱したい。
+
+#+CAPTION: 4 月初旬から 10 月下旬の TEE の推移
+[[./img/2023-10-29-tee.png]]
+
+** AHC 025
+
+[[https://atcoder.jp/contests/ahc025][AHC 025]] が終了した。複数の重りをグループ分けし、重さを平均化せよというインタラクティブ問題だった。
+
+結果は緑パフォだった。個々の要素をソートして、当てずっぽうに組み合わせることしかできなかった。そろそろ対策してみたい。
+
+- [[https://kaede2020.hatenablog.com/entry/2023/10/22/195315][kaede\under{}2020 さんのブログ]]
+- [[https://www.youtube.com/watch?v=CrzS-Tgnloc][AHC ラジオ]]
+
+** ABC 326
+
+[[https://atcoder.jp/contests/abc326][ABC 326]] に参加した。
+
+[[https://atcoder.jp/contests/abc326/tasks/abc326_a][A 問題]] ではセットアップが壊れていて焦った。
+
+[[https://atcoder.jp/contests/abc326/tasks/abc326_b][B 問題]] は算数だった。
+
+[[https://atcoder.jp/contests/abc326/tasks/abc326_c][C 問題]] では尺取り法 (two pointers) のテンプレートを使った。条件を満たす =(l, r)= 区間の一覧が返るようになっている:
+
+#+BEGIN_SRC hs
+twoPointers :: Int -> ((Int, Int) -> Bool) -> [(Int, Int)]
+twoPointers len p = _ {-# 実装は汚いので省略…… #-}
+#+END_SRC
+
+添字バグに戸惑った。閉区間 =[l, r]= では =len = r + 1 - l= となるのが厄介だった。
+
+#+BEGIN_QUOTE
+尺取り法は 2 分探索で代替できない場合がある。たとえば [[https://atcoder.jp/contests/past202109-open/tasks/past202109_l][第 8 回 PAST - L]] は 2 分探索だと TLE になった。
+#+END_QUOTE
+
+[[https://atcoder.jp/contests/abc326/tasks/abc326_d][D 問題]] は枝刈りができず見送った。実装も大変だったらしい。まだ upsolve していない。
+
+[[https://atcoder.jp/contests/abc326/tasks/abc326_e][E 問題]] は期待値 DP として解いた。図のような遷移において、 $E_i = \sum_j (E_j + \Delta x_{i, j}) p_{i, j}$ が成り立つ。実際、期待値の定義 $E[X] = \sum_i x_i p_i$ に立ち返ると計算式を証明できる (省略) 。
+
+#+ATTR_HTML: :width 551px
+#+CAPTION: 期待値 DP の雰囲気
+[[./img/2023-10-29-ex-dp.png]]
+
+$dp[i] := E_i$ はトポロジカル順に求める (終点から順に求める) 。今回の問題における遷移を整理すると $E_i = \sum_j (E_j + \Delta x_{i, j}) \frac 1 N = (\sum_j E_j + \sum_j \Delta x_{i j}) \frac 1 N$ であり、それぞれの $\sum$ をセグメント木と累積和から計算できた。セグメント木も累積和にした方が賢い。
+
+#+BEGIN_QUOTE
+確率変数 $X$ などは雰囲気で書いており、人には伝わらないかも……。
+#+END_QUOTE
+
+[[https://atcoder.jp/contests/abc326/tasks/abc326_f][F 問題]] は x, y 成分に分けると半分全列挙になるが、経路復元が間に合わなかった。 upsolve したい。
+
+以上、 C 問題 (尺取り法) と E 問題 (期待値 DP) を貯金で乗り切った。
+
+** 備忘録 (期待値 DP)
+
+[[https://atcoder.jp/contests/dp/tasks/dp_j][EDPC - J Sushi]] に通じる類題を考える。
+
+1/2 の確率で表が出るコインがある。 3 回表を出すまでにコインを投げる回数の期待値は？
+
+#+ATTR_HTML: :width 880px
+[[./img/2023-10-29-coin-dp.png]]
+
+DP 的な式整理無しで解くのは無理な気がする。まず $E_2 = \sum\limits_i p_i x_i = \sum_\limits{n=1}^{\infty} \frac n {2^n} = 2$ 。 $E_1$ は……考えたくない。。
+
+* 読書
+
+** Thunder 本
+
+AHC 025 の結果に刺激を受けて、 [[https://gihyo.jp/book/2023/978-4-297-13360-3][ゲームで学ぶ探索アルゴリズム実践入門]] を読み始めた。
+
+著者: [[https://thun-c.github.io/][Thunder]] 氏
+
+Haskell で取り組むため、 [[https://www.stackage.org/lts-21.6/package/random-1.2.1.1][random]] パッケージを見た。 =StdGen= が乱数のシード (?) で、あるシード値からは常に同じ乱数が生成される (決定的である) 点が AHC 向けだと思った。
+
+** Software Design
+
+[[https://gihyo.jp/magazine/SD/archive/2023/202311][Software Design 2023年11月号]] の Bram 氏 (Vim の作者) の追悼記事を読んだ。人生か……
+
+* Haskell
+
+** Qiita Conference 2023 Autmun Day2
+
+naoya さんを (オンラインで) 見た！！！！
+
+- [[https://www.youtube.com/watch?v=pe0vW9AyunQ&t=9530s][Youtube]]
+- [[https://t.co/WlqKmMlFjo][発表資料 (スライド)]]
+
+ツイートしなかったもの
+
+#+BEGIN_QUOTE
+- 『メンタルモデル』と音で聞いたのは初めてです
+- 『ノイマン型コンピュータ』などの正確な描写が 🧠 に /fit boxing/
+- React, Elm, オニオンアーキテクチャなど現在と過去・似たものを結びつける考えがスマート
+- IO を計算機への命令と表現した端的な解釈で脳みそが脱皮
+- =accumArrayDP= って前から半環でしたっけ
+- =shakutori= が分からない
+- 僕は『代数的構造』とか『計算』といった抽象的なものが見えたことが無くて『半環』とか =accumArray= のような具体的なものばかり考えています
+- いつもながら抽象的なものを手探りしている感じが面白かったです
+#+END_QUOTE
+
+** =State= モナド
+
+naoya さんと言えば、普段の投稿がぶっちぎっていて面白い。キーボード箱買い……棚買い事件はもちろん、 Haskell でも突き抜けている。最近は =State= モナドの使い方が腑に落ちて面白かった。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">一方、そこに State モナドを使って再帰の過程でグローバルな領域に計算結果を書き込むようにする。すると途端に再帰の記述の認知負荷が下がって、楽になる。 <a href="https://t.co/y0n64UKXpS">pic.twitter.com/y0n64UKXpS</a></p>&mdash; naoya (@naoya_ito) <a href="https://twitter.com/naoya_ito/status/1710549396746842281?ref_src=twsrc%5Etfw">October 7, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+#+END_EXPORT
+
+#+BEGIN_QUOTE
+この『いいね』数、みんな付いて来れなかったか……！
+#+END_QUOTE
+
+=State= モナドを immutable データに対する =ST= モナドのように扱えることが示されていて驚いた。むしろ、 =ST= や =IO= が =State= と似ていると考えた方が Haskell 的なのかもしれない。
+
+** =IO= の正体
+
+mod\under{}poppo 氏 [[https://zenn.dev/mod_poppo/articles/unsafeperformio][unsafePerformIOではじめる愉快なHaskellプログラミング]] の [[https://zenn.dev/mod_poppo/articles/unsafeperformio#%E7%B5%90%E8%AB%96][結論]] によると、 =GHC.IO= は以下の =newtype= であるという:
+
+#+BEGIN_SRC hs
+newtype IO a = IO (State# RealWorld -> (# State# RealWorld, a #))
+#+END_SRC
+
+ほぼ =State= モナド (?) 。なるほど『純粋』関数型言語 Haskell だ。
+
+しかしまだ =IO= と =State= が同じだとは思えない。以下でギャップを埋めてみた。
+
+*** =runIO= は無いのか
+
+=State= の =evalState= に対して、 =IO= の =runIO= は無いのか。これは =main:: IO ()= に対して =mainImpl = runIO main RealWorld= が隠されていると解釈すれば、 =main= も通常の Haskell であると言える気がする。たぶん。
+
+*** 可変変数に関して
+
+=State= ではすべての状態が文脈の中に隠れているのに対して、 =IO= では =ref <- newIORef (0 :: Int)= のように識別子が露出する。この違いをどう捉えるべきか。
+
+まず =ref= は =IO= が使用するハンドル？参照？であって、可変変数ではない。 =ref= 定数である。そして =ref= ではなく =readIORef= や =writeIORef= のような外界 (=RealWorld=) に触れる操作の方が特別 (mutable) であると考えられる。
+
+#+BEGIN_SRC hs
+-- `IORef` のサンプルコード:
+ref <- newIORef (1 :: Int)
+x1 <- readIORef ref -- `ref` が参照する値をコピーして読み出す (`1`)
+writeIORef ref (x1 + 1) -- 参照先の値を更新
+x2 <- readIORef ref -- `ref` が参照する値をコピーして読み出す (`2`)
+#+END_SRC
+
+また =State= モナドの中にアロケータ相当のデータ (たとえば =IntMap Int=) を入れれば、 =State= の文脈で以下のようなコードを書くことも不可能ではない:
+
+#+BEGIN_SRC hs
+ref <- newIntRef (0 :: Int)
+x1 <- readIntRef ref
+writeIntRef ref (x1 + 1)
+#+END_SRC
+
+よって =IO= は アロケータ (など) が入った =State= モナドであるとみなせば、 =State= と見かけ上の差が無いと言えるはず。
+
+*** Mutable な primitive 操作
+
+=State= と =IO= がほぼ同じものであることは分かった。真の違いは、 =writeIORef= など =IO= でのみ許される関数の実装にある。ここでメモリ領域の書き換えを行い、 =RealWorld -> RealWorld= という幻想を作っているはずだ。
+
+まず [[https://hackage.haskell.org/package/base-4.19.0.0/docs/Data-IORef.html#v:writeIORef][writeIORef]] は [[https://hackage.haskell.org/package/base-4.19.0.0/docs/Data-STRef.html#v:writeSTRef][writeSTRef]] を使って実装されていた。 =writeSTRef= は次の通り =writeMutVar#= に依存している:
+
+#+BEGIN_SRC hs
+writeSTRef :: STRef s a -> a -> ST s ()
+writeSTRef (STRef var#) val = ST $ \s1# ->
+    case writeMutVar# var# val s1#      of { s2# ->
+    (# s2#, () #) }
+#+END_SRC
+
+そして =writeMutVar#= の関数定義は =base= パッケージに無かった。 [[https://stackoverflow.com/a/5773136][How are mutable arrays implemented in Haskell?]] を見ると、 =writeMutVar#= を始めとした primitive な操作は [[https://gitlab.haskell.org/ghc/ghc/-/wikis/commentary/prim-ops][prim-ops]] に定義されているらしい。その実装は Haskell ではない。
+
+** まとめ
+
+=IO= は =State= と同じく純粋な Haskell として定義されているが、ランタイム中の？非純粋な関数 (=prim-ops=) に触れられる点が特別であったと認識できた。
+
+不正確な理解だが、今はこれでヨシ！
+
+* Misc
+
+** Haskell 本が書きたい
+
+Haskell で茶色コーダーになるための本が無い。もちろん素晴らしい本は存在するけれども、各自の試行錯誤と照らし合わせるには分量が足りない。あるいは競プロにフォーカスしていない。
+
+よってこの間を埋める投稿がしたい。 Advent calendar に間に合うだろうか。
+
+*** 表紙
+
+表紙画像を組んでみた: [[https://ibb.co/9Wp0grF][サンプル (3 ヶ月で削除)]] 。グロ注意。アウト過ぎたので、別の案を外注してみた。僅か 6,000 円？！　待機。
+
+『ラムダスカル』というキャラクターを考えた。ふと Haskell のキャラクターを探してみると、これが出てきた。さすが tanakh 氏。いつ見ても先を行く人だ。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Haskellのキャラクター作った <a href="http://t.co/fu1jX2yKMP">pic.twitter.com/fu1jX2yKMP</a></p>&mdash; Hideyuki Tanaka (@tanakh) <a href="https://twitter.com/tanakh/status/468959015167623169?ref_src=twsrc%5Etfw">May 21, 2014</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+

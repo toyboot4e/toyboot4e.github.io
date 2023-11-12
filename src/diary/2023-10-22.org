@@ -1,0 +1,93 @@
+#+TITLE: ARC 167, ABC 325, AHC 025, CAREER SKILLS / ステートマシン
+#+DATE: <2023-10-22 Sun>
+
+* 競技プログラミング
+
+** 訓練
+
+青 diff DP を 2 問解いた。 [[https://ts-webstore.net/?pid=120607635][マスター・オブ・場合の数]] もちょっとだけ。そろそろ進捗管理が必要だ。まずは進捗を書き留めよう。
+
+** 意識
+
+AtCoder を始める以前はコーディングの速さに自信があった。今の自己認識は『速解きができない』。それは単に速解きの練習をしていないためではないだろうか。
+
+よって今回のコンテストでは長い息継ぎを意識し、『考察と実装の反復回数を減らす』ことを目標としたい。考察から実装へのターンを短縮できたとき、速解きが完成するはずだ。プール行きたい。
+
+** ARC 167
+
+[[https://atcoder.jp/contests/arc167][ARC 167]] に参加した。 2 完 (A, B) だった。
+
+[[https://atcoder.jp/contests/arc167/tasks/arc167_a][A 問題]] は貪欲法だった。勘で書いたが、通してもらえて助かった。
+
+[[https://atcoder.jp/contests/arc167/tasks/arc167_b][B 問題]] は算数だった。オーバーフローと平方数の考察に苦しんだ。
+
+[[https://atcoder.jp/contests/arc167/tasks/arc167_c][C 問題]] は確認できていない。
+
+** ABC 325
+
+[[https://atcoder.jp/contests/abc325][ABC 325]] に参加した。 4 完 (A, B, C, D) だった。
+
+A ~ C 問題までは、半開区間や謎のコンパイルエラーに苦しんだ。実況動画を作ってみたので、以下のリンクから確認できる:
+
+- [[https://youtu.be/gXcvBzptjIM][ABC 325 (実況動画)]]
+- [[/2023-10-22-blender-vse.html][Blender VSE + Whisper + VOICEVOX (ワークフローの解説記事)]]
+
+[[https://atcoder.jp/contests/abc325/tasks/abc325_d][D 問題]] は区間スケジューリング問題の亜種だった。『[[https://shop.ohmsha.co.jp/shopdetail/000000004066/][関数プログラミング 珠玉のアルゴリズムデザイン]]』で出てきた状態遷移のパターンを使った。すなわち第一引数で状態を表して、再帰的関数呼び出しで状態遷移する:
+
+#+BEGIN_SRC hs
+solve (PULL, !queue, !heap) = {- TODO -}
+solve (PROCESS, !queue, !heap) = {- TODO -}
+solve (WAIT, !queue, !heap) = {- TODO -}
+#+END_SRC
+
+しかしステートマシンを正しくモデリングできていなかった。 1 つの商品を処理した際に 1 μ secs が経過するため、新しく到着した商品を即座にヒープへ移す必要がある。ギリギリ AC.
+
+[[https://atcoder.jp/contests/abc325/tasks/abc325_e][E 問題]] は DP が組めずに諦めた。始点・終点からの Dijkstra を繋ぎ合わせるか、状態遷移 (車から電車への乗り換え) を 2 つ目のグラフへの移動と見れば Dijkstra で解けたようだ。
+
+グラフと DP は実な同じ問題らしいので、将来的に DP でグラフ問題が解けるようになるかもしれない。いずれメタルは癌に効くようになる。
+
+[[https://atcoder.jp/contests/abc325/tasks/abc325_f][F 問題]] では EDPC 的な計算量の削減が要求される。自力で思いつかないやつだ。これは青 diff DP なので、必ず解けるようになりたい。 Upsolve しておこう。
+
+** AHC 025
+
+[[https://atcoder.jp/contests/ahc025][AHC 025]] に参加した。緑パフォまで落ちていた。終了までコメントできない。
+
+* 読書
+
+[[https://bookplus.nikkei.com/atcl/catalog/18/P55740/][CAREER SKILLS]] を 100% まで読んだ (+15%) 。著者は毎週 8 時間以上の読書で年間 50 冊を達成しているらしい (audio book を含む) 。速読だ。
+
+[[https://tkj.jp/book/?cd=70880801][冲方丁のライトノベルの書き方講座]] によると、小説を要素分解すれば『主題』『世界』『人物』『物語』『文体』となる。この要素分解を CAREER SKILLS に適用してみよう。
+
+文体はシンプルで力強い。『君はこう思うだろうが、それは甘い』『私ならこうする。君も頑張れ』。物語は『テスターから成り上がり、ブログで天下を取った後も極めて自律的な生活を続けて人々への支援を続ける』。人物は John, プログラマー、テスター、上司、ファン、自社の人々、互助会の友人。世界観は『最も多く与えた者が最も多く与えられる』。主題は『目的達成に真剣になれ』という感じ？
+
+『週報を書け』などは [[https://www.amazon.co.jp/%E3%81%82%E3%81%AA%E3%81%9F%E3%82%92%E5%A4%A9%E6%89%8D%E3%81%AB%E3%81%99%E3%82%8B%E3%82%B9%E3%83%9E%E3%83%BC%E3%83%88%E3%83%8E%E3%83%BC%E3%83%88%E3%83%BB%E9%9B%BB%E5%AD%90%E7%89%88%E3%83%97%E3%83%A9%E3%82%B9-%E5%B2%A1%E7%94%B0%E6%96%97%E5%8F%B8%E5%A4%AB-FREEex-ebook/dp/B00E4U62PO][スマートノート]] 同様に関心を惹かれた。ツールや習慣、計算を通して認識能力を補えると助かる。この先も同じテーマで本を探し続けることになるだろう。
+
+* Misc
+
+** フォント変更
+
+X で流れてきた [[https://www.intel.com/content/www/us/en/company-overview/one-monospace-font.html][Intel One Mono]] フォントに変えてみた。 Adobe の [[https://fonts.adobe.com/fonts/source-code-pro#fonts-section][Source Code Pro]] も見やすがウリだったけれど、より大胆な見た目になっている。
+
+#+CAPTION: Intel One Mono フォント。 `{ }` のデザインがすごい。
+[[./img/2023-10-15-intel-one-mono.png]]
+
+日本語と混ぜると引き締まって良い。なお [[https://github.com/ryanoasis/nerd-fonts/issues/1238][5 月時点で NerdFonts にも収録済みだった]] 。
+
+** Blender VSE + whisper + VOICEVOX
+
+実況動画の作成記事を投稿した: [[/2023-10-22-blender-vse.html][リンク]] 。 Blender は動画編集ソフトとして使った。
+
+Blender はナード向けだった。ショートカットを覚えさせるパワーユーザ指向、何だってイージーに扱える Python scripting API, 稀によくいるズバ抜けた addon 開発者たち。これは我々が求めたものでは？
+
+Blender と他ツールの比較や歴史的背景に興味が湧いてきた。おそらく 3D モデリングツールとしてもナード向け過ぎる。本が無いため [[http://podcast.blender.institute/][Blender Institute Podcast]], [[https://www.youtube.com/playlist?list=PLa1F2ddGya__t5L-fgRpzUZmbjFLTDI1o][Blender Confrences 2022 Podcasts]] などをあたってみたい？　VSE 回は無さそう。
+
+** スピーカー (1 万円)
+
+1 万円でスピーカーを買った。 PC の専用デバイスがあると、毎回ペアリングする手間が省ける。快適になった。
+
+** NixOS
+
+次の事象で OS を更新できなくなった: [[https://discourse.nixos.org/t/no-space-left-on-boot/24019][No space left on /boot]] 。過去の世代を GC にかけると復旧できた。 Rollback 用のデータが =/boot= に残っているみたいだった。
+
+この機会に GC の定期実行や =nix-store= 最適化の設定を次の記事から借りてきた: [[https://zenn.dev/asa1984/articles/nixos-is-the-best][NixOSで最強のLinuxデスクトップを作ろう]] 。 Wiki と比較しても情報が充実しておりありがたい。
+

@@ -1,0 +1,150 @@
+#+TITLE: ABC 328, AHC 026 / Mo
+#+DATE: <2023-11-12 Sun>
+
+* 競技プログラミング
+
+** 日々
+
+考察用のノートを買った。日中に考察を進めておけば、夜は実装に専念できる。考察済みの問題をストックできるようになったらいいな。
+
+** 訓練
+
+[[https://qiita.com/gotoki_no_joe][@gotoki\under{}no\under{}joe]] 氏の投稿を参考に、青 diff の問題を upsolve した。 Haskell ならではのパフォーマンスの問題を扱っていたり、独自の解法も多くて参考になる。
+
+茶色コーダー時代は人の Haskell が読めなかった。今は前よりも強くなって、コードを読む自由を得た。やはりパワーユーザーとなって遊び倒すことが人生だという感じがする。
+
+** Mo's algorithm / square root decomposition
+
+[[https://atcoder.jp/contests/abc293/tasks/abc293_g][ABC 293 G - Triple Index]] では 1 次元上の =(l, r)= 区間に対するクエリが大量に与えられる。こうした問題はセグメント木を使うと一度のイテレーションで済む場合が多く、『平面走査』の問題として知られる。
+
+ABC 293 G においては、セグメント木に =IntMap= を載せたくなった。しかし boxing なデータ型をセグメント木に載せるのは悪い傾向で、 =IntMap= 同士のマージ処理には要素数に比例する時間がかかる。当然 TLE してしまった。
+
+このような場合に高速で計算する方法として Mo's algorithm というのがあって、クエリの処理順を工夫することで =(l, r)= 区間の伸縮の距離を一定以下に落とし込むことができる。
+
+- [X] Mo's algorithm を実装した！
+
+*** 説明資料
+
+- [[https://strangerxxx.hateblo.jp/entry/20230314/1678795200][Mo's Algorithmのイメージを視覚的に理解したい - 徒然]]
+  この図が一番分かりやすかった。
+- [[https://take44444.github.io/Algorithm-Book/range/mo/main.html][Mo's algorithm - アルゴリズムとデータ構造大全]]
+  この図も良かった。僕の実装も同様に $O((L + Q) \sqrt L)$ 程度の計算量になっている。
+- [[https://ei1333.hateblo.jp/entry/2017/09/11/211011][Mo's algorithm - ei1333の日記]]
+  この図も分かりやすくて良かった。
+- [[https://cses.fi/book/book.pdf#page=265][Competitive Programmer’s Handbook]]
+  これは詳しくなかった。 Mo が載っていること自体は ◎
+- [[https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=On+the+Complexity+of+Sparse+Exon+Assembly+&btnG=][Carmel Kent, Gad M. Landau, Michal Ziv-Ukelson, On the Complexity of Sparse Exon Assembly (2005)]]
+  Mo's algorithm として知られるよりも先の研究 (無料では読めず)
+
+*** ソース
+
+- [[https://cojna.github.io/iota/Algorithm-Mo.html][Algorithm.Mo]] ([[https://github.com/cojna/iota][=cojna/iota=]])
+  抽象化の際に参照した。至福 🙏
+- [[https://nyaannyaan.github.io/library/misc/mo.hpp.html][Mo’s algorithm | Nyaan’s Library]]
+  馬鹿な、短すぎる……！
+
+*** 感想
+
+平面走査をやり過ぎて牛になったわね。夜にもなっていた。
+
+Mo というのは牛の鳴き声ではなく、選手の名前だったらしい ([[https://codeforces.com/blog/entry/20032?#comment-248430][リンク: Codeforces]]) 。 Chokudai サーチみたいなものか。牛になる時代は終わった。これからは Mo になるのだ。
+
+魔法的アルゴリズムの謎を 1 つ uncover できた。進んだトピックでは rollback するとか何とか。あまり深淵を覗き込むと心が折れるので、典型一発で満足しておこう。
+
+** AHC 026
+
+[[https://atcoder.jp/contests/ahc026][AHC 026]] に参加した。今回は短期コンで、貪欲法で 1,200 パフォが出た。ひとまず良し。
+
+可変配列との付き合い方が全然分からず、しょっちゅう =unsafeFreeze= している。 Thunder 本をやりつつ Haskell の書き方を考えたい。
+
+** ABC 328
+
+[[https://atcoder.jp/contests/abc328][ABC 328]] に参加した。 5 完 (A ~ E) だった。
+
+*** 意気込み・振り返り
+
+C まで 15 分、 E まで 40 分を目指した。後半に時間を残せば、高 diff の問題を通せる確率が上がる。
+
+しかし実際は E まで 65 分かかり、 F を解くために 5 分足りなかった。考察・設計の弱さが出た。
+
+*** 解法
+
+[[https://atcoder.jp/contests/abc328/tasks/abc328_a][A 問題]] は ~U.sum $ U.filter (<= x) ds~ だった。
+
+[[https://atcoder.jp/contests/abc328/tasks/abc328_b][B 問題]] は =Sum= の =foldMap= の気持ちで解いた (=sum= は手動で呼び出した) 。
+
+[[https://atcoder.jp/contests/abc328/tasks/abc328_c][C 問題]] は隣接二項の比較結果を累積和にして解いた。実はクエリ平方分割 (Mo) でも解けるらしい。やってみた。
+
+ところで API ドキュメントを参照する際にブラウザに移るのが良くない。エディタから =consult-ghq= でソースを覗きに行こうと思う。
+
+#+CAPTION: Mo で解いてみた。タブバーに =vector= など依存パッケージを開く
+[[./img/2023-11-12-multiple-projects.png]]
+
+#+BEGIN_QUOTE
+本当は Hoogle + FZF でパッケージを指定して絞り込みしたい。 [[https://codeberg.org/rahguzar/consult-hoogle][consult-hoogle]] は壊れているようで、コントリビュートしなきゃだけれど、うーん
+#+END_QUOTE
+
+[[https://atcoder.jp/contests/abc328/tasks/abc328_d][D 問題]] では Haskell には無い =Vec<T>= が必要……いや =cojna/iota= の =Data.Buffer= があるじゃないか！　AC! AC!
+
+#+BEGIN_SRC hs
+main :: IO ()
+main = do
+  !s <- BS.getLine
+
+  !buf <- newBufferAsStack (BS.length s)
+  let !abc = U.fromList "ABC"
+
+  forM_ (BS.unpack s) $ \ch -> do
+    pushBack buf ch
+    !vec <- unsafeFreezeBuffer buf
+    when (U.drop (U.length vec - 3) vec == abc) $ do
+      void $ popBack buf
+      void $ popBack buf
+      void $ popBack buf
+
+  !res <- unsafeFreezeBuffer buf
+  putStrLn $ U.toList res
+#+END_SRC
+
+[[https://atcoder.jp/contests/abc328/tasks/abc328_e][E 問題]] では、頂点 0, 1, .. と順に走査し、各頂点から最大 1 つの辺を貼ると考えた。計算量は $9^8 = 43,046,721$ 程度となって、枝刈りで $10^7$ 以内に収まると踏んだ。
+
+実は (頂点数 - 1) の辺を選び全域木になるか試せば良いそうで、確かに……。集合 DP も upsolve したい。
+
+[[https://atcoder.jp/contests/abc328/tasks/abc328_f][F 問題]] では時間切れとなった。ポテンシャル／関係式付き Union-Find で解くと典型らしい。 Upsolve したい。
+
+* 読書
+
+[[https://booth.pm/ja/items/1577541][Haskellで戦う競技プログラミング 第2版]] を読み返した。恐ろしくよく書かれている。
+
+- =containers= 関係
+  - =Map= などは lazy 版と実装を共有している。型クラスの実装も lazy になっているため注意
+- =vector= 関係
+  - =U.generate n id= による連番生成
+  - =U.forM_=, =U.foldM'_= は安定して速い
+  - =IO=, =ST= を除いて =U.mapM=, =U.zipWithM=, =U.replicateM= は遅い (!?)
+  - =U.concatMap= よりもリストの =concatMap= の方が速い (?)
+  - =U.constructN= が遅い ← 現在の環境では高速な模様
+- =IORef= は =IORef= → =MutVar#= → =I#= のようなダブルポインタ
+
+* Haskell 本
+
+** 進捗: 10%
+
+小さい章が 50 個くらいになりそう。間に合うか……？
+
+** 日々
+
+Thousandfold (Eluveitie) を聴いた。 1,000 回畳み込みをするわけではなく、『1,000  倍の』という意味みたい。『Thousandfold thunk』がピッタリ。
+
+** 動的リンク: 失敗
+
+[[https://wiki.archlinux.org/title/haskell][Haskell - ArchWiki]] にある通り動的リンクを試してみたが、効果が得られた実感は無かった。
+
+NixOS にいるためだろうか。保留。
+
+* Misc
+
+** Emacs
+
+=consult= (Emacs の fuzzy finder) が動かん……と思いきや、 [[https://github.com/minad/consult/issues/887#issuecomment-1802688749][2 日前に Minad 神が一瞬で解決していた]] 。残 Issue/PR 数が 0 だと……！
+

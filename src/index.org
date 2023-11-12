@@ -20,10 +20,15 @@
 - @@html:<date>2023-08-19</date>@@ [[file:/2023-08-19-keyball44-build.org][Keyball 44 組み立て]]
 - @@html:<date>2023-09-10</date>@@ [[file:/2023-09-10-light-blue-haskell.org][Haskell / AtCoder 入水！]]
 - @@html:<date>2023-09-23</date>@@ [[file:/2023-09-23-blog-improvements-2.org][=org-mode= 製ブログの改良 (2)]]
+- @@html:<date>2023-10-15</date>@@ [[file:/2023-10-22-blender-vse.org][Blender VSE + Whisper + VOICEVOX]]
 
 * diary
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2023-09-24</date>@@ [[file:/diary/2023-09-24.org][ABC 321, 入門監視]]
-- @@html:<date>2023-10-01</date>@@ [[file:/diary/2023-10-01.org][ABC 322, AHC 024, 入門監視]]
-- @@html:<date>2023-10-08</date>@@ [[file:/diary/2023-10-08.org][ABC 323, CAREER SKILLS]]
-- @@html:<date>2023-10-15</date>@@ [[file:/diary/2023-10-15.org][ARC 166, ABC 324, AHC 025, CAREER SKILLS]]
+- @@html:<date>2023-09-24</date>@@ [[file:/diary/2023-09-24.org][ABC 321, 入門監視 / PR]]
+- @@html:<date>2023-10-01</date>@@ [[file:/diary/2023-10-01.org][ABC 322, AHC 024, 入門監視 / Tempel]]
+- @@html:<date>2023-10-08</date>@@ [[file:/diary/2023-10-08.org][ABC 323, CAREER SKILLS / Whisper]]
+- @@html:<date>2023-10-15</date>@@ [[file:/diary/2023-10-15.org][ARC 166, ABC 324, AHC 025, CAREER SKILLS / AP]]
+- @@html:<date>2023-10-22</date>@@ [[file:/diary/2023-10-22.org][ARC 167, ABC 325, AHC 025, CAREER SKILLS / ステートマシン]]
+- @@html:<date>2023-10-29</date>@@ [[file:/diary/2023-10-29.org][ABC 326, AHC 025, Thunder 本 / IO, ST, State]]
+- @@html:<date>2023-11-05</date>@@ [[file:/diary/2023-11-05.org][ABC 327 / QuickCheck]]
+- @@html:<date>2023-11-12</date>@@ [[file:/diary/2023-11-12.org][ABC 328, AHC 026 / Mo]]

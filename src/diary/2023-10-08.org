@@ -1,4 +1,4 @@
-#+TITLE: ABC 323, CAREER SKILLS
+#+TITLE: ABC 323, CAREER SKILLS / Whisper
 #+DATE: <2023-10-08 Sun>
 
 * 競技プログラミング
