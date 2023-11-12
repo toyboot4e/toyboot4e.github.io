@@ -151,11 +151,11 @@ main = do
 <ul><li><code>Map</code> などは lazy 版と実装を共有している。型クラスの実装も lazy になっているため注意<br></li>
 </ul></li>
 <li><code>vector</code> 関係<br>
-<ul><li><code>U.generateN n id</code> による連番生成<br></li>
+<ul><li><code>U.generate n id</code> による連番生成<br></li>
 <li><code>U.forM_</code>, <code>U.foldM'_</code> は安定して速い<br></li>
 <li><code>IO</code>, <code>ST</code> を除いて <code>U.mapM</code>, <code>U.zipWithM</code>, <code>U.replicateM</code> は遅い (!?)<br></li>
 <li><code>U.concatMap</code> よりもリストの <code>concatMap</code> の方が速い (?)<br></li>
-<li><code>U.constructN</code> が遅い (?)<br></li>
+<li><code>U.constructN</code> が遅い ← 現在の環境では高速な模様<br></li>
 </ul></li>
 <li><code>IORef</code> は <code>IORef</code> → <code>MutVar#</code> → <code>I#</code> のようなダブルポインタ<br></li>
 </ul>
