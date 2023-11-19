@@ -1,0 +1,74 @@
+#+TITLE: ABC 329
+#+DATE: <2023-11-19 Sun>
+
+* 競技プログラミング
+
+** 訓練
+
+Keyball 44 で [[https://sushida.net/][寿司打]] をやっていた。僕は何を‥‥
+
+ミスせずタイピングを継続すると、追加でボーナス時間が与えられる。このためタイプミスを大幅に減らす訓練になった。現在のスコアは 30 皿 12,000 円を安定して超える程度。あまり速くないみたい。
+
+** ABC 329
+
+[[https://atcoder.jp/contests/abc329][ABC 329]] に参加した。寿司打をやった意味があるほどタイピングしなかった。
+
+*** 本番
+
+[[https://atcoder.jp/contests/abc329/tasks/abc329_a][A 問題]] ではお手本のような手続き型プログラミングを行った。酷いよ。
+
+#+BEGIN_SRC hs
+main :: IO ()
+main = do
+  !s <- BS.getLine
+  forM_ (BS.unpack (BS.init s)) $ \ch -> do
+    putChar ch
+    putChar ' '
+  putChar (BS.last s)
+#+END_SRC
+
+[[https://atcoder.jp/contests/abc329/tasks/abc329_b][B 問題]] では降順ソートして =uniq= を取ったら 2 番目の要素が答えとなる。
+
+[[https://atcoder.jp/contests/abc329/tasks/abc329_c][C 問題]] は =U.accumulate= で解いた。 =U.accumulate= の引数は =U.accumulate op initialVec commands= という形で =accumArray= とやや異なる。
+
+[[https://atcoder.jp/contests/abc329/tasks/abc329_d][D 問題]] ではヒープを使ってしまったが、最大値を持って =mapAccumL= すれば良かった。セグメント木に =Max (Int, Down Int)= を載せると、区間クエリの問題であっても対応できるとのこと。なるほど。
+
+*** Upsolve
+
+[[https://atcoder.jp/contests/abc329/tasks/abc329_e][E 問題]] では時系列を遡ると貪欲に解ける。すなわち元の文字列に対して # を塗っていくと、 # で覆った部分は上書きされるようになるため、 # になった箇所はワイルドカードであると見做せる。
+
+後は一度塗った箇所の近辺を再度見直すために、キューやスタックを使用する。この辺のディテールも実装力ということか。
+
+タイムラインでは、 [[https://twitter.com/310icecrystal/status/1725887202327163107][左右に 1 回ずつ走査すれば良いのではないか]] という解法が流れてきた。実に ARC 的な解答だ。
+
+[[https://atcoder.jp/contests/abc329/submissions/47705828][gksato 氏の提出]] においては可変配列が出現せず、 DP で解いている。ビット列を持って scanl した後に tail と last を見ているが……？　まだ基本的なアイデアを読み取れていない。
+
+[[https://atcoder.jp/contests/abc329/tasks/abc329_f][F 問題]] では [[https://atcoder.jp/contests/abc279/tasks/abc279_f][ABC 279 F]] からの連想で union-find を使ってしまい失敗した。 =Set= を使うと指示通りシミュレーションするだけとなった。
+
+F 問題でよく聞くマージテクとは、 union-find における union by rank とか union by size と同じ話で、極端にバランスの崩れた木を作らないように工夫することが、最悪計算量を均すことに繋がる。
+
+なお =Set= においてはマージテクが自動適用される (たぶん) ほか、 =IntSet= は深さ 64 の完全二分木を圧縮した形であるため、あまり Haskell では使わないテクニックかもしれない。
+
+* Haskell 本
+
+** 表紙、完成
+
+ラフから 2 週間で完成品を納入頂いた。見合った内容目指して頑張るぞい！
+
+** 進捗: 8%
+
+ニッチな疑問が尽きず進捗が芳しくない。最近の収穫で言うと、
+
+- haddock の =$setup= で型の =default= を指定すれば =doctest= から =(0 :​: Int)= のような型表記を省略できる
+- Boxed な =Vector= は GC だけではなく MUT も長いのはなぜか
+  未解決 (質問するかも)
+- 計算過程の =IntMap= をすべて vector に保存すると GC が長い (MUT は変わらない)
+
+茶色コーダーを目指すための tips からはかけ離れてきた。すべて載せるスタイルに方向展開したい。
+
+* Misc
+
+** Vim Conf 2023 Tiny
+
+カンファレンスをやっていたみたい。楽しそうでいいな。
+
