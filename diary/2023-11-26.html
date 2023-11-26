@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 330, ARC 168 - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 330, ARC 168</h1><p>Nov 19, 2023</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
+<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="訓練"><a href="#訓練">訓練</a></h3><p>
+回し車に乗ったハムスターのようにタイピングしていた。<br>
+</p>
+
+<p>
+もとい、寿司打のスコアで 14,000 円が安定して出るようになった。俺達の戦いはこれからだ。<br>
+</p>
+
+<h3 id="ARC 168"><a href="#ARC 168">ARC 168</a></h3><p>
+<a href="https://atcoder.jp/contests/arc168">ARC 168</a> に参加した。 1 完 (A) だった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/arc168/tasks/arc168_a">A 問題</a> では連続した <code>&gt;</code> の数に注目すれば算数になった。いわゆる『ギャグ』は ARC 序盤に頻出……俺自身がギャグとなることだ。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/arc168/tasks/arc168_b">B 問題</a> では未知の『Grundy 数』が問われた気がして迂回した。先に鉄則本を解こう。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/arc168/tasks/arc168_c">C 問題</a> は数え上げが難しい。 ARC の王道か。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/arc168/tasks/arc168_d">D 問題</a> は <a href="https://atcoder.jp/contests/tdpc/tasks/tdpc_iwi">イウイ</a> の類題だったが考察ができなかった。 Upsolve した。<br>
+</p>
+
+<h3 id="ABC 330"><a href="#ABC 330">ABC 330</a></h3><p>
+<a href="https://atcoder.jp/contests/abc330">ABC 330</a> に参加した。 5 完 (A ~ E) だった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc330/tasks/abc330_a">A 問題</a> では寿司打の成果を出せなかった。まだ Keyball の記号入力が難しい。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc330/tasks/abc330_b">B 問題</a> では誤読を積み重ね灰色パフォが出た。整理すると <code>clamp</code> にかければ良かった。やはり水色になっても頭が良くなったわけではない。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc330/tasks/abc330_c">C 問題</a> では平方数を列挙して二分探索した。境界の左と右を両方試す必要が合った。極値の探索という意味で 3 分探索でも解けるみたい。こうしたシンプルな問題で練習しておくのが良さそう (未履修) 。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc330/tasks/abc330_d">D 問題</a> では行ごと、列ごとにイテレートするため <code>generate</code> を使用した:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">let !rows = U.generate n $ \y -&gt; U.length . U.filter id $ U.generate n $ \x -&gt; gr @! (y, x)
+let !cols = U.generate n $ \x -&gt; U.length . U.filter id $ U.generate n $ \y -&gt; gr @! (y, x)
+</code></pre>
+</div>
+
+<p>
+<a href="https://atcoder.jp/contests/abc330/tasks/abc330_e">E 問題</a> では mex を探すためにセグメント木を使用した。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc330/tasks/abc330_f">F 問題</a> では x, y 成分を独立に考えればよかった。辺の長さで 2 分探索しようとしたが、正方形の最適な配置が分からなかった (重心を選ぶとサンプルで落ちた) 。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc330/editorial/7774">evima 氏の解説</a> に最適な配置が載っていた (まだ理屈は分からず) 。コストの計算は \(O(N)\) の全探索で十分間に合うようで、シンプルな実装で upsolve できた。<br>
+</p>
+
+<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="Haskell 本: 進捗 5%"><a href="#Haskell 本: 進捗 5%">Haskell 本: 進捗 5%</a></h3><p>
+すべての原稿を消し飛ばしてしまった。細かい情報を詰めていただけにショックだ。 <a href="https://twitter.com/ytakanoster/status/602442369011556352">テトリス棒になって全てを消し去りたい</a> 。<br>
+</p>
+
+<p>
+枝葉末節を大胆にカットすれば良い気がしてきた。 <code>doctest</code> の <a href="https://github.com/sol/doctest#setup-code">$setup</a> に type defaulting を書くとか、重要ではない情報に拘りすぎた。<br>
+</p>
+
+<p>
+果たして重要な情報が残るのかが不安ではある。<br>
+</p>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
