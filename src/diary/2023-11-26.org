@@ -1,0 +1,56 @@
+#+TITLE: ABC 330, ARC 168
+#+DATE: <2023-11-26 Sun>
+
+* 競技プログラミング
+
+** 訓練
+
+回し車に乗ったハムスターのようにタイピングしていた。
+
+もとい、寿司打のスコアで 14,000 円が安定して出るようになった。俺達の戦いはこれからだ。
+
+** ARC 168
+
+[[https://atcoder.jp/contests/arc168][ARC 168]] に参加した。 1 完 (A) だった。
+
+[[https://atcoder.jp/contests/arc168/tasks/arc168_a][A 問題]] では連続した =>= の数に注目すれば算数になった。いわゆる『ギャグ』は ARC 序盤に頻出……俺自身がギャグとなることだ。
+
+[[https://atcoder.jp/contests/arc168/tasks/arc168_b][B 問題]] では未知の『Grundy 数』が問われた気がして迂回した。先に鉄則本を解こう。
+
+[[https://atcoder.jp/contests/arc168/tasks/arc168_c][C 問題]] は数え上げが難しい。 ARC の王道か。
+
+[[https://atcoder.jp/contests/arc168/tasks/arc168_d][D 問題]] は [[https://atcoder.jp/contests/tdpc/tasks/tdpc_iwi][イウイ]] の類題だったが考察ができなかった。 Upsolve した。
+
+** ABC 330
+
+[[https://atcoder.jp/contests/abc330][ABC 330]] に参加した。 5 完 (A ~ E) だった。
+
+[[https://atcoder.jp/contests/abc330/tasks/abc330_a][A 問題]] では寿司打の成果を出せなかった。まだ Keyball の記号入力が難しい。
+
+[[https://atcoder.jp/contests/abc330/tasks/abc330_b][B 問題]] では誤読を積み重ね灰色パフォが出た。整理すると =clamp= にかければ良かった。やはり水色になっても頭が良くなったわけではない。
+
+[[https://atcoder.jp/contests/abc330/tasks/abc330_c][C 問題]] では平方数を列挙して二分探索した。境界の左と右を両方試す必要が合った。極値の探索という意味で 3 分探索でも解けるみたい。こうしたシンプルな問題で練習しておくのが良さそう (未履修) 。
+
+[[https://atcoder.jp/contests/abc330/tasks/abc330_d][D 問題]] では行ごと、列ごとにイテレートするため =generate= を使用した:
+
+#+BEGIN_SRC hs
+let !rows = U.generate n $ \y -> U.length . U.filter id $ U.generate n $ \x -> gr @! (y, x)
+let !cols = U.generate n $ \x -> U.length . U.filter id $ U.generate n $ \y -> gr @! (y, x)
+#+END_SRC
+
+[[https://atcoder.jp/contests/abc330/tasks/abc330_e][E 問題]] では mex を探すためにセグメント木を使用した。
+
+[[https://atcoder.jp/contests/abc330/tasks/abc330_f][F 問題]] では x, y 成分を独立に考えればよかった。辺の長さで 2 分探索しようとしたが、正方形の最適な配置が分からなかった (重心を選ぶとサンプルで落ちた) 。
+
+[[https://atcoder.jp/contests/abc330/editorial/7774][evima 氏の解説]] に最適な配置が載っていた (まだ理屈は分からず) 。コストの計算は $O(N)$ の全探索で十分間に合うようで、シンプルな実装で upsolve できた。
+
+* Misc
+
+** Haskell 本: 進捗 5%
+
+すべての原稿を消し飛ばしてしまった。細かい情報を詰めていただけにショックだ。 [[https://twitter.com/ytakanoster/status/602442369011556352][テトリス棒になって全てを消し去りたい]] 。
+
+枝葉末節を大胆にカットすれば良い気がしてきた。 =doctest= の [[https://github.com/sol/doctest#setup-code][$setup]] に type defaulting を書くとか、重要ではない情報に拘りすぎた。
+
+果たして重要な情報が残るのかが不安ではある。
+

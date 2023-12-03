@@ -33,3 +33,5 @@
 - @@html:<date>2023-11-05</date>@@ [[file:/diary/2023-11-05.org][ABC 327 / QuickCheck]]
 - @@html:<date>2023-11-12</date>@@ [[file:/diary/2023-11-12.org][ABC 328, AHC 026 / Mo]]
 - @@html:<date>2023-11-19</date>@@ [[file:/diary/2023-11-19.org][ABC 329]]
+- @@html:<date>2023-11-26</date>@@ [[file:/diary/2023-11-26.org][ABC 330, ARC 168]]
+- @@html:<date>2023-12-02</date>@@ [[file:/diary/2023-12-02.org][ABC 331, PAST 17 / 累積和]]
