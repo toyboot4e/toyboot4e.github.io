@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ARC 169 / 大敗 - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ARC 169 / 大敗</h1><p>Dec 10, 2023</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
+<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><p>
+訓練は特に無し、 AHC も不参加となった。<br>
+</p>
+
+<h3 id="ARC 169"><a href="#ARC 169">ARC 169</a></h3><p>
+<a href="https://atcoder.jp/contests/arc169">ARC 169</a> に参加した。初の 0 完を体験した。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/arc169/tasks/arc169_a">A 問題</a> では、そもそも読解に失敗していた。 \(P_i < i\) より、浅い位置のノードから親 (<strong>P</strong> arent) に向かって順番に出力していくことになる。限りなく多い回数操作を行うため、最も深いソースからの出力の和 (\(/= 0\)) の符号が答えとなった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/arc169/tasks/arc169_b">B 問題</a> ではすべての \([l, r]\) 区間に対して \(f(l, r)\) を求める必要があり、主客転倒または累積和 + 平面操作を考えた。しかし結局 \(O(N^2)\) 解法しか思いつかなかった。<br>
+</p>
+
+<p>
+公式解説は尺取り法 or 2 分探索 + DP で、 <code>constructrN</code> が上手くハマった。計算のパターンとしては初で、まだ上手く言語化できない。<br>
+</p>
+
+<p>
+いずれもシンプルな解法に帰結し、良問であると感じた。完敗だった。でも初心に帰れて面白かった。<br>
+</p>
+
+<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="Haskell"><a href="#Haskell">Haskell</a></h3><p>
+Haskell のアドベントカレンダーが例年通り盛り上がっている！　衰退ダ〜などと日記で零して申し訳なかった。<br>
+</p>
+
+<p>
+僕の投稿は進捗 30% 程度で、そろそろまずい。でも書き切れる目処は立った気がする。<br>
+</p>
+
+<h3 id="Keyball 44"><a href="#Keyball 44">Keyball 44</a></h3><p>
+Keyball 44 が初見の人に簡易キーボード・省スペースのキーボードと認識されたのが面白かった。実際に使ってみると、むしろ片手間では操作できないヘビータイプな存在だ。<br>
+</p>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
