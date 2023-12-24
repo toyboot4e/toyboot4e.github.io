@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Haskell の IntMap は平衡されない - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>Haskell の IntMap は平衡されない</h1>
+      <p>Dec 24, 2023</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <p>
+        <a href="https://adventar.org/calendars/9821">木 Advent Calendar 2023</a> の 24
+        日目の記事です。<br />
+      </p>
+
+      <p>昨日は CuriousFairy315 さんの「Colorful Tree Game」でした。<br /></p>
+
+      <p>明日は Shirotsume さんの「ラベルなし木の数え上げ」です。<br /></p>
+
+      <h2 id="記事"><a href="#記事">記事</a></h2>
+      <p>
+        Haskell における標準的な辞書は
+        <a href="https://hackage.haskell.org/package/containers">containers</a>
+        パッケージの木です。<br />
+      </p>
+
+      <h3 id="木が辞書？"><a href="#木が辞書？">木が辞書？</a></h3>
+      <p>
+        木は辞書として使えます。たとえば平衡 2 分木においては \(\log_2 N\) 回の探索で要素の lookup
+        ができますから、明らかに辞書として使えそうです。<br />
+      </p>
+
+      <p>
+        なぜ木を辞書とするかと言えば、 hashmap には可変操作が必要なため、 Haskell
+        においてはモナドが要求されてややこしいからだと思います。<br />
+      </p>
+
+      <p>
+        辞書としての木は lookup
+        などの基本的な操作が遅いのですが、順序付きマップであるために、最小値や最大値の検索・削除が
+        lookup と同じ速度で可能です。<br />
+      </p>
+
+      <h3 id="木の実装"><a href="#木の実装">木の実装</a></h3>
+      <p>
+        実用的な木を考えると、平衡木 (BTree, balanced tree) を思い浮かべると思います。
+        <code>containers</code> パッケージの <code>Map</code> 型は平衡木ですが、
+        <code>Int</code> 型をキーとするマップには、特に
+        <a href="https://hackage.haskell.org/package/containers-0.7/docs/Data-IntMap-Strict.html"
+          >IntMap</a
+        >
+        という特別なデータ型が用意されています。<br />
+      </p>
+
+      <p>
+        <code>IntMap</code> の実装はよくある平衡木ではなく、
+        <em>big-endian patricia trees</em> であるとのことです。詳細は
+        <a href="https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.37.5452"
+          >Fast Mergeable Integer Maps</a
+        >
+        にありますが、完全二分木を圧縮したような形だと思いました。<br />
+      </p>
+
+      <p>
+        ここでは
+        <a
+          href="https://hackage.haskell.org/package/containers-0.7/docs/Data-IntMap-Internal-Debug.html#v:showTreeWith"
+          >Data.IntMap.Internal.Debug</a
+        >
+        モジュールの関数を使って、実際に <code>IntMap</code> の中身を確認してみましょう。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span><code>IM.hs</code></label
+        >
+        <pre><code class="src language-hs">import Data.IntMap.Strict qualified as IM
+import Data.IntMap.Internal.Debug as IMD
+import Data.Tuple.Extra (dupe)
+
+debug :: [Int] -&gt; IO ()
+debug = putStrLn . IMD.showTree . IM.fromList . map dupe
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ stack repl IM.hs
+ghci&gt; debug [0 .. 3]
+*
++--*
+|  +-- 0:=0
+|  +-- 1:=1
++--*
+   +-- 2:=2
+   +-- 3:=3
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">ghci&gt; debug $ [0 .. 3] ++ [100]
+*
++--*
+|  +--*
+|  |  +-- 0:=0
+|  |  +-- 1:=1
+|  +--*
+|     +-- 2:=2
+|     +-- 3:=3
++-- 100:=100
+</code></pre>
+      </div>
+
+      <p>
+        最上位 bit から順に、 <code>*</code> 以下にて bit の ON/OFF で分岐しています。図を時計回りに
+        90 度傾けてもらうと、 bit が ON がなら左に、 bit が OFF ならば右に分岐しています。<br />
+      </p>
+
+      <p>
+        <code>IntMap</code>
+        は平衡されません。次のようにバランスの崩れた木を作ることができます:<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span>\(0, 1, 2, .. 2^{16}\)
+          を入れてみた場合</label
+        >
+        <pre><code class="src language-hs">ghci&gt; debug $ (0 :) $ map (2^) [0 .. 16]
+*
++--*
+|  +--*
+|  |  +--*
+|  |  |  +--*
+|  |  |  |  +--*
+|  |  |  |  |  +--*
+|  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  +-- 0:=0
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  +-- 1:=1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  +-- 2:=2
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  +-- 4:=4
+|  |  |  |  |  |  |  |  |  |  |  |  |  +-- 8:=8
+|  |  |  |  |  |  |  |  |  |  |  |  +-- 16:=16
+|  |  |  |  |  |  |  |  |  |  |  +-- 32:=32
+|  |  |  |  |  |  |  |  |  |  +-- 64:=64
+|  |  |  |  |  |  |  |  |  +-- 128:=128
+|  |  |  |  |  |  |  |  +-- 256:=256
+|  |  |  |  |  |  |  +-- 512:=512
+|  |  |  |  |  |  +-- 1024:=1024
+|  |  |  |  |  +-- 2048:=2048
+|  |  |  |  +-- 4096:=4096
+|  |  |  +-- 8192:=8192
+|  |  +-- 16384:=16384
+|  +-- 32768:=32768
++-- 65536:=65536
+</code></pre>
+      </div>
+
+      <p>
+        ただし 64 bit 整数 (<code>Int</code>) がキーである以上、木の高さは最大 64
+        であり、バランスが崩れても遅すぎるということはありません。このため
+        <a
+          href="https://hackage.haskell.org/package/containers-0.7/docs/Data-IntMap-Strict-Internal.html#v:lookup"
+          >lookup</a
+        >
+        関数の計算量は \(O(min(n,W))\) となっています (\(W = 64\) です) 。<br />
+      </p>
+
+      <p>
+        そんな
+        <code>IntMap</code>
+        はマージ処理もそこそこ速く、性能のバランスが取れているようです。今日でも優れた選択なのかは分かりませんが、平衡しないんだ〜と面白かったので共有しました。お使いの言語でも
+        patricia tree は使われているのでしょうか。<br />
+      </p>
+
+      <p>
+        以上です。昨日投稿の
+        <a href="https://zenn.dev/toyboot4e/books/seriously-haskell">AtCoder ガチ言語 Haskell 🔥</a>
+        もよろしくお願いします！<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
