@@ -1,0 +1,99 @@
+#+TITLE: ABC 332, ABC 333, PBT 本 / 尺取り法
+#+DATE: <2023-12-17 Sun>
+
+* 競技プログラミング
+
+** 尺取り法
+
+尺取り法の実装には 2 種類あることが分かった。
+
+*** 1. ステートレスな尺取り法
+
+真偽の区間クエリに $O(1)$ で答えられる場合、たとえば累積和の事前計算などで対応できる場合は、ほぼ =Int -> Int -> Bool= な関数だけで尺取り法を実装できる。
+
+もともとこの理解だったため、テンプレート入りしている:
+
+#+BEGIN_SRC hs
+twoPointersU :: Int -> (Int -> Int -> Bool) -> U.Vector (Int, Int)
+twoPointersU !n !p = U.unfoldr (uncurry f) s0
+  where
+    !s0 = (0, 0) :: (Int, Int)
+    f l r
+      | l == n = Nothing
+      | not (p l r) = f (l + 1) (max (l + 1) r)
+      | otherwise = Just ((l, r'), (l + 1, max (l + 1) r'))
+        where
+          -- run peek check and advance on success
+          r' = until ((||) <$> (== n - 1) <*> not . p l . succ) succ r
+#+END_SRC
+
+*** 2. ステートフルな尺取り法
+
+現在の区間に対応する状態を保持して、右端を右へ伸ばす／左端を右へ動かす度に状態を更新する実装。 [[https://zenn.dev/osushi0x/articles/e5bd9fe60abee4][Haskellでしゃくとり法を攻略する]] や [[https://speakerdeck.com/naoya/guan-shu-xing-puroguramingutoxing-sisutemunomentarumoderu?slide=69][naoya さんのスライド]] 中のコードに出てくる方法で、右方向にしか動けない Mo's algorithm のようなイメージで捉えられる。
+
+Library Checker に尺取り法があれば見てみたい。 [[https://github.com/cojna/iota][=cojna/iota=]] には尺取り法は無かったはず。
+
+** ABC 332
+
+[[https://atcoder.jp/contests/abc332][ABC 332]] に参加した。
+
+[[https://atcoder.jp/contests/abc332/tasks/abc332_a][A 問題]] 〜 [[https://atcoder.jp/contests/abc332/tasks/abc332_d][D 問題]] は内容を忘れてしまった。
+
+[[https://atcoder.jp/contests/abc332/tasks/abc332_e][E 問題]] は [[https://atcoder.jp/contests/abc310/tasks/abc310_d][ABC 310 D - PEACEFUL TEAMS]] の類題だった。 DFS が下手過ぎて TLE が取れず、集合 DP への切り替えが間に合わず終了した。コンテスト後も WA を連発、単位元を大きな数に変更したら AC できた。
+
+E の類題には苦手意識が強い。リストモナドの DFS でも upsolve したい。
+
+[[https://atcoder.jp/contests/abc332/tasks/abc332_f][F 問題]] は遅延セグメント木の問題だったみたい。 upsolve したい。
+
+** ABC 333
+
+[[https://atcoder.jp/contests/abc333][ABC 333]] に参加した。疲れ気味のため A ~ B 問題は省略する。
+
+[[https://atcoder.jp/contests/abc333/tasks/abc333_c][C 問題]] では cojna 氏の提出が埋め込みだったことが分かり面白かった。
+
+[[https://atcoder.jp/contests/abc333/tasks/abc333_d][D 問題]] では木の畳み込みの計算過程を残す、いわば木の scan を行った。
+
+全頂点を根とした畳み込みを計算する全包囲木 DP においても、この木の scan を実施する。 CSR (compressed sparse row) 形式のグラフにおいては全包囲木 DP を実装していなかった。
+
+良い機会なので [[https://atcoder.jp/contests/dp/tasks/dp_v][EDPC - V]] を CSR のグラフで解き直したい……が、問題スタックは貯まるばかり。
+
+[[https://atcoder.jp/contests/abc333/tasks/abc333_e][E 問題]] は良い感じに考察できたが、客観的に見ると実装が遅かった。
+
+[[https://atcoder.jp/contests/abc333/tasks/abc333_f][F 問題]] は状態数が $N \cdot 2^N$ あるように見えて歯が立たなかった。解説放送を観たい。
+
+*** 振り返って
+
+緑パフォが出たものの、特に振るわなかったという気はしない。となると、そもそものやり方が良くないのかもしれない。実装前の考察で、もっとコードの詳細まで詰めて考えるスタイルに修正してみよう思う。
+
+また今後の方針としては、 DP や遅延セグメント木を中心に、青 diff の壁を乗り越えて行くためのポテンシャルが必要にある。引き続き PAST と青 diff DP をやっていけば良さそう。
+
+* 読書
+
+[[https://www.lambdanote.com/collections/proper-erlang-elixir][実践プロパティベーステスト]] を 14 % まで読んだ。良書の例にもれずプレゼンが上手く、 PBT への期待が高まる。フレームワークの力を見ていきたい。
+
+現状、僕の QuickCheck の使い道は =forM_= の替わりに =QC.forAll= を書く程度のもの。 =cojna/iota= には prop test の実例がたくさんあるため、参照してみたい。
+
+* Misc
+
+** 凡百
+
+寒いから窓を閉めようと思ったら、既に閉まっていた。
+
+** Haskell 本: 進捗 60 %
+
+=array= の章を書き切った。 =TypeFamilies= 拡張の有無でコンパイルエラーが変わるとは思っておらず、僕自身ためになった。
+
+結局、スクラップをまとめた内容になっている。もうこれでいいか……！
+
+進捗はマズい。雑に =pandoc= で PDF 出力すると (コードが多いため) 70 ページ程度になるが、まだまだ終わらない。第四章をカットして、後からこっそり更新するつもり。
+
+特にリストモナドで DFS をする章を書きたいものの、僕の苦手分野なのでまだ書けない。今後の趣味として継続的に更新するかもしれない。
+
+** GPT-4
+
+一時期 GPT-4 への申し込みに制限がかかっていたが、ついに順番が回ってきた。
+
+使ってみると、 Haskell の =MArray= のことは理解していなかった。正しい文法で答えが返って来るだけでも驚異的ではあるものの、大体はネット検索の方が情報の質が高い。これでは Haskell 本をサボることができない。
+
+GPT-4 を Haskell 本の添削に使ってみたい。一般的な指摘を具体例にハメた形で表示してくれる気がする。自分の文脈に合わせてもらえれば、意欲的に読める気がする。そこが AI の良い点かもしれない。
+
