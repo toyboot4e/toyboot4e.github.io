@@ -1,0 +1,46 @@
+#+TITLE: 新年メモ
+#+DATE: <2023-12-31 Sun>
+
+* 2024 年
+
+** 主な目標
+
+もう少し Haskell と AtCoder をやり込みたい。
+
+- AtCoder
+  - アルゴリズム: 青
+  - ヒューリスティック: 青
+
+- 『[[https://zenn.dev/toyboot4e/books/seriously-haskell][AtCoder ガチ言語 Haskell 🔥]]』の加筆修正
+  - 動的計画法 (EDPC の図解解説)
+  - グラフ探索 (検討中)
+
+より具体的には PAST 過去問、 Thunder 本、 AHC 過去問、 〜黄 diff DP, TDPC などを全問解きたい。マスター・オブ・場合の数やマスター・オブ・整数も全問解きたい。パラグラフ・ライティングなどの文章作法を身に付けて『ガチ言語 Haskell』をブラッシュアップしたい。
+
+** その他の興味
+
+趣味
+
+- SKK, org-agenda, org-calender, elfeed, ..
+  org-babel でコードを評価すれば手順書になるとか、どこにでもジャンプできるような環境
+- 30% キーボード、 [[https://www.charachorder.com/en-jp/products/charachorder-one][CharaChorder One]]
+  キーボード操作のアクション性を高める方向性の追求
+- Flakes の利用、 Nix へのパッケージ追加 (=verification-helper= など)
+  NixOS ユーザとしての成長
+
+必要に応じて
+
+- Web 開発、 ISUCON
+  開発力
+- CS / 英語
+  2025 年を目処に活かせるように
+
+最終目標へ向けて
+
+- [[https://github.com/toyboot4e/tlp][toylisp (tlp)]] の開発再開
+  =break=, =continue=, =printf=, ジェネリック関数、構文レベルマクロ、コルーチン
+- シェーダ
+  [[https://youtu.be/vGkdfhz_bdo?si=CaM-3xHtp_5UX7sB&t=751][tantan の動画]] のシェーダを読むなど
+
+# TTTZJJK3
+

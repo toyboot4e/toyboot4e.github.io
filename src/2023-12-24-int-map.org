@@ -1,0 +1,114 @@
+#+TITLE: Haskell の IntMap は平衡されない
+#+DATE: <2023-12-24 Sun>
+
+[[https://adventar.org/calendars/9821][木 Advent Calendar 2023]] の 24 日目の記事です。
+
+昨日は CuriousFairy315 さんの「Colorful Tree Game」でした。
+
+明日は Shirotsume さんの「ラベルなし木の数え上げ」です。
+
+* 記事
+
+Haskell における標準的な辞書は [[https://hackage.haskell.org/package/containers][containers]] パッケージの木です。
+
+** 木が辞書？
+
+木は辞書として使えます。たとえば平衡 2 分木においては $\log_2 N$ 回の探索で要素の lookup ができますから、明らかに辞書として使えそうです。
+
+なぜ木を辞書とするかと言えば、 hashmap には可変操作が必要なため、 Haskell においてはモナドが要求されてややこしいからだと思います。
+
+辞書としての木は lookup などの基本的な操作が遅いのですが、順序付きマップであるために、最小値や最大値の検索・削除が lookup と同じ速度で可能です。
+
+** 木の実装
+
+実用的な木を考えると、平衡木 (BTree, balanced tree) を思い浮かべると思います。 =containers= パッケージの =Map= 型は平衡木ですが、 =Int= 型をキーとするマップには、特に [[https://hackage.haskell.org/package/containers-0.7/docs/Data-IntMap-Strict.html][IntMap]] という特別なデータ型が用意されています。
+
+=IntMap= の実装はよくある平衡木ではなく、 /big-endian patricia trees/ であるとのことです。詳細は [[https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.37.5452][Fast Mergeable Integer Maps]] にありますが、完全二分木を圧縮したような形だと思いました。
+
+ここでは [[https://hackage.haskell.org/package/containers-0.7/docs/Data-IntMap-Internal-Debug.html#v:showTreeWith][Data.IntMap.Internal.Debug]] モジュールの関数を使って、実際に =IntMap= の中身を確認してみましょう。
+
+#+CAPTION: =IM.hs=
+#+BEGIN_SRC hs
+import Data.IntMap.Strict qualified as IM
+import Data.IntMap.Internal.Debug as IMD
+import Data.Tuple.Extra (dupe)
+
+debug :: [Int] -> IO ()
+debug = putStrLn . IMD.showTree . IM.fromList . map dupe
+#+END_SRC
+
+#+BEGIN_SRC sh
+$ stack repl IM.hs
+ghci> debug [0 .. 3]
+*
++--*
+|  +-- 0:=0
+|  +-- 1:=1
++--*
+   +-- 2:=2
+   +-- 3:=3
+#+END_SRC
+
+#+BEGIN_SRC hs
+ghci> debug $ [0 .. 3] ++ [100]
+*
++--*
+|  +--*
+|  |  +-- 0:=0
+|  |  +-- 1:=1
+|  +--*
+|     +-- 2:=2
+|     +-- 3:=3
++-- 100:=100
+#+END_SRC
+
+最上位 bit から順に、 =*= 以下にて bit の ON/OFF で分岐しています。図を時計回りに 90 度傾けてもらうと、 bit が ON がなら左に、 bit が OFF ならば右に分岐しています。
+
+=IntMap= は平衡されません。次のようにバランスの崩れた木を作ることができます:
+
+#+CAPTION: $0, 1, 2, .. 2^{16}$ を入れてみた場合
+#+BEGIN_SRC hs
+ghci> debug $ (0 :) $ map (2^) [0 .. 16]
+*
++--*
+|  +--*
+|  |  +--*
+|  |  |  +--*
+|  |  |  |  +--*
+|  |  |  |  |  +--*
+|  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  +--*
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  +-- 0:=0
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  +-- 1:=1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  +-- 2:=2
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  +-- 4:=4
+|  |  |  |  |  |  |  |  |  |  |  |  |  +-- 8:=8
+|  |  |  |  |  |  |  |  |  |  |  |  +-- 16:=16
+|  |  |  |  |  |  |  |  |  |  |  +-- 32:=32
+|  |  |  |  |  |  |  |  |  |  +-- 64:=64
+|  |  |  |  |  |  |  |  |  +-- 128:=128
+|  |  |  |  |  |  |  |  +-- 256:=256
+|  |  |  |  |  |  |  +-- 512:=512
+|  |  |  |  |  |  +-- 1024:=1024
+|  |  |  |  |  +-- 2048:=2048
+|  |  |  |  +-- 4096:=4096
+|  |  |  +-- 8192:=8192
+|  |  +-- 16384:=16384
+|  +-- 32768:=32768
++-- 65536:=65536
+#+END_SRC
+
+ただし 64 bit 整数 (=Int=) がキーである以上、木の高さは最大 64 であり、バランスが崩れても遅すぎるということはありません。このため [[https://hackage.haskell.org/package/containers-0.7/docs/Data-IntMap-Strict-Internal.html#v:lookup][lookup]] 関数の計算量は $O(min(n,W))$ となっています ($W = 64$ です) 。
+
+そんな =IntMap= はマージ処理もそこそこ速く、性能のバランスが取れているようです。今日でも優れた選択なのかは分かりませんが、平衡しないんだ〜と面白かったので共有しました。お使いの言語でも patricia tree は使われているのでしょうか。
+
+以上です。昨日投稿の [[https://zenn.dev/toyboot4e/books/seriously-haskell][AtCoder ガチ言語 Haskell 🔥]] もよろしくお願いします！
+

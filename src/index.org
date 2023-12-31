@@ -21,7 +21,7 @@
 - @@html:<date>2023-09-10</date>@@ [[file:/2023-09-10-light-blue-haskell.org][Haskell / AtCoder 入水！]]
 - @@html:<date>2023-09-23</date>@@ [[file:/2023-09-23-blog-improvements-2.org][=org-mode= 製ブログの改良 (2)]]
 - @@html:<date>2023-10-15</date>@@ [[file:/2023-10-22-blender-vse.org][Blender VSE + Whisper + VOICEVOX]]
-- @@html:<date>2023-12-24</date>@@ [[file:/2023-12-24-int-map.org][Haskell の IntMap は完全 2 分木を圧縮したやつらしいです]]
+- @@html:<date>2023-12-24</date>@@ [[file:/2023-12-24-int-map.org][Haskell の IntMap は平衡されない]]
 
 * diary
 #+ATTR_HTML: :class sitemap
@@ -39,3 +39,4 @@
 - @@html:<date>2023-12-10</date>@@ [[file:/diary/2023-12-10.org][ARC 169 / 大敗]]
 - @@html:<date>2023-12-17</date>@@ [[file:/diary/2023-12-17.org][ABC 332, ABC 333, PBT 本 / 尺取り法]]
 - @@html:<date>2023-12-24</date>@@ [[file:/diary/2023-12-24.org][AGC 065, ABC 334, 書く技術 / ガチ言語]]
+- @@html:<date>2023-12-31</date>@@ [[file:/diary/2023-12-31.org][新年メモ]]
