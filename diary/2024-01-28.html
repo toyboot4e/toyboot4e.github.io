@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 338 - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 338</h1><p>Jan 28, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
+<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="訓練"><a href="#訓練">訓練</a></h3><p>
+青 diff DP を 1,600 ~ 1,800 まで解いた。以降は解説 AC も難しくなって来た。特に <a href="https://atcoder.jp/contests/abc214/tasks/abc214_f">ABC 214 F - Substrings</a> の『部分列 DP』が解けず、 <a href="https://atcoder.jp/contests/past202206-open/tasks/past202206_k">第 11 回 PAST - K</a> でも同じような問題を見た。典型として解けるよう噛み砕きたい。<br>
+</p>
+
+<h3 id="ABC 338"><a href="#ABC 338">ABC 338</a></h3><p>
+<a href="https://atcoder.jp/contests/abc338">ABC 338</a> に参加した。 5 完 (A ~ E) で青パフォだった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc338/tasks/abc338_a">A 問題</a> では <code>(up : lows) &lt;- getLine</code> のように分解する解答が良かった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc338/tasks/abc338_b">B 問題</a> ではアルファベットの数を数えるために <code>accumulate</code> を使った。 <code>group . sort</code> の形でカウントを作る解答もあって、なるほどと思った:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main :: IO ()
+main = do
+  s &lt;- BS.unpack &lt;$&gt; BS.getLine
+  let cns :: [(Char, Int)]
+  let cns = map (head &amp;&amp;&amp; length) . group . sort $ s
+  -- 以下略
+</code></pre>
+</div>
+
+<p>
+<a href="https://atcoder.jp/contests/abc338/tasks/abc338_c">C 問題</a> では変数が 2 つあって、料理 A の数と料理 B の数が変化する。ここで料理 A の数が決まると料理 B の数も自動的に定まるため、料理 A の数を全探索すれば解けた。実装は <code>zipWith</code> や <code>zipWith3</code> を使うと楽になる。 0 除算には要注意 (サンプルのおかげで助かった！) 。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc338/tasks/abc338_d">D 問題</a> では橋の数 \(N \le 2 \cdot 10^5\) に対して経路を構成する辺の数が \(M \le 2 \cdot 10^5\) もあり、単純な全探索では間に合わない。橋を切った際の辺への寄与 (左回りか右回りかを反転したときの経路長の差) を一括で計算可能にすれば高速化できる。<br>
+</p>
+
+<p>
+この計算は <a href="https://atcoder.jp/contests/abc290/tasks/abc290_e">ABC 290 E</a> における『主客転倒』に近かった。ただし今回はループの数が減ってもループの順番は変わらないため、別に主客転倒ではなかった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc338/tasks/abc338_e">E 問題</a> は幾何っぽい見た目の問題だった。ループのことを考えるとややこしいので、まずはループを忘れて数直線を考え、弦を \([l, r)\) 区間であると捉える。すると弦の交差の有無とは \(\{ [l_i, r_i) \}_{i}\) 同士の intersection が存在するかを聞かれていることになる。ソートすれば 1 回の走査で解けた。ループなど無かった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc338/tasks/abc338_f">F 問題</a> では重みが負の辺の処理に困った。実は Floyd-Warshall で全点間の最短距離を求めると、集合 DP に持ち込めたらしい。ただし Floyd-Warshall の計算の際にも、繋がれていない頂点同士を繋がないようチェックする必要があった。これは解きたかった……！<br>
+</p>
+
+<p>
+D 問題も E 問題も遅延セグメント木で解けたみたい。練習しておきたい。<br>
+</p>
+
+<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="近況"><a href="#近況">近況</a></h3><p>
+流行り病から回復した。まだ肌の感覚が鈍い。 24 時間 2 日酔いみたいな感じかも。<br>
+</p>
+
+<p>
+応用情報に受かっていた。 Chu! ノー勉でごめん。努力してなくてごめん。<br>
+</p>
+
+<h3 id="org-mode"><a href="#org-mode"><code>org-mode</code></a></h3><p>
+<code>org-mode</code> をタスク管理ツールとして使えるようになった。次はシェルの操作を <code>org-mode</code> から行って作業履歴を残すようにしてみたい。<br>
+</p>
+
+<h3 id="SKK"><a href="#SKK">SKK</a></h3><p>
+SKK は IME 界の順張りであるという話を見てニヤニヤしていた。試せば 1 日で移行できると思う。やってみたい。<br>
+</p>
+
+<h3 id="物欲"><a href="#物欲">物欲</a></h3><p>
+物欲が復活してしまった。<br>
+</p>
+
+<p>
+BOOX Palma が欲しい。 E-Ink 端末で動画再生すら滑らかとは……！　本当は E-Ink のモニタが欲しい。 <a href="https://shop.dasung.com/">Desung</a> に期待か……！<br>
+</p>
+
+<p>
+<a href="https://www.apple.com/jp/pro-display-xdr/">Pro Display XDR</a> が欲しい。 <a href="https://booth.pm/ja/items/4650562">miniDivide</a> が欲しい。本棚が欲しい。まともな椅子が欲しい。オーディオ環境も欲しい。高級なコーヒーミルが欲しい。<br>
+</p>
+
+<h3 id="Flix"><a href="#Flix">Flix</a></h3><p>
+X で流れてきた <a href="https://flix.dev/">Flix 言語</a> をチラ見した。 <a href="https://podcasts.apple.com/us/podcast/54-flix-designing-a-principled-programming-language/id1531666706?i=1000550155697&amp;l=ar">ある Podcast</a> では『ワシがこの 25 年で学んだプログラミングのすべてが入っていてショックです』というようなコメントがあった。ワシもショックです。<br>
+</p>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
