@@ -40,4 +40,5 @@
 - @@html:<date>2023-12-17</date>@@ [[file:/diary/2023-12-17.org][ABC 332, ABC 333, PBT 本 / 尺取り法]]
 - @@html:<date>2023-12-24</date>@@ [[file:/diary/2023-12-24.org][AGC 065, ABC 334, 書く技術 / ガチ言語]]
 - @@html:<date>2023-12-31</date>@@ [[file:/diary/2023-12-31.org][新年メモ]]
-- @@html:<date>2024-01-07</date>@@ [[file:/diary/2023-01-07.org][ABC 335, PBT 本]]
+- @@html:<date>2024-01-07</date>@@ [[file:/diary/2024-01-07.org][ABC 335, PBT 本]]
+- @@html:<date>2024-01-28</date>@@ [[file:/diary/2024-01-28.org][ABC 338]]
