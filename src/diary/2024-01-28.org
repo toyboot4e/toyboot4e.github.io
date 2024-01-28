@@ -1,0 +1,66 @@
+#+TITLE: ABC 338
+#+DATE: <2024-01-28 Sun>
+
+* 競技プログラミング
+
+** 訓練
+
+青 diff DP を 1,600 ~ 1,800 まで解いた。以降は解説 AC も難しくなって来た。特に [[https://atcoder.jp/contests/abc214/tasks/abc214_f][ABC 214 F - Substrings]] の『部分列 DP』が解けず、 [[https://atcoder.jp/contests/past202206-open/tasks/past202206_k][第 11 回 PAST - K]] でも同じような問題を見た。典型として解けるよう噛み砕きたい。
+
+** ABC 338
+
+[[https://atcoder.jp/contests/abc338][ABC 338]] に参加した。 5 完 (A ~ E) で青パフォだった。
+
+[[https://atcoder.jp/contests/abc338/tasks/abc338_a][A 問題]] では =(up : lows) <- getLine= のように分解する解答が良かった。
+
+[[https://atcoder.jp/contests/abc338/tasks/abc338_b][B 問題]] ではアルファベットの数を数えるために =accumulate= を使った。 =group . sort= の形でカウントを作る解答もあって、なるほどと思った:
+
+#+BEGIN_SRC hs
+main :: IO ()
+main = do
+  s <- BS.unpack <$> BS.getLine
+  let cns :: [(Char, Int)]
+  let cns = map (head &&& length) . group . sort $ s
+  -- 以下略
+#+END_SRC
+
+[[https://atcoder.jp/contests/abc338/tasks/abc338_c][C 問題]] では変数が 2 つあって、料理 A の数と料理 B の数が変化する。ここで料理 A の数が決まると料理 B の数も自動的に定まるため、料理 A の数を全探索すれば解けた。実装は =zipWith= や =zipWith3= を使うと楽になる。 0 除算には要注意 (サンプルのおかげで助かった！) 。
+
+[[https://atcoder.jp/contests/abc338/tasks/abc338_d][D 問題]] では橋の数 $N \le 2 \cdot 10^5$ に対して経路を構成する辺の数が $M \le 2 \cdot 10^5$ もあり、単純な全探索では間に合わない。橋を切った際の辺への寄与 (左回りか右回りかを反転したときの経路長の差) を一括で計算可能にすれば高速化できる。
+
+この計算は [[https://atcoder.jp/contests/abc290/tasks/abc290_e][ABC 290 E]] における『主客転倒』に近かった。ただし今回はループの数が減ってもループの順番は変わらないため、別に主客転倒ではなかった。
+
+[[https://atcoder.jp/contests/abc338/tasks/abc338_e][E 問題]] は幾何っぽい見た目の問題だった。ループのことを考えるとややこしいので、まずはループを忘れて数直線を考え、弦を $[l, r)$ 区間であると捉える。すると弦の交差の有無とは $\{ [l_i, r_i) \}_{i}$ 同士の intersection が存在するかを聞かれていることになる。ソートすれば 1 回の走査で解けた。ループなど無かった。
+
+[[https://atcoder.jp/contests/abc338/tasks/abc338_f][F 問題]] では重みが負の辺の処理に困った。実は Floyd-Warshall で全点間の最短距離を求めると、集合 DP に持ち込めたらしい。ただし Floyd-Warshall の計算の際にも、繋がれていない頂点同士を繋がないようチェックする必要があった。これは解きたかった……！
+
+D 問題も E 問題も遅延セグメント木で解けたみたい。練習しておきたい。
+
+* Misc
+
+** 近況
+
+流行り病から回復した。まだ肌の感覚が鈍い。 24 時間 2 日酔いみたいな感じかも。
+
+応用情報に受かっていた。 Chu! ノー勉でごめん。努力してなくてごめん。
+
+** =org-mode=
+
+=org-mode= をタスク管理ツールとして使えるようになった。次はシェルの操作を =org-mode= から行って作業履歴を残すようにしてみたい。
+
+** SKK
+
+SKK は IME 界の順張りであるという話を見てニヤニヤしていた。試せば 1 日で移行できると思う。やってみたい。
+
+** 物欲
+
+物欲が復活してしまった。
+
+BOOX Palma が欲しい。 E-Ink 端末で動画再生すら滑らかとは……！　本当は E-Ink のモニタが欲しい。 [[https://shop.dasung.com/][Desung]] に期待か……！
+
+[[https://www.apple.com/jp/pro-display-xdr/][Pro Display XDR]] が欲しい。 [[https://booth.pm/ja/items/4650562][miniDivide]] が欲しい。本棚が欲しい。まともな椅子が欲しい。オーディオ環境も欲しい。高級なコーヒーミルが欲しい。
+
+** Flix
+
+X で流れてきた [[https://flix.dev/][Flix 言語]] をチラ見した。 [[https://podcasts.apple.com/us/podcast/54-flix-designing-a-principled-programming-language/id1531666706?i=1000550155697&l=ar][ある Podcast]] では『ワシがこの 25 年で学んだプログラミングのすべてが入っていてショックです』というようなコメントがあった。ワシもショックです。
+
