@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>React 入門 - 1: 三目並べ - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>React 入門 - 1: 三目並べ</h1>
+      <p>Feb 3, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="背景"><a href="#背景">背景</a></h2>
+      <p>
+        <a href="https://react.dev/">react.dev</a> の公式チュートリアルをやってみました。 hooks
+        にも対応しており良いです。ただしローカル環境構築や TypeScript
+        関連の案内は無く、相変わらず不親切でした。<br />
+      </p>
+
+      <p>
+        <a href="https://github.com/toyboot4e/learn-react/tree/main"
+          >リポジトリ: toyboot4e/learn-react</a
+        ><br />
+      </p>
+
+      <h3 id="モチベーションの着火"><a href="#モチベーションの着火">モチベーションの着火</a></h3>
+      <p>
+        ここ 3 年 web
+        開発にモチベーションが湧かず、スキル習得を疎かにしてしまいました。そこで外部にモチベーションを求め、
+        <a href="https://menta.work/member/dashboard">MENTA</a>
+        でメンターを雇ってみました。メンターに毎日進捗報告するために開発をします。虚栄心駆動開発です。<br />
+      </p>
+
+      <p>
+        開発中も自分の興味を優先することにしました。 html/css/jsx の記述を高速化できる
+        <a href="https://emmet.io/">Emmet</a> に興味を持って、
+        <a href="https://github.com/toyboot4e/learn-react/blob/main/02-learn-emmet/doc/plan.org"
+          >Emmet を題材としてアプリの作成を考えています</a
+        >
+        。お金頼り、人頼りでも何でも良いので手を着けて、自身の興味に寄せていけば、最後は自立できると思います。<br />
+      </p>
+
+      <h2 id="react.dev を読む">
+        <a href="#react.dev を読む"><a href="https://react.dev/">react.dev</a> を読む</a>
+      </h2>
+      <p>TypeScript + React に入門していきます。<br /></p>
+
+      <h3 id="Quick Start">
+        <a href="#Quick Start"><a href="https://react.dev/learn">Quick Start</a></a>
+      </h3>
+      <p>
+        <a href="https://react.dev/learn">Quick Start</a>
+        では、簡単な例を通して基礎概念の説明がありました:<br />
+      </p>
+
+      <ul>
+        <li>component: UI の部品<br /></li>
+        <li>hooks: 状態や副作用を含むロジック<br /></li>
+        <li>props: 親 component から子 component に渡されるデータ<br /></li>
+      </ul>
+
+      <p>
+        データを複数の component で共有する場合は、まず親が <code>useState</code> で状態を作り、子へ
+        state を props として渡します。 State を書き換えた場合、変更が伝播して自動的に再度 rendering
+        が走ります。<br />
+      </p>
+
+      <h3 id="Tutorial: Tic-Tac-Toe の環境構築">
+        <a href="#Tutorial: Tic-Tac-Toe の環境構築"
+          ><a href="https://react.dev/learn/tutorial-tic-tac-toe">Tutorial: Tic-Tac-Toe</a>
+          の環境構築</a
+        >
+      </h3>
+      <p>
+        <a href="https://react.dev/learn/tutorial-tic-tac-toe">Tutorial: Tic-Tac-Toe</a>
+        ではフレームワークなしで React
+        を使っています。しかしローカル環境の構築方法は示されていません。
+        <code>create-react-app</code> は deprecated
+        になっていますし、いきなり宙ぶらりんになりました。<br />
+      </p>
+
+      <h4 id="プロジェクトの作成 (vite)">
+        <a href="#プロジェクトの作成 (vite)">プロジェクトの作成 (<code>vite</code>)</a>
+      </h4>
+      <p>
+        今回は <a href="https://vitejs.dev/">vite</a> を使ってみました。 Web
+        開発におけるビルドツールの 1 つだと思えば良さそうです。<br />
+      </p>
+
+      <p>プロジェクトを作成します:<br /></p>
+
+      <details>
+        <summary><code>npm create vite@latest</code> 実行</summary>
+        <div class="org-src-container">
+          <pre><code class="src language-sh">$ npm create vite@latest
+✔ Project name: … react-tic
+✔ Select a framework: › React
+✔ Select a variant: › TypeScript
+
+Scaffolding project in /home/tbm/dev/ts/react-tic...
+
+Done. Now run:
+
+  cd react-tic
+  npm install
+  npm run dev
+</code></pre>
+        </div>
+      </details>
+
+      <p>
+        指示通りのコマンド実行で dev server (<code>localhost:5173</code>)
+        も起動しました。順調です。<br />
+      </p>
+
+      <h5 id="TypeScript の種類"><a href="#TypeScript の種類">TypeScript の種類</a></h5>
+      <p>
+        言語選択は TypeScript にしました。 TypeScript +
+        <a href="https://swc.rs/">SWC (Speedy Web Compiler)</a> というのもあるようです。<br />
+      </p>
+
+      <h5 id="参考. ビルドツールのレイヤ区分">
+        <a href="#参考. ビルドツールのレイヤ区分">参考. ビルドツールのレイヤ区分</a>
+      </h5>
+      <p>
+        <code>vite</code> は
+        <code>esbuild</code> の上に作られているようです。以下の記事が分かりやすかったです:<br />
+      </p>
+
+      <p>
+        <a href="https://zenn.dev/nakaakist/articles/86457bf2908379"
+          >JavaScriptビルドツールの整理 各ツールの機能と依存関係</a
+        ><br />
+      </p>
+
+      <h4 id="ファイル内容の確認"><a href="#ファイル内容の確認">ファイル内容の確認</a></h4>
+      <p><code>npm create vite@latest</code> によって以下のファイルが生成されました:<br /></p>
+
+      <details>
+        <summary>プロジェクト構成</summary>
+        <div class="org-src-container">
+          <pre><code class="src language-txt">.
+├── README.md
+├── index.html            # ルート
+├── package-lock.json
+├── package.json          # 依存パッケージ、コマンド定義など
+├── public                # 静的アセット (TS からの参照無し)
+│   └── vite.svg
+├── src                   # ソース
+│   ├── App.css
+│   ├── App.tsx
+│   ├── assets            # 静的アセット (TS からの参照あり)
+│   │   └── react.svg
+│   ├── index.css
+│   ├── main.tsx
+│   └── vite-env.d.ts     # Vite の環境設定 (?) (公式ドキュメント参照)
+├── tsconfig.json         # TypeScript の設定 (言語のバージョンなど)
+└── vite.config.ts        # Vite の設定ファイル
+</code></pre>
+        </div>
+      </details>
+
+      <p>以下では特に重要な設定ファイルの内容を確認します。<br /></p>
+
+      <h5 id="package.json">
+        <a href="#package.json"><code>package.json</code></a>
+      </h5>
+      <p>Node.js の設定ファイルです。主な初期設定はここに載っています:<br /></p>
+
+      <details>
+        <summary>
+          <code>package.json</code>
+        </summary>
+        <div class="org-src-container">
+          <pre><code class="src language-json">{
+  "name": "react-tic",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc &amp;&amp; vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
+  }
+}
+</code></pre>
+        </div>
+      </details>
+
+      <ul>
+        <li>
+          <code>scripts</code><br />
+          <code>npm run &lt;サブコマンド名&gt;</code> で実行されるコマンドを定義します。たとえば
+          <code>npm run dev</code> を実行すると、
+          <code>vite</code> コマンドが実行されることが分かります。<br />
+        </li>
+        <li>
+          <code>dependencies</code><br />
+          ビルドと実行時に使用されるパッケージです。手動で追加する際は
+          <code>npm i &lt;パッケージ名&gt;</code> を使います。<br />
+        </li>
+        <li>
+          <code>devDependencies</code><br />
+          ビルドに使用されるパッケージです。手動で追加する際は
+          <code>npm i -D &lt;パッケージ名&gt;</code> を使います。<br />
+        </li>
+      </ul>
+
+      <h5 id="tsconfig.json">
+        <a href="#tsconfig.json"><code>tsconfig.json</code></a>
+      </h5>
+      <p>
+        TypeScript の設定ファイルです。
+        <a href="https://gihyo.jp/book/2022/978-4-297-12747-3"
+          >プロを目指す人のための TypeScript 入門</a
+        >
+        第九章の通り、追加でオプションを有効化しました:<br />
+      </p>
+
+      <details>
+        <summary>
+          <code>tsconfig.json</code>
+        </summary>
+        <div class="org-src-container">
+          <pre><code class="src language-diff-json diff-highlight">{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+-    "noFallthroughCasesInSwitch": true
++    "noFallthroughCasesInSwitch": true,
++    "noUncheckedIndexedAccess": true,
++    "exactOptionalPropertyTypes": true,
++    "noImplicitReturns": true,
++    "noImplicitOverride": true
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
+</code></pre>
+        </div>
+      </details>
+
+      <h4 id="セットアップ"><a href="#セットアップ">セットアップ</a></h4>
+      <p>
+        <a href="https://react.dev/learn/tutorial-tic-tac-toe">Tutorial: Tic-Tac-Toe</a> は JS
+        で書かれていますが、 TypeScript を使って写経します。初期状態と対応させるため、
+        <code>App.tsx</code> を丸ごと書き換えます:<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span><code>src/main.tsx</code></label
+        >
+        <pre><code class="src language-tsx">import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  &lt;React.StrictMode&gt;
+    &lt;App /&gt;
+  &lt;/React.StrictMode&gt;,
+)
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span><code>src/App.tsx</code></label
+        >
+        <pre><code class="src language-tsx">export default function Square() {
+  return &lt;button className="square"&gt;X&lt;/button&gt;;
+}
+</code></pre>
+      </div>
+
+      <p>
+        これで
+        <code>localhost:5173</code>
+        を開くと、『X』印が表示されるだけの画面となりました。チュートリアルの環境に追いつけました。<br />
+      </p>
+
+      <h3 id="追加ツールの導入"><a href="#追加ツールの導入">追加ツールの導入</a></h3>
+      <h4 id="volta">
+        <a href="#volta"><code>volta</code></a>
+      </h4>
+      <p>
+        <a href="https://volta.sh/">volta</a> は JavaScript に対する <code>rustup</code> や
+        <code>ghcup</code> のようなツールです。<br />
+      </p>
+
+      <ul>
+        <li>
+          インストール (<code>volta install &lt;tool&gt;</code>)<br />
+          <code>node</code> や <code>npm</code> をインストールできます。<br />
+        </li>
+
+        <li>
+          <p>
+            バージョン固定<br />
+            <code>volta pin &lt;tool&gt;</code> により <code>package.json</code> に node
+            のバージョンを表記できます:<br />
+          </p>
+
+          <div class="org-src-container">
+            <label class="org-src-name"
+              ><span class="listing-number">Listing 3: </span><code>package.json</code></label
+            >
+            <pre><code class="src language-json">    "volta": {
+      "node": "20.11.0",
+      "npm": "10.4.0"
+    }
+</code></pre>
+          </div>
+        </li>
+
+        <li>
+          シェルへの hook (<code>volta setup</code>)<br />
+          <code>direnv</code> のように、自動的に現プロジェクトの <code>node</code> を
+          <code>PATH</code> に入れてくれます。<br />
+        </li>
+      </ul>
+
+      <h4 id="言語サーバ"><a href="#言語サーバ">言語サーバ</a></h4>
+      <p>
+        <a href="https://github.com/typescript-language-server/typescript-language-server"
+          >typescript-language-server</a
+        >
+        を使っています。<br />
+      </p>
+
+      <h4 id="prettier">
+        <a href="#prettier"><code>prettier</code></a>
+      </h4>
+      <p>強い (aggressive な) フォーマットを実施するために導入しました。<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 4: </span><code>package.json</code> (抜粋)</label
+        >
+        <pre><code class="src language-diff-json diff-highlight">{
+  "scripts": {
++    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
+  },
+  "devDependencies": {
++    "prettier": "^3.2.4",
+  }
+}
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 5: </span><code>.eslintrc</code></label
+        >
+        <pre><code class="src language-json">{
+  "singleQuote": true,
+  "semi": true,
+  "tabWidth": 2,
+}
+</code></pre>
+      </div>
+
+      <h4 id="Emmet">
+        <a href="#Emmet"><a href="https://emmet.io/">Emmet</a></a>
+      </h4>
+      <p>
+        Emacs においては
+        <a href="https://github.com/smihica/emmet-mode">emmet-mode</a> を導入すると、
+        <code>emmet-expand</code> (<code>C-j</code>) によってサクサク html/css/tsx
+        を書けるようになります。<br />
+      </p>
+
+      <p>
+        たとえば <code>div</code> は <code>&lt;div&gt;&lt;/div&gt;</code> に展開され、
+        <code>Square/</code> は
+        <code>&lt;Square /&gt;</code>
+        に展開されます。ネストしたデータも記述できる他、構造的編集が可能になるようです。<br />
+      </p>
+
+      <h4 id="Typedoc">
+        <a href="#Typedoc"><a href="https://typedoc.org/">Typedoc</a></a>
+      </h4>
+      <p>
+        <a href="https://typedoc.org/guides/overview/">TypeDoc</a> は docstring を元に
+        <a href="https://typedoc.org/example/">Example</a>
+        にあるようなサイトを生成してくれます。<br />
+      </p>
+
+      <ul>
+        <li><code>[[name]]</code> の形でリンクが書けます。<br /></li>
+        <li>
+          <code>///</code> 形式のコメントがサポートされることは無さそうです。
+          <a href="https://github.com/microsoft/tsdoc/issues/160"
+            >Triple slash support (C# style) #160</a
+          ><br />
+        </li>
+      </ul>
+
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ npm i -D typedoc
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 6: </span><code>package.json</code></label
+        >
+        <pre><code class="src language-json">{
+  "scripts": {
+    "dev": "vite",
+    "doc": "npx typedoc src/main.tsx --skipErrorChecking",
+  },
+  "devDependencies": {
++    "typedoc": "^0.25.7",
+  }
+}
+</code></pre>
+      </div>
+
+      <p>TypeDoc の出力には <code>export</code> された関数のみが表示されます:<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 7: </span><code>index.tsx</code></label
+        >
+        <pre><code class="src language-ts">export { default as Game } from './App.tsx';
+export * from './App.tsx';
+</code></pre>
+      </div>
+
+      <blockquote>
+        <p>
+          <code>default export</code> 関数が余分な概念に見えて仕方がありません。 TypeScript Deep
+          Dive にも
+          <a href="https://basarat.gitbook.io/typescript/main-1/defaultisbad"
+            >Avoid Export Default</a
+          >
+          とあるので、禁止してみます。<br />
+        </p>
+      </blockquote>
+
+      <p>
+        他の関数へリンクするには、
+        <code>{@link &lt;name&gt;}</code> という冗長な形式を使用します:<br />
+      </p>
+
+      <pre class="example">
+/** Properties of {@link Square}. */
+export type SquareProps = {
+  value: string;
+  isFocused: boolean;
+  onSquareClick: () =&gt; void;
+};
+</pre
+      >
+
+      <p>
+        その他は
+        <a href="https://ai-can-fly.hateblo.jp/entry/get-started-with-tsdoc"
+          >【TypeScript】そろそろ TSDoc を始めてみる - AI can fly !!</a
+        >
+        などが詳しそうです。<br />
+      </p>
+
+      <h3 id="Tutorial: Tic-Tac-Toe の実践">
+        <a href="#Tutorial: Tic-Tac-Toe の実践"
+          ><a href="https://react.dev/learn/tutorial-tic-tac-toe">Tutorial: Tic-Tac-Toe</a>
+          の実践</a
+        >
+      </h3>
+      <h4 id="コンポーネントの型表記">
+        <a href="#コンポーネントの型表記">コンポーネントの型表記</a>
+      </h4>
+      <p>
+        公式チュートリアルでは JavaScript が使用されていますが、もちろん TypeScript
+        を使いたいので翻訳が必要です。<br />
+      </p>
+
+      <p>おそらくコンポーネントの型はこう書きます:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-ts">import { FC } from 'react';
+
+/** Properties of {@link Square}. */
+export type SquareProps = {
+  value: string;
+  isFocused: boolean;
+  onSquareClick: () =&gt; void;
+};
+
+const Square: FC&lt;SquareProps&gt; = ({ value, isFocused, onSquareClick }) =&gt; {
+  /* ~~ */
+}
+</code></pre>
+      </div>
+
+      <p>後はゴリゴリやるだけです……！<br /></p>
+
+      <h4 id="TypeScript のメモ"><a href="#TypeScript のメモ">TypeScript のメモ</a></h4>
+      <ul>
+        <li>配列の <code>map</code> が fuse せず、都度 copy を作ってしまうようです<br /></li>
+        <li>range syntax が無くて困っています<br /></li>
+      </ul>
+
+      <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
+      <p>
+        TypeScript の React
+        に入門し、基本的なツールをセットアップしました。まだまだ圧倒的に知識不足です。多数のプロジェクトを作成し、試行回数を増やしたいと思います。<br />
+      </p>
+
+      <p>
+        なお Web
+        開発は真剣に取り組んだことが無いこともあり、まだ自分が天才である可能性が残っています。独学でありがちな弊害ですが、あえてこのまま勘違いしてやって行きます。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
