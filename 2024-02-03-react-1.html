@@ -352,12 +352,15 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
           <div class="org-src-container">
             <label class="org-src-name"
-              ><span class="listing-number">Listing 3: </span><code>package.json</code></label
+              ><span class="listing-number">Listing 3: </span
+              ><code>package.json</code> (抜粋)</label
             >
-            <pre><code class="src language-json">    "volta": {
-      "node": "20.11.0",
-      "npm": "10.4.0"
-    }
+            <pre><code class="src language-diff-json diff-highlight">{
++  "volta": {
++    "node": "20.11.0",
++    "npm": "10.4.0"
++  }
+}
 </code></pre>
           </div>
         </li>
@@ -430,20 +433,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <a href="#Typedoc"><a href="https://typedoc.org/">Typedoc</a></a>
       </h4>
       <p>
-        <a href="https://typedoc.org/guides/overview/">TypeDoc</a> は docstring を元に
+        <a href="https://typedoc.org/guides/overview/">TypeDoc</a> は (大体) TSDoc
+        形式のコメントを元に
         <a href="https://typedoc.org/example/">Example</a>
         にあるようなサイトを生成してくれます。<br />
       </p>
-
-      <ul>
-        <li><code>[[name]]</code> の形でリンクが書けます。<br /></li>
-        <li>
-          <code>///</code> 形式のコメントがサポートされることは無さそうです。
-          <a href="https://github.com/microsoft/tsdoc/issues/160"
-            >Triple slash support (C# style) #160</a
-          ><br />
-        </li>
-      </ul>
 
       <div class="org-src-container">
         <pre><code class="src language-sh">$ npm i -D typedoc
@@ -454,7 +448,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <label class="org-src-name"
           ><span class="listing-number">Listing 6: </span><code>package.json</code></label
         >
-        <pre><code class="src language-json">{
+        <pre><code class="src language-diff-json diff-highlight">{
   "scripts": {
     "dev": "vite",
     "doc": "npx typedoc src/main.tsx --skipErrorChecking",
@@ -493,15 +487,15 @@ export * from './App.tsx';
         <code>{@link &lt;name&gt;}</code> という冗長な形式を使用します:<br />
       </p>
 
-      <pre class="example">
-/** Properties of {@link Square}. */
+      <div class="org-src-container">
+        <pre><code class="src language-ts">/** Properties of {@link Square}. */
 export type SquareProps = {
   value: string;
   isFocused: boolean;
   onSquareClick: () =&gt; void;
 };
-</pre
-      >
+</code></pre>
+      </div>
 
       <p>
         その他は
@@ -553,13 +547,13 @@ const Square: FC&lt;SquareProps&gt; = ({ value, isFocused, onSquareClick }) =&gt
 
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
-        TypeScript の React
-        に入門し、基本的なツールをセットアップしました。まだまだ圧倒的に知識不足です。多数のプロジェクトを作成し、試行回数を増やしたいと思います。<br />
+        TypeScript と React に入門し、基本的なツールをセットアップしました。ここまで 4
+        日です。まだ圧倒的に知識不足ですから、今後多数のプロジェクトを作成して試行回数を増やします。<br />
       </p>
 
       <p>
         なお Web
-        開発は真剣に取り組んだことが無いこともあり、まだ自分が天才である可能性が残っています。独学でありがちな弊害ですが、あえてこのまま勘違いしてやって行きます。<br />
+        開発は真剣に取り組んだことが無いこともあり、まだ自分が天才である可能性が残っています。独学でありがちな弊害ですが、あえてこのまま勘違いして突っ走ってみたいと思います。<br />
       </p>
     </main>
     <footer role="contentinfo">
