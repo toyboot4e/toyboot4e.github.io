@@ -1,0 +1,347 @@
+#+TITLE: React 入門 - 1: 三目並べ
+#+DATE: <2024-02-03 Sat>
+
+* 背景
+
+[[https://react.dev/][react.dev]] の公式チュートリアルをやってみました。 hooks にも対応しており良いです。ただしローカル環境構築や TypeScript 関連の案内は無く、相変わらず不親切でした。
+
+[[https://github.com/toyboot4e/learn-react/tree/main][リポジトリ: toyboot4e/learn-react]]
+
+** モチベーションの着火
+
+ここ 3 年 web 開発にモチベーションが湧かず、スキル習得を疎かにしてしまいました。そこで外部にモチベーションを求め、 [[https://menta.work/member/dashboard][MENTA]] でメンターを雇ってみました。メンターに毎日進捗報告するために開発をします。虚栄心駆動開発です。
+
+開発中も自分の興味を優先することにしました。 html/css/jsx の記述を高速化できる [[https://emmet.io/][Emmet]] に興味を持って、 [[https://github.com/toyboot4e/learn-react/blob/main/02-learn-emmet/doc/plan.org][Emmet を題材としてアプリの作成を考えています]] 。お金頼り、人頼りでも何でも良いので手を着けて、自身の興味に寄せていけば、最後は自立できると思います。
+
+* [[https://react.dev/][react.dev]] を読む
+
+TypeScript + React に入門していきます。
+
+** [[https://react.dev/learn][Quick Start]]
+
+[[https://react.dev/learn][Quick Start]] では、簡単な例を通して基礎概念の説明がありました:
+
+- component: UI の部品
+- hooks: 状態や副作用を含むロジック
+- props: 親 component から子 component に渡されるデータ
+
+データを複数の component で共有する場合は、まず親が =useState= で状態を作り、子へ state を props として渡します。 State を書き換えた場合、変更が伝播して自動的に再度 rendering が走ります。
+
+** [[https://react.dev/learn/tutorial-tic-tac-toe][Tutorial: Tic-Tac-Toe]] の環境構築
+
+[[https://react.dev/learn/tutorial-tic-tac-toe][Tutorial: Tic-Tac-Toe]] ではフレームワークなしで React を使っています。しかしローカル環境の構築方法は示されていません。 =create-react-app= は deprecated になっていますし、いきなり宙ぶらりんになりました。
+
+*** プロジェクトの作成 (=vite=)
+
+今回は [[https://vitejs.dev/][vite]] を使ってみました。 Web 開発におけるビルドツールの 1 つだと思えば良さそうです。
+
+プロジェクトを作成します:
+
+#+BEGIN_DETAILS =npm create vite@latest= 実行
+#+BEGIN_SRC sh
+$ npm create vite@latest
+✔ Project name: … react-tic
+✔ Select a framework: › React
+✔ Select a variant: › TypeScript
+
+Scaffolding project in /home/tbm/dev/ts/react-tic...
+
+Done. Now run:
+
+  cd react-tic
+  npm install
+  npm run dev
+#+END_SRC
+#+END_DETAILS
+
+指示通りのコマンド実行で dev server (=localhost:5173=) も起動しました。順調です。
+
+**** TypeScript の種類
+
+言語選択は TypeScript にしました。 TypeScript + [[https://swc.rs/][SWC (Speedy Web Compiler)]] というのもあるようです。
+
+**** 参考. ビルドツールのレイヤ区分
+
+=vite= は =esbuild= の上に作られているようです。以下の記事が分かりやすかったです:
+
+[[https://zenn.dev/nakaakist/articles/86457bf2908379][JavaScriptビルドツールの整理 各ツールの機能と依存関係]]
+
+*** ファイル内容の確認
+
+=npm create vite@latest= によって以下のファイルが生成されました:
+
+#+BEGIN_DETAILS プロジェクト構成
+#+BEGIN_SRC txt
+.
+├── README.md
+├── index.html            # ルート
+├── package-lock.json
+├── package.json          # 依存パッケージ、コマンド定義など
+├── public                # 静的アセット (TS からの参照無し)
+│   └── vite.svg
+├── src                   # ソース
+│   ├── App.css
+│   ├── App.tsx
+│   ├── assets            # 静的アセット (TS からの参照あり)
+│   │   └── react.svg
+│   ├── index.css
+│   ├── main.tsx
+│   └── vite-env.d.ts     # Vite の環境設定 (?) (公式ドキュメント参照)
+├── tsconfig.json         # TypeScript の設定 (言語のバージョンなど)
+└── vite.config.ts        # Vite の設定ファイル
+#+END_SRC
+#+END_DETAILS
+
+以下では特に重要な設定ファイルの内容を確認します。
+
+**** =package.json=
+
+Node.js の設定ファイルです。主な初期設定はここに載っています:
+
+#+BEGIN_DETAILS =package.json=
+#+BEGIN_SRC json
+{
+  "name": "react-tic",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
+  }
+}
+#+END_SRC
+#+END_DETAILS
+
+- =scripts=
+  =npm run <サブコマンド名>= で実行されるコマンドを定義します。たとえば =npm run dev= を実行すると、 =vite= コマンドが実行されることが分かります。
+- =dependencies=
+  ビルドと実行時に使用されるパッケージです。手動で追加する際は =npm i <パッケージ名>= を使います。
+- =devDependencies=
+  ビルドに使用されるパッケージです。手動で追加する際は =npm i -D <パッケージ名>= を使います。
+
+**** =tsconfig.json=
+
+TypeScript の設定ファイルです。 [[https://gihyo.jp/book/2022/978-4-297-12747-3][プロを目指す人のための TypeScript 入門]] 第九章の通り、追加でオプションを有効化しました:
+
+#+BEGIN_DETAILS =tsconfig.json=
+#+BEGIN_SRC diff-json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+-    "noFallthroughCasesInSwitch": true
++    "noFallthroughCasesInSwitch": true,
++    "noUncheckedIndexedAccess": true,
++    "exactOptionalPropertyTypes": true,
++    "noImplicitReturns": true,
++    "noImplicitOverride": true
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
+#+END_SRC
+#+END_DETAILS
+
+*** セットアップ
+
+[[https://react.dev/learn/tutorial-tic-tac-toe][Tutorial: Tic-Tac-Toe]] は JS で書かれていますが、 TypeScript を使って写経します。初期状態と対応させるため、 =App.tsx= を丸ごと書き換えます:
+
+#+CAPTION: =src/main.tsx=
+#+BEGIN_SRC tsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+#+END_SRC
+
+#+CAPTION: =src/App.tsx=
+#+BEGIN_SRC tsx
+export default function Square() {
+  return <button className="square">X</button>;
+}
+#+END_SRC
+
+これで =localhost:5173= を開くと、『X』印が表示されるだけの画面となりました。チュートリアルの環境に追いつけました。
+
+** 追加ツールの導入
+*** =volta=
+
+[[https://volta.sh/][volta]] は JavaScript に対する =rustup= や =ghcup= のようなツールです。
+
+- インストール (=volta install <tool>=)
+  =node= や =npm= をインストールできます。
+
+- バージョン固定
+  =volta pin <tool>= により =package.json= に node のバージョンを表記できます:
+
+  #+CAPTION: =package.json= (抜粋)
+  #+BEGIN_SRC diff-json
+{
++  "volta": {
++    "node": "20.11.0",
++    "npm": "10.4.0"
++  }
+}
+  #+END_SRC
+
+- シェルへの hook (=volta setup=)
+  =direnv= のように、自動的に現プロジェクトの =node= を =PATH= に入れてくれます。
+
+*** 言語サーバ
+
+[[https://github.com/typescript-language-server/typescript-language-server][typescript-language-server]] を使っています。
+
+*** =prettier=
+
+強い (aggressive な) フォーマットを実施するために導入しました。
+
+#+CAPTION: =package.json= (抜粋)
+#+BEGIN_SRC diff-json
+{
+  "scripts": {
++    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
+  },
+  "devDependencies": {
++    "prettier": "^3.2.4",
+  }
+}
+#+END_SRC
+
+#+CAPTION: =.eslintrc=
+#+BEGIN_SRC json
+{
+  "singleQuote": true,
+  "semi": true,
+  "tabWidth": 2,
+}
+#+END_SRC
+
+*** [[https://emmet.io/][Emmet]]
+
+Emacs においては [[https://github.com/smihica/emmet-mode][emmet-mode]] を導入すると、 ~emmet-expand~ (=C-j=) によってサクサク html/css/tsx を書けるようになります。
+
+たとえば =div= は =<div></div>= に展開され、 =Square/= は =<Square />= に展開されます。ネストしたデータも記述できる他、構造的編集が可能になるようです。
+
+*** [[https://typedoc.org/][Typedoc]]
+
+[[https://typedoc.org/guides/overview/][TypeDoc]] は (大体) TSDoc 形式のコメントを元に [[https://typedoc.org/example/][Example]] にあるようなサイトを生成してくれます。
+
+#+BEGIN_SRC sh
+$ npm i -D typedoc
+#+END_SRC
+
+#+CAPTION: =package.json=
+#+BEGIN_SRC diff-json
+{
+  "scripts": {
+    "dev": "vite",
+    "doc": "npx typedoc src/main.tsx --skipErrorChecking",
+  },
+  "devDependencies": {
++    "typedoc": "^0.25.7",
+  }
+}
+#+END_SRC
+
+TypeDoc の出力には =export= された関数のみが表示されます:
+
+#+CAPTION: =index.tsx=
+#+BEGIN_SRC ts
+export { default as Game } from './App.tsx';
+export * from './App.tsx';
+#+END_SRC
+
+#+BEGIN_QUOTE
+=default export= 関数が余分な概念に見えて仕方がありません。 TypeScript Deep Dive にも [[https://basarat.gitbook.io/typescript/main-1/defaultisbad][Avoid Export Default]] とあるので、禁止してみます。
+#+END_QUOTE
+
+他の関数へリンクするには、 ={@link <name>}= という冗長な形式を使用します:
+
+#+BEGIN_SRC ts
+/** Properties of {@link Square}. */
+export type SquareProps = {
+  value: string;
+  isFocused: boolean;
+  onSquareClick: () => void;
+};
+#+END_SRC
+
+その他は [[https://ai-can-fly.hateblo.jp/entry/get-started-with-tsdoc][【TypeScript】そろそろ TSDoc を始めてみる - AI can fly !!]] などが詳しそうです。
+
+** [[https://react.dev/learn/tutorial-tic-tac-toe][Tutorial: Tic-Tac-Toe]] の実践
+
+*** コンポーネントの型表記
+
+公式チュートリアルでは JavaScript が使用されていますが、もちろん TypeScript を使いたいので翻訳が必要です。
+
+おそらくコンポーネントの型はこう書きます:
+
+#+BEGIN_SRC ts
+import { FC } from 'react';
+
+/** Properties of {@link Square}. */
+export type SquareProps = {
+  value: string;
+  isFocused: boolean;
+  onSquareClick: () => void;
+};
+
+const Square: FC<SquareProps> = ({ value, isFocused, onSquareClick }) => {
+  /* ~~ */
+}
+#+END_SRC
+
+後はゴリゴリやるだけです……！
+
+*** TypeScript のメモ
+
+- 配列の =map= が fuse せず、都度 copy を作ってしまうようです
+- range syntax が無くて困っています
+
+* まとめ
+
+TypeScript と React に入門し、基本的なツールをセットアップしました。ここまで 4 日です。まだ圧倒的に知識不足ですから、今後多数のプロジェクトを作成して試行回数を増やします。
+
+なお Web 開発は真剣に取り組んだことが無いこともあり、まだ自分が天才である可能性が残っています。独学でありがちな弊害ですが、あえてこのまま勘違いして突っ走ってみたいと思います。
+

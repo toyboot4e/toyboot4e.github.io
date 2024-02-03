@@ -22,6 +22,7 @@
 - @@html:<date>2023-09-23</date>@@ [[file:/2023-09-23-blog-improvements-2.org][=org-mode= 製ブログの改良 (2)]]
 - @@html:<date>2023-10-15</date>@@ [[file:/2023-10-22-blender-vse.org][Blender VSE + Whisper + VOICEVOX]]
 - @@html:<date>2023-12-24</date>@@ [[file:/2023-12-24-int-map.org][Haskell の IntMap は平衡されない]]
+- @@html:<date>2024-02-03</date>@@ [[file:/2024-02-03-react-1.org][React 入門 - 1: 三目並べ]]
 
 * diary
 #+ATTR_HTML: :class sitemap
