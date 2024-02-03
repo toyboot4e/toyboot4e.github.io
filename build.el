@@ -229,7 +229,8 @@
                           (if lbl (format " id=\"%s\"" lbl) "")))
                (klipsify  (and  (plist-get info :html-klipsify-src)
                                 (member lang '("javascript" "js"
-                                               "ruby" "scheme" "clojure" "php" "html")))))
+                                               "ruby" "scheme" "clojure" "php" "html"))))
+               (diff-highlight (if (and lang (string-prefix-p "diff" lang)) " diff-highlight" "")))
             (if (not lang) (format "<pre class=\"example\"%s>\n%s</pre>" label code)
                 (format "<div class=\"org-src-container\">\n%s%s\n</div>"
                         ;; Build caption.
@@ -248,15 +249,16 @@
                         ;; Contents.
                         ;; Changed HTML template to work with Prism.
                         (if klipsify
-                                (format "<pre><code class=\"src language-%s\"%s%s>%s</code></pre>"
+                                (format "<pre><code class=\"src language-%s%s\"%s%s>%s</code></pre>"
                                         lang
+                                        diff-highlight
                                         label
                                         (if (string= lang "html")
                                                 " data-editor-type=\"html\""
                                             "")
                                         code)
-                            (format "<pre><code class=\"src language-%s\"%s>%s</code></pre>"
-                                    lang label code)))))))
+                            (format "<pre><code class=\"src language-%s%s\"%s>%s</code></pre>"
+                                    lang diff-highlight label code)))))))
 
 ;; Ovewrite the wrap image function and remove `id' attribute for the `<figure>' tag:
 (defun org-html--wrap-image (contents info &optional caption label)
