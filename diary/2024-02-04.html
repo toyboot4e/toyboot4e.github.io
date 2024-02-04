@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 339, React 入門 - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 339, React 入門</h1><p>Feb  4, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
+<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="ABC 339"><a href="#ABC 339">ABC 339</a></h3><p>
+<a href="https://atcoder.jp/contests/abc339">ABC 339</a> に参加した。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc339/tasks/abc339_a">A 問題</a> では接尾辞と拡張子を混同して混乱した。うーむ<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc339/tasks/abc339_b">B 問題</a> ではシミュレーションを行った。 Haskell で解くためには、可変配列および位置・方向を状態として持つ必要があってかなりハードルが高いと思う。<br>
+</p>
+
+<p>
+とにかく AC するためには、 <code>IORef</code> に位置と方向を載せれば良い。僕は <code>foldM</code> を使った。 <a href="https://atcoder.jp/contests/abc339/submissions/49924538"><code>StateT</code> と <code>PrimMonad</code> を使う解答</a> が一番好みだった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc339/tasks/abc339_c">C 問題</a> では累積和を取ってから最小値が 0 となるようにオフセットを決めれば良かった。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc339/tasks/abc339_d">D 問題</a> は <a href="https://atcoder.jp/contests/past202206-open/tasks/past202206_i">第 11 回アルゴリズム実技検定 - I</a> などの類題で、すべての変数の組み合わせを 1 つの盤面とみなせば良い。特に今回の問題では <code>(pos1, pos2)</code> で盤面を表す。後は頑張って BFS を実装する。<br>
+</p>
+
+<p>
+添字が 4 次元ともなると <code>index</code> が非常に低速になってしまった。 <a href="https://atcoder.jp/contests/abc339/submissions/49978745">cojna 氏の提出</a> にあるビット操作を利用した encode/decode 方式を検討したい。ただし配列の長さは \(2^n\) になって余分なメモリを使うと思う。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc339/tasks/abc339_e">E 問題</a> は受け取る DP の気分でセグメント木を使って高速化した。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc339/tasks/abc339_f">F 問題</a> は多倍長整数を使った全探索で通ってしまった。乱択？で upsolve したい。<br>
+</p>
+
+<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="React 入門 1 週目"><a href="#React 入門 1 週目">React 入門 1 週目</a></h3><p>
+<a href="/2024-02-03-react-1.html">React 入門 - 1: 三目並べ</a> を投稿した。 Web 開発に入門したい。<br>
+</p>
+
+<h3 id="BOOX Palma"><a href="#BOOX Palma">BOOX Palma</a></h3><p>
+<a href="http://localhost:8080/2024-02-04-boox-palma.html">BOOX Palma を購入しました</a> を投稿した。 E-Ink 端末上で見ると、 Kindle 以外のアプリの背景や文字表示が汚い。 Chrome を Reader mode でも汚い。対策を考えたい。<br>
+</p>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
