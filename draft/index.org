@@ -1,0 +1,33 @@
+#+TITLE: toybeam
+
+* devlog
+#+ATTR_HTML: :class sitemap
+- @@html:<date>2023-02-14</date>@@ [[file:/gamedev.org][Rust でローグライクを作ってみた]]
+- @@html:<date>2023-02-25</date>@@ [[file:/nix-flakes.org][NixOS の設定ファイルと Flakes]]
+- @@html:<date>2023-03-10</date>@@ [[file:/haskell.org][Haskell の `do` 記法と基本的なモナド、および effects]]
+- @@html:<date>2023-05-14</date>@@ [[file:/hash-table.org][Hash table の理論と実装]]
+- @@html:<date>2023-08-19</date>@@ [[file:/keyball61.org][Keyball 61]]
+- @@html:<date>2023-09-17</date>@@ [[file:/dp.org][動的計画法のノート]]
+- @@html:<date>2023-09-17</date>@@ [[file:/graph.org][グラフ関連のノート]]
+- @@html:<date>2023-11-26</date>@@ [[file:/seriously-haskell.org][『AtCoder ガチ言語 Haskell 🔥』を投稿しました]]
+- @@html:<date>2023-12-04</date>@@ [[file:/heuristic.org][Haskell でヒューリスティック (1)]]
+- @@html:<date>2023-12-07</date>@@ [[file:/learn-keyball-44.org][Keyball 習得の困難を分割せよ]]
+- @@html:<date>2023-12-07</date>@@ [[file:/skk.org][SKK の習得は 1 日あれば十分だった]]
+- @@html:<date>2023-12-24</date>@@ [[file:/2023-12-24-seriously-haskell.org][『AtCoder ガチ言語 Haskell 🔥』を投稿しました]]
+- @@html:<date>2024-01-07</date>@@ [[file:/2023-11-254/2023-11-12.org][<none>]]
+- @@html:<date>2024-01-07</date>@@ [[file:/2023-11-254/2023-12.org][<none>]]
+- @@html:<date>2024-01-07</date>@@ [[file:/2023-11-254/gen.org][<none>]]
+- @@html:<date>2024-01-07</date>@@ [[file:/2023-12-23.org][<none>]]
+- @@html:<date>2024-01-07</date>@@ [[file:/calendar.org][Haskell / AtCoder を初めて 1 年半]]
+- @@html:<date>2024-01-07</date>@@ [[file:/org-mode.org][=org-mode= ですべてが繋がった]]
+- @@html:<date>2024-01-07</date>@@ [[file:/possession.org][Haskell 製ローグライク =possession= を読む]]
+- @@html:<date>2024-01-07</date>@@ [[file:/web-dev.org][『Web 開発』入門中]]
+- @@html:<date>2024-12-31</date>@@ [[file:/2023-12-31-seriously-haskell.org][『AtCoder ガチ言語 Haskell 🔥』を投稿しました]]
+
+* diary
+#+ATTR_HTML: :class sitemap
+- @@html:<date>2023-11-25</date>@@ [[file:/diary/2023-11-25.org][ABC 329]]
+- @@html:<date>2024-01-07</date>@@ [[file:/diary/2023-01-07.org][ABC 335, PBT 本]]
+- @@html:<date>2024-01-07</date>@@ [[file:/diary/2023-11-12.org][<none>]]
+- @@html:<date>2024-01-07</date>@@ [[file:/diary/2023-12.org][<none>]]
+- @@html:<date>2024-01-07</date>@@ [[file:/diary/gen.org][<none>]]

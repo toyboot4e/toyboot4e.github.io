@@ -1,4 +1,4 @@
-#+TITLE: BOOX Palma を買いました
+#+TITLE: BOOX Palma を購入しました
 #+DATE: <2024-02-04 Sun>
 
 * 背景
@@ -71,6 +71,10 @@ E-Ink 端末はフロントライトを採用します。フロントライト�
 | Kindle   | 読み上げがやりにくい |
 | Web 小説 | TODO                 |
 | Termux   | TODO                 |
+
+** Web サイト
+
+- X: 縮小されて文字が汚い
 
 * 感想
 

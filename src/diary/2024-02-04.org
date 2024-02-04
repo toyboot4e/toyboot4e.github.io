@@ -1,0 +1,35 @@
+#+TITLE: ABC 339, React 入門
+#+DATE: <2024-02-04 Sun>
+
+* 競技プログラミング
+
+** ABC 339
+
+[[https://atcoder.jp/contests/abc339][ABC 339]] に参加した。
+
+[[https://atcoder.jp/contests/abc339/tasks/abc339_a][A 問題]] では接尾辞と拡張子を混同して混乱した。うーむ
+
+[[https://atcoder.jp/contests/abc339/tasks/abc339_b][B 問題]] ではシミュレーションを行った。 Haskell で解くためには、可変配列および位置・方向を状態として持つ必要があってかなりハードルが高いと思う。
+
+とにかく AC するためには、 =IORef= に位置と方向を載せれば良い。僕は =foldM= を使った。 [[https://atcoder.jp/contests/abc339/submissions/49924538][=StateT= と =PrimMonad= を使う解答]] が一番好みだった。
+
+[[https://atcoder.jp/contests/abc339/tasks/abc339_c][C 問題]] では累積和を取ってから最小値が 0 となるようにオフセットを決めれば良かった。
+
+[[https://atcoder.jp/contests/abc339/tasks/abc339_d][D 問題]] は [[https://atcoder.jp/contests/past202206-open/tasks/past202206_i][第 11 回アルゴリズム実技検定 - I]] などの類題で、すべての変数の組み合わせを 1 つの盤面とみなせば良い。特に今回の問題では =(pos1, pos2)= で盤面を表す。後は頑張って BFS を実装する。
+
+添字が 4 次元ともなると =index= が非常に低速になってしまった。 [[https://atcoder.jp/contests/abc339/submissions/49978745][cojna 氏の提出]] にあるビット操作を利用した encode/decode 方式を検討したい。ただし配列の長さは $2^n$ になって余分なメモリを使うと思う。
+
+[[https://atcoder.jp/contests/abc339/tasks/abc339_e][E 問題]] は受け取る DP の気分でセグメント木を使って高速化した。
+
+[[https://atcoder.jp/contests/abc339/tasks/abc339_f][F 問題]] は多倍長整数を使った全探索で通ってしまった。乱択？で upsolve したい。
+
+* Misc
+
+** React 入門 1 週目
+
+[[/2024-02-03-react-1.html][React 入門 - 1: 三目並べ]] を投稿した。 Web 開発に入門したい。
+
+** BOOX Palma
+
+[[http://localhost:8080/2024-02-04-boox-palma.html][BOOX Palma を購入しました]] を投稿した。 E-Ink 端末上で見ると、 Kindle 以外のアプリの背景や文字表示が汚い。 Chrome を Reader mode でも汚い。対策を考えたい。
+
