@@ -31,5 +31,5 @@
 
 ** BOOX Palma
 
-[[http://localhost:8080/2024-02-04-boox-palma.html][BOOX Palma を購入しました]] を投稿した。 E-Ink 端末上で見ると、 Kindle 以外のアプリの背景や文字表示が汚い。 Chrome を Reader mode でも汚い。対策を考えたい。
+[[http://localhost:8080/2024-02-04-boox-palma.html][BOOX Palma を購入しました]] を投稿した。 E-Ink 端末上で見ると、 Kindle 以外のアプリの背景や文字が汚い。 Chrome を Reader mode にしても汚い。対策を考えたい。
 

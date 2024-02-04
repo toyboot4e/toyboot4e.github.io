@@ -23,7 +23,7 @@
 - @@html:<date>2023-10-15</date>@@ [[file:/2023-10-22-blender-vse.org][Blender VSE + Whisper + VOICEVOX]]
 - @@html:<date>2023-12-24</date>@@ [[file:/2023-12-24-int-map.org][Haskell の IntMap は平衡されない]]
 - @@html:<date>2024-02-03</date>@@ [[file:/2024-02-03-react-1.org][React 入門 - 1: 三目並べ]]
-- @@html:<date>2024-02-04</date>@@ [[file:/2024-02-04-boox-palma.org][BOOX Palma を買いました]]
+- @@html:<date>2024-02-04</date>@@ [[file:/2024-02-04-boox-palma.org][BOOX Palma を購入しました]]
 
 * diary
 #+ATTR_HTML: :class sitemap
@@ -44,3 +44,4 @@
 - @@html:<date>2023-12-31</date>@@ [[file:/diary/2023-12-31.org][新年メモ]]
 - @@html:<date>2024-01-07</date>@@ [[file:/diary/2024-01-07.org][ABC 335, PBT 本]]
 - @@html:<date>2024-01-28</date>@@ [[file:/diary/2024-01-28.org][ABC 338]]
+- @@html:<date>2024-02-04</date>@@ [[file:/diary/2024-02-04.org][ABC 339, React 入門]]
