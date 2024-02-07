@@ -521,8 +521,10 @@ export type SquareProps = {
 
       <p>おそらくコンポーネントの型はこう書きます:<br /></p>
 
-      <div class="org-src-container">
-        <pre><code class="src language-ts">import { FC } from 'react';
+      <details>
+        <summary>違いました (<code>FC</code> 使用版)</summary>
+        <div class="org-src-container">
+          <pre><code class="src language-ts">import { FC } from 'react';
 
 /** Properties of {@link Square}. */
 export type SquareProps = {
@@ -533,6 +535,34 @@ export type SquareProps = {
 
 const Square: FC&lt;SquareProps&gt; = ({ value, isFocused, onSquareClick }) =&gt; {
   /* ~~ */
+}
+</code></pre>
+        </div>
+      </details>
+
+      <p>
+        訂正:
+        <a
+          href="https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/function_components/"
+          >Function Components | React TypeScript Cheatsheets</a
+        >
+        によると、 <code>FC</code> は古く、以下の書き方が新しいようです:<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-ts">/** Properties of {@link Square}. */
+export type SquareProps = {
+  value: string;
+  isFocused: boolean;
+  onSquareClick: () =&gt; void;
+};
+
+const Square = ({
+  value,
+  isFocused,
+  onSquareClick,
+}: SquareProps): React.JSX.Element =&gt; {
+  /* .. */
 }
 </code></pre>
       </div>
