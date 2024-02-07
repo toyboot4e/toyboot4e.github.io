@@ -317,6 +317,7 @@ export type SquareProps = {
 
 おそらくコンポーネントの型はこう書きます:
 
+#+BEGIN_DETAILS 違いました (=FC= 使用版)
 #+BEGIN_SRC ts
 import { FC } from 'react';
 
@@ -329,6 +330,26 @@ export type SquareProps = {
 
 const Square: FC<SquareProps> = ({ value, isFocused, onSquareClick }) => {
   /* ~~ */
+}
+#+END_SRC
+#+END_DETAILS
+
+訂正: [[https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/function_components/][Function Components | React TypeScript Cheatsheets]] によると、 =FC= は古く、以下の書き方が新しいようです:
+
+#+BEGIN_SRC ts
+/** Properties of {@link Square}. */
+export type SquareProps = {
+  value: string;
+  isFocused: boolean;
+  onSquareClick: () => void;
+};
+
+const Square = ({
+  value,
+  isFocused,
+  onSquareClick,
+}: SquareProps): React.JSX.Element => {
+  /* .. */
 }
 #+END_SRC
 
