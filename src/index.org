@@ -45,3 +45,4 @@
 - @@html:<date>2024-01-07</date>@@ [[file:/diary/2024-01-07.org][ABC 335, PBT 本]]
 - @@html:<date>2024-01-28</date>@@ [[file:/diary/2024-01-28.org][ABC 338]]
 - @@html:<date>2024-02-04</date>@@ [[file:/diary/2024-02-04.org][ABC 339, React 入門]]
+- @@html:<date>2024-02-11</date>@@ [[file:/diary/2024-02-11.org][ABC 340, exgcd]]
