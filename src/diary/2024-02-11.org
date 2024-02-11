@@ -190,7 +190,7 @@ TODO: 変域の考察
 
 ** キーボード探し
 
-[[https://kagizaraya.booth.pm/items/1094860][MiniAxe]] の入荷を待っています。 3 行 5 列 + 親指キーのキーボードです。タッチデバイスと Bluetooth が付属しているとなお良いのですが……。
+[[https://kagizaraya.booth.pm/items/1094860][MiniAxe]] の入荷を待っています。 3 行 5 列 + 親指キーの分割キーボードです。タッチデバイスと Bluetooth が付属しているとなお良いのですが……。
 
 # - [[https://github.com/davidphilipbarr/Sweep][Sweep]]
 #   34 キーは攻め過ぎです。
