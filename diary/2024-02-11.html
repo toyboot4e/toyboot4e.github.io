@@ -5,7 +5,7 @@
 </p>
 
 <h4 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_a">A 問題</a></a></h4><p>
-数列 \(a, a + d, .. d\) を生成します。リストの range syntax を使ったり、 <code>iterate</code> を使うとシンプルに書けるようです:<br>
+数列 \(a, a + d, .., b\) を生成します。リストの range syntax を使ったり、 <code>iterate</code> を使うとシンプルに書けるようです:<br>
 </p>
 
 <div class="org-src-container">
@@ -205,11 +205,11 @@ D 問題は Dijkstra 法 (辺に重みがある場合の BFS) をやるだけの
 </p>
 
 <p>
-等式を満たす整数値 \(x, y\) は拡張ユークリッドの互助法によって求まります。実装は <a href="https://zenn.dev/osushi0x/scraps/51ff0594a1e863#comment-29d659a57ead56">@4tsuzuru</a> さんの <code>exgcd</code> 関数を拝借しています。<br>
+この等式を満たす整数値 \(x, y\) は拡張ユークリッドの互助法によって求まります。実装は <a href="https://zenn.dev/osushi0x/scraps/51ff0594a1e863#comment-29d659a57ead56">@4tsuzuru</a> さんの <code>exgcd</code> 関数を拝借しています。<br>
 </p>
 
 <p>
-TODO: 変域の考察<br>
+TODO: \(x, y\) の変域の考察<br>
 </p>
 
 <h3 id="拡張ユークリッドの互除法"><a href="#拡張ユークリッドの互除法">拡張ユークリッドの互除法</a></h3><p>
@@ -217,7 +217,7 @@ TODO: 変域の考察<br>
 </p>
 
 <p>
-互いに疎な整数 \(A, B\) に対して \(n_A A + n_B B = 1\) を満たす整数 \(n_A, n_B\) の組が存在します。 <code>exgcd</code> によって \(n_A, n_B\) を求めると、両辺を \(l\) 倍して任意の \(L \mathrm[L]\) の水を汲むことができます。<br>
+互いに疎な整数 \(A, B\) に対して \(n_A A + n_B B = 1\) を満たす整数 \(n_A, n_B\) の組が存在します。 <code>exgcd</code> によって \(n_A, n_B\) を求めると、両辺を \(L\) 倍して任意の \(L \mathrm[L]\) の水を汲むことができます。<br>
 </p>
 
 <p>
