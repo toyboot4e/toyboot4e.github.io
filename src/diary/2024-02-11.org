@@ -9,7 +9,7 @@
 
 *** [[https://atcoder.jp/contests/abc340/tasks/abc340_a][A 問題]]
 
-数列 $a, a + d, .. d$ を生成します。リストの range syntax を使ったり、 =iterate= を使うとシンプルに書けるようです:
+数列 $a, a + d, .., b$ を生成します。リストの range syntax を使ったり、 =iterate= を使うとシンプルに書けるようです:
 
 #+BEGIN_SRC hs
 [a, a + d .. b]
@@ -171,15 +171,15 @@ $$
 \end{aligned} \\
 $$
 
-等式を満たす整数値 $x, y$ は拡張ユークリッドの互助法によって求まります。実装は [[https://zenn.dev/osushi0x/scraps/51ff0594a1e863#comment-29d659a57ead56][@4tsuzuru]] さんの =exgcd= 関数を拝借しています。
+この等式を満たす整数値 $x, y$ は拡張ユークリッドの互助法によって求まります。実装は [[https://zenn.dev/osushi0x/scraps/51ff0594a1e863#comment-29d659a57ead56][@4tsuzuru]] さんの =exgcd= 関数を拝借しています。
 
-TODO: 変域の考察
+TODO: $x, y$ の変域の考察
 
 ** 拡張ユークリッドの互除法
 
 =exgcd= が活躍する具体例は、算数でよくあるバケツで水を組む問題です。容量 $A$ のバケツと容量 $B$ のバケツを使って、お風呂にちょうど $L$ リットルの水を汲みます。
 
-互いに疎な整数 $A, B$ に対して $n_A A + n_B B = 1$ を満たす整数 $n_A, n_B$ の組が存在します。 =exgcd= によって $n_A, n_B$ を求めると、両辺を $l$ 倍して任意の $L \mathrm[L]$ の水を汲むことができます。
+互いに疎な整数 $A, B$ に対して $n_A A + n_B B = 1$ を満たす整数 $n_A, n_B$ の組が存在します。 =exgcd= によって $n_A, n_B$ を求めると、両辺を $L$ 倍して任意の $L \mathrm[L]$ の水を汲むことができます。
 
 # - [[http://mackotmurn.blog113.fc2.com/blog-entry-52.html][IT暗号 拡張ユークリッド互除法]]
 # - [[http://www.nct9.ne.jp/m_hiroi/light/pyalgo70.html][Algorithms with Python / 拡張ユークリッドの互除法]]
