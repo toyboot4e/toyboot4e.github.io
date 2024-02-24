@@ -4,10 +4,6 @@
 <a href="https://atcoder.jp/contests/abc342">ABC 342</a> に参加しました。<br>
 </p>
 
-<h4 id="意気込み"><a href="#意気込み">意気込み</a></h4><p>
-ここ数回は知識で解ける問題が多かったです。今回は重実装や高 diff DP の出題を期待します。<br>
-</p>
-
 <h4 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_a">A 問題</a></a></h4><p>
 1 問目から強敵が来ました。ワシはアプリカティブ・スタイルが大好きじゃ。<br>
 </p>
@@ -23,7 +19,7 @@ main = do
 </div>
 
 <p>
-どんな方法でも良いので、淀み無く解けることが大事だと感じました (躓きました) 。<br>
+どんな方法でも良いので、淀み無く解けることが大事だと感じました。<br>
 </p>
 
 <h4 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_b">B 問題</a></a></h4><p>
@@ -94,7 +90,7 @@ feat = foldl' (*) (1 :: Int) . mapMaybe f . primeFactors
 </div>
 
 <p>
-また \(0 = 0^2\) なので頑張ります。<br>
+また \(0 = 0^2\) の処理は頑張ります。<br>
 </p>
 
 <h4 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_e">E 問題</a></a></h4><p>
@@ -120,7 +116,7 @@ feat = foldl' (*) (1 :: Int) . mapMaybe f . primeFactors
 </p>
 
 <p>
-\(\{B^{n}\}_n\) の事前計算は要らんのか問題を解決すべく、我々は <a href="https://github.com/cojna/iota">cojna/iota</a> の <a href="https://cojna.github.io/iota/Data-ByteString-RollingHash.html">Data.RollingHash</a> に向かった……。<br>
+\(\{B^{n}\}_n\) の事前計算は不要なのか問題を解決すべく、我々は <a href="https://github.com/cojna/iota">cojna/iota</a> の <a href="https://cojna.github.io/iota/Data-ByteString-RollingHash.html">Data.RollingHash</a> に向かいます……。<br>
 </p>
 
 <h4 id="群としての rolling hash"><a href="#群としての rolling hash">群としての rolling hash</a></h4><p>
@@ -187,11 +183,11 @@ Rolling hash においては \(L^{-1} (L \diamond R)\) の計算に \(B^{-n} \bm
 </p>
 
 <p>
-セグメント木を使って rolling hash を実装する場合、結合の逆操作は必要ありません。 \(\{B_{n}\}_{n}\) を持たなくて良くなったため、理解も実装もシンプルになりました。しかもセグメント木は値の更新ができますから、良いことづくめです。唯一、計算量は \(O(N \log N)\) となりますが、そこを突く問題は AtCoder では出ません。<br>
+セグメント木を使って rolling hash を実装する場合、結合の逆操作は必要ありません。 \(\{B_{n}\}_{n}\) を持たなくて良くなったため、理解も実装もシンプルになりました。しかもセグメント木は 1 点更新ができます。唯一、計算量は \(O(N \log N)\) となりますが、そこを突く問題は AtCoder では出ません。<br>
 </p>
 
 <p>
-ちなみに回文の判定では逆方向のハッシュ値を計算するためにセグメント木が 2 本必要です。逆方向の <code>&lt;&gt;</code> の計算には <code>flip (&lt;&gt;)</code> を使えば良く、それは <a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/Data-Monoid.html#t:Dual">Dual モノイド</a> なんだって cojna さんのコードが言っていました。<br>
+回文の判定では逆方向のハッシュ値を計算するため、セグメント木が 2 本必要です。逆方向の <code>&lt;&gt;</code> の計算には <code>flip (&lt;&gt;)</code> を使えば良く、それは <a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/Data-Monoid.html#t:Dual">Dual モノイド</a> なんだって cojna さんのコードが言っていました。<br>
 </p>
 
 <h3 id="cojna/iota の高速化ネタ"><a href="#cojna/iota の高速化ネタ">cojna/iota の高速化ネタ</a></h3><h4 id="MagicHash と natVal'"><a href="#MagicHash と natVal'"><code>MagicHash</code> と <code>natVal'</code></a></h4><p>
@@ -214,7 +210,7 @@ import GHC.TypeLits
 </p>
 
 <p>
-効果は……ほぼありません。ただ <a href="https://cojna.github.io/iota/Data-Mat3x3.html">Mat3x3</a> に至っては <code>primitive</code> パッケージの <a href="https://hackage.haskell.org/package/primitive-0.9.0.0/docs/Data-Primitive-ByteArray.html">ByteArray</a> にすべての要素を詰め込んでいますから、測ってみると良さそうです。<br>
+効果は……ほぼありません。ただ <a href="https://cojna.github.io/iota/Data-Mat3x3.html">Mat3x3</a> に至っては <code>primitive</code> パッケージの <a href="https://hackage.haskell.org/package/primitive-0.9.0.0/docs/Data-Primitive-ByteArray.html">ByteArray</a> にすべての要素を詰め込んでいますから、流石に効くのではないかと思います。<br>
 </p>
 
 <h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="人"><a href="#人">人</a></h3><h4 id="Codeforces 時代"><a href="#Codeforces 時代">Codeforces 時代</a></h4><p>
@@ -255,7 +251,7 @@ Safe Haskell (<a href="https://downloads.haskell.org/~ghc/7.8.4/docs/html/users_
 </p>
 
 <h4 id="DT"><a href="#DT">DT</a></h4><p>
-<a href="https://www.youtube.com/@DistroTube">Distro Tube</a> の本 <a href="https://www.youtube.com/redirect?event=video_description&amp;redir_token=QUFFLUhqbkdjVVpkT0pybm1RWkg1Rk8xZTR2NW1la3VSQXxBQ3Jtc0trVV9GUWg3MHJqMm5fNWN3eWc2eFBSZDd4T3dib250V1hyc2ZvNHBtQUNWdkxlV1psdEt5cE9IZkszRndzTmdqcDNnYWx5TGJheVNzN0ptR3VCWWwxWFQ4ZDRwRC1ObW5TdFR3MEpQY3B4MThlc2ljSQ&amp;q=https%3A%2F%2Famzn.to%2F3T2Eb4t&amp;v=fr89lqWDCHo">The Super Wheel Options Strategy</a> が出ました (ポチッ) 。一時は xmonad, Evil Emacs, exwm などで夢中になったチャンネルです。 <a href="https://www.youtube.com/channel/UCqyrm14zcbZw6pdQeHXPF8w">新しいチャンネル</a> も観る、かも<br>
+<a href="https://www.youtube.com/@DistroTube">Distro Tube</a> から書籍 <a href="https://www.youtube.com/redirect?event=video_description&amp;redir_token=QUFFLUhqbkdjVVpkT0pybm1RWkg1Rk8xZTR2NW1la3VSQXxBQ3Jtc0trVV9GUWg3MHJqMm5fNWN3eWc2eFBSZDd4T3dib250V1hyc2ZvNHBtQUNWdkxlV1psdEt5cE9IZkszRndzTmdqcDNnYWx5TGJheVNzN0ptR3VCWWwxWFQ4ZDRwRC1ObW5TdFR3MEpQY3B4MThlc2ljSQ&amp;q=https%3A%2F%2Famzn.to%2F3T2Eb4t&amp;v=fr89lqWDCHo">The Super Wheel Options Strategy</a> が出ました (ポチッ) 。一時は xmonad, Evil Emacs, exwm などで夢中になったチャンネルです。 <a href="https://www.youtube.com/channel/UCqyrm14zcbZw6pdQeHXPF8w">新しいチャンネル</a> も観る、かも<br>
 </p>
 
 <h3 id="キーボード"><a href="#キーボード">キーボード</a></h3><p>
