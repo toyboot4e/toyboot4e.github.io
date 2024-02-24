@@ -76,7 +76,11 @@ a z
 </details>
 
 <h4 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_d">D 問題</a></a></h4><p>
-これは面白かったです。 \(\{A_{n}\}_{n}\) の走査は一度で済ませたいところですが、 \(A_j\) と掛け合わせて平方数となる \(A_i\) の取り寄せを高速化する必要があります。実はこれを 1 点に集約できるスロットの持ち方があって、それは \(2^3 \cdot 3 \cdot 5^2\) に対する \(2 \cdot 3\) のような数です。うーん言語ォ<br>
+これは面白かったです。 \(\{A_{n}\}_{n}\) の走査は一度で済ませたいところですが、 \(A_j\) と掛け合わせて平方数となる \(A_i\) の取り寄せを高速化する必要があります。実はこれを 1 点に集約できるスロットの持ち方があって、それは \(2^3 \cdot 3 \cdot 5^2\) に対する \(2 \cdot 3\) のような数です。<br>
+</p>
+
+<p>
+言語化が辛いのでコードで:<br>
 </p>
 
 <div class="org-src-container">
@@ -210,7 +214,7 @@ import GHC.TypeLits
 </p>
 
 <p>
-効果は……特にありません。ただ <a href="https://cojna.github.io/iota/Data-Mat3x3.html">Mat3x3</a> に至っては <code>primitive</code> パッケージの <a href="https://hackage.haskell.org/package/primitive-0.9.0.0/docs/Data-Primitive-ByteArray.html">ByteArray</a> にすべての要素を詰め込んでいますから、測ってみると良さそうです。<br>
+効果は……ほぼありません。ただ <a href="https://cojna.github.io/iota/Data-Mat3x3.html">Mat3x3</a> に至っては <code>primitive</code> パッケージの <a href="https://hackage.haskell.org/package/primitive-0.9.0.0/docs/Data-Primitive-ByteArray.html">ByteArray</a> にすべての要素を詰め込んでいますから、測ってみると良さそうです。<br>
 </p>
 
 <h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="人"><a href="#人">人</a></h3><h4 id="Codeforces 時代"><a href="#Codeforces 時代">Codeforces 時代</a></h4><p>
@@ -246,16 +250,16 @@ Safe Haskell (<a href="https://downloads.haskell.org/~ghc/7.8.4/docs/html/users_
 
 </details>
 
-<h4 id="tanakh"><a href="#tanakh">tanakh</a></h4><p>
+<h4 id="tanakh 氏"><a href="#tanakh 氏">tanakh 氏</a></h4><p>
 <a href="https://github.com/mattn/vim-tanakh">エディタ拡張となっていた tanakh 氏</a> を発見。 <a href="https://github.com/toyboot4e/tanakh-mode.el">Emacs にポートした</a> 。オーバー。<br>
 </p>
 
 <h4 id="DT"><a href="#DT">DT</a></h4><p>
-<a href="https://www.youtube.com/@DistroTube">Distro Tube</a> の本 <a href="https://www.youtube.com/redirect?event=video_description&amp;redir_token=QUFFLUhqbkdjVVpkT0pybm1RWkg1Rk8xZTR2NW1la3VSQXxBQ3Jtc0trVV9GUWg3MHJqMm5fNWN3eWc2eFBSZDd4T3dib250V1hyc2ZvNHBtQUNWdkxlV1psdEt5cE9IZkszRndzTmdqcDNnYWx5TGJheVNzN0ptR3VCWWwxWFQ4ZDRwRC1ObW5TdFR3MEpQY3B4MThlc2ljSQ&amp;q=https%3A%2F%2Famzn.to%2F3T2Eb4t&amp;v=fr89lqWDCHo">The Super Wheel Options Strategy</a> をポチりました。一時は xmonad, Evil Emacs, exwm などで夢中になりました。 <a href="https://www.youtube.com/channel/UCqyrm14zcbZw6pdQeHXPF8w">新しいチャンネル</a> も観る、かも<br>
+<a href="https://www.youtube.com/@DistroTube">Distro Tube</a> の本 <a href="https://www.youtube.com/redirect?event=video_description&amp;redir_token=QUFFLUhqbkdjVVpkT0pybm1RWkg1Rk8xZTR2NW1la3VSQXxBQ3Jtc0trVV9GUWg3MHJqMm5fNWN3eWc2eFBSZDd4T3dib250V1hyc2ZvNHBtQUNWdkxlV1psdEt5cE9IZkszRndzTmdqcDNnYWx5TGJheVNzN0ptR3VCWWwxWFQ4ZDRwRC1ObW5TdFR3MEpQY3B4MThlc2ljSQ&amp;q=https%3A%2F%2Famzn.to%2F3T2Eb4t&amp;v=fr89lqWDCHo">The Super Wheel Options Strategy</a> が出ました (ポチッ) 。一時は xmonad, Evil Emacs, exwm などで夢中になったチャンネルです。 <a href="https://www.youtube.com/channel/UCqyrm14zcbZw6pdQeHXPF8w">新しいチャンネル</a> も観る、かも<br>
 </p>
 
 <h3 id="キーボード"><a href="#キーボード">キーボード</a></h3><p>
-<a href="https://kagizaraya.jp/en/products/miniaxe">Miniaxe</a> が届きました。 36 キーです。組み立てが楽しみです。今後はキー数を減らしつつ操作性の拡張を目指したいです。<br>
+<a href="https://kagizaraya.jp/en/products/miniaxe">Miniaxe</a> が届きました。 36 キーで組み立てが楽しみです。今後はさらなる操作性の拡張を目指したいです。<br>
 </p>
 
 <h4 id="Steno キーボード"><a href="#Steno キーボード">Steno キーボード</a></h4><p>
@@ -265,7 +269,7 @@ Stenography は複数キーの同時押しを活かした文字入力の方式�
 <ul><li><a href="https://www.youtube.com/watch?v=uQZp7RX-h6o&amp;t=249s">Symbols and Shortcuts With Steno! Emily's Symbols And Modifiers</a><br>
 数値キーとして 8, 4, 2, 1 を用意します。たとえば <code>5</code> は <code>1</code> と <code>4</code> の同時押しです。天才……！<br></li>
 <li><a href="https://github.com/EPLHREU/emily-symbols">emily-symbols</a><br>
-Steno キーボードにおけるキーマップ例と図解が載っています。魔境だ……。<br></li>
+Steno キーボードにおけるキーマップ例と図解が載っています。魔境です。<br></li>
 <li><a href="https://github.com/EPLHREU/emily-modifiers">emily-modifiers</a><br>
 同上です。<br></li>
 </ul>
