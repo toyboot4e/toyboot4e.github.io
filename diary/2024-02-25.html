@@ -120,11 +120,11 @@ feat = foldl' (*) (1 :: Int) . mapMaybe f . primeFactors
 </p>
 
 <h4 id="群としての rolling hash"><a href="#群としての rolling hash">群としての rolling hash</a></h4><p>
-鉄則本では累積和を使って rolling hash を実装しました。累積和とは、結合と分解のできるデータ型、つまり群の列が与えられた際に、 \(O(N)\) の前処理によって任意の \([l, r]\) 区間データの結合が \(O(\diamond)\) で得られるアルゴリズムです。<br>
+鉄則本では累積和を使って rolling hash を実装しました。累積和とは、結合と分解のできるデータ型、つまり群の列が与えられた際に、 \(O(N)\) の前処理によって任意の \([l, r]\) 区間データの結合が \(O(\mathit{recip \cdot \diamond})\) で得られるアルゴリズムです。<br>
 </p>
 
 <p>
-群とは逆元が定義されたモノイドです。狭義の累積和では <code>csum[r] - csum[l]</code> を計算しますが、一般的には \(L^{-1} (L \diamond R)\) のような群に対する計算だと捉えられます。<br>
+群とは逆元が定義されたモノイドです。狭義の累積和では <code>csum[r] - csum[l]</code> を計算しますが、一般的には \(L^{-1} \diamond (L \diamond R)\) のような群に対する計算だと捉えられます。<br>
 </p>
 
 <table>
@@ -160,24 +160,24 @@ feat = foldl' (*) (1 :: Int) . mapMaybe f . primeFactors
 <tr>
 <td class="org-left">群</td>
 <td class="org-left">逆元が定義されたモノイド</td>
-<td class="org-left">\(L^{-1} (L \diamond R)\) の計算に利用</td>
+<td class="org-left">\(L^{-1} \diamond (L \diamond R)\) の計算に利用</td>
 </tr>
 </tbody>
 </table>
 
 <p>
-Rolling hash においては \(L^{-1} (L \diamond R)\) の計算に \(B^{-n} \bmod p\) が現れ、非常に大きな定数時間の計算が要求されます。したがって \(\{B^{n}\}_{n}\) を事前計算し、 \(B^{-n_1} B^{n_2} = B^{n_2 - n_1}\) として逆元の計算を打ち消すことで、 \(O(1)\) でハッシュ値を計算可能にします。<br>
+Rolling hash においては \(L^{-1} \diamond (L \diamond R)\) の計算に \(B^{-n} \bmod p\) が現れ、非常に大きな定数時間の計算が要求されます。したがって \(\{B^{n}\}_{n}\) を事前計算し、 \(B^{-n_1} B^{n_2} = B^{n_2 - n_1}\) として逆元の計算を打ち消すことで、 \(O(1)\) でハッシュ値を計算可能にします。<br>
 </p>
 
 <h4 id="モノイドとしての rolling hash"><a href="#モノイドとしての rolling hash">モノイドとしての rolling hash</a></h4><p>
-モノイドとしての rolling hash は \((B^{n}, \mathrm{hash})\) です。これがすべて、超簡単！<br>
+モノイドとしての rolling hash は \((B^{n}, \mathit{hash})\) です。これがすべて、超簡単！<br>
 </p>
 
 <p>
 \[
 \begin{aligned}
 \mathrm{mempty} &:= (B^{1}, 0) \\
-(B^{n_1}, \mathrm{hash}_1) \diamond (B^{n_2}, \mathrm{hash}_2) &:= (B^{n_1 + n_2}, n_2 \mathrm{hash}_1 + \mathrm{hash}_2)
+(B^{n_1}, \mathit{hash}_1) \diamond (B^{n_2}, \mathit{hash}_2) &:= (B^{n_1 + n_2}, n_2 \mathit{hash}_1 + \mathit{hash}_2)
 \end{aligned} \\
 \]<br>
 </p>
