@@ -55,7 +55,7 @@
 
 コンテスト後に Dijkstra や 01-BFS っぽいのを投げてみたものの TLE 。もともと最短経路を求めるアルゴリズムだし、やっぱり上手く行かないみたい。同じ数が振られた隣接頂点を 1 つに潰すと DAG になり、 DP で解けるそう。後でやってみる。
 
-[[https://atcoder.jp/contests/abc335/tasks/abc335_f][F 問題]] が解けなかった。右端から計算する方針は立てたものの、高速化ができなかった。 [[https://www.youtube.com/watch?v=cJiP8-Mq1jI&t=199s][evima さんの解法]] に従って $dp[x][i \mod x]$ を周期和とすることで upsolve できた。力こそパワー……
+[[https://atcoder.jp/contests/abc335/tasks/abc335_f][F 問題]] が解けなかった。右端から計算する方針は立てたものの、高速化ができなかった。 [[https://www.youtube.com/watch?v=cJiP8-Mq1jI&t=199s][evima さんの解法]] に従って $dp[x][i \bmod x]$ を周期和とすることで upsolve できた。力こそパワー……
 
 * 読書: PBT 本
 

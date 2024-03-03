@@ -1,0 +1,143 @@
+#+TITLE: ABC 341 / ACL contest
+#+DATE: <2024-02-18 Sun>
+#+LINK: past https://past.atcoder.jp/
+
+* ABC 341
+
+[[https://atcoder.jp/contests/abc341][ABC 341]] に参加しました。早解き回にて 6 完青パフォ！　同時期に入水した人たちと同程度のレーティングになりました。嬉ピクミンの宴です。
+
+** [[https://atcoder.jp/contests/abc341/tasks/abc341_a][A - Print 341]]
+
+=1010 .. 1= のような文字列を生成します。 [[https://www.youtube.com/watch?v=OmjShwWONsw&t=2887s][kotatsugame さん情報によると]] 、 =341 = 101010101 (2)= のようでした。すご……
+
+#+BEGIN_SRC hs
+-- 上手い方法
+take (2 * n + 1) $ cycle "10"
+
+-- 思いつきやすかった方法
+init . concat $ replicate (n + 1) "10"
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc341/tasks/abc341_b][B 問題]]
+
+畳み込みの問題です。焦って手続き的にやってしまいました。いつものことですが、 [[https://atcoder.jp/contests/abc341/submissions/50337867][gksato さんの提出]] が上手かったです。
+
+[[https://www.youtube.com/watch?v=OmjShwWONsw&t=2936s][kotatsugame さん情報によると]] $T_i \le S_i$ のため通貨が指数関数的に膨れ上がることはありません。重要な考察ですね (抜けていました) 。
+
+** [[https://atcoder.jp/contests/abc341/tasks/abc341_c][C 問題]]
+
+全探索の問題です。すべてのセルを起点にシミュレーションすれば解けます。
+
+制限時間がシビアなため、 Haskell ではサンクを溜めると TLE になるようです。僕は即 =break= できるように再帰関数を使っていました。
+
+#+CAPTION: シミュレーション (再帰関数で =break=)
+#+BEGIN_SRC hs
+let solve (!y, !x) !bs = case BS.uncons bs of
+      Nothing -> True
+      Just (!dir, !bs') ->
+        if not (inRange (boundsIV gr) yx') || gr @! yx'
+          then False
+          else solve yx' bs'
+        where
+          !yx' = add2 (y, x) (toD dir)
+#+END_SRC
+
+#+CAPTION: 全セルの座標の生成 (=vector=)
+#+BEGIN_SRC hs
+U.generate (h * w) (`divMod` w)
+#+END_SRC
+
+kotatsugame さん情報によると、終点の位置を数える問題だったようです。僕は始点の位置を数えてしまいました。単射で助かりました。
+
+** [[https://atcoder.jp/contests/abc341/tasks/abc341_d][D 問題]]
+
+算数を考えていましたがサンプル 3 で TLE. 2 分法で効率化できました。なるほど……！
+
+めぐる式 2 分探索は [[https://zenn.dev/forcia_tech/articles/20191223_advent_calendar][フォルシアの記事]] の図解が一番分かりやすかったです。
+
+** [[https://atcoder.jp/contests/abc341/tasks/abc341_e][E 問題]]
+
+前回の E 問題で遅延セグメント木が出題されたこともあり、躊躇なく使用しました。が、勇み足だったようです。セグメント木 1 本で通ります。
+
+前回の E は緑 diff で、今回の E は水 diff でした。教えはどうなってんだ教えは！
+
+** [[https://atcoder.jp/contests/abc341/tasks/abc341_f][F 問題]]
+
+高い所から低い所まで水が降りていくような問題でした。低いところから順番に解を求めます。部分問題はナップサック問題です。
+
+青 diff にしては実装が軽かったですが、 [[https://atcoder.jp/contests/abc326/tasks/abc326_f][F - Robot Rotation]] などは青 diff 中盤だったので、その辺りに壁があるようです。
+
+* 競技プログラミング
+
+** 動的計画法
+
+EDPC の [[https://atcoder.jp/contests/dp/tasks/dp_d][D - Knapsack 1]] を [[https://atcoder.jp/contests/dp/submissions/50322459][=Max= モノイドで解いてみました]] 。半環の気持ちで =Num= と =Monoid= を使うのは手に馴染みます。
+
+#+BEGIN_QUOTE
+型クラス =Semiring= を作るのはやり過ぎかも……？
+#+END_QUOTE
+
+** ライブラリ
+
+*** =KnownNat=
+
+型レベルリテラル？を GHC の =KnownNat= に移行しました。 =Integer= を返すため、若干遅くなった気もしますが、 =type= として定数を書けるのが格好良くて気に入っています。
+
+#+BEGIN_SRC hs
+{-# LANGUAGE DataKinds #-}
+import Data.Proxy
+import GHC.TypeLits
+
+type MyModulo = (998244353 :: Nat)
+
+-- | 998244353 :: Integer
+example :: Integer
+example = natVal (Proxy @MyModulo)
+#+END_SRC
+
+*** [[https://atcoder.jp/contests/practice2][AtCoder Library Practice Contest]]
+
+[[https://atcoder.jp/contests/practice2][この常設コン]] をやっていました。 [[past][PAST]] と範囲が被ります。やはり PAST でも [[https://github.com/atcoder/ac-library][ac-library]] で解ける問題が出されるわけで、難問の準備に良さそうでした。
+
+- [[https://atcoder.jp/contests/practice2/tasks/practice2_d][D - MaxFlow]]
+  Dinic 法を実装しました。 [[https://github.com/cojna/iota][cojna/iota]] を写経したため高速になりました。やはり compressed sparse row 形式でグラフを持つのが効くようです。
+
+- [[https://atcoder.jp/contests/practice2/tasks/practice2_e][E - MinCostFlow]]
+  最小費用流を実装し、最大費用流と実装を共通化しました。モノイド (=Max= or =Min=) の指定で切り替えできます。 API は整理中……
+
+- [[https://atcoder.jp/contests/practice2/tasks/practice2_h][Two SAT]]
+  2-satisfiability problem は SCC で解ける！　証明はともかく、解き方を理解しました。
+
+- [[https://atcoder.jp/contests/practice2/tasks/practice2_k][K - Range Affine Range Sum]]
+  ゲーム開発でお馴染みの変換行列で AC しました。この方法は斉次座標系／同次座標系 (homogeneous coordinate system), 射影座標系 (projected coordinate system) などで検索すればヒットします。
+
+   遅延セグメント木を修正し、演算子の適用順序を変更しました。たとえば $(B <> A) x$ を計算したつもりで $(A <> B) x$ の計算になっており、デバッグが大変でした。
+
+*** [[https://judge.yosupo.jp/][Library Checker]]
+
+[[https://judge.yosupo.jp/][Library Checker]] も難問揃いで憧れます。
+
+[[https://github.com/yosupo06/library-checker-problems][library-checker-problems]] にてテストケースを生成できる他、 [[https://github.com/online-judge-tools/verification-helper][verification-helper]] の =oj-verify run= にてテストケースのダウンロードと実行を自動化できるようです。便利！
+
+#+BEGIN_QUOTE
+NixOS だと sandbox からの脱獄に失敗しました。便利じゃない！
+#+END_QUOTE
+
+* Misc
+
+朝起きれない時は、俺自身がソラールとなることだ。
+
+** キーボード
+
+[[https://kagizaraya.jp/en/products/miniaxe][Miniaxe]] の在庫補充があり、即注文しました。楽しみです。
+
+** Cyberpunk 2077
+
+ファン作品が面白かったので買いました。他のことが気になって中々プレイできませんが、初めて GPU (RTX 3070) を活用している気がします。
+
+** Web 開発
+
+Emmet 道場と AtCoder diff が欲しいです。
+
+進捗は無ですが、やります！　本当なんです！！
+

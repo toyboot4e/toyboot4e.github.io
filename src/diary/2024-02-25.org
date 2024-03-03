@@ -1,0 +1,223 @@
+#+TITLE: ABC 342, Rolling Hash
+#+DATE: <2024-02-25 Sun>
+#+LINK: cojna/iota https://github.com/cojna/iota
+
+* ABC 342
+
+[[https://atcoder.jp/contests/abc342][ABC 342]] に参加しました。 3 完 (A, B, D) でした。
+
+*** [[https://atcoder.jp/contests/abc342/tasks/abc342_a][A 問題]]
+
+1 問目から強敵が来ました。ワシはアプリカティブ・スタイルが大好きじゃ。
+
+#+BEGIN_SRC hs
+main :: IO ()
+main = do
+  !s <- BS.getLine
+  let !cns = map ((,) <$> head <*> length) . group $ sort (BS.unpack s)
+  let !c = fst . fromJust $ find ((== 1) . snd) cns
+  print . succ . fromJust $ findIndex (== c) (BS.unpack s)
+#+END_SRC
+
+どんな方法でも良いので、淀み無く解けることが大事だと感じました。
+
+*** [[https://atcoder.jp/contests/abc342/tasks/abc342_b][B 問題]]
+
+都度 =elemIndex= を走らせる $O(NQ)$ の解法が簡潔で良いと思います。
+
+マップ (人 x $\mapsto$ その人の位置 i_x) を作れば $O(N)$ で解答できます。
+
+#+BEGIN_SRC hs
+-- 密なマップは配列で実現します
+let !is = U.accumulate (const id) (U.replicate (n + 1) (-1)) $ U.imap (flip (,)) xs
+#+END_SRC
+
+*** [[https://atcoder.jp/contests/abc342/tasks/abc342_c][C 問題]]
+
+**** 置換関数を構築する方法
+
+毎回すべての文字を置換すると、計算量は $O(QN)$ です。ここで文字の置換を $f_i$ として、 $f_q (f_{q - 1} (.. (f_1 \mathit{xs}) .. ))$ の計算を $(f_q \circ f_{q - 1} \circ .. \circ f_1) \mathit{xs}$ に置き換えると、 $O(Q f)$ で計算できます。賢い。
+
+**** Union-Find を使った解法
+
+それぞれの文字をバケットに見立てます。文字の書き換えとは、バケットの中身を別のバケットに移すことだと考えると、 Union-Find を使うことができます。
+
+できません。 Union-Find を使う場合は、破棄した文字に対応する新しい頂点を都度追加し、過去の頂点を引きずらないよう工夫する必要があります。ほげえええええええ
+
+#+BEGIN_DETAILS 撃墜ケース
+#+CAPTION: =hack-case.in=
+#+BEGIN_SRC txt
+3
+abc
+2
+a x
+a z
+#+END_SRC
+
+#+CAPTION: =hack-case.out=
+#+BEGIN_SRC txt
+xbc
+#+END_SRC
+
+見事に =zbc= を出力していました。 =x=, あなたはもう =a= じゃないのよ。あるいは =a z=, を =a' z= と見做します。
+#+END_DETAILS
+
+*** [[https://atcoder.jp/contests/abc342/tasks/abc342_d][D 問題]]
+
+これは面白かったです。 $\{A_{n}\}_{n}$ の走査は一度で済ませたいところですが、 $A_j$ と掛け合わせて平方数となる $A_i$ の取り寄せを高速化する必要があります。実はこれを 1 点に集約できるスロットの持ち方があって、それは $2^3 \cdot 3 \cdot 5^2$ に対する $2 \cdot 3$ のような数です。
+
+言語化が辛いのでコードで:
+
+#+BEGIN_SRC hs
+feat :: Int -> Int
+feat = foldl' (*) (1 :: Int) . mapMaybe f . primeFactors
+  where
+    f (!p, !n)
+      | n `mod` 2 == 0 = Nothing
+      | otherwise = Just p
+#+END_SRC
+
+また $0 = 0^2$ の処理は頑張ります。
+
+*** [[https://atcoder.jp/contests/abc342/tasks/abc342_e][E 問題]]
+
+終点からの Dijkstra 的なアレです。最も遅い時間を求めるため =Max= ヒープを使います。
+
+* 競技プログラミング
+
+** meooow25/haccepted
+
+[[https://github.com/meooow25/haccepted][meooow25/haccepted]] ([[https://meooow25.github.io/haccepted/][API ドキュメント]]) を見逃していました。 Array 派 Haskeller や Codeforces 勢は垂涎かも知れません。
+
+- [[https://github.com/meooow25/haccepted/blob/master/src/Dijkstra.hs][Dijkstra]]
+  さらっとヒープ (木) を自作しています。
+
+- [[https://github.com/meooow25/haccepted/blob/master/src/RerootFold.hs][RerootFold]]
+  全方位木 DP です。良い命名ですね。
+
+** 位取り法
+
+- 辞書順比較のために文字列を整数に単射する際は、無を 0 番、 ='a'= を 1 番とします。
+
+** Rolling Hash
+
+[[https://atcoder.jp/contests/abc331/tasks/abc331_f][ABC 331 - F]] で rolling hash をセグメント木に載せる問題が出ました。セグメント木に乗るデータ型と言えばモノイドですが、鉄則本の rolling hash はヘビー級コンテナの印象でした。
+
+$\{B^{n}\}_n$ の事前計算は不要なのか問題を解決すべく、我々は [[cojna/iota][cojna/iota]] の [[https://cojna.github.io/iota/Data-ByteString-RollingHash.html][Data.RollingHash]] に向かいます……。
+
+*** 群としての rolling hash
+
+鉄則本では累積和を使って rolling hash を実装しました。累積和とは、結合と分解のできるデータ型、つまり群の列が与えられた際に、 $O(N)$ の前処理によって任意の $[l, r]$ 区間データの結合が $O(\mathit{recip \cdot \diamond})$ で得られるアルゴリズムです。
+
+群とは逆元が定義されたモノイドです。狭義の累積和では =csum[r] - csum[l]= を計算しますが、一般的には $L^{-1} \diamond (L \diamond R)$ のような群に対する計算だと捉えられます。
+
+| 型       | 説明                           | 累積和においては                       |
+|----------+--------------------------------+----------------------------------------|
+| 半群     | 結合的な演算 =<>= を持つデータ型 | =scanl' <>= の形で利用                    |
+| モノイド | 単位元 =mempty= が定義された半群  | =scanl'= の初期値、 =csum= の番兵として利用 |
+| 群       | 逆元が定義されたモノイド       | $L^{-1} \diamond (L \diamond R)$ の計算に利用 |
+
+Rolling hash においては $L^{-1} \diamond (L \diamond R)$ の計算に $B^{-n} \bmod p$ が現れ、非常に大きな定数時間の計算が要求されます。したがって $\{B^{n}\}_{n}$ を事前計算し、 $B^{-n_1} B^{n_2} = B^{n_2 - n_1}$ として逆元の計算を打ち消すことで、 $O(1)$ でハッシュ値を計算可能にします。
+
+*** モノイドとしての rolling hash
+
+モノイドとしての rolling hash は $(B^{n}, \mathit{hash})$ です。これがすべて、超簡単！
+
+$$
+\begin{aligned}
+\mathrm{mempty} &:= (B^{1}, 0) \\
+(B^{n_1}, \mathit{hash}_1) \diamond (B^{n_2}, \mathit{hash}_2) &:= (B^{n_1 + n_2}, B^{n_2} \mathit{hash}_1 + \mathit{hash}_2)
+\end{aligned} \\
+$$
+
+セグメント木を使って rolling hash を実装する場合、結合の逆操作は必要ありません。 $\{B_{n}\}_{n}$ を持たなくて良くなったため、理解も実装もシンプルになりました。しかもセグメント木は 1 点更新ができます。唯一、計算量は $O(N \log N)$ となりますが、そこを突く問題は AtCoder では出ません。
+
+回文の判定では逆方向のハッシュ値を計算するため、セグメント木が 2 本必要です。逆方向の =<>= の計算には =flip (<>)= を使えば良く、それは [[https://hackage.haskell.org/package/base-4.19.1.0/docs/Data-Monoid.html#t:Dual][Dual モノイド]] なんだって cojna さんのコードが言っていました。
+
+** cojna/iota の高速化ネタ
+
+*** =MagicHash= と =natVal'=
+
+[[https://hackage.haskell.org/package/base-4.19.1.0/docs/GHC-TypeLits.html#t:KnownNat][KnownNat]] からの値の取得を [[https://hackage.haskell.org/package/base-4.19.1.0/docs/GHC-TypeLits.html#v:natVal][natVal]] から [[https://hackage.haskell.org/package/base-4.19.1.0/docs/GHC-TypeLits.html#v:natVal-39-][natVal']] に変えると少し速くなりました。
+
+#+BEGIN_SRC diff-hs
++{-# LANGUAGE MagicHash #-}
+-import Data.Proxy
++import GHC.Exts
+import GHC.TypeLits
+
+-fromInteger (natVal (Proxy @p))
++fromInteger (natVal' (proxy# @p))
+#+END_SRC
+
+*** =Unbox= の実装を SoA から AoS に
+
+2 要素のタプルは 2 本の unboxed vector に格納されますが、 2 要素の配列は 1 本の unboxed vector に詰めてしまえばいいじゃない！　それが [[https://cojna.github.io/iota/Data-Monoid-Affine.html][Affine]] の =Unbox= の実装です。
+
+効果は……ほぼありません。ただ [[https://cojna.github.io/iota/Data-Mat3x3.html][Mat3x3]] に至っては =primitive= パッケージの [[https://hackage.haskell.org/package/primitive-0.9.0.0/docs/Data-Primitive-ByteArray.html][ByteArray]] にすべての要素を詰め込んでいますから、流石に効くのではないかと思います。
+
+* Misc
+
+** 人
+
+*** Codeforces 時代
+
+少し調べてみました。
+
+#+BEGIN_DETAILS 確認内容
+- 2010-06: tanakh 氏 [[https://codeforces.com/contest/17/submission/76421][Codeforces にて Haskell 初投]]
+- 2011-12: cojna 氏 [[https://codeforces.com/contest/137/submission/971480][Codeforces 初投]]
+- 2014-08: tanakh 氏 Codeforces での提出を C++ に切り替え
+- 2016-01: cojna 氏 Codeforces にて [[https://codeforces.com/contest/621/submission/15698096][vector がコンパイルエラーに]]
+  =vector= は =import= できるが呼び出しできない死に体だった模様 (後述)
+- 2016-07: cojna 氏 [[https://atcoder.jp/contests/agc001/submissions/806245][AtCoder rated 初投]]
+- 2016-09: cojna 氏 [[https://atcoder.jp/contests/code-festival-2016-quala/submissions/890778][AtCoder 2 戦目より shortest 気味なコードを提出]]
+- 2016-10: kotatsugame 氏 [[https://atcoder.jp/contests/code-festival-2016-qualb/submissions/924346][AtCoder 初投]]
+- 2017-06: [[https://codeforces.com/blog/entry/52977][Codeforces では様々なパッケージが使用できない件の共有]]
+  Safe Haskell ([[https://downloads.haskell.org/~ghc/7.8.4/docs/html/users_guide/safe-haskell.html][-XSafe]]) が有効なため、 =vector= も使えなかった模様
+- 2018-02: tanakh 氏 Codeforces での提出を Rust に切り替え
+- 2018-02: [[cojna/iota][cojna/iota]] 初コミット (当初は =algorithm-haskell=)
+- 2018-04: tanakh 氏 [[https://github.com/mattn/vim-tanakh][エディタ拡張と化す]]
+- 2018-08: gksato 氏 [[https://atcoder.jp/contests/abc106/submissions/3029762][AtCoder 初投]]
+- 2018-12: gksato 氏 [[https://codeforces.com/contest/1088/submission/46590601][Codeforces 初投]]
+  =vector= にてコンパイルエラー、以降は array で戦うことに
+- 2019-??: Codeforces のビルド環境更新 (脱 Haskell Platform)
+  =-XSafe= が削除されるも、そもそも =vector= パッケージが消えた模様
+- 2019-02: [[cojna/iota][cojna/iota]] が [[https://github.com/cojna/iota/pull/10/files][現在の名前に変更]]
+- 2019-02: [[https://onlinejudge.u-aizu.ac.jp/challenges/sources/UOA/UAPC/3055][UAPC 3055 E - こたつがめを燃やさないで]] が出題
+- 2019-10: [[https://github.com/cojna/iota/pull/53][=iota= の bundler 誕生]]
+- 2021-12 [[https://codeforces.com/blog/entry/97447][CodeForces の Haskell 環境が 64 bit になった報告]]
+#+END_DETAILS
+
+*** tanakh 氏
+
+[[https://github.com/mattn/vim-tanakh][エディタ拡張となっていた tanakh 氏]] を発見。 [[https://github.com/toyboot4e/tanakh-mode.el][Emacs にポートした]] 。オーバー。
+
+*** DT
+
+[[https://www.youtube.com/@DistroTube][Distro Tube]] から書籍 [[https://www.amazon.com/Super-Wheel-Options-Strategy-Financial/dp/B0CVGGD7P6?qid=1708284820&refinements=p_27:Derek+W.+Taylor&s=books&sr=1-2&text=Derek+W.+Taylor&linkCode=sl1&tag=distrotube-20&linkId=804e4d62b3127fbbf2be13e48125c8e6&language=en_US&ref_=as_li_ss_tl][The Super Wheel Options Strategy]] が出ました (ポチッ) 。一時は xmonad, Evil Emacs, exwm などで夢中になったチャンネルです。 [[https://www.youtube.com/channel/UCqyrm14zcbZw6pdQeHXPF8w][新しいチャンネル]] も観る、かも
+
+** キーボード
+
+[[https://kagizaraya.jp/en/products/miniaxe][Miniaxe]] が届きました。 36 キーで組み立てが楽しみです。今後はさらなる操作性の拡張を目指したいです。
+
+*** Steno キーボード
+
+Stenography は複数キーの同時押しを活かした文字入力の方式です。キー数は 30 を切る程度。近年は [[https://www.openstenoproject.org/][Open Steno Project]] や [[https://stenokeyboards.com/][StenoKeyboards]] が活躍しており、誰でも 2 万円以下で気軽に挑戦できます。
+
+- [[https://www.youtube.com/watch?v=uQZp7RX-h6o&t=249s][Symbols and Shortcuts With Steno! Emily's Symbols And Modifiers]]
+  数値キーとして 8, 4, 2, 1 を用意します。たとえば =5= は =1= と =4= の同時押しです。天才……！
+- [[https://github.com/EPLHREU/emily-symbols][emily-symbols]]
+  Steno キーボードにおけるキーマップ例と図解が載っています。魔境です。
+- [[https://github.com/EPLHREU/emily-modifiers][emily-modifiers]]
+  同上です。
+
+*** 18 キーのキーボード
+
+[[https://www.youtube.com/@BenVallack][Ben Vallack]] のキーボードは steno よりもさらにキー数が少なく、驚異の 18 キーです。しかも一番目立つ位置に『リピートキー』なるものが置かれており、同じキーを 2 回連続で打つ必要が無くなっています。
+
+- [[https://www.youtube.com/watch?v=5RN_4PQ0j1A][Has Your Keyboard Got Too Many Keys? - Ben Vallack (Youtube)]]
+- [[https://www.rousette.org.uk/archives/hold-me-closer-tiny-keyboard/][BSAG » Hold me closer, tiny keyboard]]
+
+PCBWay で [[https://www.pcbway.com/project/shareproject/The_Piano_by_Ben_Vallack_Ultra_minimal_18_key_keyboard_5b2c99e1.html][買えるらしいです……？]]　気になります。
+

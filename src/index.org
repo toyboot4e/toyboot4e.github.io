@@ -46,3 +46,6 @@
 - @@html:<date>2024-01-28</date>@@ [[file:/diary/2024-01-28.org][ABC 338]]
 - @@html:<date>2024-02-04</date>@@ [[file:/diary/2024-02-04.org][ABC 339, React 入門]]
 - @@html:<date>2024-02-11</date>@@ [[file:/diary/2024-02-11.org][ABC 340, exgcd]]
+- @@html:<date>2024-02-18</date>@@ [[file:/diary/2024-02-18.org][ABC 341 / ACL contest]]
+- @@html:<date>2024-02-25</date>@@ [[file:/diary/2024-02-25.org][ABC 342, Rolling Hash]]
+- @@html:<date>2024-03-01</date>@@ [[file:/diary/2024-03-01.org][ABC 343 / 16 キー操作]]
