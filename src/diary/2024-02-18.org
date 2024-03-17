@@ -129,7 +129,7 @@ NixOS だと sandbox からの脱獄に失敗しました。便利じゃない�
 
 ** キーボード
 
-[[https://kagizaraya.jp/en/products/miniaxe][Miniaxe]] の在庫補充があり、即注文しました。楽しみです。
+[[https://kagizaraya.jp/en/products/miniaxe][MiniAxe]] の在庫補充があり、即注文しました。楽しみです。
 
 ** Cyberpunk 2077
 

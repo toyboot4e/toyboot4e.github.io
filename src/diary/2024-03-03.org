@@ -1,5 +1,5 @@
 #+TITLE: ABC 343 / 16 キー操作
-#+DATE: <2024-03-01 Sun>
+#+DATE: <2024-03-03 Sun>
 
 * ABC 343
 
@@ -7,7 +7,7 @@
 
 ** [[https://atcoder.jp/contests/abc343/tasks/abc343_a][A 問題]]
 
-問題分を素直にコードに落としました:
+問題文を素直にコードに落としました:
 
 #+BEGIN_SRC hs
 main :: IO ()
@@ -108,16 +108,16 @@ Keyball 44 を 34 キーで操作するようになりました。 34 はかな�
 複数キーの同時押しを別キーとして解釈する機能です。
 
 #+BEGIN_QUOTE
-Ben Villack 氏は combo のファンでは無いらしく、複数キーを素早く入力 (rolling) したときに誤作動すると述べていました。
+Ben Vallack 氏は combo のファンでは無いらしく、複数キーを素早く入力 (rolling) したときに誤作動すると述べていました。
 #+END_QUOTE
 
 **** [[https://zmk.dev/docs/behaviors/hold-tap][Hold-Tap]]
 
 長押しを別キーとして解釈する機能です。 Hold/Tap の優先度を調整できるっぽいです。
 
-*** Piano (Ben Villack)
+*** Piano (Ben Vallack)
 
-事前知識を蓄えたところで、 Ben Villack 氏の [[https://www.youtube.com/watch?v=5RN_4PQ0j1A][Has Your Keyboard Got Too Many Keys?]] を観ました。 16 キーのキーボード操作を、レイヤ切り替えのみで (combo 無しで) 実現しています。
+事前知識を蓄えたところで、 Ben Vallack 氏の [[https://www.youtube.com/watch?v=5RN_4PQ0j1A][Has Your Keyboard Got Too Many Keys?]] を観ました。 16 キーのキーボード操作を、レイヤ切り替えのみで (combo 無しで) 実現しています。
 
 **** Home-Row Mods
 
@@ -127,7 +127,7 @@ ASDFGHJKL といった home ポジションの row キーの長押しを modifie
 
 **** レイヤ切り替え
 
-主にスマホのシフトキー相当のレイヤ切り替えを行っています。たとえば左手キーの長押しで記号レイヤに入り、右手で記号を入力すると、元のレイヤに戻ってきます。このように、主に *2 回の打鍵で 1 つのキーを入力する* のが Ben Villack 式だと理解しました。
+主にスマホのシフトキー相当のレイヤ切り替えを行っています。たとえば左手キーの長押しで記号レイヤに入り、右手で記号を入力すると、元のレイヤに戻ってきます。このように、主に *2 回の打鍵で 1 つのキーを入力する* のが Ben Vallack 式だと理解しました。
 
 [[https://youtu.be/5RN_4PQ0j1A?si=Oi9f-ieUHe8Fn5SG&t=731][レイヤ切り替えが見れる部分 (12:11)]]
 
@@ -150,9 +150,9 @@ ASDFGHJKL といった home ポジションの row キーの長押しを modifie
 
 * Misc
 
-** Miniaxe
+** MiniAxe
 
-[[https://kagizaraya.jp/en/products/miniaxe][Miniaxe]] の基盤を破壊してしまいました。今年一番落ち込みました。
+[[https://kagizaraya.jp/en/products/miniaxe][MiniAxe]] の基盤を破壊してしまいました。今年一番落ち込みました。
 
 今後は先に基盤にハンダを塗ることにします。再注文しました。
 

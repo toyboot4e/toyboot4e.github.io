@@ -1,0 +1,131 @@
+#+TITLE: ABC 344 / Koka
+#+DATE: <2024-03-10 Sun>
+
+* ABC 344
+
+[[https://atcoder.jp/contests/abc344][ABC 344]] に参加しました。
+
+** [[https://atcoder.jp/contests/abc344/tasks/abc344_a][A 問題]]
+
+=LL|MM|RR= のような入力を =LLRR= に加工します。前後から読んで繋げるのが簡単です。
+
+#+BEGIN_SRC hs
+main=interact$(++)<$>f<*>r.f.r;f=takeWhile(/='|');r=reverse
+#+END_SRC
+
+=extra= パッケージの [[https://hackage.haskell.org/package/extra-1.7.14/docs/Data-List-Extra.html#v:split][split]] を使う解答が上手かったです。
+
+#+BEGIN_SRC hs
+import Data.List.Extra;main=interact$((++)<$>head<*>last).split(=='|')
+#+END_SRC
+
+Kotatsugame さんは [[https://atcoder.jp/contests/abc344/submissions/51021786][正規表現で =|.*|= を削除していました]] 。確かに……！
+
+** [[https://atcoder.jp/contests/abc344/tasks/abc344_b][B 問題]]
+
+入力の各行をひっくり返すだけで良いそうです。厄介な方針を早めに棄却して、迂回作を考え抜くのが大切だと思いました。
+
+#+BEGIN_SRC hs
+main=interact$unwords.reverse.lines
+#+END_SRC
+
+=0= が出るまで =getLine= を繰り返す場合、格好つけて書くとこんな形に:
+
+#+BEGIN_SRC hs
+main :: IO ()
+main = do
+  printList <=< flip fix [] $ \loop acc -> do
+    int >>= \case
+      0 -> return (0 : acc)
+      x -> loop (x : acc)
+#+END_SRC
+
+kotatsugame さんは [[https://atcoder.jp/contests/abc344/submissions/51022070][=cat= の反対の =tac= で通していました]] 。 =tac= は競プロ外でも便利そう……！
+
+** [[https://atcoder.jp/contests/abc344/tasks/abc344_c][C 問題]]
+
+全探索の結果を高速で検索する問題です。あらかじめ全探索を行い、適切なデータ構造に保存します。
+
+1. 疎なマップ (=IntSet=, =HashSet=) に入れる場合
+  $O((N^3 + Q) \log N)$ /程度/ で解けます。 =IntSet= よりも =HashSet= ([[https://hackage.haskell.org/package/unordered-containers][unordered-containers]]) の方が速くてショックでした。
+
+2. 密なマップ (=MArray=, =MVector=) に入れる場合
+  $x \le 3 \cdot 10^8$ のため非効率的に思えます。ところが 1 byte に 8 つの =Bit= を詰めると、わずか $\frac 3 8 10^8$ byte で密なマップを実現できてしまうのですね。 cojna さんが [[https://hackage.haskell.org/package/bitvec][bitvec]] で [[https://atcoder.jp/contests/abc344/submissions/51105629][upsolve されていていました]] 。
+  こんな解答が見れるとは、言語アップデート 2023 で =bitvec= を入れたのはとても良かったですね。
+
+** [[https://atcoder.jp/contests/abc344/tasks/abc344_d][D 問題]]
+
+動的計画法の問題です。煩雑になったので振り返りません。
+
+DP のスタイルは、主に (1) 畳み込みで [[https://qiita.com/H20/items/922cc0a17ba5817f26d7][Next DP]] をやるか、 (2) 可変配列を in-place に更新する の 2 種類です。 EDPC の解説などで整理したいです。
+
+** [[https://atcoder.jp/contests/abc344/tasks/abc344_e][E 問題]]
+
+=IntMap Int Double= を使って順序管理を行ったところ WA. 浮動小数の知識不足です。
+
+#+CAPTION: 浮動小数を魔法の箱だと思っていました
+#+BEGIN_SRC hs
+ghci> (1.0/2.0)^1000
+9.332636185032189e-302
+ghci> (1.0/2.0)^10000
+0.0
+#+END_SRC
+
+=IntMap Int (Int, Int)= を双方向連結リストとすれば AC しました。しかし TLE しなかったのは偶然に過ぎなかったようです。
+
+- naoya さん: =IntMap= の =!=, =insert= を =alter= に変えて AC. =IntMap= を配列に置き換えて高速化
+- gomarine さん: =snoc= を削除して AC
+- qwymb さん: =IntMap= を =HashMap= に置き換えて AC
+- cojna さん: list fusion を効かせた高速化で AC
+- gksato さん: 初手から爆速なマップ (?) を自作して AC
+
+この状況は再現性がありますね。 =IntMap= で通らない時は =HashMap= を検討してみます。
+
+** [[https://atcoder.jp/contests/abc344/tasks/abc344_f][F 問題]]
+
+フローかなと検索していましたが……？　Upsolve します。
+
+* Misc
+
+** 競プロの小説
+
+[[https://www.tokuma.jp/book/b642639.html][アルゴリズムの乙女たち]] を読みました。競プロって小説になるんだ……！
+
+Kotatsugame さんのような歩くライトノベルが存在する以上、彼らを小説で上回るのは困難です。むしろルールを変えて、まだ現実ではあり得ない面白い状況を作り出すことが重要なのかと思いました。現実の方が真似してついて来るような競プロ小説、カモンです。
+
+** Koka 言語
+
+[[https://koka-lang.github.io/][Koka]] 2.4 による AtCoder への挑戦を断念しました。
+
+- =stdin= を読み込む関数がほぼ無い
+  [[https://koka-lang.github.io/koka/doc/std_os_process.html][run-system-read]] で =cat= を呼ぶしか無さそうです。迂回できるなら OK
+- =take-while= のような関数から自作する必要がある
+  しかし Koka 2.4 には =subslice= 関数がありません。これは無理だ〜
+
+** MiniAxe
+
+MiniAxe を入手しました。 1 度基盤を壊してしまったので、はんだ付けサービスを再注文しました。 DIY is not for me..
+
+#+CAPTION: Keyball 44 とのサイズ比較
+[[./img/2024-03-10-miniaxe-2.jpg]]
+
+#+CAPTION: BOOX Palma とのサイズ比較
+[[./img/2024-03-10-miniaxe-1.jpg]]
+
+トラックボールが無くなったので、マウスキーを使っています。
+
+Tap-Hold の動作が [[https://docs.qmk.fm/#/tap_hold?id=permissive-hold][Permissive Hold]] になっていました。設定変更のために、 QMK をビルドしなければ……。
+
+** Nine キーボード
+
+[[https://github.com/bsag/nine-nano][Nine]] キーボードが欲しいです。発注の手間を乗り越えられるのか……。
+
+- [[https://www.rousette.org.uk/archives/introducing-the-nine-keyboard/][BSAG » Introducing the Nine keyboard]]
+- [[https://github.com/bsag/nine-nano/blob/main/docs/build_guide.md][nine-nano/docs/build\under{}guide.md]]
+
+** Youtube
+
+[[https://www.youtube.com/watch?v=Xgu0Ng0t54o][サイドフリップ初心者は何日でできるようになる？【側宙】 - YouTube]]
+
+全動画観ました。なんというナード！　PC だけでもこれにならねばと、初心を思い出しました。
+

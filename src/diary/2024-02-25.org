@@ -199,7 +199,7 @@ import GHC.TypeLits
 
 ** キーボード
 
-[[https://kagizaraya.jp/en/products/miniaxe][Miniaxe]] が届きました。 36 キーで組み立てが楽しみです。今後はさらなる操作性の拡張を目指したいです。
+[[https://kagizaraya.jp/en/products/miniaxe][MiniAxe]] が届きました。 36 キーで組み立てが楽しみです。今後はさらなる操作性の拡張を目指したいです。
 
 *** Steno キーボード
 
