@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 346 / SegTree, ContT - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 346 / SegTree, ContT</h1><p>Mar 24, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
+<h2 id="ABC 346"><a href="#ABC 346">ABC 346</a></h2><p>
+<a href="https://atcoder.jp/contests/abc346">ABC 346</a> に参加しました。<br>
+</p>
+
+<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc346/tasks/abc346_a">A 問題</a></a></h3><p>
+この問題から学べたことは、 <code>f&lt;$&gt;id&lt;*&gt;h</code> は <code>f&lt;*&gt;h</code> と書けることです。<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main=interact$unwords.(zipWith((show.).(*))&lt;*&gt;tail).tail.map read.words
+</code></pre>
+</div>
+
+<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc346/tasks/abc346_b">B 問題</a></a></h3><p>
+<code>w</code>, <code>b</code> の数を数える替わりに、ソートして比較しました。<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main :: IO ()
+main = do
+  (!w, !b) &lt;- ints2
+  let s = concat $ replicate 400 "wbwbwwbwbwbw"
+  let pats = V.generate 200 $ \i -&gt; sort . take (w + b) $ drop i s
+  let res = V.any (== replicate b 'b' ++ replicate w 'w') pats
+  printYn res
+</code></pre>
+</div>
+
+<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc346/tasks/abc346_c">C 問題</a></a></h3><p>
+補集合を考えて、 \(1 .. K\) の総和から \(\mathrm{sum} \{ A_i | A_i \le K\}_i\) を引いて解きます。<br>
+</p>
+
+<p>
+リストを使う場合は、 <code>extra</code> パッケージの <a href="https://hackage.haskell.org/package/extra-1.7.14/docs/Data-List-Extra.html#v:nubSort">nubSort</a> を使って \(\{ A_i | A_i \le K\}\) を作るのが良いと思います。 <code>nub . sort</code> よりちょっと速いです。<br>
+</p>
+
+<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc346/tasks/abc346_d">D 問題</a></a></h3><p>
+DP として解きました。<br>
+</p>
+
+<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc346/tasks/abc346_e">E 問題</a></a></h3><p>
+クエリを逆順に処理する発想が無く、重たい実装になってしまいました。色 <code>0</code> の処理もゴリ押しです。水 diff は堅いと思っていました。<br>
+</p>
+
+<p>
+<a href="https://atcoder.jp/contests/abc346/submissions/51617622">upsolve</a> すると単なる畳み込み (+ 後処理) になりました。<br>
+</p>
+
+<h3 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc346/tasks/abc346_f">F 問題</a></a></h3><p>
+全然解ける気がしないですね……<br>
+</p>
+
+<h2 id="正格セグメント木のボトムアップ実装"><a href="#正格セグメント木のボトムアップ実装">正格セグメント木のボトムアップ実装</a></h2><p>
+正格セグメント木を再実装しました。 \(N=5000\) で \(O(N^2 \log N)\) が通らなかった問題も、強引に AC できるようになりました。<br>
+</p>
+
+<ul><li><a href="https://atcoder.jp/contests/typical90/submissions/51416711">改造前: TLE (&gt; 2.0 secs)</a><br></li>
+<li><a href="https://atcoder.jp/contests/typical90/submissions/51461315">改造後: AC (1,621 secs)</a><br></li>
+</ul>
+
+<p>
+以下では高速化に役立った『再帰実装』、より適切に言えばボトムアップ実装をメモします。<br>
+</p>
+
+<blockquote>
+<p>
+Haskell においては (ほぼ) すべてのループが再帰ですから、ボトムアップ実装と言わねば意味が通らないと思います。<br>
+</p>
+</blockquote>
+
+<h3 id="最高の資料"><a href="#最高の資料">最高の資料</a></h3><p>
+やはりえびちゃん氏の資料が 1 番です。ローリングハッシュのモノイドも出てきました。<br>
+</p>
+
+<p>
+<a href="https://hcpc-hokudai.github.io/archive/structure_segtree_001.pdf">非再帰セグ木サイコー！ 一番すきなセグ木です</a><br>
+</p>
+
+<h3 id="区間取得の 2 種類の実装"><a href="#区間取得の 2 種類の実装">区間取得の 2 種類の実装</a></h3><p>
+典型的なセグメント木は、 \([0, N)\) 区間に対する完全 2 分木です。高さ \(h = \left \lceil \log_2 N \right \rceil\) で、葉の数 \(N = 64\) の場合 \(h = 6\) です。<br>
+</p>
+
+<p>
+セグメント木は \([l, r)\) 区間の畳み込みを \(O(\log N)\), つまり高さ \(h\) に比例する程度の時間で計算できます。この計算の実装は、トップダウンとボトムアップの 2 通りあります。<br>
+</p>
+
+
+<figure>
+<img src="./img/2024-03-24-top-down-fold.png" alt="2024-03-24-top-down-fold.png"><br>
+
+<figcaption><span class="figure-number">Figure 1: </span>トップダウンに畳み込みを求める方法</figcaption>
+</figure>
+
+
+<figure>
+<img src="./img/2024-03-24-bottom-up-fold-1.png" alt="2024-03-24-bottom-up-fold-1.png"><br>
+
+<figcaption><span class="figure-number">Figure 2: </span>ボトムアップに畳み込みを求める方法</figcaption>
+</figure>
+
+<p>
+図に描いた通り、明らかにボトムアップ実装の方が速そうですね。<br>
+</p>
+
+<h4 id="ボトムアップ実装が常に速いのか"><a href="#ボトムアップ実装が常に速いのか">ボトムアップ実装が常に速いのか</a></h4><p>
+ランダムな \([l, r]\) 区間が与えられた場合、トップダウン実装においては 3/4 の確率で最下段のデータを読む必要があります。そのため (厳密な期待値は分からないですが) ボトムアップ実装の方が高速……っぽいです。<br>
+</p>
+
+<p>
+<a href="https://proc-cpuinfo.fixstars.com/2017/07/optimize-segment-tree/">Segment Tree を少し速くする</a> のベンチマークを見ると、ボトムアップ実装が倍程度速いようです。証明は……放っておきます。<br>
+</p>
+
+<h3 id="ボトムアップ実装の詳細"><a href="#ボトムアップ実装の詳細">ボトムアップ実装の詳細</a></h3><p>
+<a href="https://book.mynavi.jp/ec/products/detail/id=135840">PAST 上級本</a> における遅延セグメント木の実装に準拠して実装しました。<br>
+</p>
+
+<h4 id="1-based index"><a href="#1-based index">1-based index</a></h4><p>
+頂点の番号を 1-based index にした場合、親 or 子への移動をビット演算で表現できるため、若干高速になります。左シフト (<a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/Data-Bits.html#v:.-60--60-.">.&lt;&lt;.</a>) で左の子、左シフト後に最初のビットを建てる (<a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/Data-Bits.html#v:.-124-.">.|.</a> 1) ことで右の子、右シフト (<a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/Data-Bits.html#v:.-62--62-.">.&gt;&gt;.</a>) で親頂点に移動できます。<br>
+</p>
+
+
+<figure>
+<img src="./img/2024-03-24-1-based-index.png" alt="2024-03-24-1-based-index.png" width="400px"><br>
+
+</figure>
+
+<p>
+特に遅延セグメント木の実装の際は、 1 回の bit 演算で n 個上の親に移動できるのが便利です。<br>
+</p>
+
+<h4 id="畳み込み"><a href="#畳み込み">畳み込み</a></h4><p>
+畳み込みの計算は、左右から (壁抜け + 天井破り) を繰り返して実施します。セグ木を移動するマリオが見えます。<br>
+</p>
+
+
+<figure>
+<img src="./img/2024-03-24-bottom-up-fold-2.png" alt="2024-03-24-bottom-up-fold-2.png"><br>
+
+</figure>
+
+<p>
+僕の中ではこの処理を glitching fold と呼んでいます。慣れればこっちの方が実装も簡単らしいです。<br>
+</p>
+
+<h3 id="API"><a href="#API">API</a></h3><p>
+<code>Monoid a</code> を制約にしました。今やモノイドを前提としたほうが簡単に見えます。ただし <code>Max Double</code>, <code>Min Double</code> は成り立たないため、咄嗟にモノイドを自作する必要があるかもしれません。<br>
+</p>
+
+<p>
+関数は cojna/iota の <a href="https://cojna.github.io/iota/Data-SegTree-Primal.html">Data.SegTree.Primal</a> を参考に生やしました。 ac-library も似た関数を持っているようです。<br>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">方法</th>
+<th scope="col" class="org-left">命名</th>
+<th scope="col" class="org-left">他の命名候補</th>
+<th scope="col" class="org-left">備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">1 点取得</td>
+<td class="org-left"><code>read</code></td>
+<td class="org-left"><code>get</code></td>
+<td class="org-left">便利です</td>
+</tr>
+
+<tr>
+<td class="org-left">1 点更新</td>
+<td class="org-left"><code>write</code></td>
+<td class="org-left"><code>set</code>, <code>insert</code></td>
+<td class="org-left">既存の頂点なので <code>insert</code> というよりも <code>write</code> でした</td>
+</tr>
+
+<tr>
+<td class="org-left">区間取得</td>
+<td class="org-left"><code>fold</code></td>
+<td class="org-left"><code>prod</code>, <code>query</code>, <code>append</code>, <code>rangeGet</code></td>
+<td class="org-left"><code>unsafeFold</code> かも</td>
+</tr>
+
+<tr>
+<td class="org-left">区間取得 (<code>Maybe</code> 型)</td>
+<td class="org-left"><code>foldMay</code></td>
+<td class="org-left"><code>safeFold</code></td>
+<td class="org-left"><a href="https://hackage.haskell.org/package/safe-0.3.21/docs/Safe.html">safe</a> パッケージに倣います</td>
+</tr>
+
+<tr>
+<td class="org-left">全区間取得</td>
+<td class="org-left"><code>foldAll</code></td>
+<td class="org-left"><code>foldWhole</code>, <code>readAll</code></td>
+<td class="org-left">便利です</td>
+</tr>
+
+<tr>
+<td class="org-left">2 分探索</td>
+<td class="org-left"><code>bsearch</code></td>
+<td class="org-left"><code>lowerBound</code>, <code>upperBound</code></td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="精進談義"><a href="#精進談義">精進談義</a></h3><ul><li>交互 (interleaved) な演習の方が学習効率が高い説<br>
+naoya さんの <a href="https://publish.obsidian.md/naoya/atcoder/ABC345+%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8A#%E6%84%9F%E6%83%B3%E3%81%AA%E3%81%A9">ABC345 振り返り</a> が面白かったです。自分の成長は主観では正しく測れないことを覚えておきたいです。<br></li>
+
+<li>茶色コーダーになるのが難しい件について<br>
+1 色上を目指すのは常に困難が伴います。僕自身、半年かけて何とかレーティングを維持するだけの状況です。クソ……うんち難しいです<br></li>
+</ul>
+
+<h3 id="競プロ見聞録"><a href="#競プロ見聞録">競プロ見聞録</a></h3><h4 id="ADT"><a href="#ADT">ADT</a></h4><p>
+<a href="https://atcoder.jp/contests/adt_top/">AtCoder Daily Training (ADT)</a> で 4 連敗しました。半年前の自分が 50 分で通した問題に 100 分かかり、地頭が既にピークよりも下にあるという困惑と納得がありました。<br>
+</p>
+
+<h4 id="\(\log N\) のサイズ感"><a href="#\(\log N\) のサイズ感">\(\log N\) のサイズ感</a></h4><p>
+<a href="https://atcoder.jp/contests/abc227/tasks/abc227_c">ABC 227 C - ABC conjecture</a> がどうしても解けませんでした。原因は、 2 分探索すると \(\log_2 N\) が大き過ぎて TLE したことでした。<br>
+</p>
+
+<p>
+\(\log_2 10^9\) が 30 程度です。 2 分探索無しでも 300 ms 程度の解答だったので、 10 倍以上の低速化がかかるとすれば通らないわけですね。こういう知識と経験で立ち回ります。<br>
+</p>
+
+<h4 id="集合の分割"><a href="#集合の分割">集合の分割</a></h4><p>
+グループ分けの問題は、集合 DP や DFS によって解ける場合があります (<a href="https://atcoder.jp/contests/abc310/tasks/abc310_d">ABC 310 D - Peaceful Teams</a>, <a href="https://atcoder.jp/contests/typical90/tasks/typical90_as">典型 045 - Simple Grouping</a> など) 。この DFS は <a href="https://ja.wikipedia.org/wiki/%E9%9B%86%E5%90%88%E3%81%AE%E5%88%86%E5%89%B2">集合の分割 (partition)</a> の列挙なんだって ChatGPT が言っていました。<br>
+</p>
+
+<p>
+<a href="https://www.sbcr.jp/product/4815621353/">群論への第一歩</a> にも分割が出て来ます。競プロをやると基礎教養への感度が上がりますね。 TRPG をやると頭が良くなるってひよりんニキも言っていました。<br>
+</p>
+
+<h3 id="ContT で大域脱出"><a href="#ContT で大域脱出"><code>ContT</code> で大域脱出</a></h3><p>
+<code>ContT</code> モナドが (僕の) 注目を集めています:<br>
+</p>
+
+<ul><li><a href="https://atcoder.jp/contests/abc345/submissions/51403780">cojna さんの提出</a><br></li>
+<li><a href="https://takoeight0821.hatenablog.jp/entry/2024/03/12/150448">継続モナドで立ち向かうローンパターンとEither地獄</a><br></li>
+</ul>
+
+<p>
+継続とは何かを棚に上げ、試しに使用してみます。たとえば \(2^n \ge x_0\) を満たす \(2^n\) を求める関数があります:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">-- &gt;&gt;&gt; calc1 14
+-- 16
+calc1 :: Int -&gt; Int
+calc1 x0 = until (&gt;= x0) (* 2) (1 :: Int)
+</code></pre>
+</div>
+
+<p>
+これを Rust で手続き的に実装すればこんな形で:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-rust">fn calc_2(x0: usize) -&gt; usize {
+    let mut x = x0;
+    while x &lt; x0 {
+        x *= 2;
+    }
+    x
+}
+</code></pre>
+</div>
+
+<p>
+<code>Cont</code> を使って手続き的な実装にすれば以下の通り:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">calc2 :: Int -&gt; Int
+calc2 x0 = evalCont $ callCC $ \exit -&gt;
+  flip fix (1 :: Int) $ \loop acc -&gt; do
+    when (acc &gt;= x0) $
+      exit acc
+    loop (acc * 2)
+</code></pre>
+</div>
+
+<p>
+無駄に <code>ContT</code> を使えばこうなります:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">calc2' :: Int -&gt; Int
+calc2' x0 = (`execState` (1 :: Int)) $ evalContT $ callCC $ \exit -&gt; do
+  fix $ \loop -&gt; do
+    acc &lt;- get
+    when (acc &gt;= x0) $
+      exit ()
+    put (2 * acc)
+    loop
+</code></pre>
+</div>
+
+<p>
+<code>ST</code> や <code>IO</code> などの文脈の元でも <code>ContT</code> が使用できます。 <code>for_ ..</code> を大量にネストする場合などは、 <code>Cont</code> / <code>ContT</code> を使うと実装が簡単になります。パフォーマンスと利便性を両立するためには、もう少し深い理解が必要かもしれません (なぜか遅かったので……) 。<br>
+</p>
+
+<p>
+なお <code>PrimMonad m =&gt; PrimMonad (ContT r m)</code> が提供されているため、たとえば <code>ContT ()(ST s)</code> は <code>PrimMonad</code> を実装します。 <code>lift</code> する必要はありません。<br>
+</p>
+
+<h3 id="キーボード"><a href="#キーボード">キーボード</a></h3><p>
+Ben Vallack はレイヤ切り替えのみで 16 キー操作を実現しましたが、 <a href="https://inkeys.wiki/en/keymaps/taipo">taipo</a> レイアウトにおいてはキーの同時押しを使用します。常に両手で交互にタイピングできるのが強みのようです。やってみたい。<br>
+</p>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/FI8Imy3krnA?si=-CnImwU29-1Itorb" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+<p>
+こちらの方も同時押しを嗜まれるようです。<br>
+</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">参考にならないでしょうが、私の自作キーボードにおけるキー数の減らし方。その考え方の1例を雑な画像にしてみた。<br>指を伸ばして押下するよりも、Home Row絡みの複数キー同時打鍵の方がずっと楽だわ……という発見に基づき、Combo(ZMK)を多用しています。<br><br>Different strokes for different folks♪ <a href="https://t.co/Ki23JTacrt">pic.twitter.com/Ki23JTacrt</a></p>&mdash; がらくたでぶ (@garakuta_dev) <a href="https://twitter.com/garakuta_dev/status/1750455855286522182?ref_src=twsrc%5Etfw">January 25, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+
+<p>
+この方の操作方法は不明ですが、やはり変態なのは間違いないでしょう。<br>
+</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">[xiao ble] [pmw3610 トラックボール] [16キー V字] [lofreeスイッチ] [17mm 狭ピッチ]<br><br>第一段階クリア〜<br><br>あとは、Bluetooth入力・バッテリー運用・ケース作成ですな〜<a href="https://twitter.com/hashtag/%E8%87%AA%E4%BD%9C%E3%82%AD%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89?src=hash&amp;ref_src=twsrc%5Etfw">#自作キーボード</a> <a href="https://t.co/1isuuh7HE7">pic.twitter.com/1isuuh7HE7</a></p>&mdash; 非ガンダム (@kaiiiiiiiiiiiak) <a href="https://twitter.com/kaiiiiiiiiiiiak/status/1768062051568812145?ref_src=twsrc%5Etfw">March 13, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+
+<p>
+この手のキーボードを簡単に入手したいものですが……。<br>
+</p>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
