@@ -140,6 +140,6 @@ withByteString bs k f = case B.toForeignPtr bs of
 </p>
 
 <p>
-<code>ByteString</code> の内側が <a href="https://hackage.haskell.org/package/base-4.18.1.0/docs/Foreign-ForeignPtr-Safe.html#t:ForeignPtr">ForeignPtr</a> なのは謎です。 <a href="https://github.com/haskell/bytestring/issues/193">Quit using ForeignPtr in favor of ByteArray# #193</a> を見ると、 <code>ByteString</code> は FFI にも使用されるらしいので、仕方が無いのかもしれません。<br>
+<code>ByteString</code> の内側が <a href="https://hackage.haskell.org/package/base-4.18.1.0/docs/Foreign-ForeignPtr-Safe.html#t:ForeignPtr">ForeignPtr</a> なのは謎です。 <a href="https://github.com/haskell/bytestring/issues/193">Quit using ForeignPtr in favor of ByteArray# #193</a> を見ると、 <code>ByteString</code> は FFI にも使用されるらしいので、そういうものかもしれません。<br>
 </p>
 </main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
