@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 348 / IO, StateT - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 348 / IO, StateT</h1><p>Apr  7, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
+<h2 id="ABC 348"><a href="#ABC 348">ABC 348</a></h2><p>
+<a href="https://atcoder.jp/contests/abc348">ABC 348</a> に参加しました。<br>
+</p>
+
+<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc348/tasks/abc348_a">A 問題</a></a></h3><p>
+<a href="https://atcoder.jp/contests/abc348/submissions/52117259">cojna さんの提出</a> が痺れます。 <a href="https://atcoder.jp/contests/abc348/submissions/52065070">Shortest</a> もシンプルで凄い。<br>
+</p>
+
+<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc348/tasks/abc348_b">B 問題</a></a></h3><p>
+最小・最大を読み間違えており、なかなか大変な問題だと思っていました。<br>
+</p>
+
+<p>
+実装のコツは、<br>
+</p>
+
+<ol><li>小数の精度不足を恐れ、距離の 2 乗を整数値として使う<br></li>
+<li>最小値の検索 (<code>minimum</code>) と <code>findIndex (== theMin)</code> の実行を分ける<br></li>
+</ol>
+
+<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc348/tasks/abc348_c">C 問題</a></a></h3><p>
+<code>maximum . IM.elems . IM.fromListWith min</code> で解きました。<br>
+</p>
+
+<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc348/tasks/abc348_d">D 問題</a></a></h3><p>
+体力が \(E_i\) 回復する、と誤読して Bellman-Ford 法を試そうとしていました。 BFS を撃ちまくる富豪プレイで通ります。<br>
+</p>
+
+<p>
+考察成功の後もバグが取れず、あきまへんな……。<br>
+</p>
+
+<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc348/tasks/abc348_e">E 問題</a></a></h3><p>
+全包囲木 DP として解きたかったのですが、ライブラリがバグっていました。やはりテストを書いて CI/CD を動かす必要があります。<br>
+</p>
+
+<h2 id="入出力"><a href="#入出力">入出力</a></h2><p>
+<code>cojna/iota</code> の <a href="https://cojna.github.io/iota/Data-PrimParser.html">PrimParser</a> を読み、 <code>StateT</code> ベースのパーサを実装しました。<br>
+</p>
+
+<h3 id="ベンチマーク"><a href="#ベンチマーク">ベンチマーク</a></h3><p>
+ベンチマーク代わりに <a href="https://judge.yosupo.jp/">Library Checker</a> の <a href="https://judge.yosupo.jp/problem/many_aplusb">Many A + B</a> を解きました。大量の \(A_i + B_i\) を求める問題です。提出一覧がこちら:<br>
+</p>
+
+<table>
+<caption class="t-above"><span class="table-number">Table 1:</span> 提出一覧</caption>
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">提出</th>
+<th scope="col" class="org-left">入力処理</th>
+<th scope="col" class="org-left">出力処理</th>
+<th scope="col" class="org-left">時間</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><a href="https://judge.yosupo.jp/submission/198488">提出 1 (リスト)</a></td>
+<td class="org-left"><code>getLine</code></td>
+<td class="org-left"><code>String</code> (n 回出力)</td>
+<td class="org-left">TLE (5,000 ms 超え)</td>
+</tr>
+
+<tr>
+<td class="org-left"><a href="https://judge.yosupo.jp/submission/198525">提出 2</a></td>
+<td class="org-left"><code>BS.getLine</code></td>
+<td class="org-left"><code>String</code> (n 回出力)</td>
+<td class="org-left">593 ms</td>
+</tr>
+
+<tr>
+<td class="org-left"><a href="https://judge.yosupo.jp/submission/198522">提出 3</a></td>
+<td class="org-left"><code>BS.getLine</code></td>
+<td class="org-left"><code>Builder</code> (1 回出力)</td>
+<td class="org-left">326 ms</td>
+</tr>
+
+<tr>
+<td class="org-left"><a href="https://judge.yosupo.jp/submission/200020">提出 4 (<code>StateT</code>)</a></td>
+<td class="org-left"><code>BS.getContents</code></td>
+<td class="org-left"><code>Builder</code> (1 回出力)</td>
+<td class="org-left">301 ms</td>
+</tr>
+
+<tr>
+<td class="org-left"><a href="https://judge.yosupo.jp/submission/198534">提出 5 (<code>PrimParser</code>)</a></td>
+<td class="org-left"><code>PrimParser</code></td>
+<td class="org-left"><code>Builder</code> (1 回出力)</td>
+<td class="org-left">137 ms</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+主な学びは次のとおりです:<br>
+</p>
+
+<ol><li>入力処理には <code>ByteString</code> を使った方が圧倒的に速い (TLE 解消)<br></li>
+<li>出力に <code>Builder</code> を使うと速い (-270 ms)<br></li>
+<li>入力に <code>BS.getContents</code> を使うと僅かに速い (-25 ms)<br></li>
+<li><code>PrimParser</code> (<code>cojna/iota</code>) の入力処理は速い (-164 ms)<br></li>
+</ol>
+
+<p>
+<code>PrimParser</code> の内部では、 <code>ByteString</code> をバイト単位で読んでいます。シンプルな内容ながら、 <code>UnboxedTuples</code> に染まっているため難解です。<br>
+</p>
+
+<h3 id="StateT ベースのパーサ"><a href="#StateT ベースのパーサ"><code>StateT</code> ベースのパーサ</a></h3><p>
+僕は <code>StateT</code> ベースの単純なパーサを使うことにしました。最小構成は以下の形です:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">runIO :: StateT BS.ByteString IO a -&gt; IO a
+runIO = (BS.getContents &gt;&gt;=) . evalStateT
+
+int' :: (MonadState BS.ByteString m) =&gt; m Int
+int' = state $ fromJust . BS.readInt . BS.dropWhile isSpace
+
+main :: IO ()
+main = runIO $ do
+  {- .. -}
+</code></pre>
+</div>
+
+<h4 id="入力の分離"><a href="#入力の分離">入力の分離</a></h4><p>
+<code>main</code> 関数と <code>solve</code> 関数を分離すると、 <code>solve</code> 関数は標準入力以外にも使うことができます:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+solve = {- .. -}
+
+main :: IO ()
+main = runIO solve
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">ghci&gt; -- 文字列リテラルを入力とする
+ghci&gt; evalStateT solve $ BS.pack "test input"
+ghci&gt; -- ファイル内容を入力とする
+ghci&gt; evalStateT solve =&lt;&lt; BS.readFile "test-case.in"
+</code></pre>
+</div>
+
+<h4 id="入力処理の柔軟性"><a href="#入力処理の柔軟性">入力処理の柔軟性</a></h4><p>
+使用例です。憧れの <code>(,) &lt;$&gt; int &lt;*&gt; int</code> が書けます:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main :: IO ()
+main = runIO $ do
+  (!a, !t) &lt;- (,) &lt;$&gt; int' &lt;*&gt; int'
+  liftIO $ print $ 5 * a + t - 1
+</code></pre>
+</div>
+
+<p>
+<code>int1 = pred &lt;$&gt; int</code> とすれば、 1-based index から 0-based index への変換も自然に行えます:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main :: IO ()
+main = runIO $ do
+  -- t は 0-based index に変換して読む
+  (!a, !t) &lt;- (,) &lt;$&gt; int' &lt;*&gt; int1'
+  liftIO $ print $ 5 * a + t
+</code></pre>
+</div>
+
+<p>
+<code>StateT</code> を使ったおかげで、入力をちょっとずつ読むのが得意です。行単位の読み出し (<code>getLine</code>) に拘束されません:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">-- q 個のクエリをパースする例
+qs &lt;- U.replicateM q $ int' &gt;&gt;= \case
+  -- クエリ 1 は 3-tuple
+  1 -&gt; (1 :: Int,,) &lt;$&gt; int' &lt;*&gt; int'
+  -- クエリ 2 は 2-tuple
+  2 -&gt; (2,,-1) &lt;$&gt; int'
+</code></pre>
+</div>
+
+<h4 id="print"><a href="#print"><code>print</code></a></h4><p>
+<code>runIO</code> 以下では、 <code>print</code> は <code>liftIO . print</code> の形で呼び出す必要があります。<br>
+</p>
+
+<p>
+<code>MonadIO</code> を使った <code>print</code> 関数を自作した場合、 <code>liftIO</code> 無しで呼び出しできます。また出力に <code>bytestring</code> の <code>Builder</code> を使うと、多少高速になります。<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">putBSB :: (MonadIO m) =&gt; BSB.Builder -&gt; m ()
+putBSB = liftIO . BSB.hPutBuilder stdout
+
+class ShowBSB a where
+  showBSB :: a -&gt; BSB.Builder
+
+printBSB :: (ShowBSB a, MonadIO m) =&gt; a -&gt; m ()
+printBSB = putBSB . (&lt;&gt; BSB.char7 '\n') . showBSB
+
+main :: IO ()
+main = runIO $ do
+  (!a, !t) &lt;- (,) &lt;$&gt; int' &lt;*&gt; int'
+  printBSB $ 5 * a + t
+</code></pre>
+</div>
+
+<h4 id="インタラクティブ問題"><a href="#インタラクティブ問題">インタラクティブ問題</a></h4><p>
+<code>BS.getContents</code> を実行すると制御が帰って来ませんから、行単位で読めば良い気がします。ごちゃつきますが……:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main :: IO ()
+main = do
+  (!a, !t) &lt;- evalState ((,) &lt;$&gt; int' &lt;*&gt; int1') &lt;$&gt; BS.getLine
+  {- .. -}
+</code></pre>
+</div>
+
+<p>
+以上、 <code>cojna</code> さんや <code>gksato</code> さんのスタイルに迫って来たかと思います。これで悔いの無い所までやり込んだ手応えがあります。<br>
+</p>
+
+<h3 id="Builder の中身？"><a href="#Builder の中身？"><code>Builder</code> の中身？</a></h3><p>
+ByteString <code>Builder</code> の中身が気になっています。 <a href="https://hackage.haskell.org/package/bytestring-0.12.1.0/docs/Data-ByteString-Builder-Internal.html">Data.ByteString.Builder.Internal</a> を見ると、なんとなく差分リストが思い起こされる見た目です。<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">newtype Builder = Builder (forall r. BuildStep r -&gt; BuildStep r)
+</code></pre>
+</div>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
