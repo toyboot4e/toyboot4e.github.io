@@ -2,7 +2,7 @@
 #+DATE: <2023-02-14 Tue>
 #+LINK: nixos https://nixos.org/
 
-前回購入した PC パーツが届きました。 PC を組み立てて Linux 環境を整えます。
+[[./2023-01-14-buy-new-machine.html][前回]] 購入した PC パーツが届きました。 PC を組み立てて Linux 環境を整えます。
 
 贅沢最高！
 

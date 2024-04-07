@@ -1,0 +1,171 @@
+#+TITLE: ABC 348 / IO, StateT
+#+DATE: <2024-04-07 Sun>
+#+LINK: iota https://github.com/cojna/iota
+
+* ABC 348
+
+[[https://atcoder.jp/contests/abc348][ABC 348]] に参加しました。
+
+** [[https://atcoder.jp/contests/abc348/tasks/abc348_a][A 問題]]
+
+[[https://atcoder.jp/contests/abc348/submissions/52117259][cojna さんの提出]] が痺れます。 [[https://atcoder.jp/contests/abc348/submissions/52065070][Shortest]] もシンプルで凄い。
+
+** [[https://atcoder.jp/contests/abc348/tasks/abc348_b][B 問題]]
+
+最小・最大を読み間違えており、なかなか大変な問題だと思っていました。
+
+実装のコツは、
+
+1. 小数の精度不足を恐れ、距離の 2 乗を整数値として使う
+2. 最大値の検索 (=maximum=) と添字の発見 (~findIndex (== theMax)~) の実行を分ける
+
+** [[https://atcoder.jp/contests/abc348/tasks/abc348_c][C 問題]]
+
+=maximum . IM.elems . IM.fromListWith min= で解きました。
+
+** [[https://atcoder.jp/contests/abc348/tasks/abc348_d][D 問題]]
+
+体力が $E_i$ 回復する、と誤読して Bellman-Ford 法を試そうとしていました。 BFS を撃ちまくる富豪プレイで通ります。
+
+考察成功の後もバグが取れず、あきまへんな……。
+
+** [[https://atcoder.jp/contests/abc348/tasks/abc348_e][E 問題]]
+
+全包囲木 DP として解きたかったのですが、ライブラリがバグっていました。やはりテストを書いて CI/CD を動かす必要があります。
+
+* 入出力
+
+=cojna/iota= の [[https://cojna.github.io/iota/Data-PrimParser.html][PrimParser]] を読み、 =StateT= ベースのパーサを実装しました。
+
+** ベンチマーク
+
+ベンチマーク代わりに [[https://judge.yosupo.jp/][Library Checker]] の [[https://judge.yosupo.jp/problem/many_aplusb][Many A + B]] を解きました。大量の $A_i + B_i$ を求める問題です。提出一覧がこちら:
+
+#+CAPTION: 提出一覧
+| 提出               | 入力処理      | 出力処理          | 時間               |
+|--------------------+---------------+-------------------+--------------------|
+| [[https://judge.yosupo.jp/submission/198488][提出 1 (リスト)]]    | =getLine=        | =String= (n 回出力)  | TLE (5,000 ms 超え) |
+| [[https://judge.yosupo.jp/submission/198525][提出 2]]             | =BS.getLine=     | =String= (n 回出力)  | 593 ms              |
+| [[https://judge.yosupo.jp/submission/198522][提出 3]]             | =BS.getLine=     | =Builder= (1 回出力) | 326 ms              |
+| [[https://judge.yosupo.jp/submission/200020][提出 4 (=StateT=)]]     | =BS.getContents= | =Builder= (1 回出力) | 301 ms              |
+| [[https://judge.yosupo.jp/submission/198534][提出 5 (=PrimParser=)]] | =PrimParser=     | =Builder= (1 回出力) | 137 ms              |
+
+主な学びは次のとおりです:
+
+1. 入力処理には =ByteString= を使った方が圧倒的に速い (TLE 解消)
+2. 出力に =Builder= を使うと速い (-270 ms)
+3. 入力に =BS.getContents= を使うと僅かに速い (-25 ms)
+4. =PrimParser= (=cojna/iota=) の入力処理は速い (-164 ms)
+
+=PrimParser= の内部では、 =ByteString= をバイト単位で読んでいます。シンプルな内容ながら、 =UnboxedTuples= に染まっているため難解です。
+
+** =StateT= ベースのパーサ
+
+僕は =StateT= ベースの単純なパーサを使うことにしました。最小構成は以下の形です:
+
+#+BEGIN_SRC hs
+runIO :: StateT BS.ByteString IO a -> IO a
+runIO = (BS.getContents >>=) . evalStateT
+
+int' :: (MonadState BS.ByteString m) => m Int
+int' = state $ fromJust . BS.readInt . BS.dropWhile isSpace
+
+main :: IO ()
+main = runIO $ do
+  {- .. -}
+#+END_SRC
+
+*** 入力の分離
+
+=main= 関数と =solve= 関数を分離すると、 =solve= 関数は標準入力以外にも使うことができます:
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = {- .. -}
+
+main :: IO ()
+main = runIO solve
+#+END_SRC
+
+#+BEGIN_SRC hs
+ghci> -- 文字列リテラルを入力とする
+ghci> evalStateT solve $ BS.pack "test input"
+ghci> -- ファイル内容を入力とする
+ghci> evalStateT solve =<< BS.readFile "test-case.in"
+#+END_SRC
+
+*** 入力処理の柔軟性
+
+使用例です。憧れの =(,) <$> int <*> int= が書けます:
+
+#+BEGIN_SRC hs
+main :: IO ()
+main = runIO $ do
+  (!a, !t) <- (,) <$> int' <*> int'
+  liftIO $ print $ 5 * a + t - 1
+#+END_SRC
+
+=int1 = pred <$> int= とすれば、 1-based index から 0-based index への変換も自然に行えます:
+
+#+BEGIN_SRC hs
+main :: IO ()
+main = runIO $ do
+  -- t は 0-based index に変換して読む
+  (!a, !t) <- (,) <$> int' <*> int1'
+  liftIO $ print $ 5 * a + t
+#+END_SRC
+
+=StateT= を使ったおかげで、入力をちょっとずつ読むのが得意です。行単位の読み出し (=getLine=) に拘束されません:
+
+#+BEGIN_SRC hs
+-- q 個のクエリをパースする例
+qs <- U.replicateM q $ int' >>= \case
+  -- クエリ 1 は 3-tuple
+  1 -> (1 :: Int,,) <$> int' <*> int'
+  -- クエリ 2 は 2-tuple
+  2 -> (2,,-1) <$> int'
+#+END_SRC
+
+*** =print=
+
+=runIO= 以下では、 =print= は =liftIO . print= の形で呼び出す必要があります。
+
+=MonadIO= を使った =print= 関数を自作した場合、 =liftIO= 無しで呼び出しできます。また出力に =bytestring= の =Builder= を使うと、多少高速になります。
+
+#+BEGIN_SRC hs
+putBSB :: (MonadIO m) => BSB.Builder -> m ()
+putBSB = liftIO . BSB.hPutBuilder stdout
+
+class ShowBSB a where
+  showBSB :: a -> BSB.Builder
+
+printBSB :: (ShowBSB a, MonadIO m) => a -> m ()
+printBSB = putBSB . (<> BSB.char7 '\n') . showBSB
+
+main :: IO ()
+main = runIO $ do
+  (!a, !t) <- (,) <$> int' <*> int'
+  printBSB $ 5 * a + t
+#+END_SRC
+
+*** インタラクティブ問題
+
+=BS.getContents= を実行すると制御が帰って来ませんから、行単位で読めば良い気がします。ごちゃつきますが……:
+
+#+BEGIN_SRC hs
+main :: IO ()
+main = do
+  (!a, !t) <- evalState ((,) <$> int' <*> int1') <$> BS.getLine
+  {- .. -}
+#+END_SRC
+
+以上、 =cojna= さんや =gksato= さんのスタイルに迫って来たかと思います。これで悔いの無い所までやり込んだ手応えがあります。
+
+** =Builder= の中身？
+
+ByteString =Builder= の中身が気になっています。 [[https://hackage.haskell.org/package/bytestring-0.12.1.0/docs/Data-ByteString-Builder-Internal.html][Data.ByteString.Builder.Internal]] を見ると、なんとなく差分リストが思い起こされる見た目です。
+
+#+BEGIN_SRC hs
+newtype Builder = Builder (forall r. BuildStep r -> BuildStep r)
+#+END_SRC
+

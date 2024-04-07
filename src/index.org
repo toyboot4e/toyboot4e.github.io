@@ -51,3 +51,6 @@
 - @@html:<date>2024-03-03</date>@@ [[file:/diary/2024-03-03.org][ABC 343 / 16 キー操作]]
 - @@html:<date>2024-03-10</date>@@ [[file:/diary/2024-03-10.org][ABC 344 / Koka]]
 - @@html:<date>2024-03-17</date>@@ [[file:/diary/2024-03-17.org][ABC 345 / BL, QMK (MiniAxe)]]
+- @@html:<date>2024-03-24</date>@@ [[file:/diary/2024-03-24.org][ABC 346 / SegTree, ContT]]
+- @@html:<date>2024-03-31</date>@@ [[file:/diary/2024-03-31.org][ABC 347 / Fastest]]
+- @@html:<date>2024-04-07</date>@@ [[file:/diary/2024-04-07.org][ABC 348 / IO, StateT]]

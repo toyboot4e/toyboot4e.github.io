@@ -1,0 +1,117 @@
+#+TITLE: ABC 347 / Fastest
+#+DATE: <2024-03-31 Sun>
+
+* ABC 347
+
+[[https://atcoder.jp/contests/abc347][ABC 347]] に参加しました。
+
+** [[https://atcoder.jp/contests/abc347/tasks/abc347_a][A 問題]]
+
+=map . filter= の形で解きました。
+
+#+BEGIN_SRC hs
+main=interact$unwords.((\k->map(show.(`div`k)).filter((==0).(`mod`k)))<$>head<*>tail).tail.map read.words
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc347/tasks/abc347_b][B 問題]]
+
+=(l, r)= 区間を全探索することで連続部分列 (スライス) を列挙します。 =String= や =ByteString= のスライスを得るには =take len . drop l= を使います。 =vector= だったらズバり =slice= 関数があります。
+
+ユニークな連続部分列をカウントするためには、 =length . nubSort= とか =Map.size . Map.fromList= を使います。
+
+** [[https://atcoder.jp/contests/abc347/tasks/abc347_c][C 問題]]
+
+今日が何曜日であるかを適当に決めると、すべての予定日が連続した休日に収まります。そのため =(`mod` (a + b))= で作った曜日の列を 2 週間分に倍加して、固定幅で走査しました。
+
+たとえば以下の曜日に予定が入っている場合、
+
+#+BEGIN_SRC txt
+ 0  3  9
+#+END_SRC
+
+予定一覧を 2 週間分に倍加して、
+
+#+BEGIN_SRC txt
+ 0  3  9 10 13 19
+#+END_SRC
+
+幅 3 のウィンドウで見た時に、ウィンドウの含む日数が A 日以内のものがあるか調べます。ウィンドウの左右端の日数の差に注目すれば良いです:
+
+#+BEGIN_SRC txt
+ 0  3  9 10 13 19
+ <----->: 10 日
+    <----->: 8 日
+       <----->: 4 日
+#+END_SRC
+
+ところで長さ =a + b= の配列を作ると RE になって混乱しました。たぶん =Heap exhausted;= で死ぬために MLE にはなりません。メモリ使用量が異常に多かったことに注目するべきでした。
+
+** [[https://atcoder.jp/contests/abc347/tasks/abc347_d][D 問題]]
+
+算数で解けそうな問題ですが、あえて全探索に寄せて解法を考え始めます。うおおお！ (略)
+
+** [[https://atcoder.jp/contests/abc347/tasks/abc347_e][E 問題]]
+
+シミュレーション過程をメモしてみると、位置と時間の 2 軸が見えてきます。位置方向の和を一括処理するのは困難ですが、時間方向の和は一括処理できることに気付きます。
+
+** [[https://atcoder.jp/contests/abc347/tasks/abc347_f][F 問題]]
+
+DP だと思ったのですが、敷き詰める順番がトポロジカル順にならないですね……。解けません。問題ジャンルすら見えないようです。
+
+類題は [[https://atcoder.jp/contests/abc223/tasks/abc223_e][ABC 223 E - Placing Rectangles]] および [[https://atcoder.jp/contests/arc074/tasks/arc074_a][ARC 074 A]] らしいです。
+
+* Misc
+
+** =join=
+
+本日も cojna さんの影を追い、 [[https://hackage.haskell.org/package/base-4.19.1.0/docs/Control-Monad.html#v:join][join]] を学びました。配列の倍加などに利用できます。
+
+#+BEGIN_SRC hs
+ghci> import Control.Monad
+ghci> join (++) [1,2,3]
+[1,2,3,1,2,3]
+#+END_SRC
+
+=join= もしっかり [[https://ziphil.com/other/other/12.html][ポイントフリー Haskell メモ — Avendia]] に載っていました。このページは時間が経てば立つほど真価を発揮しています。
+
+** Fastest
+
+Dijkstra を貼っただけで Fastest が取れてしまいました。
+
+[[./img/2024-03-31-fastest.png]]
+
+穴場だと思うので、 fastest が欲しければおすすめです。 [[https://atcoder.jp/contests/past202203-open/submissions?f.LanguageName=&f.Status=AC&f.Task=past202203_k&f.User=&orderBy=time_consumption][提出一覧]]
+
+** 最小全域木 (MST)
+
+Kruskal 法の実装が =filterM= でスッキリしました。 =Buffer= も =unfoldrM= も =mayMaybeM= も必要無いようです。なるほどな〜……
+
+#+BEGIN_SRC hs
+{-# INLINE collectMST #-}
+collectMST :: (Ord w, U.Unbox w) => Int -> U.Vector (Vertex, Vertex, w) -> U.Vector (Vertex, Vertex, w)
+collectMST nVerts edges = runST $ do
+  uf <- newMUF nVerts
+  flip U.filterM edges' $ \(!v1, !v2, !_) -> do
+    -- 新しく unify した場合は @True@ を返却する
+    unifyMUF uf v1 v2
+  where
+    edges' = U.modify (VAI.sortBy (comparing thd3)) edges
+#+END_SRC
+
+** =PrimParser= が気になる
+
+Haskell すきー星人最大の謎の 1 つ、 [[https://cojna.github.io/iota/Data-PrimParser.html][PrimParser]] の解読を始めました。入口はこれですね。
+
+#+BEGIN_SRC hs
+withByteString :: B.ByteString -> (a -> IO r) -> PrimParser a -> IO r
+withByteString bs k f = case B.toForeignPtr bs of
+  (fp, o, I# len#) -> do
+    withForeignPtr (plusForeignPtr fp o) $ \(Ptr p#) -> do
+      case runPrimParser# f (plusAddr# p# len#) p# of
+        (# _, x #) -> k x
+#+END_SRC
+
+=ByteString= 中のバイト列に [[https://hackage.haskell.org/package/bytestring-0.12.1.0/docs/Data-ByteString-Internal.html#v:toForeignPtr][toForeignPtr]] でアクセスし、手動でパースする方針と見ました。 =UnboxedTuples= に染まっていて面食らいます。
+
+=ByteString= の内側が [[https://hackage.haskell.org/package/base-4.18.1.0/docs/Foreign-ForeignPtr-Safe.html#t:ForeignPtr][ForeignPtr]] なのは謎です。 [[https://github.com/haskell/bytestring/issues/193][Quit using ForeignPtr in favor of ByteArray# #193]] を見ると、 =ByteString= は FFI にも使用されるらしいので、そういうものかもしれません。
+
