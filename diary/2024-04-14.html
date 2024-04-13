@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 349 - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 349</h1><p>Apr 14, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
+<h2 id="ABC 349"><a href="#ABC 349">ABC 349</a></h2><p>
+<a href="https://atcoder.jp/contests/abc349">ABC 349</a> に参加しました。<br>
+</p>
+
+<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc349/tasks/abc349_a">A 問題</a></a></h3><p>
+<code>未知の数 + 既知の数の和 = 0</code> の等式変形で <code>未知の数 = -既知の数の和</code> が分かります。<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main=interact$show.(0-).sum.map read.tail.words
+</code></pre>
+</div>
+
+<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc349/tasks/abc349_b">B 問題</a></a></h3><p>
+いかにも <code>accumArray</code> な問題ですが、確かに <code>map length . group . sort</code> を使って解くこともできます。<br>
+</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">頭が手続き型なので B から C++ にしたけど，やろうと思えばワンライナーでききるにゃんね……<br>null . filter ( /= 2 ) . map length . group . sort . map length . group . sort</p>&mdash; とーらす🌸📦🌕✨🌂🎧 (@torus711) <a href="https://twitter.com/torus711/status/1779151906193219686?ref_src=twsrc%5Etfw">April 13, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+
+<div class="org-src-container">
+<pre><code class="src language-hs">import Data.List
+main=interact$(\b-&gt;if b then"Yes"else"No").all((==2).length).group.sort.map length.group.sort.init
+</code></pre>
+</div>
+
+<blockquote>
+<p>
+<code>interact</code> は改行文字を含むため、 <code>init</code> で切り落とします。<br>
+</p>
+</blockquote>
+
+<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc349/tasks/abc349_c">C 問題</a></a></h3><p>
+確かに <code>isSubsequenceOf</code> を使うのが良さそうです。<br>
+</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">完全に頭から抜けてたけど Haskell に isSubsequenceOf あるので C はこっちの方が楽だったっぽ</p>&mdash; とーらす🌸📦🌕✨🌂🎧 (@torus711) <a href="https://twitter.com/torus711/status/1779145642054660554?ref_src=twsrc%5Etfw">April 13, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+
+<div class="org-src-container">
+<pre><code class="src language-hs">import Data.Char
+import Data.List
+main=interact$g.f.map (map toLower.reverse).words
+f[s,('x':t)]=isSubsequenceOf t s
+f[s,t]=isSubsequenceOf t s
+g True="Yes"
+g _="No"
+</code></pre>
+</div>
+
+<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc349/tasks/abc349_d">D 問題</a></a></h3><p>
+とにかく右へ伸ばす貪欲で解けるようですが、 <code>l = 0</code> の処理を間違えていました。また \(2^n\) を作らなくても解けるとのことで、写経しました。<br>
+</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">D はリファクタリングするとこれで OK か<br>L = 0 の場合を特別扱いしたのが敗因だったな<br>教訓: 慌ててそういう横着してはいけない <a href="https://t.co/fW2zGECcS5">pic.twitter.com/fW2zGECcS5</a></p>&mdash; naoya (@naoya_ito) <a href="https://twitter.com/naoya_ito/status/1779156685405483361?ref_src=twsrc%5Etfw">April 13, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main=interact$(\x-&gt;unwords.map show$(length x-1:).concat$zipWith(\a b-&gt;[a,b])x(tail x)).h.map read.words
+n j r 0=(2^).last$takeWhile((&lt;=r).(2^))j
+n j r l=(\x-&gt;if x==[]then r+1 else l+2^last x)$takeWhile(\i-&gt;l+2^i&lt;=r&amp;&amp;l`mod`2^i==0)j
+h[l,r]=takeWhile(&lt;=r)$iterate(n[0..]r)l
+</code></pre>
+</div>
+
+<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc349/tasks/abc349_e">E 問題</a></a></h3><p>
+ゲームの問題です。ゲーム DP の基本を思い出して解きます。<br>
+</p>
+
+<p>
+枝刈りしなくても通る成約なので、愚直に解くことができます。逆に、不要な処理を追加しないことが重要な問題でした。<br>
+</p>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
