@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 350 - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 350</h1><p>Apr 21, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
+<h2 id="ABC 350"><a href="#ABC 350">ABC 350</a></h2><p>
+<a href="https://atcoder.jp/contests/abc350">ABC 350</a> に参加しました。<br>
+</p>
+
+<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc350/tasks/abc350_a">A 問題</a></a></h3><p>
+愚直に解きます。 90 bytes..<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main=interact$(\b-&gt;if b then"Yes"else"No").((&amp;&amp;)&lt;$&gt;(`elem`[1..349])&lt;*&gt;(/=316)).read.drop 3
+</code></pre>
+</div>
+
+<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc350/tasks/abc350_b">B 問題</a></a></h3><p>
+でんてぃすとあおき！<br>
+</p>
+
+<p>
+<code>accumArray</code> で解くのが堅いです。この問題も <code>group . sort</code> で解けるんですね。<br>
+</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">B in Haskell，むずかしいライブラリは知らないのでこう<br>print $ ( n - ) $ length $ filter odd $ map length $ group $ sort as</p>&mdash; とーらす🌸📦🌕✨🌂🎧 (@torus711) <a href="https://twitter.com/torus711/status/1781685041665548680?ref_src=twsrc%5Etfw">April 20, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>
+これを借りて AC します。 108 bytes<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">import Data.List
+main=interact$show.((-).head&lt;*&gt;length.filter(odd.length).group.sort.drop 2).map read.words
+</code></pre>
+</div>
+
+<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc350/tasks/abc350_c">C 問題</a></a></h3><p>
+離れた要素も入れ替えできます。最適でなくても良いので、左から順番に値を確定させて行けば良いです。値 → 添字と添字 → 値、両方向のマップを持って解きます。<br>
+</p>
+
+<p>
+やはり <a href="https://atcoder.jp/contests/abc350/submissions/52568385">gksato さんの提出</a> が上手かったです。<br>
+</p>
+
+<ul><li><code>VU.imap (flip (,))</code><br>
+値 → 添字のマップ (配列) を生成します。<br></li>
+<li><a href="https://www.stackage.org/haddock/lts-21.6/vector-0.13.0.0/Data-Vector-Generic.html#v:update">VU.update</a><br>
+<code>VU.accumulate (const id)</code> と同じです。<br></li>
+<li><code>(`VU.mapMaybeM` VU.generate n id) $ ..</code><br>
+値の入れ替えが起きた場合のみ <code>Just (i, i')</code> を返すことで、操作履歴が得られます。<br></li>
+<li><code>VUM.swap</code><br>
+配列中の値の入れ替えを行います。<br></li>
+</ul>
+
+<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc350/tasks/abc350_d">D 問題</a></a></h3><p>
+連結成分の任意の頂点同士の間に辺が引けることが分かります。<br>
+</p>
+
+<p>
+答えは \(\sum_i {\binom {{頂点数}_i} {2} - {辺の数}_i}\) です。連結成分中の辺の数を追跡しつつ、 Union-Find を使って解きました。<br>
+</p>
+
+<p>
+ところが式整理すると \(\sum_i {\binom {{頂点数}_i} {2}} - 辺の数の和\) となるため、さらに手抜きできるようです。以下となりました:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !m) &lt;- ints2'
+  !es &lt;- U.replicateM m ints11'
+
+  -- 連結成分のリストを取得
+  let !gr = buildSG (0, n - 1) $ swapDupeU es
+  let !res = map length . snd $ allComponentsSG gr
+
+  printBSB $ subtract m $ sum $ map (\v -&gt; v * pred v `div` 2) res
+</code></pre>
+</div>
+
+<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc350/tasks/abc350_e">E 問題</a></a></h3><p>
+トポロジカル順に答えを求めるのが無理そうで、諦めて F に行きました。<br>
+</p>
+
+<p>
+メモ化再帰で解けるようです。そうじゃん……！<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !a, !x, !y) &lt;- ints4'
+
+  let calc :: Int -&gt; IM.IntMap Double -&gt; (Double, IM.IntMap Double)
+      calc i im = case IM.lookup i im of
+        Just cached -&gt; (cached, im)
+        Nothing -&gt; runState (calcDp i) im
+      calcDp :: Int -&gt; State (IM.IntMap Double) Double
+      calcDp i = do
+        !e1 &lt;- (intToDouble x +) &lt;$&gt; state (calc (i `div` a))
+        -- E[i] = \sum_j {1/6 (y + E[i/j])}_{1..6}
+        -- E[i] = 1/5 (6y + \sum_j {E[i/j]}_{1..5})
+        !e2 &lt;- do
+          !k2 &lt;- state (calc (i `div` 2))
+          !k3 &lt;- state (calc (i `div` 3))
+          !k4 &lt;- state (calc (i `div` 4))
+          !k5 &lt;- state (calc (i `div` 5))
+          !k6 &lt;- state (calc (i `div` 6))
+          return $ (intToDouble y * 6.0 + k2 + k3 + k4 + k5 + k6) / 5.0
+        let !e = min e1 e2
+        modify' $ IM.insert i e
+        return e
+
+  printBSB $ fst $ calc n $ IM.singleton 0 0.0
+</code></pre>
+</div>
+
+<p>
+反射で解ける問題しか解けないのが課題です。<br>
+</p>
+
+<h3 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc350/tasks/abc350_f">F 問題</a></a></h3><p>
+もぅﾏﾁﾞ無理。。<br>
+</p>
+
+<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="汎用 Dijkstra"><a href="#汎用 Dijkstra">汎用 Dijkstra</a></h3><p>
+重さ <code>w</code> の制約を <code>(U.Unbox w, Monoid w, Ord w)</code> にするのが汎用性があって良さそうです。 <code>Sum Int</code>, <code>Max Int</code>, <code>Down (Sum Int)</code> など……<br>
+</p>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
