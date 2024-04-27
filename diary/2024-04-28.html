@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ARC 176 / ABC 351 / ライブラリのテスト - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ARC 176 / ABC 351 / ライブラリのテスト</h1><p>Apr 28, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
+<h2 id="ARC 176"><a href="#ARC 176">ARC 176</a></h2><p>
+<a href="https://atcoder.jp/contests/arc176">ARC 176</a> に参加しました。 0 完で緑コーダーになりました。フォォォォォ!<br>
+</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">ARC0完は良いことなのである。<br>ARC0完の経験が、未来の難問の解き方を教えてくれるのである。</p>&mdash; 明智重蔵 (@AketiJyuuzou) <a href="https://twitter.com/AketiJyuuzou/status/1782053341608173687?ref_src=twsrc%5Etfw">April 21, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/arc176/tasks/arc176_a">A 問題</a></a></h3><p>
+グリッドの大半は空白です。 K 行 K 列は KxK の交点を埋めることで条件を満たすため、空白はほぼ機械的に埋めることができます。<br>
+</p>
+
+<p>
+余りおよび初期配置に選ばれた行・列は、二部マッチングの問題として解くか、行毎に確定させる貪欲法で解けました。解説は未確認です。<br>
+</p>
+
+<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/arc176/tasks/arc176_b">B 問題</a></a></h3><p>
+mod だったりしますか……？<br>
+</p>
+
+<h2 id="ABC 351"><a href="#ABC 351">ABC 351</a></h2><p>
+<a href="https://atcoder.jp/contests/abc351">ABC 351</a> に参加しました。水色コーダーになりました。<br>
+</p>
+
+<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc351/tasks/abc351_a">A 問題</a></a></h3><p>
+和の差に 1 を加算します。<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main=interact$show.(\(xs,ys)-&gt;sum xs-sum ys+1).splitAt 9.map read.words
+</code></pre>
+</div>
+
+<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc351/tasks/abc351_b">B 問題</a></a></h3><p>
+2 つの行列の間で値の異なる (i, j) 成分を表示します。<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main=do n&lt;-readLn;interact$(\(x,y)-&gt;unwords.map show$head[[i`div`n+1,i`mod`n+1]|(i,(a,b))&lt;-zip[0..](zip x y),a/=b]).splitAt(n*n).filter(/='\n')
+</code></pre>
+</div>
+
+<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc351/tasks/abc351_c">C 問題</a></a></h3><p>
+\(2^{A_i}\) とありますが、倍すると指数は +1 されます。なかなか理解が追いつきませんでした。<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main=interact$show.f[-1].tail.map read.words
+f(x:y:r)n|x==y=f(x+1:r)n
+f x[]=length x-1
+f(x:r)(i:n)|True=f(i:x:r)n
+</code></pre>
+</div>
+
+<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc351/tasks/abc351_d">D 問題</a></a></h3><p>
+基本は flood fill ですが、磁石の側に寄ると動けなくなる設定が面白かったです。 1 つのセルを 2 回以上使う場合があります。<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-txt">.#..
+....     &lt;-- # の下の `.` には左からも右からも辿り着ける
+</code></pre>
+</div>
+
+<p>
+磁石に隣接したセルの訪問は <code>IntSet</code> に記録し、その他のセルの訪問は <code>MVector</code> に保存することで解きました。分岐が増えたので良くなかったです。<br>
+</p>
+
+<p>
+<code>Bool</code> ではなく識別番号の配列を持てば悩みは減るようです。世代番号とか識別番号とか、数値のトリックは好きです。<br>
+</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">AHC高速化典型だ（何回目のBFSかを持つ） <a href="https://t.co/0tAUsrMpmb">https://t.co/0tAUsrMpmb</a></p>&mdash; TERRY (@terry_u16) <a href="https://twitter.com/terry_u16/status/1784219917212172381?ref_src=twsrc%5Etfw">April 27, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>
+Union-Find を使った解法は大変そうで避けました。ただ本質的には同じことをした気がします。<br>
+</p>
+
+<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc351/tasks/abc351_e">E 問題</a></a></h3><p>
+典型 90 問のマンハッタン距離の知識が問われました。常設コンに出た知識は ABC に出して良いという暗黙のルールがある気がします (たとえば Chokudai Speedrun の転倒数など) 。<br>
+</p>
+
+<p>
+<a href="https://zenn.dev/link/comments/2ed2069667779b">関連のメモ</a> を参照して AC できました。部分問題はセグメント木を使って強引に解きましたが、 \(O(N)\) 解法が無いか気になりました。<br>
+</p>
+
+<p>
+こういう時は <a href="https://atcoder.jp/contests/abc351/submissions/52866902">gksato さんの提出</a> を見れば解決します。よく公式解説の最終形態のようなコードが載っています:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">procCoord :: VU.Vector Int -&gt; Int
+procCoord = VU.sum
+  . VU.imap (\ !i !x -&gt; x * (2 * i - (n - 1)))
+  . VU.modify VAIT.sort
+</code></pre>
+</div>
+
+<p>
+美しい。まだ考察についていけず読解を諦めることが多いのですが、美しさを感じる頻度は増えています。 C++ をぶち抜く提出は、実装以上にロジックが効いているかもしません。<br>
+</p>
+
+<blockquote>
+<p>
+昔はいわゆる『異常高速化』の賜物かと想像していました。<br>
+</p>
+</blockquote>
+
+<h3 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc351/tasks/abc351_f">F 問題</a></a></h3><p>
+平面走査で解きました。平面走査というのは、何らかのデータ構造 (主にセグメント木) を持って一度のループで答えを求めることだと思います。<br>
+</p>
+
+<p>
+僕のセグメント木は <code>cojna</code> さん準拠になったので任意の <code>Monoid</code> が載ります。ということは <code>(Sum Int, Sum Int)</code> がそのまま <code>Monoid</code> として載るので、ちょっと楽でした。<br>
+</p>
+
+<p>
+式変形による別解が良かったです。<br>
+</p>
+
+<blockquote class="twitter-tweet"><p lang="zxx" dir="ltr"><a href="https://t.co/VbIgHSHuZN">pic.twitter.com/VbIgHSHuZN</a></p>&mdash; Syntax_Error_ (@SyNtAx_error_1) <a href="https://twitter.com/SyNtAx_error_1/status/1784231586411794534?ref_src=twsrc%5Etfw">April 27, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<h2 id="ライブラリのテストを作る"><a href="#ライブラリのテストを作る">ライブラリのテストを作る</a></h2><p>
+前々回、全包囲木 DP のライブラリがバグっておりレーティングを落としたのが無念でした。リファクタリングの際には新しいバグが発生していない保証が必要です。<br>
+</p>
+
+<p>
+以下では <code>tasty</code> と <code>oj-verify</code> の導入を紹介します。自作テストと過去提出のリジャッジによってバグを防ぎます。<br>
+</p>
+
+<h3 id="2 分法の QuickCheck (tasty-test-quickcheck)"><a href="#2 分法の QuickCheck (tasty-test-quickcheck)">2 分法の QuickCheck (<code>tasty-test-quickcheck</code>)</a></h3><p>
+2 分法の実装を Int/Double および monadic/pure 関数の間で共通化しました (<a href="https://github.com/toyboot4e/toy-lib/commit/d3824fb231b4d0aeb32236a561d78f6cf1f8a7c9">コミット</a>) 。<br>
+</p>
+
+<blockquote>
+<p>
+スパゲッティ気味ですが、元ネタは <a href="https://zenn.dev/forcia_tech/articles/20191223_advent_calendar">二分探索を絶対にバグらせないで書く方法</a>, <a href="https://github.com/cojna/iota">iota</a> および <a href="https://byorgey.wordpress.com/2023/01/01/competitive-programming-in-haskell-better-binary-search/">Competitive programming in Haskell: better binary search</a> のつもりです。<br>
+</p>
+</blockquote>
+
+<p>
+リファクタリングの後、 QuickCheck (<code>tasty-test-quickcheck</code>) で 10,000 ケースを試しました。 2 分法は愚直解が作りやすいので、 <code>quickcheck</code> によるランダムテストが適しています。これで安心です (<a href="https://github.com/toyboot4e/toy-lib/commit/d3824fb231b4d0aeb32236a561d78f6cf1f8a7c9#diff-4e37a223b215bdf35a70f3564ecf7c0c677d828be9bf424ef3153d6c7b9d144f">tests/Tests/Bisect.hs</a>)。巨人読みました。<br>
+</p>
+
+<p>
+<code>quickcheck</code> は <code>tasty</code> 越しに使用しました。 <a href="https://github.com/UnkindPartition/tasty">tasty</a> は <code>hspec</code> や <code>quickcheck</code> を始めとした各種テストツールを統一的に扱うためのフレームワークです。 <a href="https://github.com/haskell/vector">vector</a> でも採用されているので、 vector のコードを参考にしたいと思います。<br>
+</p>
+
+<h3 id="oj-verify"><a href="#oj-verify"><code>oj-verify</code></a></h3><p>
+<a href="https://github.com/online-judge-tools/verification-helper">verifycation-helper</a> (<code>oj-verify</code>) はローカル環境でシステムテストを実施するツールです。ファイル中に指定の書式で問題リンクを書くだけで使用できます:<br>
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 1: </span><code>graph/shortest_path.hs</code></label><pre><code class="src language-diff-hs diff-highlight">+-- verification-helper: PROBLEM https://judge.yosupo.jp/problem/shortest_path
+main :: IO ()
+main = do
+  {- .. -}
+</code></pre>
+</div>
+
+<p>
+<code>oj-verify run graph/shortest_path.hs</code> によりテストを実行できます。自作ライブラリを <code>import</code> する解答ファイルをストックしておけば、 <code>oj-verify</code> を実行する度に (ほぼ) バグが無いことを保証できると思います。<br>
+</p>
+
+<p>
+ただ <code>oj</code> 関連のツールはドキュメントに改善の余地があります。以下では <code>oj-verify</code> 導入のハマり所を紹介します。<br>
+</p>
+
+<h4 id="インストール (NixOS)"><a href="#インストール (NixOS)">インストール (NixOS)</a></h4><p>
+<code>verification-helper</code> は nixpkgs に登録されていません。しかし仮想環境では PyPI の Python パッケージを使用できます:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-sh">$ # 仮想環境 (=venv=) の有効化
+$ python -m venv .venv
+(.venv) $ source .venv/bin/activate.fish # activate (fish の場合)
+(.venv) $ pip3 install online-judge-verify-helper
+
+$ # 終了
+(.venv) $ deactivate
+</code></pre>
+</div>
+
+<p>
+<code>direnv</code> 起動時に <code>.venv/bin/activate.fish</code> を自動読み込みできたら良さそうです。<br>
+</p>
+
+<h4 id="使い方"><a href="#使い方">使い方</a></h4><p>
+このまま <code>oj-verify run</code> にかけると <code>runghc</code> で実行されてしまいます。コンパイル・実行コマンドを上書きするため、設定ファイルを作成しました:<br>
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 2: </span><code>.verify-helper/config.yaml</code></label><pre><code class="src language-toml">[languages.haskell]
+# '{path}' は `graph/shortest_paths.hs` のように展開する
+compile = "./compile {path}"
+execute = "./execute {path}"
+
+verification_file_suffix = ".hs"
+
+# 参考:
+# https://online-judge-tools.github.io/verification-helper/document.ja.html
+</code></pre>
+</div>
+
+<ul><li>NixOS だとコマンド実行に難があったため、シェルスクリプトを挟んでいます (<code>./compile</code>, <code>./execute</code>) 。シェルシクリプトの中で <code>cargo run shortest_path-exe</code> のようなコマンドを実行します。<br></li>
+<li><code>.verify-helper/</code> は必ず CWD の直下とみなされます。サブディレクトリを使いたい場合は面倒です。<br></li>
+</ul>
+
+<p>
+なんとか <code>oj-verify</code> によりシステムテストを実行できるようになりました:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-sh">$ oj-verify run graph/shortest_path.hs
+INFO:onlinejudge_verify.config:config file loaded: .verify-helper/config.toml: {'languages': {'haskell': {'compile': './compile {path}', 'execute': './execute {path}', 'verification_file_suffix': '.hs'}}}
+WARNING:onlinejudge_verify.languages.list:config.toml: languages.haskell: Adding new languages using `config.toml` is supported but not recommended. Please consider making pull requests for your languages, see https://github.com/kmyk/online-judge-verify-helper/issues/116
+WARNING:onlinejudge_verify.languages.user_defined:The functionality to list dependencies of .hs file is not implemented yet.
+INFO:onlinejudge_verify.verify:verify: graph/shortest_path.hs
+INFO:onlinejudge_verify.verify:problem: https://judge.yosupo.jp/problem/shortest_path
+INFO:onlinejudge_verify.languages.user_defined:$ ./compile graph/shortest_path.hs
+
+.. (中略)
+
+[INFO] slowest: 3.929285 sec  (for almost_line_00)
+[WARNING] max memory: 1427.680000 MB  (for almost_line_01)
+[SUCCESS] test success: 29 cases
+WARNING:onlinejudge_verify.languages.user_defined:The functionality to list dependencies of .hs file is not implemented yet.
+INFO:onlinejudge_verify.verify:all tests succeeded
+</code></pre>
+</div>
+
+<h4 id="メモ"><a href="#メモ">メモ</a></h4><ul><li>Library Checker のテストケースはローカルで生成してくれます<br></li>
+<li>AtCoder のテストケースは Dropbox からダウンロードする必要があり、 Dropbox の API トークンが要求されます (確認中……)<br>
+<ul><li>テストケースをダウンロードするための standalone なツールが欲しいです<br></li>
+</ul></li>
+<li><code>oj-verify run -j N</code> で並列実行できるようです (<code>oj</code> と同様)<br></li>
+<li><code>oj-verify run &lt;path&gt;</code> を 2 回実行すると、ソースファイルに更新が無い場合は以前の結果を返してくれます<br>
+<ul><li>強制的に再実行させるには……？ (たぶん <code>touch</code> で十分？)<br></li>
+</ul></li>
+</ul>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
