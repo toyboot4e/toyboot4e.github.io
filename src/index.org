@@ -54,3 +54,6 @@
 - @@html:<date>2024-03-24</date>@@ [[file:/diary/2024-03-24.org][ABC 346 / SegTree, ContT]]
 - @@html:<date>2024-03-31</date>@@ [[file:/diary/2024-03-31.org][ABC 347 / Fastest]]
 - @@html:<date>2024-04-07</date>@@ [[file:/diary/2024-04-07.org][ABC 348 / IO, StateT]]
+- @@html:<date>2024-04-14</date>@@ [[file:/diary/2024-04-14.org][ABC 349]]
+- @@html:<date>2024-04-21</date>@@ [[file:/diary/2024-04-21.org][ABC 350]]
+- @@html:<date>2024-04-28</date>@@ [[file:/diary/2024-04-28.org][ARC 176 / ABC 351 / ライブラリのテスト]]

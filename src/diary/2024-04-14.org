@@ -1,0 +1,71 @@
+#+TITLE: ABC 349
+#+DATE: <2024-04-14 Sun>
+
+* ABC 349
+
+[[https://atcoder.jp/contests/abc349][ABC 349]] に参加しました。
+
+** [[https://atcoder.jp/contests/abc349/tasks/abc349_a][A 問題]]
+
+=未知の数 + 既知の数の和 = 0= の等式変形で ~未知の数 = -既知の数の和~ が分かります。
+
+#+BEGIN_SRC hs
+main=interact$show.(0-).sum.map read.tail.words
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc349/tasks/abc349_b][B 問題]]
+
+いかにも =accumArray= な問題ですが、確かに =map length . group . sort= を使って解くことができます。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">頭が手続き型なので B から C++ にしたけど，やろうと思えばワンライナーでききるにゃんね……<br>null . filter ( /= 2 ) . map length . group . sort . map length . group . sort</p>&mdash; とーらす🌸📦🌕✨🌂🎧 (@torus711) <a href="https://twitter.com/torus711/status/1779151906193219686?ref_src=twsrc%5Etfw">April 13, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+#+END_EXPORT
+
+#+BEGIN_SRC hs
+import Data.List
+main=interact$(\b->if b then"Yes"else"No").all((==2).length).group.sort.map length.group.sort.init
+#+END_SRC
+
+#+BEGIN_QUOTE
+=interact= は改行文字を含むため、 =init= で切り落とします。
+#+END_QUOTE
+
+** [[https://atcoder.jp/contests/abc349/tasks/abc349_c][C 問題]]
+
+確かに =isSubsequenceOf= を使うのが良さそうです。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">完全に頭から抜けてたけど Haskell に isSubsequenceOf あるので C はこっちの方が楽だったっぽ</p>&mdash; とーらす🌸📦🌕✨🌂🎧 (@torus711) <a href="https://twitter.com/torus711/status/1779145642054660554?ref_src=twsrc%5Etfw">April 13, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+#+END_EXPORT
+
+#+BEGIN_SRC hs
+import Data.Char
+import Data.List
+main=interact$g.f.map (map toLower.reverse).words
+f[s,('x':t)]=isSubsequenceOf t s
+f[s,t]=isSubsequenceOf t s
+g True="Yes"
+g _="No"
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc349/tasks/abc349_d][D 問題]]
+
+とにかく右へ伸ばす貪欲で解けるようですが、 ~l = 0~ の処理を間違えていました。また $2^n$ は =^= 演算子で計算して良いとのことで、写経しました。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">D はリファクタリングするとこれで OK か<br>L = 0 の場合を特別扱いしたのが敗因だったな<br>教訓: 慌ててそういう横着してはいけない <a href="https://t.co/fW2zGECcS5">pic.twitter.com/fW2zGECcS5</a></p>&mdash; naoya (@naoya_ito) <a href="https://twitter.com/naoya_ito/status/1779156685405483361?ref_src=twsrc%5Etfw">April 13, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+#+END_EXPORT
+
+#+BEGIN_SRC hs
+main=interact$(\x->unwords.map show$(length x-1:).concat$zipWith(\a b->[a,b])x(tail x)).h.map read.words
+n j r 0=(2^).last$takeWhile((<=r).(2^))j
+n j r l=(\x->if x==[]then r+1 else l+2^last x)$takeWhile(\i->l+2^i<=r&&l`mod`2^i==0)j
+h[l,r]=takeWhile(<=r)$iterate(n[0..]r)l
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc349/tasks/abc349_e][E 問題]]
+
+ゲームの問題です。ゲーム DP の基本を思い出して解きます。
+
+枝刈りしなくても通る成約なので、愚直に解くことができます。逆に、不要な処理を追加しないことが重要な問題でした。
+

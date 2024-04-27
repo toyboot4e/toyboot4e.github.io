@@ -1,0 +1,203 @@
+#+TITLE: ARC 176 / ABC 351 / ライブラリのテスト
+#+DATE: <2024-04-28 Sun>
+
+* ARC 176
+
+[[https://atcoder.jp/contests/arc176][ARC 176]] に参加しました。 0 完で緑コーダーになりました。フォォォォォ!
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">ARC0完は良いことなのである。<br>ARC0完の経験が、未来の難問の解き方を教えてくれるのである。</p>&mdash; 明智重蔵 (@AketiJyuuzou) <a href="https://twitter.com/AketiJyuuzou/status/1782053341608173687?ref_src=twsrc%5Etfw">April 21, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+** [[https://atcoder.jp/contests/arc176/tasks/arc176_a][A 問題]]
+
+グリッドの大半は空白です。 K 行 K 列は KxK の交点を埋めることで条件を満たすため、空白はほぼ機械的に埋めることができます。
+
+余りおよび初期配置に選ばれた行・列は、二部マッチングの問題として解くか、行毎に確定させる貪欲法で解けました。解説は未確認です。
+
+** [[https://atcoder.jp/contests/arc176/tasks/arc176_b][B 問題]]
+
+mod だったりしますか……？
+
+* ABC 351
+
+[[https://atcoder.jp/contests/abc351][ABC 351]] に参加しました。水色コーダーになりました。
+
+** [[https://atcoder.jp/contests/abc351/tasks/abc351_a][A 問題]]
+
+和の差に 1 を加算します。
+
+#+BEGIN_SRC hs
+main=interact$show.(\(xs,ys)->sum xs-sum ys+1).splitAt 9.map read.words
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc351/tasks/abc351_b][B 問題]]
+
+2 つの行列の間で値の異なる (i, j) 成分を表示します。
+
+#+BEGIN_SRC hs
+main=do n<-readLn;interact$(\(x,y)->unwords.map show$head[[i`div`n+1,i`mod`n+1]|(i,(a,b))<-zip[0..](zip x y),a/=b]).splitAt(n*n).filter(/='\n')
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc351/tasks/abc351_c][C 問題]]
+
+$2^{A_i}$ とありますが、倍すると指数は +1 されます。なかなか理解が追いつきませんでした。
+
+#+BEGIN_SRC hs
+main=interact$show.f[-1].tail.map read.words
+f(x:y:r)n|x==y=f(x+1:r)n
+f x[]=length x-1
+f(x:r)(i:n)|True=f(i:x:r)n
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc351/tasks/abc351_d][D 問題]]
+
+基本は flood fill ですが、磁石の側に寄ると動けなくなる設定が面白かったです。 1 つのセルを 2 回以上使う場合があります。
+
+#+BEGIN_SRC txt
+.#..
+....     <-- # の下の `.` には左からも右からも辿り着ける
+#+END_SRC
+
+磁石に隣接したセルの訪問は =IntSet= に記録し、その他のセルの訪問は =MVector= に保存することで解きました。分岐が増えたので良くなかったです。
+
+=Bool= ではなく識別番号の配列を持てば悩みは減るようです。世代番号とか識別番号とか、数値のトリックは好きです。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">AHC高速化典型だ（何回目のBFSかを持つ） <a href="https://t.co/0tAUsrMpmb">https://t.co/0tAUsrMpmb</a></p>&mdash; TERRY (@terry_u16) <a href="https://twitter.com/terry_u16/status/1784219917212172381?ref_src=twsrc%5Etfw">April 27, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+Union-Find を使った解法は大変そうで避けました。ただ本質的には同じことをした気がします。
+
+** [[https://atcoder.jp/contests/abc351/tasks/abc351_e][E 問題]]
+
+典型 90 問のマンハッタン距離の知識が問われました。常設コンに出た知識は ABC に出して良いという暗黙のルールがある気がします (たとえば Chokudai Speedrun の転倒数など) 。
+
+[[https://zenn.dev/link/comments/2ed2069667779b][関連のメモ]] を参照して AC できました。部分問題はセグメント木を使って強引に解きましたが、 $O(N)$ 解法が無いか気になりました。
+
+こういう時は [[https://atcoder.jp/contests/abc351/submissions/52866902][gksato さんの提出]] を見れば解決します。よく公式解説の最終形態のようなコードが載っています:
+
+#+BEGIN_SRC hs
+procCoord :: VU.Vector Int -> Int
+procCoord = VU.sum
+  . VU.imap (\ !i !x -> x * (2 * i - (n - 1)))
+  . VU.modify VAIT.sort
+#+END_SRC
+
+美しい。まだ考察についていけず読解を諦めることが多いのですが、美しさを感じる頻度は増えています。 C++ をぶち抜く提出は、実装以上にロジックが効いているかもしません。
+
+#+BEGIN_QUOTE
+昔はいわゆる『異常高速化』の賜物かと想像していました。
+#+END_QUOTE
+
+** [[https://atcoder.jp/contests/abc351/tasks/abc351_f][F 問題]]
+
+平面走査で解きました。平面走査というのは、何らかのデータ構造 (主にセグメント木) を持って一度のループで答えを求めることだと思います。
+
+僕のセグメント木は =cojna= さん準拠になったので任意の =Monoid= が載ります。ということは =(Sum Int, Sum Int)= がそのまま =Monoid= として載るので、ちょっと楽でした。
+
+式変形による別解が良かったです。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="zxx" dir="ltr"><a href="https://t.co/VbIgHSHuZN">pic.twitter.com/VbIgHSHuZN</a></p>&mdash; Syntax_Error_ (@SyNtAx_error_1) <a href="https://twitter.com/SyNtAx_error_1/status/1784231586411794534?ref_src=twsrc%5Etfw">April 27, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+* ライブラリのテストを作る
+
+前々回、全包囲木 DP のライブラリがバグっておりレーティングを落としたのが無念でした。リファクタリングの際には新しいバグが発生していない保証が必要です。
+
+以下では =tasty= と =oj-verify= の導入を紹介します。自作テストと過去提出のリジャッジによってバグを防ぎます。
+
+** 2 分法の QuickCheck (=tasty-test-quickcheck=)
+
+2 分法の実装を Int/Double および monadic/pure 関数の間で共通化しました ([[https://github.com/toyboot4e/toy-lib/commit/d3824fb231b4d0aeb32236a561d78f6cf1f8a7c9][コミット]]) 。
+
+#+BEGIN_QUOTE
+スパゲッティ気味ですが、元ネタは [[https://zenn.dev/forcia_tech/articles/20191223_advent_calendar][二分探索を絶対にバグらせないで書く方法]], [[https://github.com/cojna/iota][iota]] および [[https://byorgey.wordpress.com/2023/01/01/competitive-programming-in-haskell-better-binary-search/][Competitive programming in Haskell: better binary search]] のつもりです。
+#+END_QUOTE
+
+リファクタリングの後、 QuickCheck (=tasty-test-quickcheck=) で 10,000 ケースを試しました。 2 分法は愚直解が作りやすいので、 =quickcheck= によるランダムテストが適しています。これで安心です ([[https://github.com/toyboot4e/toy-lib/commit/d3824fb231b4d0aeb32236a561d78f6cf1f8a7c9#diff-4e37a223b215bdf35a70f3564ecf7c0c677d828be9bf424ef3153d6c7b9d144f][tests/Tests/Bisect.hs]])。巨人読みました。
+
+=quickcheck= は =tasty= 越しに使用しました。 [[https://github.com/UnkindPartition/tasty][tasty]] は =hspec= や =quickcheck= を始めとした各種テストツールを統一的に扱うためのフレームワークです。 [[https://github.com/haskell/vector][vector]] でも採用されているので、 vector のコードを参考にしたいと思います。
+
+** =oj-verify=
+
+[[https://github.com/online-judge-tools/verification-helper][verifycation-helper]] (=oj-verify=) はローカル環境でシステムテストを実施するツールです。ファイル中に指定の書式で問題リンクを書くだけで使用できます:
+
+#+CAPTION: =graph/shortest_path.hs=
+#+BEGIN_SRC diff-hs
++-- verification-helper: PROBLEM https://judge.yosupo.jp/problem/shortest_path
+main :: IO ()
+main = do
+  {- .. -}
+#+END_SRC
+
+=oj-verify run graph/shortest_path.hs= によりテストを実行できます。自作ライブラリを =import= する解答ファイルをストックしておけば、 =oj-verify= を実行する度に (ほぼ) バグが無いことを保証できると思います。
+
+ただ =oj= 関連のツールはドキュメントに改善の余地があります。以下では =oj-verify= 導入のハマり所を紹介します。
+
+*** インストール (NixOS)
+
+=verification-helper= は nixpkgs に登録されていません。しかし仮想環境では PyPI の Python パッケージを使用できます:
+
+#+BEGIN_SRC sh
+$ # 仮想環境 (=venv=) の有効化
+$ python -m venv .venv
+(.venv) $ source .venv/bin/activate.fish # activate (fish の場合)
+(.venv) $ pip3 install online-judge-verify-helper
+
+$ # 終了
+(.venv) $ deactivate
+#+END_SRC
+
+=direnv= 起動時に =.venv/bin/activate.fish= を自動読み込みできたら良さそうです。
+
+*** 使い方
+
+このまま =oj-verify run= にかけると =runghc= で実行されてしまいます。コンパイル・実行コマンドを上書きするため、設定ファイルを作成しました:
+
+#+CAPTION: =.verify-helper/config.yaml=
+#+BEGIN_SRC toml
+[languages.haskell]
+# '{path}' は `graph/shortest_paths.hs` のように展開する
+compile = "./compile {path}"
+execute = "./execute {path}"
+
+verification_file_suffix = ".hs"
+
+# 参考:
+# https://online-judge-tools.github.io/verification-helper/document.ja.html
+#+END_SRC
+
+- NixOS だとコマンド実行に難があったため、シェルスクリプトを挟んでいます (=./compile=, =./execute=) 。シェルシクリプトの中で =cargo run shortest_path-exe= のようなコマンドを実行します。
+- =.verify-helper/= は必ず CWD の直下とみなされます。サブディレクトリを使いたい場合は面倒です。
+
+なんとか =oj-verify= によりシステムテストを実行できるようになりました:
+
+#+BEGIN_SRC sh
+$ oj-verify run graph/shortest_path.hs
+INFO:onlinejudge_verify.config:config file loaded: .verify-helper/config.toml: {'languages': {'haskell': {'compile': './compile {path}', 'execute': './execute {path}', 'verification_file_suffix': '.hs'}}}
+WARNING:onlinejudge_verify.languages.list:config.toml: languages.haskell: Adding new languages using `config.toml` is supported but not recommended. Please consider making pull requests for your languages, see https://github.com/kmyk/online-judge-verify-helper/issues/116
+WARNING:onlinejudge_verify.languages.user_defined:The functionality to list dependencies of .hs file is not implemented yet.
+INFO:onlinejudge_verify.verify:verify: graph/shortest_path.hs
+INFO:onlinejudge_verify.verify:problem: https://judge.yosupo.jp/problem/shortest_path
+INFO:onlinejudge_verify.languages.user_defined:$ ./compile graph/shortest_path.hs
+
+.. (中略)
+
+[INFO] slowest: 3.929285 sec  (for almost_line_00)
+[WARNING] max memory: 1427.680000 MB  (for almost_line_01)
+[SUCCESS] test success: 29 cases
+WARNING:onlinejudge_verify.languages.user_defined:The functionality to list dependencies of .hs file is not implemented yet.
+INFO:onlinejudge_verify.verify:all tests succeeded
+#+END_SRC
+
+*** メモ
+
+- Library Checker のテストケースはローカルで生成してくれます
+- AtCoder のテストケースは Dropbox からダウンロードする必要があり、 Dropbox の API トークンが要求されます (確認中……)
+  - テストケースをダウンロードするための standalone なツールが欲しいです
+- =oj-verify run -j N= で並列実行できるようです (=oj= と同様)
+- =oj-verify run <path>= を 2 回実行すると、ソースファイルに更新が無い場合は以前の結果を返してくれます
+  - 強制的に再実行させるには……？ (たぶん =touch= で十分？)
+

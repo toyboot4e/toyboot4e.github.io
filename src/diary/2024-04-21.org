@@ -1,0 +1,114 @@
+#+TITLE: ABC 350
+#+DATE: <2024-04-21 Sun>
+
+* ABC 350
+
+[[https://atcoder.jp/contests/abc350][ABC 350]] に参加しました。
+
+** [[https://atcoder.jp/contests/abc350/tasks/abc350_a][A 問題]]
+
+愚直に解きます。 90 bytes..
+
+#+BEGIN_SRC hs
+main=interact$(\b->if b then"Yes"else"No").((&&)<$>(`elem`[1..349])<*>(/=316)).read.drop 3
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc350/tasks/abc350_b][B 問題]]
+
+でんてぃすとあおき！
+
+=accumArray= で解くのが堅いです。この問題も =group . sort= で解けるんですね。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">B in Haskell，むずかしいライブラリは知らないのでこう<br>print $ ( n - ) $ length $ filter odd $ map length $ group $ sort as</p>&mdash; とーらす🌸📦🌕✨🌂🎧 (@torus711) <a href="https://twitter.com/torus711/status/1781685041665548680?ref_src=twsrc%5Etfw">April 20, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+これを借りて AC します。 108 bytes
+
+#+BEGIN_SRC hs
+import Data.List
+main=interact$show.((-).head<*>length.filter(odd.length).group.sort.drop 2).map read.words
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc350/tasks/abc350_c][C 問題]]
+
+離れた要素も入れ替えできます。最適でなくても良いので、左から順番に値を確定させて行けば良いです。値 → 添字と添字 → 値、両方向のマップを持って解きます。
+
+やはり [[https://atcoder.jp/contests/abc350/submissions/52568385][gksato さんの提出]] が上手かったです。
+
+- =VU.imap (flip (,))=
+  値 → 添字のマップ (配列) を生成します。
+- [[https://www.stackage.org/haddock/lts-21.6/vector-0.13.0.0/Data-Vector-Generic.html#v:update][VU.update]]
+  =VU.accumulate (const id)= と同じです。
+- =(`VU.mapMaybeM` VU.generate n id) $ ..=
+  値の入れ替えが起きた場合のみ =Just (i, i')= を返すことで、操作履歴が得られます。
+- =VUM.swap=
+  配列中の値の入れ替えを行います。
+
+** [[https://atcoder.jp/contests/abc350/tasks/abc350_d][D 問題]]
+
+連結成分の任意の頂点同士の間に辺が引けることが分かります。
+
+答えは $\sum_i {\binom {{頂点数}_i} {2} - {辺の数}_i}$ です。連結成分中の辺の数を追跡しつつ、 Union-Find を使って解きました。
+
+ところが式整理すると $\sum_i {\binom {{頂点数}_i} {2}} - 辺の数の和$ となるため、さらに手抜きできるようです。以下となりました:
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !m) <- ints2'
+  !es <- U.replicateM m ints11'
+
+  -- 連結成分のリストを取得
+  let !gr = buildSG (0, n - 1) $ swapDupeU es
+  let !res = map length . snd $ allComponentsSG gr
+
+  printBSB $ subtract m $ sum $ map (\v -> v * pred v `div` 2) res
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc350/tasks/abc350_e][E 問題]]
+
+トポロジカル順に答えを求めるのが無理そうで、諦めて F に行きました。
+
+メモ化再帰で解けるようです。そうじゃん……！
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !a, !x, !y) <- ints4'
+
+  let calc :: Int -> IM.IntMap Double -> (Double, IM.IntMap Double)
+      calc i im = case IM.lookup i im of
+        Just cached -> (cached, im)
+        Nothing -> runState (calcDp i) im
+      calcDp :: Int -> State (IM.IntMap Double) Double
+      calcDp i = do
+        !e1 <- (intToDouble x +) <$> state (calc (i `div` a))
+        -- E[i] = \sum_j {1/6 (y + E[i/j])}_{1..6}
+        -- E[i] = 1/5 (6y + \sum_j {E[i/j]}_{1..5})
+        !e2 <- do
+          !k2 <- state (calc (i `div` 2))
+          !k3 <- state (calc (i `div` 3))
+          !k4 <- state (calc (i `div` 4))
+          !k5 <- state (calc (i `div` 5))
+          !k6 <- state (calc (i `div` 6))
+          return $ (intToDouble y * 6.0 + k2 + k3 + k4 + k5 + k6) / 5.0
+        let !e = min e1 e2
+        modify' $ IM.insert i e
+        return e
+
+  printBSB $ fst $ calc n $ IM.singleton 0 0.0
+#+END_SRC
+
+反射で解ける問題しか解けないのが課題です。
+
+** [[https://atcoder.jp/contests/abc350/tasks/abc350_f][F 問題]]
+
+もぅﾏﾁﾞ無理。。
+
+* Misc
+
+** 汎用 Dijkstra
+
+重さ =w= の制約を =(U.Unbox w, Monoid w, Ord w)= にするのが汎用性があって良さそうです。 =Sum Int=, =Max Int=, =Down (Sum Int)= など……
+
