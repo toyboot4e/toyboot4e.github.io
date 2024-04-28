@@ -1,0 +1,27 @@
+* Devlog
+
+This is [[https://toyboot4e.github.io/][my devlog (link)]] written in =.org= files and converted into HTML.
+
+** Commands
+
+- =./x watch=
+- =./x serve=
+
+** Thanks
+
+*** Articles
+
+- [[https://systemcrafters.net/publishing-websites-with-org-mode/building-the-site/][Build Your Website with Org Mode]]
+- [[https://www.roygbyte.com/add_syntax_highlighting_to_an_org_publish_project.html][Add syntax highlighting to an org-publish-project]]
+
+*** ELisp
+
+- [[https://github.com/tali713/esxml][esxml]]
+- [[https://github.com/balddotcat/ox-slimhtml][ox-slimhtml]]
+
+*** CSS/JS
+
+- [[https://github.com/kevquirk/simple.css/][Simple.css]]
+- [[https://prismjs.com/][Prism.js]]
+- [[https://www.mathjax.org/][MathJax]]
+
