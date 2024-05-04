@@ -1,0 +1,271 @@
+#+TITLE: ABC 352 / HLD
+#+DATE: <2024-05-05 Sun>
+
+* HL 分解 (heavy-light decomposition)
+
+HLD を習得しました。いわゆる [[https://qiita.com/BinomialSheep/items/e7a717f34e6991affa1c#vs-%E9%AB%98%E5%BA%A6%E5%85%B8%E5%9E%8B-option][高度典型]] とされるデータ構造ですが、木の基本機能と言って良いほど馴染みがあって強力でした。 HLD の機能は、ダブリングによる LCA の上位互換です。更新に強く、非可換なモノイドも任意の経路に沿って畳み込みできます。
+
+以下は HLD のお気持ち解説です。かえって混乱する危険もありますが、悪しからず……
+
+** LCA (ダブリング) の復習
+
+木に対して =(親頂点, モノイド)= のペアをダブリングすると、 LCA および可換モノイドの畳み込みが $\log N$ 程度で計算できるのでした ([[https://zenn.dev/link/comments/5d69da97c0ddea][メモ]]) 。
+
+#+BEGIN_QUOTE
+注: 僕の実装は $O(\log^2 N)$ でした。 $O(\log N)$ 実装はどうやるんでしょう……
+#+END_QUOTE
+
+** HLD の学習資料
+
+HLD の概要を掴むため、以下の資料を参照しました。難航しました。
+
+- [[https://take44444.github.io/Algorithm-Book/graph/tree/hld/main.html][HL分解 - アルゴリズムとデータ構造大全]]
+  図や計算量の解説が明快で良かったです。しかしパスクエリ以降の説明が具体的過ぎて追えませんでした。
+
+- [[https://codeforces.com/blog/entry/53170][Easiest HLD with subtree queries]]
+  コードが短いのは良さそうでした。しかし cojna/iota とは HLD の形式が異なるため、メンタルモデルが全く分かりませんでした。
+
+詳細は [[https://github.com/cojna/iota/blob/master/src/Data/Graph/Tree/HLD.hs][cojna/iota の HLD]] および [[https://judge.yosupo.jp/submission/73349][maspy さんの提出]] を写経して理解しました。
+
+- cojna さんの HLD
+  木 DP を畳み込みとして書いているのが良かったです。また =SparseGraph= に親しみがあったため細部まで完全に理解できました。
+
+- maspy さんの提出
+  非可換モノイドの畳み込み経路の作り方を学びました (=get_path_decomposition=) 。 HLD に合わせてセグメント木を管理する =TreeMonoid= も丸パクリしました。
+
+** HLD の概要
+
+HLD の出力は以下です。フィールド毎に解説します。
+
+#+BEGIN_SRC hs
+data HLD = HLD
+  { -- | `Vertex` -> Parent `Vertex`.
+    parentHLD :: !(U.Vector Vertex),
+    -- | `Vertex` -> Reindexed vertex (`VertexHLD`).
+    indexHLD :: !(U.Vector VertexHLD),
+    -- | `Vertex` -> The line's head `Vertex`.
+    headHLD :: !(U.Vector Vertex)
+  }
+  deriving (Show, Eq)
+#+END_SRC
+
+*** 元の木
+
+木にはランダムな頂点番号が割り振られているものとします。
+
+#+BEGIN_SRC txt
+  0--8--7--3--1--2--12--13--15--14     XX: 頂点
+     |        |                         --: 辺
+ 10--5        11--8--6                   |: 頂点
+     |
+     4
+#+END_SRC
+
+*** =indexHLD=: =Vertex -> VertexHLD=
+
+=indexHLD= は頂点番号の再割当てです。木を列に分けた時、同じ列にある頂点の番号が連続するように再割当てを行います。
+
+#+BEGIN_SRC txt
+ 0==1==2==3==4==5==6==7==8==9     XX: VertexHLD
+    |        |                     ==: 同じ列にある辺
+14==13       10==11==12            |: 他の列を繋ぐ辺
+    |
+    15
+#+END_SRC
+
+なお長い列を貪欲に作ると、列の数は十分小さくなるようです ($\log N$ 程度？) 。
+
+*** =headHLD=: =Vertex -> Vertex=
+
+=headHLD= は、各列の頂点を列の『頭』に写します。
+
+#+BEGIN_SRC txt
+ 0==0==0==0==0==0==0==0==0==0    XX: Vertex (VertexHLD ではない)
+    |     |
+ 5==5     11==11==11
+    |
+    4
+#+END_SRC
+
+*** =parentHLD: Vertex -> Vertex=
+
+=parentHLD= は頂点を親頂点に写します。
+
+#+BEGIN_SRC txt
+ (-1)==0==8==7==3==1==2==12==13==15   XX: Vertex (VertexHLD ではない)
+       |        |
+    5==8        1==11=8
+       |
+       5
+#+END_SRC
+
+*** LCA の求め方
+
+=lca(u, v)= を求めるには、 2 頂点 =(u, v=) を徐々に上へ引き上げて行きます。
+
+#+CAPTION: LCA の求め方 (気持ち)
+#+BEGIN_SRC hs
+let lca = do
+  let 引き上げ操作 = do
+    `headHLD` を使って列の頭まで移動する
+    `parentHLD` を使って列の頭から親の列へ移動する
+  let loop u v
+    | headOf u == headOf v = min u v -- LCA 確定
+    | otherwise = 引き上げ操作 (max u v) ; loop u' v' -- 深い方を引き上げる
+  loop
+#+END_SRC
+
+*** セグメント木によるモノイドの畳み込み
+
+1 本のセグメント木にすべての頂点 (=VertexHLD=) が収まります。 LCA と同様の計算過程で各列の =both (indexHLD U.!) (u, headOf u)= を残せば、セグメント木の上で畳み込みできます。
+
+可換モノイドを畳み込むためには、 =u -> lca(u, v)= と =lca(u, v) -> v= の双方向の畳み込みが必要です。そのため =Dual a= を載せたセグメント木を併用します。
+
+** verify
+
+=toy-lib= に [[https://github.com/toyboot4e/toy-lib/tree/main/verify][verify 用のディレクトリ]] を追加しました。ここで [[https://github.com/online-judge-tools/verification-helper][verifycation-helper]] によるシステムテストを実施しています。
+
+- [[https://judge.yosupo.jp/problem/lca][Lowest Common Ancestor]]
+  LCA を求める問題です。
+
+- [[https://judge.yosupo.jp/problem/vertex_add_path_sum][Vertex Add Path Sum - Library Checker]]
+  頂点の畳み込み (可換モノイド) の問題です。
+
+- [[https://judge.yosupo.jp/problem/vertex_set_path_composite][Vertex Set Path Composite - Library Checker]]
+  頂点の畳み込み (非可換モノイド) の問題です。
+
+- [[https://atcoder-tags.herokuapp.com/check/abc294_g][ABC 294 - G. Distance Queries on a Tree]]
+  辺の畳み込み (可換モノイド) の問題です。辺を新たな頂点に分けてしまうか、辺の重みを頂点に載せるテクニック (=max u v= に重みを載せる) を使います。
+
+** 感想
+
+PAST に出てくるデータ構造と比べ、 HLD は 1 回り易しかったです。今思えば、最大流や遅延セグ木は十分に高度な典型だったようです。遅延セグ木が緑 diff だったのが異常でした。
+
+HLD を実装したことで、高度典型も基本装備に過ぎないことが察せられました。大変そうですが、 CHT や FFT も習得しようと思います。
+
+* FFT
+
+[[https://www.kinokuniya.co.jp/f/dsg-01-9784563011093][フーリエ解析―基礎と応用]] と [[https://www.tdupress.jp/book/b349237.html][ビギナーズ デジタルフーリエ変換]] を参考にしました。
+
+** 冪級数展開 (Taylor 展開)
+
+三角関数のように無限回微分できる関数は、冪級数の形に展開できることが知られています:
+
+\begin{aligned}
+f(x)
+&= \sum \limits_{n=0}^{\infty} \frac {f^{(n)}(x_0)} {n!} (x - x_0)^{n} \bigg|_{x_0 = 0}
+\\ &= \sum \limits_{n=0}^{\infty} \frac {f^{(n)}(0)} {n!} x^{n}
+\end{aligned}
+
+FIXME: 三角基底 $\{e^{inx}\}_{n \in \mathbb{N}}$ は完全直行基底であり、 $f(x)$ は三角基底の線型結合で表せることが知られています。
+
+** 複素フーリエ級数
+
+周期 $T$ の関数 $f(x)$ を三角基底の線型結合で表したとき、成分 $c_n$ を複素フーリエ級数と呼びます:
+
+\begin{aligned}
+f(x) &\sim \sum_{n=-\infty}^{\infty} c_n e^{i \frac {2 n \pi} {T} x}
+\\ :&= \sum_{n=-\infty}^{\infty} c_n e^{i \omega_n x}
+\end{aligned}
+
+三角基底は直行基底であることから、フーリエ級数 $c_n$ は内積に比例します:
+
+\begin{aligned}
+(f(x), e^{i\omega x}) &= (c_n e^{i \omega x}, e^{i \omega x})
+\\ &= c_n (e^{i \omega x}, e^{i \omega x})
+\\ &= c_n \| e^{i \omega x} \|^2
+\\ &= c_n \int_{\frac{-T}{-2}}^{\frac{T}{2}} e^{i\omega x} e^{-i\omega x} \mathrm{d}x
+\\ &= c_n T
+\end{aligned}
+
+$c_n$ を $f(x)$ に代入すると以下の形になります:
+
+$$
+f(x) = \sum_{n=-\infty}^{\infty} \frac {1} {T} (f(x), e^{i\omega x}) e^{i \omega_n x}
+$$
+
+** フーリエ変換
+
+非周期関数 $f(x)$ においては $T = \frac {2\pi} {\Delta \omega} \rightarrow \infty$ とすれば、 $f(x)$ を連続な基底ベクトル $\{e^{i\omega x}\}_{\omega}$ の積分の形で表すことができます。
+
+\begin{aligned}
+f(x) &= \sum_{n=-\infty}^{\infty} \frac {\Delta \omega} {2 \pi} (f(x), e^{i\omega x}) e^{i\omega_n x}
+\\ &= \int_{-\infty}^{\infty} \frac {\mathrm{d}\omega} {2 \pi} (f(x), e^{i\omega x}) e^{i\omega x}
+\\ :&= \int_{-\infty}^{\infty} \frac {\mathrm{d}\omega} {2 \pi} \mathcal{F}[f](\omega) e^{i\omega x}
+\end{aligned}
+
+フーリエ変換 $\mathcal{F}[f](\omega) := (f(x), e^{i\omega x})$ は $f(x)$ の $e^{i\omega x}$ 成分に相当します。
+
+** 離散フーリエ変換
+
+周期関数に戻ります。周期関数 $f(x)$ を 1 秒間に $N$ 回サンプリングした時、以下の $f(x)$ について TODO: 何が分かった？
+
+$$
+f(x) = \sum_{n=-\infty}^{\infty} \frac {1} {T} (f(x), e^{i\omega x}) e^{i \omega_n x}
+$$
+
+\begin{aligned}
+\mathbb{A} &:= \begin{bmatrix} A\\B\\0 \end{bmatrix}, \mathbb{X} := \begin{bmatrix} x\\y\\0 \end{bmatrix} \\
+\frac {|\mathbb{A} \times \mathbb{X}|} {2} &= 1 \iff |Ay - Bx| = 2 \iff Ay - Bx = \pm2
+\end{aligned}
+
+$W_N := e^{i\omega_n x}$ として、
+
+$$
+行列
+$$
+
+** バタフライ演算
+
+* Misc
+
+** ライブラリ (CLI) の強化
+
+手抜きですが =toy-lib= (CLI コマンド) に機能追加しました。
+
+*** ライブラリ更新機能
+
+=Main.hs= に埋め込まれたライブラリを、現在の =toy-lib= のソース内容で上書きします:
+
+#+BEGIN_SRC sh
+$ toy-lib -u d/Main.hs | tee d/Main.hs
+#+END_SRC
+
+*** 依存モジュール読み込み機能
+
+指定範囲内のモジュール (および依存モジュール) をソースファイルに埋め込みます:
+
+#+BEGIN_SRC sh
+$ cat Example.hs
+-- 提出前に埋め込みに変える
+-- {{{ toy-lib import
+import Math.Manhattan
+-- }}} toy-lib import
+
+main = putStrLn "Hallo"
+#+END_SRC
+
+#+BEGIN_SRC sh
+$ toy-lib -e Examle.hs
+-- 提出前に埋め込みに変える
+rot45 :: (Int, Int) -> (Int, Int);rot45 (!x, !y) = (x - y, x + y)
+
+main = putStrLn "Hallo"
+#+END_SRC
+
+特に =oj-verify= 用のソースは =toy-lib= を =import= して使っているので、これを AtCoder に提出する際は =toy-lib -e= にかけてライブラリを埋め込みます。
+
+** 提出用ソースに verify 用のコメントを追加
+
+Dropbox にテストケースが追加された後は、 =oj-verify run= の対象にできます。ま、まあ問題文を開きやすくなるし、入れるメリットはあるはず……？
+
+#+BEGIN_SRC hs
+-- verification-helper: PROBLEM https://atcoder.jp/contests/abc294/tasks/abc294_g
+main :: IO
+main = do {- .. -}
+#+END_SRC
+
+** アークナイツ
+
+[[https://astrid.tech/2023/01/07/0/android-libvirt-gaming/][Gaming on an Android VM on Linux]] を参考に Android のエミュレータを作成……したい
+
