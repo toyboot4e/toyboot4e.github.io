@@ -218,7 +218,7 @@ HLD の出力を以下とします。フィールド毎に解説します。<br>
   let loop u v
     | headOf u == headOf v = indexHLD の小さいほうが LCA
     | otherwise = do
-      indexHLD の小さい方に対して引き上げ操作
+      indexHLD の大きい方に対して引き上げ操作
       loop u' v'
   loop
 </code></pre>
