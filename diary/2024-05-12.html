@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 353 / Convolution (予習) - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 353 / Convolution (予習)</h1><p>May 12, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
+<h2 id="ABC 353"><a href="#ABC 353">ABC 353</a></h2><p>
+<a href="https://atcoder.jp/contests/abc353">ABC 353</a> に参加しました。何とかレーティングをキープできました。<br>
+</p>
+
+<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc353/tasks/abc353_a">A 問題</a></a></h3><p>
+<code>y+0</code> のように <code>+0</code> を入れると <code>read</code> が整数型に推論される技を知りました:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main=interact$show.f.map read.words;f(_:h:x)=head$[i|(i,y)&lt;-zip[2..]x,y+0&gt;h]++[-1]
+</code></pre>
+</div>
+
+<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc353/tasks/abc353_b">B 問題</a></a></h3><p>
+<code>%</code> 演算子を定義し、関数呼び出し時の空白の数を減らしましょう:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-hs">main=interact$show.(0%).tail.map read.words
+a%[_]=min 1a
+a%(k:y:r)|a+y&gt;k=1+0%(k:y:r)|0&lt;1=(a+y)%(k:r)
+</code></pre>
+</div>
+
+<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc353/tasks/abc353_c">C 問題</a></a></h3><p>
+\(A\) をソートします。 \(\bmod\) と言わず \(10^8\) を引くことにすれば、一括処理できます。<br>
+</p>
+
+<p>
+\(i\) を固定したとき、和が \(10^8\) を超え始める点を見つけるためには 2 分探索または尺取り法を使います。 Haskell で実装する尺取り法の必勝法……を考え始めることの検討を加速します。<br>
+</p>
+
+<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc353/tasks/abc353_d">D 問題</a></a></h3><p>
+ゴリ押しするか簡単な解法を考え抜きます。<br>
+</p>
+
+<p>
+私はゴリ押ししました。日記もゴリ押しに一塩です。<br>
+</p>
+
+<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc353/tasks/abc353_e">E 問題</a></a></h3><p>
+これは輪を通る弦の組み合わせの数をカウントしていく問題だと思いました。戦闘の文字でグループ分けしつつ、 1 文字ずつ剥いて行けば解けます。<br>
+</p>
+
+
+<figure>
+<img src="./img/2024-05-12-rings.png" alt="2024-05-12-rings.png"><br>
+
+<figcaption><span class="figure-number">Figure 1: </span>貪欲に数えて行けば良い</figcaption>
+</figure>
+
+<p>
+なお文字列ソートの計算量は \(O(N L_1 (\log N + \log L_1))\) 程度 <a href="https://scrapbox.io/rustacean/%E6%96%87%E5%AD%97%E5%88%97%E3%82%BD%E3%83%BC%E3%83%88%E3%81%AE%E5%AE%9F%E8%A1%8C%E6%99%82%E9%96%93(Big-O%E8%A8%98%E6%B3%95)">らしいです</a> 。今回は文字列長の総和 \(L \le 3 \cdot 10^5\) のため \(N = L_1 = \sqrt L\) とすれば \(O(L \log L)\) ？　速いですね〜 (読もう……)<br>
+</p>
+
+<h3 id="G 問題"><a href="#G 問題"><a href="https://atcoder.jp/contests/abc353/tasks/abc353_g">G 問題</a></a></h3><p>
+<a href="https://atcoder.jp/contests/dp/tasks/dp_z">EDPC - Z</a> と同じ問題に見えました。絶対値を外すため、 CHT に 2 本ずつ直線を追加していけば解けるはずです。 CHT は未習得の高度典型なので解けませんでした。<br>
+</p>
+
+<p>
+ところが絶対値を外して現れた式は、単なる 2 つの <code>Max</code> であってセグメント木 2 本に載ります。解けるべき問題でした。<br>
+</p>
+
+<p>
+なお CHT に似た何かがある？　みたいなので、 CHT に挑む時までに gksato さんの提出を読み込んでみようと思います。<br>
+</p>
+
+<blockquote class="twitter-tweet" data-conversation="none"><p lang="ja" dir="ltr">G. ある市場(T, P)の以前に左で行われた市場の中で最善のもの、みたいなクエリが解けると良い。これは割と抽象化できるパターンだが言語化がむずい。<br>doEvent :: (Position, EventResult) -&gt; (Position, EventContent) -&gt; Maybe (Position, EventResult)<br>instance Ord Position (続)</p>&mdash; 符号/gksato (@Fine_sugar_hill) <a href="https://twitter.com/Fine_sugar_hill/status/1789331475382624435?ref_src=twsrc%5Etfw">May 11, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<h2 id="Convolution (予習)"><a href="#Convolution (予習)">Convolution (予習)</a></h2><p>
+高度典型: FFT/NTT/Convolution の勉強ノートです (未実装) 。<br>
+</p>
+
+<p>
+<strong>内容は誤りだらけです</strong> 。真剣に読まないでください。<br>
+</p>
+
+<h3 id="三角基底による関数の展開"><a href="#三角基底による関数の展開">三角基底による関数の展開</a></h3><p>
+まずはフーリエ変換をエアプします。 <a href="https://www.kinokuniya.co.jp/f/dsg-01-9784563011093">フーリエ解析―基礎と応用</a> を参考にしました。<br>
+</p>
+
+<p>
+ボトムアップかつ天下り的に行きます。<br>
+</p>
+
+<h4 id="冪級数展開 (Taylor 展開)"><a href="#冪級数展開 (Taylor 展開)">冪級数展開 (Taylor 展開)</a></h4><p>
+三角関数のように無限回微分できる関数は、冪級数の形に展開できることが知られています:<br>
+</p>
+
+\begin{aligned}
+f(x)
+&= \sum \limits_{n=0}^{\infty} \frac {f^{(n)}(x_0)} {n!} (x - x_0)^{n} \bigg|_{x_0 = 0}
+\\ &= \sum \limits_{n=0}^{\infty} \frac {f^{(n)}(0)} {n!} x^{n}
+\end{aligned}
+
+<p>
+三角関数と指数関数を \(x = 0\) の回りで冪級数展開すると、オイラーの公式 \(e^{ix} = \cos x + i \sin x\) が得られます。<br>
+</p>
+
+<p>
+三角基底 (複素三角基底？) \(\{e^{ix}\}\) は完全直行基底であり、ある種の \(f(x)\) が三角基底の線型結合で表せることが知られています。<br>
+</p>
+
+<h4 id="フーリエ級数 (FS)"><a href="#フーリエ級数 (FS)">フーリエ級数 (FS)</a></h4><p>
+フーリエ変換の基本は周期関数です。周期 \(T\) の周期関数 \(f(x)\) は周期 \(T, 2T, \dots\) の三角基底の線型結合で表せるものとします。係数 \(c_n\) を複素フーリエ級数と呼びます:<br>
+</p>
+
+\begin{aligned}
+f(x) &\sim \sum_{n=-\infty}^{\infty} c_n e^{i \frac {2 n \pi} {T} x}
+\\ :&= \sum_{n=-\infty}^{\infty} c_n e^{i \omega_n x}
+\end{aligned}
+
+<p>
+三角基底は直行基底であり、基底に対する成分 (フーリエ級数 \(c_n\)) は内積に比例します:<br>
+</p>
+
+\begin{aligned}
+(f(x), e^{i\omega x}) &= (c_n e^{i \omega x}, e^{i \omega x})
+\\ &= c_n (e^{i \omega x}, e^{i \omega x})
+\\ &= c_n \| e^{i \omega x} \|^2
+\\ &= c_n \int_{\frac{-T}{-2}}^{\frac{T}{2}} e^{i\omega x} e^{-i\omega x} \mathrm{d}x
+\\ &= c_n T
+\end{aligned}
+
+<p>
+\(c_n\) を \(f(x)\) に代入すると以下の形になります:<br>
+</p>
+
+<p>
+\[
+f(x) = \sum_{n=-\infty}^{\infty} \frac {1} {T} (f(x), e^{i\omega_n x}) e^{i \omega_n x}
+\]<br>
+</p>
+
+<h4 id="フーリエ変換 (FT)"><a href="#フーリエ変換 (FT)">フーリエ変換 (FT)</a></h4><p>
+\(T = \frac {2\pi} {\Delta \omega} \rightarrow \infty\) とすれば、非周期関数 \(f(x)\) を連続な基底ベクトル \(\{e^{i\omega x}\}_{\omega}\) で展開できます (逆フーリエ変換 (IFT)) 。<br>
+</p>
+
+\begin{aligned}
+f(x) &= \sum_{n=-\infty}^{\infty} \frac {\Delta \omega} {2 \pi} (f(x), e^{i\omega_n x}) e^{i\omega_n x}
+\\ &= \int_{-\infty}^{\infty} \frac {\mathrm{d}\omega} {2 \pi} (f(x), e^{i\omega x}) e^{i\omega x}
+\\ :&= \int_{-\infty}^{\infty} \frac {\mathrm{d}\omega} {2 \pi} \mathcal{F}[f](\omega) e^{i\omega x}
+\end{aligned}
+
+<p>
+フーリエ変換 \(\mathcal{F}[f](\omega) := (f(x), e^{i\omega x})\) は \(f(x)\) の \(e^{i\omega x}\) 成分に相当します。指数関数の微積分は簡単なので、 \(\{e^{i\omega_n x}\}\) を基底としたのは幸先良さそうです。<br>
+</p>
+
+<h3 id="三角基底による離散関数の展開"><a href="#三角基底による離散関数の展開">三角基底による離散関数の展開</a></h3><p>
+デジタル信号処理へ寄ります。ここからは <a href="https://www.tdupress.jp/book/b349237.html">ビギナーズ デジタルフーリエ変換</a> および小野測器の <a href="https://www.onosokki.co.jp/HP-WK/eMM_back/backcontents.htm#column">計測コラム</a> の <a href="https://www.onosokki.co.jp/HP-WK/eMM_back/emm138.pdf">em138 添付資料</a> を参考にエアプします。<br>
+</p>
+
+<h4 id="時間離散フーリエ変換"><a href="#時間離散フーリエ変換">時間離散フーリエ変換</a></h4><p>
+関数 \(f(x)\) を \(\tau\) の間隔で離散化し、離散関数 \(f_{\tau}(x)\) を得ます。 \(f(x)\) に周期的デルタ関数 \(\delta_{\tau}(x)\) をかけることで、 \(f(x)\) の離散化を表現します:<br>
+</p>
+
+\begin{aligned}
+\delta_{\tau} (x) &:= \sum_{n \in \mathbb{Z}} \delta(x - n \tau)
+\\ f_{\tau}(x) &:= \delta_{\tau} (x) f(x)
+\end{aligned}
+
+<p>
+\(f_{\tau}(x)\) のフーリエ変換も離散化されています:<br>
+</p>
+
+\begin{aligned}
+\mathcal{F}[f_{\tau}](\omega) &= (f_{\tau}(x), e^{i\omega x})
+\\ &= \int_{-\infty}^{\infty} f_{\tau}(x) e^{-i\omega x} \mathrm{d}x
+\\ &= \sum_{n \in \mathbb{N}} f(n \tau) e^{-i \omega n \tau}
+\end{aligned}
+
+<p>
+さらに時間が離散化されたことから位相に周期性が生じており、 \(\mathcal{F}[f_{\tau}(x)](\omega)\) は周期 \(\frac {2 \pi} {\tau}\) の周期関数になりました (\(\mathcal{F}[f_{\tau}](\omega) = \mathcal{F}[f_{\tau}](\omega + \frac {2 \pi} {\tau})\))。<br>
+</p>
+
+<p>
+改めて \(f_{\tau}(n \tau)\) を三角基底で展開すると、次の式を得ます:<br>
+</p>
+
+\begin{aligned}
+f_{\tau}(n \tau) &= \int_{-\frac {\pi} {\tau}}^{\frac {\pi} {\tau}} \frac {\mathrm{d}\omega} {2 \pi} \mathcal{F}[f_{\tau}](\omega) e^{i\omega n \tau}
+\end{aligned}
+
+<h4 id="離散フーリエ級数 (DFS)"><a href="#離散フーリエ級数 (DFS)">離散フーリエ級数 (DFS)</a></h4><p>
+時間信号 \(x(t)\) の一部を時間幅 \(T\) で切り取り、 \(\tau\) の間隔で離散化したとします。この信号列を周期 \(T\) の周期関数に拡張すると、やはり複素フーリエ級数の和の形に展開できます。<br>
+</p>
+
+\begin{aligned}
+x(k \tau) &= \sum_{n \in \mathbb{Z}} c_n e^{i \omega_n k \tau}
+\\ &= \sum_{n \in \mathbb{Z}} c_n e^{i \frac {2n\pi} {T} k \tau}
+\end{aligned}
+
+<p>
+\(n \in \mathbb{Z}\) とありますが、時間が離散化されたことによって位相が周期的になり、 \(x(k \tau)\) は \(\{e^{i\omega_n x}\}_{n \in [0, N - 1] \cap \mathbb{Z}}\) のみにより展開されるはずです。実際 \(n \rightarrow n + rN\) に分解して確かめられます (天才だ……):<br>
+</p>
+
+\begin{aligned}
+x(k \tau) &= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} \sum_{r \in \mathbb{Z}} c_{n + rN} e^{i \omega_{n + rN} k \tau}
+\\ &= \sum_{n \in [0, N - 1] \cap \mathbb{Z}}  e^{i \omega_{n} k \tau} \sum_{r \in \mathbb{Z}} c_{n + rN} \bigg|_{c_n = 0 (n > M)}
+\\ &= \sum_{n \in [0, N - 1] \cap \mathbb{Z}}  e^{i \omega_{n} k \tau} c_n
+\end{aligned}
+
+<p>
+上記の 2 ~ 3 行で帯域制限を設け、 \(x(t)\) が M 次の高調波成分までしか持たないとした場合、 \(\sum_{r \in \mathbb{Z}} c_{n + rN} = c_n\) から非常に簡素な式に整理できました。 N 個 (\(N = \frac T {\tau}\)) の信号 \({x(n\tau)\) を整理すると、以下の行列で書けます:<br>
+</p>
+
+\begin{aligned}
+\begin{bmatrix} x(0) \\ x(\tau) \\ \vdots \\ x(\frac {T - \tau} T) \end{bmatrix} &=
+\begin{bmatrix}
+    1 & 1 & \dots & 1 \\
+    1 & e^{i\omega_1} & \dots & e^{i{\omega_1(N-1)}} \\
+    \vdots & \vdots & & \vdots \\
+    1 & e^{i\omega_{N-1}} & \dots & e^{i{\omega_{N-1}(N-1)}} \\
+\end{bmatrix}
+\begin{bmatrix} c_0 \\ c_1 \\ \vdots \\ c_{N-1} \end{bmatrix}
+\end{aligned}
+
+<p>
+よって時間信号 \(x(t)\) に対して 1. その一部を時間幅 \(T\) で切り抜き 2. \(\tau\) の間隔で離散化し 3. 周期 \(T\) の周期関数に拡張し 4. 帯域制限を行うと、 N 回のサンプリング結果から複素フーリエ級数が分かり、 AC の新作が発表されます。<br>
+</p>
+
+<h4 id="離散フーリエ変換 (DFT)"><a href="#離散フーリエ変換 (DFT)">離散フーリエ変換 (DFT)</a></h4><p>
+上記の \(x(n\tau) := x_n\) に対し、なぜか改めて離散フーリエ変換 \(X_k\) を定義します (なぜ……？):<br>
+</p>
+
+\begin{aligned}
+X_k &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n e^{-i \frac {2\pi} {N}k}
+\\ &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W^{nk}
+\end{aligned}
+
+<p>
+この気持ちは勉強不足のため理解できていません。フーリエ変換の方が重要なので、単純な式にしたかった？<br>
+</p>
+
+<h3 id="高速フーリエ変換 (FFT)"><a href="#高速フーリエ変換 (FFT)">高速フーリエ変換 (FFT)</a></h3><h4 id="(2-radix) DFT の再帰的な定義"><a href="#(2-radix) DFT の再帰的な定義">(2-radix) DFT の再帰的な定義</a></h4><p>
+DFT の高速計算 (FFT) を小野測器の <a href="https://www.onosokki.co.jp/HP-WK/eMM_back/emm140.pdf">計測コラム emm140 号用</a> から学びます。 P2 の図から汲み取れる通り、 8 点 DFT の出力 \(\{X_{8, k}\}_{k \in [0, 7]}\) は、それぞれ 4 点 DFT の和に分解できます:<br>
+</p>
+
+\begin{aligned}
+X_{8,k} (\{x_k\}_{k \in [0, 7] \cap \mathbb{Z}}) &= \sum_{n \in [0, 7]} x_{n} W^{nk}
+\\ &= \sum_{n \in [0, 2, 4, 6]} x_{n} W^{nk} + \sum_{n \in [0, 2, 4, 6]} x_{n+1} W^{(n+1)k}
+\\ &= \sum_{n \in [0, 2, 4, 6]} x_{n} W^{nk} + W_k \sum_{n \in [1, 3, 5, 7]} x_{n} W^{n}
+\\ &= \sum_{n \in [0, 2, 4, 6]} x_{n} W^{nk} + W_k \sum_{n \in [1, 3, 5, 7]} x_{n} W^{n}
+\\ &= X_{4,k}({x_0, x_2, x_4, x_6}) + W_k X_{4,k}({x_1, x_3, x_5, x_7})
+\end{aligned}
+
+<p>
+8 点 DFT の出力を以下の信号流れ図にまとめます。 \(\{x_n\}_n\) が上下に 2 分割されており、再帰的に \(O(\log N)\) で計算できることが予想できます。<br>
+</p>
+
+
+<figure>
+<img src="./img/2024-05-12-butterfly-8.png" alt="2024-05-12-butterfly-8.png"><br>
+
+</figure>
+
+<p>
+バタフライ演算の部分を丁寧に図示すると以下です。黒点を接続とし、加算器と乗算器を明示しています:<br>
+</p>
+
+
+<figure>
+<img src="./img/2024-05-12-butterfly-8'.png" alt="2024-05-12-butterfly-8'.png" width="612px"><br>
+
+<figcaption><span class="figure-number">Figure 2: </span>信号流れ図が読めなかったので</figcaption>
+</figure>
+
+<p>
+これを簡略化し、また \(W_8^4 = e^{i \pi} = -1\) を代入すると、前の図になります。読めないよ〜〜<br>
+</p>
+
+<h4 id="バタフライ演算"><a href="#バタフライ演算">バタフライ演算</a></h4><p>
+8 点 DFT を再帰的に展開すると、 \(x_0, .., x_7\) は \(x_0, x_4, x_2, x_6, x_1, x_5, x_3, x_7\) の並びになります:<br>
+</p>
+
+
+<figure>
+<img src="./img/2024-05-12-butterfly-8-4-2-1.png" alt="2024-05-12-butterfly-8-4-2-1.png"><br>
+
+</figure>
+
+<p>
+したがって以下の手順で高速に DFT を計算できます。<br>
+</p>
+
+<ol><li>添字の置換を (一括して) 行う<br></li>
+<li>バタフライ演算を繰り返し適用する<br></li>
+</ol>
+
+<h4 id="添字のソート方法"><a href="#添字のソート方法">添字のソート方法</a></h4><p>
+人が数列をソートするときは、最も大きな高いくらいから順番にソートすることが多いです。 (2-radix) FFT においては (2 進数表記で) 小さな位から順番にソートされていくことになります。したがって添字をビット反転 (例: <code>0b1100</code> -&gt; <code>0b0011</code>) した値を基準に \(\{x_n\}_n\) をソートします。<br>
+</p>
+
+
+<figure>
+<img src="./img/2024-05-12-dft-indices.png" alt="2024-05-12-dft-indices.png"><br>
+
+<figcaption><span class="figure-number">Figure 3: </span>2-radix FFT における引数の置換の追跡 (検索すれば同じ図が出てきます)</figcaption>
+</figure>
+
+<h3 id="NTT (数論変換)"><a href="#NTT (数論変換)">NTT (数論変換)</a></h3><p>
+バタフライ演算の実装にあたり、 \(W_n^k\) をどう計算するか。ここで <a href="https://sen-comp.hatenablog.com/entry/2021/02/06/180310">FFT は精度が悪いらしい</a> ので、競プロでは \(e^{i\omega_n}\) でなく \(\bmod 998244353\) の世界で正規直行基底を定義してフーリエ変換を行うようです。<br>
+</p>
+
+<h3 id="感想"><a href="#感想">感想</a></h3><p>
+くう〜疲れましたw　まだ道半ばです。たぶん実装は遅延セグメント木より簡単そうかな……<br>
+</p>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
