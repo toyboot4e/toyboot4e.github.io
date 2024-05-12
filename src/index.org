@@ -57,3 +57,5 @@
 - @@html:<date>2024-04-14</date>@@ [[file:/diary/2024-04-14.org][ABC 349]]
 - @@html:<date>2024-04-21</date>@@ [[file:/diary/2024-04-21.org][ABC 350]]
 - @@html:<date>2024-04-28</date>@@ [[file:/diary/2024-04-28.org][ARC 176 / ABC 351 / ライブラリのテスト]]
+- @@html:<date>2024-05-05</date>@@ [[file:/diary/2024-05-05.org][ABC 352 / HLD]]
+- @@html:<date>2024-05-12</date>@@ [[file:/diary/2024-05-12.org][ABC 353 / Convolution (予習)]]
