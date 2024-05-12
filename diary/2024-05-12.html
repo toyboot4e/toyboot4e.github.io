@@ -198,12 +198,12 @@ x(k \tau) &= \sum_{n \in \mathbb{Z}} c_n e^{i \omega_n k \tau}
 
 \begin{aligned}
 x(k \tau) &= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} \sum_{r \in \mathbb{Z}} c_{n + rN} e^{i \omega_{n + rN} k \tau}
-\\ &= \sum_{n \in [0, N - 1] \cap \mathbb{Z}}  e^{i \omega_{n} k \tau} \sum_{r \in \mathbb{Z}} c_{n + rN} \bigg|_{c_n = 0 (n > M)}
+\\ &= \sum_{n \in [0, N - 1] \cap \mathbb{Z}}  e^{i \omega_{n} k \tau} \sum_{r \in \mathbb{Z}} c_{n + rN} \bigg|_{c_n = 0 (|n| > N)}
 \\ &= \sum_{n \in [0, N - 1] \cap \mathbb{Z}}  e^{i \omega_{n} k \tau} c_n
 \end{aligned}
 
 <p>
-上記の 2 ~ 3 行で帯域制限を設け、 \(x(t)\) が M 次の高調波成分までしか持たないとした場合、 \(\sum_{r \in \mathbb{Z}} c_{n + rN} = c_n\) から非常に簡素な式に整理できました。 N 個 (\(N = \frac T {\tau}\)) の信号 \(\{x(n\tau)\}_n\) を整理すると、以下の行列で書けます:<br>
+上記の 2 ~ 3 行で帯域制限を設け、 \(x(t)\) が N 次の高調波成分までしか持たないとした場合、 \(\sum_{r \in \mathbb{Z}} c_{n + rN} = c_n\) から非常に簡素な式に整理できました。 N 個 (\(N = \frac T {\tau}\)) の信号 \(\{x(n\tau)\}_n\) を整理すると、以下の行列で書けます:<br>
 </p>
 
 \begin{aligned}
