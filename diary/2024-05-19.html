@@ -140,7 +140,7 @@ Upsolve します。やはり F が解けないとな〜……<br>
 </p>
 
 <h3 id="Misc"><a href="#Misc">Misc</a></h3><p>
-AI で典型問題が解けるという点が徐々に物議を醸しています。自分程度の実力でも周囲と相対化される (極端に弱かったりそこそこ強かったりする) のが面白かったわけですが、徐々に元の曖昧な世界へ戻っていくんだなと思いました。<br>
+AI で典型問題が解けると点が徐々に物議を醸しています。自分程度の実力でも周囲と相対化される (極端に弱かったりそこそこ強かったりする) のが面白かったわけですが、徐々に元の曖昧な世界へ戻っていくんだなと思いました。<br>
 </p>
 
 <h2 id="寿司打"><a href="#寿司打">寿司打</a></h2><p>
@@ -205,11 +205,11 @@ g^{p-1} &= 1 \pmod p
 </p>
 
 <h5 id="理論 (未習得)"><a href="#理論 (未習得)">理論 (未習得)</a></h5><p>
-原始根って、何ですか……？　理論習得のためには <a href="https://zenn.dev/ankoma/articles/72212c58d3f6ef">【NTT（数論変換）入門（２）】NTT（数論変換）編 - Zenn</a> の理解を目標にします。この記事を理解できないのは『巡回群』に馴染みが無いためで、つまり『<a href="https://www.sbcr.jp/product/4815621353/">群論への第一歩</a>』を読んでいないためだと思います。<br>
+原始根って、何ですか……？　理論習得のために <a href="https://zenn.dev/ankoma/articles/72212c58d3f6ef">【NTT（数論変換）入門（２）】NTT（数論変換）編 - Zenn</a> の理解を目標にします。この記事を理解できないのは『巡回群』に馴染みが無いためで、つまり『<a href="https://www.sbcr.jp/product/4815621353/">群論への第一歩</a>』を読んでいないためと思います。<br>
 </p>
 
 <p>
-まずは『<a href="https://www.sbcr.jp/product/4815621353/">群論への第一歩</a>』を読もうと思います。真っ当に勉強していたら、かなり直接的に役立つはずだったんですね〜<br>
+まずは『<a href="https://www.sbcr.jp/product/4815621353/">群論への第一歩</a>』を読もうと思います。しかし、学部レベルの勉強をもっと真っ当にやっていれば、もっと直接的に役立ったのかもしれません。<br>
 </p>
 
 <h3 id="Convolution (畳み込み、合成積)"><a href="#Convolution (畳み込み、合成積)">Convolution (畳み込み、合成積)</a></h3><p>
@@ -324,13 +324,13 @@ FFT の図は前回同様で、 IDFT の計算方法もこの図から分かり�
 <li><a href="https://atcoder.jp/contests/practice2/tasks/practice2_f">ACL Practice Contest F - Convolution</a><br>
 Library Checker の問題と同じです。テストケースは弱め (?) です。<br></li>
 <li><a href="https://atcoder.jp/contests/atc001/tasks/fft_c">AtCoder Typical Contest 001 C - 高速フーリエ変換</a><br>
-よく考えると畳み込みそのものな問題です。テストケースが弱いので解く必要はありませんが、スライドが良いと思います。また \(\bmod\) を取らない畳み込み計算の必要性を<br></li>
+よく考えると畳み込みそのものな問題です。テストケースが弱いので解く必要はありませんが、スライドが良いと思います。<br></li>
 <li><a href="https://atcoder.jp/contests/typical90/tasks/typical90_bm">典型 90 問 065 - RGB Ball 2 (★7)</a><br>
 いずれ見ます……<br></li>
 </ul>
 
 <h3 id="中国剰余定理 (CRT / Garner's algorithm)"><a href="#中国剰余定理 (CRT / Garner's algorithm)">中国剰余定理 (CRT / Garner's algorithm)</a></h3><ul><li><a href="https://atcoder.jp/contests/past202203-open/tasks/past202203_n">PAST 10 N - 400億マス計算</a><br>
-2 つの項を選んだ積について考える時、積を指数部に持っていくことで畳み込みに持ち込める。天才ですね。ただし \(\bmod\) を取らない？畳み込み計算 (<a href="https://atcoder.github.io/ac-library/production/document_ja/convolution.html">convolute<sub>ll</sub></a> 相当) が必要で、そのために中国剰余定理 (CRT / Gramer Theory) を使っているようです。<br></li>
+2 つの項の和について考える時、和を指数部に持っていくことで畳み込みに持ち込める。天才ですね。ただし \(\bmod\) を取らない？畳み込み計算 (<a href="https://atcoder.github.io/ac-library/production/document_ja/convolution.html">convolute<sub>ll</sub></a> 相当) が必要で、そのために中国剰余定理 (CRT / Gramer Theory) を使っているようです。<br></li>
 </ul>
 
 <p>
@@ -340,18 +340,18 @@ Library Checker の問題と同じです。テストケースは弱め (?) で�
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">aclのconvolution_llってどうやって実装してるんだと思ったが3本計算してCRTで復元してるのか</p>&mdash; だうなー (@downerkei) <a href="https://twitter.com/downerkei/status/1772349995368304816?ref_src=twsrc%5Etfw">March 25, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
 
 <p>
-CRT は理解していませんが、 ACL を写経して AC しました。今は接点を持てただけでヨシ……！<br>
+CRT は理解していませんが、 ACL を写経して AC しました。解けるから今はヨシ……！<br>
 </p>
 
 <h3 id="今後"><a href="#今後">今後</a></h3><p>
-僕の <code>convolution</code> は、今より 10 倍速くなりそうです。今は AC できるので良しとしますが、将来的には <a href="https://tayu0110.hatenablog.com/entry/2023/05/06/023244">爆速なNTTを実装したい - 競プロ備忘録</a> などを参考に高速化が必要です。<br>
+僕の <code>convolution</code> は、今より 10 倍速くなりそうです。将来的には <a href="https://tayu0110.hatenablog.com/entry/2023/05/06/023244">爆速なNTTを実装したい - 競プロ備忘録</a> などを参考に高速化が必要です。<br>
 </p>
 
-<h3 id="その他"><a href="#その他">その他</a></h3><ul><li><a href="https://zenn.dev/konn/articles/2023-12-14-pure-parallel-fft-in-linear-haskell#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">2023年の Linear Haskell で純粋・並列 FFT を実装する──「Haskell は Rust になれるのか？」補遺</a><br></li>
+<h3 id="関連"><a href="#関連">関連</a></h3><ul><li><a href="https://zenn.dev/konn/articles/2023-12-14-pure-parallel-fft-in-linear-haskell#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">2023年の Linear Haskell で純粋・並列 FFT を実装する──「Haskell は Rust になれるのか？」補遺</a><br></li>
 <li>FFT のハードウェア実装？<br></li>
 </ul>
 
 <h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="SparseGraph から頂点の型パラメータを削除"><a href="#SparseGraph から頂点の型パラメータを削除"><code>SparseGraph</code> から頂点の型パラメータを削除</a></h3><p>
-<code>SparseGraph i w</code> においては頂点の型 <code>i</code> (<code>Index i</code>) を抽象化していましたが、 <code>Int</code> 型に固定しました。 <code>(x, y)</code> のように成分に分けた API が欲しければ、都度 <code>adj :: SparseGraph w -&gt; Vertex -&gt; U.Vector Vertex</code> をラップした関数を作成します。<br>
+<code>SparseGraph i w</code> においては頂点の型 <code>i</code> (<code>Index i</code>) を抽象化していましたが、 <code>Int</code> 型に固定しました。 <code>(x, y)</code> のように成分に分けた API が欲しければ、都度グラフをラップした関数を作成します。<br>
 </p>
 </main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
