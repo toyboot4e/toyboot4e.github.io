@@ -172,7 +172,7 @@ FFT が載っている CS の本として、 <a href="https://www.kindaikagaku.c
 \begin{aligned}
 W_N^k &:= e^{-i\frac{2\pi}{N}k}
 \\ X_N^k &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{k}
-\\ x_n &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{-k}
+\\ x_n &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} X_n W_N^{-k}
 \end{aligned}
 
 <h4 id="TODO: 周期の規格化"><a href="#TODO: 周期の規格化">TODO: 周期の規格化</a></h4><p>
@@ -281,7 +281,7 @@ a &:= (a_0, a_1, .., a_{n-1})
 \mathcal{F}&: \{x_i\}_i \mapsto \{X_i\}_i
 \\ \mathcal{F^{-1}}&: \{X_i\}_i \mapsto \{x_i\}_i
 \\ X_k &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{nk}
-\\ x_n &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{-nk}
+\\ x_n &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} X_n W_N^{-nk}
 \end{aligned}
 
 <p>
