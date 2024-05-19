@@ -176,8 +176,8 @@ FFT が載っている CS の本として、 <a href="https://www.kindaikagaku.c
 
 \begin{aligned}
 W_N^k &:= e^{-i\frac{2\pi}{N}k}
-\\ X_N^k &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{k}
-\\ x_n &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} X_n W_N^{-k}
+\\ X_N^k &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{nk}
+\\ x_n &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} X_n W_N^{-nk}
 \end{aligned}
 
 <h4 id="TODO: 周期の規格化"><a href="#TODO: 周期の規格化">TODO: 周期の規格化</a></h4><p>
@@ -193,7 +193,7 @@ DFT は基底変換だと思いました。 FFT を要約すると、『基底�
 </p>
 
 <h5 id="結論"><a href="#結論">結論</a></h5><p>
-\(W_N\) を \(1^{-N}\) (1 の N 乗根) とすれば、 \(\bmod p\) の世界でも FFT を実施できます。 \(1^{-N}\) は以下の通り求まります。<br>
+\(W_N\) を \(1^{-\frac 1 N}\) (1 の N 乗根の逆数) とすれば、 \(\bmod p\) の世界でも FFT を実施できます。 \(1^{\frac 1 N}\) は以下の通り求まります。<br>
 </p>
 
 <p>
