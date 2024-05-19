@@ -177,7 +177,7 @@ FFT が載っている CS の本として、 <a href="https://www.kindaikagaku.c
 \begin{aligned}
 W_N^k &:= e^{-i\frac{2\pi}{N}k}
 \\ X_N^k &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{nk}
-\\ x_n &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} X_n W_N^{-nk}
+\\ x_k &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} X_n W_N^{-nk}
 \end{aligned}
 
 <h4 id="TODO: 周期の規格化"><a href="#TODO: 周期の規格化">TODO: 周期の規格化</a></h4><p>
@@ -251,7 +251,7 @@ g^{p-1} &= 1 \pmod p
 </blockquote>
 
 <h4 id="離散関数の合成積"><a href="#離散関数の合成積">離散関数の合成積</a></h4><p>
-数列を \(f(x) = \sum_i \delta(i - x) a_x\) のように離散的な関数として見ることで、次式が得られると解釈しました:<br>
+数列を \(f(x) = \sum_i \delta(i - x) a_x\) のように離散的な関数として見ることで、次式の合成積が得られると解釈しました:<br>
 </p>
 
 \begin{align}
