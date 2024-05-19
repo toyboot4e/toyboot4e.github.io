@@ -32,7 +32,7 @@ f(i:r)a k|a>k=i|0<1=f r(a+2^i)k
 
 数学的センスがある人は、 $\sum_{i \in [0, k-1]} 2^i = 2^k-1$ による簡潔な解答になるようです。
 
-[[https://atcoder.jp/contests/abc354/submissions/53641748][待って、これは何ですか]] ([[https://hackage.haskell.org/package/base-4.20.0.0/docs/Prelude.html#v:exponent][exopnent]]) ??　地球は今日も美しい……
+[[https://atcoder.jp/contests/abc354/submissions/53641748][待って、これは何ですか]] ([[https://hackage.haskell.org/package/base-4.20.0.0/docs/Prelude.html#v:exponent][exponent]]) ??　地球は今日も美しい……
 
 ** [[https://atcoder.jp/contests/abc354/tasks/abc354_b][B 問題]]
 
@@ -76,11 +76,12 @@ solve = do
 - =IORef= に状態を載せつつ =mapMaybeM= でループする
   これが無難です。
 - =IORef= に状態を載せつつ =concatMapM= でループする
-  これもいけますね。後で =concat= します。
+  これもいけますね。
 - =mapAccumL= で =[Maybe Int]= に写し、後で =catMaybe= する
-  これもアリですね。
+  アリです。
 - =foldl'= で状態を持ってループしつつ、リストに出力を溜める (後で =reverse= する)
   動けば良かろうなのだ！
+- 再帰関数で状態を持つ
 - 他にも色々あると思います
 
 初心を思い出しました。解けて良かった…….
@@ -95,7 +96,7 @@ Imos 法で解くのが典型です。解けて良かったシリーズに入り
 
 ** [[https://atcoder.jp/contests/abc354/tasks/abc354_e][E 問題]]
 
-集合 DP で解くのが典型です。遷移先に 1 つでも先手必敗のケースがあれば先手の勝利です。
+集合 DP で解くのが典型です。遷移先に 1 つでも後手必勝のケースがあれば先手の勝利です。
 
 解けて良かったシリーズでした。
 
@@ -105,7 +106,7 @@ Upsolve します。やはり F が解けないとな〜……
 
 ** Misc
 
-AI で典型問題が解けるという点が徐々に物議を醸しています。自分程度の実力でも周囲と相対化される (極端に弱かったりそこそこ強かったりする) のが面白かったわけですが、徐々に元の曖昧な世界へ戻っていくんだなと思いました。
+AI で典型問題が解ける点が徐々に物議を醸しています。自分程度の実力でも周囲と相対化される (極端に弱かったりそこそこ強かったりする) のが面白かったわけですが、徐々に元の曖昧な世界へ戻っていくんだなと思いました。
 
 * 寿司打
 
@@ -121,6 +122,8 @@ AI で典型問題が解けるという点が徐々に物議を醸していま�
 FFT が載っている CS の本として、 [[https://www.kindaikagaku.co.jp/book_list/detail/9784764906488][Introduction to Algortihms]] や [[https://www.cambridge.org/core/books/modern-computer-algebra/DB3563D4013401734851CF683D2F03F0][Modern Computer Algebra]] があるようです。そっちを読めば良かったかも。
 #+END_QUOTE
 
+※ 今回も自分専用のノートです。
+
 ** 地固め
 
 *** 前回の疑問 (DFT)
@@ -131,8 +134,8 @@ FFT が載っている CS の本として、 [[https://www.kindaikagaku.co.jp/bo
 
 \begin{aligned}
 W_N^k &:= e^{-i\frac{2\pi}{N}k}
-\\ X_N^k &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{k}
-\\ x_n &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{-k}
+\\ X_N^k &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{nk}
+\\ x_k &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} X_n W_N^{-nk}
 \end{aligned}
 
 *** TODO: 周期の規格化
@@ -141,7 +144,7 @@ $W_N^k$ の定義には周期 $T$ (または周波数 $\omega = \frac {2\pi} {T}
 
 *** FFT と線形代数の関連
 
-DFT は基底変換だと思いました。 FFT を要約すると、『基底変換の際に変換先の基底として 1 の N 乗根を選んだ場合、分割統治によって $(O(N \log N))$ で変換先の成分をできる』と言えそうです。 NTT への拡張を予感させます。
+DFT は基底変換だと思いました。 FFT を要約すると、『基底変換の際に変換先の基底として 1 の N 乗根を選んだ場合、分割統治によって $O(N \log N)$ で変換先の成分を計算できる』と言えそうです。 NTT への拡張を予感させます。
 
 ** DFT から NTT へ
 
@@ -151,7 +154,7 @@ DFT は基底変換だと思いました。 FFT を要約すると、『基底�
 
 **** 結論
 
-$W_N$ を $1^{-N}$ (1 の N 乗根) とすれば、 $\bmod p$ の世界でも FFT を実施できます。 $1^{-N}$ は以下の通り求まります。
+$W_N$ を $1^{-\frac 1 N}$ (1 の N 乗根の逆数) とすれば、 $\bmod p$ の世界でも FFT を実施できます。 $1^{\frac 1 N}$ は以下の通り求まります。
 
 $g$ が『原始根』であるとき、Fermet の小定理から $1 / 2^m \pmod p$ が分かります:
 
@@ -164,9 +167,9 @@ $g^{p-1/2^m}$ を 2 乗していくと、 $1/2^m, .., 1/4, 1/2$ がすべて求�
 
 **** 理論 (未習得)
 
-原始根って、何ですか……？　理論習得のためには [[https://zenn.dev/ankoma/articles/72212c58d3f6ef][【NTT（数論変換）入門（２）】NTT（数論変換）編 - Zenn]] の理解を目標にします。この記事を理解できないのは『巡回群』に馴染みが無いためで、つまり『[[https://www.sbcr.jp/product/4815621353/][群論への第一歩]]』を読んでいないためだと思います。
+原始根って、何ですか……？　理論習得のために [[https://zenn.dev/ankoma/articles/72212c58d3f6ef][【NTT（数論変換）入門（２）】NTT（数論変換）編 - Zenn]] の理解を目標にします。この記事を理解できないのは『巡回群』に馴染みが無いためで、つまり『[[https://www.sbcr.jp/product/4815621353/][群論への第一歩]]』を読んでいないためと思います。
 
-まずは『[[https://www.sbcr.jp/product/4815621353/][群論への第一歩]]』を読もうと思います。真っ当に勉強していたら、かなり直接的に役立つはずだったんですね〜
+まずは『[[https://www.sbcr.jp/product/4815621353/][群論への第一歩]]』を読もうと思います。しかし、学部レベルの勉強をもっと真っ当にやっていれば、もっと直接的に役立ったのかもしれません。
 
 ** Convolution (畳み込み、合成積)
 
@@ -180,7 +183,7 @@ $$
 (f * g)(x) := \int_{-\frac{T}{2}}^{\frac{T}{2}} f(\tau)g(x-\tau)\mathrm{d}\tau
 $$
 
-畳み込みに対するフーリエ変換は、フーリエ変換の積に分解できます:
+合成積に対するフーリエ変換は、フーリエ変換の積に分解できます:
 
 \begin{align}
 ((f * g)(x), e^{i\omega x}) &= \int_{-\frac{T}{2}}^{\frac{T}{2}} (f * g)(x) e^{-i\omega_n x} \mathrm{d}x
@@ -197,15 +200,15 @@ $$
 
 *** 離散関数の合成積
 
-数列を $f(x) = \sum_i \delta(i - x) a_x$ のように離散的な関数として見ることで、次式が得られると解釈しました:
+数列を $f(x) = \sum_i \delta(i - x) a_x$ のように離散的な関数として見ることで、次式の合成積が得られると解釈しました:
 
 \begin{align}
 a &:= (a_0, a_1, .., a_{n-1})
 \\ b &:= (b_0, b_1, .., b_{m-1})
-\\ (a * b)_n &:= \sum_{t \in [0, n + m - 2] \cap \mathcal{Z}} a_t b_{n - t}
+\\ (a * b)_n &:= \sum_{t \in [0, n] \cap \mathcal{Z}} a_t b_{n - t}
 \end{align}
 
-数列の例としては多項式の係数があります。多項式の積の係数部分は畳み込みで表されます。この辺りは [[https://manabitimes.jp/math/954][高校数学の美しい物語]] の図解が良かったです。
+数列の例としては多項式の係数があります。多項式の積の係数部分は合成積で表されます。この辺りは [[https://manabitimes.jp/math/954][高校数学の美しい物語]] の図解が良かったです。
 
 \begin{align}
 \mathbb{a} &:= \sum_i a_i x^i
@@ -217,7 +220,7 @@ a &:= (a_0, a_1, .., a_{n-1})
 
 *** まとめ
 
-多項式の積を計算する際に、 1 の N 乗根の基底に基底変換し、分割統治で成分を求めた上で、元の基底に対する成分を計算することにより、 $O(N \log N)$ で多項式の積が計算できます。
+多項式の積を計算する際に、 1 の N 乗根の基底に基底変換し、分割統治で成分を求めた上で、元の基底に対する成分を計算することにより、 $O(N \log N)$ で計算できます。
 
 *** 実装
 
@@ -227,7 +230,7 @@ a &:= (a_0, a_1, .., a_{n-1})
 \mathcal{F}&: \{x_i\}_i \mapsto \{X_i\}_i
 \\ \mathcal{F^{-1}}&: \{X_i\}_i \mapsto \{x_i\}_i
 \\ X_k &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{nk}
-\\ x_n &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{-nk}
+\\ x_k &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} X_n W_N^{-nk}
 \end{aligned}
 
 FFT の図は前回同様で、 IDFT の計算方法もこの図から分かります:
@@ -240,7 +243,7 @@ FFT の図は前回同様で、 IDFT の計算方法もこの図から分かり�
   [[https://www.linkedin.com/pulse/%E7%B5%B6%E5%AF%BE%E3%81%AB%E3%82%84%E3%81%A3%E3%81%A6%E3%81%AF%E3%81%84%E3%81%91%E3%81%AA%E3%81%84%E3%83%93%E3%83%83%E3%83%88%E5%8F%8D%E8%BB%A2-masayuki-tatebe?articleId=6539466321338425345][絶対にやってはいけないビット反転]] を参考に実装しました。逆変換は =bitRevSort= 自身です。
 
 - =butterfly=: $\mathcal{F}(\mathbb{a})$ の内、引数の並び替え以外の部分
-  上図の通り実装します。ただし $W_N^i := 1^{-N} \pmod p$ とします。
+  上図の通り実装します。ただし $W_N^i := (1^{-\frac i N}) \pmod p$ とします。
 
 - =invButtefly=: $\mathcal{F^{-1}(\mathbb{a})}$ の内、引数の並び替え以外の部分
   上図で右から左へ逆向きに回路を辿る式を考えて実装します。
@@ -259,14 +262,14 @@ FFT の図は前回同様で、 IDFT の計算方法もこの図から分かり�
 - [[https://atcoder.jp/contests/practice2/tasks/practice2_f][ACL Practice Contest F - Convolution]]
   Library Checker の問題と同じです。テストケースは弱め (?) です。
 - [[https://atcoder.jp/contests/atc001/tasks/fft_c][AtCoder Typical Contest 001 C - 高速フーリエ変換]]
-  よく考えると畳み込みそのものな問題です。テストケースが弱いので解く必要はありませんが、スライドが良いと思います。また $\bmod$ を取らない畳み込み計算の必要性を
+  よく考えると合成積そのものな問題です。テストケースが弱いので解く必要はありませんが、スライドが良いと思います。
 - [[https://atcoder.jp/contests/typical90/tasks/typical90_bm][典型 90 問 065 - RGB Ball 2 (★7)]]
   いずれ見ます……
 
 ** 中国剰余定理 (CRT / Garner's algorithm)
 
 - [[https://atcoder.jp/contests/past202203-open/tasks/past202203_n][PAST 10 N - 400億マス計算]]
-  2 つの項を選んだ積について考える時、積を指数部に持っていくことで畳み込みに持ち込める。天才ですね。ただし $\bmod$ を取らない？畳み込み計算 ([[https://atcoder.github.io/ac-library/production/document_ja/convolution.html][convolute_ll]] 相当) が必要で、そのために中国剰余定理 (CRT / Gramer Theory) を使っているようです。
+  2 つの項の和について考える時、和を指数部に持っていくことで合成積に持ち込める。天才ですね。ただし $\bmod$ を取らない？合成積 ([[https://atcoder.github.io/ac-library/production/document_ja/convolution.html][convolution\under{}ll]] 相当) が必要で、そのために中国剰余定理 (CRT / Gerner's algorithm) を使っているようです。
 
 =convolutin_ll= ([[https://github.com/atcoder/ac-library/blob/master/atcoder/convolution.hpp][convolution.hpp]])
 
@@ -274,13 +277,13 @@ FFT の図は前回同様で、 IDFT の計算方法もこの図から分かり�
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">aclのconvolution_llってどうやって実装してるんだと思ったが3本計算してCRTで復元してるのか</p>&mdash; だうなー (@downerkei) <a href="https://twitter.com/downerkei/status/1772349995368304816?ref_src=twsrc%5Etfw">March 25, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
 #+END_EXPORT
 
-CRT は理解していませんが、 ACL を写経して AC しました。今は接点を持てただけでヨシ……！
+CRT は理解していませんが、 ACL を写経して AC しました。解けるから今はヨシ……！
 
 ** 今後
 
-僕の =convolution= は、今より 10 倍速くなりそうです。今は AC できるので良しとしますが、将来的には [[https://tayu0110.hatenablog.com/entry/2023/05/06/023244][爆速なNTTを実装したい - 競プロ備忘録]] などを参考に高速化が必要です。
+僕の =convolution= は、今より 10 倍速くなりそうです。将来的には [[https://tayu0110.hatenablog.com/entry/2023/05/06/023244][爆速なNTTを実装したい - 競プロ備忘録]] などを参考に高速化が必要です。
 
-** その他
+** 関連
 
 - [[https://zenn.dev/konn/articles/2023-12-14-pure-parallel-fft-in-linear-haskell#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB][2023年の Linear Haskell で純粋・並列 FFT を実装する──「Haskell は Rust になれるのか？」補遺]]
 - FFT のハードウェア実装？
@@ -289,5 +292,5 @@ CRT は理解していませんが、 ACL を写経して AC しました。今�
 
 ** =SparseGraph= から頂点の型パラメータを削除
 
-=SparseGraph i w= においては頂点の型 =i= (=Index i=) を抽象化していましたが、 =Int= 型に固定しました。 =(x, y)= のように成分に分けた API が欲しければ、都度 =adj :: SparseGraph w -> Vertex -> U.Vector Vertex= をラップした関数を作成します。
+=SparseGraph i w= においては頂点の型 =i= (=Index i=) を抽象化していましたが、 =Int= 型に固定しました。 =(x, y)= のように成分に分けた API が欲しければ、都度グラフをラップした関数を作成します。
 
