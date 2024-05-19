@@ -261,7 +261,7 @@ a &:= (a_0, a_1, .., a_{n-1})
 \end{align}
 
 <p>
-数列の例としては多項式の係数があります。多項式の積の係数部分は畳み込みで表されます。この辺りは <a href="https://manabitimes.jp/math/954">高校数学の美しい物語</a> の図解が良かったです。<br>
+数列の例としては多項式の係数があります。多項式の積の係数部分は合成積で表されます。この辺りは <a href="https://manabitimes.jp/math/954">高校数学の美しい物語</a> の図解が良かったです。<br>
 </p>
 
 \begin{align}
@@ -329,13 +329,13 @@ FFT の図は前回同様で、 IDFT の計算方法もこの図から分かり�
 <li><a href="https://atcoder.jp/contests/practice2/tasks/practice2_f">ACL Practice Contest F - Convolution</a><br>
 Library Checker の問題と同じです。テストケースは弱め (?) です。<br></li>
 <li><a href="https://atcoder.jp/contests/atc001/tasks/fft_c">AtCoder Typical Contest 001 C - 高速フーリエ変換</a><br>
-よく考えると畳み込みそのものな問題です。テストケースが弱いので解く必要はありませんが、スライドが良いと思います。<br></li>
+よく考えると合成積そのものな問題です。テストケースが弱いので解く必要はありませんが、スライドが良いと思います。<br></li>
 <li><a href="https://atcoder.jp/contests/typical90/tasks/typical90_bm">典型 90 問 065 - RGB Ball 2 (★7)</a><br>
 いずれ見ます……<br></li>
 </ul>
 
 <h3 id="中国剰余定理 (CRT / Garner's algorithm)"><a href="#中国剰余定理 (CRT / Garner's algorithm)">中国剰余定理 (CRT / Garner's algorithm)</a></h3><ul><li><a href="https://atcoder.jp/contests/past202203-open/tasks/past202203_n">PAST 10 N - 400億マス計算</a><br>
-2 つの項の和について考える時、和を指数部に持っていくことで畳み込みに持ち込める。天才ですね。ただし \(\bmod\) を取らない？畳み込み計算 (<a href="https://atcoder.github.io/ac-library/production/document_ja/convolution.html">convolute<sub>ll</sub></a> 相当) が必要で、そのために中国剰余定理 (CRT / Gerner's algorithm) を使っているようです。<br></li>
+2 つの項の和について考える時、和を指数部に持っていくことで合成積に持ち込める。天才ですね。ただし \(\bmod\) を取らない？合成積 (<a href="https://atcoder.github.io/ac-library/production/document_ja/convolution.html">convolution_ll</a> 相当) が必要で、そのために中国剰余定理 (CRT / Gerner's algorithm) を使っているようです。<br></li>
 </ul>
 
 <p>
