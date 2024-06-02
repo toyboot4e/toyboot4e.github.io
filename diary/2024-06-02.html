@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 356 / PAST 上級 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 356 / PAST 上級</h1>
+      <p>Jun 2, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 356"><a href="#ABC 356">ABC 356</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/abc356">ABC 356</a> に参加しました。今回から diff
+        の予想結果を記載します。<br />
+      </p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">予想</td>
+            <td class="org-right">100</td>
+            <td class="org-right">300</td>
+            <td class="org-right">700</td>
+            <td class="org-left">1,100</td>
+            <td class="org-left">2,000</td>
+            <td class="org-left">1,700</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">18</td>
+            <td class="org-right">40</td>
+            <td class="org-right">568</td>
+            <td class="org-left">886</td>
+            <td class="org-left">1506</td>
+            <td class="org-left">2152</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        改めて、序盤の振り返りではコードゴルフをやっています。自己満ですが、億劫になって『やるだけ』と書くよりは良い気がしています。<br />
+      </p>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc356/tasks/abc356_a">A 問題</a></a>
+      </h3>
+      <p>
+        無名関数 <code>(\-&gt; .. )</code> を通常の関数にすると 1 文字節約できるみたいです。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$unwords.map show.f.map read.words;f[n,l,r]=[1..l-1]++reverse[l..r]++[r+1..n]
+main=interact$unwords.map show.(\[n,l,r]-&gt;[1..l-1]++reverse[l..r]++[r+1..n]).map read.words
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc356/tasks/abc356_b">B 問題</a></a>
+      </h3>
+      <p>
+        <code>zipWith</code> 祭りで面白かったです。 <code>zipWith</code> の良い点は 2
+        変数関数が使える点で、演算子をポイントフリースタイルで書けます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$f.map read.words
+f(n:m:r)=y.and$zipWith(&lt;=)(take m r)$foldl(zipWith(+))[0|_&lt;-[1..m]]$take n.tail$iterate(drop m)r
+y True="Yes"
+y False="No"
+</code></pre>
+      </div>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc356/tasks/abc356_c">C 問題</a></a>
+      </h3>
+      <p>
+        読解の難しい問題でした。
+        <a href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Bits.html"
+          >Data.Bits</a
+        >
+        を使用しました。<br />
+      </p>
+
+      <details>
+        <summary><code>bit</code> 関数と <code>.&amp;.</code> 演算子の使い方</summary>
+        <div class="org-src-container">
+          <pre><code class="src language-hs">ghci&gt; -- i 番目の bit (のみ) を立てる
+ghci&gt; bit 0 :: Int
+1
+ghci&gt; bit 1 :: Int
+2
+ghci&gt; bit 2 :: Int
+4
+
+ghci&gt; -- bit 積を取る
+ghci&gt; 0b11 .&amp;. 0b01 :: Int -- 3 .&amp;. 1
+1
+ghci&gt; 0b11 .&amp;. 0b10 :: Int -- 3 .&amp;. 3
+2
+ghci&gt; 0b11 .&amp;. 0b11 :: Int -- 3 .&amp;. 7
+3
+
+ghci&gt; -- 立っている bit の数を数える
+ghci&gt; popCount (0b11 :: Int)
+2
+ghci&gt; popCount (0b10 :: Int)
+1
+ghci&gt; popCount (0b00 :: Int)
+0
+</code></pre>
+        </div>
+      </details>
+
+      <p>
+        ビット全探索は <code>[0 .. bit n - 1]</code> (リスト) または
+        <code>U.generate (bit n) id</code> (vector) です。<br />
+      </p>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc356/tasks/abc356_d">D 問題</a></a>
+      </h3>
+      <p>
+        D 問題は桁 DP で解きました。 \(k < N\) ならば各 bit は <code>0</code> または
+        <code>1</code> を自由に取ることができるため、 \(k = N\) と \(k < N\) で場合分けします。<br />
+      </p>
+
+      <p>
+        難し過ぎて、 QuickCheck で愚直解と高速解を比較しました。参考:
+        <a href="https://blog.miz-ar.info/2020/08/debugging-with-quickcheck/"
+          >QuickCheckで競プロ用Haskellコードをデバッグする</a
+        ><br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span>QuickCheck によるテスト</label
+        >
+        <pre><code class="src language-hs">-- 0 ~ 7 の N, M に対して愚直回と高速解を比較する
+propQC :: QC.Property
+propQC =
+  QC.forAll (QC.choose (0, maxN)) $ \n -&gt; do
+    QC.forAll (QC.choose (0, maxN)) $ \m -&gt; do
+      solveNaive n m QC.=== solve' n m
+  where
+    maxN = bit (3 - 1) :: Int
+
+-- 100 ケースをテストする
+runQC :: IO ()
+runQC = QC.quickCheck (QC.withMaxSuccess 100 propQC)
+</code></pre>
+      </div>
+
+      <p>
+        今回は REPL からテスト実行していました。コード編集の度に <code>:r</code> (reload) します:<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span>REPL からテスト実行</label
+        >
+        <pre><code class="src language-txt">$ stack repl d/Main.hs
+Ok, one module loaded.
+Loaded GHCi configuration ..
+
+REPL に入ったお                            ＿＿＿
+                                       ／　　　 　 ＼
+ghci&gt; runQC                         ／⌒　　 ⌒　　 ＼
++++ OK, passed 100 tests.        ／（● ）　（● ）　　　ヽ
+                                |　⌒（__人__）⌒　 　 　 |
+100 ケース通ったみたいだけど、    ＼ 　 ｀⌒ ´　　　　　／
+これで提出して大丈夫なんだお？       /　　　　 　 　 　 　 ＼
+
+　　 ／￣￣＼
+　／　　 _ノ　　＼
+　|　　　 （ ●）（●）    100 も試せば十分だろ、
+.　|　　　　 （__人__）    常識的に考えて……
+　 |　　　　　｀ ⌒´ﾉ　　　
+.　 |　　　　　　 　 }
+.　 ヽ　　　　　 　 }
+　　 ヽ　　　　　ノ　　　　　　　　＼
+　　　/　　　 く　　＼　　　　　　　 ＼
+　　　|　　　　 ＼ 　 ＼ 　 　　　　　　＼
+　 　 |　　　　|ヽ、二⌒)､　 　 　　　　　 ＼
+</code></pre>
+      </div>
+
+      <p>
+        なお quickcheck を使わずとも <code>forM_</code> で全ケースをチェックすれば良いです。<br />
+      </p>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc356/tasks/abc356_e">E 問題</a></a>
+      </h3>
+      <p>
+        \(\sum\) の一括計算が思いつかず飛ばしました。調和級数と言われても何も思いつきません。
+        Upsolve します。<br />
+      </p>
+
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc356/tasks/abc356_f">F 問題</a></a>
+      </h3>
+      <p>平方分割を考えていましたが、セグメント木で解けますね。<br /></p>
+
+      <p>セグ木を 2 本用意しました。モノイドも 2 種類です。<br /></p>
+
+      <ul>
+        <li>左から右へ区間を繋げていくモノイド<br /></li>
+        <li>右から左へ区間を繋げていくモノイド<br /></li>
+      </ul>
+
+      <p>
+        これで 1 点から左右に伸ばせる区間が分かります。また区間和を取るために 3
+        本目のセグ木を使いました。<br />
+      </p>
+
+      <p>
+        その他気になる解法には区間を set で管理するテクニックがあります。解説も読んでみます。<br />
+      </p>
+
+      <h2 id="PAST (アルゴリズム実技検定)">
+        <a href="#PAST (アルゴリズム実技検定)">PAST (アルゴリズム実技検定)</a>
+      </h2>
+      <p>
+        PAST で出題される問題は典型問題が多いようです。実感としては、 upsolve
+        するのも困難な骨太の問題ばかりです。 PAST (典型問題)
+        が解けるなら十二分の実力があると思います。<br />
+      </p>
+
+      <h3 id="PAST 18"><a href="#PAST 18">PAST 18</a></h3>
+      <p>
+        第 18
+        回アルゴリズム実技検定を受験し、結果は中級でした。時間はあったのに解ける問題がありませんでした。やはり上級は相当厳しいです。<br />
+      </p>
+
+      <h3 id="PAST 19"><a href="#PAST 19">PAST 19</a></h3>
+      <p>第 19 回アルゴリズム実技検定を受験し、上級を取得しました。<br /></p>
+
+      <figure>
+        <img src="./img/2024-06-02-past.png" alt="2024-06-02-past.png" /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 1: </span>15 問中 12 問が解ければ上級
+        </figcaption>
+      </figure>
+
+      <p>試験期間終了まで、これ以上言及できません。<br /></p>
+
+      <h3 id="PAST の出題傾向"><a href="#PAST の出題傾向">PAST の出題傾向</a></h3>
+      <ul>
+        <li>
+          序盤は場合分けが煩雑になる問題が多い<br />
+          序盤でも困難な問題が多いです。ただしランダムテストによってコーナーケースを発見できるため、確実に解ける問題にできます。
+          <a href="https://atcoder.jp/contests/past15-open/tasks/past202306_d">この問題</a>
+          だけは解答が間違っている気がしますが……<br />
+        </li>
+
+        <li>
+          中盤は典型問題が多い<br />
+          過去問を解いて典型を網羅しました。グラフと DP が特に出ますね。<br />
+        </li>
+
+        <li>
+          中盤はテストケースが強い<br />
+          \(\log\) を付けると落とされる場合が多く、尺取り法や Warshall-Floyd
+          などアルゴリズムの選択に慎重になる必要があります。<br />
+        </li>
+
+        <li>
+          後半は高度典型が出る<br />
+          アルゴリズム一発の問題もあれば、典型 90
+          問のような考察テクニックが要求される問題もあります。今後、本格的に取り組んでみたいです。<br />
+        </li>
+      </ul>
+
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="Haskell にはコールスタックが無い">
+        <a href="#Haskell にはコールスタックが無い">Haskell にはコールスタックが無い</a>
+      </h3>
+      <p>Arithmetic overflow が出ました。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs"> ghci&gt; testBit (0 :: Int) (-1 :: Int)
+ *** Exception: arithmetic overflow
+</code></pre>
+      </div>
+
+      <p>
+        厄介なのは、どのコールが例外を出したのか分からない点です。そもそも Haskell
+        にはコールスタックが無いとかなんとか。確認中です。<br />
+      </p>
+
+      <p>
+        <a href="https://0xd34df00d.me/posts/2020/08/callstacks.html"
+          >Call stacks aren't really call stacks — 0xd34df00d.me</a
+        ><br />
+      </p>
+
+      <p>
+        次回は Haskell のデバッガや DAP の使い方を調べていこうかと思います。メモ:
+        アルゴリズム面は区間を set で管理するテクニック<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
