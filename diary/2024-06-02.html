@@ -191,7 +191,7 @@ propQC =
     QC.forAll (QC.choose (0, maxN)) $ \m -&gt; do
       solveNaive n m QC.=== solve' n m
   where
-    maxN = bit (3 - 1) :: Int
+    maxN = bit 3 - 1 :: Int
 
 -- 100 ケースをテストする
 runQC :: IO ()
