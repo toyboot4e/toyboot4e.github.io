@@ -201,14 +201,15 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
 
       <ul>
         <li>
-          <code>insertIM :​: Int -&gt; Int -&gt; a -&gt; RangeMap a -&gt; RangeMap a</code><br />
+          <code>insertIM :​: Int -&gt; Int -&gt; a -&gt; IntervalMap a -&gt; IntervalMap a</code
+          ><br />
           <code>[l, r]</code> 区間の値を
           <code>x</code>
           にします。区間同士の重複した部分は、後から挿入された区間によって上書きされるものとします。<br />
         </li>
 
         <li>
-          <code>deleteIM :​: Int -&gt; Int -&gt; RangeMap a -&gt; RangeMap a</code><br />
+          <code>deleteIM :​: Int -&gt; Int -&gt; IntervalMap a -&gt; IntervalMap a</code><br />
           <code>[l, r]</code> 区間の値を削除します。<br />
         </li>
       </ul>
