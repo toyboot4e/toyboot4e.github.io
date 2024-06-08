@@ -152,8 +152,7 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
       </p>
 
       <p>
-        \(S := \sum\limits_{i \in [0, \mathcal{len})} p^i\)
-        の計算方法は、数列でしこたまやったやつですね。<br />
+        \(S := \sum\limits_{i \in [0, x)} p^i\) の計算方法は、数列でしこたまやったやつですね。<br />
       </p>
 
       \begin{aligned} S &= p^0 + p^1 + \dots + p^{x - 1} \\ p S &= 0 + p^1 + \dots + p^{x - 1} +
@@ -337,7 +336,7 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
       <h3 id="Quickcheck の書き方の調べ方">
         <a href="#Quickcheck の書き方の調べ方">Quickcheck の書き方の調べ方</a>
       </h3>
-      <p>ChatGPT にタプルのジェネレータの使い方を教えてもらいました。<br /></p>
+      <p>ChatGPT にタプルのジェネレータの書き方を教えてもらいました。<br /></p>
 
       <div class="org-src-container">
         <pre><code class="src language-hs">valueSpanGen :: Int -&gt; Int -&gt; Int -&gt; Int -&gt; Gen (Bool, (Int, Int, Int))
