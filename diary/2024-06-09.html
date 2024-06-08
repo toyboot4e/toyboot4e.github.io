@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 357 / 区間を set で管理するテク - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 357 / 区間を set で管理するテク</h1>
+      <p>Jun 9, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 357"><a href="#ABC 357">ABC 357</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/abc357">ABC 357</a> に参加しました。 Diff
+        予想は全然当たりません。<br />
+      </p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-right">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">予想</td>
+            <td class="org-right">200</td>
+            <td class="org-right">50</td>
+            <td class="org-right">600</td>
+            <td class="org-right">600</td>
+            <td class="org-left">1,100</td>
+            <td class="org-left">1,600</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">19</td>
+            <td class="org-right">26</td>
+            <td class="org-right">371</td>
+            <td class="org-right">970</td>
+            <td class="org-left">1295</td>
+            <td class="org-left">1793</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc357/tasks/abc357_a">A 問題</a></a>
+      </h3>
+      <p>1 問目から飛ばし気味です。累積和を考えると良いですね。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$show.f.map read.words;f(_:m:r)=length.takeWhile(&lt;=m)$scanl1(+)r
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc357/tasks/abc357_b">B 問題</a></a>
+      </h3>
+      <p>
+        <a href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html"
+          >Data.Char</a
+        >
+        に
+        <a href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html#v:isUpper"
+          >isUpper</a
+        >,
+        <a href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html#v:toUpper"
+          >toUpper</a
+        >,
+        <a href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html#v:isLower"
+          >isLower</a
+        >,
+        <a href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html#v:toLower"
+          >toLower</a
+        >
+        があります。
+        <a href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html#v:ord"
+          >ord :: Char -&gt; Int</a
+        >
+        もよく使います。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">import Data.Char
+main=interact$flip map&lt;*&gt;f.sum.map(g.isUpper).init
+g b|b=1|0&lt;1=(-1)
+f n|n&gt;0=toUpper|1&gt;0=toLower
+</code></pre>
+      </div>
+
+      <p>
+        <code>interact</code> には改行文字が付いてくるので
+        <code>init</code> で切り落としました。<br />
+      </p>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc357/tasks/abc357_c">C 問題</a></a>
+      </h3>
+      <p>
+        手続き的にごり押ししました。皆さんの解答が美しくて良かったです。グリッドと戦う時は、いつもグシャグシャになってしまう……<br />
+      </p>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc357/tasks/abc357_d">D 問題</a></a>
+      </h3>
+      <p>
+        入力値を \(x\) とすると、 \(\sum\limits_{i \in [0, \mathcal{x})} p^i x (p :=
+        10^{\mathcal{len}})\) を計算します。<br />
+      </p>
+
+      <p>
+        \(S := \sum\limits_{i \in [0, \mathcal{len})} p^i\)
+        の計算方法は、数列でしこたまやったやつですね。<br />
+      </p>
+
+      \begin{aligned} S &= p^0 + p^1 + \dots + p^{x - 1} \\ p S &= 0 + p^1 + \dots + p^{x - 1} +
+      p^{x} \\ S &= \frac {p^{x} - p^0} {p - 1} \end{aligned}
+
+      <p>
+        \(p^x\) の部分は
+        <a href="https://booth.pm/ja/items/1577541"
+          >【電子版単体】Haskellで戦う競技プログラミング 第2版</a
+        >
+        でおなじみの Fermet の小定理およびダブリング (binary lifting)
+        で計算しました。オーバーフローには要注意です。パワー！<br />
+      </p>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc357/tasks/abc357_e">E 問題</a></a>
+      </h3>
+      <p>
+        Functional graph の問題です。閉路の部分をサイズ K の頂点 1
+        つに置き換えるようなイメージで解きました。グラフと戦う時は、いつもグシャグシャになってしまう……<br />
+      </p>
+
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc357/tasks/abc357_f">F 問題</a></a>
+      </h3>
+      <p>課題を感じさせる問題でした。<br /></p>
+
+      <ul>
+        <li>
+          平方分割力<br />
+          平方分割が安定した場合に稼げるレーティングはデカい！　良いテンプレートを作りたいです。<br />
+        </li>
+
+        <li>
+          遅延セグメント木力<br />
+          形式的には \((f_1 \diamond f_2) * (x_1 \diamond x_2) = (f_1 * x_1) \diamond (f_2 * x_2)\)
+          が成り立つように計算を考えれば良いのですが、これもイメージが乏しく対策の必要性を感じました。<br />
+        </li>
+      </ul>
+
+      <h2 id="区間を set で管理するテクニック">
+        <a href="#区間を set で管理するテクニック">区間を set で管理するテクニック</a>
+      </h2>
+      <h3 id="概要"><a href="#概要">概要</a></h3>
+      <p><code>IntervalMap</code> はある種の区間クエリを捌くシンプルなデータ型です。<br /></p>
+
+      <ul>
+        <li>
+          <code>insertIM :​: Int -&gt; Int -&gt; a -&gt; RangeMap a -&gt; RangeMap a</code><br />
+          <code>[l, r]</code> 区間の値を
+          <code>x</code>
+          にします。区間同士の重複した部分は、後から挿入された区間によって上書きされるものとします。<br />
+        </li>
+
+        <li>
+          <code>deleteIM :​: Int -&gt; Int -&gt; RangeMap a -&gt; RangeMap a</code><br />
+          <code>[l, r]</code> 区間の値を削除します。<br />
+        </li>
+      </ul>
+
+      <h4 id="例"><a href="#例">例</a></h4>
+      <div class="org-src-container">
+        <pre><code class="src language-txt">初期状態:
+    [---------]       [---------]  [-------]
+         x                 y           z
+
+値 a の区間を挿入する:
+                             ********
+    [---------]       [-----][------][-----]
+         x               y      a       z
+
+区間を削除する:
+          ***************
+    [----]               [--][------][-----]
+       x                 y      a      z
+</code></pre>
+      </div>
+
+      <h4 id="償却計算量について (お気持ち解説)">
+        <a href="#償却計算量について (お気持ち解説)">償却計算量について (お気持ち解説)</a>
+      </h4>
+      <p>
+        区間の数は 1 度の挿入で高だが 2
+        つしか増えません。また多数の区間を上書き／削除した場合、区間の数はごっそりと減ります。よって
+        insert/delete の償却計算量は区間数に比例しません。<br />
+      </p>
+
+      <h4 id="命名について"><a href="#命名について">命名について</a></h4>
+      <p>
+        区間 <code>[l, r]</code> の訳は interval <code>[l, r]</code> であり、 range map よりも
+        interval map と呼ぶのが適切なようです。<br />
+      </p>
+
+      <p>
+        と言いつつ Haskell には
+        <a href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Ix.html#v:inRange"
+          >inRange</a
+        >
+        関数があるため、 Haskell においては
+        <code>RangeMap</code> と呼ぶのも問題無い気がします。<br />
+      </p>
+
+      <h3 id="リファレンス実装"><a href="#リファレンス実装">リファレンス実装</a></h3>
+      <p>
+        <a href="https://atcoder.jp/contests/past202104-open/tasks/past202104_m"
+          >PAST 06 M - 等しい数</a
+        >
+        は、上記のテクを持っていると「やるだけ」な問題です。解説
+        <a href="https://noimi.hatenablog.com/entry/2021/05/02/195143"
+          >区間を管理する構造体 - のいみのいみのいみのいみ</a
+        >
+        を写経して <code>IntervalMap</code> を実装しました。<br />
+      </p>
+
+      <p>
+        C++ の <code>std::set</code> は
+        <a href="https://cpprefjp.github.io/reference/set/set/upper_bound.html">upper_bound</a>
+        が左から右へのイテレータを返す点などが良さそうでした。実際、
+        <a href="https://atcoder.jp/contests/past202104-open/submissions/22259205"
+          >noimi さんの提出</a
+        >
+        が 328 ms で
+        <a href="https://atcoder.jp/contests/past202104-open/submissions/54303097">僕の提出</a> が
+        1055 ~ 1304 ms です。速い木が欲しい……！<br />
+      </p>
+
+      <h3 id="Quickcheck"><a href="#Quickcheck">Quickcheck</a></h3>
+      <p>
+        Insert/delete のクエリを生成し、 <code>IntervalMap</code> の計算結果を愚直解と比較する
+        quickcheck を作成しました。あまり個々の property をチェックする必要性を感じません。<br />
+      </p>
+
+      <h3 id="感想"><a href="#感想">感想</a></h3>
+      <p>
+        素直な方法でした。アルゴリズムとしては Union-Find
+        よりも簡単な気がしますが、なぜか『高度典型』に含まれるようです。<br />
+      </p>
+
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="デバッグ"><a href="#デバッグ">デバッグ</a></h3>
+      <p>
+        未だに runtime error の発生箇所が分からない問題……悲しいです。至るところに
+        <code>HasCallStack</code> があれば良いのに……。<br />
+      </p>
+
+      <p>
+        vector に関しては <code>U.(!)</code> に
+        <code>HasCallStack</code> が付いていない問題を理解し、
+        <a href="https://github.com/haskell">issue を立てました</a> 。
+        <code>U.(!)</code> の実行時エラーは発生箇所が分かりませんが、
+        <code>G.(!)</code> の方はフルでスタックトレースが出ます。
+        <code>G.(!)</code> を好んで使うべきでしょう。<br />
+      </p>
+
+      <p>
+        実行時エラーの際に、常にスタックトレースを表示するようなデバッグビルドを探しています。たとえば
+        <code>stack</code> で
+        <code>--trace</code> 引数を使うと……何も起きません。気軽に調べます。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a href="https://docs.haskellstack.org/en/stable/debugging/"
+            >Debugging - The Haskell Tool Stack</a
+          ><br />
+        </li>
+        <li><a href="https://wiki.haskell.org/Debugging">Debugging - HaskellWiki</a><br /></li>
+        <li>
+          <a
+            href="https://downloads.haskell.org/ghc/latest/docs/users_guide/ghci.html#the-ghci-debugger"
+            >3.5. The GHCi Debugger</a
+          >
+          (公式ドキュメント)<br />
+        </li>
+        <li>
+          <a href="https://github.com/phoityne/hdx4emacs">https://github.com/phoityne/hdx4emacs</a>
+          (dap-mode の設定)<br />
+        </li>
+      </ul>
+
+      <h3 id="Quickcheck の書き方の調べ方">
+        <a href="#Quickcheck の書き方の調べ方">Quickcheck の書き方の調べ方</a>
+      </h3>
+      <p>ChatGPT にタプルのジェネレータの使い方を教えてもらいました。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">valueSpanGen :: Int -&gt; Int -&gt; Int -&gt; Int -&gt; Gen (Bool, (Int, Int, Int))
+valueSpanGen l0 r0 xl xr = do
+  l &lt;- QC.chooseInt (l0, r0)
+  r &lt;- QC.chooseInt (l, r0)
+  x &lt;- QC.chooseInt (xl, xr)
+  return (True, (l, r, x))
+</code></pre>
+      </div>
+
+      <p>
+        <code>Property</code> を作る際には、それぞれの <code>Gen</code> を
+        <code>QC.forAll</code> にかける必要があります。
+        <code>forAll</code> のネストを減らしたければ、
+        <code>Gen</code> の方をタプルにまとめてしまえば良いようです。<br />
+      </p>
+
+      <h3 id="ガチ言語 Haskell"><a href="#ガチ言語 Haskell">ガチ言語 Haskell</a></h3>
+      <p>99 likes まで言っていました。ありがとう……読みづらくてごめんなさい……<br /></p>
+
+      <p>
+        入門とはトラブルシューティングのことだと思っていたので、そうした事例の寄せ集めになっているかと思います。
+        <strong><strong>読み通すだけでレベルアップできるような構成</strong></strong>
+        を目指すべきだと反省しています。書き直したい……！<br />
+      </p>
+
+      <h3 id="やる夫"><a href="#やる夫">やる夫</a></h3>
+      <p>やる夫を書いてみたかったのですが、厳しい状況でした。<br /></p>
+
+      <ul>
+        <li>
+          <a href="https://yaruo.fandom.com/wiki/%EF%BC%88%C2%B4%D0%B4%EF%BD%80%EF%BC%89Edit"
+            >(´Д｀)Edit</a
+          >
+          は 2010 年辺りで開発が止まっている<br />
+        </li>
+        <li>そもそも Windows 以外の環境で表示崩れしがち (MS Gothic 前提)<br /></li>
+      </ul>
+
+      <p>Haskeller やる夫、 brainf*ck 霊夢、 Nibbles の妖精などを見てみたかったです。<br /></p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
