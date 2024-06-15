@@ -389,7 +389,7 @@ saOfNaive bs =
 
       <p>
         ここで \(\mathcal{lcp}[i] := \mathcal{lcp}(s[sa[i]:], s[sa[i+1]:])\) を用いて
-        \(\mathcal{lcp}(i, j) = \min \{ \mathcal{lcp}[k, k+1] ) \}_{k \in [i .. j)}\) のようです。
+        \(\mathcal{lcp}(i, j) = \min \{ \mathcal{lcp}[k] ) \}_{k \in [i .. j)}\) のようです。
         \(\mathcal{lcp}\) 配列の添字が辞書順ソート後の接尾辞列に対する添字であることを考えると、
         \(s[sa[i]:]\) から \(s[sa[j]:]\) までの間は、徐々に \(s[sa[j]:]\)
         に向かって文字列が編集されていくように見えます。実際 \(\mathcal{lcp}(s[sa[i]:], s[sa[k]:])\)
