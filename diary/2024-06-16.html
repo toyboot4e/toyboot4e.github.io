@@ -360,8 +360,8 @@ saOfNaive bs =
       <h4 id="Library checker"><a href="#Library checker">Library checker</a></h4>
       <p>
         <a href="https://judge.yosupo.jp/problem/suffixarray">Suffix Array - Library Checker</a> が
-        <a href="https://judge.yosupo.jp/submission/215153">234 ms</a> でした。 \((O(N))\) 実装は 2
-        ~ 7 倍速くなります。<br />
+        <a href="https://judge.yosupo.jp/submission/215153">234 ms</a> でした。 \(O(N)\) 実装は 2 ~
+        7 倍速くなります。<br />
       </p>
 
       <h3 id="\(O(N)\) 実装 (スキップ)">
@@ -391,7 +391,7 @@ saOfNaive bs =
         ここで \(\mathcal{lcp}[i] := \mathcal{lcp}(s[sa[i]:], s[sa[i+1]:])\) を用いて
         \(\mathcal{lcp}(i, j) = \min \{ \mathcal{lcp}[k, k+1] ) \}_{k \in [i .. j)}\) のようです。
         \(\mathcal{lcp}\) 配列の添字が辞書順ソート後の接尾辞列に対する添字であることを考えると、
-        \(s[sa[i]:]\) から \(s[sa[j]:]\) まで徐々に \(s[sa[j]]\)
+        \(s[sa[i]:]\) から \(s[sa[j]:]\) までの間は、徐々に \(s[sa[j]:]\)
         に向かって文字列が編集されていくように見えます。実際 \(\mathcal{lcp}(s[sa[i]:], s[sa[k]:])\)
         は \(k\) が増加するにつれて単調減少します。ここで \(k \in [i .. j - 1]\) の範囲で
         <code>min</code> 演算子で LCP を畳み込むことで \(lcp(s[sa[i]:], s[sa[j]:])\)
@@ -445,7 +445,7 @@ saOfNaive bs =
       \mathcal{lcp}[\mathcal{sa}^{-1}[i]] - 1 \\ \end{aligned}
 
       <p>
-        2 行目は \(s[(i+1):], s[(\mathcal{sa}^{-1}[i]+1]+1):]\) が存在し
+        3 行目は \(s[(i+1):], s[(\mathcal{sa}^{-1}[i]+1]+1):]\) が存在し
         \(\mathcal{sortedIndexOf}(s[(i+1):]) <
         \mathcal{sortedIndexOf}(s[(\mathcal{sa}^{-1}[i]+2):])\) から前項 (LCP の min 畳み込み)
         によって証明できます。<br />
@@ -460,8 +460,8 @@ saOfNaive bs =
       </p>
 
       <p>
-        なぜ \(\mathcal{lcp}[i]\) を引けば良いのか。それは suffix の prefix + 対象の prefix が他の
-        prefix と一致することを避けるためのようです。この辺も難しい。。<br />
+        なぜ \(\mathcal{lcp}[i]\) を引けば良いのか。それは prefix の suffix + 対象の suffix が他の
+        suffix と一致することを避けるためのようです。この辺も難しい。。<br />
       </p>
 
       <ul>
