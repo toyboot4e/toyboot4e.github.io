@@ -454,9 +454,9 @@ saOfNaive bs =
       <h4 id="ACL / Library Checker"><a href="#ACL / Library Checker">ACL / Library Checker</a></h4>
       <p>
         ユニークな部分列の数を数える問題です。ここでも suffix array 上で隣接する 2 項間の LCP
-        間が最大であることを踏まえて、 \(\mathcal{sa}[i]\) と結合できる prefix (空でも良い)
+        値が最大であることを踏まえて、 \(\mathcal{sa}[i]\) と結合できる prefix (空でも良い)
         を重複無く数える式を考えると \(\sum\limits_i {(n - \mathcal{sa}[i] - \mathcal{lcp}[i])} =
-        n^2 - \frac {n (n + 1)} {2} - \sum\limits_i \mathcal{lcp}[i]\) が導かれます。<br />
+        n^2 - \frac {n (n - 1)} {2} - \sum\limits_i \mathcal{lcp}[i]\) が導かれます。<br />
       </p>
 
       <p>
