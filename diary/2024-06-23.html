@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 034 / ABC 359 / Floor Sum, CRT, CHT - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 034 / ABC 359 / Floor Sum, CRT, CHT</h1>
+      <p>Jun 23, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="AHC 034"><a href="#AHC 034">AHC 034</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/ahc034">AHC 034</a> に参加しました。グリッドに +-100
+        の値が設定されており、効率良く 0
+        に均す問題でした。いつも通り適当にパスを作ってうろちょろすることしかできず、成長の仕方が分かりません。<br />
+      </p>
+
+      <video src="./img/2024-06-23-ahc034.mp4" preload="auto" controls></video>
+
+      <p>
+        yosupo さんが 1 位でした。かっこいい。
+        <a href="https://yosupo.hatenablog.com/entry/2024/06/17/221003"
+          >トヨタ自動車プログラミングコンテスト2024#6（AtCoder Heuristic Contest 034) 解法 -
+          よすぽの日記</a
+        ><br />
+      </p>
+
+      <h2 id="ABC 359"><a href="#ABC 359">ABC 359</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc359">ABC 359</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-left">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">予想</td>
+            <td class="org-right">10</td>
+            <td class="org-right">300</td>
+            <td class="org-left">1,300</td>
+            <td class="org-left">1,100</td>
+            <td class="org-left">1,500</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">10</td>
+            <td class="org-right">27</td>
+            <td class="org-left">828</td>
+            <td class="org-left">1381</td>
+            <td class="org-left">1275</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc359/tasks/abc359_a">A 問題</a></a>
+      </h3>
+      <p>なんと文字検索の問題でした:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$show.length.filter(=='T')
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc359/tasks/abc359_b">B 問題</a></a>
+      </h3>
+      <p>\(i \in [0, 2n - 3]\) の範囲で見ます:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$show.sum.f.map read.words;f(n:x)=[1|i&lt;-[0..2*n-3],x!!i==x!!(i+2)]]
+</code></pre>
+      </div>
+
+      <p><code>zipWith3</code> を使うが上手い方法ですね:<br /></p>
+
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          B を zipWith3 で華麗に解いたのでボーナス点ください
+          <a href="https://t.co/zkJvzLdVBy">pic.twitter.com/zkJvzLdVBy</a>
+        </p>
+        &mdash; naoya (@naoya_ito)
+        <a href="https://twitter.com/naoya_ito/status/1804523247930949788?ref_src=twsrc%5Etfw"
+          >June 22, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc359/tasks/abc359_c">C 問題</a></a>
+      </h3>
+      <p>無理過ぎる……<br /></p>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc359/tasks/abc359_d">D 問題</a></a>
+      </h3>
+      <p>
+        直前 K 文字の状態を持って DP します。 \(K\) 文字目までと \(K\)
+        文字目以降で処理が変わるのが厄介なところです。<br />
+      </p>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc359/tasks/abc359_e">E 問題</a></a>
+      </h3>
+      <p>
+        \(i\) 番目の壁を乗り越えるためには、 \(j \le i (\forall k \in [j, i], A[k] \le A[i])\)
+        を高さ \(A[i]\) まで埋める必要があります。また \(j - 1\) 番目の壁を乗り越えるためには、
+        \(dp[j - 1]\) の水が必要です。<br />
+      </p>
+
+      <h4 id="DP 解法 1. [x] 区間 Max の 2 分探索">
+        <a href="#DP 解法 1. [x] 区間 Max の 2 分探索"
+          >DP 解法 1. [x] 区間 <code>Max</code> の 2 分探索</a
+        >
+      </h4>
+      <p>
+        <code>Max</code> モノイドのセグメント木を持ちます。上記の \(j\) を 2
+        分探索によって発見します。計算量は \(O(N \log^2 N)\) ですが、簡単で良い方法だと思います。<br />
+      </p>
+
+      <h4 id="DP 解法 2. [ ] 区間 Max を伸ばしていくモノイド">
+        <a href="#DP 解法 2. [ ] 区間 Max を伸ばしていくモノイド"
+          >DP 解法 2. [ ] 区間 <code>Max</code> を伸ばしていくモノイド</a
+        >
+      </h4>
+      <p>
+        区間 <code>Max</code> をどこまで伸ばしていけるか判定するためのモノイドを作成します。計算量は
+        \(O(N \log N)\)
+        ですが、真横のモノイド同士しか結合できないなど、細かい判定がかなり大変です。<br />
+      </p>
+
+      <h4 id="DP 解法 3. [ ] 遅延伝播セグメント木を用いたシミュレーション">
+        <a href="#DP 解法 3. [ ] 遅延伝播セグメント木を用いたシミュレーション"
+          >DP 解法 3. [ ] 遅延伝播セグメント木を用いたシミュレーション</a
+        >
+      </h4>
+      <p>同様に、重い方針だと思います。<br /></p>
+
+      <h4 id="別解. [ ] スタックを持ってシミュレーション">
+        <a href="#別解. [ ] スタックを持ってシミュレーション"
+          >別解. [ ] スタックを持ってシミュレーション</a
+        >
+      </h4>
+      <p>
+        なるほど。ここでスタックは償却計算量 \(O(1)\) (1 回のクエリで最大 1
+        つのみ要素が追加され、それぞれの要素は最大 1 度のみ使用される) であり、 \(O(N)\)
+        で解けるみたいです。<br />
+      </p>
+
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          アライグマ「E問題は、最大長方形問題みたいにスタックを使うのだ！　前の壁より高い壁が出てきたら、前のゾーンも高い壁の高さまで行かないと超えられないから、今まで越えた壁の高さと位置をスタックで持ちながら計算すればいいのだ！」
+          <a href="https://t.co/zipQFclCgL">pic.twitter.com/zipQFclCgL</a>
+        </p>
+        &mdash; 競技プログラミングをするフレンズ (@kyopro_friends)
+        <a href="https://twitter.com/kyopro_friends/status/1804517516225728867?ref_src=twsrc%5Etfw"
+          >June 22, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc359/tasks/abc359_f">F 問題</a></a>
+      </h3>
+      <p>難しそうですが……。<br /></p>
+
+      <h2 id="Floor sum (unsigned)"><a href="#Floor sum (unsigned)">Floor sum (unsigned)</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/practice2">AtCoder Library Practice Contest (ALPC)</a>
+        を埋めました。最後に残った問題が <code>floor_sum</code> でした。
+        <code>floor_sum</code> の解説は、
+        <a href="https://qiita.com/AkariLuminous/items/3e2c80baa6d5e6f3abe9"
+          >【math編】AtCoder Library 解読 〜Pythonでの実装まで〜</a
+        >
+        が良かったです。この記事の図を写経して理解しました。<br />
+      </p>
+
+      <p>以下は 100% 自分用のメモです。<br /></p>
+
+      <h3 id="概要"><a href="#概要">概要</a></h3>
+      <p>
+        Floor sum は 1 次関数 \(y(x) := \frac {ax + b} {m} (a, b \in \mathbb{Z}_{\ge 0}, m \in
+        \mathbb{N})\) の下側にある格子点の数を高速で数えるアルゴリズムです。具体的には、 \(S := [(y,
+        x) | x \in [0, n), y \in (0, y(x)]]\) 中の格子点の数を \(O(\log aN)\)
+        で求めるアルゴリズムです。<br />
+      </p>
+
+      <h3 id="考察"><a href="#考察">考察</a></h3>
+      <p>\(S\) を 3 つに分けて計算します。<br /></p>
+
+      <h4 id="\(S_1, S_2\)"><a href="#\(S_1, S_2\)">\(S_1, S_2\)</a></h4>
+      <figure>
+        <img src="./img/2024-06-23-floor_sum_1.png" alt="2024-06-23-floor_sum_1.png" /><br />
+      </figure>
+
+      <ul>
+        <li>x, y の変域は半開区間であるため、 S の下端と右端には格子点がありません。<br /></li>
+
+        <li>
+          緑箇所 \(S_1 := S \cap y \le \frac {b} {m}\) 中の格子点の数は \(n \lfloor \frac b m
+          \rfloor\) です。<br />
+          <ul>
+            <li>\(\lfloor \frac b m \rfloor\) は \(y(x)\) の y 切片の整数部分です。<br /></li>
+            <li>\(y \gt 0\) に注意します。<br /></li>
+          </ul>
+        </li>
+
+        <li>
+          赤色箇所 \(S_2 := S \cap y \gt \frac {b} {m}\) 中の格子点の数は \(\sum\limits_{i=1}^{n-1}
+          \lfloor \frac a m \rfloor\) i です。<br />
+          <ul>
+            <li>
+              \(y \gt \frac {b} {m}\) より \(S_1\) と \(S_2\)
+              は共通部分を持たず、格子点のダブルカウントを避けられます。<br />
+            </li>
+            <li>
+              \(y = \lfloor \frac {a} {m} \rfloor\) は \(y(x)\) と共通の y
+              切片を持つ傾きが整数の直線であって傾きが最大のものです。 \(y \ge 0\) を保つ限り \(y =
+              \frac {a} {m}\) から \(y = x\) を引ける回数が \(\lfloor \frac a m \rfloor\)
+              であるとも言えます。<br />
+              <ul>
+                <li>
+                  y 方向の変域 \((\frac b m, \frac b m + \lfloor \frac a m \rfloor x] (x \in
+                  \mathbb{N})\) の大きさは、たとえるならば \(整数値 - \mathcal{eps}\) です。よって
+                  \(S_2\) 中の格子点の数は y 切片の値によらず常に \(\sum\limits_{i=1}^{n-1} \lfloor
+                  \frac a m \rfloor\) です。<br />
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <h4 id="\(S_3\)"><a href="#\(S_3\)">\(S_3\)</a></h4>
+      <p>
+        残る \(S_3 := [(y, x) | x \in [0, n - 1], \lfloor \frac {a} {m} \rfloor \frac {b} {m} \lt y
+        \le y(x)\) を考えます。 \(y' := y - \lfloor \frac b m \rfloor\)
+        にフォーカスします。このとき元の直線は \(y' = \frac {a} {m} + \frac {b \% m} {m}\)
+        となります。<br />
+      </p>
+
+      <figure>
+        <img src="./img/2024-06-23-floor_sum_2.png" alt="2024-06-23-floor_sum_2.png" /><br />
+      </figure>
+
+      <p>
+        実はダルマ落としのように赤い三角形部分を切り落としてしまっても、 \(S_3\)
+        からの格子点の数は変わりません。元の直線の傾きから赤い直線の傾きを引き、青い直線 \(y = \frac
+        {a\%m} {m} + \frac {b \% m} {m} := y'(n)\) が現れます::<br />
+      </p>
+
+      <figure>
+        <img src="./img/2024-06-23-floor_sum_3.png" alt="2024-06-23-floor_sum_3.png" /><br />
+      </figure>
+
+      <ul>
+        <li>
+          紫箇所は格子点の数に寄与しません。そもそも \(y''\) 軸が \(y' = y'(x)\)
+          中の最大の整数部分で切る線だからです。<br />
+        </li>
+        <li>
+          黄色箇所は格子点の数に寄与しません。なぜなら青い直線の傾き \(\frac {a\%m} {m} < 1\) かつ y
+          切片 \(\frac {b\%m} m < 1\) のため、点線を伸ばしていくと \(x = -1\) に到達する前に \(y =
+          0\) になります。<br />
+        </li>
+      </ul>
+
+      <p>ここで \(x, y'\) と \(x'', y''\) の関係を整理します。<br /></p>
+
+      \begin{aligned} x &= -y'' + n \\ y' &= -x'' + \lfloor y'(n) \rfloor \end{aligned}
+
+      <p>
+        これを肝心の直線 \(y' = \frac {a\%m} {m} x + \frac {b\%m} {m}\) に代入して整理します:<br />
+      </p>
+
+      \begin{aligned} -x'' + \lfloor y'(n) \rfloor &= \frac {a\%m} {m} (-y'' + n) + \frac {b\%m} {m}
+      \\ &= - \frac {a\%m} {m} y'' + \frac {a\%m} {m} n + \frac {b\%m} {m} \\ &= - \frac {a\%m} {m}
+      y'' + y'(n) \\ \frac {a\%m} {m} y'' &= x'' - m \lfloor y'(n) \rfloor + m y'(n) \\ &= x'' + m
+      (y'(n) - \lfloor y'(n) \rfloor) \\ &= x'' + ((a\%m)n + b\%m)\%m \\ y'' &= \frac {mx'' +
+      ((a\%m)n + b\%m)\%m} {a\%m} \end{aligned}
+
+      <ul>
+        <li>
+          \(y'(x) = \frac {(a\%m)x + b\%m} {m} := \frac {f(x)} {m}\) に対して \(m (y'(x) - \lfloor
+          y'(x) \rfloor) = f(x)\%m\)<br />
+        </li>
+      </ul>
+
+      <p>
+        上図の \(x'', y''\)
+        座標系に注目します。紫部分を除去し黄色部分をくっつけることで、元の問題と同じ形に帰着できました。よって
+        <code>floor_sum</code> は再帰的に計算できます:<br />
+      </p>
+
+      <figure>
+        <img src="./img/2024-06-23-floor_sum_4.png" alt="2024-06-23-floor_sum_4.png" /><br />
+      </figure>
+
+      <h3 id="計算式"><a href="#計算式">計算式</a></h3>
+      \begin{equation} \mathcal{floorSum}(n, m, a, b) = \begin{cases} 0 \text{ if } m = 0, \\ 0
+      \text{ if } a = 0, \\ \mathcal{fromS_1} + \mathcal{fromS_2} + \mathcal{floorSum}(n, m, a\%m,
+      b\%m) \text{ otherwise.} \end{cases} \end{equation}
+
+      <h3 id="実装"><a href="#実装">実装</a></h3>
+      <p>
+        再帰関数を書きました:
+        <a
+          href="https://github.com/toyboot4e/toy-lib/blob/cd85f68974bed83a2d874e9eba382a789831a1a0/src/Math/FloorSum.hs"
+          >Math/FloorSum.hs</a
+        >.<br />
+      </p>
+
+      <p>
+        末尾再帰 &amp; 正格評価の形 (返値を <code>!acc</code> 引数として引き回す形)
+        に書き直しても、ジャッジ環境においては高速化されませんでした。
+        <a href="https://opaupafz2.hatenablog.com/entry/2021/09/18/230521"
+          >Haskellで再帰を心置きなく書いて良い理由</a
+        >
+        を見る限りでは
+        <code>!acc</code>
+        を書いて初めてサンクを潰せるように見えますが、実はコンパイラがよしなに正格評価してくれる気がします。関連:
+        <a href="https://qiita.com/autotaker1984/items/09c5ceaa13e9077f5359#foldl-vs-foldl"
+          >foldl vs. foldl'に終止符を打つ</a
+        >
+        。<br />
+      </p>
+
+      <h3 id="計算量"><a href="#計算量">計算量</a></h3>
+      <p>
+        傾きが大きいほど計算量が増え、 \(O(\log ma)\)
+        らしいです。たぶん互助法の計算量と同じ？　今は理解する体力が残っていません……。<br />
+      </p>
+
+      <h3 id="感想"><a href="#感想">感想</a></h3>
+      <p>消耗しました。この程度の数学に 1 週間を丸ごと費やすとは……絶望ですw<br /></p>
+
+      <h3 id="Floor sum (signed)"><a href="#Floor sum (signed)">Floor sum (signed)</a></h3>
+      <p>
+        上記の <code>floorSum</code> において \(a \ge 0, b \ge 0\)
+        の成約を取り外すことができます。応用的な問題で役立つらしく、これも読み込みたいです。<br />
+      </p>
+
+      <p>
+        <a
+          href="https://qiita.com/AkariLuminous/items/3e2c80baa6d5e6f3abe9#49-a-b%E3%81%8C%E8%B2%A0%E3%81%AE%E5%A0%B4%E5%90%88"
+          >4.9. a, bが負の場合</a
+        ><br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
