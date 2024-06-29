@@ -50,7 +50,7 @@
 
       <h3 id="いつやるか？"><a href="#いつやるか？">いつやるか？</a></h3>
       <p>
-        今で (略) ABC の E 問題までに必要なコードを揃えたら頃に Library Checker
+        今で (略) ABC の E 問題までに必要なコードを揃えた頃に Library Checker
         に挑戦すると、ちょうどいいと思いました。<br />
       </p>
 
@@ -70,7 +70,8 @@
           >Online Judge Verification Helper の細かい仕様</a
         >
         や <a href="https://github.com/toyboot4e/toy-lib/tree/main/verify">toy-lib/verify</a>,
-        <code>oj</code> のエラーメッセージが参考になると思います。<br />
+        <code>oj</code> のエラーメッセージが参考になると思います。 NixOS でも (やや脱獄気味ですが？)
+        動きました。<br />
       </p>
 
       <h3 id="新設"><a href="#新設">新設</a></h3>
@@ -79,7 +80,7 @@
           <code>HashMap</code> (<code>Int</code> キーのみ)<br />
           <a href="https://github.com/maspypy/library/blob/main/ds/hashmap.hpp">ds/hashmap.hpp</a>
           を写経しました。至って普通の <code>HashMap</code> ですが、 unboxed vector
-          を使った分爆速になりました。<br />
+          を使った分爆速になりました。 Mutable なのも使い勝手良しです。<br />
         </li>
 
         <li>
@@ -111,8 +112,8 @@
         <li>
           <code>STRef</code> / <code>IORef</code> / <code>MutVar</code> → unboxed
           <code>Vector</code> に変更<br />
-          <code>MutVar</code> の boxing なデータ型であり、
-          <code>Vector</code> の方が大幅に速かったです。一番速いのは、たぶん
+          <code>MutVar</code> も boxing なデータ型であり、
+          <code>Vector</code> の方が圧倒的に速かったです。一番速いのは、たぶん
           <code>State</code> モナドでしょうか。<br />
         </li>
 
@@ -126,7 +127,7 @@
           グラフ探索のコード共通化<br />
           重み無しグラフ = 辺の重みが <code>1</code> のグラフとすることで、 BFS/DFS
           のコードを統一できました。本当は、重さの型に応じて関数を overload
-          できたら良かったのですが。<br />
+          できたら良かったです。<br />
         </li>
 
         <li>
@@ -140,8 +141,9 @@
           <ul>
             <li>
               部分木の畳み込み<br />
-              Index 後の頂点 (頂点') において部分木の頂点番号は連続しているため、 1 発で取得できます
-              (可換モノイドに限る) 。部分木のサイズをフィールドに追加しました。<br />
+              Index 後の頂点 (頂点') において
+              <strong>部分木の頂点番号は連続している</strong> ため、部分木のサイズを覚えておけば 1
+              発で取得できます (可換モノイドに限る) 。部分木のサイズをフィールドに追加しました。<br />
             </li>
             <li>
               Ancestor / level ancestor<br />
@@ -163,11 +165,11 @@
 
       <h3 id="動機"><a href="#動機">動機</a></h3>
       <p>
-        Linux で yabridge を使って VST を動かしてみましたが、動かない VST の方が遥かに多かったです。
-        DTM をやってみたければ、結局 Windows も必要なんだと思い購入しました。<br />
+        DTM です。 Linux の <code>yabridge</code> で動かない VST の方が遥かに多かったです。 DTM
+        をやってみたければ、結局 Mac/Windows が必要なんだと思い購入しました。<br />
       </p>
 
-      <h3 id="購買"><a href="#購買">購買</a></h3>
+      <h5 id="購買"><a href="#購買">購買</a></h5>
       <p>約 20 万円になりました。 GPU も無いのに……！<br /></p>
 
       <table>
@@ -261,8 +263,8 @@
       <p>既に後悔している点は以下です。<br /></p>
 
       <ul>
-        <li>CPU は AMD Ryzen 7 5700X BOX にすれば 5 万円安くできました。<br /></li>
-        <li>SSD のメーカが謎です。ある意味 1 番重要なパーツなのに、即壊れそうで不安です。<br /></li>
+        <li>CPU: AMD Ryzen 7 5700X BOX にすれば 5 万円安くできました。<br /></li>
+        <li>SSD: メーカが謎です。ある意味 1 番重要なパーツなのに、即壊れそうで不安です。<br /></li>
       </ul>
 
       <h3 id="参考: 自作以外"><a href="#参考: 自作以外">参考: 自作以外</a></h3>
