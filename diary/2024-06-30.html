@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ARC 180 / Library Checker / サブ PC - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ARC 180 / Library Checker / サブ PC</h1>
+      <p>Jun 30, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ARC 180"><a href="#ARC 180">ARC 180</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/arc180">ARC 180</a> に参加しました。 A ~ D
+        問題まで、分からないことが分かっただけでした。愚直解と比較して WA
+        のケースを発見し、これは確かにダメだとなっていました。<br />
+      </p>
+
+      <h2 id="盆栽"><a href="#盆栽">盆栽</a></h2>
+      <p>
+        <a href="https://judge.yosupo.jp/">Library Checker</a> を進めてみました (<a
+          href="https://zenn.dev/toyboot4e/scraps/3c7b727551b820#comment-737b0b6abd86ec"
+          >スクラップ</a
+        >) 。<br />
+      </p>
+
+      <h3 id="破格の待遇"><a href="#破格の待遇">破格の待遇</a></h3>
+      <p>
+        Haskell には <strong>言語名『GHC』で完璧なジャッジ環境が用意されています</strong> 。明らかに
+        Haskell は恵まれた言語です。たとえば <strong>C</strong>, Common Lisp, Fortran, Kotlin, Nim,
+        Zig
+        などはジャッジ非対応ですから、ローカルジャッジで我慢するしかありません。先人の人、ありがとう……！！<br />
+      </p>
+
+      <h3 id="いつやるか？"><a href="#いつやるか？">いつやるか？</a></h3>
+      <p>
+        今で (略) ABC の E 問題までに必要なコードを揃えたら頃に Library Checker
+        に挑戦すると、ちょうどいいと思いました。<br />
+      </p>
+
+      <h3 id="ローカルジャッジの実行方法">
+        <a href="#ローカルジャッジの実行方法">ローカルジャッジの実行方法</a>
+      </h3>
+      <p>
+        <code>verifycation-helper</code>
+        によりテストケースをダウンロードし、ローカル環境でジャッジを実施できます。特に Library
+        Checker に対しては本物のジャッジが動作するため、答えが 1
+        意に定まらない問題も正しくジャッジできます。<br />
+      </p>
+
+      <p>
+        ローカルジャッジの実行方法は、調べるのが大変です。
+        <a href="https://online-judge-tools.github.io/verification-helper/document.ja.html"
+          >Online Judge Verification Helper の細かい仕様</a
+        >
+        や <a href="https://github.com/toyboot4e/toy-lib/tree/main/verify">toy-lib/verify</a>,
+        <code>oj</code> のエラーメッセージが参考になると思います。<br />
+      </p>
+
+      <h3 id="新設"><a href="#新設">新設</a></h3>
+      <ul>
+        <li>
+          <code>HashMap</code> (<code>Int</code> キーのみ)<br />
+          <a href="https://github.com/maspypy/library/blob/main/ds/hashmap.hpp">ds/hashmap.hpp</a>
+          を写経しました。至って普通の <code>HashMap</code> ですが、 unboxed vector
+          を使った分爆速になりました。<br />
+        </li>
+
+        <li>
+          64 分木 (<code>Int</code> キーかつ \([0, n)\) の範囲のみ可)<br />
+          <a href="https://github.com/maspypy/library/blob/main/ds/fastset.hpp">da/fastset.hpp</a>
+          を写経しました。 64 分木と呼ばれていますが、原理は
+          <a href="https://docs.rs/hibitset">hibitset</a> です。なぜか大して速くありません。 maspy
+          さんの提出は爆速なので、僕の実装が悪いかも……？<br />
+        </li>
+
+        <li>
+          閉路検出<br />
+          <a href="https://drken1215.hatenablog.com/entry/2023/05/20/200517"
+            >けんちょんさんの記事</a
+          >
+          を元に閉路検出・復元を実装しました。 Functional graph だったら SCC
+          で十分ですが、一般のグラフではそうも行きません (気付いてなかった……) 。<br />
+        </li>
+
+        <li>
+          UndoableUnionFind (未実装)<br />
+          Undoable な vector を使って union-find を実装すれば良いようです。 Undoable な vector は、
+          <code>(key, value)</code> ペアを更新履歴として持っておけば良いです。<br />
+        </li>
+      </ul>
+
+      <h3 id="改良"><a href="#改良">改良</a></h3>
+      <ul>
+        <li>
+          <code>STRef</code> / <code>IORef</code> / <code>MutVar</code> → unboxed
+          <code>Vector</code> に変更<br />
+          <code>MutVar</code> の boxing なデータ型であり、
+          <code>Vector</code> の方が大幅に速かったです。一番速いのは、たぶん
+          <code>State</code> モナドでしょうか。<br />
+        </li>
+
+        <li>
+          全包囲木 DP<br />
+          辺に重みがあるタイプの全包囲木 DP に対応しました。
+          <code>onEdge :: op -&gt; (Vertex, w) -&gt; op</code> を追加しただけです。<br />
+        </li>
+
+        <li>
+          グラフ探索のコード共通化<br />
+          重み無しグラフ = 辺の重みが <code>1</code> のグラフとすることで、 BFS/DFS
+          のコードを統一できました。本当は、重さの型に応じて関数を overload
+          できたら良かったのですが。<br />
+        </li>
+
+        <li>
+          BFS, Dijkstra<br />
+          <code>whenJustM</code> (<code>Data.Tuple.Extra</code>)
+          を使って簡潔なコードになりました。<br />
+        </li>
+
+        <li>
+          HLD (heavy-light decomposition)<br />
+          <ul>
+            <li>
+              部分木の畳み込み<br />
+              Index 後の頂点 (頂点') において部分木の頂点番号は連続しているため、 1 発で取得できます
+              (可換モノイドに限る) 。部分木のサイズをフィールドに追加しました。<br />
+            </li>
+            <li>
+              Ancestor / level ancestor<br />
+              セグメント、もとい heavy/light edge 毎に一括で登って \(O(\log N)\) です。 (頂点' →
+              頂点) をフィールドに追加しました。<br />
+            </li>
+            <li>
+              Jump<br />
+              Ancestor を使って <code>(u, v)</code> 間の
+              <code>i</code>
+              番目の頂点を求めます。各頂点の深さの情報をフィールドに追加しました。<br />
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <h2 id="サブ PC 購入"><a href="#サブ PC 購入">サブ PC 購入</a></h2>
+      <p>先週サブ PC を発注しました。明日マザーボードが届きます。<br /></p>
+
+      <h3 id="動機"><a href="#動機">動機</a></h3>
+      <p>
+        Linux で yabridge を使って VST を動かしてみましたが、動かない VST の方が遥かに多かったです。
+        DTM をやってみたければ、結局 Windows も必要なんだと思い購入しました。<br />
+      </p>
+
+      <h3 id="購買"><a href="#購買">購買</a></h3>
+      <p>約 20 万円になりました。 GPU も無いのに……！<br /></p>
+
+      <table>
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">項目</th>
+            <th scope="col" class="org-left">購入品</th>
+            <th scope="col" class="org-left">値段</th>
+            <th scope="col" class="org-left">備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">CPU</td>
+            <td class="org-left">Intel Core i7 14700K</td>
+            <td class="org-left">75,363</td>
+            <td class="org-left">
+              <a href="https://browser.geekbench.com/processors/intel-core-i7-14700k"
+                >スコア 2,945 / 19,264</a
+              >
+            </td>
+          </tr>
+
+          <tr>
+            <td class="org-left">メモリ</td>
+            <td class="org-left">Patriot Viper Steel DDR4</td>
+            <td class="org-left">18,560</td>
+            <td class="org-left">3600MHz PC4-28800 64GB (32GB x2)</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">ストレージ</td>
+            <td class="org-left">Fikwot FN970</td>
+            <td class="org-left">31,280</td>
+            <td class="org-left">4 TB, M.2 2280 PCIe Gen4 x4 NVMe 1.4</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">マザーボード</td>
+            <td class="org-left">MAG B760 TOMAHAWK WIFI DDR4</td>
+            <td class="org-left">43,145</td>
+            <td class="org-left">ATX, B760</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">電源</td>
+            <td class="org-left">玄人志向 80Plus GOLD 750W</td>
+            <td class="org-left">11,209</td>
+            <td class="org-left">ATX, 750W, 80PLUS Gold</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">CPU クーラ</td>
+            <td class="org-left">DEEPCOOL AK620</td>
+            <td class="org-left">7,433</td>
+            <td class="org-left">サイド</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">PC ケース</td>
+            <td class="org-left">CORSAIR 4000D</td>
+            <td class="org-left">12,755</td>
+            <td class="org-left">ATX</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">OS</td>
+            <td class="org-left">Windows 11 Home</td>
+            <td class="org-left">16,545</td>
+            <td class="org-left">&#xa0;</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">グリス</td>
+            <td class="org-left">ARCTIC MX-4</td>
+            <td class="org-left">1,080</td>
+            <td class="org-left">&#xa0;</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>既に後悔している点は以下です。<br /></p>
+
+      <ul>
+        <li>CPU は AMD Ryzen 7 5700X BOX にすれば 5 万円安くできました。<br /></li>
+        <li>SSD のメーカが謎です。ある意味 1 番重要なパーツなのに、即壊れそうで不安です。<br /></li>
+      </ul>
+
+      <h3 id="参考: 自作以外"><a href="#参考: 自作以外">参考: 自作以外</a></h3>
+      <ul>
+        <li>
+          Mac (iMac / Mac mini / Mac Studio)<br />
+          高過ぎました。<br />
+        </li>
+
+        <li>
+          <a href="https://www.dospara.co.jp/TC798/MC13960-SN3440.html"
+            >raytrek スリープフリークス監修 DTMモデル EM7＋/G 4060</a
+          ><br />
+          Core i7-14700F / RTX 4060 / 32 GB / 2 TB で 20 万円です。これも良かったですね。<br />
+        </li>
+      </ul>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
