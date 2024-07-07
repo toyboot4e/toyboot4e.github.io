@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 360 / ABC 361 / Flakes - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 360 / ABC 361 / Flakes</h1>
+      <p>Jul 7, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 360"><a href="#ABC 360">ABC 360</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc360">ABC 360</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-right">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">予想</td>
+            <td class="org-right">10</td>
+            <td class="org-right">150</td>
+            <td class="org-right">380</td>
+            <td class="org-right">600</td>
+            <td class="org-left">1,200</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">18</td>
+            <td class="org-right">40</td>
+            <td class="org-right">568</td>
+            <td class="org-right">886</td>
+            <td class="org-left">1506</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc360/tasks/abc360_a">A 問題</a></a>
+      </h3>
+      <p><code>elemIndex</code> を比較するのが無難です。<br /></p>
+
+      <p>真の場合を列挙し、それ以外は偽とするのも良い手です。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$f;f('R':_)="Yes";f('S':'R':_)="Yes";f _="No"
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">-- 比較を短縮した場合:
+main=interact$f;f s|s&gt;"SR"||s&gt;"R"&amp;&amp;s&lt;"S"="Yes"|0&lt;1="No"
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc360/tasks/abc360_b">B 問題</a></a>
+      </h3>
+      <p>
+        <code>extra</code> パッケージの <code>chunksOf</code> でリストを row-major 行列に変換し、
+        <code>transpose</code> によって column-major 行列に変換できます。なるほど。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">import Data.List.Extra;main=interact$f.words;f[s,t]|elem t$concatMap(transpose.(`chunksOf`s))[1..length s-1]="Yes"|0&lt;1="No"
+</code></pre>
+      </div>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc360/tasks/abc360_c">C 問題</a></a>
+      </h3>
+      <p>
+        同じ箱に複数の荷物が詰められたとき、最も重い荷物以外を他の箱に移動させるのが最適です。
+        <code>accumArray</code> や <code>group . sort</code> などで解きます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">import Data.List;main=interact$show.f.map read.words;f(n:r)=sum.map(sum.map snd.init).groupBy(\(i,_)(j,_)-&gt;i==j).sort.zipWith(,)r$drop n r
+</code></pre>
+      </div>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc360/tasks/abc360_d">D 問題</a></a>
+      </h3>
+      <p>
+        左向きの蟻と右向きの蟻に分けます。右向きの蟻の位置を固定し、左向きの蟻が
+        <code>2T</code> 移動すると考えると、左向きの蟻は
+        <code>[x - 2T, x]</code>
+        の範囲の右向きの蟻とすれ違います。よって累積和によって解答できます。<br />
+      </p>
+
+      <p>転倒数を使った解答は考察が上手いですね。<br /></p>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc360/tasks/abc360_e">E 問題</a></a>
+      </h3>
+      <p>遷移は次の形です:<br /></p>
+
+      <p>
+        \[ \begin{bmatrix} p_1 \\ p_2 \\ \vdots \\ p_N \end {bmatrix} = \begin{bmatrix} a & b &
+        \dots & b \\ b & a & \dots & b \\ \vdots & \vdots & \dots & \vdots \\ b & b & \dots & a \\
+        \end{bmatrix}^k \begin{bmatrix} 1 \\ 0 \\ \vdots \\ 0 \end {bmatrix} \]<br />
+      </p>
+
+      <p>\(a, b\) の値は次の通り:<br /></p>
+
+      \begin{aligned} a &= \frac {1} {N} \frac {1} {N} + \frac {N - 1} {N} \frac {N - 1} {N} \\ b &=
+      \frac {1 - a} {N - 1} \end{aligned}
+
+      <p>遷移行列は巨大ですが、対角成分とその他に分けて計算できます。<br /></p>
+
+      <p>
+        \[ \begin{bmatrix} a & b & \dots & b \\ b & a & \dots & b \\ \vdots & \vdots & \dots &
+        \vdots \\ b & b & \dots & a \\ \end{bmatrix}^{ } \begin{bmatrix} a' & b' & \dots & b' \\ b'
+        & a' & \dots & b' \\ \vdots & \vdots & \dots & \vdots \\ b' & b' & \dots & a' \\
+        \end{bmatrix}^{ } := \begin{bmatrix} a'' & b'' & \dots & b'' \\ b'' & a'' & \dots & b'' \\
+        \vdots & \vdots & \dots & \vdots \\ b'' & b'' & \dots & a'' \\ \end{bmatrix}^{ } \]<br />
+      </p>
+
+      <p>したがって、以下を遷移とすれば良いです:<br /></p>
+
+      \begin{aligned} a'' &= a a' + (n - 1) b b' \\ b'' &= a b' + b a' + (n - 2) b b' \end{aligned}
+
+      <p>
+        期待値 (答え) は \(\sum\limits_{i=1}^{N} i p_i = p_1 + \sum\limits_{i=2}^{N} {i p_i} = p_1 +
+        p_2 (\frac {(2 + N) (N - 1)} {2})\) です。<br />
+      </p>
+
+      <h2 id="ABC 361"><a href="#ABC 361">ABC 361</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc361">ABC 361</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 2:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">予想</td>
+            <td class="org-right">10</td>
+            <td class="org-right">600</td>
+            <td class="org-right">800</td>
+            <td class="org-left">1,500</td>
+            <td class="org-left">1,000</td>
+            <td class="org-left">1,900</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">15</td>
+            <td class="org-right">299</td>
+            <td class="org-right">342</td>
+            <td class="org-left">1,202</td>
+            <td class="org-left">1,213</td>
+            <td class="org-left">1,606</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc361/tasks/abc361_a">A 問題</a></a>
+      </h3>
+      <p><code>splitAt k</code> して間に <code>x</code> を挿入する問題です。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$unwords.map show.f.map read.words;f(_:k:x:s)=take k s++[x]++drop k s
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc361/tasks/abc361_b">B 問題</a></a>
+      </h3>
+      <p>直方体の面が軸と並行なのがポイントです。<br /></p>
+
+      <p>
+        それぞれの立方体を (x, y, z) 成分の区間 (interval) 3
+        つで表します。立方体同士の体積の積は、各成分の区間 (interval) 同士の共通部分 (intersection)
+        の積です。<br />
+      </p>
+
+      <p>初見で解ける人は算数のセンスがあると思います。<br /></p>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc361/tasks/abc361_c">C 問題</a></a>
+      </h3>
+      <p>これが解けなくて先に E に行ってしまいました。<br /></p>
+
+      <p>
+        好きな要素を消して良いので、ソート後の列を考えます。最善としてありえるケースを全探索します。そのケースは、最小値を
+        K 個消す、最小値を K - 1 個・最大値を 1 個消す、……、最大値を K 個消す、の (K + 1)
+        通りです。<br />
+      </p>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc361/tasks/abc361_d">D 問題</a></a>
+      </h3>
+      <p>
+        一見 ARC ですが、 BFS の問題でした。状態数を \(3^{n+2}\) にして upsolve しました。<br />
+      </p>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc361/tasks/abc361_e">E 問題</a></a>
+      </h3>
+      <p>
+        辺に重みがあるタイプの全包囲木 DP で WA. 木の直径で十分なことに気付いて AC しました。<br />
+      </p>
+
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="Nix Flakes 入門"><a href="#Nix Flakes 入門">Nix Flakes 入門</a></h3>
+      <p>
+        <a href="../2024-07-07-nix-flakes.html">Nix Flakes に入門してみました</a> 。
+        <code>configuration.nix</code> を <code>flake.nix</code> に置き換えただけですが……。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

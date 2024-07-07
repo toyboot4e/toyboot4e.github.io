@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nix Flakes 入門 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>Nix Flakes 入門</h1>
+      <p>Jul 7, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="Flakes 事始め"><a href="#Flakes 事始め">Flakes 事始め</a></h2>
+      <p>
+        <a href="https://nixos-and-flakes.thiscute.world/">NixOS &amp; Flakes Book</a> を参考に Nix
+        Flakes に移行しました。<br />
+      </p>
+
+      <h3 id="Flakes を使うメリット"><a href="#Flakes を使うメリット">Flakes を使うメリット</a></h3>
+      <p>Flakes へのモチベーションは以下です。<br /></p>
+
+      <ol>
+        <li>
+          <code>shell.nix</code> → <code>flake.nix</code>:<br />
+          キャッシュが効くようになり、環境の切り替えが爆速になります。<br />
+        </li>
+
+        <li>
+          <code>configuration.nix</code> → <code>flake.nix</code><br />
+          モジュール分けや dotfiles リポジトリからの設定反映が簡単になります。<br />
+        </li>
+      </ol>
+
+      <h3 id="Flakes の注意点"><a href="#Flakes の注意点">Flakes の注意点</a></h3>
+      <p>
+        Nix Flakes は git worktree 中のファイルを
+        <code>/etc/nixos</code>
+        以下にファイルコピーしますが、全ユーザから読めるファイル権限となるため要注意とあります。<br />
+      </p>
+
+      <blockquote>
+        <p>
+          Warning: Since contents of flake files are copied to the world-readable Nix store folder,
+          do not put any unencrypted secrets in flake files. You should instead use a secret
+          managing scheme. - <a href="https://wiki.nixos.org/wiki/Flakes">Flakes - NixOS Wiki</a
+          ><br />
+        </p>
+      </blockquote>
+
+      <p>
+        やはりプライベートなファイルは
+        <code>.git</code> プロジェクトに置かないほうが良いでしょう。<br />
+      </p>
+
+      <h2 id="設定の実施"><a href="#設定の実施">設定の実施</a></h2>
+      <h3 id="Flakes の有効化"><a href="#Flakes の有効化">Flakes の有効化</a></h3>
+      <p>
+        Flakes は初期状態では無効ですから、
+        <code>configuration.nix</code> を編集して有効化します。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a
+            href="https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-with-flakes-enabled"
+            >NixOS with Flakes Enabled</a
+          ><br />
+        </li>
+        <li><a href="https://wiki.nixos.org/wiki/Flakes">Flakes - NixOS Wiki</a><br /></li>
+      </ul>
+
+      <h3 id="shell.nix → flake.nix">
+        <a href="#shell.nix → flake.nix"><code>shell.nix</code> → <code>flake.nix</code></a>
+      </h3>
+      <p>
+        <code>shell.nix</code> を
+        <code>flake.nix</code> に置き換えると、キャッシュが効いて爆速になります。
+        <a href="https://github.com/nix-community/nix-direnv">nix-direnv</a>
+        などで非常に有用です。<br />
+      </p>
+
+      <p>
+        Flake は git worktree (index) 上のファイルしか見えません。
+        <code>flake.nix</code> をコミットしないリポジトリであっても、一時的に
+        <code>flake.nix</code> をコミットする必要があります。<br />
+      </p>
+
+      <details>
+        <summary>
+          <code>.envrc</code> 例 (<a
+            href="https://github.com/nix-community/nix-direnv?tab=readme-ov-file#flakes-support"
+            >Flakes support</a
+          >
+          のテンプレートにより生成)
+        </summary>
+        <div class="org-src-container">
+          <pre><code class="src language-nix">if ! has nix_direnv_version || ! nix_direnv_version 3.0.4; then
+    source_url "https://raw.githubusercontent.com/nix-community/nix-direnv/3.0.4/direnvrc" "sha256-DzlYZ33mWF/Gs8DDeyjr8mnVmQGx7ASYqA5WlxwvBG4="
+fi
+use flake
+</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><code>flake.nix</code> 例</summary>
+        <p>ひとまずこれで <code>shell.nix</code> と同様にパッケージを追加できます:<br /></p>
+
+        <div class="org-src-container">
+          <pre><code class="src language-nix">{
+  description = "A basic flake with a shell";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  inputs.flake-utils.url = "github:numtide/flake-utils";
+
+  outputs = { nixpkgs, flake-utils, ... }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+      {
+        devShells.default = with pkgs; mkShell {
+          nativeBuildInputs = [
+            pkg-config
+            stack
+            cabal-install
+            llvmPackages.bintools
+          ];
+
+          packages = [
+            # atcoder-cli is from npm
+
+            online-judge-tools
+            python311Packages.selenium
+            python311Packages.pyaml
+            python311Packages.importlab
+            nodejs
+
+            hlint
+            haskell.compiler.ghc946
+            (haskell-language-server.override { supportedGhcVersions = [ "946" ]; })
+            haskellPackages.hoogle
+            haskellPackages.ghcid
+            haskellPackages.ghcide
+          ];
+        };
+      });
+}
+</code></pre>
+        </div>
+      </details>
+
+      <h3 id="NixOS の設定ファイルの flake 化">
+        <a href="#NixOS の設定ファイルの flake 化">NixOS の設定ファイルの flake 化</a>
+      </h3>
+      <p>
+        <code>/etc/nixos/</code>
+        以下の設定ファイルをローカルなリポジトリに移動することができます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-sh">.
+├── configuration.nix
+├── flake.nix
+├── hardware-configuration.nix
+└── home.nix
+</code></pre>
+      </div>
+
+      <p>
+        このようなディレクトリ下で
+        <code>sudo nixos-rebuild --flake .#&lt;ホスト名&gt;</code> を実行すると、
+        <code>flake.nix</code> を基点に OS の設定を更新することができます。<br />
+      </p>
+
+      <h4 id="flake.nix, configuration.nix">
+        <a href="#flake.nix, configuration.nix"
+          ><code>flake.nix</code>, <code>configuration.nix</code></a
+        >
+      </h4>
+      <p>
+        <a
+          href="https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-flake-configuration-explained"
+          >NixOS's <code>flake.nix</code> explained - NixOS &amp; Flakes Book</a
+        >
+        を参考に、 <code>flake.nix</code> から <code>configuration.nix</code> を読み込みます:<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span><code>flake.nix</code> 例</label
+        >
+        <pre><code class="src language-nix">{
+  # sudo nixos-rebuild --flake .#tbm
+  description = "My NixOS configuration";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  outputs = inputs@{ nixpkgs, home-manager, ... }: {
+    nixosConfigurations.tbm = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./configuration.nix
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.tbm = import ./home.nix;
+        }
+      ];
+    };
+  };
+}
+</code></pre>
+      </div>
+
+      <h4 id="home.nix">
+        <a href="#home.nix"><code>home.nix</code></a>
+      </h4>
+      <p>
+        主に Home Manager Manual を参考に <code>flake.nix</code> から
+        <code>home.nix</code> を読み込みます。 <code>configuration.nix</code> からの
+        <code>home.nix</code> の読み込みは削除します。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a
+            href="https://nixos-and-flakes.thiscute.world/nixos-with-flakes/start-using-home-manager"
+            >Getting Started with Home Manager | NixOS &amp; Flakes Book</a
+          ><br />
+        </li>
+        <li>
+          <a href="https://nix-community.github.io/home-manager/index.xhtml#ch-nix-flakes"
+            >Nix Flakes - Home Manager Manual</a
+          ><br />
+        </li>
+      </ul>
+
+      <p>
+        ここまでで
+        <code>nixos-rebuild switch --flake .#&lt;host 名&gt;</code> が動くことを確認しました。<br />
+      </p>
+
+      <h3 id="Trouble shooting"><a href="#Trouble shooting">Trouble shooting</a></h3>
+      <p>
+        ファイル分割するとエラーが出ました。謎のエラーですが、今回は最下行に原因が出ています:<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-sh">error:
+       … while calling the 'seq' builtin
+
+         at /nix/store/j4jzjbr302cw5bl0n3pch5j9bh5qwmaj-source/lib/modules.nix:322:18:
+
+          321|         options = checked options;
+          322|         config = checked (removeAttrs config [ "_module" ]);
+             |                  ^
+          323|         _module = checked (config._module);
+
+       … while evaluating a branch condition
+
+         at /nix/store/j4jzjbr302cw5bl0n3pch5j9bh5qwmaj-source/lib/modules.nix:261:9:
+
+          260|       checkUnmatched =
+          261|         if config._module.check &amp;&amp; config._module.freeformType == null &amp;&amp; merged.unmatchedDefns != [] then
+             |         ^
+          262|           let
+
+       (stack trace truncated; use '--show-trace' to show the full trace)
+
+       error: getting status of '/nix/store/djv4hwa1gsl3043wjxvzw7jf690rlcx2-source/nixos/nixos': No such file or directory
+</code></pre>
+      </div>
+
+      <p>
+        最終行を抜粋すると、分割したファイルを
+        <code>git add</code> していないことが原因でした:<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-sh">       error: getting status of '/nix/store/djv4hwa1gsl3043wjxvzw7jf690rlcx2-source/nixos/nixos': No such file or directory
+</code></pre>
+      </div>
+
+      <p>これが最大の壁でした……<br /></p>
+
+      <h3 id="fenix を overlay として導入する">
+        <a href="#fenix を overlay として導入する"><code>fenix</code> を overlay として導入する</a>
+      </h3>
+      <p>
+        <code>flake.nix</code> においても、
+        <a href="https://github.com/nix-community/fenix">fenix</a> をある種 rustup
+        の代わりとして使えます:<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-diff-nix diff-highlight">{
+  # sudo nixos-rebuild --flake .#tbm
+  description = "NixOS configuration";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
++    fenix.url = "github:nix-community/fenix/monthly";
+  };
+
+   outputs = inputs@{ nixpkgs, home-manager, ... }: {
++    packages.x86_64-linux.default = inputs.fenix.packages.x86_64-linux.default.toolchain;
+    nixosConfigurations.tbm = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./nixos
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.tbm = import ./tbm;
+        }
+      ];
+    };
+  };
+}
+</code></pre>
+      </div>
+
+      <h3 id="ファイル分割"><a href="#ファイル分割">ファイル分割</a></h3>
+      <p><code>imports</code> でファイル指定すると設定ファイルを読み込みできます。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-nix">{
+  imports = [
+    ./desktop.nix
+    ./input-mozc.nix
+    ./services.nix
+    ./virtual.nix
+  ];
+}
+</code></pre>
+      </div>
+
+      <p>
+        サブディレクトリのファイルを指定する場合、
+        <code>./dir/file.nix</code> と書いても良いですが、 <code>./dir</code> と書くと
+        <code>./dir/default.nix</code> に自動的に名前解決されます。<br />
+      </p>
+
+      <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
+      <p>
+        最小限の変更で <code>shell.nix</code> および <code>configuration.nix</code> を
+        <code>flake.nix</code> に置き換える方法を確認しました。 Nix Flakes は Git
+        に強く依存するものの、バージョンのロックやキャッシュなどのエコシステムが充実しており、有力な選択肢だと思います。<br />
+      </p>
+
+      <p>
+        まだまだ Nix / Flakes
+        の本領は引き出せていないと思いますから、今後も調べて行きたいと思います。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
