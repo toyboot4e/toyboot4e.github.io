@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 362 / Splay tree - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 362 / Splay tree</h1>
+      <p>Jul 14, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 362"><a href="#ABC 362">ABC 362</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc362">ABC 362</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          体感 Diff
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">&#xa0;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">予想</td>
+            <td class="org-right">100</td>
+            <td class="org-right">300</td>
+            <td class="org-right">600</td>
+            <td class="org-left">8,00</td>
+            <td class="org-left">2,000</td>
+            <td class="org-left">1,500</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">&#xa0;</td>
+            <td class="org-right">&#xa0;</td>
+            <td class="org-right">&#xa0;</td>
+            <td class="org-left">&#xa0;</td>
+            <td class="org-left">&#xa0;</td>
+            <td class="org-left">&#xa0;</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc362/tasks/abc362_a">A 問題</a></a>
+      </h3>
+      <p>指定色以外のペンの <code>min</code> を取ります。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$show.(f.map read.init&lt;*&gt;last).words;f[r,g,b](c:_)|c=='R'=0+min g b|c=='G'=min b r|0&lt;1=min r g
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc362/tasks/abc362_b">B 問題</a></a>
+      </h3>
+      <p>
+        三平方の定理かベクトルの内積で直角三角形を判定します。内積は \(a \cdot b = \sum_i a_i b_i =
+        |a| |b| \cos (\angle (a - b))\) より \(|a| \ne 0, |b| \ne 0\) ならば \(\sum_i a_i b_i = 0\)
+        で直角を判定できます。<br />
+      </p>
+
+      <p>前回も幾何でした。珍しい。<br /></p>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc362/tasks/abc362_c">C 問題</a></a>
+      </h3>
+      <p>Haskeller 的には難問です。解説も難しいのですが、一応書きました。<br /></p>
+
+      <p>
+        \(\{[\mathcal{dl}_i, \mathcal{dr}_i]\}_i\) が与えられ、各ステップでは \([\mathcal{dl}_i,
+        \mathcal{dr}_i]\) の範囲内で移動します。
+        <code>inRange (sum dls, sum drs) 0</code> が成り立つならば <code>0</code> で停止できます。
+        <code>0</code> で停止できるなら、各ステップの移動量を決めて行きます。<br />
+      </p>
+
+      <p>
+        まず各ステップ \(i\) で \(\mathcal{dl}_i\) だけ移動するものとして、
+        <code>0</code> に近づくために必要な分だけ \(\mathcal{dl}_i\) を \(\mathcal{dr}_i\)
+        に近づけていきます。この差分を \(\mathcal{delta}_i\) とすると、 \(\mathcal{delta}_i\)
+        列を求めて \(\mathcal{dl}_i\) 列に加算することで解答できます。<br />
+      </p>
+
+      <p>
+        \(\mathcal{delta}_i\) を決めるためには、必要な正方向への移動量を状態に持って
+        \(\{[\mathcal{dl}_i, \mathcal{dr}_i]\}_i\) を走査すれば良いです。リストならば
+        <code>mapAccumL</code> が、 <code>vector</code> ならば <code>mapM</code> +
+        <code>State</code> モナドが使えます。再帰関数を作っても良いですね。<br />
+      </p>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc362/tasks/abc362_d">D 問題</a></a>
+      </h3>
+      <p>
+        \(v_1\) と各点間の最短距離を求めます。 Dijkstra
+        法を実施したいのですが、辺と頂点の両方に重みがあります。解法は 2 つあります:<br />
+      </p>
+
+      <ol>
+        <li>
+          頂点の重みを辺の重みに繰り込む<br />
+          辺を作るときに頂点の重みを加算しておきます。<br />
+        </li>
+
+        <li>
+          頂点倍化<br />
+          <a href="https://atcoder.jp/contests/abc362/editorial/10421">evima さんの解説</a> です。
+          \(v_{in}, v_{out}\) に分けることで、頂点の重みを辺に組み込めるとか。<br />
+        </li>
+      </ol>
+
+      <p>Dijkstra 法は鉄則本やけんちょん本に載っています。枝刈りをお忘れなく！<br /></p>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc362/tasks/abc362_e">E 問題</a></a>
+      </h3>
+      <p>
+        辛い……。
+        <a href="https://atcoder.jp/contests/abc362/submissions/55548303">2 ms</a>
+        ってどういうことなんですか？！<br />
+      </p>
+
+      <h3 id="G 問題">
+        <a href="#G 問題"><a href="https://atcoder.jp/contests/abc362/tasks/abc362_g">G 問題</a></a>
+      </h3>
+      <p>苦手な文字列アルゴリズムです。 Suffix Array は最近作ったので upsolve したいです。<br /></p>
+
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="Splay tree"><a href="#Splay tree">Splay tree</a></h3>
+      <p>Link/cut tree に必要という splay tree を実装しました。<br /></p>
+
+      <h4 id="主な情報源"><a href="#主な情報源">主な情報源</a></h4>
+      <p>以下から学びました。<br /></p>
+
+      <ul>
+        <li>
+          <a href="https://www.slideshare.net/slideshow/2013-spaceships2/17575244#137"
+            >Spacesihps 解説</a
+          ><br />
+          概要を掴むのに最適です。計算量解析は飛ばします……。<br />
+        </li>
+
+        <li>
+          <a href="http://www.cs.cmu.edu/~sleator/papers/self-adjusting.pdf"
+            >Self-Adjusting Binary Search Trees</a
+          ><br />
+          元論文に top-down splaying の解説がありました。結局これが一番良さそうですね。<br />
+        </li>
+
+        <li>
+          <a href="https://github.com/sile/splay_tree">sile/splay_tree</a><br />
+          Top-down splaying を行う splay tree です。内部データを密に保つため、
+          <code>delete</code> は
+          <code>swap_remove</code> のような処理になっています。どうなんでしょう。<br />
+        </li>
+      </ul>
+
+      <h4 id="用途"><a href="#用途">用途</a></h4>
+      <p>
+        ありません。今のところ <strong>ただの遅い木</strong> です。遅延評価とか link/cut tree
+        にして初めて使い道が生まれるのかと思います。 Link/cut tree への期待が高まります。<br />
+      </p>
+
+      <h3 id="なぜ vector の concat / concatMap は \(O(N)\) なのか">
+        <a href="#なぜ vector の concat / concatMap は \(O(N)\) なのか"
+          >なぜ <code>vector</code> の <code>concat</code> / <code>concatMap</code> は \(O(N)\)
+          なのか</a
+        >
+      </h3>
+      <p>
+        <code>vector</code> の
+        <a
+          href="https://hackage.haskell.org/package/vector-0.13.1.0/docs/Data-Vector-Generic.html#v:concat"
+          >concat</a
+        >
+        は \(O(N)\) と書かれています。単純に
+        <code>(++)</code> で畳み込むわけではないようです。たとえば <code>(++)</code> を使って長さ
+        \(1\) の配列の \(N\) 個畳み込む場合、長さ \(2, 3, \dots, N\) の配列が生成されて最悪計算量は
+        \(O(N^2)\) になります。<br />
+      </p>
+
+      <h4 id="結論"><a href="#結論">結論</a></h4>
+      <p><code>MVector</code> を経由して上手いことやっています。<br /></p>
+
+      <ol>
+        <li>
+          <code>concat</code> の場合<br />
+          最終配列長が事前に分かるとしています。長さ
+          <code>n</code> の配列を作って埋めていきます。<br />
+        </li>
+
+        <li>
+          <code>concatMap</code> の場合<br />
+          最終配列長が事前に分からないものとしています (なぜ？)
+          。適当な長さの配列を作り、サイズを倍々にして行くようです。 <code>concatMap</code> が
+          \(O(N)\) で済むのは、 Rust における N 回の <code>Vec::push</code> 呼び出しが \(O(N)\)
+          なのと似ています。実際、長さ \(1, 2, 4, \dots, 2^k\) の配列を生成した場合、高々 \(4N\)
+          程度のアロケーションしかありませんから、 \(O(N)\) です。<br />
+        </li>
+      </ol>
+
+      <h4 id="unstream">
+        <a href="#unstream"><code>unstream</code></a>
+      </h4>
+      <p>
+        <a
+          href="https://hackage.haskell.org/package/vector-0.13.1.0/docs/Data-Vector-Generic.html#v:concat"
+          >concat</a
+        >
+        の中身を見ると、 <code>New.unstream</code> によって実装されています。
+        <code>unstream</code> 処理を追っていきましょう。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">-- | /O(n)/ Concatenate all vectors in the list.
+concat :: Vector v a =&gt; [v a] -&gt; v a
+{-# INLINE concat #-}
+concat = unstream . Bundle.fromVectors
+</code></pre>
+      </div>
+
+      <details>
+        <summary><code>concat</code> の関数呼び出しを辿る</summary>
+        <div class="org-src-container">
+          <label class="org-src-name"
+            ><span class="listing-number">Listing 1: </span><code>Generic.hs</code></label
+          >
+          <pre><code class="src language-hs">-- | /O(n)/ Construct a vector from a 'Bundle'.
+unstream :: Vector v a =&gt; Bundle v a -&gt; v a
+{-# INLINE unstream #-}
+unstream s = new (New.unstream s)
+
+-- | Construct a vector from a monadic initialiser.
+new :: Vector v a =&gt; New v a -&gt; v a
+{-# INLINE_FUSED new #-}
+new m = m `seq` runST (unsafeFreeze =&lt;&lt; New.run m)
+</code></pre>
+        </div>
+
+        <p><code>New.unstream</code> は <code>MVector.vunstream</code> を呼んでいます。<br /></p>
+
+        <div class="org-src-container">
+          <label class="org-src-name"
+            ><span class="listing-number">Listing 2: </span><code>New.hs</code></label
+          >
+          <pre><code class="src language-hs">-- ほぼ `MVector`
+data New v a = New (forall s. ST s (Mutable v s a))
+
+unstream :: Vector v a =&gt; Bundle v a -&gt; New v a
+{-# INLINE_FUSED unstream #-}
+unstream s = s `seq` New (MVector.vunstream s)
+</code></pre>
+        </div>
+
+        <p>さらに追いかけます。<br /></p>
+
+        <div class="org-src-container">
+          <label class="org-src-name"
+            ><span class="listing-number">Listing 3: </span><code>Mutable.hs</code></label
+          >
+          <pre><code class="src language-hs">-- | Create a new mutable vector and fill it with elements from the 'Bundle'.
+-- The vector will grow exponentially if the maximum size of the 'Bundle' is
+-- unknown.
+vunstream :: (PrimMonad m, V.Vector v a)
+         =&gt; Bundle v a -&gt; m (V.Mutable v (PrimState m) a)
+-- NOTE: replace INLINE_FUSED by INLINE? (also in unstreamR)
+{-# INLINE_FUSED vunstream #-}
+vunstream s = vmunstream (Bundle.lift s)
+</code></pre>
+        </div>
+      </details>
+
+      <p>
+        結局 <code>Mutable</code> モジュールの <code>vmunstream</code> を呼び出しており、これは
+        bundle の最大サイズが事前に分かるかで分岐しています。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 4: </span><code>Mutable.hs</code></label
+        >
+        <pre><code class="src language-hs">-- | Create a new mutable vector and fill it with elements from the monadic
+-- stream. The vector will grow exponentially if the maximum size of the stream
+-- is unknown.
+vmunstream :: (PrimMonad m, V.Vector v a)
+           =&gt; MBundle m v a -&gt; m (V.Mutable v (PrimState m) a)
+{-# INLINE_FUSED vmunstream #-}
+vmunstream s = case upperBound (MBundle.size s) of
+               Just n  -&gt; vmunstreamMax     s n
+               Nothing -&gt; vmunstreamUnknown s
+</code></pre>
+      </div>
+
+      <p>
+        サイズ <code>n</code> が事前に分かる場合は、長さ <code>n</code> の
+        <code>MVector</code> を作って埋めていきます。これが <code>concat</code> の場合です。<br />
+      </p>
+
+      <details>
+        <summary><code>vmunsteramMax</code>: bundle の最大サイズが事前に分かっている場合</summary>
+        <div class="org-src-container">
+          <pre><code class="src language-hs">vmunstreamMax :: (PrimMonad m, V.Vector v a)
+              =&gt; MBundle m v a -&gt; Int -&gt; m (V.Mutable v (PrimState m) a)
+{-# INLINE vmunstreamMax #-}
+vmunstreamMax s n
+  = do
+      v &lt;- checkLength Internal n $ unsafeNew n
+      let {-# INLINE_INNER copyChunk #-}
+          copyChunk i (Chunk m f) =
+            checkSlice Internal i m (length v) $ do
+              f (basicUnsafeSlice i m v)
+              return (i+m)
+
+      n' &lt;- Stream.foldlM' copyChunk 0 (MBundle.chunks s)
+      return $ checkSlice Internal 0 n' n
+             $ unsafeSlice 0 n' v
+</code></pre>
+        </div>
+      </details>
+
+      <p>
+        サイズが不明の場合は、 <code>MVector</code> のサイズを倍々に増やしつつ埋めていきます。これが
+        <code>concatMap</code> の場合です。<br />
+      </p>
+
+      <details>
+        <summary><code>vmunstreamUnknown</code>: bundle の最大サイズが事前に分からない場合</summary>
+        <div class="org-src-container">
+          <pre><code class="src language-hs">vmunstreamUnknown :: (PrimMonad m, V.Vector v a)
+                 =&gt; MBundle m v a -&gt; m (V.Mutable v (PrimState m) a)
+{-# INLINE vmunstreamUnknown #-}
+vmunstreamUnknown s
+  = do
+      v &lt;- unsafeNew 0
+      (v', n) &lt;- Stream.foldlM copyChunk (v,0) (MBundle.chunks s)
+      return $ checkSlice Internal 0 n (length v')
+             $ unsafeSlice 0 n v'
+  where
+    {-# INLINE_INNER copyChunk #-}
+    copyChunk (v,i) (Chunk n f)
+      = do
+          let j = i+n
+          v' &lt;- if basicLength v &lt; j
+                  then unsafeGrow v (delay_inline max (enlarge_delta v) (j - basicLength v))
+                  else return v
+          checkSlice Internal i n (length v') $ f (basicUnsafeSlice i n v')
+          return (v',j)
+</code></pre>
+        </div>
+      </details>
+
+      <h4 id=""><a href="#"></a></h4>
+      <h4 id="concat の計算量">
+        <a href="#concat の計算量"><code>concat</code> の計算量</a>
+      </h4>
+      <p>
+        <code>concat</code> はサイズが <code>Exact n</code> の <code>Bundle</code> を作って
+        <code>unstream</code> にかけています。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">-- | /O(n)/ Concatenate all vectors in the list.
+concat :: Vector v a =&gt; [v a] -&gt; v a
+{-# INLINE concat #-}
+concat = unstream . Bundle.fromVectors
+</code></pre>
+      </div>
+
+      <p>
+        Fusion
+        関係のコードは読み込めていませんが、ひとまずサイズ指定の部分だけ見れば良いかと思います
+        (<code>Exact n</code> です) 。<br />
+      </p>
+
+      <details>
+        <summary>
+          <code>Data/Vector/Fusion/Bundle/Monadic.hs</code>
+        </summary>
+        <div class="org-src-container">
+          <pre><code class="src language-hs">fromVectors :: forall m v a. (Monad m, Vector v a) =&gt; [v a] -&gt; Bundle m v a
+{-# INLINE_FUSED fromVectors #-}
+fromVectors us = Bundle (Stream pstep (Left us))
+                        (Stream vstep us)
+                        Nothing
+                        (Exact n) -- ***** これ
+  where
+    n = List.foldl' (\k v -&gt; k + basicLength v) 0 us
+
+    pstep (Left []) = return Done
+    pstep (Left (v:vs)) = basicLength v `seq` return (Skip (Right (v,0,vs)))
+
+    pstep (Right (v,i,vs))
+      | i &gt;= basicLength v = return $ Skip (Left vs)
+      | otherwise          = case basicUnsafeIndexM v i of
+                               Box x -&gt; return $ Yield x (Right (v,i+1,vs))
+
+    -- FIXME: work around bug in GHC 7.6.1
+    vstep :: HasCallStack =&gt; [v a] -&gt; m (Step [v a] (Chunk v a))
+    vstep [] = return Done
+    vstep (v:vs) = return $ Yield (Chunk (basicLength v)
+                                         (\mv -&gt; check
+                                                 Internal
+                                                 "length mismatch"
+                                                 (M.basicLength mv == basicLength v)
+                                                 $ stToPrim $ basicUnsafeCopy mv v)) vs
+</code></pre>
+        </div>
+      </details>
+
+      <h4 id="concatMap の計算量">
+        <a href="#concatMap の計算量"><code>concatMap</code> の計算量</a>
+      </h4>
+      <p>
+        <a
+          href="https://hackage.haskell.org/package/vector-0.13.1.0/docs/Data-Vector-Generic.html#v:concatMap"
+          >concatMap</a
+        >
+        はサイズ <code>Unknown</code> の <code>Bundle</code> を作って
+        <code>unstream</code> にかけています。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">-- | Map a function over a vector and concatenate the results.
+concatMap :: (Vector v a, Vector v b) =&gt; (a -&gt; v b) -&gt; v a -&gt; v b
+{-# INLINE concatMap #-}
+-- NOTE: We can't fuse concatMap anyway so don't pretend we do.
+-- ..
+concatMap f = unstream
+            . Bundle.concatVectors
+            . Bundle.map f
+            . stream
+</code></pre>
+      </div>
+
+      <p><code>Bundle</code> のサイズは <code>Exact n</code> です。<br /></p>
+
+      <details>
+        <summary>
+          <code>Data/Vector/Fusion/Bundle/Monadic.hs</code>
+        </summary>
+        <div class="org-src-container">
+          <pre><code class="src language-hs">concatVectors :: (Monad m, Vector v a) =&gt; Bundle m u (v a) -&gt; Bundle m v a
+{-# INLINE_FUSED concatVectors #-}
+concatVectors Bundle{sElems = Stream step t}
+  = Bundle (Stream pstep (Left t))
+           (Stream vstep t)
+           Nothing
+           Unknown -- ***** これ
+  where
+    pstep (Left s) = do
+      r &lt;- step s
+      case r of
+        Yield v s' -&gt; basicLength v `seq` return (Skip (Right (v,0,s')))
+        Skip    s' -&gt; return (Skip (Left s'))
+        Done       -&gt; return Done
+
+    pstep (Right (v,i,s))
+      | i &gt;= basicLength v = return (Skip (Left s))
+      | otherwise          = case basicUnsafeIndexM v i of
+                               Box x -&gt; return (Yield x (Right (v,i+1,s)))
+
+
+    vstep s = do
+      r &lt;- step s
+      case r of
+        Yield v s' -&gt; return (Yield (Chunk (basicLength v)
+                                           (\mv -&gt; check
+                                                   Internal
+                                                   "length mismatch"
+                                                   (M.basicLength mv == basicLength v)
+                                                   $ stToPrim $ basicUnsafeCopy mv v)) s')
+        Skip    s' -&gt; return (Skip s')
+        Done       -&gt; return Done
+</code></pre>
+        </div>
+      </details>
+
+      <h4 id="vconcatMapN">
+        <a href="#vconcatMapN"><code>vconcatMapN</code></a>
+      </h4>
+      <p>
+        上記 <code>concatMap</code> において、 <code>Bundle</code> のサイズ指定を
+        <code>Unknown</code> から
+        <code>Exact n</code> に変更してみました。が、実行速度には無影響でした。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a href="https://atcoder.jp/contests/abc362/submissions/55535867"
+            ><code>concatMap</code> を使った場合: 143 ms</a
+          ><br />
+        </li>
+        <li>
+          <a href="https://atcoder.jp/contests/abc362/submissions/55594325"
+            ><code>vconcatMap</code> を使った場合: 144 ms</a
+          ><br />
+        </li>
+      </ul>
+
+      <p>なぜでしょう？　まあ問題無く使って行けそうです。<br /></p>
+
+      <h3 id="SNS 情報"><a href="#SNS 情報">SNS 情報</a></h3>
+      <ul>
+        <li>
+          <a href="https://audee.jp/program/show/300008578">vim-jp ラジオ</a> 爆誕<br />
+          めでたい！<br />
+        </li>
+
+        <li>
+          <a href="https://sktgroup.co.jp/go7/">Boox Go Color 7</a><br />
+          7 インチの色付き E-Ink 端末です。
+          <span class="underline">It just works</span> ということで良さそうですが、 7
+          インチなのでパスです。 Kindle Scribe
+          が色付きになると、大型技術書を色付きで読めて嬉しいのですが。<br />
+        </li>
+      </ul>
+
+      <h4 id="Emacs"><a href="#Emacs">Emacs</a></h4>
+      <ul>
+        <li>
+          <a href="https://github.com/oantolin/embark">oantolin/embark</a><br />
+          ポスト <code>completing-read</code> 時代の人気パッケージです。
+          <code>find-file</code> で選んだファイルを
+          <a href="https://github.com/abo-abo/ace-window">abo-abo/ace-window</a>
+          で指定したウィンドウで開く (<a
+            href="https://karthinks.com/software/fifteen-ways-to-use-embark/#:~:text=to%20suitable%20keys.-,Open%20any%20buffer%20by%20splitting%20any%20window,-This%20needs%20a"
+            >記事</a
+          >) など、活用できると良さそうですね。<br />
+        </li>
+
+        <li>
+          <a href="https://github.com/blahgeek/emacs-lsp-booster">slotThe/emacs-lsp-booster</a>,
+          <a href="https://github.com/slotThe/emacs-lsp-booster-flake"
+            >slotThe/emacs-lsp-booster-flake</a
+          ><br />
+          LSP のメッセージ処理を並列処理にすることで、 <code>lsp-mode</code> も
+          <a href="https://github.com/manateelazycat/lsp-bridge">lsp-bridge</a>
+          並に速くなるとか。ひとまず入れました。<br />
+        </li>
+      </ul>
+
+      <h3 id="DTM"><a href="#DTM">DTM</a></h3>
+      <h4 id="PC"><a href="#PC">PC</a></h4>
+      <p>先々週に買った PC ですが、購買を間違えました。やはりパソコンに疎いようです。<br /></p>
+
+      <ul>
+        <li>
+          Intel の 13, 14 世代 CPU は発熱の問題が
+          <a href="https://gazlog.jp/entry/intel-cpu-degrade-issue/">非常に深刻だった</a><br />
+          ひとまず BIOS を更新して推奨設定にすれば問題無いと思いたいですが……。<br />
+        </li>
+
+        <li>
+          SSD の開発元が怪しかった<br />
+          幸い (?) 初期不良なので返品します。公式サイトが http
+          なのは何とかしてほしいですね……。次は高級ブランド (Sumsung)
+          から買っておけば大丈夫でしょう。<br />
+        </li>
+      </ul>
+
+      <h4 id="ギター (ど下手)"><a href="#ギター (ど下手)">ギター (ど下手)</a></h4>
+      <p>
+        急に 160 BPS の 16 分音符が弾けるようになりました (単弦に限る)
+        。手首というより、指でピッキングして良いことを理解しました。たぶん。<br />
+      </p>
+
+      <p>トレモロの音が出せると色々遊べてデカいですが、どうでしょう。 SSD 到着待ちです。<br /></p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
