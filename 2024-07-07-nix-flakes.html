@@ -324,11 +324,14 @@ use flake
 +    fenix.url = "github:nix-community/fenix/monthly";
   };
 
-   outputs = inputs@{ nixpkgs, home-manager, ... }: {
-+    packages.x86_64-linux.default = inputs.fenix.packages.x86_64-linux.default.toolchain;
+  outputs = inputs@{ nixpkgs, home-manager, ... }: {
++     packages.x86_64-linux.default = inputs.fenix.packages.x86_64-linux.default.toolchain;
     nixosConfigurations.tbm = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
++        {
++          nixpkgs.overlays = [ fenix.overlays ];
++        }
         ./nixos
         home-manager.nixosModules.home-manager
         {
@@ -342,6 +345,14 @@ use flake
 }
 </code></pre>
       </div>
+
+      <p>
+        これで <code>pkgs.fenix</code> が使えるようになるため、
+        <code
+          >(fenix.complete.withComponents [ "cargo" "clippy" "rust-src" "rustc" "rustfmt" ])</code
+        >
+        のようにパッケージ指定できます。<br />
+      </p>
 
       <h3 id="ファイル分割"><a href="#ファイル分割">ファイル分割</a></h3>
       <p><code>imports</code> でファイル指定すると設定ファイルを読み込みできます。<br /></p>
