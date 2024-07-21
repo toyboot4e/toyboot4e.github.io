@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 363 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 363</h1>
+      <p>Jul 21, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 363"><a href="#ABC 363">ABC 363</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/abc363">ABC 363</a>
+        に参加しました。回分回でした。爆死された方が多かったようです。<br />
+      </p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          体感 Diff
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">予想</td>
+            <td class="org-right">10</td>
+            <td class="org-right">200</td>
+            <td class="org-right">600</td>
+            <td class="org-left">1,500</td>
+            <td class="org-left">1,000</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">18</td>
+            <td class="org-right">32</td>
+            <td class="org-right">602</td>
+            <td class="org-left">886</td>
+            <td class="org-left">1506</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc363/tasks/abc363_a">A 問題</a></a>
+      </h3>
+      <p>
+        \(A\) を 100 の倍数に切り上げたとき、元の数よりどれだけ大きくなるか。 \(100 - a\%100\)
+        で解けます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=print.((100-).(`mod`100))=&lt;&lt;readLn
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc363/tasks/abc363_b">B 問題</a></a>
+      </h3>
+      <p>愚直テストを 2 分探索しました。<br /></p>
+
+      <p>今考えると、降順ソートして前から P 番目の人に注目するのが良さそうです。<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span>昇順ソートして後ろから \(N - P + 1\)
+          番目の人に注目しても良し</label
+        >
+        <pre><code class="src language-hs">import Data.List;main=interact$show.f.map read.words;f(n:t:p:l)=max 0$t-sort l!!(n-p)
+</code></pre>
+      </div>
+
+      <p>
+        よくあるソートは \(O(N \log N)\) ですが、
+        <a
+          href="https://hackage.haskell.org/package/vector-algorithms-0.9.0.2/docs/Data-Vector-Algorithms-Intro.html#v:selectBy"
+          >selectBy</a
+        >
+        を使えば \(O(N)\) で解けるそうです？　CS をやった人ならピンと来るかもしれません。<br />
+      </p>
+
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          そういえば　Data.Vector.Algorithms.Intro.selectBy を使うとABC363-BはO(N) で解けますね
+        </p>
+        &mdash; 符号/gksato (@Fine_sugar_hill)
+        <a href="https://twitter.com/Fine_sugar_hill/status/1814663774252769741?ref_src=twsrc%5Etfw"
+          >July 20, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc363/tasks/abc363_c">C 問題</a></a>
+      </h3>
+      <p>
+        \(O(N \cdot N!)\) が通るため、すべての (ユニークな) 順列を全探索します。 vector の
+        <a
+          href="https://hackage.haskell.org/package/vector-0.13.1.0/docs/Data-Vector-Generic-Mutable.html#v:nextPermutation"
+          >nextPermutation</a
+        >
+        で解けそうですね。<br />
+      </p>
+
+      <p>
+        実際は TLE します。 2014 年の <code>TODO</code> が原因だったので、
+        <a href="https://github.com/haskell/vector/pull/497">vector に PR を投げました</a> 。<br />
+      </p>
+
+      <blockquote class="twitter-tweet" data-conversation="none">
+        <p lang="ja" dir="ltr">
+          ちなみにstrictness analysisでうまくいかないのは一般のPrimMonad
+          だからっぽいので、そこにbang patternを突っ込む代わりに 処理開始時に stToPrim
+          を噛ませても解決します:<a href="https://t.co/trLQ7ZvTX2">https://t.co/trLQ7ZvTX2</a>
+        </p>
+        &mdash; 符号/gksato (@Fine_sugar_hill)
+        <a href="https://twitter.com/Fine_sugar_hill/status/1814853993526665641?ref_src=twsrc%5Etfw"
+          >July 21, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+      <p>
+        <code>stToPrim</code> でさらに速くなります。型クラスを使うと遅くなる (*)
+        ので、モナドのインスタンスを
+        <code>ST</code> に確定させた方が速いんですね。勉強になりました。<br />
+      </p>
+
+      <p>(*): 正確性解析や辞書渡しが原因<br /></p>
+
+      <p>
+        辞書順列を列強する
+        <a
+          href="https://github.com/toyboot4e/toy-lib/blob/7c87d5cd25343c9a800eab2d1b0383d48a348268/src/ToyLib/DP.hs#L224"
+          >lexPerm</a
+        >
+        で upsolve しました。本来は軽い問題ですね。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span>ほぼワンライナ</label
+        >
+        <pre><code class="src language-hs">  -- p の定義は省略
+  printBSB $ V.length $ V.filter p $ lexPerms xs
+</code></pre>
+      </div>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc363/tasks/abc363_d">D 問題</a></a>
+      </h3>
+      <p>難しくないですか？　考察中です。<br /></p>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc363/tasks/abc363_e">E 問題</a></a>
+      </h3>
+      <p>
+        ヒープで解きます。 cojna さんの
+        <a
+          href="https://github.com/cojna/iota/blob/4257f2c1ec2718ce17d23651eddda74800771105/src/Data/Heap/Binary.hs"
+          >BinaryHeap</a
+        >
+        は最高だぜの問題でした。<br />
+      </p>
+
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="ビルド環境の改善"><a href="#ビルド環境の改善">ビルド環境の改善</a></h3>
+      <p>
+        自作ライブラリを
+        <code>Main.hs</code> に埋め込むのを止め、外部ライブラリとして参照する形に変更しました。例:
+        <a
+          href="https://github.com/toyboot4e/abc-hs/blob/17743fe1abc8c70edc7d938474c47f069e954b4a/abc363/c/Main.hs"
+          >直近の <code>Main.hs</code></a
+        >,
+        <a href="https://atcoder.jp/contests/abc363/submissions/55836610">提出 (埋め込み)</a>
+        。<br />
+      </p>
+
+      <p>プロジェクトファイルはこんな感じです:<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 3: </span><code>cabal.project</code></label
+        >
+        <pre><code class="src language-yaml">packages:
+  ./abc363.cabal
+  -- 絶対パス (仮)
+  ~/dev/hs/toy-lib/toy-lib.cabal
+
+constraints: (
+  -- debug ログ ON
+  toy-lib +debug
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 4: </span><code>abc363.cabal</code></label
+        >
+        <pre><code class="src language-yaml">common deps
+  build-depends:
+    , adjunctions                    ^&gt;=4.4.2
+    -- ~~
+    , toy-lib
+    -- ~~
+</code></pre>
+      </div>
+
+      <p>
+        提出直前にライブラリを埋め込んで
+        <code>.submit.hs</code> を作成します。提出ファイルも変更しました:<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 5: </span><code>template.json</code> (<a
+            href="https://github.com/Tatamo/atcoder-cli"
+            >atcoder-cli</a
+          >)</label
+        >
+        <pre><code class="src language-json">{
+    "task": {
+        "program": [
+            "Main.hs"
+        ],
+        "submit": ".submit.hs"
+    }
+}
+</code></pre>
+      </div>
+
+      <p>初回ビルドが遅いので、 Nix か何かでビルドキャッシュを共有したいところです。<br /></p>
+
+      <h3 id="コンテスト用コードの短縮">
+        <a href="#コンテスト用コードの短縮">コンテスト用コードの短縮</a>
+      </h3>
+      <p>
+        全ライブラリの埋め込みを止め、指定モジュールのみ埋め込むことにしました。 Haskell longest
+        コードゴルフ王者、引退です。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 6: </span
+          ><code>toy-lib import</code> セクションを提出時に埋め込む</label
+        >
+        <pre><code class="src language-hs">-- {{{ toy-lib import
+import ToyLib.Contest.Prelude
+-- import ToyLib.Contest.Bisect
+-- import ToyLib.Contest.Graph
+-- import ToyLib.Contest.Grid
+-- import ToyLib.Contest.Tree
+import ToyLib.DP
+-- }}} toy-lib import
+</code></pre>
+      </div>
+
+      <p>いずれ使用モジュールのみ自動的に埋め込むようにしたいです。<br /></p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
