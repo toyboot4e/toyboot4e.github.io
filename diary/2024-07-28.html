@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 364, 遅延セグ木の定数倍高速化 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 364, 遅延セグ木の定数倍高速化</h1>
+      <p>Jul 28, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 364"><a href="#ABC 364">ABC 364</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc364">ABC 364</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          体感 diff
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">体感</td>
+            <td class="org-right">400</td>
+            <td class="org-right">400</td>
+            <td class="org-right">300</td>
+            <td class="org-left">1,000</td>
+            <td class="org-left">1,600</td>
+            <td class="org-left">1,700</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">29</td>
+            <td class="org-right">40</td>
+            <td class="org-right">189</td>
+            <td class="org-left">1,136</td>
+            <td class="org-left">1,496</td>
+            <td class="org-left">1,878</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc364/tasks/abc364_a">A 問題</a></a>
+      </h3>
+      <p>
+        長さ 2 の窓で見るのが良いですね。僕は
+        <code>group</code> 関数に飛びついてしまい、厄介な処理になりました。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span>ワンライナ (汚い)</label
+        >
+        <pre><code class="src language-hs">main=interact$y.or.(zipWith(&amp;&amp;)&lt;*&gt;tail).map(elem 'w').init.words;y b|b="No"|0&lt;1="Yes"
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc364/tasks/abc364_b">B 問題</a></a>
+      </h3>
+      <p>
+        グリッドの問題です。
+        <a
+          href="https://zenn.dev/toyboot4e/books/seriously-haskell/viewer/3-1-typical-io#4.-%E3%82%B0%E3%83%AA%E3%83%83%E3%83%89"
+          >グリッドの入力処理</a
+        >
+        では <code>Array</code> が登場しますし、 Haskell
+        入門者には難問です。高橋くんの位置の追跡には畳み込みが登場します。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span>単純な畳込み</label
+        >
+        <pre><code class="src language-hs">-- 和の計算
+foldl' (+) (0 :: Int) [0 :: Int, 1, 2, 3]
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 3: </span>今回の問題も、実は単純な畳込み</label
+        >
+        <pre><code class="src language-hs">-- 高橋くんの移動の計算
+foldl' walk (y0, x0) "LRUUDDLR"
+</code></pre>
+      </div>
+
+      <h4 id="脱線"><a href="#脱線">脱線</a></h4>
+      <p>naoya さんのコードには、以下の <code>lrud</code> が登場しました:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">lrud@[left, right, up, down] = [(0, -1), (0, 1), (-1, 0), (1, 0)] :: [(Int, Int)]
+</code></pre>
+      </div>
+
+      <p>
+        そういえばトップレベルでパタンマッチできるのですね。トップレベルのタプルの中身を正格評価しつつ
+        <code>{-# NOINLINE #-}</code> を付けるなど、活用できそうです。<br />
+      </p>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc364/tasks/abc364_c">C 問題</a></a>
+      </h3>
+      <p>
+        それぞれの系列を降順ソートして貪欲に解きます。比較演算は strict な方 (\(x \ge\) ではなく \(x
+        \gt\)) です。 Strict な演算子というのは競プロ方言か何かで、英語では普通に greater/greater
+        than と言うはずです。<br />
+      </p>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc364/tasks/abc364_d">D 問題</a></a>
+      </h3>
+      <p>
+        主に 2 分探索の問題です。 2 分探索の説明は
+        <a href="https://zenn.dev/forcia_tech/articles/20191223_advent_calendar">FORCIA 社の記事</a>
+        が一番分かりやすかったと思います。『めぐる式 2 分探索』なので元ネタにちなんで
+        <code>ok</code>, <code>ng</code> が出てきますが、 yes/no
+        の方が適切かと思います。この辺りも自由に決めて良いのが競プロ！<br />
+      </p>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc364/tasks/abc364_e">E 問題</a></a>
+      </h3>
+      <p>
+        ひと目見て最大流の問題だと思ったのですが、違いました。重さが 2 次元のナップサック問題と見て
+        <code>IntMap</code> で枝刈りしてみましたが、 WA が取れず失敗しました。<br />
+      </p>
+
+      <p>
+        公式解説は
+        <a href="https://atcoder.jp/contests/dp/tasks/dp_e">Kpapsack 2</a> でした。ガーン……<br />
+      </p>
+
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc364/tasks/abc364_f">F 問題</a></a>
+      </h3>
+      <p>
+        遅延セグメント木の解法を考えていました。区間を set
+        で管理するテクニックでも解けるらしいです？　Upsolve します。<br />
+      </p>
+
+      <p>
+        この問題は
+        <a href="https://judge.yosupo.jp/">Library Chercker</a>
+        の問題案にあったらしいです。いずれテストケース生成係もやりたいですね……。<br />
+      </p>
+
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          問題案がABCの先回りになっていることも結構多いので、他の問題案もぜひ
+        </p>
+        &mdash; maspy (@maspy_stars)
+        <a href="https://twitter.com/maspy_stars/status/1817228765967335528?ref_src=twsrc%5Etfw"
+          >July 27, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+      <h2 id="Splay tree メモ"><a href="#Splay tree メモ">Splay tree メモ</a></h2>
+      <p>
+        Link/cut tree の前準備で splay tree を (まだ)
+        作っています。前提知識が見えて来たのでメモします。<br />
+      </p>
+
+      <h3 id="[1] 2 種類の API"><a href="#[1] 2 種類の API">[1] 2 種類の API</a></h3>
+      <h4 id="Indexed API (列としての API)">
+        <a href="#Indexed API (列としての API)">Indexed API (列としての API)</a>
+      </h4>
+      <p>
+        <a
+          href="https://www.stackage.org/haddock/nightly-2024-07-27/containers-0.6.8/Data-Map-Strict.html"
+          >Data.Map.Strict</a
+        >
+        の
+        <a
+          href="https://www.stackage.org/haddock/nightly-2024-07-27/containers-0.6.8/Data-Map-Strict.html#g:28"
+          >Indexed</a
+        >
+        API (<code>elemAt</code>, <code>deleteAt</code>) がこのカテゴリに相当します。
+        <a
+          href="https://qiita.com/NokonoKotlin/items/9441856089f44a38100b#----%E5%88%97%E6%93%8D%E4%BD%9C-splitmerge"
+          >split/merge</a
+        >
+        のような splay tree 特有の API もあります。<br />
+      </p>
+
+      <p>
+        maspy さんの splay tree は、値の列を管理するためのデータ型として実装されています。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a href="https://github.com/maspypy/library">maspypy/library</a><br />
+          素直にこれを写経しておけば良かったです<br />
+          <ul>
+            <li>
+              <a
+                href="https://github.com/maspypy/library/blob/ae783f093ffac1b12c584fb599865f25fa2260e0/ds/splaytree/splaytree.hpp"
+                >splaytree.hpp</a
+              ><br />
+            </li>
+            <li>
+              <a
+                href="https://github.com/maspypy/library/blob/ae783f093ffac1b12c584fb599865f25fa2260e0/test/library_checker/datastructure/dynamic_sequence_range_affine_range_sum_splay.test.cpp"
+                >dynamic_sequence_range_affine_range_sum_splay.test.cpp</a
+              ><br />
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="https://judge.yosupo.jp/problem/dynamic_sequence_range_affine_range_sum"
+            >Dynamic Sequence Range Affine Range Sum - Library Checker</a
+          ><br />
+          API の verify に使える問題です (※
+          区間反転があり高難度のため、まずは自分で簡単なテストを作った方が良さそうです)<br />
+        </li>
+      </ul>
+
+      <h4 id="Ord k ベースの API (平衡木としての API)">
+        <a href="#Ord k ベースの API (平衡木としての API)"
+          ><code>Ord k</code> ベースの API (平衡木としての API)</a
+        >
+      </h4>
+      <p>
+        <a
+          href="https://www.stackage.org/haddock/nightly-2024-07-27/containers-0.6.8/Data-Map-Strict.html"
+          >Data.Map.Strict</a
+        >
+        の主な API (insert/delete や 2 分探索)
+        がこのカテゴリに相当します。が、競プロでは必要の無い機能だったかもしれません。<br />
+      </p>
+
+      <p>
+        Tarjan 氏の論文では平衡二分木の実装として splay tree
+        が紹介されていますから、こちらの機能がフィーチャーされています。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a href="https://www.cs.cmu.edu/~sleator/papers/self-adjusting.pdf"
+            >Self-Adjusting Binary Search Trees</a
+          ><br />
+          これが一番分かりやすいのですが、競プロにはやや回り道かもしれません。<br />
+        </li>
+        <li>
+          <a href="https://judge.yosupo.jp/problem/predecessor_problem"
+            >Predecessor Problem - Library Checker</a
+          ><br />
+          API の verify に使える問題です。<br />
+        </li>
+      </ul>
+
+      <h3 id="[2] 2 種類の splay 実装">
+        <a href="#[2] 2 種類の splay 実装">[2] 2 種類の splay 実装</a>
+      </h3>
+      <h4 id="Bottom-up splaying"><a href="#Bottom-up splaying">Bottom-up splaying</a></h4>
+      <p>
+        maspy さんの splay tree は bottom-up splaying を使って実装されています。たぶん。特に集約
+        (畳み込み) の計算は bottom-up 実装でなければ難しそうです (後述) 。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a href="https://qiita.com/ngtkana/items/4d0b84d45210771aa074"
+            >エッ！？ 平衝二分木の update, push (eval, propagate) のタイミングがわからないですって？
+            フッフッフ……</a
+          ><br />
+          Bottom-up 実装の定数倍高速化の手法を整理しています。<br />
+        </li>
+      </ul>
+
+      <h4 id="Top-down splaying"><a href="#Top-down splaying">Top-down splaying</a></h4>
+      <p>
+        Tarjan 氏の論文では top-down splaying が速くて良いぞとなっています (そうかな？) 。 Top-down
+        splaying でサイズを求める実装も見つかりましたが、 bottom-up
+        実装と比べてそこまで優位なのかは疑問です。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a href="https://www.cs.cmu.edu/~sleator/papers/self-adjusting.pdf"
+            >Self-Adjusting Binary Search Trees</a
+          >
+          (再掲)<br />
+        </li>
+        <li>
+          <a href="http://www.nct9.ne.jp/m_hiroi/light/pyalgo21.html#top_down"
+            >Algorithms with Python / スプレー木 - M.Hiroi's Home Page</a
+          ><br />
+        </li>
+        <li>
+          <a href="https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c"
+            >top-down-splay.c</a
+          >
+          (サイズ計算無し)<br />
+        </li>
+        <li>
+          <a href="https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-size-splay.c"
+            >top-down-size-splay.c</a
+          >
+          (サイズ計算有り)<br />
+          <ul>
+            <li>
+              <a href="https://codeforces.com/blog/entry/10498"
+                >splay tree (top down) - Codeforces</a
+              ><br />
+              <code>top-down-size-spaly.c</code> へのリンクがあります。<br />
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="[3] 集約 (畳み込み) ・作用">
+        <a href="#[3] 集約 (畳み込み) ・作用">[3] 集約 (畳み込み) ・作用</a>
+      </h3>
+      <p>
+        ノードに部分木のサイズや畳み込みを持たせます。区間反転用のフラグを載せてあれこれする場合もあるようです。<br />
+      </p>
+
+      <h3 id="以上"><a href="#以上">以上</a></h3>
+      <p>Splay tree は作り直しになりそうです。 Link/cut tree の情報も集めないとー<br /></p>
+
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <p>この頃は問題も解かずゴロゴロしています。<br /></p>
+
+      <h3 id="maspy さんの遅延伝播セグメント木の定数倍高速化">
+        <a href="#maspy さんの遅延伝播セグメント木の定数倍高速化"
+          >maspy さんの遅延伝播セグメント木の定数倍高速化</a
+        >
+      </h3>
+      <p>遅延セグ木の実装を PAST 上級本から maspy さん準拠に変更しました。<br /></p>
+
+      <h4 id="枝刈り"><a href="#枝刈り">枝刈り</a></h4>
+      <p>
+        <a href="https://maspypy.com/segment-tree-%E3%81%AE%E3%81%8A%E5%8B%89%E5%BC%B72"
+          >maspy さんのブログ記事</a
+        >
+        を読むと、 (1) 上から伝播 と (3) 上側を計算し直し
+        において葉まで降りない実装になっていることが分かります。真似してみると、作用が重いときは若干高速になりました。作用が軽いときは
+        PAST 上級本のように葉まで降りたほうが速かったです。やらなくても良かったかも。<br />
+      </p>
+
+      <h4 id="作用が長さを引数に取る">
+        <a href="#作用が長さを引数に取る">作用が長さを引数に取る</a>
+      </h4>
+      <p>
+        区間の長さをモノイドに載せるより、セグメント木の畳み込み関数側から与えた方が速くなるようです
+        (1.5 倍ほど？　未実装) 。真似して
+        <code>SemigroupActionWithLength</code> みたいな型クラスを作るかもしれません。<br />
+      </p>
+
+      <h3 id="繰り返し 2 乗法の再整理">
+        <a href="#繰り返し 2 乗法の再整理">繰り返し 2 乗法の再整理</a>
+      </h3>
+      <p>
+        <a
+          href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Semigroup.html#v:stimes"
+          >stimes</a
+        >
+        は繰り返し 2
+        乗法の効率的な実装ですが、正確評価をしないため遅いです。コピペで正格評価版を作りました。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">-- | Strict, much faster `stimes`.
+{-# INLINE stimes' #-}
+stimes' :: (Semigroup a) =&gt; Int -&gt; a -&gt; a
+stimes' n0 x0
+  | n0 &lt;= 0 = errorWithoutStackTrace "stimes: positive multiplier expected"
+  | otherwise = mulTimes n0 (&lt;&gt;) x0
+
+-- | Strict, much faster `mtimes`.
+{-# INLINE mtimes' #-}
+mtimes' :: (Monoid a) =&gt; Int -&gt; a -&gt; a
+mtimes' n0 x0 = case compare n0 0 of
+  LT -&gt; errorWithoutStackTrace "mtimes: zero or positive multiplier expected"
+  EQ -&gt; mempty
+  GT -&gt; mulTimes n0 (&lt;&gt;) x0
+
+-- | Multiplies @x@ by @n@ (N &gt; 0) times using the binary lifting technique.
+{-# INLINE mulTimes #-}
+mulTimes :: Int -&gt; (a -&gt; a -&gt; a) -&gt; a -&gt; a
+mulTimes n0 op x0
+  | n0 &lt;= 0 = errorWithoutStackTrace "mulTimes: positive multiplier expected"
+  | otherwise = f x0 n0
+  where
+    f !x !n
+      | even n = f (x `op` x) (n .&gt;&gt;. 1)
+      | n == 1 = x
+      | otherwise = g (x `op` x) (n .&gt;&gt;. 1) x
+    g !x !n !z
+      | even n = g (x `op` x) (n .&gt;&gt;. 1) z
+      | n == 1 = x `op` z
+      | otherwise = g (x `op` x) (n .&gt;&gt;. 1) (x `op` z)
+</code></pre>
+      </div>
+
+      <p>
+        <a
+          href="https://github.com/toyboot4e/toy-lib/blob/41a572fc6a60415bf8970b10e51b6ef7d1320e67/src/Math/PowMod.hs"
+          >powMod</a
+        >
+        関係も整理がついて良かったです。<br />
+      </p>
+
+      <h3 id="nextPermutation">
+        <a href="#nextPermutation"><code>nextPermutation</code></a>
+      </h3>
+      <p>
+        <a href="https://github.com/haskell/vector/pull/498"
+          >gksato さんの <code>nextPermutation</code></a
+        >
+        がマージ間近です。マージカル！　<code>INLINE</code> 化、アルゴリズムの改善、
+        <code>prevPermutation</code> の追加など、贅沢な内容です。<br />
+      </p>
+
+      <p>自ライブラリの <code>Compat</code> モジュールにコピーしました。<br /></p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
