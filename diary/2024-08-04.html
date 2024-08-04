@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 365, Segment Tree Beats! - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 365, Segment Tree Beats!</h1>
+      <p>Aug 4, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 365"><a href="#ABC 365">ABC 365</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/abc365">ABC 365</a> に参加しました。 2
+        完灰パフォの悪夢が夢で良かったです。<br />
+      </p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-right">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+            <th scope="col" class="org-left">G 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">予想</td>
+            <td class="org-right">50</td>
+            <td class="org-right">100</td>
+            <td class="org-right">400</td>
+            <td class="org-right">700</td>
+            <td class="org-left">1,300</td>
+            <td class="org-left">1,800</td>
+            <td class="org-left">1,600</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">10</td>
+            <td class="org-right">22</td>
+            <td class="org-right">269</td>
+            <td class="org-right">730</td>
+            <td class="org-left">1,102</td>
+            <td class="org-left">2,561</td>
+            <td class="org-left">2,254</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        今夜の ARC
+        に出るか迷っています。レーティングって下がるのは一瞬ですが、上げるのは数ヶ月かかりますものね。<br />
+      </p>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_a">A 問題</a></a>
+      </h3>
+      <p>
+        cojna さんが流石で、
+        <a href="https://hackage.haskell.org/package/time-1.14/docs/Data-Time-Calendar.html"
+          >Data.Time.Calendar</a
+        >
+        に
+        <a
+          href="https://hackage.haskell.org/package/time-1.14/docs/Data-Time-Calendar.html#v:isLeapYear"
+          >isLeapYear</a
+        >
+        (閏年の判定関数) がありました。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">import Data.Time.Calendar;main=print.f=&lt;&lt;readLn;f x|isLeapYear x=366|0&lt;1=365
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_b">B 問題</a></a>
+      </h3>
+      <p>ソートして 2 番目に大きい数を抜き出すのが良さそうですね。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">import Data.List;main=interact$show.snd.last.init.sort.(`zip`[1..]).tail.map (read @Int).words
+</code></pre>
+      </div>
+
+      <p>
+        タプル同士は左端のキーから順に比較されるため、 <code>zip[1..]</code> ではなく
+        <code>(`zip`[1..])</code> としました。<br />
+      </p>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_c">C 問題</a></a>
+      </h3>
+      <p>
+        2 分探索の問題でした。判定問題を決めて \(O(N \log N)\) で解けました。灰 diff だと……？！<br />
+      </p>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_d">D 問題</a></a>
+      </h3>
+      <p>
+        直前の手 (R, P, S) 毎に最大の勝利回数を持って畳み込みします。畳み込みで解ける DP は茶 diff
+        典型ですね。<br />
+      </p>
+
+      <p>
+        <a href="https://atcoder.jp/contests/abc365/editorial/10600">貪欲法では解けない考察</a>
+        が抜けていました。競プロ以外では、意図せず嘘貪欲を使ってしまうケースの方が多そうです。<br />
+      </p>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_e">E 問題</a></a>
+      </h3>
+      <p>
+        初め、 xor ではなく or だと思って架空の問題を解いてしまいました。取り返せて良かった。<br />
+      </p>
+
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_f">F 問題</a></a>
+      </h3>
+      <p>
+        合成できないやつだと思って飛ばしました。 PAST
+        にも似た問題があって解けなかった記憶があります。 <strong>やはり PAST か……！</strong><br />
+      </p>
+
+      <h3 id="G 問題">
+        <a href="#G 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_g">G 問題</a></a>
+      </h3>
+      <p>
+        別解のマージテク (?) で解いてみたいです。長い区間の処理が大変そうです
+        (座標圧縮と累積和で一括計算する？) 。<br />
+      </p>
+
+      <h3 id="以上"><a href="#以上">以上</a></h3>
+      <p>手抜きですが ABC 振り返りでした。提出が汚いので、あまり振り返りたくないです ()<br /></p>
+
+      <h2 id="Segment Tree Beats!"><a href="#Segment Tree Beats!">Segment Tree Beats!</a></h2>
+      <p>
+        maspy さんのライブラリを読み解き、区間 chmin/chmax
+        が扱える特殊なセグメント木を実装しました。命名の元ネタは
+        <a href="https://codeforces.com/blog/entry/57319">Angle Beats! らしい</a> です。<br />
+      </p>
+
+      <p>
+        主なメモは
+        <a href="https://zenn.dev/toyboot4e/scraps/3c7b727551b820#comment-9c63c125c4f2ec"
+          >Zeen スクラップ</a
+        >
+        に置いています。以下ではアルゴリズム以外の部分をメモします。<br />
+      </p>
+
+      <h3 id="コードの重複"><a href="#コードの重複">コードの重複</a></h3>
+      <p>
+        遅延セグメント木と Beats でコードが重複しています。実装の共通化のため、
+        <strong>セグメント木のための型クラスを特別に用意</strong>
+        した方が良い気がしてきました。<br />
+      </p>
+
+      <h3 id="多相なフィールドは {-# UNPACK #-} できない">
+        <a href="#多相なフィールドは {-# UNPACK #-} できない"
+          >多相なフィールドは <code>{-# UNPACK #-}</code> できない</a
+        >
+      </h3>
+      <p>
+        Haskell
+        の多相は特殊化されず、動的な実装になることが多いです。関数もそうですが、レコードでも起こります。<br />
+      </p>
+
+      <p>多相化されたフィールドは <code>{-# UNPACK #-}</code> できません:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">data AddChminChmax a = AddChminChmax
+  { addACC :: !a,
+    chminACC :: !a,
+    chmaxACC :: !a
+  }
+  deriving (Show, Eq)
+</code></pre>
+      </div>
+
+      <p>これを特殊化すると box 化が消えて高速になるようです:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">data AddChminChmaxInt = AddChminChmaxInt
+  { addACCInt :: {-# UNPACK #-} !Int,
+    chminACCInt :: {-# UNPACK #-} !Int,
+    chmaxACCInt :: {-# UNPACK #-} !Int
+  }
+  deriving (Show, Eq)
+</code></pre>
+      </div>
+
+      <p>これは C++ の方が速いのも仕方ありません。パフォーマンスは諦め気味です。<br /></p>
+
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="Fortran"><a href="#Fortran">Fortran</a></h3>
+      <p>
+        yum さんこと MrTired が
+        <a href="https://atcoder.jp/contests/abc365/submissions/56296646"
+          >新しいランダムキャラ (ギャンブラー猿)</a
+        >
+        を追加してくれました。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span>ギャンブラー猿 (カッコいい)</label
+        >
+        <pre><code class="src language-fortran">!&gt; This file was processed by `fypp`.
+!&gt; Today's fortune: "Lucky WA", really OK?
+!&gt; ランダムウォーク猿「'半分全列挙' で はっぴー.」
+!&gt; ギャンブラー猿「AtCoder はゲームだ.」
+</code></pre>
+      </div>
+
+      <p>
+        僕は
+        <a href="https://www.unp.or.jp/ISBN/ISBN978-4-8158-1087-0.html">みんなの Fortran</a>
+        を読んでいます。僕の中の難解言語ランキングは Prolog &gt; Batch Script &gt; Emacs Lisp &gt;
+        Haskell だったわけですが、 Fortran は 2 位になるかもです。<br />
+      </p>
+
+      <h3 id="Emacs"><a href="#Emacs">Emacs</a></h3>
+      <p>
+        SNS で共有のあった
+        <a href="https://github.com/jcfk/org-sliced-images">org-sliced-images</a> が良かったです。
+        (<code>org-mode</code> に限り) 画像を visual 行単位でカーソル移動・スクロールできます。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
