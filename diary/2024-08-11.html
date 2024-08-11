@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ARC 181, ABC 366, Wavelet Matirx (1) - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ARC 181, ABC 366, Wavelet Matirx (1)</h1>
+      <p>Aug 11, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ARC 181"><a href="#ARC 181">ARC 181</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/arc181">ARC 181</a> に参加しました。なんと D
+        問題が解けました！　バイブスあげてこー！<br />
+      </p>
+
+      <figure>
+        <img src="./img/2024-08-11-arc.png" alt="2024-08-11-arc.png" /><br />
+
+        <figcaption>
+          <span class="figure-number">Figure 1: </span
+          ><a href="https://atcoder-replay.kakira.dev/">AtCoder Replay</a>
+        </figcaption>
+      </figure>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/arc181/tasks/arc181_a">A 問題</a></a>
+      </h3>
+      <p>35 分で解いて緑パフォ下位でした。<br /></p>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/arc181/tasks/arc181_d">D 問題</a></a>
+      </h3>
+      <p>
+        JOI
+        <a
+          href="http://s3-ap-northeast-1.amazonaws.com/data.cms.ioi-jp.org/open-2018/2018-open-bubblesort2-ja.pdf"
+          >Bubble Sort 2 の解説</a
+        >
+        を見つけ、バブルソートでは 1 回の走査につき各点の転倒数がちょうど 1
+        下がることが分かりました。シミュレーションで解けました。<br />
+      </p>
+
+      <p>
+        B, C 問題と比べても明らかに解説が薄く、本来 B 問題相当な気がします。それはそれとして、黄
+        diff の問題を本番で通せたのは最高でした。<br />
+      </p>
+
+      <h2 id="ABC 366"><a href="#ABC 366">ABC 366</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/abc366">ABC 366</a> に参加しました。 3
+        完！！　バイブスが消え去りました。<br />
+      </p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">予想</td>
+            <td class="org-right">5</td>
+            <td class="org-right">400</td>
+            <td class="org-right">300</td>
+            <td class="org-left">1,300</td>
+            <td class="org-left">1,200</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">20</td>
+            <td class="org-right">180</td>
+            <td class="org-right">180</td>
+            <td class="org-left">586</td>
+            <td class="org-left">1,513</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc366/tasks/abc366_a">A 問題</a></a>
+      </h3>
+      <p>Yes!<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$f.map read.words;f[n,t,a]|((||)&lt;$&gt;(&lt;t)&lt;*&gt;(&lt;a))(n`div`2)="Yes"|0&lt;1="No"
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc366/tasks/abc366_b">B 問題</a></a>
+      </h3>
+      <p>
+        下から上に読む不思議な問題でした。
+        <a href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-List.html#v:transpose"
+          >transpose</a
+        >
+        と
+        <a
+          href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-List.html#v:dropWhileEnd"
+          >dropWhileEnd</a
+        >
+        を知っていると楽できますね。 <code>dropWhileEnd</code> は知りませんでした。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">import Data.List;main=interact$unlines.map(dropWhileEnd(=='*')).transpose.map(++replicate 99'*').reverse.tail.lines
+</code></pre>
+      </div>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc366/tasks/abc366_c">C 問題</a></a>
+      </h3>
+      <p>
+        <a
+          href="https://github.com/toyboot4e/toy-lib/blob/fa3d8ddec24627fc688ac7c6ba7b311112255373/src/Data/MultiSet.hs"
+          >MultiSet</a
+        >
+        の verify 用の問題のような見た目でした。やはり
+        <a href="https://cpprefjp.github.io/reference/set/multiset.html">std::multiset</a>
+        相当のテンプレートを持っていた方が良いですね。<br />
+      </p>
+
+      <p>
+        クエリ処理としては、 <code>mapMaybeM</code> で <code>State</code> モナドに
+        <code>Map</code> を載せるのが正攻法だと思います。とにかく解くだけなら、
+        <code>foldl'</code> でリストも状態に持てば良いと思います。<br />
+      </p>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc366/tasks/abc366_d">D 問題</a></a>
+      </h3>
+      <p>\(A_{x, y, z}\) を \(A_{z, y, x}\) だと思っていました (＾ω＾) (＾ω＾)<br /></p>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc366/tasks/abc366_e">E 問題</a></a>
+      </h3>
+      <p>
+        マンハッタン距離は X, Y 成分毎に独立して考えられる性質が良いですね。 Upsolve するぞー<br />
+      </p>
+
+      <p>
+        \(\sum_i |x_i - x_0|\) の最小値は \(x_0\) が中央値 (<code>xs</code>
+        をソートした時の真ん中の値) の時に最小です。中央値から [-D, +D] の範囲で \(x_0\)
+        を動かしたときの \(\sum_i |x_i - x_0|\) の分布を \([0, D]\)
+        の範囲で記録すれば解けると思います。<br />
+      </p>
+
+      <h2 id="Wavelet Matrix (1)"><a href="#Wavelet Matrix (1)">Wavelet Matrix (1)</a></h2>
+      <p>
+        Wavelet Matrix の頭文字は WM.
+        ウィンドウマネージャと同じくらい必須のデータ型かもしれません。つまり普通は使わないのでは……？<br />
+      </p>
+
+      <p>
+        セグメント木が変域 (添字) の 2 分木とするならば、 Wavelet Matrix は値域の 2
+        分木と言えそうです。実際強力です。<br />
+      </p>
+
+      <h3 id="概要"><a href="#概要">概要</a></h3>
+      <p>
+        入力は座標圧縮済みの数列とします。上位 bit から順番に、その bit の 01
+        を基準に数列をソートしていきます。<br />
+      </p>
+
+      <figure>
+        <img
+          src="./img/2024-08-11-wavelet-matrix-1.png"
+          alt="2024-08-11-wavelet-matrix-1.png"
+        /><br />
+      </figure>
+
+      <h4 id="kthMin">
+        <a href="#kthMin"><code>kthMin</code></a>
+      </h4>
+      <p>
+        各行の bit 列が wavelet matrix の本体です。たとえば \([l, r]\) 区間中の K
+        番目に小さい数を求めるためには、次のように上から下に降りていきます:<br />
+      </p>
+
+      <figure>
+        <img
+          src="./img/2024-08-11-wavelet-matrix-2.png"
+          alt="2024-08-11-wavelet-matrix-2.png"
+        /><br />
+      </figure>
+
+      <p>
+        各行 (各 bit) で区間 &lt;&#x2014;&gt; が 2 分されていきます。最下段まで降りるまでの bit 値は
+        0, 0, 1 の順番だったため、答えは <code>0b001 = 1</code> です。また区間が 2
+        分されるとき、左へ降りるか右へ降りるかを \(O(1)\) で判定するため、事前に各 bit
+        の累積和を作成します。<br />
+      </p>
+
+      <h4 id="freq">
+        <a href="#freq"><code>freq</code></a>
+      </h4>
+      <p>
+        1 行降りる度に値域が 2 分されることから、区間内の \(|\{x | x \lt x_{ref}\}|\)
+        も取得できます。<br />
+      </p>
+
+      <h4 id="access">
+        <a href="#access"><code>access</code></a>
+      </h4>
+      <p>
+        なお元の数列、ソート済みの数列は復元できるため削除します。また累積和では Word (64 bit)
+        単位で和を取ることで省メモリ化します。<br />
+      </p>
+
+      <h3 id="情報源"><a href="#情報源">情報源</a></h3>
+      <p>以下 2 つから学びました:<br /></p>
+
+      <ul>
+        <li>
+          <a href="https://miti-7.hatenablog.com/entry/2018/04/28/152259"
+            >ウェーブレット行列(wavelet matrix) - Eating Your Own Cat Food</a
+          ><br />
+        </li>
+        <li>
+          <a
+            href="https://github.com/NyaanNyaan/library/blob/8fcf379daa5b49f9c20ba6a97a6047d7c0e80a39/data-structure-2d/wavelet-matrix.hpp"
+            >NyaanNyaan/library/data-structure-2d/wavelet-matrix.hpp</a
+          ><br />
+        </li>
+      </ul>
+
+      <p>他に気になっているのは:<br /></p>
+
+      <ul>
+        <li>
+          <a href="https://www.kspub.co.jp/book/detail/5124765.html">コンパクトデータ構造</a
+          ><a href="https://www.kspub.co.jp/book/detail/5124765.html">コンパクトデータ構造</a><br />
+          ながたかなさんお気に入りの書です。<br />
+        </li>
+
+        <li>
+          naoya さんの
+          <a href="https://naoya-2.hatenadiary.org/entry/20081116/1226841070">Wavelet Tree</a>
+          (の参考文献)<br />
+          これを読んで、まだまだインプットが足りないと自覚しました。<br />
+        </li>
+      </ul>
+
+      <p>未読のコードは:<br /></p>
+
+      <ul>
+        <li>
+          <a
+            href="https://github.com/NyaanNyaan/library/blob/8fcf379daa5b49f9c20ba6a97a6047d7c0e80a39/data-structure-2d/segment-tree-on-wavelet-matrix.hpp"
+            >NyaanNyaan/library/data-structure-2d/segment-tree-on-wavelet-matrix.hpp</a
+          ><br />
+        </li>
+        <li><a href="https://github.com/ei1333/library">ei1333/library</a><br /></li>
+        <li><a href="https://github.com/maspypy/library">maspypy/library</a><br /></li>
+      </ul>
+
+      <h3 id="Verify"><a href="#Verify">Verify</a></h3>
+      <ul>
+        <li class="on">
+          <code>[X]</code>
+          <a href="https://judge.yosupo.jp/problem/range_kth_smallest">Range Kth Smallest</a><br />
+        </li>
+        <li class="on">
+          <code>[X]</code>
+          <a href="https://judge.yosupo.jp/problem/static_range_frequency">Static Range Frequency</a
+          ><br />
+        </li>
+        <li class="off">
+          <code>[&#xa0;]</code>
+          <a href="https://judge.yosupo.jp/problem/rectangle_sum">Rectangle Sum</a><br />
+          Segment Tree on Wavelet Matrix?<br />
+        </li>
+      </ul>
+
+      <h3 id="未実装の API"><a href="#未実装の API">未実装の API</a></h3>
+      <p>Wavelet Matrix の機能はまだまだあるようです。<br /></p>
+
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="ポテンシャル付き Union-Find の抽象化">
+        <a href="#ポテンシャル付き Union-Find の抽象化">ポテンシャル付き Union-Find の抽象化</a>
+      </h3>
+      <p>ポテンシャル付き Union-Find には非可換な群が載ります。<br /></p>
+
+      <ul>
+        <li class="on">
+          <code>[X]</code>
+          <a href="https://judge.yosupo.jp/problem/unionfind_with_potential"
+            >Unionfind with Potential</a
+          ><br />
+          <a href="https://judge.yosupo.jp/submission/226598">126 ms</a>. 重み付き Union-Find
+          (可換群)<br />
+        </li>
+
+        <li class="on">
+          <code>[X]</code>
+          <a href="https://judge.yosupo.jp/problem/unionfind_with_potential_non_commutative_group"
+            >Unionfind with Potential (Non-Commutative Group)</a
+          ><br />
+          <a href="https://judge.yosupo.jp/submission/226599">319 ms</a>. 重み付き Union-Find
+          (非可換群)<br />
+        </li>
+      </ul>
+
+      <p>
+        参考:
+        <a href="https://qiita.com/drken/items/cce6fc5c579051e64fab"
+          >重み付き Union-Find とそれが使える問題のまとめ、および、牛ゲーについて</a
+        ><br />
+      </p>
+
+      <h3 id="遅延伝播セグメント木の型クラス">
+        <a href="#遅延伝播セグメント木の型クラス">遅延伝播セグメント木の型クラス</a>
+      </h3>
+      <p>
+        <code>SemigroupAction</code> とは別に
+        <code>SegmentTreeAction</code>
+        を作成しました。区間長を受け取る半群作用を使うと、モノイドに長さを載せなくて済んで便利です。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">class SegmentTreeAction op a where
+  -- 半群作用 (セグメント木用)
+  {-# INLINE segAct #-}
+  segAct :: op -&gt; a -&gt; a
+  segAct op a = segActWithLength op a 1
+
+  -- 区間長を受け取る半群作用 (セグメント木用)
+  {-# INLINE segActWithLength #-}
+  segActWithLength :: op -&gt; a -&gt; Int -&gt; a
+  segActWithLength op a _  segAct op a
+</code></pre>
+      </div>
+
+      <h3 id="Emacs"><a href="#Emacs">Emacs</a></h3>
+      <h4 id="Ellama"><a href="#Ellama">Ellama</a></h4>
+      <p>
+        話題の
+        <a href="https://blog.tomoya.dev/posts/emacs-on-local-llm/"
+          >最強ローカルLLM実行環境としてのEmacs</a
+        >
+        に沿って
+        <a href="https://github.com/s-kostyaev/ellama">Ellama</a> を設定してみました。しかし手元の
+        VRAM が小さく (8 GB), ローカル LLM を快適に動かすには至りませんでした。<br />
+      </p>
+
+      <p>
+        著者の tomoya さんは Mac ユーザです。現代の Mac (M1 以降) はメモリが RAM 兼 VRAM
+        として機能するらしく、 AI 時代には相性が良さそうですね。<br />
+      </p>
+
+      <h4 id="org-ai">
+        <a href="#org-ai"><code>org-ai</code></a>
+      </h4>
+      <p>
+        <a href="https://github.com/rksm/org-ai">org-ai</a> から gpt-4o
+        を使い始めました。爆速ではないか……！<br />
+      </p>
+
+      <figure><img src="./img/2024-08-11-org-ai.png" alt="2024-08-11-org-ai.png" /><br /></figure>
+
+      <p>
+        やはり Web よりも使い勝手が良いです。フロントエンド (コマンド)
+        も充実していて応用が効きそうです。<br />
+      </p>
+
+      <h3 id="Deno くん？"><a href="#Deno くん？">Deno くん？</a></h3>
+      <p>いいですねー。<br /></p>
+
+      <blockquote class="twitter-tweet">
+        <p lang="zxx" dir="ltr"><a href="https://t.co/EtMOgfey2V">pic.twitter.com/EtMOgfey2V</a></p>
+        &mdash; Deno (@deno_land)
+        <a href="https://twitter.com/deno_land/status/1821903238083559802?ref_src=twsrc%5Etfw"
+          >August 9, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+      <p>関係無いですが、 Gopher くんキーキャップが欲しいです。<br /></p>
+
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          Gopherキーキャップとても良い
+          <a href="https://t.co/h2JuN42zY2">pic.twitter.com/h2JuN42zY2</a>
+        </p>
+        &mdash; uji (@uji_rb)
+        <a href="https://twitter.com/uji_rb/status/1501157341177135105?ref_src=twsrc%5Etfw"
+          >March 8, 2022</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+      <h3 id="HS 5"><a href="#HS 5">HS 5</a></h3>
+      <p>
+        スタジオモニターの
+        <a href="https://jp.yamaha.com/products/proaudio/speakers/hs_series/index.html"
+          >YAMAHA HS 5</a
+        >
+        を買いました。スピーカーなのにちゃんと鳴って良かったです。耳と高さが合わないと良さが 3
+        割減なので、 FlexiSpot を買わねばと思います。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
