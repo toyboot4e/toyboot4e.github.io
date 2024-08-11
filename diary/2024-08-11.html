@@ -154,19 +154,17 @@
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc366/tasks/abc366_c">C 問題</a></a>
       </h3>
       <p>
+        <a href="https://cpprefjp.github.io/reference/set/multiset.html">std::multiset</a> の verify
+        用の問題のようでした。自作の
         <a
           href="https://github.com/toyboot4e/toy-lib/blob/fa3d8ddec24627fc688ac7c6ba7b311112255373/src/Data/MultiSet.hs"
           >MultiSet</a
-        >
-        の verify 用の問題のような見た目でした。やはり
-        <a href="https://cpprefjp.github.io/reference/set/multiset.html">std::multiset</a>
-        相当のテンプレートを持っていた方が良いですね。<br />
+        >を使いました。<br />
       </p>
 
       <p>
-        クエリ処理としては、 <code>mapMaybeM</code> で <code>State</code> モナドに
-        <code>Map</code> を載せるのが正攻法だと思います。とにかく解くだけなら、
-        <code>foldl'</code> でリストも状態に持てば良いと思います。<br />
+        クエリ処理の方法としては、 <code>mapAccumL</code> を使うか、 <code>mapMaybeM</code> で
+        <code>State</code> モナドに <code>Map</code> を載せるのが正攻法だと思います。<br />
       </p>
 
       <h3 id="D 問題">
@@ -182,11 +180,12 @@
       </p>
 
       <p>
-        \(\sum_i |x_i - x_0|\) の最小値は \(x_0\) が中央値 (<code>xs</code>
-        をソートした時の真ん中の値) の時に最小です。中央値から [-D, +D] の範囲で \(x_0\)
-        を動かしたときの \(\sum_i |x_i - x_0|\) の分布を \([0, D]\)
-        の範囲で記録すれば解けると思います。<br />
+        \(\sum_i |x_i - x_0|\) は \(x_0\) = 中央値 (<code>xs</code> をソートした時の真ん中の値)
+        の時に最小です。中央値から [-D, +D] の範囲で \(x_0\) を動かしたときの \(\{ |x_i - x_0|
+        \}_i\) の分布を \([0, D]\) の範囲で記録すれば解けると思います。<br />
       </p>
+
+      <p>2 分探索というのがピンと来ておらず、別解がありそうです。<br /></p>
 
       <h2 id="Wavelet Matrix (1)"><a href="#Wavelet Matrix (1)">Wavelet Matrix (1)</a></h2>
       <p>
@@ -267,8 +266,7 @@
         </li>
       </ul>
 
-      <p>他に気になっているのは:<br /></p>
-
+      <h4 id="気になる"><a href="#気になる">気になる</a></h4>
       <ul>
         <li>
           <a href="https://www.kspub.co.jp/book/detail/5124765.html">コンパクトデータ構造</a
@@ -279,13 +277,12 @@
         <li>
           naoya さんの
           <a href="https://naoya-2.hatenadiary.org/entry/20081116/1226841070">Wavelet Tree</a>
-          (の参考文献)<br />
+          (および参考文献)<br />
           これを読んで、まだまだインプットが足りないと自覚しました。<br />
         </li>
       </ul>
 
-      <p>未読のコードは:<br /></p>
-
+      <h4 id="未読のコード"><a href="#未読のコード">未読のコード</a></h4>
       <ul>
         <li>
           <a
@@ -402,7 +399,7 @@
       <figure><img src="./img/2024-08-11-org-ai.png" alt="2024-08-11-org-ai.png" /><br /></figure>
 
       <p>
-        やはり Web よりも使い勝手が良いです。フロントエンド (コマンド)
+        やはりブラウザよりも使い勝手が良いです。フロントエンド (コマンド)
         も充実していて応用が効きそうです。<br />
       </p>
 
