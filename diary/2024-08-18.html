@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ARC 182, ABC 367, Wavelet Matirx (2) - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ARC 182, ABC 367, Wavelet Matirx (2)</h1>
+      <p>Aug 18, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ARC 182"><a href="#ARC 182">ARC 182</a></h2>
+      <p><a href="https://atcoder.jp/contests/arc182">ARC 182</a> に参加しました。<br /></p>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/arc182/tasks/arc182_a">A 問題</a></a>
+      </h3>
+      <p>
+        各操作で点 \(P_i\) を基点に右または左へ <code>chmax</code> 操作をします。過去と未来の
+        \((P_i, V_i)\) を元に各操作が可能な方向に制約が課せられると考えて、矛盾しない場合は
+        \(2^{\mathcal{nFree}}\) が答えです。<br />
+      </p>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/arc182/tasks/arc182_b">B 問題</a></a>
+      </h3>
+      <p>こちらの方が解かれている……？？<br /></p>
+
+      <h2 id="ABC 367"><a href="#ABC 367">ABC 367</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/abc367">ABC 367</a> に参加しました。 C
+        問題で崩壊しましたが、灰 diff でしたか……<br />
+      </p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-left">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">予想</td>
+            <td class="org-right">200</td>
+            <td class="org-right">300</td>
+            <td class="org-left">1,100</td>
+            <td class="org-left">1,200</td>
+            <td class="org-left">1,000</td>
+            <td class="org-left">1,800</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">43</td>
+            <td class="org-right">43</td>
+            <td class="org-left">234</td>
+            <td class="org-left">1,037</td>
+            <td class="org-left">1,370</td>
+            <td class="org-left">1,540</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc367/tasks/abc367_a">A 問題</a></a>
+      </h3>
+      <p>起床時刻を基点として 定刻 &lt; 起床時刻 \(\pmod {24}\) ならば <code>"Yes"</code>!<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span>たこやき愛してる！！</label
+        >
+        <pre><code class="src language-hs">main=interact$f.map read.words;f[a,b,c]|mod(b-c)24&gt;mod(a-c)24="Yes"|0&lt;1="No"
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc367/tasks/abc367_b">B 問題</a></a>
+      </h3>
+      <p>末尾の <code>0</code> と <code>.</code> を切り落とします:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">import Data.List;main=getLine&gt;&gt;=putStrLn.dropWhileEnd(=='.').dropWhileEnd(=='0')
+</code></pre>
+      </div>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc367/tasks/abc367_c">C 問題</a></a>
+      </h3>
+      <p>七転八倒して 6 進数を列挙して解きました。リストを使うべきですね。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">let result :: [[Int]]
+    result = inner 0 $ U.toList constraints
+      where
+        inner !acc []
+          | acc `mod` k == 0 = [[]]
+          -- 一応枝刈りしました:
+          | otherwise = []
+        inner !acc (a : as) = do
+          d &lt;- [1 .. a]
+          -- map == (&lt;$&gt;)
+          -- 再帰的なリスト内包表記が書けないマンです
+          (d :) &lt;$&gt; inner (acc + d) as
+</code></pre>
+      </div>
+
+      <p>
+        ちなみに <code>bytestring</code> の <code>Builder</code> 生成は <code>foldMap'</code> よりも
+        <code>foldMap</code> の方が速かったです。いずれも
+        <code>print</code> まで遅延される気がしていましたが……。<br />
+      </p>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc367/tasks/abc367_d">D 問題</a></a>
+      </h3>
+      <p>円環上の頂点を幅 (N - 1) の窓で見ます:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-txt">1---2---3---4---1---2---3---4
+x---o---o---o
+.   x---o---o---o
+.   .   x---o---o---o
+.   .   .   x---o---o---o
+</code></pre>
+      </div>
+
+      <p>整理後、以下の形になりました:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !m) &lt;- ints2'
+  !ds &lt;- intsU'
+
+  let !sumMod = U.sum ds `mod` m
+
+  -- 各点の位相 (各点の位置 mod m):
+  let !pos = U.init $ U.scanl' (addMod m) (0 :: Int) ds
+
+  -- 位相の分布 (distribution):
+  !dist &lt;- U.unsafeThaw $ U.accumulate (+) (U.replicate m (0 :: Int)) $ U.map (,1) pos
+
+  -- カウンタを `StateT` に載せて以下の処理を実施する:
+  printBSB &lt;=&lt; (`execStateT` (0 :: Int)) $ U.forM_ pos $ \x -&gt; do
+    -- x を分布から消す:
+    -- x---o---o---o
+    GM.modify dist pred x
+    -- x と同相の点数をカウントに追加する:
+    modify' . (+) =&lt;&lt; GM.read dist x
+    -- 尺取り虫:
+    -- .   o---o---o---o
+    GM.modify dist succ (addMod m x sumMod)
+</code></pre>
+      </div>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc367/tasks/abc367_e">E 問題</a></a>
+      </h3>
+      <p>ダブリングの API を再整理しました。<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span
+          ><code>Permutation</code> よりも適切な言葉を募集中！</label
+        >
+        <pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !k) &lt;- ints2'
+  !perm &lt;- U.map pred &lt;$&gt; intsU'
+  !xs &lt;- intsU'
+  printVec $ sactTimes k (Permutation perm) xs
+</code></pre>
+      </div>
+
+      <p>
+        One-shot なダブリングは
+        <a
+          href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Semigroup.html#v:stimes"
+          >stimes</a
+        >
+        (の正格評価版) で実施すべきですね。半群作用の形にすればなおヨシ！<br />
+      </p>
+
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc367/tasks/abc367_f">F 問題</a></a>
+      </h3>
+      <p>一瞬 Mo を考え、すぐに解けないことが分かりました。もうっ<br /></p>
+
+      <h2 id="Wavelet Matrix (2)"><a href="#Wavelet Matrix (2)">Wavelet Matrix (2)</a></h2>
+      <h3 id="追加の API"><a href="#追加の API">追加の API</a></h3>
+      <h4 id="ran (freq, count)">
+        <a href="#ran (freq, count)"><code>ran</code> (<code>freq</code>, <code>count</code>)</a>
+      </h4>
+      <p>後述します。<br /></p>
+
+      <h4 id="lookupGE wm x">
+        <a href="#lookupGE wm x"><code>lookupGE wm x</code></a>
+      </h4>
+      <p><code>kthMin wm (countLE wm x + 1)</code> の形で実装できます。<br /></p>
+
+      <h3 id="Segment Tree on Wavelet Matrix">
+        <a href="#Segment Tree on Wavelet Matrix">Segment Tree on Wavelet Matrix</a>
+      </h3>
+      <p>
+        先週の図を前提として、 <code>rank</code> (<code>freq</code>, <code>count</code>) や
+        <code>fold</code> は以下のように実装します:<br />
+      </p>
+
+      <figure>
+        <img
+          src="./img/2024-08-18-segment-tree-on-wavelet-matrix-1.png"
+          alt="2024-08-18-segment-tree-on-wavelet-matrix-1.png"
+        /><br />
+      </figure>
+
+      <p>
+        たとえば 2 番目の <code>1</code> に注目すると、ちょうど 1 回だけ
+        <code>fold</code> の対象になっていることが分かります:<br />
+      </p>
+
+      <figure>
+        <img
+          src="./img/2024-08-18-segment-tree-on-wavelet-matrix-2.png"
+          alt="2024-08-18-segment-tree-on-wavelet-matrix-2.png"
+        /><br />
+      </figure>
+
+      <p>
+        したがって bit 毎に (各行に) セグメント木を持って畳み込めば、 <code>freq</code> と同じ要領で
+        <code>fold</code> を実装できます。凄いなー……<br />
+      </p>
+
+      <h3 id="Distinct count">
+        <a href="#Distinct count">Distinct <code>count</code></a>
+      </h3>
+      <p>
+        <code>[l, r)</code> 区間中の重複しない要素数を数えよ。これも Wavelet Matrix
+        で解けるようです。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">-- 重複する点を数える。以下のように近隣の重複点の位置を WM に入れる:
+--
+-- input      A  .  .  A  .  A  .  A
+-- i          0  1  2  3  4  5  6  7
+-- input'     -        0     3     5
+--                     &lt;-----&gt;        [3, 5] 中の x \in [3, 5] の数は 1 (重複数が 1)
+--                     &lt;-----------&gt;  [3, 7] 中の x \in [3, 7] の数は 2 (重複数が 2)
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a href="https://judge.yosupo.jp/problem/static_range_count_distinct"
+            >Static Range Count Distinct</a
+          ><br />
+        </li>
+        <li><a href="https://codeforces.com/blog/entry/8962">spoj Problem D-query</a><br /></li>
+      </ul>
+
+      <h3 id="Distinct kthMin">
+        <a href="#Distinct kthMin">Distinct <code>kthMin</code></a>
+      </h3>
+      <p>思いつきません。<br /></p>
+
+      <h3 id="実際、 Wavelet Matrix に使い道はあるのか">
+        <a href="#実際、 Wavelet Matrix に使い道はあるのか"
+          >実際、 Wavelet Matrix に使い道はあるのか</a
+        >
+      </h3>
+      <p>
+        機能豊富かと思いきや、高速なのは特殊な操作ばかりでした。役立つかはかなり疑問です。<br />
+      </p>
+
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="最近買った本"><a href="#最近買った本">最近買った本</a></h3>
+      <p>買っただけです。<br /></p>
+
+      <ul>
+        <li>
+          <a href="https://www.unp.or.jp/ISBN/ISBN978-4-8158-1087-0.html">みんなの Fortran</a><br />
+          Fortran.. あまりにも辛いです。<br />
+        </li>
+        <li>
+          <a href="https://leanpub.com/optics-by-example/">Optics by Example</a><br />
+          <code>lens</code> のワンライナは格好いいですね。読んでいこうと思います。
+          <code>lens</code> の
+          <span class="underline">path</span>
+          がメソッドチェイン風の順序になるのは違和感があります。<br />
+        </li>
+        <li>
+          <a href="https://gihyo.jp/book/2022/978-4-297-13180-7">入門セキュリティコンテスト</a
+          ><br />
+          CTF のハードルの高さをどう超えるか……<br />
+        </li>
+        <li>
+          <a href="https://book.mynavi.jp/ec/products/detail/id=42421"
+            >セキュリティコンテストチャレンジブック</a
+          ><br />
+          CTF のハードルの高さをどう超えるか……<br />
+        </li>
+      </ul>
+
+      <h3 id="セール"><a href="#セール">セール</a></h3>
+      <ul>
+        <li>
+          ハルヒが全巻 100 円<br />
+          間違えてコミックスを買わないように……<br />
+        </li>
+      </ul>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
