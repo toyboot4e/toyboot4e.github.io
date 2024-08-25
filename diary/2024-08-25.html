@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 368, Splay tree (2), SWAG - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 368, Splay tree (2), SWAG</h1>
+      <p>Aug 18, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 368"><a href="#ABC 368">ABC 368</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc368">ABC 368</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-left">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">予想</td>
+            <td class="org-right">10</td>
+            <td class="org-right">200</td>
+            <td class="org-left">1,100</td>
+            <td class="org-left">1,000</td>
+            <td class="org-left">1,400</td>
+            <td class="org-left">1,600</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">20</td>
+            <td class="org-right">56</td>
+            <td class="org-left">368</td>
+            <td class="org-left">816</td>
+            <td class="org-left">2,140</td>
+            <td class="org-left">1,180</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="oj が動かない……？">
+        <a href="#oj が動かない……？"><code>oj</code> が動かない……？</a>
+      </h3>
+      <p>確認中です。<br /></p>
+
+      <details>
+        <summary>エラーログ</summary>
+        <div class="org-src-container">
+          <pre><code class="src language-txt">abc368/contest.acc.json created.
+create project of Hitachi Vantara Programming Contest 2024（AtCoder Beginner Contest 368）
+node:events:497
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: spawn /nix/store/q8gf4f7373l92a5sd472mbxqci1d1v20-python3.11-online-judge-tools-12.0.0/bin/oj ENOENT
+    at ChildProcess._handle.onexit (node:internal/child_process:286:19)
+    at onErrorNT (node:internal/child_process:484:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+Emitted 'error' event on ChildProcess instance at:
+    at ChildProcess._handle.onexit (node:internal/child_process:292:12)
+    at onErrorNT (node:internal/child_process:484:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'spawn /nix/store/q8gf4f7373l92a5sd472mbxqci1d1v20-python3.11-online-judge-tools-12.0.0/bin/oj',
+  path: '/nix/store/q8gf4f7373l92a5sd472mbxqci1d1v20-python3.11-online-judge-tools-12.0.0/bin/oj',
+  spawnargs: [
+    'dl',
+    'https://atcoder.jp/contests/abc368/tasks/abc368_a',
+    '-d',
+    'test-cases'
+  ]
+}
+
+Node.js v20.15.1
+</code></pre>
+        </div>
+      </details>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc368/tasks/abc368_a">A 問題</a></a>
+      </h3>
+      <p>リストを <code>splitAt (n - k)</code> して入れ替えます。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$unwords.f.words;f(n:k:x)=(++).snd&lt;*&gt;fst$splitAt(read n-read k)x
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc368/tasks/abc368_b">B 問題</a></a>
+      </h3>
+      <p>
+        Mutable にシミュレーションで解きました。序盤からオセロットですが、オセロットしたくて Haskell
+        を使っていることもあり、苦渋の決断を踏み切りました。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span
+          >リロードタイムがこんなにも戦場に息吹を！</label
+        >
+        <pre><code class="src language-hs">res &lt;- (`execStateT` (0 :: Int)) $ fix $ \loop -&gt; do
+  -- 操作完了まで繰り返し
+  unlessM isDone $ do
+    run
+    modify' succ
+    loop
+</code></pre>
+      </div>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc368/tasks/abc368_c">C 問題</a></a>
+      </h3>
+      <p>40 分苦戦しました。素直にループを書きましょう……！<br /></p>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc368/tasks/abc368_d">D 問題</a></a>
+      </h3>
+      <p>
+        次数 1 の頂点を消して行きます。 cojna さんの
+        <a
+          href="https://github.com/cojna/iota/blob/e77bb3087f8a5231d0ae1320d93fd2649de37149/src/Data/Heap/Binary.hs"
+          >Binary Heap</a
+        >
+        をお借りしました。<br />
+      </p>
+
+      <p>
+        コードはぐちゃぐちゃになりましたが、手グセを持っていて助かりました。やはり手続き型プログラミングが楽ですね……。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span>ヒープが空になるまでループする</label
+        >
+        <pre><code class="src language-hs">fix $ \loop -&gt; do
+  whenJustM (deleteBH heap) $ \x -&gt; do
+    {- ~~ -}
+</code></pre>
+      </div>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc368/tasks/abc368_e">E 問題</a></a>
+      </h3>
+      <p>hogeeee<br /></p>
+
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc368/tasks/abc368_f">F 問題</a></a>
+      </h3>
+      <p>hogeeee<br /></p>
+
+      <h2 id="Splay tree (2)"><a href="#Splay tree (2)">Splay tree (2)</a></h2>
+      <h3 id="Splay tree とは何者なのか">
+        <a href="#Splay tree とは何者なのか">Splay tree とは何者なのか</a>
+      </h3>
+      <h4 id="No: SplayMap">
+        <a href="#No: SplayMap">No: <code>SplayMap</code></a>
+      </h4>
+      <p>
+        <a href="./2024-07-14.html#Splay tree">以前</a> は map としての splay tree
+        を作りました。しかし top-down splaying
+        で集約の計算ができず、単なるマップになったのでした。欲しいやつじゃなかった……！<br />
+      </p>
+
+      <h4 id="Yes: SplaySeq (遅延伝播反転可能 splay tree)">
+        <a href="#Yes: SplaySeq (遅延伝播反転可能 splay tree)"
+          >Yes: <code>SplaySeq</code> (遅延伝播反転可能 splay tree)</a
+        >
+      </h4>
+      <p>
+        今回は列 (sequence) としての splay tree を作りました。
+        <a
+          href="https://github.com/maspypy/library/blob/f05f893635f7855c3bb268435a0b7c3f9b84ae9c/ds/splaytree/splaytree.hpp"
+          >maspy さんの <code>splaytree.hpp</code></a
+        >
+        を写経します。列を木にすると、親が子の集約 (畳み込み) を持つことができます:<br />
+      </p>
+
+      <figure>
+        <img
+          src="./img/2024-08-25-sequence.png"
+          alt="2024-08-25-sequence.png"
+          width="600px"
+        /><br />
+      </figure>
+
+      <p>
+        セグメント木との主な違いとしては、要素の挿入・削除ができ、区間反転ができます。出ないと思いますが、部分木の入れ替えなども可能です。<br />
+      </p>
+
+      <p>
+        区間反転は左右の子を貪欲に swap
+        して実装できます。また可換モノイドの畳み込みは反転の影響を受けないため、反転の反映は遅延させます。<br />
+      </p>
+
+      <h3 id="verify"><a href="#verify">verify</a></h3>
+      <ul>
+        <li class="on">
+          <code>[X]</code>
+          <a href="https://judge.yosupo.jp/problem/range_reverse_range_sum"
+            >Range Reverse Range Sum</a
+          ><br />
+        </li>
+        <li class="on">
+          <code>[X]</code>
+          <a href="https://judge.yosupo.jp/problem/dynamic_sequence_range_affine_range_sum"
+            >Dynamic Sequence Range Affine Range Sum</a
+          ><br />
+        </li>
+      </ul>
+
+      <h3 id="余談"><a href="#余談">余談</a></h3>
+      <ul>
+        <li>
+          <a href="https://nyaannyaan.github.io/library/rbst/lazy-reversible-rbst.hpp.html"
+            >遅延伝搬反転可能乱択平衡二分木</a
+          ><br />
+          このような強い平衡木の実装としては、競プロの文脈では RBST
+          が人気のようです。和名のカッコよさも一役買っている気がします。また RBST, splay tree
+          に限らず AVL 木のようなメジャーな木でも実現できそうです。<br />
+        </li>
+
+        <li>
+          直近の <a href="https://judge.yosupo.jp/submission/230376">Nachia さんの提出</a><br />
+          Top-down splaying
+          で同等の機能を実現されていました。集約の計算をどう実装されたのか気になります。<br />
+        </li>
+
+        <li>
+          ★
+          <a href="https://qiita.com/NokonoKotlin/items/c108a603622c03c4c67b"
+            >自作 Set ライブラリ提供 : C++ の std::set が残念な件</a
+          ><br />
+          列としての splay tree に map としての機能を詰め込み、特に
+          <code>MultiSet</code> にすると良いぞという記事です。 kth min
+          までの畳み込みができます。これは真似してみたいです。<br />
+        </li>
+      </ul>
+
+      <h2 id="SWAG (sliding window aggregation)">
+        <a href="#SWAG (sliding window aggregation)">SWAG (sliding window aggregation)</a>
+      </h2>
+      <p>SWAG は簡単かつマイナ過ぎて解説が少ない気がします。<br /></p>
+
+      <h3 id="Stack ベースの SWAG"><a href="#Stack ベースの SWAG">Stack ベースの SWAG</a></h3>
+      <p>
+        尺取り方でモノイドの畳み込みを償却 \(O(1)\) で求めるためのデータ構造 (?)
+        です。群ではなく、逆操作が存在しない点がポイントです。双対右スキャンで壁を作って pop
+        に備えます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-txt">　　　　　　　配列  [1]-[2]-[3]-[4]-[5]-[6]-[7]-[8]-..
+　　　　　　　　窓  [---------------------]
+　　　　　バッファ                  [5]-[6]
+バッファの畳み込み                  *******
+　　双対右スキャン  &lt;--------------
+</code></pre>
+      </div>
+
+      <p>
+        双対右スキャンとは、右から作る左畳み込み (<code>scanr' (flip (&lt;&gt;)) mempty</code>)
+        です。造語だったらすみません。<br />
+      </p>
+
+      <p>この図において各操作の内容は、<br /></p>
+
+      <ul>
+        <li>
+          <code>fold</code><br />
+          双対右スキャンの左端 (<code>&lt;--</code>) の値 \(\diamond\) バッファの畳込み<br />
+        </li>
+        <li>
+          <code>pushBack</code><br />
+          バッファに値 <code>[7]</code> を追加し、バッファの畳み込みを更新する<br />
+        </li>
+        <li>
+          <code>popFront</code><br />
+          双対右スキャンの左端 (<code>&lt;--</code>) の値を削除する (※)<br />
+        </li>
+      </ul>
+
+      <p>
+        ※
+        <code>popFront</code>
+        で双対右スキャンが空になったとき、バッファ中の値を双対右スキャンへ移動します。よって償却
+        \(O(1)\) です。<br />
+      </p>
+
+      <h3 id="Deque ベースの swag"><a href="#Deque ベースの swag">Deque ベースの swag</a></h3>
+      <p>
+        push/pop を左右から操作可能にします。これは左右方向にスタックとスキャンを持てば良いです。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-txt">　　　　　右窓                -------------&gt;
+　　左スキャン                -------------&gt;
+　　　　　左窓  &lt;-----------
+双対右スキャン  &lt;-----------
+</code></pre>
+      </div>
+
+      <p>
+        もう pop できない時は、要素を左右均等に振り分けてバランスをとります。これで償却 \(O(1)\)
+        になるみたいです。未証明……<br />
+      </p>
+
+      <h3 id="verify"><a href="#verify">verify</a></h3>
+      <ul>
+        <li>
+          <a href="https://judge.yosupo.jp/problem/q">Queue Operate All Composite</a><br />
+          <a href="https://judge.yosupo.jp/submission/230684">187 ms</a>. Stack 版 SWAG です。 Deque
+          版で解くと <a href="https://judge.yosupo.jp/submission/230775">219 ms</a> でした。 Deque
+          でいいか……<br />
+        </li>
+
+        <li>
+          <a href="https://judge.yosupo.jp/problem/deque_operate_all_composite"
+            >Deque Operate All Composite</a
+          ><br />
+          <a href="https://judge.yosupo.jp/submission/230774">220 ms</a>. Deque 版 SWAG です。<br />
+        </li>
+      </ul>
+
+      <h3 id="セグ木で \(O(N \log N)\) で良くない？">
+        <a href="#セグ木で \(O(N \log N)\) で良くない？">セグ木で \(O(N \log N)\) で良くない？</a>
+      </h3>
+      <p>セグ木で十分だと思いました。競プロ小説を書くなら主人公は SegTree です。<br /></p>
+
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <ul>
+        <li>
+          <a href="https://github.com/haskell/vector/pull/498">nextPermutation 最適化</a><br />
+          gksato さんの PR で <code>MVector</code> の <code>nextPermutation</code> が 10
+          倍以上速くなりました！　アルゴリズムの改善が渋いですね。言語アップデートまではコピーしてお借りします。<br />
+        </li>
+
+        <li>
+          <a href="https://www.youtube.com/channel/UCdBzzKmLiLFrQOBqLQtw_Qw">宮崎雄也と音楽の話</a>
+          が登録者 8,000 人<br />
+          すごい勢いです。この間まで 300 人でしたが？！<br />
+        </li>
+
+        <li>
+          <a href="https://fleshgodapocalypse.bandcamp.com/album/opera"
+            >Fleshgod Apocalypse の新譜</a
+          >
+          が出ました<br />
+          90 秒聴くにはいい感じなんですが……。<br />
+        </li>
+      </ul>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
