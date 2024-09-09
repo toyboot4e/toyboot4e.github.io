@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 370 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 370</h1>
+      <p>Sep 8, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 370"><a href="#ABC 370">ABC 370</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc370">ABC 370</a> に参加しました。<br /></p>
+
+      <table>
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">提出</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-left">AC</td>
+            <td class="org-left">-</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">Diff 予想</td>
+            <td class="org-right">5</td>
+            <td class="org-right">300</td>
+            <td class="org-right">600</td>
+            <td class="org-left">800</td>
+            <td class="org-left">1,700</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">Diff 結果</td>
+            <td class="org-right">11</td>
+            <td class="org-right">84</td>
+            <td class="org-right">228</td>
+            <td class="org-left">1,088</td>
+            <td class="org-left">1,453</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="A 問題">
+        <a href="#A 問題"
+          ><a href="https://atcoder.jp/contests/abc370/tasks/abc370%20_a">A 問題</a></a
+        >
+      </h3>
+      <p>
+        パターンマッチです。
+        <a href="https://atcoder.jp/contests/abc370/submissions/57586511"
+          >ワンライナにする意味がありません</a
+        >
+        ！<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$(["Invalid","Yes","No"]!!).(`mod`3).sum.zipWith(*)[1,2].map read.words
+</code></pre>
+      </div>
+
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc370/tasks/abc370_b">B 問題</a></a>
+      </h3>
+      <p>畳み込みの問題です。ゴリ押しワンライナ……<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$show.f.map(map(pred.read).words).lines;f([n]:x)=foldl(\i j-&gt;x!!max i j!!min i j)(x!!0!!0)[1..n]+1
+</code></pre>
+      </div>
+
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc370/tasks/abc370_c">C 問題</a></a>
+      </h3>
+      <p>
+        コンパイルエラーと戦いました。エラーの原因は、 <code>UM.Vector</code> に対して
+        <code>VM.Vector</code> の関数を使っていたことでした。 Haskell のコンパイルエラーは、 2
+        分探索とエスパーで戦うしかありません。。辛いです。<br />
+      </p>
+
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc370/tasks/abc370_d">D 問題</a></a>
+      </h3>
+      <p>行ごと、列ごとに <code>Set</code> で壁マスを持つとシミュレーションできます。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+solve = do
+  (!h, !w, !q) &lt;- ints3'
+  !qs &lt;- U.replicateM q ints11'
+
+  rows &lt;- VM.replicate h (IS.fromList [0 .. w - 1])
+  cols &lt;- VM.replicate w (IS.fromList [0 .. h - 1])
+
+  U.forM_ qs $ \(!y, !x) -&gt; do
+    row &lt;- VM.read rows y
+    col &lt;- VM.read cols x
+    if IS.member x row
+      then do
+        -- この壁を削除
+        let !row' = IS.delete x row
+        let !col' = IS.delete y col
+        VM.write rows y row'
+        VM.write cols x col'
+      else do
+        -- 4 方の壁を削除
+        let !x1 = fromMaybe (-1) $ IS.lookupLT x row
+        let !x2 = fromMaybe (-1) $ IS.lookupGT x row
+        let !y1 = fromMaybe (-1) $ IS.lookupLT y col
+        let !y2 = fromMaybe (-1) $ IS.lookupGT y col
+
+        let !row' = (IS.delete x2 . IS.delete x1) row
+        let !col' = (IS.delete y2 . IS.delete y1) col
+        GM.write rows y row'
+        GM.write cols x col'
+
+        unless (y1 == -1) $ GM.modify rows (IS.delete x) y1
+        unless (y2 == -1) $ GM.modify rows (IS.delete x) y2
+        unless (x1 == -1) $ GM.modify cols (IS.delete y) x1
+        unless (x2 == -1) $ GM.modify cols (IS.delete y) x2
+
+  res &lt;- V.sum . V.map IS.size &lt;$&gt; V.unsafeFreeze rows
+  printBSB res
+</code></pre>
+      </div>
+
+      <p>
+        <code>Set</code>
+        に床マスを入れた場合は、より大きなグリッドの制約でも解くことができるそうです (<a
+          href="https://atcoder.jp/contests/abc370/editorial/10905"
+          >hiro さんの解説</a
+        >) 。しかし 2 分探索パートが理解できません……。<br />
+      </p>
+
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc370/tasks/abc370_e">E 問題</a></a>
+      </h3>
+      <p>
+        \(DP[i]\) を \(A_i\) で切ったときの、 \(A_i\) までの有効な切り分けの数とします。位置 \(x\)
+        への流入は、全流入から位置 \(x - k\) からの流入を引いたものです。なるほど。<br />
+      </p>
+
+      <p>理解すればあっさり解けるのが〜青 diff 帯の DP ですが、やはり理解が難しい。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !k) &lt;- ints2'
+  !xs &lt;- intsU'
+
+  let !positions = U.postscanl' (+) (0 :: Int) xs
+
+  let (!res, !_, !_) = U.foldl' step s0 positions
+        where
+          -- nTot: the number of valid splits so far
+          -- cnts: position -&gt; count
+          s0 = (modInt 0, modInt 1, IM.singleton 0 1)
+          step (!_, !nTot, !cnts) !pos = (incoming, nTot', cnts')
+            where
+              !incoming = nTot - fromMaybe 0 (cnts IM.!? (pos - k))
+              !nTot' = nTot + incoming
+              !cnts' = IM.insertWith (+) pos incoming cnts
+
+  printBSB res
+</code></pre>
+      </div>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
