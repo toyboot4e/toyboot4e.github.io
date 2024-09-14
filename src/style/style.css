@@ -111,3 +111,33 @@ div.WARNING {
     text-align: center;
 }
 
+.coderef-anchor {
+    display:inline-block;
+    color:#fff!important;
+    background:rgba(175,134,90,0.8);
+    border-radius:50%;
+    text-align:center;
+    font-size:.75em;
+    width:1.67em;
+    height:1.67em;
+    line-height:1.67em;
+    font-family:"Open Sans","DejaVu Sans",sans-serif;
+    font-style:normal;
+    font-weight:bold
+}
+.coderef-anchor *{color:#fff!important}
+.coderef-anchor+b{display:none}
+/* .coderef-anchor::after{content:attr(data-value)} */
+
+.coderef-off {
+    display: inline-block;
+    width: 100%;
+    background: hsla(24, 20%, 50%,.25);
+}
+
+.code-highlighted {
+    display: inline-block;
+    width: 100%;
+    background: hsla(60, 30%, 50%,.25);
+}
+

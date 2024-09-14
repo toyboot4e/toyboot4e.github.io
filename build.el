@@ -167,6 +167,10 @@
       (link (@ (rel "stylesheet")
                (href "/style/prism.css")))
       (script (@ (type "text/javascript")
+                 (src "/style/style.js"))
+              ;; NOTE: empty body is required for self-closing tag
+              "")
+      (script (@ (type "text/javascript")
                  ;; NOTE: It creates `async=""`. I prefer `async` only, but the value is required for XHTML.
                  (async "")
                  (src "/style/prism.js"))
@@ -259,6 +263,53 @@
                                         code)
                             (format "<pre><code class=\"src language-%s%s\"%s>%s</code></pre>"
                                     lang diff-highlight label code)))))))
+
+;; Overwrite the format for custom `coderef' (callouts) style in code.
+(defun org-html-do-format-code
+        (code &optional lang refs retain-labels num-start wrap-lines)
+    "Format CODE string as source code.
+Optional arguments LANG, REFS, RETAIN-LABELS, NUM-START, WRAP-LINES
+are, respectively, the language of the source code, as a string, an
+alist between line numbers and references (as returned by
+`org-export-unravel-code'), a boolean specifying if labels should
+appear in the source code, the number associated to the first
+line of code, and a boolean specifying if lines of code should be
+wrapped in code elements."
+    (let* ((code-lines (split-string code "\n"))
+	       (code-length (length code-lines))
+	       (num-fmt
+	        (and num-start
+	             (format "%%%ds: "
+		                 (length (number-to-string (+ code-length num-start))))))
+	       (code (org-html-fontify-code code lang)))
+        (org-export-format-code
+         code
+         (lambda (loc line-num ref)
+             (setq loc
+	               (concat
+	                ;; Add line number, if needed.
+	                (when num-start
+		                (format "<span class=\"linenr\">%s</span>"
+			                    (format num-fmt line-num)))
+	                ;; Transcoded src line.
+	                (if wrap-lines
+		                    (format "<code%s>%s</code>"
+			                        (if num-start
+                                            (format " data-ox-html-linenr=\"%s\"" line-num)
+                                        "")
+			                        loc)
+		                loc)
+	                ;; Add label, if needed.
+                    ;; NOTE(toyboot): added coderef style.
+                    ;; TODO: replace with callout images?
+	                (when (and ref retain-labels)
+                        ;; (format " <span class=\"coderef-anchor\">(%s)</span>" ref)
+                        (format " <span class=\"coderef-anchor\">%s</span>" ref))))
+             ;; Mark transcoded line as an anchor, if needed.
+             (if (not ref) loc
+	             (format "<span id=\"coderef-%s\" class=\"coderef-off\">%s</span>"
+		                 ref loc)))
+         num-start refs)))
 
 ;; Ovewrite the wrap image function and remove `id' attribute for the `<figure>' tag:
 (defun org-html--wrap-image (contents info &optional caption label)
@@ -480,8 +531,13 @@ INFO is a plist holding contextual information.  See
                                                                                '%s');\" onmouseout=\"CodeHighlightOff(this, '%s');\""
 	                          fragment fragment)
 		              attributes
-		              (format (org-export-get-coderef-format path desc)
-			                  (org-export-resolve-coderef path info)))))
+                      ;; NOTE(toyboot): reference code with anchor style
+		              ;; (format (org-export-get-coderef-format path desc)
+			          ;;         (org-export-resolve-coderef path info))
+                      (format "<span class=\"coderef-anchor\">%s</span>"
+                              ;; the ref name:
+		                      (format (org-export-get-coderef-format path desc)
+			                          (org-export-resolve-coderef path info))))))
          ;; External link with a description part.
          ((and path desc)
           (format "<a href=\"%s\"%s>%s</a>"
