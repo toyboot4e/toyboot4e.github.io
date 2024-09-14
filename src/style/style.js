@@ -11,11 +11,12 @@ function CodeHighlightOn(elem, id)
    }
  }
 
- function CodeHighlightOff(elem, id)
- {
-   var target = document.getElementById(id);
-   if(elem.cacheClassElem)
-     elem.className = elem.cacheClassElem;
-   if(elem.cacheClassTarget)
-     target.className = elem.cacheClassTarget;
- }
+function CodeHighlightOff(elem, id)
+{
+  var target = document.getElementById(id);
+  if(elem.cacheClassElem)
+    elem.className = elem.cacheClassElem;
+  if(elem.cacheClassTarget)
+    target.className = elem.cacheClassTarget;
+}
+

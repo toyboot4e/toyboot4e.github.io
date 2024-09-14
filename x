@@ -60,14 +60,19 @@ _serve() {
 
 _format() {
     echo "formatting all the htmls.."
-    npx prettier --print-width 100 --write out/*.html
+    cd out
+    npx prettier --print-width 100 --write *.html
+    cd diary
+    npx prettier --print-width 100 --write *.html
+    cd ../../
 }
 
 _watch() {
     echo "start watching.."
     if [[ "${1:-}" == "-d" || "${1:-}" == "--draft" ]] ; then
         echo "draft build"
-        watchexec -e org -w draft --ignore "index.org" "./x build --draft && ./x format"
+        # watchexec -e org -w draft --ignore "index.org" "./x build --draft && ./x format"
+        watchexec -e org -w draft --ignore "index.org" "./x build --draft"
     elif [[ -z "${1:-}" || "${1:-}" == "-r" || "${1:-}" == "--release" ]] ; then
         echo "release build"
         watchexec -e org -w src --ignore "index.org" "./x build --release && ./x format"
