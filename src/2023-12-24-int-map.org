@@ -110,5 +110,9 @@ ghci> debug $ (0 :) $ map (2^) [0 .. 16]
 
 そんな =IntMap= はマージ処理もそこそこ速く、性能のバランスが取れているようです。今日でも優れた選択なのかは分かりませんが、平衡しないんだ〜と面白かったので共有しました。お使いの言語でも patricia tree は使われているのでしょうか。
 
+#+BEGIN_QUOTE
+追記: 平衡されますが、特殊なやり方だっただけでした。
+#+END_QUOTE
+
 以上です。昨日投稿の [[https://zenn.dev/toyboot4e/books/seriously-haskell][AtCoder ガチ言語 Haskell 🔥]] もよろしくお願いします！
 

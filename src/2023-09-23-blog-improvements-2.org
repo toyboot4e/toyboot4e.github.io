@@ -1,4 +1,4 @@
-#+TITLE: =org-mode= 製ブログの改良 (2)
+#+TITLE: =org-mode= 製ブログの改良 (2): =<details>=
 #+DATE: <2023-09-23 Sat>
 
 * 背景
@@ -32,7 +32,7 @@
 
 #+CAPTION: 変換前 (=org-mode=)
 #+BEGIN_SRC org-mode
-#+BEGIN_DETAILS 個々にタイトル
+#+BEGIN_DETAILS ここにタイトル
 折りたたみ表示
 #+END_DETAILS
 #+END_SRC
@@ -40,10 +40,16 @@
 #+CAPTION: 変換後 (=html=)
 #+BEGIN_SRC html
 <details>
-<summary>個々にタイトル</summary>
+<summary>ここにタイトル</summary>
 折りたたみ表示
 </details>
 #+END_SRC
+
+実演:
+
+#+BEGIN_DETAILS ここにタイトル
+折りたたみ表示
+#+END_DETAILS
 
 今後追加したい block があれば、同様に対応できます。
 

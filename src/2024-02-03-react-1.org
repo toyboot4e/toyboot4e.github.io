@@ -7,11 +7,7 @@
 
 [[https://github.com/toyboot4e/learn-react/tree/main][リポジトリ: toyboot4e/learn-react]]
 
-** モチベーションの着火
-
-ここ 3 年 web 開発にモチベーションが湧かず、スキル習得を疎かにしてしまいました。そこで外部にモチベーションを求め、 [[https://menta.work/member/dashboard][MENTA]] でメンターを雇ってみました。メンターに毎日進捗報告するために開発をします。虚栄心駆動開発です。
-
-開発中も自分の興味を優先することにしました。 html/css/jsx の記述を高速化できる [[https://emmet.io/][Emmet]] に興味を持って、 [[https://github.com/toyboot4e/learn-react/blob/main/02-learn-emmet/doc/plan.org][Emmet を題材としてアプリの作成を考えています]] 。お金頼り、人頼りでも何でも良いので手を着けて、自身の興味に寄せていけば、最後は自立できると思います。
+html/css/jsx の記述を高速化できる [[https://emmet.io/][Emmet]] に興味を持って、 [[https://github.com/toyboot4e/learn-react/blob/main/02-learn-emmet/doc/plan.org][Emmet を題材としてアプリの作成を考えています]] 。
 
 * [[https://react.dev/][react.dev]] を読む
 
@@ -362,7 +358,5 @@ const Square = ({
 
 * まとめ
 
-TypeScript と React に入門し、基本的なツールをセットアップしました。ここまで 4 日です。まだ圧倒的に知識不足ですから、今後多数のプロジェクトを作成して試行回数を増やします。
-
-なお Web 開発は真剣に取り組んだことが無いこともあり、まだ自分が天才である可能性が残っています。などと勘違いを表明するのは独学の弊害ですが、あえてこのまま突っ走ってみたいと思います。
+TypeScript と React に入門し、基本的なツールをセットアップしました。ここまで 4 日です。まだ圧倒的に知識不足ですから、試行回数を増やしたいです。
 
