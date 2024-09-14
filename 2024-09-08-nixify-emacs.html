@@ -105,8 +105,7 @@
     # `org-babel-tangle` の Nix 式による実装 (すごい)
     org-babel.url = "github:emacs-twist/org-babel";
   };
-<span id="coderef-1-2" onmouseover="CodeHighlightOn(this,'jump-coderef-1-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-2');" class="coderef-off"><a href="#coderef-1-2">  # <span class="coderef-anchor">2</span></a></span>
-  outputs = { self, nixpkgs, home-manager, org-babel, emacs-overlay, ... }: {
+<span id="coderef-1-2" onmouseover="CodeHighlightOn(this,'jump-coderef-1-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-2');" class="coderef-off"><a href="#coderef-1-2">  outputs = { self, nixpkgs, home-manager, org-babel, emacs-overlay, ... }: { # <span class="coderef-anchor">2</span></a></span>
       # macOS における設定
       darwinConfigurations = (import ./hosts/OPL2212-2 {
         inherit self nixpkgs nix-darwin home-manager org-babel emacs-overlay
@@ -334,8 +333,7 @@ let
 <span id="coderef-3-2" onmouseover="CodeHighlightOn(this,'jump-coderef-3-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-3-2');" class="coderef-off"><a href="#coderef-3-2">  sources = pkgs.callPackage ../_sources/generated.nix { }; # <span class="coderef-anchor">2</span></a></span>
   # その他省略
 in {
-<span id="coderef-3-3" onmouseover="CodeHighlightOn(this,'jump-coderef-3-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-3-3');" class="coderef-off"><a href="#coderef-3-3">  # <span class="coderef-anchor">3</span></a></span>
-  imports = modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
+<span id="coderef-3-3" onmouseover="CodeHighlightOn(this,'jump-coderef-3-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-3-3');" class="coderef-off"><a href="#coderef-3-3">  imports = modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices; # <span class="coderef-anchor">3</span></a></span>
   home.stateVersion = "24.05";
   home.packages = basicPkgs ++ advancedPkgs ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs;
 }
@@ -420,8 +418,7 @@ in [
 
       <div class="org-src-container">
         <pre><code class="src language-nix">{ pkgs, org-babel, sources }:
-<span id="coderef-5-1" onmouseover="CodeHighlightOn(this,'jump-coderef-5-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-5-1');" class="coderef-off"><a href="#coderef-5-1"># <span class="coderef-anchor">1</span></a></span>
-let tangle = org-babel.lib.tangleOrgBabel { languages = [ "emacs-lisp" ]; };
+<span id="coderef-5-1" onmouseover="CodeHighlightOn(this,'jump-coderef-5-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-5-1');" class="coderef-off"><a href="#coderef-5-1">let tangle = org-babel.lib.tangleOrgBabel { languages = [ "emacs-lisp" ]; }; # <span class="coderef-anchor">1</span></a></span>
 in {
 <span id="coderef-5-2" onmouseover="CodeHighlightOn(this,'jump-coderef-5-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-5-2');" class="coderef-off"><a href="#coderef-5-2">  programs.emacs = { # <span class="coderef-anchor">2</span></a></span>
     enable = true;
