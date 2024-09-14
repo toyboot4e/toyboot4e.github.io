@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -38,28 +39,17 @@
         ><br />
       </p>
 
-      <h3 id="モチベーションの着火"><a href="#モチベーションの着火">モチベーションの着火</a></h3>
       <p>
-        ここ 3 年 web
-        開発にモチベーションが湧かず、スキル習得を疎かにしてしまいました。そこで外部にモチベーションを求め、
-        <a href="https://menta.work/member/dashboard">MENTA</a>
-        でメンターを雇ってみました。メンターに毎日進捗報告するために開発をします。虚栄心駆動開発です。<br />
-      </p>
-
-      <p>
-        開発中も自分の興味を優先することにしました。 html/css/jsx の記述を高速化できる
-        <a href="https://emmet.io/">Emmet</a> に興味を持って、
+        html/css/jsx の記述を高速化できる <a href="https://emmet.io/">Emmet</a> に興味を持って、
         <a href="https://github.com/toyboot4e/learn-react/blob/main/02-learn-emmet/doc/plan.org"
           >Emmet を題材としてアプリの作成を考えています</a
         >
-        。お金頼り、人頼りでも何でも良いので手を着けて、自身の興味に寄せていけば、最後は自立できると思います。<br />
+        。<br />
       </p>
-
       <h2 id="react.dev を読む">
         <a href="#react.dev を読む"><a href="https://react.dev/">react.dev</a> を読む</a>
       </h2>
       <p>TypeScript + React に入門していきます。<br /></p>
-
       <h3 id="Quick Start">
         <a href="#Quick Start"><a href="https://react.dev/learn">Quick Start</a></a>
       </h3>
@@ -79,7 +69,6 @@
         state を props として渡します。 State を書き換えた場合、変更が伝播して自動的に再度 rendering
         が走ります。<br />
       </p>
-
       <h3 id="Tutorial: Tic-Tac-Toe の環境構築">
         <a href="#Tutorial: Tic-Tac-Toe の環境構築"
           ><a href="https://react.dev/learn/tutorial-tic-tac-toe">Tutorial: Tic-Tac-Toe</a>
@@ -93,7 +82,6 @@
         <code>create-react-app</code> は deprecated
         になっていますし、いきなり宙ぶらりんになりました。<br />
       </p>
-
       <h4 id="プロジェクトの作成 (vite)">
         <a href="#プロジェクトの作成 (vite)">プロジェクトの作成 (<code>vite</code>)</a>
       </h4>
@@ -127,13 +115,11 @@ Done. Now run:
         指示通りのコマンド実行で dev server (<code>localhost:5173</code>)
         も起動しました。順調です。<br />
       </p>
-
       <h5 id="TypeScript の種類"><a href="#TypeScript の種類">TypeScript の種類</a></h5>
       <p>
         言語選択は TypeScript にしました。 TypeScript +
         <a href="https://swc.rs/">SWC (Speedy Web Compiler)</a> というのもあるようです。<br />
       </p>
-
       <h5 id="参考. ビルドツールのレイヤ区分">
         <a href="#参考. ビルドツールのレイヤ区分">参考. ビルドツールのレイヤ区分</a>
       </h5>
@@ -147,7 +133,6 @@ Done. Now run:
           >JavaScriptビルドツールの整理 各ツールの機能と依存関係</a
         ><br />
       </p>
-
       <h4 id="ファイル内容の確認"><a href="#ファイル内容の確認">ファイル内容の確認</a></h4>
       <p><code>npm create vite@latest</code> によって以下のファイルが生成されました:<br /></p>
 
@@ -176,7 +161,6 @@ Done. Now run:
       </details>
 
       <p>以下では特に重要な設定ファイルの内容を確認します。<br /></p>
-
       <h5 id="package.json">
         <a href="#package.json"><code>package.json</code></a>
       </h5>
@@ -237,7 +221,6 @@ Done. Now run:
           <code>npm i -D &lt;パッケージ名&gt;</code> を使います。<br />
         </li>
       </ul>
-
       <h5 id="tsconfig.json">
         <a href="#tsconfig.json"><code>tsconfig.json</code></a>
       </h5>
@@ -287,7 +270,6 @@ Done. Now run:
 </code></pre>
         </div>
       </details>
-
       <h4 id="セットアップ"><a href="#セットアップ">セットアップ</a></h4>
       <p>
         <a href="https://react.dev/learn/tutorial-tic-tac-toe">Tutorial: Tic-Tac-Toe</a> は JS
@@ -327,7 +309,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <code>localhost:5173</code>
         を開くと、『X』印が表示されるだけの画面となりました。チュートリアルの環境に追いつけました。<br />
       </p>
-
       <h3 id="追加ツールの導入"><a href="#追加ツールの導入">追加ツールの導入</a></h3>
       <h4 id="volta">
         <a href="#volta"><code>volta</code></a>
@@ -371,7 +352,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <code>PATH</code> に入れてくれます。<br />
         </li>
       </ul>
-
       <h4 id="言語サーバ"><a href="#言語サーバ">言語サーバ</a></h4>
       <p>
         <a href="https://github.com/typescript-language-server/typescript-language-server"
@@ -379,7 +359,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         >
         を使っています。<br />
       </p>
-
       <h4 id="prettier">
         <a href="#prettier"><code>prettier</code></a>
       </h4>
@@ -411,7 +390,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 }
 </code></pre>
       </div>
-
       <h4 id="Emmet">
         <a href="#Emmet"><a href="https://emmet.io/">Emmet</a></a>
       </h4>
@@ -428,7 +406,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <code>&lt;Square /&gt;</code>
         に展開されます。ネストしたデータも記述できる他、構造的編集が可能になるようです。<br />
       </p>
-
       <h4 id="Typedoc">
         <a href="#Typedoc"><a href="https://typedoc.org/">Typedoc</a></a>
       </h4>
@@ -504,7 +481,6 @@ export type SquareProps = {
         >
         などが詳しそうです。<br />
       </p>
-
       <h3 id="Tutorial: Tic-Tac-Toe の実践">
         <a href="#Tutorial: Tic-Tac-Toe の実践"
           ><a href="https://react.dev/learn/tutorial-tic-tac-toe">Tutorial: Tic-Tac-Toe</a>
@@ -568,22 +544,15 @@ const Square = ({
       </div>
 
       <p>後はゴリゴリやるだけです……！<br /></p>
-
       <h4 id="TypeScript のメモ"><a href="#TypeScript のメモ">TypeScript のメモ</a></h4>
       <ul>
         <li>配列の <code>map</code> が fuse せず、都度 copy を作ってしまうようです<br /></li>
         <li>range syntax が無くて困っています<br /></li>
       </ul>
-
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
         TypeScript と React に入門し、基本的なツールをセットアップしました。ここまで 4
-        日です。まだ圧倒的に知識不足ですから、今後多数のプロジェクトを作成して試行回数を増やします。<br />
-      </p>
-
-      <p>
-        なお Web
-        開発は真剣に取り組んだことが無いこともあり、まだ自分が天才である可能性が残っています。などと勘違いを表明するのは独学の弊害ですが、あえてこのまま突っ走ってみたいと思います。<br />
+        日です。まだ圧倒的に知識不足ですから、試行回数を増やしたいです。<br />
       </p>
     </main>
     <footer role="contentinfo">
