@@ -19,7 +19,6 @@ AsciiDoc でお馴染みの [[https://docs.asciidoctor.org/asciidoc/latest/verba
   };
   outputs = { self, nixpkgs, home-manager, org-babel, emacs-overlay, ... }: {
       nixosConfigurations = (import ./hosts/tbm { # (ref:2)
-      nixosConfigurations = (import ./hosts/tbm {nixosConfigurations = (import ./hosts/tbm { # (ref:2)
         inherit self nixpkgs home-manager;
       });
     };

@@ -48,8 +48,7 @@ Nix が流行っています。僕は 1 年半 NixOS を使っていますが、
     # `org-babel-tangle` の Nix 式による実装 (すごい)
     org-babel.url = "github:emacs-twist/org-babel";
   };
-  # (ref:2)
-  outputs = { self, nixpkgs, home-manager, org-babel, emacs-overlay, ... }: {
+  outputs = { self, nixpkgs, home-manager, org-babel, emacs-overlay, ... }: { # (ref:2)
       # macOS における設定
       darwinConfigurations = (import ./hosts/OPL2212-2 {
         inherit self nixpkgs nix-darwin home-manager org-babel emacs-overlay
@@ -135,8 +134,7 @@ let
   sources = pkgs.callPackage ../_sources/generated.nix { }; # (ref:2)
   # その他省略
 in {
-  # (ref:3)
-  imports = modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
+  imports = modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices; # (ref:3)
   home.stateVersion = "24.05";
   home.packages = basicPkgs ++ advancedPkgs ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs;
 }
@@ -172,8 +170,7 @@ in [
 
 #+BEGIN_SRC nix
 { pkgs, org-babel, sources }:
-# (ref:1)
-let tangle = org-babel.lib.tangleOrgBabel { languages = [ "emacs-lisp" ]; };
+let tangle = org-babel.lib.tangleOrgBabel { languages = [ "emacs-lisp" ]; }; # (ref:1)
 in {
   programs.emacs = { # (ref:2)
     enable = true;
