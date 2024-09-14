@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nixify your Emacs - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>Nixify your Emacs</h1>
+      <p>Sep 14, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="Nix + Emacs"><a href="#Nix + Emacs">Nix + Emacs</a></h2>
+      <p>
+        Nix が流行っています。僕は 1 年半 NixOS を使っていますが、僅か 1
+        週間で完全に抜き去られました。インテリだ〜〜。この波に乗って Nix
+        のパワーユーザを目指します。<br />
+      </p>
+      <h3 id="やりたいこと"><a href="#やりたいこと">やりたいこと</a></h3>
+      <p>
+        今一番面白い
+        <a href="https://github.com/takeokunn/nixos-configuration">takeokunn/nixos-configuration</a>
+        を参考に、 Emacs パッケージを Nix で管理してみます。これでパッケージのバージョン固定や
+        rollback が可能になるはずです。反面、エディタの更新に
+        <code>nixos-rebuild</code> が必要になって面倒……ということもなく、 Nix
+        化されていないパッケージは従来どおり <code>elpa/</code> に保存されます。<br />
+      </p>
+      <h3 id="先に結論"><a href="#先に結論">先に結論</a></h3>
+      <p>進捗は以下のコミットです。ほぼ変更無しで Emacs パッケージを Nix 化できます。<br /></p>
+
+      <ul>
+        <li>
+          <a
+            href="https://github.com/toyboot4e/dotfiles/commit/10181af8ede15d14d0aa77a6afd6b04c719b63ab"
+            >nixify your emacs</a
+          ><br />
+          <a href="https://github.com/nix-community/emacs-overlay">emacs-overlay</a>
+          により依存パッケージが自動的に Nix 化されました。<br />
+        </li>
+        <li>
+          <a
+            href="https://github.com/toyboot4e/dotfiles/commit/7bbdc9deff22a73b718982620b56c8a94110a473"
+            >introduce <code>nvfetcher</code></a
+          ><br />
+          <code>nixpkgs</code> に無いパッケージを <code>melpaBuild</code> でビルドし、更新には
+          <code>nvfetcher</code> を使う方法を確認しました。<br />
+        </li>
+      </ul>
+      <h2 id="ファイル分割を読む"><a href="#ファイル分割を読む">ファイル分割を読む</a></h2>
+      <p>
+        <a href="https://github.com/takeokunn/nixos-configuration">takeokunn/nixos-configuration</a>
+        を読んで基本的な Nix Flakes を学びます。<br />
+      </p>
+      <h3 id="nvfetcher.toml">
+        <a href="#nvfetcher.toml"><code>nvfetcher.toml</code></a>
+      </h3>
+      <p>
+        <a href="https://github.com/berberman/nvfetcher">nvfetcher</a> は
+        <code>nvfetcher.toml</code> を元に
+        <a href="https://nixos.wiki/wiki/Nix_Hash">hash 値</a>
+        の集まりを生成します。最新のソースを表す hash 値への更新がコマンド 1
+        つで実施できる点が便利です。<br />
+      </p>
+
+      <p>
+        <code>nixpkgs</code> に登録されていないパッケージは
+        <code>nvfetcher.toml</code>
+        に記載し、自分でビルドする方針のようです。詳しくは後ほど紹介します。<br />
+      </p>
+      <h4 id="flake.nix">
+        <a href="#flake.nix"><code>flake.nix</code></a>
+      </h4>
+      <p>設定ファイルを読んでいきます。 NixOS, macOS に両対応しています。<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span><code>flake.nix</code> (抜粋)</label
+        >
+        <pre><code class="src language-nix">{
+<span id="coderef-1-1" onmouseover="CodeHighlightOn(this,'jump-coderef-1-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-1');" class="coderef-off"><a href="#coderef-1-1">  inputs = { # <span class="coderef-anchor">1</span></a></span>
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
+    # Emacs の HEAD ビルド等ができる `overlay`.
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-stable.follows = "nixpkgs-stable";
+    };
+    # `org-babel-tangle` の Nix 式による実装 (すごい)
+    org-babel.url = "github:emacs-twist/org-babel";
+  };
+<span id="coderef-1-2" onmouseover="CodeHighlightOn(this,'jump-coderef-1-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-2');" class="coderef-off"><a href="#coderef-1-2">  # <span class="coderef-anchor">2</span></a></span>
+  outputs = { self, nixpkgs, home-manager, org-babel, emacs-overlay, ... }: {
+      # macOS における設定
+      darwinConfigurations = (import ./systems/OPL2212-2 {
+        inherit self nixpkgs nix-darwin home-manager org-babel emacs-overlay
+          wezterm-flake neovim-nightly-overlay;
+      });
+      # NixOS における設定
+<span id="coderef-1-3" onmouseover="CodeHighlightOn(this,'jump-coderef-1-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-3');" class="coderef-off"><a href="#coderef-1-3">      nixosConfigurations = (import ./systems/X13Gen2 { # <span class="coderef-anchor">3</span></a></span>
+<span id="coderef-1-4" onmouseover="CodeHighlightOn(this,'jump-coderef-1-4');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-4');" class="coderef-off"><a href="#coderef-1-4">        inherit self nixpkgs home-manager org-babel emacs-overlay; # <span class="coderef-anchor">4</span></a></span>
+      });
+    };
+}
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-1-1"
+            id="jump-coderef-1-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-1-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-1-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          <a href="https://nixos-and-flakes.thiscute.world/other-usage-of-flakes/inputs"
+            ><code>inputs</code></a
+          >
+          <code>= { .. };</code><br />
+          <code>flake.nix</code> の入力 (依存)を書きます。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-1-2"
+            id="jump-coderef-1-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-1-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-1-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          <a href="https://nixos-and-flakes.thiscute.world/other-usage-of-flakes/outputs"
+            ><code>outputs</code></a
+          >
+          <code>= {self, .. }: { .. };</code><br />
+          <code>flake.nix</code> の出力を関数の形で書きます。
+          <a
+            href="https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-flake-configuration-explained#special-parameter-self-of-outputs-function"
+            ><code>self</code> は <code>outputs</code> 自身を指す</a
+          >
+          自己参照ですが、以降の使用は無さそうです。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-1-3"
+            id="jump-coderef-1-3"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-1-3');"
+            onmouseout="CodeHighlightOff(this, 'coderef-1-3');"
+            ><span class="coderef-anchor">3</span></a
+          >
+          <code>nixosConfigurations = (import ./systems/X13Gen2) { .. })</code><br />
+          <ul>
+            <li>
+              <a href="https://nix.dev/tutorials/nix-language.html#import"><code>import</code></a>
+              <code>./systems/X13Gen2 { .. };</code><br />
+              <code>import ./systems/X13Gen2/default.nix { .. };</code> と等価です。
+              <code>default.nix</code> の内容 (後述) は関数であるため、直後に引数として attribute
+              set <code>{ .. }</code> を与えています。<br />
+            </li>
+            <li>
+              <a
+                href="#coderef-1-4"
+                id="jump-coderef-1-4"
+                class="coderef"
+                onmouseover="CodeHighlightOn(this,'coderef-1-4');"
+                onmouseout="CodeHighlightOff(this, 'coderef-1-4');"
+                ><span class="coderef-anchor">4</span></a
+              >
+              <a href="https://nix.dev/manual/nix/2.18/language/constructs#inheriting-attributes"
+                ><code>{ inherit x y z; }</code></a
+              ><br />
+              <code>{ x = x; y = y; z = z; }</code> と等価です。常時
+              <code>inherit</code> されてほしかったですが、 Nix
+              も古い言語なので仕方がありません。<br />
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <h3 id="systems/X13Gen2/default.nix">
+        <a href="#systems/X13Gen2/default.nix"><code>systems/X13Gen2/default.nix</code></a>
+      </h3>
+      <p>ここから NixOS の設定ファイルを読み込んでいます。<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span
+          ><code>systems/X13Gen2/default.nix</code> (抜粋)</label
+        >
+        <pre><code class="src language-hs"><span id="coderef-2-1" onmouseover="CodeHighlightOn(this,'jump-coderef-2-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-1');" class="coderef-off"><a href="#coderef-2-1">{ self, nixpkgs, home-manager, org-babel, emacs-overlay }: # <span class="coderef-anchor">1</span></a></span>
+let
+  username = "&lt;name&gt;";
+  system = "x86_64-linux";
+in {
+<span id="coderef-2-2" onmouseover="CodeHighlightOn(this,'jump-coderef-2-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-2');" class="coderef-off"><a href="#coderef-2-2">  X13Gen2 = nixpkgs.lib.nixosSystem { # <span class="coderef-anchor">2</span></a></span>
+    inherit system;
+<span id="coderef-2-3" onmouseover="CodeHighlightOn(this,'jump-coderef-2-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-3');" class="coderef-off"><a href="#coderef-2-3">    specialArgs = { inherit xremap username; }; # <span class="coderef-anchor">3</span></a></span>
+    # `configuration.nix` および `hardware-configuration.nix` 相当
+<span id="coderef-2-4" onmouseover="CodeHighlightOn(this,'jump-coderef-2-4');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-4');" class="coderef-off"><a href="#coderef-2-4">    modules = [ # <span class="coderef-anchor">4</span></a></span>
+      # ルートユーザの設定
+      ../../nixos
+      # ハードウェアとかドライブの情報 (?)
+      ./hardware-configuration.nix
+      # ログインユーザ (?) の設定
+      home-manager.nixosModules.home-manager
+      {
+        home-manager.useUserPackages = true;
+<span id="coderef-2-5" onmouseover="CodeHighlightOn(this,'jump-coderef-2-5');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-5');" class="coderef-off"><a href="#coderef-2-5">        home-manager.users."${username}" = import ../../home-manager { # <span class="coderef-anchor">5</span></a></span>
+          inherit system nixpkgs org-babel emacs-overlay;
+        };
+      }
+    ];
+  };
+}
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-2-1"
+            id="jump-coderef-2-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          <code>{ .. }: let .. in ..;</code><br />
+          前述の通り、このファイルは <code>{ .. }</code> を引数に取る関数を定義しています。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-2-2"
+            id="jump-coderef-2-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          <code>{ X13Gen2 = nixpkgs.lib.nixosSystem { .. }; }</code><br />
+          先の <code>flake.nix</code> から見ると
+          <code>nixosConfigurations = { X13Gen2 = nixpkgs.lib.nixosSystem { .. }; }</code>
+          のような式になります。
+          <code>nixosConfigurations</code> 以下には複数の設定を配置できます。特定の設定を
+          <code>sudo nixos-rebuild switch --flake #X13Gen2 switch</code>
+          の形で指定してシステムに適用します。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-2-3"
+            id="jump-coderef-2-3"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-3');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-3');"
+            ><span class="coderef-anchor">3</span></a
+          >
+          <a
+            href="https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-flake-and-module-system#pass-non-default-parameters-to-submodules"
+            ><code>specialArgs</code></a
+          >
+          <code>= { .. };</code><br />
+          <a
+            href="https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-flake-configuration-explained#simple-introduction-to-nixpkgs-lib-nixos-system"
+            >nixpkgs.lib.nixosSystem</a
+          >
+          の引数です。 <code>modules</code> で指定したファイル (関数) が引数として取れる値になります
+          (後述) 。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-2-4"
+            id="jump-coderef-2-4"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-4');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-4');"
+            ><span class="coderef-anchor">4</span></a
+          >
+          <code>modules = [ .. ];</code><br />
+          設定内容の一覧です (<a
+            href="https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-flake-configuration-explained#simple-introduction-to-nixpkgs-lib-nixos-system"
+            >nixpkgs.lib.nixosSystem</a
+          >
+          への引数です) 。利便性のためか、複数の設定ファイルを指定できます。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-2-5"
+            id="jump-coderef-2-5"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-5');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-5');"
+            ><span class="coderef-anchor">5</span></a
+          >
+          <code>import ../../home-manager</code><br />
+          これがユーザ設定です。<br />
+        </li>
+      </ul>
+      <h3 id="home-manager/default.nix">
+        <a href="#home-manager/default.nix"><code>home-manager/default.nix</code></a>
+      </h3>
+      <p>分割された設定ファイルを <code>imports</code> で指定しています。<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 3: </span
+          ><code>home-manager/default.nix</code> (抜粋)</label
+        >
+        <pre><code class="src language-nix">{ system, nixpkgs, org-babel, emacs-overlay }:
+let
+  lib = nixpkgs.lib;
+  pkgs = import nixpkgs {
+    inherit system;
+    config.allowUnfree = true;
+<span id="coderef-3-1" onmouseover="CodeHighlightOn(this,'jump-coderef-3-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-3-1');" class="coderef-off"><a href="#coderef-3-1">    overlays = import ./overlay { inherit emacs-overlay; }; # <span class="coderef-anchor">1</span></a></span>
+  };
+  advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };
+<span id="coderef-3-2" onmouseover="CodeHighlightOn(this,'jump-coderef-3-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-3-2');" class="coderef-off"><a href="#coderef-3-2">  sources = pkgs.callPackage ../_sources/generated.nix { }; # <span class="coderef-anchor">2</span></a></span>
+  # その他省略
+in {
+<span id="coderef-3-3" onmouseover="CodeHighlightOn(this,'jump-coderef-3-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-3-3');" class="coderef-off"><a href="#coderef-3-3">  # <span class="coderef-anchor">3</span></a></span>
+  imports = modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
+  home.stateVersion = "24.05";
+  home.packages = basicPkgs ++ advancedPkgs ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs;
+}
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-3-1"
+            id="jump-coderef-3-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-3-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-3-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          <code>nixpkgs</code> に対して Emacs の
+          <a href="https://nixos.wiki/wiki/Overlays">overlay</a> を設定しています。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-3-2"
+            id="jump-coderef-3-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-3-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-3-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          <code>generated.nix</code> はある種のロックファイルです。
+          <a href="https://github.com/berberman/nvfetcher">nvfetcher</a> により生成され、 Git
+          リポジトリへのリンクや
+          <a href="https://nixos.wiki/wiki/Nix_Hash">hash 値</a> を含みます。この中に Emacs
+          パッケージのリポジトリも含まれており、後ほど利用します。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-3-3"
+            id="jump-coderef-3-3"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-3-3');"
+            onmouseout="CodeHighlightOff(this, 'coderef-3-3');"
+            ><span class="coderef-anchor">3</span></a
+          >
+          <a href="https://nixos.wiki/wiki/NixOS_modules">NixOS Module</a> として
+          <code>imports</code>
+          によりファイル分割できます。モジュール全体の出力は、各ファイルの出力の和です。<br />
+        </li>
+      </ul>
+      <h3 id="home-manager/programs/advanced.nix">
+        <a href="#home-manager/programs/advanced.nix"
+          ><code>home-manager/programs/advanced.nix</code></a
+        >
+      </h3>
+      <p>Emacs 部分に注目すると、 <code>import</code> しているだけです:<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 4: </span
+          ><code>home-manager/programs/advanced.nix</code> (抜粋)</label
+        >
+        <pre><code class="src language-nix">{ lib, pkgs, org-babel, sources }:
+let
+  emacs = import ./emacs { inherit pkgs org-babel sources; };
+in [
+  emacs
+]
+</code></pre>
+      </div>
+
+      <p><code>./emasc/default.nix</code> が肝心の Emacs の設定ファイルですね。<br /></p>
+      <h2 id="Emacs 部分を読む"><a href="#Emacs 部分を読む">Emacs 部分を読む</a></h2>
+      <p>本題です。 Emacs の部分はどうなっているのでしょうか。<br /></p>
+      <h3 id="home-manager/programs/emacs/default.nix">
+        <a href="#home-manager/programs/emacs/default.nix"
+          ><code>home-manager/programs/emacs/default.nix</code></a
+        >
+      </h3>
+      <p>
+        <a href="https://github.com/nix-community/emacs-overlay">emacs-overlay</a>
+        を使用しています。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-nix">{ pkgs, org-babel, sources }:
+<span id="coderef-5-1" onmouseover="CodeHighlightOn(this,'jump-coderef-5-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-5-1');" class="coderef-off"><a href="#coderef-5-1"># <span class="coderef-anchor">1</span></a></span>
+let tangle = org-babel.lib.tangleOrgBabel { languages = [ "emacs-lisp" ]; };
+in {
+<span id="coderef-5-2" onmouseover="CodeHighlightOn(this,'jump-coderef-5-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-5-2');" class="coderef-off"><a href="#coderef-5-2">  programs.emacs = { # <span class="coderef-anchor">2</span></a></span>
+    enable = true;
+<span id="coderef-5-3" onmouseover="CodeHighlightOn(this,'jump-coderef-5-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-5-3');" class="coderef-off"><a href="#coderef-5-3">    package = pkgs.emacsWithPackagesFromUsePackage { # <span class="coderef-anchor">3</span></a></span>
+      config = ./elisp/init.org;
+      defaultInitFile = true;
+<span id="coderef-5-4" onmouseover="CodeHighlightOn(this,'jump-coderef-5-4');" onmouseout="CodeHighlightOff(this,'jump-coderef-5-4');" class="coderef-off"><a href="#coderef-5-4">      package = pkgs.emacs-git; # <span class="coderef-anchor">4</span></a></span>
+      alwaysTangle = true;
+<span id="coderef-5-5" onmouseover="CodeHighlightOn(this,'jump-coderef-5-5');" onmouseout="CodeHighlightOff(this,'jump-coderef-5-5');" class="coderef-off"><a href="#coderef-5-5">      extraEmacsPackages = import ./epkgs { inherit pkgs sources; }; # <span class="coderef-anchor">5</span></a></span>
+    };
+  };
+
+<span id="coderef-5-6" onmouseover="CodeHighlightOn(this,'jump-coderef-5-6');" onmouseout="CodeHighlightOff(this,'jump-coderef-5-6');" class="coderef-off"><a href="#coderef-5-6">  home.file = { # <span class="coderef-anchor">6</span></a></span>
+    ".config/emacs/init.el".text = tangle (builtins.readFile ./elisp/init.org);
+    ".config/emacs/early-init.el".text =
+      tangle (builtins.readFile ./elisp/early-init.org);
+    ".config/emacs/yasnippet.org".source = ./yasnippet.org;
+  };
+
+  home.packages = with pkgs; [ emacs-lsp-booster pinentry-emacs cmigemo ];
+}
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-5-1"
+            id="jump-coderef-5-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-5-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-5-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          <a href="https://github.com/emacs-twist/org-babel">emacs-twist/org-babel</a> は
+          <code>org-babel-tangle</code> の Nix 実装です (え？) 。 <code>$HOME</code> 以下に各種
+          <code>.el</code> を配置するため使用されています。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-5-2"
+            id="jump-coderef-5-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-5-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-5-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          <a
+            href="https://github.com/nix-community/home-manager/blob/503af483e1b328691ea3a434d331995595fb2e3d/modules/programs/emacs.nix"
+            >programs.emacs</a
+          >
+          は <code>home-manager</code> 定義です。 <code>user.packages</code> と
+          <code>programs</code> の違いとしては、
+          <code>programs</code> の方が追加設定を実施してくれるイメージがあります。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-5-3"
+            id="jump-coderef-5-3"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-5-3');"
+            onmouseout="CodeHighlightOff(this, 'coderef-5-3');"
+            ><span class="coderef-anchor">3</span></a
+          >
+          <a
+            href="https://github.com/nix-community/emacs-overlay/blob/795d5dc72088bd6c758826c56284b0024b045194/elisp.nix"
+            >emacsWithPackagesFromUsePackage</a
+          >
+          は
+          <a href="https://github.com/nix-community/emacs-overlay">emacs-overlay</a>
+          の関数です。設定ファイル中の <code>use-package</code> /
+          <code>leaf</code> 式をパースして、本家の
+          <code>emacsWithPackages</code> に渡してくれるようです。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-5-4"
+            id="jump-coderef-5-4"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-5-4');"
+            onmouseout="CodeHighlightOff(this, 'coderef-5-4');"
+            ><span class="coderef-anchor">4</span></a
+          >
+          <code>emacs-git</code> は HEAD, <code>emacs-unstable</code> は latest リリースを指します。
+          HEAD ビルドを選択しています。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-5-5"
+            id="jump-coderef-5-5"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-5-5');"
+            onmouseout="CodeHighlightOff(this, 'coderef-5-5');"
+            ><span class="coderef-anchor">5</span></a
+          >
+          <code>extraEmacsPackages</code> で Emacs パッケージを指定しています。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-5-6"
+            id="jump-coderef-5-6"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-5-6');"
+            onmouseout="CodeHighlightOff(this, 'coderef-5-6');"
+            ><span class="coderef-anchor">6</span></a
+          >
+          <a href="https://github.com/emacs-twist/org-babel">emacs-twist/org-babel</a>
+          で設定ファイルを配置しています。<br />
+        </li>
+      </ul>
+      <h3 id="home-manager/programs/emacs/epkgs/default.nix">
+        <a href="#home-manager/programs/emacs/epkgs/default.nix"
+          ><code>home-manager/programs/emacs/epkgs/default.nix</code></a
+        >
+      </h3>
+      <p>
+        これはパッケージのリストを作るだけですね。リストされたパッケージは
+        <code>load-path</code> に入ります。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-nix">{ pkgs, sources }:
+epkgs:
+let
+  ai = import ./packages/ai { inherit epkgs pkgs sources; };
+  # 略
+in ai ++ awesome ++ buffer ++ client ++ coding ++ cursor ++ dired ++ elfeed
+++ eshell ++ eww ++ exwm ++ file ++ ime ++ language ++ language_specific
+++ monitor ++ org ++ project ++ remote_access ++ themes ++ search ++ window
+</code></pre>
+      </div>
+
+      <p>
+        nixpkgs に無いパッケージは、 <code>nvfetcher</code> によりソース指定して
+        <code>melpaBuild</code> により Nix 化しています。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-nix">{ sources, epkgs }: {
+  rainbow-csv = epkgs.melpaBuild {
+    pname = "rainbow-csv";
+    version = "0.0.1";
+    src = sources.emacs-rainbow-csv.src;
+
+    packageRequires = with epkgs; [ csv-mode ];
+
+    ignoreCompilationError = false;
+  };
+  ## ~~
+}
+</code></pre>
+      </div>
+
+      <p>
+        ……ハッ、それだけ？！　すごいエコシステムです。使い方を調べるのは非常に大変だと思いますが、今回は
+        take
+        さんに便乗できて楽できました。今後もフォースペンギンぐらいの歩き方をして行こうかなと……。<br />
+      </p>
+      <h2 id="備考: nvfetcher の使い方">
+        <a href="#備考: nvfetcher の使い方">備考: <code>nvfetcher</code> の使い方</a>
+      </h2>
+      <p>
+        <a href="https://github.com/tacit7/smyx/pull/14"><code>smyx</code> への修正</a>
+        マージまでの間、 fork を <code>nvfetcher</code> 経由で使ってみることにしました。<br />
+      </p>
+
+      <blockquote>
+        <p>もちろん <code>straight</code> や <code>elpaca</code> を使っても良いです。<br /></p>
+      </blockquote>
+      <h3 id="source を作成する">
+        <a href="#source を作成する"><code>source</code> を作成する</a>
+      </h3>
+      <p>以下の <code>nvfetcher.toml</code> にリポジトリの一覧を記載します:<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 5: </span><code>nvfetcher.toml</code></label
+        >
+        <pre><code class="src language-toml">[emacs-smyx]
+src.git = "https://github.com/toyboot4e/smyx"
+src.branch = "master"
+fetch.github = "toyboot4e/smyx"
+</code></pre>
+      </div>
+
+      <p><code>nvfetcher</code> コマンドで <code>.nix</code> を生成します:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ nvfetcher
+# CheckGit
+    url: https://github.com/toyboot4e/smyx
+    branch: master
+Changes:
+emacs-smyx: ∅ → 97a2e1ef2bcffd34e43b1cabad17d317e41258ec
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ ls _sources/
+generated.json  generated.nix
+</code></pre>
+      </div>
+
+      <p>ファイル内容は次の通りです:<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 6: </span><code>_sources/generated.nix</code></label
+        >
+        <pre><code class="src language-nix"># This file was generated by nvfetcher, please do not modify it manually.
+{ fetchgit, fetchurl, fetchFromGitHub, dockerTools }:
+{
+  emacs-smyx = {
+    pname = "emacs-smyx";
+    version = "97a2e1ef2bcffd34e43b1cabad17d317e41258ec";
+    src = fetchFromGitHub {
+      owner = "toyboot4e";
+      repo = "smyx";
+      rev = "97a2e1ef2bcffd34e43b1cabad17d317e41258ec";
+      fetchSubmodules = false;
+      sha256 = "sha256-1UZRtQ74p4xAuB6JXFHMxrNBO9BG6JPRYLvEeCOz5rc=";
+    };
+    date = "2024-09-14";
+  };
+}
+</code></pre>
+      </div>
+      <h3 id="source を読み込みビルドする">
+        <a href="#source を読み込みビルドする"><code>source</code> を読み込みビルドする</a>
+      </h3>
+      <p><code>extraPackages</code> を <code>epkgs.el</code> で指定することにします:<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 7: </span><code>tbm/default.nix</code></label
+        >
+        <pre><code class="src language-nix"># home-manager の各ユーザ設定ファイルにて
+programs.emacs = {
+  enable = true;
+  package = pkgs.emacsWithPackagesFromUsePackage {
+    config = ../../editor/emacs-leaf/init.org;
+    defaultInitFile = false; # true;
+    package = pkgs.emacs-unstable; # pkgs.emacs-git;
+    alwaysTangle = true;
+    alwaysEnsure = true;
+<span id="coderef-12-1" onmouseover="CodeHighlightOn(this,'jump-coderef-12-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-12-1');" class="coderef-off"><a href="#coderef-12-1">    extraEmacsPackages import ./epkgs { inherit pkgs sources; }; # <span class="coderef-anchor">1</span></a></span>
+  };
+};
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-12-1"
+            id="jump-coderef-12-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-12-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-12-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          take さんのファイル分割を丸パクリ<br />
+        </li>
+      </ul>
+
+      <p>Emacs パッケージは <code>epkgs.melpaBuild</code> でビルドできます:<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 8: </span><code>tbm/epkgs.nix</code></label
+        >
+        <pre><code class="src language-nix"># emacs packages
+{ pkgs, sources }: epkgs: [
+  # meplaBuild:
+  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/emacs/build-support/melpa.nix
+
+  (epkgs.melpaBuild {
+    # pname = "smyx";
+    pname = "smyx-theme";
+    version = "0.0.1";
+    src = sources.emacs-smyx.src;
+    # packageRequires = with epkgs; [];
+    # files = ["smyx-theme.el"];
+    ignoreCompilationError = false;
+  })
+]
+</code></pre>
+      </div>
+
+      <p><code>nixos-rebuild</code> して完成です:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ git add _sources
+$ git add epkgs.nix
+$ sudo nixos-rebuild --flake .#tbm switch
+</code></pre>
+      </div>
+      <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
+      <p>
+        <a href="https://github.com/nix-community/emacs-overlay">emacs-overlay</a> により一挙に
+        Emacs の Nix 化ができることが分かりました。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a href="https://github.com/nix-community/emacs-overlay">emacs-overlay</a> がすごい<br />
+          <ul>
+            <li>
+              <code>use-package</code> や <code>leaf</code> ユーザは自動的に Nix に移行できる
+              (<code>emacsWithPackagesFromUsePackage</code>)<br />
+            </li>
+            <li>
+              Nix 化しないパッケージは、今までどおり <code>elpa/</code> や
+              <code>straight/</code> に入れてしまえば良い<br />
+            </li>
+          </ul>
+        </li>
+        <li>
+          nixpkgs がすごい<br />
+          <ul>
+            <li>elpa や melpa に登録されていない Emacs パッケージも nixpkgs にはある<br /></li>
+            <li><code>melpaBuild</code> で大抵のパッケージを自分で取り込める<br /></li>
+          </ul>
+        </li>
+        <li>
+          <a href="https://github.com/berberman/nvfetcher">nvfetcher</a> が便利<br />
+          <ul>
+            <li>依存リポジトリの一覧を管理し、一括でバージョンを更新できる<br /></li>
+          </ul>
+        </li>
+      </ul>
+      <h3 id="課題"><a href="#課題">課題</a></h3>
+      <ul>
+        <li>
+          外部コマンドに依存するパッケージをビルドする方法を知りたい<br />
+          たとえば <code>straight</code> は <code>git</code> に依存するため、単純な
+          <code>melpaBuild</code> ではビルドできないようです (?)<br />
+        </li>
+        <li>
+          パッケージを Pin できているのかイマイチ分からない<br />
+          <code>emacs-overlay</code> のバージョン =
+          依存パッケージ全体のバージョンだと思って良い？<br />
+        </li>
+      </ul>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

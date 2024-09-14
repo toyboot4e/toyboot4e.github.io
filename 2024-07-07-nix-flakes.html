@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -30,7 +31,6 @@
         <a href="https://nixos-and-flakes.thiscute.world/">NixOS &amp; Flakes Book</a> を参考に Nix
         Flakes に移行しました。<br />
       </p>
-
       <h3 id="Flakes を使うメリット"><a href="#Flakes を使うメリット">Flakes を使うメリット</a></h3>
       <p>Flakes へのモチベーションは以下です。<br /></p>
 
@@ -45,12 +45,13 @@
           モジュール分けや dotfiles リポジトリからの設定反映が簡単になります。<br />
         </li>
       </ol>
-
       <h3 id="Flakes の注意点"><a href="#Flakes の注意点">Flakes の注意点</a></h3>
       <p>
         Nix Flakes は git worktree 中のファイルを
         <code>/etc/nixos</code>
-        以下にファイルコピーしますが、全ユーザから読めるファイル権限となるため要注意とあります。<br />
+        以下にファイルコピーしますが、全ユーザから読めるファイル権限となるため要注意とあります。特に
+        cachix で
+        <strong>重要なファイルが外部のサーバにコピーされる</strong> と相当まずいですね。<br />
       </p>
 
       <blockquote>
@@ -63,10 +64,10 @@
       </blockquote>
 
       <p>
-        やはりプライベートなファイルは
-        <code>.git</code> プロジェクトに置かないほうが良いでしょう。<br />
+        ひとまずプライベートなファイルは
+        <code>.git</code>
+        プロジェクトに置かないことにします。その方がまだ安全です。今後プライバシーの守り方を学びたいと思います。<br />
       </p>
-
       <h2 id="設定の実施"><a href="#設定の実施">設定の実施</a></h2>
       <h3 id="Flakes の有効化"><a href="#Flakes の有効化">Flakes の有効化</a></h3>
       <p>
@@ -83,7 +84,6 @@
         </li>
         <li><a href="https://wiki.nixos.org/wiki/Flakes">Flakes - NixOS Wiki</a><br /></li>
       </ul>
-
       <h3 id="shell.nix → flake.nix">
         <a href="#shell.nix → flake.nix"><code>shell.nix</code> → <code>flake.nix</code></a>
       </h3>
@@ -164,6 +164,11 @@ use flake
         </div>
       </details>
 
+      <p>
+        ↑
+        <code>flake.nix</code>
+        例の書き方は古いので、いずれモダンな書き方に直す必要があります。<br />
+      </p>
       <h3 id="NixOS の設定ファイルの flake 化">
         <a href="#NixOS の設定ファイルの flake 化">NixOS の設定ファイルの flake 化</a>
       </h3>
@@ -186,7 +191,6 @@ use flake
         <code>sudo nixos-rebuild --flake .#&lt;ホスト名&gt;</code> を実行すると、
         <code>flake.nix</code> を基点に OS の設定を更新することができます。<br />
       </p>
-
       <h4 id="flake.nix, configuration.nix">
         <a href="#flake.nix, configuration.nix"
           ><code>flake.nix</code>, <code>configuration.nix</code></a
@@ -231,7 +235,6 @@ use flake
 }
 </code></pre>
       </div>
-
       <h4 id="home.nix">
         <a href="#home.nix"><code>home.nix</code></a>
       </h4>
@@ -259,7 +262,6 @@ use flake
         ここまでで
         <code>nixos-rebuild switch --flake .#&lt;host 名&gt;</code> が動くことを確認しました。<br />
       </p>
-
       <h3 id="Trouble shooting"><a href="#Trouble shooting">Trouble shooting</a></h3>
       <p>
         ファイル分割するとエラーが出ました。謎のエラーですが、今回は最下行に原因が出ています:<br />
@@ -302,7 +304,6 @@ use flake
       </div>
 
       <p>これが最大の壁でした……<br /></p>
-
       <h3 id="fenix を overlay として導入する">
         <a href="#fenix を overlay として導入する"><code>fenix</code> を overlay として導入する</a>
       </h3>
@@ -353,7 +354,6 @@ use flake
         >
         のようにパッケージ指定できます。<br />
       </p>
-
       <h3 id="ファイル分割"><a href="#ファイル分割">ファイル分割</a></h3>
       <p><code>imports</code> でファイル指定すると設定ファイルを読み込みできます。<br /></p>
 
@@ -374,7 +374,6 @@ use flake
         <code>./dir/file.nix</code> と書いても良いですが、 <code>./dir</code> と書くと
         <code>./dir/default.nix</code> に自動的に名前解決されます。<br />
       </p>
-
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
         最小限の変更で <code>shell.nix</code> および <code>configuration.nix</code> を
