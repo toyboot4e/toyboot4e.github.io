@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -33,14 +34,12 @@
       <p>昨日は CuriousFairy315 さんの「Colorful Tree Game」でした。<br /></p>
 
       <p>明日は Shirotsume さんの「ラベルなし木の数え上げ」です。<br /></p>
-
       <h2 id="記事"><a href="#記事">記事</a></h2>
       <p>
         Haskell における標準的な辞書は
         <a href="https://hackage.haskell.org/package/containers">containers</a>
         パッケージの木です。<br />
       </p>
-
       <h3 id="木が辞書？"><a href="#木が辞書？">木が辞書？</a></h3>
       <p>
         木は辞書として使えます。たとえば平衡 2 分木においては \(\log_2 N\) 回の探索で要素の lookup
@@ -57,7 +56,6 @@
         などの基本的な操作が遅いのですが、順序付きマップであるために、最小値や最大値の検索・削除が
         lookup と同じ速度で可能です。<br />
       </p>
-
       <h3 id="木の実装"><a href="#木の実装">木の実装</a></h3>
       <p>
         実用的な木を考えると、平衡木 (BTree, balanced tree) を思い浮かべると思います。
@@ -197,6 +195,10 @@ ghci&gt; debug [0 .. 3]
         はマージ処理もそこそこ速く、性能のバランスが取れているようです。今日でも優れた選択なのかは分かりませんが、平衡しないんだ〜と面白かったので共有しました。お使いの言語でも
         patricia tree は使われているのでしょうか。<br />
       </p>
+
+      <blockquote>
+        <p>追記: 平衡されますが、特殊なやり方だっただけでした。<br /></p>
+      </blockquote>
 
       <p>
         以上です。昨日投稿の
