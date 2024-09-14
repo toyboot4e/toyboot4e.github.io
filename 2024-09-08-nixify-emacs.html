@@ -108,12 +108,12 @@
 <span id="coderef-1-2" onmouseover="CodeHighlightOn(this,'jump-coderef-1-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-2');" class="coderef-off"><a href="#coderef-1-2">  # <span class="coderef-anchor">2</span></a></span>
   outputs = { self, nixpkgs, home-manager, org-babel, emacs-overlay, ... }: {
       # macOS における設定
-      darwinConfigurations = (import ./systems/OPL2212-2 {
+      darwinConfigurations = (import ./hosts/OPL2212-2 {
         inherit self nixpkgs nix-darwin home-manager org-babel emacs-overlay
           wezterm-flake neovim-nightly-overlay;
       });
       # NixOS における設定
-<span id="coderef-1-3" onmouseover="CodeHighlightOn(this,'jump-coderef-1-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-3');" class="coderef-off"><a href="#coderef-1-3">      nixosConfigurations = (import ./systems/X13Gen2 { # <span class="coderef-anchor">3</span></a></span>
+<span id="coderef-1-3" onmouseover="CodeHighlightOn(this,'jump-coderef-1-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-3');" class="coderef-off"><a href="#coderef-1-3">      nixosConfigurations = (import ./hosts/X13Gen2 { # <span class="coderef-anchor">3</span></a></span>
 <span id="coderef-1-4" onmouseover="CodeHighlightOn(this,'jump-coderef-1-4');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-4');" class="coderef-off"><a href="#coderef-1-4">        inherit self nixpkgs home-manager org-babel emacs-overlay; # <span class="coderef-anchor">4</span></a></span>
       });
     };
@@ -166,12 +166,12 @@
             onmouseout="CodeHighlightOff(this, 'coderef-1-3');"
             ><span class="coderef-anchor">3</span></a
           >
-          <code>nixosConfigurations = (import ./systems/X13Gen2) { .. })</code><br />
+          <code>nixosConfigurations = (import ./hosts/X13Gen2) { .. })</code><br />
           <ul>
             <li>
               <a href="https://nix.dev/tutorials/nix-language.html#import"><code>import</code></a>
-              <code>./systems/X13Gen2 { .. };</code><br />
-              <code>import ./systems/X13Gen2/default.nix { .. };</code> と等価です。
+              <code>./hosts/X13Gen2 { .. };</code><br />
+              <code>import ./hosts/X13Gen2/default.nix { .. };</code> と等価です。
               <code>default.nix</code> の内容 (後述) は関数であるため、直後に引数として attribute
               set <code>{ .. }</code> を与えています。<br />
             </li>
@@ -194,15 +194,15 @@
           </ul>
         </li>
       </ul>
-      <h3 id="systems/X13Gen2/default.nix">
-        <a href="#systems/X13Gen2/default.nix"><code>systems/X13Gen2/default.nix</code></a>
+      <h3 id="hosts/X13Gen2/default.nix">
+        <a href="#hosts/X13Gen2/default.nix"><code>hosts/X13Gen2/default.nix</code></a>
       </h3>
       <p>ここから NixOS の設定ファイルを読み込んでいます。<br /></p>
 
       <div class="org-src-container">
         <label class="org-src-name"
           ><span class="listing-number">Listing 2: </span
-          ><code>systems/X13Gen2/default.nix</code> (抜粋)</label
+          ><code>hosts/X13Gen2/default.nix</code> (抜粋)</label
         >
         <pre><code class="src language-hs"><span id="coderef-2-1" onmouseover="CodeHighlightOn(this,'jump-coderef-2-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-1');" class="coderef-off"><a href="#coderef-2-1">{ self, nixpkgs, home-manager, org-babel, emacs-overlay }: # <span class="coderef-anchor">1</span></a></span>
 let
