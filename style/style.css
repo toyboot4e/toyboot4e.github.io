@@ -131,7 +131,7 @@ div.WARNING {
 
 .coderef-off {
     display: inline-block;
-    width: 100%;
+    min-width: 100%;
     background: hsla(24, 20%, 50%,.25);
 }
 
