@@ -135,9 +135,12 @@ div.WARNING {
     background: hsla(24, 20%, 50%,.25);
 }
 
-.code-highlighted {
+span.code-highlighted {
     display: inline-block;
     width: 100%;
+}
+
+.code-highlighted {
     background: hsla(60, 30%, 50%,.25);
 }
 

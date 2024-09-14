@@ -307,8 +307,12 @@ wrapped in code elements."
                         (format " <span class=\"coderef-anchor\">%s</span>" ref))))
              ;; Mark transcoded line as an anchor, if needed.
              (if (not ref) loc
-	             (format "<span id=\"coderef-%s\" class=\"coderef-off\">%s</span>"
-		                 ref loc)))
+                 ;; REMARK(toyboot): added a wrapper `span' with `href', adding mouseover/click to `jump-href-*'.
+                 (let ((in (format "onmouseover=\"CodeHighlightOn(this,'jump-coderef-%s');\"" ref))
+                       (out (format "onmouseout=\"CodeHighlightOff(this,'jump-coderef-%s');\"" ref))
+                       (content (format "<a href=\"#coderef-%s\">%s</a>" ref loc)))
+	                 (format "<span id=\"coderef-%s\" %s %s class=\"coderef-off\">%s</span>"
+		                     ref in out content))))
          num-start refs)))
 
 ;; Ovewrite the wrap image function and remove `id' attribute for the `<figure>' tag:
@@ -525,10 +529,11 @@ INFO is a plist holding contextual information.  See
          ;; equivalent line number.
          ((string= type "coderef")
           (let ((fragment (concat "coderef-" (org-html-encode-plain-text path))))
-	          (format "<a href=\"#%s\" %s%s>%s</a>"
+              ;; NOTE(toyboot): added id (`jump-coderef-*')
+	          (format "<a href=\"#%s\" id=\"jump-%s\" %s%s>%s</a>"
 		              fragment
-		              (format "class=\"coderef\" onmouseover=\"CodeHighlightOn(this, \
-                                                                               '%s');\" onmouseout=\"CodeHighlightOff(this, '%s');\""
+		              fragment
+		              (format "class=\"coderef\" onmouseover=\"CodeHighlightOn(this,'%s');\" onmouseout=\"CodeHighlightOff(this, '%s');\""
 	                          fragment fragment)
 		              attributes
                       ;; NOTE(toyboot): reference code with anchor style
