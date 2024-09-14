@@ -608,8 +608,8 @@ INFO is a plist holding contextual information.  See
            ;; Org-mode file links:
            (list (mapcar (lambda (link-path)
                              (format "- %s" (my-parse-headlines (concat base-dir link-path) link-path))) files2))
-           ;; Alphabetically sorted:
-           (list2 (sort list #'string<))
+           ;; Reverse alphabetically sorted:
+           (list2 (sort list #'string>))
 
            ;; Filter & stringify
            (to-lines (lambda (xs) (mapconcat #'identity xs "\n")))
