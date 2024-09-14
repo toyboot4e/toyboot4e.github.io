@@ -132,6 +132,9 @@
         ("static"
          :base-directory "./src"
          :base-extension "js\\|css\\|png\\|jpg\\|gif\\|mp4"
+         ;; `/ltximg/' is for previewing. MathJax is used at runtime.
+         :exclude ,(rx-to-string (rx "ltximg/"))
+         ;; :exclude ,(rx-to-string (rx line-start "ltximg"))
          :publishing-directory  "./out"
          :recursive t
          :publishing-function org-publish-attachment)))
