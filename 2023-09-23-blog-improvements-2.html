@@ -1,13 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>org-mode 製ブログの改良 (2) - toybeam</title>
+    <title>org-mode 製ブログの改良 (2): <details> - toybeam</title>
     <meta name="description" content="devlog of toyboot4e" />
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -18,7 +19,7 @@
   </head>
   <body>
     <header role="banner">
-      <h1><code>org-mode</code> 製ブログの改良 (2)</h1>
+      <h1><code>org-mode</code> 製ブログの改良 (2): <code>&lt;details&gt;</code></h1>
       <p>Sep 23, 2023</p>
       <nav role="navigation">
         <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
@@ -37,7 +38,6 @@
         <code>index.html</code>
         の生成をテコ入れしました。また原稿ファイルで使える便利構文を追加しました。<br />
       </p>
-
       <h2 id="改造機能"><a href="#改造機能">改造機能</a></h2>
       <h3 id="diary/ ディレクトリの追加">
         <a href="#diary/ ディレクトリの追加"><code>diary/</code> ディレクトリの追加</a>
@@ -59,7 +59,6 @@
         <code>&lt;h2&gt;</code> タグで区切られるようになりました。日記では、主に ABC
         (毎週開催の競技プログラミングのコンテスト) の感想を書く予定です。<br />
       </p>
-
       <h3 id="#+BEGIN_DETAILS">
         <a href="##+BEGIN_DETAILS"><code>#+BEGIN_DETAILS</code></a>
       </h3>
@@ -77,7 +76,7 @@
         <label class="org-src-name"
           ><span class="listing-number">Listing 1: </span>変換前 (<code>org-mode</code>)</label
         >
-        <pre><code class="src language-org-mode">#+BEGIN_DETAILS 個々にタイトル
+        <pre><code class="src language-org-mode">#+BEGIN_DETAILS ここにタイトル
 折りたたみ表示
 #+END_DETAILS
 </code></pre>
@@ -88,14 +87,20 @@
           ><span class="listing-number">Listing 2: </span>変換後 (<code>html</code>)</label
         >
         <pre><code class="src language-html">&lt;details&gt;
-&lt;summary&gt;個々にタイトル&lt;/summary&gt;
+&lt;summary&gt;ここにタイトル&lt;/summary&gt;
 折りたたみ表示
 &lt;/details&gt;
 </code></pre>
       </div>
 
-      <p>今後追加したい block があれば、同様に対応できます。<br /></p>
+      <p>実演:<br /></p>
 
+      <details>
+        <summary>ここにタイトル</summary>
+        <p>折りたたみ表示<br /></p>
+      </details>
+
+      <p>今後追加したい block があれば、同様に対応できます。<br /></p>
       <h3 id="絶対パスを使って .org ファイルにリンクできるように">
         <a href="#絶対パスを使って .org ファイルにリンクできるように"
           >絶対パスを使って <code>.org</code> ファイルにリンクできるように</a
@@ -110,7 +115,6 @@
       <p>
         その他に <code>#+BEGIN_CENTER</code> の html 出力を調整するなど、ツギハギしています。<br />
       </p>
-
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
         相変わらず手のかかるブログですが、

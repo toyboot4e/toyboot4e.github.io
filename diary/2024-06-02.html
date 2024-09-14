@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -89,7 +90,6 @@
       <p>
         改めて、序盤の振り返りではコードゴルフをやっています。自己満ですが、億劫になって『やるだけ』と書くよりは良い気がしています。<br />
       </p>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc356/tasks/abc356_a">A 問題</a></a>
       </h3>
@@ -102,7 +102,6 @@
 main=interact$unwords.map show.(\[n,l,r]-&gt;[1..l-1]++reverse[l..r]++[r+1..n]).map read.words
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc356/tasks/abc356_b">B 問題</a></a>
       </h3>
@@ -118,7 +117,6 @@ y True="Yes"
 y False="No"
 </code></pre>
       </div>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc356/tasks/abc356_c">C 問題</a></a>
       </h3>
@@ -164,7 +162,6 @@ ghci&gt; popCount (0b00 :: Int)
         ビット全探索は <code>[0 .. bit n - 1]</code> (リスト) または
         <code>U.generate (bit n) id</code> (vector) です。<br />
       </p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc356/tasks/abc356_d">D 問題</a></a>
       </h3>
@@ -236,7 +233,6 @@ ghci&gt; runQC                         ／⌒　　 ⌒　　　＼
       <p>
         なお quickcheck を使わずとも <code>forM_</code> で全ケースをチェックすれば良いです。<br />
       </p>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc356/tasks/abc356_e">E 問題</a></a>
       </h3>
@@ -244,7 +240,6 @@ ghci&gt; runQC                         ／⌒　　 ⌒　　　＼
         \(\sum\) の一括計算が思いつかず飛ばしました。調和級数と言われても何も思いつきません。
         Upsolve します。<br />
       </p>
-
       <h3 id="F 問題">
         <a href="#F 問題"><a href="https://atcoder.jp/contests/abc356/tasks/abc356_f">F 問題</a></a>
       </h3>
@@ -265,7 +260,6 @@ ghci&gt; runQC                         ／⌒　　 ⌒　　　＼
       <p>
         その他気になる解法には区間を set で管理するテクニックがあります。解説も読んでみます。<br />
       </p>
-
       <h2 id="PAST (アルゴリズム実技検定)">
         <a href="#PAST (アルゴリズム実技検定)">PAST (アルゴリズム実技検定)</a>
       </h2>
@@ -274,13 +268,11 @@ ghci&gt; runQC                         ／⌒　　 ⌒　　　＼
         するのも困難な骨太の問題ばかりです。 PAST (典型問題)
         が解けるなら十二分の実力があると思います。<br />
       </p>
-
       <h3 id="PAST 18"><a href="#PAST 18">PAST 18</a></h3>
       <p>
         第 18
         回アルゴリズム実技検定を受験し、結果は中級でした。時間はあったのに解ける問題がありませんでした。やはり上級は相当厳しいです。<br />
       </p>
-
       <h3 id="PAST 19"><a href="#PAST 19">PAST 19</a></h3>
       <p>第 19 回アルゴリズム実技検定を受験し、上級を取得しました。<br /></p>
 
@@ -293,7 +285,6 @@ ghci&gt; runQC                         ／⌒　　 ⌒　　　＼
       </figure>
 
       <p>試験期間終了まで、これ以上言及できません。<br /></p>
-
       <h3 id="PAST の出題傾向"><a href="#PAST の出題傾向">PAST の出題傾向</a></h3>
       <ul>
         <li>
@@ -320,7 +311,6 @@ ghci&gt; runQC                         ／⌒　　 ⌒　　　＼
           問のような考察テクニックが要求される問題もあります。今後、本格的に取り組んでみたいです。<br />
         </li>
       </ul>
-
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
       <h3 id="Haskell にはコールスタックが無い">
         <a href="#Haskell にはコールスタックが無い">Haskell にはコールスタックが無い</a>

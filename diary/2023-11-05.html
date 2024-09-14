@@ -1,79 +1,119 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 327 / QuickCheck - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 327 / QuickCheck</h1><p>Nov  5, 2023</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="オフ"><a href="#オフ">オフ</a></h3><p>
-今週は Haskell 本にかかりきりだった。読書も無し。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 327 / QuickCheck - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 327 / QuickCheck</h1>
+      <p>Nov 5, 2023</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2>
+      <h3 id="オフ"><a href="#オフ">オフ</a></h3>
+      <p>今週は Haskell 本にかかりきりだった。読書も無し。<br /></p>
 
-<p>
-今回の ABC では、小さな関数を積極的に作ろうと決めた。<br>
-</p>
+      <p>今回の ABC では、小さな関数を積極的に作ろうと決めた。<br /></p>
+      <h3 id="ABC 327"><a href="#ABC 327">ABC 327</a></h3>
+      <p>
+        <a href="https://atcoder.jp/contests/abc327">ABC 327</a> に参加した。 5 完 (A~E) だった。<br />
+      </p>
 
-<h3 id="ABC 327"><a href="#ABC 327">ABC 327</a></h3><p>
-<a href="https://atcoder.jp/contests/abc327">ABC 327</a> に参加した。 5 完 (A~E) だった。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc327/tasks/abc327_a">A 問題</a> では長さ 2
+        の窓を左から右へ流し、 <code>or $ BS.zipWith p s (BS.tail s)</code> の形で解いた。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc327/tasks/abc327_a">A 問題</a> では長さ 2 の窓を左から右へ流し、 <code>or $ BS.zipWith p s (BS.tail s)</code> の形で解いた。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc327/tasks/abc327_b">B 問題</a>
+        では平方数と勘違いして 2 分探索を始めた。困ります。。 \(1^1 .. 17^{17}\)
+        程度までが解の候補であると気づいて全探索した。俺の埋め込みが火を吹く……ほどでもない。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc327/tasks/abc327_b">B 問題</a> では平方数と勘違いして 2 分探索を始めた。困ります。。 \(1^1 .. 17^{17}\) 程度までが解の候補であると気づいて全探索した。俺の埋め込みが火を吹く……ほどでもない。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc327/tasks/abc327_c">C 問題</a> はゴリゴリ解いた。 2
+        次元配列を列ごとに走査する関数を作っても良い気がした。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc327/tasks/abc327_c">C 問題</a> はゴリゴリ解いた。 2 次元配列を列ごとに走査する関数を作っても良い気がした。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc327/tasks/abc327_d">D 問題</a>
+        では長さが奇数のループができたら No であると判定する方法を考え、実際に 0, 1
+        を塗ってみれば良いと気づいた。タイムラインでは 2 部グラフ判定と言う人が多かった。確かに！<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc327/tasks/abc327_d">D 問題</a> では長さが奇数のループができたら No であると判定する方法を考え、実際に 0, 1 を塗ってみれば良いと気づいた。タイムラインでは 2 部グラフ判定と言う人が多かった。確かに！<br>
-</p>
+      <p>
+        全点から DFS/BFS
+        するのは競プロ的な富豪スタイルだと思う。全探索という概念を知って驚くのと似ている。この辺の計算量の感覚が身につくと茶色コーダーになれるんだろう。<br />
+      </p>
 
-<p>
-全点から DFS/BFS するのは競プロ的な富豪スタイルだと思う。全探索という概念を知って驚くのと似ている。この辺の計算量の感覚が身につくと茶色コーダーになれるんだろう。<br>
-</p>
+      <p>
+        ところで BFS を空で書けと言われると厳しい。
+        <code>concatMapM</code> か、キューを使うか……。やはり Haskell では再帰 DFS が 2
+        部グラフ判定の最も簡単な実装となる。<br />
+      </p>
 
-<p>
-ところで BFS を空で書けと言われると厳しい。 <code>concatMapM</code> か、キューを使うか……。やはり Haskell では再帰 DFS が 2 部グラフ判定の最も簡単な実装となる。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc327/tasks/abc327_e">E 問題</a>
+        は読解が大変だった。ナップサック問題じゃん (´･_･`)<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc327/tasks/abc327_e">E 問題</a> は読解が大変だった。ナップサック問題じゃん (´･_･`)<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc327/tasks/abc327_f">F 問題</a> は PAST
+        でありがちな平面走査の問題だった。解けない。<br />
+      </p>
+      <h3 id="QuickCheck で E の誤答を検証する">
+        <a href="#QuickCheck で E の誤答を検証する">QuickCheck で E の誤答を検証する</a>
+      </h3>
+      <p>
+        E 問題では DP テーブルを三角形にしたため AC
+        できた。正方形のテーブル全体を使用した場合は、本来無効なセルに何度も \(0.9\)
+        がかけられて行き、最終的に牙を剥くらしい。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc327/tasks/abc327_f">F 問題</a> は PAST でありがちな平面走査の問題だった。解けない。<br>
-</p>
+      <p>
+        \(0.9^N\) が発生するにせよ、 <code>max</code> による緩和で消える気がして納得できない:<br />
+      </p>
 
-<h3 id="QuickCheck で E の誤答を検証する"><a href="#QuickCheck で E の誤答を検証する">QuickCheck で E の誤答を検証する</a></h3><p>
-E 問題では DP テーブルを三角形にしたため AC できた。正方形のテーブル全体を使用した場合は、本来無効なセルに何度も \(0.9\) がかけられて行き、最終的に牙を剥くらしい。<br>
-</p>
-
-<p>
-\(0.9^N\) が発生するにせよ、 <code>max</code> による緩和で消える気がして納得できない:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">ghci&gt; (!! 5000) $ iterate (* 0.9) (-(10.0^18))
+      <div class="org-src-container">
+        <pre><code class="src language-hs">ghci&gt; (!! 5000) $ iterate (* 0.9) (-(10.0^18))
 -1.6313501853428285e-211
 ghci&gt; max 1 $ (!! 5000) $ iterate (* 0.9) (-(10.0^18))
 1.0
 </code></pre>
-</div>
+      </div>
 
-<p>
-そこで WA となるテストケースを見つけるために、 <a href="https://www.stackage.org/lts-21.6/package/QuickCheck-2.14.3">QuickCheck</a> を使ってみることにした。<br>
-</p>
+      <p>
+        そこで WA となるテストケースを見つけるために、
+        <a href="https://www.stackage.org/lts-21.6/package/QuickCheck-2.14.3">QuickCheck</a>
+        を使ってみることにした。<br />
+      </p>
 
-<p>
-公式サイトが無い。 README もほぼ空。 Haskell のコミュニティは謎だ。<br>
-</p>
+      <p>公式サイトが無い。 README もほぼ空。 Haskell のコミュニティは謎だ。<br /></p>
 
-<p>
-人のブログを読んで、乱数の <code>Gen</code> を <code>forAll</code> に食わせてテストケースを作ることができると理解した:<br>
-</p>
+      <p>
+        人のブログを読んで、乱数の <code>Gen</code> を
+        <code>forAll</code> に食わせてテストケースを作ることができると理解した:<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-hs">import Test.QuickCheck qualified as QC
+      <div class="org-src-container">
+        <pre><code class="src language-hs">import Test.QuickCheck qualified as QC
 
 prop :: QC.Property
 prop =
@@ -92,120 +132,161 @@ runTest = QC.quickCheck prop
 -- 実行制限時間 [ms] を設けるなら、次のように書けば良さそう:
 -- QU.quickCheck $ QC.within (1000 * 1000) prop
 </code></pre>
-</div>
+      </div>
 
-<p>
-REPL から QuickCheck を実施してみた:<br>
-</p>
+      <p>REPL から QuickCheck を実施してみた:<br /></p>
 
-<div class="org-src-container">
-<pre><code class="src language-sh">$ stack repl e/Main.hs
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ stack repl e/Main.hs
 ghci&gt; runTest
 </code></pre>
-</div>
+      </div>
 
-<p>
-遅い。 HeavyCheck という感じだ。やはり REPL からの実行ではコンパイル実行にならないことが分かったので、一旦 <code>main</code> 関数から <code>runTest</code> を呼ぶようにしてみた:<br>
-</p>
+      <p>
+        遅い。 HeavyCheck という感じだ。やはり REPL
+        からの実行ではコンパイル実行にならないことが分かったので、一旦 <code>main</code> 関数から
+        <code>runTest</code> を呼ぶようにしてみた:<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-hs">main = runTest
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main = runTest
 </code></pre>
-</div>
+      </div>
 
-<div class="org-src-container">
-<pre><code class="src language-hs">$ cabal run e-exe
+      <div class="org-src-container">
+        <pre><code class="src language-hs">$ cabal run e-exe
 &lt;巨大な出力&gt;
 </code></pre>
-</div>
+      </div>
 
-<p>
-高速で実行できたが、テストケースがデカ過ぎて一望できない。 <code>maxN = 1000</code> で再度実施した:<br>
-</p>
+      <p>
+        高速で実行できたが、テストケースがデカ過ぎて一望できない。
+        <code>maxN = 1000</code> で再度実施した:<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-sh">$ cabal run e-exe
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ cabal run e-exe
 </code></pre>
-</div>
+      </div>
 
-<div class="org-src-container">
-<pre><code class="src language-hs"> *** Failed! Falsified (after 6 tests):
+      <div class="org-src-container">
+        <pre><code class="src language-hs"> *** Failed! Falsified (after 6 tests):
 835
 [2315,1697,2340,2332,4072,3338,3072,1816,380,1763,2422,4562,3200,4568,4553,4049,825,4335,2931,2017,668,3548,1300,415,4785,1941,790,18,2053,3246,2959,830,3981,4993,4504,2431,3031,1964,3273,611,2289,4163,481,2085,4642,2762,2399,2194,1584,4961,2294,130,4790,4297,3007,4318,2210,1812,2393,404,231,3151,2973,1260,756,340,2208,4719,4717,2348,3735,440,4516,3979,84,2467,2570,1699,3933,46,2664,1274,2412,2659,2205,4102,1089,4797,1593,1147,1514,3406,3139,3121,2068,412,4327,2475,755,2294,333,1198,1811,1330,1153,545,3837,2338,4841,2152,2534,4390,1926,4782,1538,556,1318,1507,1975,3481,1084,3705,2025,1934,661,3448,638,369,925,3096,1295,4802,2359,3963,2740,1550,104,3202,4706,272,1358,1008,3518,4808,3905,1424,65,1581,4261,700,4440,2511,4893,3060,2100,1988,2425,389,1225,1842,3667,2525,2320,838,449,1965,4289,3939,2575,2499,1277,1564,1433,4260,4666,78,1068,3061,1314,1943,2591,4867,2349,817,1720,4253,2209,2905,444,887,3323,3958,3163,4208,1659,328,536,75,4162,2875,1440,4046,4839,732,4912,4138,3728,2349,3944,4810,4353,1464,4700,3491,2078,3924,1064,742,4996,4427,1292,2521,3551,4076,3843,2189,1064,2172,2518,706,1627,4877,3651,1035,3287,2351,3359,1053,1063,2907,4808,2793,1614,3449,4821,506,1231,2049,1861,1792,585,2879,2279,3159,2665,3799,4975,242,1865,3570,3893,4092,1633,220,2502,3262,378,3565,4699,478,3724,1011,108,4049,1243,404,2,3123,4305,4195,4141,3378,272,1989,285,480,3718,1460,2766,4195,2535,3325,3780,918,3772,50,1411,2935,2906,4352,3782,1632,746,2574,3861,2991,1259,1620,3635,3756,3472,1510,2214,2744,994,2100,1008,1115,3661,1040,3233,4274,2640,4595,4538,2328,4138,3948,1711,1057,3542,2001,173,3267,4096,4665,1647,2879,1168,1314,728,1549,4111,4526,3040,24,272,4941,4345,4169,1019,775,2056,3134,918,3090,2142,1527,936,2779,2184,2975,1810,1386,3054,4013,3252,4184,1516,4859,950,2906,2983,181,1758,1292,2549,3651,3637,3057,2384,3039,4757,4243,1903,249,3338,461,2797,3185,3303,3682,4930,4247,3882,667,817,2253,2023,2228,933,891,2433,477,3525,4548,1196,3959,803,4109,599,1750,2315,3531,2097,1490,4999,898,4570,4547,96,401,1841,1592,2255,4557,575,2693,2838,1960,199,3066,1811,4792,3839,1309,3079,675,1105,2976,2524,542,3306,1893,4422,3760,1387,4783,2236,4659,1702,4339,1944,113,583,1872,1427,3474,4166,3749,3417,2572,4874,2282,4911,4840,154,2396,4789,4001,1060,1669,1654,4814,2433,4399,1335,3545,3318,2287,1998,3704,4519,749,4276,514,4884,3698,4726,1839,4752,4930,3696,1267,3503,4957,2970,2596,1697,1101,2668,221,1251,1702,2605,3058,1742,3173,3895,1724,247,2331,2617,3918,3243,1714,4512,3919,1596,3405,877,1118,769,836,447,786,958,79,3078,1415,956,4116,116,1192,3780,1066,4036,4995,1457,4838,434,2226,839,2009,3285,123,4316,2974,352,4058,4104,4365,2661,1466,4898,451,2225,258,1947,2081,4554,4818,332,2523,2922,4944,1821,3423,2957,2678,3521,2649,2078,1218,4007,1547,3260,2040,2688,4297,4508,4714,4782,2886,230,507,4824,3446,2810,4033,280,752,123,4285,1869,1776,4854,3098,583,1453,4235,631,4258,938,3729,1188,1008,3461,3249,3432,987,4162,3177,3991,215,2930,4574,4459,3341,1952,4193,4308,2861,1947,3074,3388,428,2710,2038,3788,3059,227,3995,4654,4755,4961,611,4005,1144,2471,318,1366,422,3328,1995,3781,294,413,1411,414,3868,4725,3724,1838,4959,3070,4856,3369,4827,2097,2613,1205,363,2541,3934,4200,2592,4229,2645,2957,4383,3225,2063,161,1510,3020,384,4541,3471,2642,2649,4703,1357,2907,2954,4458,3173,82,1542,1248,234,1908,4420,3547,3924,2773,1300,3151,3757,4140,3359,4478,521,4971,4315,3088,4098,3440,733,4472,4699,1606,3136,3546,147,671,34,581,720,1088,1054,3605,4421,2347,2369,82,4403,2490,4137,4420,3749,4768,217,1234,1467,678,261,2143,3999,4476,1724,3706,3762,2740,2122,3816,4879,352,2040,1482,495,2774,1118,222,4877,271,2155,4128,687,1890,1485,4132,3111,3953,3272,76,811,2942,718,3870,706,4582,3425,1776,469,3897,3165,4119,2555,958,1903,2087,4403,4632,770,3148,854,3582,1692,2783,2555,3829,3423,4469,1653,852,2806,1241,2578,4593,4971,1867,1490,4656,1199,1968,3736,4931,2082,3727,4206,103,1887,4486,3006,2015,2164,3687,528,2566,2324,3444,2551,3140,3359,3798,4194,893,2835,3428,731,3670,4842,2234,2361]
 4811.146865958838 /= 4829.74309692967
 </code></pre>
-</div>
+      </div>
 
-<p>
-よっしゃ！　見つけたぞ！<br>
-</p>
+      <p>よっしゃ！　見つけたぞ！<br /></p>
 
-<p>
-それで、どうして間違ってるんですかね…… (´･_･`) ?　全然 shrinking してくれない。でも、もう満足しちゃったんだ。<br>
-</p>
+      <p>
+        それで、どうして間違ってるんですかね…… (´･_･`) ?　全然 shrinking
+        してくれない。でも、もう満足しちゃったんだ。<br />
+      </p>
+      <h2 id="読書"><a href="#読書">読書</a></h2>
+      <p>何も読んでいない。<br /></p>
 
-<h2 id="読書"><a href="#読書">読書</a></h2><p>
-何も読んでいない。<br>
-</p>
+      <p>
+        ラムダノートの
+        <a href="https://www.lambdanote.com/collections/proper-erlang-elixir"
+          >実践プロパティベーステスト ― PropErとErlang/Elixirではじめよう</a
+        >
+        が話題だ。
+        <a href="https://shop.ohmsha.co.jp/shopdetail/000000001926/">すごい Haskell</a> も
+        <a href="https://www.shoeisha.co.jp/book/detail/9784798169163">実践TLA+</a>
+        も流行ったけれど、実際に読んだのは何人くらいだろう。<br />
+      </p>
 
-<p>
-ラムダノートの <a href="https://www.lambdanote.com/collections/proper-erlang-elixir">実践プロパティベーステスト ― PropErとErlang/Elixirではじめよう</a> が話題だ。 <a href="https://shop.ohmsha.co.jp/shopdetail/000000001926/">すごい Haskell</a> も <a href="https://www.shoeisha.co.jp/book/detail/9784798169163">実践TLA+</a> も流行ったけれど、実際に読んだのは何人くらいだろう。<br>
-</p>
+      <p>短いなー人生。<br /></p>
+      <h2 id="Haskell 本"><a href="#Haskell 本">Haskell 本</a></h2>
+      <p>
+        <a href="https://qiita.com/advent-calendar/2023/haskell">Haskell Advent Calendar 2023</a> の
+        23 日目の記事に予約した。購読者 13
+        人。衰退する運命にあるというか、そもそも流行っていないというか……。<br />
+      </p>
+      <h3 id="進捗: 10%"><a href="#進捗: 10%">進捗: 10%</a></h3>
+      <p>
+        標準入出力、 Cabal スクリプト、 ABS
+        などに関してざっと書いた。クエリ処理とキューの不在など、序盤の難所に入れそう。<br />
+      </p>
+      <h3 id="表紙"><a href="#表紙">表紙</a></h3>
+      <p>表紙のラフが来た！　良かった。ガイコツ案の未練はもう無い。<br /></p>
 
-<p>
-短いなー人生。<br>
-</p>
+      <p>
+        当初は巨大なスクラップのような book
+        を予定していたが、できるだけ歩み寄った内容を目指したくなった。うーん無理かも。<br />
+      </p>
+      <h3 id="環境構築"><a href="#環境構築">環境構築</a></h3>
+      <ul>
+        <li><code>cabal</code> プロジェクトをセットアップしてみた<br /></li>
+        <li>
+          <code>vector</code> パッケージのインポート名を変えた (<code>VU</code> -&gt;
+          <code>U</code> など)<br />
+          タイプ数が減って良かった<br />
+        </li>
+      </ul>
+      <h3 id="vector-algorithms の sort が遅い件">
+        <a href="#vector-algorithms の sort が遅い件"
+          ><code>vector-algorithms</code> の <code>sort</code> が遅い件</a
+        >
+      </h3>
+      <p>
+        <a href="https://haskell.jp/slack-log/html/C4M4TT8JJ/104.html#message-1698841366.259449"
+          >haskell-jp におけるコメント</a
+        >
+        の通り <code>VAI.sort</code> が遅くなっていたのを体験できた。<br />
+      </p>
 
-<h2 id="Haskell 本"><a href="#Haskell 本">Haskell 本</a></h2><p>
-<a href="https://qiita.com/advent-calendar/2023/haskell">Haskell Advent Calendar 2023</a> の 23 日目の記事に予約した。購読者 13 人。衰退する運命にあるというか、そもそも流行っていないというか……。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc269/tasks/abc269_d"
+          >ABC 269 D - Do use hexagon grid</a
+        ><br />
+      </p>
 
-<h3 id="進捗: 10%"><a href="#進捗: 10%">進捗: 10%</a></h3><p>
-標準入出力、 Cabal スクリプト、 ABS などに関してざっと書いた。クエリ処理とキューの不在など、序盤の難所に入れそう。<br>
-</p>
+      <ul>
+        <li>
+          <a href="https://atcoder.jp/contests/abc269/submissions/47281848"
+            ><code>VAI.sort</code> を使った場合 (TLE)</a
+          ><br />
+        </li>
+        <li>
+          <a href="https://atcoder.jp/contests/abc269/submissions/47281855"
+            ><code>VAI.sortBy compare</code> を使った場合 (263 ms)</a
+          ><br />
+        </li>
+      </ul>
+      <h3 id="State モナドで immutable データ構造を持ち回す">
+        <a href="#State モナドで immutable データ構造を持ち回す"
+          ><code>State</code> モナドで immutable データ構造を持ち回す</a
+        >
+      </h3>
+      <p>憧れの方法をやってみた。<br /></p>
 
-<h3 id="表紙"><a href="#表紙">表紙</a></h3><p>
-表紙のラフが来た！　良かった。ガイコツ案の未練はもう無い。<br>
-</p>
+      <ul>
+        <li>
+          <a href="https://atcoder.jp/contests/abc269/submissions/47282846"
+            ><code>SparseUnionFind</code> を持ち歩いた場合 (4 ms)</a
+          ><br />
+        </li>
+      </ul>
+      <h3 id="deepseq">
+        <a href="#deepseq"><code>deepseq</code></a>
+      </h3>
+      <p>
+        <a href="https://qiita.com/gotoki_no_joe/items/83bd5795bbf795205116#%E7%B5%90%E6%9E%9C-5"
+          >ABC275 A～E+F をHaskellで</a
+        ><br />
+      </p>
 
-<p>
-当初は巨大なスクラップのような book を予定していたが、できるだけ歩み寄った内容を目指したくなった。うーん無理かも。<br>
-</p>
+      <p>
+        <code>foldl'</code> 中の <code>step</code> 関数の中で
+        <code>force</code> を実行すると速くなる場合がある (<code>deepseq</code>) 。実際
+        <code>force</code>
+        を入れると、リストを使ってナップサック問題を解いた場合も十分な速度が出た。<br />
+      </p>
 
-<h3 id="環境構築"><a href="#環境構築">環境構築</a></h3><ul><li><code>cabal</code> プロジェクトをセットアップしてみた<br></li>
-<li><code>vector</code> パッケージのインポート名を変えた (<code>VU</code> -&gt; <code>U</code> など)<br>
-タイプ数が減って良かった<br></li>
-</ul>
-
-<h3 id="vector-algorithms の sort が遅い件"><a href="#vector-algorithms の sort が遅い件"><code>vector-algorithms</code> の <code>sort</code> が遅い件</a></h3><p>
-<a href="https://haskell.jp/slack-log/html/C4M4TT8JJ/104.html#message-1698841366.259449">haskell-jp におけるコメント</a> の通り <code>VAI.sort</code> が遅くなっていたのを体験できた。<br>
-</p>
-
-<p>
-<a href="https://atcoder.jp/contests/abc269/tasks/abc269_d">ABC 269 D - Do use hexagon grid</a><br>
-</p>
-
-<ul><li><a href="https://atcoder.jp/contests/abc269/submissions/47281848"><code>VAI.sort</code> を使った場合 (TLE)</a><br></li>
-<li><a href="https://atcoder.jp/contests/abc269/submissions/47281855"><code>VAI.sortBy compare</code> を使った場合 (263 ms)</a><br></li>
-</ul>
-
-<h3 id="State モナドで immutable データ構造を持ち回す"><a href="#State モナドで immutable データ構造を持ち回す"><code>State</code> モナドで immutable データ構造を持ち回す</a></h3><p>
-憧れの方法をやってみた。<br>
-</p>
-
-<ul><li><a href="https://atcoder.jp/contests/abc269/submissions/47282846"><code>SparseUnionFind</code> を持ち歩いた場合 (4 ms)</a><br></li>
-</ul>
-
-<h3 id="deepseq"><a href="#deepseq"><code>deepseq</code></a></h3><p>
-<a href="https://qiita.com/gotoki_no_joe/items/83bd5795bbf795205116#%E7%B5%90%E6%9E%9C-5">ABC275 A～E+F をHaskellで</a><br>
-</p>
-
-<p>
-<code>foldl'</code> 中の <code>step</code> 関数の中で <code>force</code> を実行すると速くなる場合がある (<code>deepseq</code>) 。実際 <code>force</code> を入れると、リストを使ってナップサック問題を解いた場合も十分な速度が出た。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">sparseListForced :: Int -&gt; U.Vector (Int, Int) -&gt; Int
+      <div class="org-src-container">
+        <pre><code class="src language-hs">sparseListForced :: Int -&gt; U.Vector (Int, Int) -&gt; Int
 sparseListForced maxW = maximum . map snd . U.foldl' step s0
   where
     s0 = [(0, 0)] :: [(Int, Int)]
@@ -220,26 +301,36 @@ sparseListForced maxW = maximum . map snd . U.foldl' step s0
       GT -&gt; y : merge xxs ys
       EQ -&gt; (fst x, max (snd x) (snd y)) : merge xs ys
 </code></pre>
-</div>
+      </div>
 
-<ul><li><a href="https://atcoder.jp/contests/dp/submissions/47192642">Force あり (572 ms, 39 MB)</a><br></li>
-<li><a href="https://atcoder.jp/contests/dp/submissions/47201536">Force なし (1,896 ms, 300MB)</a><br></li>
-</ul>
+      <ul>
+        <li>
+          <a href="https://atcoder.jp/contests/dp/submissions/47192642"
+            >Force あり (572 ms, 39 MB)</a
+          ><br />
+        </li>
+        <li>
+          <a href="https://atcoder.jp/contests/dp/submissions/47201536"
+            >Force なし (1,896 ms, 300MB)</a
+          ><br />
+        </li>
+      </ul>
 
-<p>
-ただしサンクが溜まっていない状態で <code>force</code> すると、余計なコストがかかるだけのようだ。<br>
-</p>
+      <p>
+        ただしサンクが溜まっていない状態で
+        <code>force</code> すると、余計なコストがかかるだけのようだ。<br />
+      </p>
+      <h3 id="ベンチマーク"><a href="#ベンチマーク">ベンチマーク</a></h3>
+      <p>
+        <a href="https://hackage.haskell.org/package/criterion">criterion</a> や
+        <a href="https://hackage.haskell.org/package/tasty-bench">tasty-bench</a>
+        でベンチマークテストを実施できる。<br />
+      </p>
 
-<h3 id="ベンチマーク"><a href="#ベンチマーク">ベンチマーク</a></h3><p>
-<a href="https://hackage.haskell.org/package/criterion">criterion</a> や <a href="https://hackage.haskell.org/package/tasty-bench">tasty-bench</a> でベンチマークテストを実施できる。<br>
-</p>
+      <p>コードとしては、テストケースを列挙するだけだった:<br /></p>
 
-<p>
-コードとしては、テストケースを列挙するだけだった:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">main :: IO ()
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main :: IO ()
 main = do
   ((!n, !w), !input) &lt;- readInput
   defaultMain
@@ -251,45 +342,93 @@ main = do
         ]
     ]
 </code></pre>
-</div>
+      </div>
 
-<p>
-Cabal プロジェクトの設定としては <a href="https://github.com/haskell/vector/tree/master/vector">vector</a> が参考になった。 <code>tasty-bench</code> の方が軽くて良かったが、 <code>criterion</code> は結果の時間軸を対数にして表示できるのが良かった:<br>
-</p>
+      <p>
+        Cabal プロジェクトの設定としては
+        <a href="https://github.com/haskell/vector/tree/master/vector">vector</a> が参考になった。
+        <code>tasty-bench</code> の方が軽くて良かったが、
+        <code>criterion</code> は結果の時間軸を対数にして表示できるのが良かった:<br />
+      </p>
 
+      <figure>
+        <img src="./img/2023-11-05-criterion.png" alt="2023-11-05-criterion.png" /><br />
 
-<figure>
-<img src="./img/2023-11-05-criterion.png" alt="2023-11-05-criterion.png"><br>
+        <figcaption>
+          <span class="figure-number">Figure 1: </span
+          ><a href="https://atcoder.jp/contests/dp/tasks/dp_d">EDPC D - Knapsack 1</a>
+          のベンチマーク結果。
+        </figcaption>
+      </figure>
 
-<figcaption><span class="figure-number">Figure 1: </span><a href="https://atcoder.jp/contests/dp/tasks/dp_d">EDPC D - Knapsack 1</a> のベンチマーク結果。</figcaption>
-</figure>
+      <p>
+        <code>vector</code> は <code>tasty-bench</code> を使用しているが、
+        <code>criterion</code> とほぼ共通の API のため乗り換えは簡単。<br />
+      </p>
+      <h3 id="The Haskell Unfolder series">
+        <a href="#The Haskell Unfolder series">The Haskell Unfolder series</a>
+      </h3>
+      <p>ざっと観たはずだが……<br /></p>
 
-<p>
-<code>vector</code> は <code>tasty-bench</code> を使用しているが、 <code>criterion</code> とほぼ共通の API のため乗り換えは簡単。<br>
-</p>
+      <ol>
+        <li>
+          <a href="https://www.youtube.com/watch?v=S_HSt6jEtWM">Episode 1: unfoldr</a><br />
+          <code>unfoldr</code> の定義を見る。何を表現できて、何が表現できないか確認する。<br />
+        </li>
+        <li>
+          <a href="https://www.youtube.com/watch?v=d18Fdu6ayM8&amp;t=2s"
+            >Episode 2: quantified constraints</a
+          ><br />
+          @ は at を表していて、 <code>Proxy @Int</code> は instantinate Proxy @t Int
+          と読まれる、はず<br />
+        </li>
+        <li>
+          <a href="https://www.youtube.com/watch?v=1vd9mvH8Bos&amp;t=1s">Episode 3: injectivity</a
+          ><br />
+          型族の話だった。 Functional dependency で単射にできる。だからどうなんだっけ……<br />
+        </li>
+        <li>
+          <a href="https://www.youtube.com/watch?v=N0d7_MJmsKQ&amp;t=1465s">Episode 4: falsify</a
+          ><br />
+          <code>falsify</code> によるプロパティベーステスト。飛ばしてしまった。<br />
+        </li>
+        <li>
+          <a href="https://www.youtube.com/watch?v=-czh_zc7y1A&amp;t=1543s"
+            >Episode 5: composing left folds</a
+          ><br />
+          <code>readFile</code> の返り値に対して 3
+          回イテレートすると、処理時間が定数倍ではなくなった。<br />
+          TODO: なぜ？<br />
+          3 回 <code>readFile</code> すれば定数時間になった。また
+          <a href="https://hackage.haskell.org/package/foldl">foldl</a>
+          パッケージを使うと、複数の畳み込みを 1 回の実行で済ませるコードが簡単にかける。<br />
+        </li>
+      </ol>
+      <h3 id="その他"><a href="#その他">その他</a></h3>
+      <ul>
+        <li>
+          <a href="https://qiita.com/kerupani129">@kerupani129</a> 氏の投稿が面白い<br />
+          たとえば
+          <a href="https://qiita.com/kerupani129/items/1600e6af3873015eabc7"
+            >[Haskell] where 句は式でない</a
+          >
+          で <code>case</code> 式のガードに対して <code>where</code> が書けることを知った。
+          <code>constructN</code> で役立ちそう。<br />
+        </li>
 
-<h3 id="The Haskell Unfolder series"><a href="#The Haskell Unfolder series">The Haskell Unfolder series</a></h3><p>
-ざっと観たはずだが……<br>
-</p>
-
-<ol><li><a href="https://www.youtube.com/watch?v=S_HSt6jEtWM">Episode 1: unfoldr</a><br>
-<code>unfoldr</code> の定義を見る。何を表現できて、何が表現できないか確認する。<br></li>
-<li><a href="https://www.youtube.com/watch?v=d18Fdu6ayM8&amp;t=2s">Episode 2: quantified constraints</a><br>
-@ は at を表していて、 <code>Proxy @Int</code> は instantinate Proxy @t Int と読まれる、はず<br></li>
-<li><a href="https://www.youtube.com/watch?v=1vd9mvH8Bos&amp;t=1s">Episode 3: injectivity</a><br>
-型族の話だった。 Functional dependency で単射にできる。だからどうなんだっけ……<br></li>
-<li><a href="https://www.youtube.com/watch?v=N0d7_MJmsKQ&amp;t=1465s">Episode 4: falsify</a><br>
-<code>falsify</code> によるプロパティベーステスト。飛ばしてしまった。<br></li>
-<li><a href="https://www.youtube.com/watch?v=-czh_zc7y1A&amp;t=1543s">Episode 5: composing left folds</a><br>
-<code>readFile</code> の返り値に対して 3 回イテレートすると、処理時間が定数倍ではなくなった。<br>
-TODO: なぜ？<br>
-3 回 <code>readFile</code> すれば定数時間になった。また <a href="https://hackage.haskell.org/package/foldl">foldl</a> パッケージを使うと、複数の畳み込みを 1 回の実行で済ませるコードが簡単にかける。<br></li>
-</ol>
-
-<h3 id="その他"><a href="#その他">その他</a></h3><ul><li><a href="https://qiita.com/kerupani129">@kerupani129</a> 氏の投稿が面白い<br>
-たとえば <a href="https://qiita.com/kerupani129/items/1600e6af3873015eabc7">[Haskell] where 句は式でない</a> で <code>case</code> 式のガードに対して <code>where</code> が書けることを知った。 <code>constructN</code> で役立ちそう。<br></li>
-
-<li><a href="https://konn-san.com/prog/haskell/extensible-effects.html">Extensible Effects はモナド変換子に対する救世主になり得るか？</a><br>
-TL で流れてきて良かった。 Extensible effects を使うと、モナドをフラットに合成できそう。ただ 10 年前の記事なので、現在の動向が知りたくなった。<br></li>
-</ul>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+        <li>
+          <a href="https://konn-san.com/prog/haskell/extensible-effects.html"
+            >Extensible Effects はモナド変換子に対する救世主になり得るか？</a
+          ><br />
+          TL で流れてきて良かった。 Extensible effects
+          を使うと、モナドをフラットに合成できそう。ただ 10
+          年前の記事なので、現在の動向が知りたくなった。<br />
+        </li>
+      </ul>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

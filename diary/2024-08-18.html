@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -27,7 +28,6 @@
     <main role="main">
       <h2 id="ARC 182"><a href="#ARC 182">ARC 182</a></h2>
       <p><a href="https://atcoder.jp/contests/arc182">ARC 182</a> に参加しました。<br /></p>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/arc182/tasks/arc182_a">A 問題</a></a>
       </h3>
@@ -36,12 +36,10 @@
         \((P_i, V_i)\) を元に各操作が可能な方向に制約が課せられると考えて、矛盾しない場合は
         \(2^{\mathcal{nFree}}\) が答えです。<br />
       </p>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/arc182/tasks/arc182_b">B 問題</a></a>
       </h3>
       <p>こちらの方が解かれている……？？<br /></p>
-
       <h2 id="ABC 367"><a href="#ABC 367">ABC 367</a></h2>
       <p>
         <a href="https://atcoder.jp/contests/abc367">ABC 367</a> に参加しました。 C
@@ -102,7 +100,6 @@
           </tr>
         </tbody>
       </table>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc367/tasks/abc367_a">A 問題</a></a>
       </h3>
@@ -115,7 +112,6 @@
         <pre><code class="src language-hs">main=interact$f.map read.words;f[a,b,c]|mod(b-c)24&gt;mod(a-c)24="Yes"|0&lt;1="No"
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc367/tasks/abc367_b">B 問題</a></a>
       </h3>
@@ -125,7 +121,6 @@
         <pre><code class="src language-hs">import Data.List;main=getLine&gt;&gt;=putStrLn.dropWhileEnd(=='.').dropWhileEnd(=='0')
 </code></pre>
       </div>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc367/tasks/abc367_c">C 問題</a></a>
       </h3>
@@ -152,7 +147,6 @@
         <code>foldMap</code> の方が速かったです。いずれも
         <code>print</code> まで遅延される気がしていましたが……。<br />
       </p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc367/tasks/abc367_d">D 問題</a></a>
       </h3>
@@ -195,7 +189,6 @@ solve = do
     GM.modify dist succ (addMod m x sumMod)
 </code></pre>
       </div>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc367/tasks/abc367_e">E 問題</a></a>
       </h3>
@@ -223,24 +216,20 @@ solve = do
         >
         (の正格評価版) で実施すべきですね。半群作用の形にすればなおヨシ！<br />
       </p>
-
       <h3 id="F 問題">
         <a href="#F 問題"><a href="https://atcoder.jp/contests/abc367/tasks/abc367_f">F 問題</a></a>
       </h3>
       <p>一瞬 Mo を考え、すぐに解けないことが分かりました。もうっ<br /></p>
-
       <h2 id="Wavelet Matrix (2)"><a href="#Wavelet Matrix (2)">Wavelet Matrix (2)</a></h2>
       <h3 id="追加の API"><a href="#追加の API">追加の API</a></h3>
       <h4 id="ran (freq, count)">
         <a href="#ran (freq, count)"><code>ran</code> (<code>freq</code>, <code>count</code>)</a>
       </h4>
       <p>後述します。<br /></p>
-
-      <h4 id="lookupGE wm x">
-        <a href="#lookupGE wm x"><code>lookupGE wm x</code></a>
+      <h4 id="lookupGT wm x">
+        <a href="#lookupGT wm x"><code>lookupGT wm x</code></a>
       </h4>
       <p><code>kthMin wm (countLE wm x)</code> の形で実装できます。<br /></p>
-
       <h3 id="Segment Tree on Wavelet Matrix">
         <a href="#Segment Tree on Wavelet Matrix">Segment Tree on Wavelet Matrix</a>
       </h3>
@@ -272,7 +261,6 @@ solve = do
         したがって bit 毎に (各行に) セグメント木を持って畳み込めば、 <code>freq</code> と同じ要領で
         <code>fold</code> を実装できます。凄いなー……<br />
       </p>
-
       <h3 id="Distinct count">
         <a href="#Distinct count">Distinct <code>count</code></a>
       </h3>
@@ -300,12 +288,10 @@ solve = do
         </li>
         <li><a href="https://codeforces.com/blog/entry/8962">spoj Problem D-query</a><br /></li>
       </ul>
-
       <h3 id="Distinct kthMin">
         <a href="#Distinct kthMin">Distinct <code>kthMin</code></a>
       </h3>
       <p>思いつきません。<br /></p>
-
       <h3 id="実際、 Wavelet Matrix に使い道はあるのか">
         <a href="#実際、 Wavelet Matrix に使い道はあるのか"
           >実際、 Wavelet Matrix に使い道はあるのか</a
@@ -314,7 +300,6 @@ solve = do
       <p>
         機能豊富かと思いきや、高速なのは特殊な操作ばかりでした。役立つかはかなり疑問です。<br />
       </p>
-
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
       <h3 id="最近買った本"><a href="#最近買った本">最近買った本</a></h3>
       <p>買っただけです。<br /></p>
@@ -343,7 +328,6 @@ solve = do
           CTF のハードルの高さをどう超えるか……<br />
         </li>
       </ul>
-
       <h3 id="セール"><a href="#セール">セール</a></h3>
       <ul>
         <li>

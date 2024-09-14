@@ -1,40 +1,89 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 341 / ACL contest - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 341 / ACL contest</h1><p>Feb 18, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="ABC 341"><a href="#ABC 341">ABC 341</a></h2><p>
-<a href="https://atcoder.jp/contests/abc341">ABC 341</a> に参加しました。早解き回にて 6 完青パフォ！　同時期に入水した人たちと同程度のレーティングになりました。嬉ピクミンの宴です。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 341 / ACL contest - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 341 / ACL contest</h1>
+      <p>Feb 18, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 341"><a href="#ABC 341">ABC 341</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/abc341">ABC 341</a> に参加しました。早解き回にて 6
+        完青パフォ！　同時期に入水した人たちと同程度のレーティングになりました。嬉ピクミンの宴です。<br />
+      </p>
+      <h3 id="A - Print 341">
+        <a href="#A - Print 341"
+          ><a href="https://atcoder.jp/contests/abc341/tasks/abc341_a">A - Print 341</a></a
+        >
+      </h3>
+      <p>
+        <code>1010 .. 1</code> のような文字列を生成します。
+        <a href="https://www.youtube.com/watch?v=OmjShwWONsw&amp;t=2887s"
+          >kotatsugame さん情報によると</a
+        >
+        、 <code>341 = 101010101 (2)</code> のようでした。すご……<br />
+      </p>
 
-<h3 id="A - Print 341"><a href="#A - Print 341"><a href="https://atcoder.jp/contests/abc341/tasks/abc341_a">A - Print 341</a></a></h3><p>
-<code>1010 .. 1</code> のような文字列を生成します。 <a href="https://www.youtube.com/watch?v=OmjShwWONsw&amp;t=2887s">kotatsugame さん情報によると</a> 、 <code>341 = 101010101 (2)</code> のようでした。すご……<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">-- 上手い方法
+      <div class="org-src-container">
+        <pre><code class="src language-hs">-- 上手い方法
 take (2 * n + 1) $ cycle "10"
 
 -- 思いつきやすかった方法
 init . concat $ replicate (n + 1) "10"
 </code></pre>
-</div>
+      </div>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc341/tasks/abc341_b">B 問題</a></a>
+      </h3>
+      <p>
+        畳み込みの問題です。焦って手続き的にやってしまいました。いつものことですが、
+        <a href="https://atcoder.jp/contests/abc341/submissions/50337867">gksato さんの提出</a>
+        が上手かったです。<br />
+      </p>
 
-<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc341/tasks/abc341_b">B 問題</a></a></h3><p>
-畳み込みの問題です。焦って手続き的にやってしまいました。いつものことですが、 <a href="https://atcoder.jp/contests/abc341/submissions/50337867">gksato さんの提出</a> が上手かったです。<br>
-</p>
+      <p>
+        <a href="https://www.youtube.com/watch?v=OmjShwWONsw&amp;t=2936s"
+          >kotatsugame さん情報によると</a
+        >
+        \(T_i \le S_i\) のため通貨が指数関数的に膨れ上がることはありません。重要な考察ですね
+        (抜けていました) 。<br />
+      </p>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc341/tasks/abc341_c">C 問題</a></a>
+      </h3>
+      <p>全探索の問題です。すべてのセルを起点にシミュレーションすれば解けます。<br /></p>
 
-<p>
-<a href="https://www.youtube.com/watch?v=OmjShwWONsw&amp;t=2936s">kotatsugame さん情報によると</a> \(T_i \le S_i\) のため通貨が指数関数的に膨れ上がることはありません。重要な考察ですね (抜けていました) 。<br>
-</p>
+      <p>
+        制限時間がシビアなため、 Haskell ではサンクを溜めると TLE になるようです。僕は即
+        <code>break</code> できるように再帰関数を使っていました。<br />
+      </p>
 
-<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc341/tasks/abc341_c">C 問題</a></a></h3><p>
-全探索の問題です。すべてのセルを起点にシミュレーションすれば解けます。<br>
-</p>
-
-<p>
-制限時間がシビアなため、 Haskell ではサンクを溜めると TLE になるようです。僕は即 <code>break</code> できるように再帰関数を使っていました。<br>
-</p>
-
-<div class="org-src-container">
-<label class="org-src-name"><span class="listing-number">Listing 1: </span>シミュレーション (再帰関数で <code>break</code>)</label><pre><code class="src language-hs">let solve (!y, !x) !bs = case BS.uncons bs of
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span>シミュレーション (再帰関数で
+          <code>break</code>)</label
+        >
+        <pre><code class="src language-hs">let solve (!y, !x) !bs = case BS.uncons bs of
       Nothing -&gt; True
       Just (!dir, !bs') -&gt;
         if not (inRange (boundsIV gr) yx') || gr @! yx'
@@ -43,57 +92,80 @@ init . concat $ replicate (n + 1) "10"
         where
           !yx' = add2 (y, x) (toD dir)
 </code></pre>
-</div>
+      </div>
 
-<div class="org-src-container">
-<label class="org-src-name"><span class="listing-number">Listing 2: </span>全セルの座標の生成 (<code>vector</code>)</label><pre><code class="src language-hs">U.generate (h * w) (`divMod` w)
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span>全セルの座標の生成
+          (<code>vector</code>)</label
+        >
+        <pre><code class="src language-hs">U.generate (h * w) (`divMod` w)
 </code></pre>
-</div>
+      </div>
 
-<p>
-kotatsugame さん情報によると、終点の位置を数える問題だったようです。僕は始点の位置を数えてしまいました。単射で助かりました。<br>
-</p>
+      <p>
+        kotatsugame
+        さん情報によると、終点の位置を数える問題だったようです。僕は始点の位置を数えてしまいました。単射で助かりました。<br />
+      </p>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc341/tasks/abc341_d">D 問題</a></a>
+      </h3>
+      <p>算数を考えていましたがサンプル 3 で TLE. 2 分法で効率化できました。なるほど……！<br /></p>
 
-<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc341/tasks/abc341_d">D 問題</a></a></h3><p>
-算数を考えていましたがサンプル 3 で TLE. 2 分法で効率化できました。なるほど……！<br>
-</p>
+      <p>
+        めぐる式 2 分探索は
+        <a href="https://zenn.dev/forcia_tech/articles/20191223_advent_calendar"
+          >フォルシアの記事</a
+        >
+        の図解が一番分かりやすかったです。<br />
+      </p>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc341/tasks/abc341_e">E 問題</a></a>
+      </h3>
+      <p>
+        前回の E
+        問題で遅延セグメント木が出題されたこともあり、躊躇なく使用しました。が、勇み足だったようです。セグメント木
+        1 本で通ります。<br />
+      </p>
 
-<p>
-めぐる式 2 分探索は <a href="https://zenn.dev/forcia_tech/articles/20191223_advent_calendar">フォルシアの記事</a> の図解が一番分かりやすかったです。<br>
-</p>
+      <p>前回の E は緑 diff で、今回の E は水 diff でした。教えはどうなってんだ教えは！<br /></p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc341/tasks/abc341_f">F 問題</a></a>
+      </h3>
+      <p>
+        高い所から低い所まで水が降りていくような問題でした。低いところから順番に解を求めます。部分問題はナップサック問題です。<br />
+      </p>
 
-<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc341/tasks/abc341_e">E 問題</a></a></h3><p>
-前回の E 問題で遅延セグメント木が出題されたこともあり、躊躇なく使用しました。が、勇み足だったようです。セグメント木 1 本で通ります。<br>
-</p>
+      <p>
+        青 diff にしては実装が軽かったですが、
+        <a href="https://atcoder.jp/contests/abc326/tasks/abc326_f">F - Robot Rotation</a> などは青
+        diff 中盤だったので、その辺りに壁があるようです。<br />
+      </p>
+      <h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2>
+      <h3 id="動的計画法"><a href="#動的計画法">動的計画法</a></h3>
+      <p>
+        EDPC の <a href="https://atcoder.jp/contests/dp/tasks/dp_d">D - Knapsack 1</a> を
+        <a href="https://atcoder.jp/contests/dp/submissions/50322459"
+          ><code>Max</code> モノイドで解いてみました</a
+        >
+        。半環の気持ちで <code>Num</code> と <code>Monoid</code> を使うのは手に馴染みます。<br />
+      </p>
 
-<p>
-前回の E は緑 diff で、今回の E は水 diff でした。教えはどうなってんだ教えは！<br>
-</p>
+      <blockquote>
+        <p>型クラス <code>Semiring</code> を作るのはやり過ぎかも……？<br /></p>
+      </blockquote>
+      <h3 id="ライブラリ"><a href="#ライブラリ">ライブラリ</a></h3>
+      <h4 id="KnownNat">
+        <a href="#KnownNat"><code>KnownNat</code></a>
+      </h4>
+      <p>
+        型レベルリテラル？を GHC の <code>KnownNat</code> に移行しました。
+        <code>Integer</code> を返すため、若干遅くなった気もしますが、
+        <code>type</code> として定数を書けるのが格好良くて気に入っています。<br />
+      </p>
 
-<h3 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc341/tasks/abc341_f">F 問題</a></a></h3><p>
-高い所から低い所まで水が降りていくような問題でした。低いところから順番に解を求めます。部分問題はナップサック問題です。<br>
-</p>
-
-<p>
-青 diff にしては実装が軽かったですが、 <a href="https://atcoder.jp/contests/abc326/tasks/abc326_f">F - Robot Rotation</a> などは青 diff 中盤だったので、その辺りに壁があるようです。<br>
-</p>
-
-<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="動的計画法"><a href="#動的計画法">動的計画法</a></h3><p>
-EDPC の <a href="https://atcoder.jp/contests/dp/tasks/dp_d">D - Knapsack 1</a> を <a href="https://atcoder.jp/contests/dp/submissions/50322459"><code>Max</code> モノイドで解いてみました</a> 。半環の気持ちで <code>Num</code> と <code>Monoid</code> を使うのは手に馴染みます。<br>
-</p>
-
-<blockquote>
-<p>
-型クラス <code>Semiring</code> を作るのはやり過ぎかも……？<br>
-</p>
-</blockquote>
-
-<h3 id="ライブラリ"><a href="#ライブラリ">ライブラリ</a></h3><h4 id="KnownNat"><a href="#KnownNat"><code>KnownNat</code></a></h4><p>
-型レベルリテラル？を GHC の <code>KnownNat</code> に移行しました。 <code>Integer</code> を返すため、若干遅くなった気もしますが、 <code>type</code> として定数を書けるのが格好良くて気に入っています。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">{-# LANGUAGE DataKinds #-}
+      <div class="org-src-container">
+        <pre><code class="src language-hs">{-# LANGUAGE DataKinds #-}
 import Data.Proxy
 import GHC.TypeLits
 
@@ -103,62 +175,93 @@ type MyModulo = (998244353 :: Nat)
 example :: Integer
 example = natVal (Proxy @MyModulo)
 </code></pre>
-</div>
+      </div>
+      <h4 id="AtCoder Library Practice Contest">
+        <a href="#AtCoder Library Practice Contest"
+          ><a href="https://atcoder.jp/contests/practice2">AtCoder Library Practice Contest</a></a
+        >
+      </h4>
+      <p>
+        <a href="https://atcoder.jp/contests/practice2">この常設コン</a> をやっていました。
+        <a href="https://past.atcoder.jp/">PAST</a> と範囲が被ります。やはり PAST でも
+        <a href="https://github.com/atcoder/ac-library">ac-library</a>
+        で解ける問題が出されるわけで、難問の準備に良さそうでした。<br />
+      </p>
 
-<h4 id="AtCoder Library Practice Contest"><a href="#AtCoder Library Practice Contest"><a href="https://atcoder.jp/contests/practice2">AtCoder Library Practice Contest</a></a></h4><p>
-<a href="https://atcoder.jp/contests/practice2">この常設コン</a> をやっていました。 <a href="https://past.atcoder.jp/">PAST</a> と範囲が被ります。やはり PAST でも <a href="https://github.com/atcoder/ac-library">ac-library</a> で解ける問題が出されるわけで、難問の準備に良さそうでした。<br>
-</p>
+      <ul>
+        <li>
+          <a href="https://atcoder.jp/contests/practice2/tasks/practice2_d">D - MaxFlow</a><br />
+          Dinic 法を実装しました。
+          <a href="https://github.com/cojna/iota">cojna/iota</a>
+          を写経したため高速になりました。やはり compressed sparse row
+          形式でグラフを持つのが効くようです。<br />
+        </li>
 
-<ul><li><a href="https://atcoder.jp/contests/practice2/tasks/practice2_d">D - MaxFlow</a><br>
-Dinic 法を実装しました。 <a href="https://github.com/cojna/iota">cojna/iota</a> を写経したため高速になりました。やはり compressed sparse row 形式でグラフを持つのが効くようです。<br></li>
+        <li>
+          <a href="https://atcoder.jp/contests/practice2/tasks/practice2_e">E - MinCostFlow</a
+          ><br />
+          最小費用流を実装し、最大費用流と実装を共通化しました。モノイド (<code>Max</code> or
+          <code>Min</code>) の指定で切り替えできます。 API は整理中……<br />
+        </li>
 
-<li><a href="https://atcoder.jp/contests/practice2/tasks/practice2_e">E - MinCostFlow</a><br>
-最小費用流を実装し、最大費用流と実装を共通化しました。モノイド (<code>Max</code> or <code>Min</code>) の指定で切り替えできます。 API は整理中……<br></li>
+        <li>
+          <a href="https://atcoder.jp/contests/practice2/tasks/practice2_h">Two SAT</a><br />
+          2-satisfiability problem は SCC で解ける！　証明はともかく、解き方を理解しました。<br />
+        </li>
 
-<li><a href="https://atcoder.jp/contests/practice2/tasks/practice2_h">Two SAT</a><br>
-2-satisfiability problem は SCC で解ける！　証明はともかく、解き方を理解しました。<br></li>
+        <li>
+          <p>
+            <a href="https://atcoder.jp/contests/practice2/tasks/practice2_k"
+              >K - Range Affine Range Sum</a
+            ><br />
+            ゲーム開発でお馴染みの変換行列で AC しました。この方法は斉次座標系／同次座標系
+            (homogeneous coordinate system), 射影座標系 (projected coordinate system)
+            などで検索すればヒットします。<br />
+          </p>
 
-<li><p>
-<a href="https://atcoder.jp/contests/practice2/tasks/practice2_k">K - Range Affine Range Sum</a><br>
-ゲーム開発でお馴染みの変換行列で AC しました。この方法は斉次座標系／同次座標系 (homogeneous coordinate system), 射影座標系 (projected coordinate system) などで検索すればヒットします。<br>
-</p>
+          <p>
+            遅延セグメント木を修正し、演算子の適用順序を変更しました。たとえば \((B <> A) x\)
+            を計算したつもりで \((A <> B) x\) の計算になっており、デバッグが大変でした。<br />
+          </p>
+        </li>
+      </ul>
+      <h4 id="Library Checker">
+        <a href="#Library Checker"><a href="https://judge.yosupo.jp/">Library Checker</a></a>
+      </h4>
+      <p><a href="https://judge.yosupo.jp/">Library Checker</a> も難問揃いで憧れます。<br /></p>
 
-<p>
-遅延セグメント木を修正し、演算子の適用順序を変更しました。たとえば \((B <> A) x\) を計算したつもりで \((A <> B) x\) の計算になっており、デバッグが大変でした。<br>
-</p></li>
-</ul>
+      <p>
+        <a href="https://github.com/yosupo06/library-checker-problems">library-checker-problems</a>
+        にてテストケースを生成できる他、
+        <a href="https://github.com/online-judge-tools/verification-helper">verification-helper</a>
+        の
+        <code>oj-verify run</code>
+        にてテストケースのダウンロードと実行を自動化できるようです。便利！<br />
+      </p>
 
-<h4 id="Library Checker"><a href="#Library Checker"><a href="https://judge.yosupo.jp/">Library Checker</a></a></h4><p>
-<a href="https://judge.yosupo.jp/">Library Checker</a> も難問揃いで憧れます。<br>
-</p>
+      <blockquote>
+        <p>NixOS だと sandbox からの脱獄に失敗しました。便利じゃない！<br /></p>
+      </blockquote>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <p>朝起きれない時は、俺自身がソラールとなることだ。<br /></p>
+      <h3 id="キーボード"><a href="#キーボード">キーボード</a></h3>
+      <p>
+        <a href="https://kagizaraya.jp/en/products/miniaxe">MiniAxe</a>
+        の在庫補充があり、即注文しました。楽しみです。<br />
+      </p>
+      <h3 id="Cyberpunk 2077"><a href="#Cyberpunk 2077">Cyberpunk 2077</a></h3>
+      <p>
+        ファン作品が面白かったので買いました。他のことが気になって中々プレイできませんが、初めて GPU
+        (RTX 3070) を活用している気がします。<br />
+      </p>
+      <h3 id="Web 開発"><a href="#Web 開発">Web 開発</a></h3>
+      <p>Emmet 道場と AtCoder diff が欲しいです。<br /></p>
 
-<p>
-<a href="https://github.com/yosupo06/library-checker-problems">library-checker-problems</a> にてテストケースを生成できる他、 <a href="https://github.com/online-judge-tools/verification-helper">verification-helper</a> の <code>oj-verify run</code> にてテストケースのダウンロードと実行を自動化できるようです。便利！<br>
-</p>
-
-<blockquote>
-<p>
-NixOS だと sandbox からの脱獄に失敗しました。便利じゃない！<br>
-</p>
-</blockquote>
-
-<h2 id="Misc"><a href="#Misc">Misc</a></h2><p>
-朝起きれない時は、俺自身がソラールとなることだ。<br>
-</p>
-
-<h3 id="キーボード"><a href="#キーボード">キーボード</a></h3><p>
-<a href="https://kagizaraya.jp/en/products/miniaxe">MiniAxe</a> の在庫補充があり、即注文しました。楽しみです。<br>
-</p>
-
-<h3 id="Cyberpunk 2077"><a href="#Cyberpunk 2077">Cyberpunk 2077</a></h3><p>
-ファン作品が面白かったので買いました。他のことが気になって中々プレイできませんが、初めて GPU (RTX 3070) を活用している気がします。<br>
-</p>
-
-<h3 id="Web 開発"><a href="#Web 開発">Web 開発</a></h3><p>
-Emmet 道場と AtCoder diff が欲しいです。<br>
-</p>
-
-<p>
-進捗は無ですが、やります！　本当なんです！！<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>進捗は無ですが、やります！　本当なんです！！<br /></p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -81,7 +82,6 @@
           </tr>
         </tbody>
       </table>
-
       <h3 id="A 問題">
         <a href="#A 問題"
           ><a href="https://atcoder.jp/contests/abc370/tasks/abc370%20_a">A 問題</a></a
@@ -99,7 +99,6 @@
         <pre><code class="src language-hs">main=interact$(["Invalid","Yes","No"]!!).(`mod`3).sum.zipWith(*)[1,2].map read.words
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc370/tasks/abc370_b">B 問題</a></a>
       </h3>
@@ -109,7 +108,6 @@
         <pre><code class="src language-hs">main=interact$show.f.map(map(pred.read).words).lines;f([n]:x)=foldl(\i j-&gt;x!!max i j!!min i j)(x!!0!!0)[1..n]+1
 </code></pre>
       </div>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc370/tasks/abc370_c">C 問題</a></a>
       </h3>
@@ -118,7 +116,6 @@
         <code>VM.Vector</code> の関数を使っていたことでした。 Haskell のコンパイルエラーは、 2
         分探索とエスパーで戦うしかありません。。辛いです。<br />
       </p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc370/tasks/abc370_d">D 問題</a></a>
       </h3>
@@ -172,7 +169,6 @@ solve = do
           >hiro さんの解説</a
         >) 。しかし 2 分探索パートが理解できません……。<br />
       </p>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc370/tasks/abc370_e">E 問題</a></a>
       </h3>

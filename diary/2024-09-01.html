@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -92,7 +93,6 @@
           </tr>
         </tbody>
       </table>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc369/tasks/abc369_a">A 問題</a></a>
       </h3>
@@ -102,7 +102,6 @@
         <pre><code class="src language-hs">import Data.List;main=interact$f.map read.words;f[a,b]=show$sum[1|x&lt;-[-300..300],(==1).length.nub.(zipWith(-)&lt;*&gt;tail)$sort[a,b,x]]
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc369/tasks/abc369_b">B 問題</a></a>
       </h3>
@@ -133,7 +132,6 @@
       </div>
 
       <p>左手と右手は独立した問題なので、実装の共通化もできるようです。<br /></p>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc369/tasks/abc369_c">C 問題</a></a>
       </h3>
@@ -152,7 +150,6 @@
         >
       </blockquote>
       <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc369/tasks/abc369_d">D 問題</a></a>
       </h3>
@@ -171,7 +168,6 @@
  printBSB $ max r1 r2
 </code></pre>
       </div>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc369/tasks/abc369_e">E 問題</a></a>
       </h3>
@@ -182,7 +178,6 @@
       </p>
 
       <p>学びの多い問題でした。<br /></p>
-
       <h4 id="Floyd–Warshall vs 全頂点 Dijkstra">
         <a href="#Floyd–Warshall vs 全頂点 Dijkstra">Floyd–Warshall vs 全頂点 Dijkstra</a>
       </h4>
@@ -191,7 +186,6 @@
         <strong>はず</strong> です。実際は、同程度の速さになりました。案外
         <strong>Floyd–Warshall の方が無難で良さそう</strong> です。<br />
       </p>
-
       <h4 id="盆栽要素"><a href="#盆栽要素">盆栽要素</a></h4>
       <p>ライブラリを整理しました。<br /></p>
 
@@ -210,7 +204,6 @@
           </ul>
         </li>
       </ul>
-
       <h3 id="F 問題">
         <a href="#F 問題"><a href="https://atcoder.jp/contests/abc369/tasks/abc369_f">F 問題</a></a>
       </h3>
@@ -221,7 +214,6 @@
       </p>
 
       <p>出力は <code>Bulider</code> を使うのが計算量の観点で無難です。<br /></p>
-
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
       <ul>
         <li>

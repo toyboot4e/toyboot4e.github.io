@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -87,7 +88,6 @@
           </tr>
         </tbody>
       </table>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc358/tasks/abc358_a">A 問題</a></a>
       </h3>
@@ -118,7 +118,6 @@
         <code>;</code> で区切ったほうが面倒がありません。 Kotatsugame さんは改行文字を 1
         バイトにして提出するブラウザ拡張を使っています。<br />
       </p>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc358/tasks/abc358_b">B 問題</a></a>
       </h3>
@@ -134,7 +133,6 @@
         <code>vector</code> パッケージにおいては <code>postscanl'</code> を使えば
         <code>tail</code> する必要がありません。<br />
       </p>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc358/tasks/abc358_c">C 問題</a></a>
       </h3>
@@ -142,7 +140,6 @@
         Bit 全探索と bitset の問題でした。 Bit mask の和を取るときは、 <code>sum</code> ではなく
         <code>foldl' (.|.) (0 :: Int)</code> を使わねばなりません……<br />
       </p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc358/tasks/abc358_d">D 問題</a></a>
       </h3>
@@ -154,7 +151,6 @@
       </p>
 
       <p>僕は multiset でズルをしてしまいました。<br /></p>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc358/tasks/abc358_e">E 問題</a></a>
       </h3>
@@ -164,17 +160,14 @@
       </p>
 
       <p>Upsolve します。<br /></p>
-
       <h3 id="F 問題">
         <a href="#F 問題"><a href="https://atcoder.jp/contests/abc358/tasks/abc358_f">F 問題</a></a>
       </h3>
       <p>hogee<br /></p>
-
       <h3 id="G 問題">
         <a href="#G 問題"><a href="https://atcoder.jp/contests/abc358/tasks/abc358_g">G 問題</a></a>
       </h3>
       <p>hogee<br /></p>
-
       <h2 id="Z Function"><a href="#Z Function">Z Function</a></h2>
       <p>
         文字列に苦手意識があります。特に文字列のアルゴリズムは全容が見えて来ません。困難は実装せよということで、
@@ -191,7 +184,6 @@
       <p>
         このサイトは初見に厳し目ですが、読めば分かるように書いてあって高印象……好印象です。以下は自分用メモです。<br />
       </p>
-
       <h3 id="\(O(N^2)\) 実装"><a href="#\(O(N^2)\) 実装">\(O(N^2)\) 実装</a></h3>
       <p>Z 関数 (配列) の定義を以下とします:<br /></p>
 
@@ -212,7 +204,6 @@ zOfNaive bs = U.generate (BS.length bs) z
     z i = lcpOf bs (BS.drop i bs)
 </code></pre>
       </div>
-
       <h3 id="\(O(N)\) 実装"><a href="#\(O(N)\) 実装">\(O(N)\) 実装</a></h3>
       <p>
         \(s\) と接尾辞 (\(s[1:], s[2:], \dots\)) のマッチの内、最も右端までマッチした範囲を
@@ -241,7 +232,6 @@ zOfNaive bs = U.generate (BS.length bs) z
           >僕の実装 (ZFunction.hs)</a
         ><br />
       </p>
-
       <h4 id="\(O(N)\) になるお気持ち">
         <a href="#\(O(N)\) になるお気持ち">\(O(N)\) になるお気持ち</a>
       </h4>
@@ -250,10 +240,8 @@ zOfNaive bs = U.generate (BS.length bs) z
         解による文字比較の回数は、マッチした場合・マッチしなかった場合がそれぞれ高々
         <code>n</code> 回となります。よって \(O(n)\) で計算できています。そんなお気持ちです。<br />
       </p>
-
       <h4 id="Quickcheck"><a href="#Quickcheck">Quickcheck</a></h4>
       <p>愚直解と比較しました。<br /></p>
-
       <h4 id="Library Checker"><a href="#Library Checker">Library Checker</a></h4>
       <p>
         <a href="https://judge.yosupo.jp/submission/215154">Z Algorithm - Library Checker</a> が
@@ -262,7 +250,6 @@ zOfNaive bs = U.generate (BS.length bs) z
       </p>
 
       <p>まだ使い方は知らず、エアプです。<br /></p>
-
       <h2 id="Suffix array"><a href="#Suffix array">Suffix array</a></h2>
       <p>
         <a href="https://cp-algorithms.com/string/suffix-array.html"
@@ -276,7 +263,6 @@ zOfNaive bs = U.generate (BS.length bs) z
         >
         で立ちはだかるデータ構造です。以下は自分用メモです。<br />
       </p>
-
       <h3 id="\(O(N^2 \log N)\) 実装">
         <a href="#\(O(N^2 \log N)\) 実装">\(O(N^2 \log N)\) 実装</a>
       </h3>
@@ -300,7 +286,6 @@ saOfNaive bs =
       <p>
         以降、 <code>i</code> と <code>i'</code> の空間の違いを強く意識することが重要です。<br />
       </p>
-
       <h3 id="\(O(N \log N)\) 実装"><a href="#\(O(N \log N)\) 実装">\(O(N \log N)\) 実装</a></h3>
       <p>
         <a href="https://cp-algorithms.com/string/suffix-array.html"
@@ -353,17 +338,14 @@ saOfNaive bs =
       </ul>
 
       <p>積み重ねが凄くて面白いですね。<br /></p>
-
       <h4 id="QuickCheck"><a href="#QuickCheck">QuickCheck</a></h4>
       <p>愚直解と比較しました。<br /></p>
-
       <h4 id="Library checker"><a href="#Library checker">Library checker</a></h4>
       <p>
         <a href="https://judge.yosupo.jp/problem/suffixarray">Suffix Array - Library Checker</a> が
         <a href="https://judge.yosupo.jp/submission/215153">234 ms</a> でした。 \(O(N)\) 実装は 2 ~
         7 倍速くなります。<br />
       </p>
-
       <h3 id="\(O(N)\) 実装 (スキップ)">
         <a href="#\(O(N)\) 実装 (スキップ)">\(O(N)\) 実装 (スキップ)</a>
       </h3>
@@ -371,7 +353,6 @@ saOfNaive bs =
         SA-IS (suffix array induced sorting) が \(O(N)\) で強いらしいです。 \(O(N)\)
         でなければ間に合わない問題もしばしばあるようですが、大変らしいので飛ばします。<br />
       </p>
-
       <h3 id="LCP 配列 (Kasai's algorithm)">
         <a href="#LCP 配列 (Kasai's algorithm)">LCP 配列 (Kasai's algorithm)</a>
       </h3>
@@ -379,7 +360,6 @@ saOfNaive bs =
         Suffix array と LCP 配列を併用すると、 suffix trie よりも効率が良いと評判のようです。 Suffix
         trie のことは知らないので、 trie との関連付けは一旦忘れることにします。<br />
       </p>
-
       <h4 id="LCP 配列とは"><a href="#LCP 配列とは">LCP 配列とは</a></h4>
       <p>
         多数の \(lcp(s[sa[i]:], s[sa[j]:])\) クエリへの応答を考えます。 \(s[sa[i]:], s[sa[j]:]\)
@@ -419,7 +399,6 @@ saOfNaive bs =
         また重要な事実として suffix array 上で隣接した 2 項の LCP が最も大きく、間隔を広げると LCP
         は広義単調減少します。このことから次の Kasai's algorithm を導けます。<br />
       </p>
-
       <h4 id="Kasai's algorithm (\(O(N)\))">
         <a href="#Kasai's algorithm (\(O(N)\))">Kasai's algorithm (\(O(N)\))</a>
       </h4>
@@ -450,7 +429,6 @@ saOfNaive bs =
         \mathcal{sortedIndexOf}(s[(\mathcal{sa}^{-1}[i]+2):])\) から前項 (LCP の min 畳み込み)
         によって証明できます。<br />
       </p>
-
       <h4 id="ACL / Library Checker"><a href="#ACL / Library Checker">ACL / Library Checker</a></h4>
       <p>
         ユニークな部分列の数を数える問題です。ここでも suffix array 上で隣接する 2 項間の LCP
@@ -476,14 +454,12 @@ saOfNaive bs =
           ><br />
         </li>
       </ul>
-
       <h3 id="感想"><a href="#感想">感想</a></h3>
       <p>
         <a href="https://atcoder.github.io/ac-library/production/document_ja/string.html">ACL</a>
         の文字列データ構造 (Z Funciton および Suffix Array)
         を実装しました。最大流とか遅延セグメント木に比べれば簡単な方ですが、使い方が見えない点が苦痛です。幸いプログラミングにおいては困難は実装せよで理解が進むため、なんとか喰らいつくことができました。<br />
       </p>
-
       <h2 id="Haskell"><a href="#Haskell">Haskell</a></h2>
       <h3 id="醜い Haskell のフォーマット">
         <a href="#醜い Haskell のフォーマット">醜い Haskell のフォーマット</a>
@@ -524,7 +500,6 @@ saOfNaive bs =
     n = BS.length bs
 </code></pre>
       </div>
-
       <h3 id="QuickCheck alternatives?">
         <a href="#QuickCheck alternatives?">QuickCheck alternatives?</a>
       </h3>
@@ -553,7 +528,6 @@ saOfNaive bs =
       </ul>
 
       <p>これは QuickCheck 上で exhaustive test を実施する方法を調べたほうが良さそうです。<br /></p>
-
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
       <h3 id="nerd-icons.el">
         <a href="#nerd-icons.el"><code>nerd-icons.el</code></a>
@@ -581,10 +555,8 @@ saOfNaive bs =
         <li><a href="https://github.com/rainstormstudio/nerd-icons.el">nerd-icons.el</a><br /></li>
         <li><a href="https://github.com/gekoke/magit-file-icons">magit-file-icons.el</a><br /></li>
       </ul>
-
       <h3 id="内なるクソリプの衝動"><a href="#内なるクソリプの衝動">内なるクソリプの衝動</a></h3>
       <p>X で Emacs の画像を送りつけてしまいました。しばらく控えます……<br /></p>
-
       <h3 id="AtCoder-JOI">
         <a href="#AtCoder-JOI"><a href="https://joi.goodbaton.com/">AtCoder-JOI</a></a>
       </h3>
@@ -630,7 +602,6 @@ saOfNaive bs =
         と助言を頂いたので、素直に取り組んでみます。ありがたい……！
         <a href="https://joi.goodbaton.com/">AtCoder-JOI</a> をあたります。<br />
       </p>
-
       <h3 id="oj t -M diff-all">
         <a href="#oj t -M diff-all"><code>oj t -M diff-all</code></a>
       </h3>
@@ -644,7 +615,6 @@ saOfNaive bs =
       </p>
 
       <p>Nix 上の環境構築を確認中……<br /></p>
-
       <h3 id="skk-tutorial">
         <a href="#skk-tutorial"><code>skk-tutorial</code></a>
       </h3>
@@ -666,7 +636,6 @@ saOfNaive bs =
         <a href="https://shirogane-lab.net/items/64b7a006eb6dbe00346cd0c5">Keyball</a> には既に
         Enter キーや IME on, IME off が親指にあり、操作感を崩さずに移行するのが良さそうです。<br />
       </p>
-
       <h3 id="Misc of misc"><a href="#Misc of misc">Misc of misc</a></h3>
       <ul>
         <li>

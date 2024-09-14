@@ -1,19 +1,47 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 332, ABC 333, PBT 本 / 尺取り法 - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 332, ABC 333, PBT 本 / 尺取り法</h1><p>Dec 17, 2023</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="尺取り法"><a href="#尺取り法">尺取り法</a></h3><p>
-尺取り法の実装には 2 種類あることが分かった。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 332, ABC 333, PBT 本 / 尺取り法 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 332, ABC 333, PBT 本 / 尺取り法</h1>
+      <p>Dec 17, 2023</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2>
+      <h3 id="尺取り法"><a href="#尺取り法">尺取り法</a></h3>
+      <p>尺取り法の実装には 2 種類あることが分かった。<br /></p>
+      <h4 id="1. ステートレスな尺取り法">
+        <a href="#1. ステートレスな尺取り法">1. ステートレスな尺取り法</a>
+      </h4>
+      <p>
+        真偽の区間クエリに \(O(1)\)
+        で答えられる場合、たとえば累積和の事前計算などで対応できる場合は、ほぼ
+        <code>Int -&gt; Int -&gt; Bool</code> な関数だけで尺取り法を実装できる。<br />
+      </p>
 
-<h4 id="1. ステートレスな尺取り法"><a href="#1. ステートレスな尺取り法">1. ステートレスな尺取り法</a></h4><p>
-真偽の区間クエリに \(O(1)\) で答えられる場合、たとえば累積和の事前計算などで対応できる場合は、ほぼ <code>Int -&gt; Int -&gt; Bool</code> な関数だけで尺取り法を実装できる。<br>
-</p>
+      <p>もともとこの理解だったため、テンプレート入りしている:<br /></p>
 
-<p>
-もともとこの理解だったため、テンプレート入りしている:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">twoPointersU :: Int -&gt; (Int -&gt; Int -&gt; Bool) -&gt; U.Vector (Int, Int)
+      <div class="org-src-container">
+        <pre><code class="src language-hs">twoPointersU :: Int -&gt; (Int -&gt; Int -&gt; Bool) -&gt; U.Vector (Int, Int)
 twoPointersU !n !p = U.unfoldr (uncurry f) s0
   where
     !s0 = (0, 0) :: (Int, Int)
@@ -25,109 +53,151 @@ twoPointersU !n !p = U.unfoldr (uncurry f) s0
           -- run peek check and advance on success
           r' = until ((||) &lt;$&gt; (== n - 1) &lt;*&gt; not . p l . succ) succ r
 </code></pre>
-</div>
+      </div>
+      <h4 id="2. ステートフルな尺取り法">
+        <a href="#2. ステートフルな尺取り法">2. ステートフルな尺取り法</a>
+      </h4>
+      <p>
+        現在の区間に対応する状態を保持して、右端を右へ伸ばす／左端を右へ動かす度に状態を更新する実装。
+        <a href="https://zenn.dev/osushi0x/articles/e5bd9fe60abee4"
+          >Haskellでしゃくとり法を攻略する</a
+        >
+        や
+        <a
+          href="https://speakerdeck.com/naoya/guan-shu-xing-puroguramingutoxing-sisutemunomentarumoderu?slide=69"
+          >naoya さんのスライド</a
+        >
+        中のコードに出てくる方法で、右方向にしか動けない Mo's algorithm
+        のようなイメージで捉えられる。<br />
+      </p>
 
-<h4 id="2. ステートフルな尺取り法"><a href="#2. ステートフルな尺取り法">2. ステートフルな尺取り法</a></h4><p>
-現在の区間に対応する状態を保持して、右端を右へ伸ばす／左端を右へ動かす度に状態を更新する実装。 <a href="https://zenn.dev/osushi0x/articles/e5bd9fe60abee4">Haskellでしゃくとり法を攻略する</a> や <a href="https://speakerdeck.com/naoya/guan-shu-xing-puroguramingutoxing-sisutemunomentarumoderu?slide=69">naoya さんのスライド</a> 中のコードに出てくる方法で、右方向にしか動けない Mo's algorithm のようなイメージで捉えられる。<br>
-</p>
+      <p>
+        Library Checker に尺取り法があれば見てみたい。
+        <a href="https://github.com/cojna/iota"><code>cojna/iota</code></a>
+        には尺取り法は無かったはず。<br />
+      </p>
+      <h3 id="ABC 332"><a href="#ABC 332">ABC 332</a></h3>
+      <p><a href="https://atcoder.jp/contests/abc332">ABC 332</a> に参加した。<br /></p>
 
-<p>
-Library Checker に尺取り法があれば見てみたい。 <a href="https://github.com/cojna/iota"><code>cojna/iota</code></a> には尺取り法は無かったはず。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc332/tasks/abc332_a">A 問題</a> 〜
+        <a href="https://atcoder.jp/contests/abc332/tasks/abc332_d">D 問題</a>
+        は内容を忘れてしまった。<br />
+      </p>
 
-<h3 id="ABC 332"><a href="#ABC 332">ABC 332</a></h3><p>
-<a href="https://atcoder.jp/contests/abc332">ABC 332</a> に参加した。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc332/tasks/abc332_e">E 問題</a> は
+        <a href="https://atcoder.jp/contests/abc310/tasks/abc310_d">ABC 310 D - PEACEFUL TEAMS</a>
+        の類題だった。 DFS が下手過ぎて TLE が取れず、集合 DP
+        への切り替えが間に合わず終了した。コンテスト後も WA を連発、単位元を大きな数に変更したら AC
+        できた。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc332/tasks/abc332_a">A 問題</a> 〜 <a href="https://atcoder.jp/contests/abc332/tasks/abc332_d">D 問題</a> は内容を忘れてしまった。<br>
-</p>
+      <p>E の類題には苦手意識が強い。リストモナドの DFS でも upsolve したい。<br /></p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc332/tasks/abc332_e">E 問題</a> は <a href="https://atcoder.jp/contests/abc310/tasks/abc310_d">ABC 310 D - PEACEFUL TEAMS</a> の類題だった。 DFS が下手過ぎて TLE が取れず、集合 DP への切り替えが間に合わず終了した。コンテスト後も WA を連発、単位元を大きな数に変更したら AC できた。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc332/tasks/abc332_f">F 問題</a>
+        は遅延セグメント木の問題だったみたい。 upsolve したい。<br />
+      </p>
+      <h3 id="ABC 333"><a href="#ABC 333">ABC 333</a></h3>
+      <p>
+        <a href="https://atcoder.jp/contests/abc333">ABC 333</a> に参加した。疲れ気味のため A ~ B
+        問題は省略する。<br />
+      </p>
 
-<p>
-E の類題には苦手意識が強い。リストモナドの DFS でも upsolve したい。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc333/tasks/abc333_c">C 問題</a> では cojna
+        氏の提出が埋め込みだったことが分かり面白かった。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc332/tasks/abc332_f">F 問題</a> は遅延セグメント木の問題だったみたい。 upsolve したい。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc333/tasks/abc333_d">D 問題</a>
+        では木の畳み込みの計算過程を残す、いわば木の scan を行った。<br />
+      </p>
 
-<h3 id="ABC 333"><a href="#ABC 333">ABC 333</a></h3><p>
-<a href="https://atcoder.jp/contests/abc333">ABC 333</a> に参加した。疲れ気味のため A ~ B 問題は省略する。<br>
-</p>
+      <p>
+        全頂点を根とした畳み込みを計算する全包囲木 DP においても、この木の scan を実施する。 CSR
+        (compressed sparse row) 形式のグラフにおいては全包囲木 DP を実装していなかった。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc333/tasks/abc333_c">C 問題</a> では cojna 氏の提出が埋め込みだったことが分かり面白かった。<br>
-</p>
+      <p>
+        良い機会なので <a href="https://atcoder.jp/contests/dp/tasks/dp_v">EDPC - V</a> を CSR
+        のグラフで解き直したい……が、問題スタックは貯まるばかり。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc333/tasks/abc333_d">D 問題</a> では木の畳み込みの計算過程を残す、いわば木の scan を行った。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc333/tasks/abc333_e">E 問題</a>
+        は良い感じに考察できたが、客観的に見ると実装が遅かった。<br />
+      </p>
 
-<p>
-全頂点を根とした畳み込みを計算する全包囲木 DP においても、この木の scan を実施する。 CSR (compressed sparse row) 形式のグラフにおいては全包囲木 DP を実装していなかった。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc333/tasks/abc333_f">F 問題</a> は状態数が \(N \cdot
+        2^N\) あるように見えて歯が立たなかった。解説放送を観たい。<br />
+      </p>
+      <h4 id="振り返って"><a href="#振り返って">振り返って</a></h4>
+      <p>
+        緑パフォが出たものの、特に振るわなかったという気はしない。となると、そもそものやり方が良くないのかもしれない。実装前の考察で、もっとコードの詳細まで詰めて考えるスタイルに修正してみよう思う。<br />
+      </p>
 
-<p>
-良い機会なので <a href="https://atcoder.jp/contests/dp/tasks/dp_v">EDPC - V</a> を CSR のグラフで解き直したい……が、問題スタックは貯まるばかり。<br>
-</p>
+      <p>
+        また今後の方針としては、 DP や遅延セグメント木を中心に、青 diff
+        の壁を乗り越えて行くためのポテンシャルが必要にある。引き続き PAST と青 diff DP
+        をやっていけば良さそう。<br />
+      </p>
+      <h2 id="読書"><a href="#読書">読書</a></h2>
+      <p>
+        <a href="https://www.lambdanote.com/collections/proper-erlang-elixir"
+          >実践プロパティベーステスト</a
+        >
+        を 14 % まで読んだ。良書の例にもれずプレゼンが上手く、 PBT
+        への期待が高まる。フレームワークの力を見ていきたい。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc333/tasks/abc333_e">E 問題</a> は良い感じに考察できたが、客観的に見ると実装が遅かった。<br>
-</p>
+      <p>
+        現状、僕の QuickCheck の使い道は <code>forM_</code> の替わりに
+        <code>QC.forAll</code> を書く程度のもの。 <code>cojna/iota</code> には prop test
+        の実例がたくさんあるため、参照してみたい。<br />
+      </p>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="凡百"><a href="#凡百">凡百</a></h3>
+      <p>寒いから窓を閉めようと思ったら、既に閉まっていた。<br /></p>
+      <h3 id="Haskell 本: 進捗 60 %"><a href="#Haskell 本: 進捗 60 %">Haskell 本: 進捗 60 %</a></h3>
+      <p>
+        <code>array</code> の章を書き切った。
+        <code>TypeFamilies</code>
+        拡張の有無でコンパイルエラーが変わるとは思っておらず、僕自身ためになった。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc333/tasks/abc333_f">F 問題</a> は状態数が \(N \cdot 2^N\) あるように見えて歯が立たなかった。解説放送を観たい。<br>
-</p>
+      <p>結局、スクラップをまとめた内容になっている。もうこれでいいか……！<br /></p>
 
-<h4 id="振り返って"><a href="#振り返って">振り返って</a></h4><p>
-緑パフォが出たものの、特に振るわなかったという気はしない。となると、そもそものやり方が良くないのかもしれない。実装前の考察で、もっとコードの詳細まで詰めて考えるスタイルに修正してみよう思う。<br>
-</p>
+      <p>
+        進捗はマズい。雑に <code>pandoc</code> で PDF 出力すると (コードが多いため) 70
+        ページ程度になるが、まだまだ終わらない。第四章をカットして、後からこっそり更新するつもり。<br />
+      </p>
 
-<p>
-また今後の方針としては、 DP や遅延セグメント木を中心に、青 diff の壁を乗り越えて行くためのポテンシャルが必要にある。引き続き PAST と青 diff DP をやっていけば良さそう。<br>
-</p>
+      <p>
+        特にリストモナドで DFS
+        をする章を書きたいものの、僕の苦手分野なのでまだ書けない。今後の趣味として継続的に更新するかもしれない。<br />
+      </p>
+      <h3 id="GPT-4"><a href="#GPT-4">GPT-4</a></h3>
+      <p>一時期 GPT-4 への申し込みに制限がかかっていたが、ついに順番が回ってきた。<br /></p>
 
-<h2 id="読書"><a href="#読書">読書</a></h2><p>
-<a href="https://www.lambdanote.com/collections/proper-erlang-elixir">実践プロパティベーステスト</a> を 14 % まで読んだ。良書の例にもれずプレゼンが上手く、 PBT への期待が高まる。フレームワークの力を見ていきたい。<br>
-</p>
+      <p>
+        使ってみると、 Haskell の
+        <code>MArray</code>
+        のことは理解していなかった。正しい文法で答えが返って来るだけでも驚異的ではあるものの、大体はネット検索の方が情報の質が高い。これでは
+        Haskell 本をサボることができない。<br />
+      </p>
 
-<p>
-現状、僕の QuickCheck の使い道は <code>forM_</code> の替わりに <code>QC.forAll</code> を書く程度のもの。 <code>cojna/iota</code> には prop test の実例がたくさんあるため、参照してみたい。<br>
-</p>
-
-<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="凡百"><a href="#凡百">凡百</a></h3><p>
-寒いから窓を閉めようと思ったら、既に閉まっていた。<br>
-</p>
-
-<h3 id="Haskell 本: 進捗 60 %"><a href="#Haskell 本: 進捗 60 %">Haskell 本: 進捗 60 %</a></h3><p>
-<code>array</code> の章を書き切った。 <code>TypeFamilies</code> 拡張の有無でコンパイルエラーが変わるとは思っておらず、僕自身ためになった。<br>
-</p>
-
-<p>
-結局、スクラップをまとめた内容になっている。もうこれでいいか……！<br>
-</p>
-
-<p>
-進捗はマズい。雑に <code>pandoc</code> で PDF 出力すると (コードが多いため) 70 ページ程度になるが、まだまだ終わらない。第四章をカットして、後からこっそり更新するつもり。<br>
-</p>
-
-<p>
-特にリストモナドで DFS をする章を書きたいものの、僕の苦手分野なのでまだ書けない。今後の趣味として継続的に更新するかもしれない。<br>
-</p>
-
-<h3 id="GPT-4"><a href="#GPT-4">GPT-4</a></h3><p>
-一時期 GPT-4 への申し込みに制限がかかっていたが、ついに順番が回ってきた。<br>
-</p>
-
-<p>
-使ってみると、 Haskell の <code>MArray</code> のことは理解していなかった。正しい文法で答えが返って来るだけでも驚異的ではあるものの、大体はネット検索の方が情報の質が高い。これでは Haskell 本をサボることができない。<br>
-</p>
-
-<p>
-GPT-4 を Haskell 本の添削に使ってみたい。一般的な指摘を具体例にハメた形で表示してくれる気がする。自分の文脈に合わせてもらえれば、意欲的に読める気がする。そこが AI の良い点かもしれない。<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>
+        GPT-4 を Haskell
+        本の添削に使ってみたい。一般的な指摘を具体例にハメた形で表示してくれる気がする。自分の文脈に合わせてもらえれば、意欲的に読める気がする。そこが
+        AI の良い点かもしれない。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

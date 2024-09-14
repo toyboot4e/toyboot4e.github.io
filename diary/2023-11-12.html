@@ -1,117 +1,215 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 328, AHC 026 / Mo - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 328, AHC 026 / Mo</h1><p>Nov 12, 2023</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="日々"><a href="#日々">日々</a></h3><p>
-考察用のノートを買った。日中に考察を進めておけば、夜は実装に専念できる。考察済みの問題をストックできるようになったらいいな。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 328, AHC 026 / Mo - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 328, AHC 026 / Mo</h1>
+      <p>Nov 12, 2023</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2>
+      <h3 id="日々"><a href="#日々">日々</a></h3>
+      <p>
+        考察用のノートを買った。日中に考察を進めておけば、夜は実装に専念できる。考察済みの問題をストックできるようになったらいいな。<br />
+      </p>
+      <h3 id="訓練"><a href="#訓練">訓練</a></h3>
+      <p>
+        <a href="https://qiita.com/gotoki_no_joe">@gotoki_no_joe</a> 氏の投稿を参考に、青 diff
+        の問題を upsolve した。 Haskell
+        ならではのパフォーマンスの問題を扱っていたり、独自の解法も多くて参考になる。<br />
+      </p>
 
-<h3 id="訓練"><a href="#訓練">訓練</a></h3><p>
-<a href="https://qiita.com/gotoki_no_joe">@gotoki_no_joe</a> 氏の投稿を参考に、青 diff の問題を upsolve した。 Haskell ならではのパフォーマンスの問題を扱っていたり、独自の解法も多くて参考になる。<br>
-</p>
+      <p>
+        茶色コーダー時代は人の Haskell
+        が読めなかった。今は前よりも強くなって、コードを読む自由を得た。やはりパワーユーザーとなって遊び倒すことが人生だという感じがする。<br />
+      </p>
+      <h3 id="Mo's algorithm / square root decomposition">
+        <a href="#Mo's algorithm / square root decomposition"
+          >Mo's algorithm / square root decomposition</a
+        >
+      </h3>
+      <p>
+        <a href="https://atcoder.jp/contests/abc293/tasks/abc293_g">ABC 293 G - Triple Index</a>
+        では 1 次元上の
+        <code>(l, r)</code>
+        区間に対するクエリが大量に与えられる。こうした問題はセグメント木を使うと一度のイテレーションで済む場合が多く、『平面走査』の問題として知られる。<br />
+      </p>
 
-<p>
-茶色コーダー時代は人の Haskell が読めなかった。今は前よりも強くなって、コードを読む自由を得た。やはりパワーユーザーとなって遊び倒すことが人生だという感じがする。<br>
-</p>
+      <p>
+        ABC 293 G においては、セグメント木に <code>IntMap</code> を載せたくなった。しかし boxing
+        なデータ型をセグメント木に載せるのは悪い傾向で、
+        <code>IntMap</code> 同士のマージ処理には要素数に比例する時間がかかる。当然 TLE
+        してしまった。<br />
+      </p>
 
-<h3 id="Mo's algorithm / square root decomposition"><a href="#Mo's algorithm / square root decomposition">Mo's algorithm / square root decomposition</a></h3><p>
-<a href="https://atcoder.jp/contests/abc293/tasks/abc293_g">ABC 293 G - Triple Index</a> では 1 次元上の <code>(l, r)</code> 区間に対するクエリが大量に与えられる。こうした問題はセグメント木を使うと一度のイテレーションで済む場合が多く、『平面走査』の問題として知られる。<br>
-</p>
+      <p>
+        このような場合に高速で計算する方法として Mo's algorithm
+        というのがあって、クエリの処理順を工夫することで
+        <code>(l, r)</code> 区間の伸縮の距離を一定以下に落とし込むことができる。<br />
+      </p>
 
-<p>
-ABC 293 G においては、セグメント木に <code>IntMap</code> を載せたくなった。しかし boxing なデータ型をセグメント木に載せるのは悪い傾向で、 <code>IntMap</code> 同士のマージ処理には要素数に比例する時間がかかる。当然 TLE してしまった。<br>
-</p>
+      <ul>
+        <li class="on"><code>[X]</code> Mo's algorithm を実装した！<br /></li>
+      </ul>
+      <h4 id="説明資料"><a href="#説明資料">説明資料</a></h4>
+      <ul>
+        <li>
+          <a href="https://strangerxxx.hateblo.jp/entry/20230314/1678795200"
+            >Mo's Algorithmのイメージを視覚的に理解したい - 徒然</a
+          ><br />
+          この図が一番分かりやすかった。<br />
+        </li>
+        <li>
+          <a href="https://take44444.github.io/Algorithm-Book/range/mo/main.html"
+            >Mo's algorithm - アルゴリズムとデータ構造大全</a
+          ><br />
+          この図も良かった。僕の実装も同様に \(O((L + Q) \sqrt L)\) 程度の計算量になっている。<br />
+        </li>
+        <li>
+          <a href="https://ei1333.hateblo.jp/entry/2017/09/11/211011"
+            >Mo's algorithm - ei1333の日記</a
+          ><br />
+          この図も分かりやすくて良かった。<br />
+        </li>
+        <li>
+          <a href="https://cses.fi/book/book.pdf#page=265">Competitive Programmer’s Handbook</a
+          ><br />
+          これは詳しくなかった。 Mo が載っていること自体は ◎<br />
+        </li>
+        <li>
+          <a
+            href="https://scholar.google.com/scholar?hl=en&amp;as_sdt=0%2C5&amp;q=On+the+Complexity+of+Sparse+Exon+Assembly+&amp;btnG="
+            >Carmel Kent, Gad M. Landau, Michal Ziv-Ukelson, On the Complexity of Sparse Exon
+            Assembly (2005)</a
+          ><br />
+          Mo's algorithm として知られるよりも先の研究 (無料では読めず)<br />
+        </li>
+      </ul>
+      <h4 id="ソース"><a href="#ソース">ソース</a></h4>
+      <ul>
+        <li>
+          <a href="https://cojna.github.io/iota/Algorithm-Mo.html">Algorithm.Mo</a> (<a
+            href="https://github.com/cojna/iota"
+            ><code>cojna/iota</code></a
+          >)<br />
+          抽象化の際に参照した。至福 🙏<br />
+        </li>
+        <li>
+          <a href="https://nyaannyaan.github.io/library/misc/mo.hpp.html"
+            >Mo’s algorithm | Nyaan’s Library</a
+          ><br />
+          馬鹿な、短すぎる……！<br />
+        </li>
+      </ul>
+      <h4 id="感想"><a href="#感想">感想</a></h4>
+      <p>平面走査をやり過ぎて牛になったわね。夜にもなっていた。<br /></p>
 
-<p>
-このような場合に高速で計算する方法として Mo's algorithm というのがあって、クエリの処理順を工夫することで <code>(l, r)</code> 区間の伸縮の距離を一定以下に落とし込むことができる。<br>
-</p>
+      <p>
+        Mo というのは牛の鳴き声ではなく、選手の名前だったらしい (<a
+          href="https://codeforces.com/blog/entry/20032?#comment-248430"
+          >リンク: Codeforces</a
+        >) 。 Chokudai サーチみたいなものか。牛になる時代は終わった。これからは Mo になるのだ。<br />
+      </p>
 
-<ul><li class="on"><code>[X]</code> Mo's algorithm を実装した！<br></li>
-</ul>
+      <p>
+        魔法的アルゴリズムの謎を 1 つ uncover できた。進んだトピックでは rollback
+        するとか何とか。あまり深淵を覗き込むと心が折れるので、典型一発で満足しておこう。<br />
+      </p>
+      <h3 id="AHC 026"><a href="#AHC 026">AHC 026</a></h3>
+      <p>
+        <a href="https://atcoder.jp/contests/ahc026">AHC 026</a>
+        に参加した。今回は短期コンで、貪欲法で 1,200 パフォが出た。ひとまず良し。<br />
+      </p>
 
-<h4 id="説明資料"><a href="#説明資料">説明資料</a></h4><ul><li><a href="https://strangerxxx.hateblo.jp/entry/20230314/1678795200">Mo's Algorithmのイメージを視覚的に理解したい - 徒然</a><br>
-この図が一番分かりやすかった。<br></li>
-<li><a href="https://take44444.github.io/Algorithm-Book/range/mo/main.html">Mo's algorithm - アルゴリズムとデータ構造大全</a><br>
-この図も良かった。僕の実装も同様に \(O((L + Q) \sqrt L)\) 程度の計算量になっている。<br></li>
-<li><a href="https://ei1333.hateblo.jp/entry/2017/09/11/211011">Mo's algorithm - ei1333の日記</a><br>
-この図も分かりやすくて良かった。<br></li>
-<li><a href="https://cses.fi/book/book.pdf#page=265">Competitive Programmer’s Handbook</a><br>
-これは詳しくなかった。 Mo が載っていること自体は ◎<br></li>
-<li><a href="https://scholar.google.com/scholar?hl=en&amp;as_sdt=0%2C5&amp;q=On+the+Complexity+of+Sparse+Exon+Assembly+&amp;btnG=">Carmel Kent, Gad M. Landau, Michal Ziv-Ukelson, On the Complexity of Sparse Exon Assembly (2005)</a><br>
-Mo's algorithm として知られるよりも先の研究 (無料では読めず)<br></li>
-</ul>
+      <p>
+        可変配列との付き合い方が全然分からず、しょっちゅう <code>unsafeFreeze</code> している。
+        Thunder 本をやりつつ Haskell の書き方を考えたい。<br />
+      </p>
+      <h3 id="ABC 328"><a href="#ABC 328">ABC 328</a></h3>
+      <p>
+        <a href="https://atcoder.jp/contests/abc328">ABC 328</a> に参加した。 5 完 (A ~ E)
+        だった。<br />
+      </p>
+      <h4 id="意気込み・振り返り"><a href="#意気込み・振り返り">意気込み・振り返り</a></h4>
+      <p>
+        C まで 15 分、 E まで 40 分を目指した。後半に時間を残せば、高 diff
+        の問題を通せる確率が上がる。<br />
+      </p>
 
-<h4 id="ソース"><a href="#ソース">ソース</a></h4><ul><li><a href="https://cojna.github.io/iota/Algorithm-Mo.html">Algorithm.Mo</a> (<a href="https://github.com/cojna/iota"><code>cojna/iota</code></a>)<br>
-抽象化の際に参照した。至福 🙏<br></li>
-<li><a href="https://nyaannyaan.github.io/library/misc/mo.hpp.html">Mo’s algorithm | Nyaan’s Library</a><br>
-馬鹿な、短すぎる……！<br></li>
-</ul>
+      <p>
+        しかし実際は E まで 65 分かかり、 F を解くために 5
+        分足りなかった。考察・設計の弱さが出た。<br />
+      </p>
+      <h4 id="解法"><a href="#解法">解法</a></h4>
+      <p>
+        <a href="https://atcoder.jp/contests/abc328/tasks/abc328_a">A 問題</a> は
+        <code>U.sum $ U.filter (&lt;= x) ds</code> だった。<br />
+      </p>
 
-<h4 id="感想"><a href="#感想">感想</a></h4><p>
-平面走査をやり過ぎて牛になったわね。夜にもなっていた。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc328/tasks/abc328_b">B 問題</a> は
+        <code>Sum</code> の <code>foldMap</code> の気持ちで解いた (<code>sum</code>
+        は手動で呼び出した) 。<br />
+      </p>
 
-<p>
-Mo というのは牛の鳴き声ではなく、選手の名前だったらしい (<a href="https://codeforces.com/blog/entry/20032?#comment-248430">リンク: Codeforces</a>) 。 Chokudai サーチみたいなものか。牛になる時代は終わった。これからは Mo になるのだ。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc328/tasks/abc328_c">C 問題</a>
+        は隣接二項の比較結果を累積和にして解いた。実はクエリ平方分割 (Mo)
+        でも解けるらしい。やってみた。<br />
+      </p>
 
-<p>
-魔法的アルゴリズムの謎を 1 つ uncover できた。進んだトピックでは rollback するとか何とか。あまり深淵を覗き込むと心が折れるので、典型一発で満足しておこう。<br>
-</p>
+      <p>
+        ところで API ドキュメントを参照する際にブラウザに移るのが良くない。エディタから
+        <code>consult-ghq</code> でソースを覗きに行こうと思う。<br />
+      </p>
 
-<h3 id="AHC 026"><a href="#AHC 026">AHC 026</a></h3><p>
-<a href="https://atcoder.jp/contests/ahc026">AHC 026</a> に参加した。今回は短期コンで、貪欲法で 1,200 パフォが出た。ひとまず良し。<br>
-</p>
+      <figure>
+        <img
+          src="./img/2023-11-12-multiple-projects.png"
+          alt="2023-11-12-multiple-projects.png"
+        /><br />
 
-<p>
-可変配列との付き合い方が全然分からず、しょっちゅう <code>unsafeFreeze</code> している。 Thunder 本をやりつつ Haskell の書き方を考えたい。<br>
-</p>
+        <figcaption>
+          <span class="figure-number">Figure 1: </span>Mo で解いてみた。タブバーに
+          <code>vector</code> など依存パッケージを開く
+        </figcaption>
+      </figure>
 
-<h3 id="ABC 328"><a href="#ABC 328">ABC 328</a></h3><p>
-<a href="https://atcoder.jp/contests/abc328">ABC 328</a> に参加した。 5 完 (A ~ E) だった。<br>
-</p>
+      <blockquote>
+        <p>
+          本当は Hoogle + FZF でパッケージを指定して絞り込みしたい。
+          <a href="https://codeberg.org/rahguzar/consult-hoogle">consult-hoogle</a>
+          は壊れているようで、コントリビュートしなきゃだけれど、うーん<br />
+        </p>
+      </blockquote>
 
-<h4 id="意気込み・振り返り"><a href="#意気込み・振り返り">意気込み・振り返り</a></h4><p>
-C まで 15 分、 E まで 40 分を目指した。後半に時間を残せば、高 diff の問題を通せる確率が上がる。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc328/tasks/abc328_d">D 問題</a> では Haskell には無い
+        <code>Vec&lt;T&gt;</code> が必要……いや <code>cojna/iota</code> の
+        <code>Data.Buffer</code> があるじゃないか！　AC! AC!<br />
+      </p>
 
-<p>
-しかし実際は E まで 65 分かかり、 F を解くために 5 分足りなかった。考察・設計の弱さが出た。<br>
-</p>
-
-<h4 id="解法"><a href="#解法">解法</a></h4><p>
-<a href="https://atcoder.jp/contests/abc328/tasks/abc328_a">A 問題</a> は <code>U.sum $ U.filter (&lt;= x) ds</code> だった。<br>
-</p>
-
-<p>
-<a href="https://atcoder.jp/contests/abc328/tasks/abc328_b">B 問題</a> は <code>Sum</code> の <code>foldMap</code> の気持ちで解いた (<code>sum</code> は手動で呼び出した) 。<br>
-</p>
-
-<p>
-<a href="https://atcoder.jp/contests/abc328/tasks/abc328_c">C 問題</a> は隣接二項の比較結果を累積和にして解いた。実はクエリ平方分割 (Mo) でも解けるらしい。やってみた。<br>
-</p>
-
-<p>
-ところで API ドキュメントを参照する際にブラウザに移るのが良くない。エディタから <code>consult-ghq</code> でソースを覗きに行こうと思う。<br>
-</p>
-
-
-<figure>
-<img src="./img/2023-11-12-multiple-projects.png" alt="2023-11-12-multiple-projects.png"><br>
-
-<figcaption><span class="figure-number">Figure 1: </span>Mo で解いてみた。タブバーに <code>vector</code> など依存パッケージを開く</figcaption>
-</figure>
-
-<blockquote>
-<p>
-本当は Hoogle + FZF でパッケージを指定して絞り込みしたい。 <a href="https://codeberg.org/rahguzar/consult-hoogle">consult-hoogle</a> は壊れているようで、コントリビュートしなきゃだけれど、うーん<br>
-</p>
-</blockquote>
-
-<p>
-<a href="https://atcoder.jp/contests/abc328/tasks/abc328_d">D 問題</a> では Haskell には無い <code>Vec&lt;T&gt;</code> が必要……いや <code>cojna/iota</code> の <code>Data.Buffer</code> があるじゃないか！　AC! AC!<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">main :: IO ()
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main :: IO ()
 main = do
   !s &lt;- BS.getLine
 
@@ -129,54 +227,88 @@ main = do
   !res &lt;- unsafeFreezeBuffer buf
   putStrLn $ U.toList res
 </code></pre>
-</div>
+      </div>
 
-<p>
-<a href="https://atcoder.jp/contests/abc328/tasks/abc328_e">E 問題</a> では、頂点 0, 1, .. と順に走査し、各頂点から最大 1 つの辺を貼ると考えた。計算量は \(9^8 = 43,046,721\) 程度となって、枝刈りで \(10^7\) 以内に収まると踏んだ。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc328/tasks/abc328_e">E 問題</a> では、頂点 0, 1, ..
+        と順に走査し、各頂点から最大 1 つの辺を貼ると考えた。計算量は \(9^8 = 43,046,721\)
+        程度となって、枝刈りで \(10^7\) 以内に収まると踏んだ。<br />
+      </p>
 
-<p>
-実は (頂点数 - 1) の辺を選び全域木になるか試せば良いそうで、確かに……。集合 DP も upsolve したい。<br>
-</p>
+      <p>
+        実は (頂点数 - 1) の辺を選び全域木になるか試せば良いそうで、確かに……。集合 DP も upsolve
+        したい。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc328/tasks/abc328_f">F 問題</a> では時間切れとなった。ポテンシャル／関係式付き Union-Find で解くと典型らしい。 Upsolve したい。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc328/tasks/abc328_f">F 問題</a>
+        では時間切れとなった。ポテンシャル／関係式付き Union-Find で解くと典型らしい。 Upsolve
+        したい。<br />
+      </p>
+      <h2 id="読書"><a href="#読書">読書</a></h2>
+      <p>
+        <a href="https://booth.pm/ja/items/1577541">Haskellで戦う競技プログラミング 第2版</a>
+        を読み返した。恐ろしくよく書かれている。<br />
+      </p>
 
-<h2 id="読書"><a href="#読書">読書</a></h2><p>
-<a href="https://booth.pm/ja/items/1577541">Haskellで戦う競技プログラミング 第2版</a> を読み返した。恐ろしくよく書かれている。<br>
-</p>
+      <ul>
+        <li>
+          <code>containers</code> 関係<br />
+          <ul>
+            <li>
+              <code>Map</code> などは lazy 版と実装を共有している。型クラスの実装も lazy
+              になっているため注意<br />
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>vector</code> 関係<br />
+          <ul>
+            <li><code>U.generate n id</code> による連番生成<br /></li>
+            <li><code>U.forM_</code>, <code>U.foldM'_</code> は安定して速い<br /></li>
+            <li>
+              <code>IO</code>, <code>ST</code> を除いて <code>U.mapM</code>,
+              <code>U.zipWithM</code>, <code>U.replicateM</code> は遅い (!?)<br />
+            </li>
+            <li>
+              <code>U.concatMap</code> よりもリストの <code>concatMap</code> の方が速い (?)<br />
+            </li>
+            <li><code>U.constructN</code> が遅い ← 現在の環境では高速な模様<br /></li>
+          </ul>
+        </li>
+        <li>
+          <code>IORef</code> は <code>IORef</code> → <code>MutVar#</code> →
+          <code>I#</code> のようなダブルポインタ<br />
+        </li>
+      </ul>
+      <h2 id="Haskell 本"><a href="#Haskell 本">Haskell 本</a></h2>
+      <h3 id="進捗: 10%"><a href="#進捗: 10%">進捗: 10%</a></h3>
+      <p>小さい章が 50 個くらいになりそう。間に合うか……？<br /></p>
+      <h3 id="日々"><a href="#日々">日々</a></h3>
+      <p>
+        Thousandfold (Eluveitie) を聴いた。 1,000 回畳み込みをするわけではなく、『1,000
+        倍の』という意味みたい。『Thousandfold thunk』がピッタリ。<br />
+      </p>
+      <h3 id="動的リンク: 失敗"><a href="#動的リンク: 失敗">動的リンク: 失敗</a></h3>
+      <p>
+        <a href="https://wiki.archlinux.org/title/haskell">Haskell - ArchWiki</a>
+        にある通り動的リンクを試してみたが、効果が得られた実感は無かった。<br />
+      </p>
 
-<ul><li><code>containers</code> 関係<br>
-<ul><li><code>Map</code> などは lazy 版と実装を共有している。型クラスの実装も lazy になっているため注意<br></li>
-</ul></li>
-<li><code>vector</code> 関係<br>
-<ul><li><code>U.generate n id</code> による連番生成<br></li>
-<li><code>U.forM_</code>, <code>U.foldM'_</code> は安定して速い<br></li>
-<li><code>IO</code>, <code>ST</code> を除いて <code>U.mapM</code>, <code>U.zipWithM</code>, <code>U.replicateM</code> は遅い (!?)<br></li>
-<li><code>U.concatMap</code> よりもリストの <code>concatMap</code> の方が速い (?)<br></li>
-<li><code>U.constructN</code> が遅い ← 現在の環境では高速な模様<br></li>
-</ul></li>
-<li><code>IORef</code> は <code>IORef</code> → <code>MutVar#</code> → <code>I#</code> のようなダブルポインタ<br></li>
-</ul>
-
-<h2 id="Haskell 本"><a href="#Haskell 本">Haskell 本</a></h2><h3 id="進捗: 10%"><a href="#進捗: 10%">進捗: 10%</a></h3><p>
-小さい章が 50 個くらいになりそう。間に合うか……？<br>
-</p>
-
-<h3 id="日々"><a href="#日々">日々</a></h3><p>
-Thousandfold (Eluveitie) を聴いた。 1,000 回畳み込みをするわけではなく、『1,000  倍の』という意味みたい。『Thousandfold thunk』がピッタリ。<br>
-</p>
-
-<h3 id="動的リンク: 失敗"><a href="#動的リンク: 失敗">動的リンク: 失敗</a></h3><p>
-<a href="https://wiki.archlinux.org/title/haskell">Haskell - ArchWiki</a> にある通り動的リンクを試してみたが、効果が得られた実感は無かった。<br>
-</p>
-
-<p>
-NixOS にいるためだろうか。保留。<br>
-</p>
-
-<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="Emacs"><a href="#Emacs">Emacs</a></h3><p>
-<code>consult</code> (Emacs の fuzzy finder) が動かん……と思いきや、 <a href="https://github.com/minad/consult/issues/887#issuecomment-1802688749">2 日前に Minad 神が一瞬で解決していた</a> 。残 Issue/PR 数が 0 だと……！<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>NixOS にいるためだろうか。保留。<br /></p>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="Emacs"><a href="#Emacs">Emacs</a></h3>
+      <p>
+        <code>consult</code> (Emacs の fuzzy finder) が動かん……と思いきや、
+        <a href="https://github.com/minad/consult/issues/887#issuecomment-1802688749"
+          >2 日前に Minad 神が一瞬で解決していた</a
+        >
+        。残 Issue/PR 数が 0 だと……！<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

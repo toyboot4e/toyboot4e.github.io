@@ -1,140 +1,210 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 352 / HLD - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 352 / HLD</h1><p>May  5, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="ABC 352"><a href="#ABC 352">ABC 352</a></h2><p>
-ABC 352 に参加しました。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 352 / HLD - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 352 / HLD</h1>
+      <p>May 5, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 352"><a href="#ABC 352">ABC 352</a></h2>
+      <p>ABC 352 に参加しました。<br /></p>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc352/tasks/abc352_a">A 問題</a></a>
+      </h3>
+      <p>比較演算子の練習問題です。<br /></p>
 
-<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc352/tasks/abc352_a">A 問題</a></a></h3><p>
-比較演算子の練習問題です。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">main=interact$(\[_,b,c,d]-&gt;if min b c&lt;=d&amp;&amp;d&lt;=max b c then"Yes"else"No").map (read @Int).words
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$(\[_,b,c,d]-&gt;if min b c&lt;=d&amp;&amp;d&lt;=max b c then"Yes"else"No").map (read @Int).words
 </code></pre>
-</div>
+      </div>
 
-<p>
-<a href="https://atcoder.jp/contests/abc352/submissions/53148584">cojna さんの提出</a> を読むと、 <code>if then else</code> よりもガードを使った方が短くなるようです。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc352/submissions/53148584">cojna さんの提出</a>
+        を読むと、 <code>if then else</code> よりもガードを使った方が短くなるようです。<br />
+      </p>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc352/tasks/abc352_b">B 問題</a></a>
+      </h3>
+      <p>
+        2 つのイレテータをマッチさせていくような問題です。 Haskell
+        においてはパターンマッチを使うのが簡単です。<br />
+      </p>
 
-<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc352/tasks/abc352_b">B 問題</a></a></h3><p>
-2 つのイレテータをマッチさせていくような問題です。 Haskell においてはパターンマッチを使うのが簡単です。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">main=(f 1&lt;$&gt;getLine&lt;*&gt;getLine)&gt;&gt;=putStr.unwords.map show
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=(f 1&lt;$&gt;getLine&lt;*&gt;getLine)&gt;&gt;=putStr.unwords.map show
 f i[]_ = [];f i(x:a)(y:b)|x==y=i:f(i+1)a b|True=f(i+1)(x:a)b
 </code></pre>
-</div>
+      </div>
 
-<p>
-<a href="https://atcoder.jp/contests/abc352/submissions/53148902">cojna さんの提出</a> では再帰関数ならぬ再帰演算子 <code>%</code> が定義されており面白いです。 <code>shows</code> で <code>unwords.map show</code> を手動実装しているのもゴルフ界の重要な典型に違いありません。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc352/submissions/53148902">cojna さんの提出</a>
+        では再帰関数ならぬ再帰演算子 <code>%</code> が定義されており面白いです。
+        <code>shows</code> で
+        <code>unwords.map show</code>
+        を手動実装しているのもゴルフ界の重要な典型に違いありません。<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-hs">ghci&gt; (show 13 ++) "abc"
+      <div class="org-src-container">
+        <pre><code class="src language-hs">ghci&gt; (show 13 ++) "abc"
 "13abc"
 ghci&gt; shows 13 "abc"
 "13abc"
 </code></pre>
-</div>
+      </div>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc352/tasks/abc352_c">C 問題</a></a>
+      </h3>
+      <p>設定が面白い問題でした。モハラン先生の新作が生まれました。<br /></p>
 
-<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc352/tasks/abc352_c">C 問題</a></a></h3><p>
-設定が面白い問題でした。モハラン先生の新作が生まれました。<br>
-</p>
+      <blockquote class="twitter-tweet">
+        <p lang="en" dir="ltr">
+          C - Standing On The Shoulders
+          <a href="https://t.co/BFgDlxPgmy">pic.twitter.com/BFgDlxPgmy</a>
+        </p>
+        &mdash; モハラン (@programsamisii)
+        <a href="https://twitter.com/programsamisii/status/1786760224281653412?ref_src=twsrc%5Etfw"
+          >May 4, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">C - Standing On The Shoulders <a href="https://t.co/BFgDlxPgmy">pic.twitter.com/BFgDlxPgmy</a></p>&mdash; モハラン (@programsamisii) <a href="https://twitter.com/programsamisii/status/1786760224281653412?ref_src=twsrc%5Etfw">May 4, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">main=interact$show.((+)&lt;$&gt;sum.map snd.filter(even.fst).zip[0..]&lt;*&gt;f).tail.map read.words
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$show.((+)&lt;$&gt;sum.map snd.filter(even.fst).zip[0..]&lt;*&gt;f).tail.map read.words
 f[]=0
 f(x:y:r)=max(y-x)(f r)
 </code></pre>
-</div>
+      </div>
 
-<p>
-<a href="https://atcoder.jp/contests/abc352/submissions/53149067">cojna さんの提出</a> ではリスト内包表記を使ってコードが短縮されていました。強い……！<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc352/submissions/53149067">cojna さんの提出</a>
+        ではリスト内包表記を使ってコードが短縮されていました。強い……！<br />
+      </p>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc352/tasks/abc352_d">D 問題</a></a>
+      </h3>
+      <p>値 → 添字のマップ (配列) <code>is</code> を作ります。<br /></p>
 
-<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc352/tasks/abc352_d">D 問題</a></a></h3><p>
-値 → 添字のマップ (配列) <code>is</code> を作ります。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">is &lt;- U.update (U.replicate n (-1 :: Int)) . U.imap (flip (,)) . U.map pred &lt;$&gt; intsU'
+      <div class="org-src-container">
+        <pre><code class="src language-hs">is &lt;- U.update (U.replicate n (-1 :: Int)) . U.imap (flip (,)) . U.map pred &lt;$&gt; intsU'
 </code></pre>
-</div>
+      </div>
 
-<p>
-<code>IntSet</code> を状態として <code>is</code> を幅 k の窓で見る尺取法を実施すれば良く、以下の形で解けました。<br>
-</p>
+      <p>
+        <code>IntSet</code> を状態として <code>is</code> を幅 k
+        の窓で見る尺取法を実施すれば良く、以下の形で解けました。<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-hs">U.foldl' step s0 $ U.zip (U.drop k is) is
+      <div class="org-src-container">
+        <pre><code class="src language-hs">U.foldl' step s0 $ U.zip (U.drop k is) is
   where
     s0 = {- .. -}
     step acc (!push, !pop) = {- .. -}
 </code></pre>
-</div>
+      </div>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc352/tasks/abc352_e">E 問題</a></a>
+      </h3>
+      <p>
+        辺の数が異常に多いですが、最小全域木を作る問題なので Kruskal 法を実施するだけでした。<br />
+      </p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc352/tasks/abc352_f">F 問題</a></a>
+      </h3>
+      <p>ポテンシャル付き Union-Find 木を使って楽をしつつ、全探索解を提出しました。<br /></p>
 
-<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc352/tasks/abc352_e">E 問題</a></a></h3><p>
-辺の数が異常に多いですが、最小全域木を作る問題なので Kruskal 法を実施するだけでした。<br>
-</p>
+      <p>集合 DP らしいですがピンと来ていません。 Upsolve するぞ〜<br /></p>
+      <h2 id="HL 分解 (heavy-light decomposition)">
+        <a href="#HL 分解 (heavy-light decomposition)">HL 分解 (heavy-light decomposition)</a>
+      </h2>
+      <p>
+        HLD を習得しました。 HLD の機能は、ダブリングによる LCA
+        の上位互換だったと思います。更新に強く、非可換なモノイドも任意の経路に沿って畳み込みできます。<br />
+      </p>
 
-<h3 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc352/tasks/abc352_f">F 問題</a></a></h3><p>
-ポテンシャル付き Union-Find 木を使って楽をしつつ、全探索解を提出しました。<br>
-</p>
+      <p>以下は HLD のお気持ち解説です。かえって混乱する危険もありますが、悪しからず……<br /></p>
+      <h3 id="LCA (ダブリング) の復習">
+        <a href="#LCA (ダブリング) の復習">LCA (ダブリング) の復習</a>
+      </h3>
+      <p>
+        木に対して <code>(親頂点, モノイド)</code> のペアをダブリングすると、 LCA
+        および可換モノイドの畳み込みが \(O(\log N)\) 程度で計算できるのでした (<a
+          href="https://zenn.dev/link/comments/5d69da97c0ddea"
+          >メモ</a
+        >) 。<br />
+      </p>
 
-<p>
-集合 DP らしいですがピンと来ていません。 Upsolve するぞ〜<br>
-</p>
+      <blockquote>
+        <p>
+          注: 僕の実装は \(O(\log^2 N)\) でした。 \(O(\log N)\) 実装はどうやるんでしょう……<br />
+        </p>
+      </blockquote>
+      <h3 id="HLD の学習資料"><a href="#HLD の学習資料">HLD の学習資料</a></h3>
+      <p>HLD の概要を掴むため、以下の資料を参照しました。難航しました。<br /></p>
 
-<h2 id="HL 分解 (heavy-light decomposition)"><a href="#HL 分解 (heavy-light decomposition)">HL 分解 (heavy-light decomposition)</a></h2><p>
-HLD を習得しました。 HLD の機能は、ダブリングによる LCA の上位互換だったと思います。更新に強く、非可換なモノイドも任意の経路に沿って畳み込みできます。<br>
-</p>
+      <ul>
+        <li>
+          <a href="https://take44444.github.io/Algorithm-Book/graph/tree/hld/main.html"
+            >HL分解 - アルゴリズムとデータ構造大全</a
+          ><br />
+          図や計算量の解説が明快で良かったです。しかしパスクエリ以降の説明が具体的過ぎて追えませんでした。<br />
+        </li>
 
-<p>
-以下は HLD のお気持ち解説です。かえって混乱する危険もありますが、悪しからず……<br>
-</p>
+        <li>
+          <a href="https://codeforces.com/blog/entry/53170">Easiest HLD with subtree queries</a
+          ><br />
+          コードが短いのは良さそうでした。しかし cojna/iota とは HLD
+          の形式が異なるため、メンタルモデルが全く分かりませんでした。<br />
+        </li>
+      </ul>
 
-<h3 id="LCA (ダブリング) の復習"><a href="#LCA (ダブリング) の復習">LCA (ダブリング) の復習</a></h3><p>
-木に対して <code>(親頂点, モノイド)</code> のペアをダブリングすると、 LCA および可換モノイドの畳み込みが \(O(\log N)\) 程度で計算できるのでした (<a href="https://zenn.dev/link/comments/5d69da97c0ddea">メモ</a>) 。<br>
-</p>
+      <p>
+        詳細は
+        <a href="https://github.com/cojna/iota/blob/master/src/Data/Graph/Tree/HLD.hs"
+          >cojna/iota の HLD</a
+        >
+        および
+        <a href="https://judge.yosupo.jp/submission/73349">maspy さんの提出</a>
+        を写経して理解しました。<br />
+      </p>
 
-<blockquote>
-<p>
-注: 僕の実装は \(O(\log^2 N)\) でした。 \(O(\log N)\) 実装はどうやるんでしょう……<br>
-</p>
-</blockquote>
+      <ul>
+        <li>
+          cojna さんの HLD<br />
+          木 DP を畳み込みとして書いているのが良かったです。また
+          <code>SparseGraph</code> に親しみがあったため細部まで完全に理解できました。<br />
+        </li>
 
-<h3 id="HLD の学習資料"><a href="#HLD の学習資料">HLD の学習資料</a></h3><p>
-HLD の概要を掴むため、以下の資料を参照しました。難航しました。<br>
-</p>
+        <li>
+          maspy さんの提出<br />
+          非可換モノイドの畳み込み経路の作り方を学びました (<code>get_path_decomposition</code>) 。
+          HLD に合わせてセグメント木を管理する <code>TreeMonoid</code> を丸パクリしました。<br />
+        </li>
+      </ul>
+      <h3 id="HLD の概要"><a href="#HLD の概要">HLD の概要</a></h3>
+      <p>HLD の出力を以下とします。フィールド毎に解説します。<br /></p>
 
-<ul><li><a href="https://take44444.github.io/Algorithm-Book/graph/tree/hld/main.html">HL分解 - アルゴリズムとデータ構造大全</a><br>
-図や計算量の解説が明快で良かったです。しかしパスクエリ以降の説明が具体的過ぎて追えませんでした。<br></li>
-
-<li><a href="https://codeforces.com/blog/entry/53170">Easiest HLD with subtree queries</a><br>
-コードが短いのは良さそうでした。しかし cojna/iota とは HLD の形式が異なるため、メンタルモデルが全く分かりませんでした。<br></li>
-</ul>
-
-<p>
-詳細は <a href="https://github.com/cojna/iota/blob/master/src/Data/Graph/Tree/HLD.hs">cojna/iota の HLD</a> および <a href="https://judge.yosupo.jp/submission/73349">maspy さんの提出</a> を写経して理解しました。<br>
-</p>
-
-<ul><li>cojna さんの HLD<br>
-木 DP を畳み込みとして書いているのが良かったです。また <code>SparseGraph</code> に親しみがあったため細部まで完全に理解できました。<br></li>
-
-<li>maspy さんの提出<br>
-非可換モノイドの畳み込み経路の作り方を学びました (<code>get_path_decomposition</code>) 。 HLD に合わせてセグメント木を管理する <code>TreeMonoid</code> を丸パクリしました。<br></li>
-</ul>
-
-<h3 id="HLD の概要"><a href="#HLD の概要">HLD の概要</a></h3><p>
-HLD の出力を以下とします。フィールド毎に解説します。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">data HLD = HLD
+      <div class="org-src-container">
+        <pre><code class="src language-hs">data HLD = HLD
   { -- | `Vertex` -&gt; Parent `Vertex`.
     parentHLD :: !(U.Vector Vertex),
     -- | `Vertex` -&gt; Reindexed vertex (`VertexHLD`).
@@ -144,74 +214,84 @@ HLD の出力を以下とします。フィールド毎に解説します。<br>
   }
   deriving (Show, Eq)
 </code></pre>
-</div>
+      </div>
+      <h4 id="元の木"><a href="#元の木">元の木</a></h4>
+      <p>木にはランダムな頂点番号が割り振られているものとします。<br /></p>
 
-<h4 id="元の木"><a href="#元の木">元の木</a></h4><p>
-木にはランダムな頂点番号が割り振られているものとします。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-txt">  0--8--7--3--1--2--12--13--15--14     XX: Vertex
+      <div class="org-src-container">
+        <pre><code class="src language-txt">  0--8--7--3--1--2--12--13--15--14     XX: Vertex
      |        |                         --: 辺
  10--5        11--8--6                   |: 頂点
      |
      4
 </code></pre>
-</div>
+      </div>
+      <h4 id="indexHLD: Vertex -> VertexHLD">
+        <a href="#indexHLD: Vertex -> VertexHLD"
+          ><code>indexHLD</code>: <code>Vertex -&gt; VertexHLD</code></a
+        >
+      </h4>
+      <p>
+        <code>indexHLD</code>
+        は頂点番号の再割当てです。木を列に分けた時、同じ列にある頂点の番号が連続するように再割当てを行います。<br />
+      </p>
 
-<h4 id="indexHLD: Vertex -> VertexHLD"><a href="#indexHLD: Vertex -> VertexHLD"><code>indexHLD</code>: <code>Vertex -&gt; VertexHLD</code></a></h4><p>
-<code>indexHLD</code> は頂点番号の再割当てです。木を列に分けた時、同じ列にある頂点の番号が連続するように再割当てを行います。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-txt"> 0==1==2==3==4==5==6==7==8==9     XX: VertexHLD
+      <div class="org-src-container">
+        <pre><code class="src language-txt"> 0==1==2==3==4==5==6==7==8==9     XX: VertexHLD
     |        |                     ==: 同じ列にある辺
 14==13       10==11==12            |: 他の列を繋ぐ辺
     |
     15
 </code></pre>
-</div>
+      </div>
 
-<p>
-<code>Vertex</code> と <code>VertexHLD</code> は注意深く区別する必要があります。 <strong><code>newtype</code> を作った方が良かった</strong> かもしれません。<br>
-</p>
+      <p>
+        <code>Vertex</code> と <code>VertexHLD</code> は注意深く区別する必要があります。
+        <strong><code>newtype</code> を作った方が良かった</strong> かもしれません。<br />
+      </p>
 
-<p>
-なお長い列を貪欲に作ると、列の数は十分小さくなるようです (\(\log N\) 程度？) 。<br>
-</p>
+      <p>なお長い列を貪欲に作ると、列の数は十分小さくなるようです (\(\log N\) 程度？) 。<br /></p>
+      <h4 id="headHLD: Vertex -> Vertex">
+        <a href="#headHLD: Vertex -> Vertex"
+          ><code>headHLD</code>: <code>Vertex -&gt; Vertex</code></a
+        >
+      </h4>
+      <p><code>headHLD</code> は、各列の頂点を列の『頭』に写します。<br /></p>
 
-<h4 id="headHLD: Vertex -> Vertex"><a href="#headHLD: Vertex -> Vertex"><code>headHLD</code>: <code>Vertex -&gt; Vertex</code></a></h4><p>
-<code>headHLD</code> は、各列の頂点を列の『頭』に写します。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-txt"> 0==0==0==0==0==0==0==0==0==0    XX: Vertex (VertexHLD ではない)
+      <div class="org-src-container">
+        <pre><code class="src language-txt"> 0==0==0==0==0==0==0==0==0==0    XX: Vertex (VertexHLD ではない)
     |     |
  5==5     11==11==11
     |
     4
 </code></pre>
-</div>
+      </div>
+      <h4 id="parentHLD: Vertex -> Vertex">
+        <a href="#parentHLD: Vertex -> Vertex"><code>parentHLD: Vertex -&gt; Vertex</code></a>
+      </h4>
+      <p><code>parentHLD</code> は頂点を親頂点に写します。<br /></p>
 
-<h4 id="parentHLD: Vertex -> Vertex"><a href="#parentHLD: Vertex -> Vertex"><code>parentHLD: Vertex -&gt; Vertex</code></a></h4><p>
-<code>parentHLD</code> は頂点を親頂点に写します。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-txt"> (-1)==0==8==7==3==1==2==12==13==15   XX: Vertex (VertexHLD ではない)
+      <div class="org-src-container">
+        <pre><code class="src language-txt"> (-1)==0==8==7==3==1==2==12==13==15   XX: Vertex (VertexHLD ではない)
        |        |
     5==8        1==11=8
        |
        5
 </code></pre>
-</div>
+      </div>
+      <h4 id="LCA の求め方 (\(O(N \log N)\))">
+        <a href="#LCA の求め方 (\(O(N \log N)\))">LCA の求め方 (\(O(N \log N)\))</a>
+      </h4>
+      <p>
+        <code>lca(u, v)</code> を求めるには、 2 頂点 <code>(u, v</code>)
+        を徐々に上へ引き上げて行きます。<br />
+      </p>
 
-<h4 id="LCA の求め方 (\(O(N \log N)\))"><a href="#LCA の求め方 (\(O(N \log N)\))">LCA の求め方 (\(O(N \log N)\))</a></h4><p>
-<code>lca(u, v)</code> を求めるには、 2 頂点 <code>(u, v</code>) を徐々に上へ引き上げて行きます。<br>
-</p>
-
-<div class="org-src-container">
-<label class="org-src-name"><span class="listing-number">Listing 1: </span>LCA の求め方 (気持ち)</label><pre><code class="src language-hs">let lca = do
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span>LCA の求め方 (気持ち)</label
+        >
+        <pre><code class="src language-hs">let lca = do
   let 引き上げ操作 = do
     `headHLD` を使って列の頭まで移動する
     `parentHLD` を使って列の頭から親の列へ移動する
@@ -222,66 +302,111 @@ HLD の出力を以下とします。フィールド毎に解説します。<br>
       loop u' v'
   loop
 </code></pre>
-</div>
+      </div>
+      <h4 id="セグメント木によるモノイドの畳み込み (\(O(N \log^2 N)\))">
+        <a href="#セグメント木によるモノイドの畳み込み (\(O(N \log^2 N)\))"
+          >セグメント木によるモノイドの畳み込み (\(O(N \log^2 N)\))</a
+        >
+      </h4>
+      <p>
+        1 本のセグメント木にすべての頂点 (<code>VertexHLD</code>) が収まります。 LCA
+        と同様の計算過程で各列の
+        <code>(indexHLD U.! u, indexHLD U.! headOf u)</code>
+        を残せば、セグメント木の上で畳み込みできます。<br />
+      </p>
 
-<h4 id="セグメント木によるモノイドの畳み込み (\(O(N \log^2 N)\))"><a href="#セグメント木によるモノイドの畳み込み (\(O(N \log^2 N)\))">セグメント木によるモノイドの畳み込み (\(O(N \log^2 N)\))</a></h4><p>
-1 本のセグメント木にすべての頂点 (<code>VertexHLD</code>) が収まります。 LCA と同様の計算過程で各列の <code>(indexHLD U.! u, indexHLD U.! headOf u)</code> を残せば、セグメント木の上で畳み込みできます。<br>
-</p>
+      <p>
+        可換モノイドを畳み込むためには、下から上 (<code>u -&gt; lca(u, v)</code>) と上から下 (<code
+          >lca(u, v) -&gt; v</code
+        >) の双方向の畳み込みが必要です。そのため
+        <code>Dual a</code> を載せたセグメント木を併用します。この辺りは maspy さんの
+        <code>TreeMonoid</code> を写経しました。<br />
+      </p>
+      <h3 id="verify"><a href="#verify">verify</a></h3>
+      <p>
+        <code>toy-lib</code> に
+        <a href="https://github.com/toyboot4e/toy-lib/tree/main/verify">verify 用のディレクトリ</a>
+        を追加しました。ここで
+        <a href="https://github.com/online-judge-tools/verification-helper">verification-helper</a>
+        によるシステムテストを実施しています。<br />
+      </p>
 
-<p>
-可換モノイドを畳み込むためには、下から上 (<code>u -&gt; lca(u, v)</code>) と上から下 (<code>lca(u, v) -&gt; v</code>) の双方向の畳み込みが必要です。そのため <code>Dual a</code> を載せたセグメント木を併用します。この辺りは maspy さんの <code>TreeMonoid</code> を写経しました。<br>
-</p>
+      <ul>
+        <li>
+          <a href="https://judge.yosupo.jp/problem/lca">Lowest Common Ancestor</a><br />
+          LCA を求める問題です。<br />
+        </li>
 
-<h3 id="verify"><a href="#verify">verify</a></h3><p>
-<code>toy-lib</code> に <a href="https://github.com/toyboot4e/toy-lib/tree/main/verify">verify 用のディレクトリ</a> を追加しました。ここで <a href="https://github.com/online-judge-tools/verification-helper">verification-helper</a> によるシステムテストを実施しています。<br>
-</p>
+        <li>
+          <a href="https://judge.yosupo.jp/problem/vertex_add_path_sum"
+            >Vertex Add Path Sum - Library Checker</a
+          ><br />
+          頂点の畳み込み (可換モノイド) の問題です。<br />
+        </li>
 
-<ul><li><a href="https://judge.yosupo.jp/problem/lca">Lowest Common Ancestor</a><br>
-LCA を求める問題です。<br></li>
+        <li>
+          <a href="https://judge.yosupo.jp/problem/vertex_set_path_composite"
+            >Vertex Set Path Composite - Library Checker</a
+          ><br />
+          頂点の畳み込み (非可換モノイド) の問題です。<br />
+        </li>
 
-<li><a href="https://judge.yosupo.jp/problem/vertex_add_path_sum">Vertex Add Path Sum - Library Checker</a><br>
-頂点の畳み込み (可換モノイド) の問題です。<br></li>
+        <li>
+          <a href="https://atcoder-tags.herokuapp.com/check/abc294_g"
+            >ABC 294 - G. Distance Queries on a Tree</a
+          ><br />
+          辺の畳み込み (可換モノイド)
+          の問題です。辺を新たな頂点に分けてしまうか、辺の重みを頂点に載せるテクニック (<code
+            >max (indexHLD U.! u) (index HLD U.! v)</code
+          >
+          に重みを載せる) を使います。<br />
+        </li>
+      </ul>
+      <h3 id="感想"><a href="#感想">感想</a></h3>
+      <p>
+        HLD は木の基本機能と言って良いほど馴染みがあって強力でした。良いカードを手に入れました。<br />
+      </p>
 
-<li><a href="https://judge.yosupo.jp/problem/vertex_set_path_composite">Vertex Set Path Composite - Library Checker</a><br>
-頂点の畳み込み (非可換モノイド) の問題です。<br></li>
+      <p>
+        HLD は
+        <a
+          href="https://qiita.com/BinomialSheep/items/e7a717f34e6991affa1c#vs-%E9%AB%98%E5%BA%A6%E5%85%B8%E5%9E%8B-option"
+          >高度典型</a
+        >
+        (高 diff 典型)
+        とされるデータ構造ですが、最大流や遅延セグメント木に比べれば簡単でした。改めて、遅延セグ木が緑
+        diff だったのが異常だったと思います。<br />
+      </p>
 
-<li><a href="https://atcoder-tags.herokuapp.com/check/abc294_g">ABC 294 - G. Distance Queries on a Tree</a><br>
-辺の畳み込み (可換モノイド) の問題です。辺を新たな頂点に分けてしまうか、辺の重みを頂点に載せるテクニック (<code>max (indexHLD U.! u) (index HLD U.! v)</code> に重みを載せる) を使います。<br></li>
-</ul>
+      <p>
+        HLD を実装したことで、高度典型も基本装備に過ぎないことが察せられました。 CHT や FFT, Suffix
+        Array なども習得しようと思います。<br />
+      </p>
 
-<h3 id="感想"><a href="#感想">感想</a></h3><p>
-HLD は木の基本機能と言って良いほど馴染みがあって強力でした。良いカードを手に入れました。<br>
-</p>
+      <blockquote>
+        <p>フーリエ変換が内積なのはよく分かりましたが、バタフライ演算が分からなくて……。<br /></p>
+      </blockquote>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="ライブラリ (CLI) の強化">
+        <a href="#ライブラリ (CLI) の強化">ライブラリ (CLI) の強化</a>
+      </h3>
+      <h4 id="ライブラリ更新機能"><a href="#ライブラリ更新機能">ライブラリ更新機能</a></h4>
+      <p>
+        <code>Main.hs</code> に埋め込まれたライブラリ (<code>Main.hs</code> の 15 行目) を、現在の
+        <code>toy-lib</code> のソース内容で上書きします:<br />
+      </p>
 
-<p>
-HLD は <a href="https://qiita.com/BinomialSheep/items/e7a717f34e6991affa1c#vs-%E9%AB%98%E5%BA%A6%E5%85%B8%E5%9E%8B-option">高度典型</a> (高 diff 典型) とされるデータ構造ですが、最大流や遅延セグメント木に比べれば簡単でした。改めて、遅延セグ木が緑 diff だったのが異常だったと思います。<br>
-</p>
-
-<p>
-HLD を実装したことで、高度典型も基本装備に過ぎないことが察せられました。 CHT や FFT, Suffix Array なども習得しようと思います。<br>
-</p>
-
-<blockquote>
-<p>
-フーリエ変換が内積なのはよく分かりましたが、バタフライ演算が分からなくて……。<br>
-</p>
-</blockquote>
-
-<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="ライブラリ (CLI) の強化"><a href="#ライブラリ (CLI) の強化">ライブラリ (CLI) の強化</a></h3><h4 id="ライブラリ更新機能"><a href="#ライブラリ更新機能">ライブラリ更新機能</a></h4><p>
-<code>Main.hs</code> に埋め込まれたライブラリ (<code>Main.hs</code> の 15 行目) を、現在の <code>toy-lib</code> のソース内容で上書きします:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-sh">$ toy-lib -u d/Main.hs | tee d/Main.hs
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ toy-lib -u d/Main.hs | tee d/Main.hs
 </code></pre>
-</div>
+      </div>
+      <h4 id="依存モジュール読み込み機能">
+        <a href="#依存モジュール読み込み機能">依存モジュール読み込み機能</a>
+      </h4>
+      <p>指定範囲内のモジュール (および依存モジュール) をソースファイルに埋め込みます:<br /></p>
 
-<h4 id="依存モジュール読み込み機能"><a href="#依存モジュール読み込み機能">依存モジュール読み込み機能</a></h4><p>
-指定範囲内のモジュール (および依存モジュール) をソースファイルに埋め込みます:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-sh">$ cat Example.hs
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ cat Example.hs
 -- 提出前に埋め込みに変える
 -- {{{ toy-lib import
 import Math.Manhattan
@@ -295,32 +420,48 @@ rot45 :: (Int, Int) -&gt; (Int, Int);rot45 (!x, !y) = (x - y, x + y)
 
 main = putStrLn "Hallo"
 </code></pre>
-</div>
+      </div>
 
-<p>
-特に <code>oj-verify</code> 用のソースは <code>toy-lib</code> を <code>import</code> して使っているので、これを AtCoder に提出する際は <code>toy-lib -e</code> にかけてライブラリを埋め込みます。<br>
-</p>
+      <p>
+        特に <code>oj-verify</code> 用のソースは <code>toy-lib</code> を
+        <code>import</code> して使っているので、これを AtCoder に提出する際は
+        <code>toy-lib -e</code> にかけてライブラリを埋め込みます。<br />
+      </p>
+      <h3 id="提出用ソースに verify 用のコメントを追加">
+        <a href="#提出用ソースに verify 用のコメントを追加"
+          >提出用ソースに verify 用のコメントを追加</a
+        >
+      </h3>
+      <p>
+        <code>oj-verify</code> 用のコメントをテンプレートに追加しました。 Dropbox
+        にテストケースが追加された後は、 <code>oj-verify run</code> の対象にできます。<br />
+      </p>
 
-<h3 id="提出用ソースに verify 用のコメントを追加"><a href="#提出用ソースに verify 用のコメントを追加">提出用ソースに verify 用のコメントを追加</a></h3><p>
-<code>oj-verify</code> 用のコメントをテンプレートに追加しました。 Dropbox にテストケースが追加された後は、 <code>oj-verify run</code> の対象にできます。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">-- verification-helper: PROBLEM https://atcoder.jp/contests/abc294/tasks/abc294_g
+      <div class="org-src-container">
+        <pre><code class="src language-hs">-- verification-helper: PROBLEM https://atcoder.jp/contests/abc294/tasks/abc294_g
 main :: IO ()
 main = do {- .. -}
 </code></pre>
-</div>
+      </div>
 
-<p>
-問題文を開きやすくなるし、入れるメリットは一応あるはず……？<br>
-</p>
-
-<h3 id="Youtube"><a href="#Youtube">Youtube</a></h3><p>
-<a href="https://www.youtube.com/channel/UCdBzzKmLiLFrQOBqLQtw_Qw">宮崎雄也と音楽の話</a> がめちゃめちゃ面白い。全部観ました。<br>
-</p>
-
-<h3 id="アークナイツ"><a href="#アークナイツ">アークナイツ</a></h3><p>
-インテリオタクたちの激推しコンテンツです。未プレイのため、 <a href="https://astrid.tech/2023/01/07/0/android-libvirt-gaming/">Gaming on an Android VM on Linux</a> を参考に Android のエミュレータを作成……したい<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>問題文を開きやすくなるし、入れるメリットは一応あるはず……？<br /></p>
+      <h3 id="Youtube"><a href="#Youtube">Youtube</a></h3>
+      <p>
+        <a href="https://www.youtube.com/channel/UCdBzzKmLiLFrQOBqLQtw_Qw">宮崎雄也と音楽の話</a>
+        がめちゃめちゃ面白い。全部観ました。<br />
+      </p>
+      <h3 id="アークナイツ"><a href="#アークナイツ">アークナイツ</a></h3>
+      <p>
+        インテリオタクたちの激推しコンテンツです。未プレイのため、
+        <a href="https://astrid.tech/2023/01/07/0/android-libvirt-gaming/"
+          >Gaming on an Android VM on Linux</a
+        >
+        を参考に Android のエミュレータを作成……したい<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

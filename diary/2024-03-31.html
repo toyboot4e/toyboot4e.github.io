@@ -1,115 +1,170 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 347 / Fastest - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 347 / Fastest</h1><p>Mar 31, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="ABC 347"><a href="#ABC 347">ABC 347</a></h2><p>
-<a href="https://atcoder.jp/contests/abc347">ABC 347</a> に参加しました。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 347 / Fastest - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 347 / Fastest</h1>
+      <p>Mar 31, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 347"><a href="#ABC 347">ABC 347</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc347">ABC 347</a> に参加しました。<br /></p>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc347/tasks/abc347_a">A 問題</a></a>
+      </h3>
+      <p><code>map . filter</code> の形で解きました。<br /></p>
 
-<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc347/tasks/abc347_a">A 問題</a></a></h3><p>
-<code>map . filter</code> の形で解きました。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">main=interact$unwords.((\k-&gt;map(show.(`div`k)).filter((==0).(`mod`k)))&lt;$&gt;head&lt;*&gt;tail).tail.map read.words
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$unwords.((\k-&gt;map(show.(`div`k)).filter((==0).(`mod`k)))&lt;$&gt;head&lt;*&gt;tail).tail.map read.words
 </code></pre>
-</div>
+      </div>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc347/tasks/abc347_b">B 問題</a></a>
+      </h3>
+      <p>
+        <code>(l, r)</code> 区間を全探索することで連続部分列 (スライス) を列挙します。
+        <code>String</code> や <code>ByteString</code> のスライスを得るには
+        <code>take len . drop l</code> を使います。 <code>vector</code> だったらズバり
+        <code>slice</code> 関数があります。<br />
+      </p>
 
-<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc347/tasks/abc347_b">B 問題</a></a></h3><p>
-<code>(l, r)</code> 区間を全探索することで連続部分列 (スライス) を列挙します。 <code>String</code> や <code>ByteString</code> のスライスを得るには <code>take len . drop l</code> を使います。 <code>vector</code> だったらズバり <code>slice</code> 関数があります。<br>
-</p>
+      <p>
+        ユニークな連続部分列をカウントするためには、 <code>length . nubSort</code> とか
+        <code>Map.size . Map.fromList</code> を使います。<br />
+      </p>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc347/tasks/abc347_c">C 問題</a></a>
+      </h3>
+      <p>
+        今日が何曜日であるかを適当に決めると、すべての予定日が連続した休日に収まります。そのため
+        <code>(`mod` (a + b))</code> で作った曜日の列を 2
+        週間分に倍加して、固定幅で走査しました。<br />
+      </p>
 
-<p>
-ユニークな連続部分列をカウントするためには、 <code>length . nubSort</code> とか <code>Map.size . Map.fromList</code> を使います。<br>
-</p>
+      <p>たとえば以下の曜日に予定が入っている場合、<br /></p>
 
-<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc347/tasks/abc347_c">C 問題</a></a></h3><p>
-今日が何曜日であるかを適当に決めると、すべての予定日が連続した休日に収まります。そのため <code>(`mod` (a + b))</code> で作った曜日の列を 2 週間分に倍加して、固定幅で走査しました。<br>
-</p>
-
-<p>
-たとえば以下の曜日に予定が入っている場合、<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-txt"> 0  3  9
+      <div class="org-src-container">
+        <pre><code class="src language-txt"> 0  3  9
 </code></pre>
-</div>
+      </div>
 
-<p>
-予定一覧を 2 週間分に倍加して、<br>
-</p>
+      <p>予定一覧を 2 週間分に倍加して、<br /></p>
 
-<div class="org-src-container">
-<pre><code class="src language-txt"> 0  3  9 10 13 19
+      <div class="org-src-container">
+        <pre><code class="src language-txt"> 0  3  9 10 13 19
 </code></pre>
-</div>
+      </div>
 
-<p>
-幅 3 のウィンドウで見た時に、ウィンドウの含む日数が A 日以内のものがあるか調べます。ウィンドウの左右端の日数の差に注目すれば良いです:<br>
-</p>
+      <p>
+        幅 3 のウィンドウで見た時に、ウィンドウの含む日数が A
+        日以内のものがあるか調べます。ウィンドウの左右端の日数の差に注目すれば良いです:<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-txt"> 0  3  9 10 13 19
+      <div class="org-src-container">
+        <pre><code class="src language-txt"> 0  3  9 10 13 19
  &lt;-----&gt;: 10 日
     &lt;-----&gt;: 8 日
        &lt;-----&gt;: 4 日
 </code></pre>
-</div>
+      </div>
 
-<p>
-ところで長さ <code>a + b</code> の配列を作ると RE になって混乱しました。たぶん <code>Heap exhausted;</code> で死ぬために MLE にはなりません。メモリ使用量が異常に多かったことに注目するべきでした。<br>
-</p>
+      <p>
+        ところで長さ <code>a + b</code> の配列を作ると RE になって混乱しました。たぶん
+        <code>Heap exhausted;</code> で死ぬために MLE
+        にはなりません。メモリ使用量が異常に多かったことに注目するべきでした。<br />
+      </p>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc347/tasks/abc347_d">D 問題</a></a>
+      </h3>
+      <p>
+        算数で解けそうな問題ですが、あえて全探索に寄せて解法を考え始めます。うおおお！ (略)<br />
+      </p>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc347/tasks/abc347_e">E 問題</a></a>
+      </h3>
+      <p>
+        シミュレーション過程をメモしてみると、位置と時間の 2
+        軸が見えてきます。位置方向の和を一括処理するのは困難ですが、時間方向の和は一括処理できることに気付きます。<br />
+      </p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc347/tasks/abc347_f">F 問題</a></a>
+      </h3>
+      <p>
+        DP
+        だと思ったのですが、敷き詰める順番がトポロジカル順にならないですね……。解けません。問題ジャンルすら見えないようです。<br />
+      </p>
 
-<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc347/tasks/abc347_d">D 問題</a></a></h3><p>
-算数で解けそうな問題ですが、あえて全探索に寄せて解法を考え始めます。うおおお！ (略)<br>
-</p>
+      <p>
+        類題は
+        <a href="https://atcoder.jp/contests/abc223/tasks/abc223_e"
+          >ABC 223 E - Placing Rectangles</a
+        >
+        および
+        <a href="https://atcoder.jp/contests/arc074/tasks/arc074_a">ARC 074 A</a> らしいです。<br />
+      </p>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="join">
+        <a href="#join"><code>join</code></a>
+      </h3>
+      <p>
+        本日も cojna さんの影を追い、
+        <a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/Control-Monad.html#v:join"
+          >join</a
+        >
+        を学びました。配列の倍加などに利用できます。<br />
+      </p>
 
-<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc347/tasks/abc347_e">E 問題</a></a></h3><p>
-シミュレーション過程をメモしてみると、位置と時間の 2 軸が見えてきます。位置方向の和を一括処理するのは困難ですが、時間方向の和は一括処理できることに気付きます。<br>
-</p>
-
-<h3 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc347/tasks/abc347_f">F 問題</a></a></h3><p>
-DP だと思ったのですが、敷き詰める順番がトポロジカル順にならないですね……。解けません。問題ジャンルすら見えないようです。<br>
-</p>
-
-<p>
-類題は <a href="https://atcoder.jp/contests/abc223/tasks/abc223_e">ABC 223 E - Placing Rectangles</a> および <a href="https://atcoder.jp/contests/arc074/tasks/arc074_a">ARC 074 A</a> らしいです。<br>
-</p>
-
-<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="join"><a href="#join"><code>join</code></a></h3><p>
-本日も cojna さんの影を追い、 <a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/Control-Monad.html#v:join">join</a> を学びました。配列の倍加などに利用できます。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">ghci&gt; import Control.Monad
+      <div class="org-src-container">
+        <pre><code class="src language-hs">ghci&gt; import Control.Monad
 ghci&gt; join (++) [1,2,3]
 [1,2,3,1,2,3]
 </code></pre>
-</div>
+      </div>
 
-<p>
-<code>join</code> もしっかり <a href="https://ziphil.com/other/other/12.html">ポイントフリー Haskell メモ — Avendia</a> に載っていました。このページは時間が経てば立つほど真価を発揮しています。<br>
-</p>
+      <p>
+        <code>join</code> もしっかり
+        <a href="https://ziphil.com/other/other/12.html">ポイントフリー Haskell メモ — Avendia</a>
+        に載っていました。このページは時間が経てば立つほど真価を発揮しています。<br />
+      </p>
+      <h3 id="Fastest"><a href="#Fastest">Fastest</a></h3>
+      <p>Dijkstra を貼っただけで Fastest が取れてしまいました。<br /></p>
 
-<h3 id="Fastest"><a href="#Fastest">Fastest</a></h3><p>
-Dijkstra を貼っただけで Fastest が取れてしまいました。<br>
-</p>
+      <figure><img src="./img/2024-03-31-fastest.png" alt="2024-03-31-fastest.png" /><br /></figure>
 
+      <p>
+        穴場だと思うので、 fastest が欲しければおすすめです。
+        <a
+          href="https://atcoder.jp/contests/past202203-open/submissions?f.LanguageName=&amp;f.Status=AC&amp;f.Task=past202203_k&amp;f.User=&amp;orderBy=time_consumption"
+          >提出一覧</a
+        ><br />
+      </p>
+      <h3 id="最小全域木 (MST)"><a href="#最小全域木 (MST)">最小全域木 (MST)</a></h3>
+      <p>
+        Kruskal 法の実装が <code>filterM</code> でスッキリしました。 <code>Buffer</code> も
+        <code>unfoldrM</code> も <code>mayMaybeM</code> も必要無いようです。なるほどな〜……<br />
+      </p>
 
-<figure>
-<img src="./img/2024-03-31-fastest.png" alt="2024-03-31-fastest.png"><br>
-
-</figure>
-
-<p>
-穴場だと思うので、 fastest が欲しければおすすめです。 <a href="https://atcoder.jp/contests/past202203-open/submissions?f.LanguageName=&amp;f.Status=AC&amp;f.Task=past202203_k&amp;f.User=&amp;orderBy=time_consumption">提出一覧</a><br>
-</p>
-
-<h3 id="最小全域木 (MST)"><a href="#最小全域木 (MST)">最小全域木 (MST)</a></h3><p>
-Kruskal 法の実装が <code>filterM</code> でスッキリしました。 <code>Buffer</code> も <code>unfoldrM</code> も <code>mayMaybeM</code> も必要無いようです。なるほどな〜……<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">{-# INLINE collectMST #-}
+      <div class="org-src-container">
+        <pre><code class="src language-hs">{-# INLINE collectMST #-}
 collectMST :: (Ord w, U.Unbox w) =&gt; Int -&gt; U.Vector (Vertex, Vertex, w) -&gt; U.Vector (Vertex, Vertex, w)
 collectMST nVerts edges = runST $ do
   uf &lt;- newMUF nVerts
@@ -119,27 +174,53 @@ collectMST nVerts edges = runST $ do
   where
     edges' = U.modify (VAI.sortBy (comparing thd3)) edges
 </code></pre>
-</div>
+      </div>
+      <h3 id="PrimParser が気になる">
+        <a href="#PrimParser が気になる"><code>PrimParser</code> が気になる</a>
+      </h3>
+      <p>
+        Haskell すきー星人最大の謎の 1 つ、
+        <a href="https://cojna.github.io/iota/Data-PrimParser.html">PrimParser</a>
+        の解読を始めました。入口はこれですね。<br />
+      </p>
 
-<h3 id="PrimParser が気になる"><a href="#PrimParser が気になる"><code>PrimParser</code> が気になる</a></h3><p>
-Haskell すきー星人最大の謎の 1 つ、 <a href="https://cojna.github.io/iota/Data-PrimParser.html">PrimParser</a> の解読を始めました。入口はこれですね。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">withByteString :: B.ByteString -&gt; (a -&gt; IO r) -&gt; PrimParser a -&gt; IO r
+      <div class="org-src-container">
+        <pre><code class="src language-hs">withByteString :: B.ByteString -&gt; (a -&gt; IO r) -&gt; PrimParser a -&gt; IO r
 withByteString bs k f = case B.toForeignPtr bs of
   (fp, o, I# len#) -&gt; do
     withForeignPtr (plusForeignPtr fp o) $ \(Ptr p#) -&gt; do
       case runPrimParser# f (plusAddr# p# len#) p# of
         (# _, x #) -&gt; k x
 </code></pre>
-</div>
+      </div>
 
-<p>
-<code>ByteString</code> 中のバイト列に <a href="https://hackage.haskell.org/package/bytestring-0.12.1.0/docs/Data-ByteString-Internal.html#v:toForeignPtr">toForeignPtr</a> でアクセスし、手動でパースする方針と見ました。 <code>UnboxedTuples</code> に染まっていて面食らいます。<br>
-</p>
+      <p>
+        <code>ByteString</code> 中のバイト列に
+        <a
+          href="https://hackage.haskell.org/package/bytestring-0.12.1.0/docs/Data-ByteString-Internal.html#v:toForeignPtr"
+          >toForeignPtr</a
+        >
+        でアクセスし、手動でパースする方針と見ました。
+        <code>UnboxedTuples</code> に染まっていて面食らいます。<br />
+      </p>
 
-<p>
-<code>ByteString</code> の内側が <a href="https://hackage.haskell.org/package/base-4.18.1.0/docs/Foreign-ForeignPtr-Safe.html#t:ForeignPtr">ForeignPtr</a> なのは謎です。 <a href="https://github.com/haskell/bytestring/issues/193">Quit using ForeignPtr in favor of ByteArray# #193</a> を見ると、 <code>ByteString</code> は FFI にも使用されるらしいので、そういうものかもしれません。<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>
+        <code>ByteString</code> の内側が
+        <a
+          href="https://hackage.haskell.org/package/base-4.18.1.0/docs/Foreign-ForeignPtr-Safe.html#t:ForeignPtr"
+          >ForeignPtr</a
+        >
+        なのは謎です。
+        <a href="https://github.com/haskell/bytestring/issues/193"
+          >Quit using ForeignPtr in favor of ByteArray# #193</a
+        >
+        を見ると、 <code>ByteString</code> は FFI
+        にも使用されるらしいので、そういうものかもしれません。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>org-mode 製ブログの改良 (3): callouts - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1><code>org-mode</code> 製ブログの改良 (3): callouts</h1>
+      <p>Sep 15, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="機能追加"><a href="#機能追加">機能追加</a></h2>
+      <p>久しぶりに <code>org-mode</code> 製ブログを改良しました。<br /></p>
+      <h3 id="Callouts"><a href="#Callouts">Callouts</a></h3>
+      <p>
+        AsciiDoc でお馴染みの
+        <a href="https://docs.asciidoctor.org/asciidoc/latest/verbatim/callouts/">callouts</a> を
+        org-mode の
+        <a href="https://emacs.stackexchange.com/a/60795">coderef</a>
+        と呼ばれる機能で再現しました。<br />
+      </p>
+      <h4 id="例"><a href="#例">例</a></h4>
+      <div class="org-src-container">
+        <pre><code class="src language-nix">{
+<span id="coderef-1-1" onmouseover="CodeHighlightOn(this,'jump-coderef-1-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-1');" class="coderef-off"><a href="#coderef-1-1">  inputs = { # <span class="coderef-anchor">1</span></a></span>
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
+  };
+  outputs = { self, nixpkgs, home-manager, org-babel, emacs-overlay, ... }: {
+<span id="coderef-1-2" onmouseover="CodeHighlightOn(this,'jump-coderef-1-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-2');" class="coderef-off"><a href="#coderef-1-2">      nixosConfigurations = (import ./hosts/tbm { # <span class="coderef-anchor">2</span></a></span>
+<span id="coderef-1-2" onmouseover="CodeHighlightOn(this,'jump-coderef-1-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-1-2');" class="coderef-off"><a href="#coderef-1-2">      nixosConfigurations = (import ./hosts/tbm {nixosConfigurations = (import ./hosts/tbm { # <span class="coderef-anchor">2</span></a></span>
+        inherit self nixpkgs home-manager;
+      });
+    };
+}
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-1-1"
+            id="jump-coderef-1-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-1-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-1-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          <code>(ref:1)</code> の形でコード中に coderef (callout) を書きます<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-1-2"
+            id="jump-coderef-1-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-1-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-1-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          ← のように <code>[[(2)]]</code> といった形で参照できます<br />
+        </li>
+        <li>マウスホバー時に JS によってハイライトします<br /></li>
+      </ul>
+      <h4 id="実装"><a href="#実装">実装</a></h4>
+      <ul>
+        <li><code>ox-html</code> の HTML 変換関数を上書きして頑張ります。<br /></li>
+        <li>
+          <a
+            href="https://github.com/emacs-mirror/emacs/blob/691f441717e968b1a497ed5d7792dbbe02cba609/lisp/org/ox-html.el#L249"
+            >org-html-scripts</a
+          >
+          に <code>&lt;script&gt;</code> タグの埋め込みがあるため、コピーします (マウスホバー処理)
+          。<br />
+        </li>
+        <li>
+          ユニークな ID 作成のため、何番目の codeblock を処理中かグローバル変数で記録しました。<br />
+        </li>
+      </ul>
+      <h3 id="記事のソートを降順に変更">
+        <a href="#記事のソートを降順に変更">記事のソートを降順に変更</a>
+      </h3>
+      <p>最新記事が一番上に表示されるようにしました。<br /></p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

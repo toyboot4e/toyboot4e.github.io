@@ -137,7 +137,7 @@ div.WARNING {
 
 span.code-highlighted {
     display: inline-block;
-    width: 100%;
+    min-width: 100%;
 }
 
 .code-highlighted {

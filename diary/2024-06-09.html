@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -85,7 +86,6 @@
           </tr>
         </tbody>
       </table>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc357/tasks/abc357_a">A 問題</a></a>
       </h3>
@@ -95,7 +95,6 @@
         <pre><code class="src language-hs">main=interact$show.f.map read.words;f(_:m:r)=length.takeWhile(&lt;=m)$scanl1(+)r
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc357/tasks/abc357_b">B 問題</a></a>
       </h3>
@@ -135,14 +134,12 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
         <code>interact</code> には改行文字が付いてくるので
         <code>init</code> で切り落としました。<br />
       </p>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc357/tasks/abc357_c">C 問題</a></a>
       </h3>
       <p>
         手続き的にごり押ししました。皆さんの解答が美しくて良かったです。グリッドと戦う時は、いつもグシャグシャになってしまう……<br />
       </p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc357/tasks/abc357_d">D 問題</a></a>
       </h3>
@@ -166,7 +163,6 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
         でおなじみの Fermet の小定理およびダブリング (binary lifting)
         で計算しました。オーバーフローには要注意です。パワー！<br />
       </p>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc357/tasks/abc357_e">E 問題</a></a>
       </h3>
@@ -174,7 +170,6 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
         Functional graph の問題です。閉路の部分をサイズ K の頂点 1
         つに置き換えるようなイメージで解きました。グラフと戦う時は、いつもグシャグシャになってしまう……<br />
       </p>
-
       <h3 id="F 問題">
         <a href="#F 問題"><a href="https://atcoder.jp/contests/abc357/tasks/abc357_f">F 問題</a></a>
       </h3>
@@ -192,7 +187,6 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
           が成り立つように計算を考えれば良いのですが、これもイメージが乏しく対策の必要性を感じました。<br />
         </li>
       </ul>
-
       <h2 id="区間を set で管理するテクニック">
         <a href="#区間を set で管理するテクニック">区間を set で管理するテクニック</a>
       </h2>
@@ -213,7 +207,6 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
           <code>[l, r]</code> 区間の値を削除します。<br />
         </li>
       </ul>
-
       <h4 id="例"><a href="#例">例</a></h4>
       <div class="org-src-container">
         <pre><code class="src language-txt">初期状態:
@@ -231,7 +224,6 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
        x                 y      a      z
 </code></pre>
       </div>
-
       <h4 id="償却計算量について (お気持ち解説)">
         <a href="#償却計算量について (お気持ち解説)">償却計算量について (お気持ち解説)</a>
       </h4>
@@ -240,7 +232,6 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
         つしか増えません。また多数の区間を上書き／削除した場合、区間の数はごっそりと減ります。よって
         insert/delete の償却計算量は区間数に比例しません。<br />
       </p>
-
       <h4 id="命名について"><a href="#命名について">命名について</a></h4>
       <p>
         区間 <code>[l, r]</code> の訳は interval <code>[l, r]</code> であり、 range map よりも
@@ -255,7 +246,6 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
         関数があるため、 Haskell においては
         <code>RangeMap</code> と呼ぶのも問題無い気がします。<br />
       </p>
-
       <h3 id="リファレンス実装"><a href="#リファレンス実装">リファレンス実装</a></h3>
       <p>
         <a href="https://atcoder.jp/contests/past202104-open/tasks/past202104_m"
@@ -279,19 +269,16 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
         <a href="https://atcoder.jp/contests/past202104-open/submissions/54303097">僕の提出</a> が
         1055 ~ 1304 ms です。速い木が欲しい……！<br />
       </p>
-
       <h3 id="Quickcheck"><a href="#Quickcheck">Quickcheck</a></h3>
       <p>
         Insert/delete のクエリを生成し、 <code>IntervalMap</code> の計算結果を愚直解と比較する
         quickcheck を作成しました。あまり個々の property をチェックする必要性を感じません。<br />
       </p>
-
       <h3 id="感想"><a href="#感想">感想</a></h3>
       <p>
         素直な方法でした。アルゴリズムとしては Union-Find
         よりも簡単な気がしますが、なぜか『高度典型』に含まれるようです。<br />
       </p>
-
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
       <h3 id="デバッグ"><a href="#デバッグ">デバッグ</a></h3>
       <p>
@@ -333,7 +320,6 @@ f n|n&gt;0=toUpper|1&gt;0=toLower
           (dap-mode の設定)<br />
         </li>
       </ul>
-
       <h3 id="Quickcheck の書き方の調べ方">
         <a href="#Quickcheck の書き方の調べ方">Quickcheck の書き方の調べ方</a>
       </h3>
@@ -355,7 +341,6 @@ valueSpanGen l0 r0 xl xr = do
         <code>forAll</code> のネストを減らしたければ、
         <code>Gen</code> の方をタプルにまとめてしまえば良いようです。<br />
       </p>
-
       <h3 id="ガチ言語 Haskell"><a href="#ガチ言語 Haskell">ガチ言語 Haskell</a></h3>
       <p>99 likes まで言っていました。ありがとう……読みづらくてごめんなさい……<br /></p>
 
@@ -364,7 +349,6 @@ valueSpanGen l0 r0 xl xr = do
         <strong><strong>読み通すだけでレベルアップできるような構成</strong></strong>
         を目指すべきだと反省しています。書き直したい……！<br />
       </p>
-
       <h3 id="やる夫"><a href="#やる夫">やる夫</a></h3>
       <p>やる夫を書いてみたかったのですが、厳しい状況でした。<br /></p>
 

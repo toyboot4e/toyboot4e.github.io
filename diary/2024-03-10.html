@@ -1,166 +1,273 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 344 / Koka - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 344 / Koka</h1><p>Mar 10, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="ABC 344"><a href="#ABC 344">ABC 344</a></h2><p>
-<a href="https://atcoder.jp/contests/abc344">ABC 344</a> に参加しました。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 344 / Koka - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 344 / Koka</h1>
+      <p>Mar 10, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 344"><a href="#ABC 344">ABC 344</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc344">ABC 344</a> に参加しました。<br /></p>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc344/tasks/abc344_a">A 問題</a></a>
+      </h3>
+      <p>
+        <code>LL|MM|RR</code> のような入力を
+        <code>LLRR</code> に加工します。前後から読んで繋げるのが簡単です。<br />
+      </p>
 
-<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc344/tasks/abc344_a">A 問題</a></a></h3><p>
-<code>LL|MM|RR</code> のような入力を <code>LLRR</code> に加工します。前後から読んで繋げるのが簡単です。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">main=interact$(++)&lt;$&gt;f&lt;*&gt;r.f.r;f=takeWhile(/='|');r=reverse
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$(++)&lt;$&gt;f&lt;*&gt;r.f.r;f=takeWhile(/='|');r=reverse
 </code></pre>
-</div>
+      </div>
 
-<p>
-<code>extra</code> パッケージの <a href="https://hackage.haskell.org/package/extra-1.7.14/docs/Data-List-Extra.html#v:split">split</a> を使う解答が上手かったです。<br>
-</p>
+      <p>
+        <code>extra</code> パッケージの
+        <a href="https://hackage.haskell.org/package/extra-1.7.14/docs/Data-List-Extra.html#v:split"
+          >split</a
+        >
+        を使う解答が上手かったです。<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-hs">import Data.List.Extra;main=interact$((++)&lt;$&gt;head&lt;*&gt;last).split(=='|')
+      <div class="org-src-container">
+        <pre><code class="src language-hs">import Data.List.Extra;main=interact$((++)&lt;$&gt;head&lt;*&gt;last).split(=='|')
 </code></pre>
-</div>
+      </div>
 
-<p>
-Kotatsugame さんは <a href="https://atcoder.jp/contests/abc344/submissions/51021786">正規表現で <code>|.*|</code> を削除していました</a> 。確かに……！<br>
-</p>
+      <p>
+        Kotatsugame さんは
+        <a href="https://atcoder.jp/contests/abc344/submissions/51021786"
+          >正規表現で <code>|.*|</code> を削除していました</a
+        >
+        。確かに……！<br />
+      </p>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc344/tasks/abc344_b">B 問題</a></a>
+      </h3>
+      <p>
+        入力の各行をひっくり返すだけで良いそうです。厄介な方針を早めに棄却して、迂回作を考え抜くのが大切だと思いました。<br />
+      </p>
 
-<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc344/tasks/abc344_b">B 問題</a></a></h3><p>
-入力の各行をひっくり返すだけで良いそうです。厄介な方針を早めに棄却して、迂回作を考え抜くのが大切だと思いました。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">main=interact$unwords.reverse.lines
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$unwords.reverse.lines
 </code></pre>
-</div>
+      </div>
 
-<p>
-<code>0</code> が出るまで <code>getLine</code> を繰り返す場合、格好つけて書くとこんな形に:<br>
-</p>
+      <p>
+        <code>0</code> が出るまで
+        <code>getLine</code> を繰り返す場合、格好つけて書くとこんな形に:<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-hs">main :: IO ()
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main :: IO ()
 main = do
   printList &lt;=&lt; flip fix [] $ \loop acc -&gt; do
     int &gt;&gt;= \case
       0 -&gt; return (0 : acc)
       x -&gt; loop (x : acc)
 </code></pre>
-</div>
+      </div>
 
-<p>
-kotatsugame さんは <a href="https://atcoder.jp/contests/abc344/submissions/51022070"><code>cat</code> の反対の <code>tac</code> で通していました</a> 。 <code>tac</code> は競プロ外でも便利そう……！<br>
-</p>
+      <p>
+        kotatsugame さんは
+        <a href="https://atcoder.jp/contests/abc344/submissions/51022070"
+          ><code>cat</code> の反対の <code>tac</code> で通していました</a
+        >
+        。 <code>tac</code> は競プロ外でも便利そう……！<br />
+      </p>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc344/tasks/abc344_c">C 問題</a></a>
+      </h3>
+      <p>
+        全探索の結果を高速で検索する問題です。あらかじめ全探索を行い、適切なデータ構造に保存します。<br />
+      </p>
 
-<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc344/tasks/abc344_c">C 問題</a></a></h3><p>
-全探索の結果を高速で検索する問題です。あらかじめ全探索を行い、適切なデータ構造に保存します。<br>
-</p>
+      <ol>
+        <li>
+          疎なマップ (<code>IntSet</code>, <code>HashSet</code>) に入れる場合<br />
+          \(O((N^3 + Q) \log N)\) <em>程度</em> で解けます。 <code>IntSet</code> よりも
+          <code>HashSet</code> (<a href="https://hackage.haskell.org/package/unordered-containers"
+            >unordered-containers</a
+          >) の方が速くてショックでした。<br />
+        </li>
 
-<ol><li>疎なマップ (<code>IntSet</code>, <code>HashSet</code>) に入れる場合<br>
-\(O((N^3 + Q) \log N)\) <em>程度</em> で解けます。 <code>IntSet</code> よりも <code>HashSet</code> (<a href="https://hackage.haskell.org/package/unordered-containers">unordered-containers</a>) の方が速くてショックでした。<br></li>
+        <li>
+          密なマップ (<code>MArray</code>, <code>MVector</code>) に入れる場合<br />
+          \(x \le 3 \cdot 10^8\) のため非効率的に思えます。ところが 1 byte に 8 つの
+          <code>Bit</code> を詰めると、わずか \(\frac 3 8 10^8\) byte
+          で密なマップを実現できてしまうのですね。 cojna さんが
+          <a href="https://hackage.haskell.org/package/bitvec">bitvec</a> で
+          <a href="https://atcoder.jp/contests/abc344/submissions/51105629"
+            >upsolve されていていました</a
+          >
+          。<br />
+          こんな解答が見れるとは、言語アップデート 2023 で
+          <code>bitvec</code> を入れたのはとても良かったですね。<br />
+        </li>
+      </ol>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc344/tasks/abc344_d">D 問題</a></a>
+      </h3>
+      <p>動的計画法の問題です。煩雑になったので振り返りません。<br /></p>
 
-<li>密なマップ (<code>MArray</code>, <code>MVector</code>) に入れる場合<br>
-\(x \le 3 \cdot 10^8\) のため非効率的に思えます。ところが 1 byte に 8 つの <code>Bit</code> を詰めると、わずか \(\frac 3 8 10^8\) byte で密なマップを実現できてしまうのですね。 cojna さんが <a href="https://hackage.haskell.org/package/bitvec">bitvec</a> で <a href="https://atcoder.jp/contests/abc344/submissions/51105629">upsolve されていていました</a> 。<br>
-こんな解答が見れるとは、言語アップデート 2023 で <code>bitvec</code> を入れたのはとても良かったですね。<br></li>
-</ol>
+      <p>
+        DP のスタイルは、主に (1) 畳み込みで
+        <a href="https://qiita.com/H20/items/922cc0a17ba5817f26d7">Next DP</a> をやるか、 (2)
+        可変配列を in-place に更新する の 2 種類です。 EDPC の解説などで整理したいです。<br />
+      </p>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc344/tasks/abc344_e">E 問題</a></a>
+      </h3>
+      <p>
+        <code>IntMap Int Double</code> を使って順序管理を行ったところ WA.
+        浮動小数の知識不足です。<br />
+      </p>
 
-<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc344/tasks/abc344_d">D 問題</a></a></h3><p>
-動的計画法の問題です。煩雑になったので振り返りません。<br>
-</p>
-
-<p>
-DP のスタイルは、主に (1) 畳み込みで <a href="https://qiita.com/H20/items/922cc0a17ba5817f26d7">Next DP</a> をやるか、 (2) 可変配列を in-place に更新する の 2 種類です。 EDPC の解説などで整理したいです。<br>
-</p>
-
-<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc344/tasks/abc344_e">E 問題</a></a></h3><p>
-<code>IntMap Int Double</code> を使って順序管理を行ったところ WA. 浮動小数の知識不足です。<br>
-</p>
-
-<div class="org-src-container">
-<label class="org-src-name"><span class="listing-number">Listing 1: </span>浮動小数を魔法の箱だと思っていました</label><pre><code class="src language-hs">ghci&gt; (1.0/2.0)^1000
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span
+          >浮動小数を魔法の箱だと思っていました</label
+        >
+        <pre><code class="src language-hs">ghci&gt; (1.0/2.0)^1000
 9.332636185032189e-302
 ghci&gt; (1.0/2.0)^10000
 0.0
 </code></pre>
-</div>
+      </div>
 
-<p>
-<code>IntMap Int (Int, Int)</code> を双方向連結リストとすれば AC しました。しかし TLE しなかったのは偶然に過ぎなかったようです。<br>
-</p>
+      <p>
+        <code>IntMap Int (Int, Int)</code> を双方向連結リストとすれば AC しました。しかし TLE
+        しなかったのは偶然に過ぎなかったようです。<br />
+      </p>
 
-<ul><li>naoya さん: <code>IntMap</code> の <code>!</code>, <code>insert</code> を <code>alter</code> に変えて AC. <code>IntMap</code> を配列に置き換えて高速化<br></li>
-<li>gomarine さん: <code>snoc</code> を削除して AC<br></li>
-<li>qwymb さん: <code>IntMap</code> を <code>HashMap</code> に置き換えて AC<br></li>
-<li>cojna さん: list fusion を効かせた高速化で AC<br></li>
-<li>gksato さん: 初手から爆速なマップ (?) を自作して AC<br></li>
-</ul>
+      <ul>
+        <li>
+          naoya さん: <code>IntMap</code> の <code>!</code>, <code>insert</code> を
+          <code>alter</code> に変えて AC. <code>IntMap</code> を配列に置き換えて高速化<br />
+        </li>
+        <li>gomarine さん: <code>snoc</code> を削除して AC<br /></li>
+        <li>qwymb さん: <code>IntMap</code> を <code>HashMap</code> に置き換えて AC<br /></li>
+        <li>cojna さん: list fusion を効かせた高速化で AC<br /></li>
+        <li>gksato さん: 初手から爆速なマップ (?) を自作して AC<br /></li>
+      </ul>
 
-<p>
-この状況は再現性がありますね。 <code>IntMap</code> で通らない時は <code>HashMap</code> を検討してみます。<br>
-</p>
+      <p>
+        この状況は再現性がありますね。 <code>IntMap</code> で通らない時は
+        <code>HashMap</code> を検討してみます。<br />
+      </p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc344/tasks/abc344_f">F 問題</a></a>
+      </h3>
+      <p>フローかなと検索していましたが……？　Upsolve します。<br /></p>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="競プロの小説"><a href="#競プロの小説">競プロの小説</a></h3>
+      <p>
+        <a href="https://www.tokuma.jp/book/b642639.html">アルゴリズムの乙女たち</a>
+        を読みました。競プロって小説になるんだ……！<br />
+      </p>
 
-<h3 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc344/tasks/abc344_f">F 問題</a></a></h3><p>
-フローかなと検索していましたが……？　Upsolve します。<br>
-</p>
+      <p>
+        Kotatsugame
+        さんのような歩くライトノベルが存在する以上、彼らを小説で上回るのは困難です。むしろルールを変えて、まだ現実ではあり得ない面白い状況を作り出すことが重要なのかと思いました。現実の方が真似してついて来るような競プロ小説、カモンです。<br />
+      </p>
+      <h3 id="Koka 言語"><a href="#Koka 言語">Koka 言語</a></h3>
+      <p>
+        <a href="https://koka-lang.github.io/">Koka</a> 2.4 による AtCoder
+        への挑戦を断念しました。<br />
+      </p>
 
-<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="競プロの小説"><a href="#競プロの小説">競プロの小説</a></h3><p>
-<a href="https://www.tokuma.jp/book/b642639.html">アルゴリズムの乙女たち</a> を読みました。競プロって小説になるんだ……！<br>
-</p>
+      <ul>
+        <li>
+          <code>stdin</code> を読み込む関数がほぼ無い<br />
+          <a href="https://koka-lang.github.io/koka/doc/std_os_process.html">run-system-read</a> で
+          <code>cat</code> を呼ぶしか無さそうです。迂回できるなら OK<br />
+        </li>
+        <li>
+          <code>take-while</code> のような関数から自作する必要がある<br />
+          しかし Koka 2.4 には <code>subslice</code> 関数がありません。これは無理だ〜<br />
+        </li>
+      </ul>
+      <h3 id="MiniAxe"><a href="#MiniAxe">MiniAxe</a></h3>
+      <p>
+        MiniAxe を入手しました。 1 度基盤を壊してしまったので、はんだ付けサービスを再注文しました。
+        DIY is not for me..<br />
+      </p>
 
-<p>
-Kotatsugame さんのような歩くライトノベルが存在する以上、彼らを小説で上回るのは困難です。むしろルールを変えて、まだ現実ではあり得ない面白い状況を作り出すことが重要なのかと思いました。現実の方が真似してついて来るような競プロ小説、カモンです。<br>
-</p>
+      <figure>
+        <img src="./img/2024-03-10-miniaxe-2.jpg" alt="2024-03-10-miniaxe-2.jpg" /><br />
 
-<h3 id="Koka 言語"><a href="#Koka 言語">Koka 言語</a></h3><p>
-<a href="https://koka-lang.github.io/">Koka</a> 2.4 による AtCoder への挑戦を断念しました。<br>
-</p>
+        <figcaption>
+          <span class="figure-number">Figure 1: </span>Keyball 44 とのサイズ比較
+        </figcaption>
+      </figure>
 
-<ul><li><code>stdin</code> を読み込む関数がほぼ無い<br>
-<a href="https://koka-lang.github.io/koka/doc/std_os_process.html">run-system-read</a> で <code>cat</code> を呼ぶしか無さそうです。迂回できるなら OK<br></li>
-<li><code>take-while</code> のような関数から自作する必要がある<br>
-しかし Koka 2.4 には <code>subslice</code> 関数がありません。これは無理だ〜<br></li>
-</ul>
+      <figure>
+        <img src="./img/2024-03-10-miniaxe-1.jpg" alt="2024-03-10-miniaxe-1.jpg" /><br />
 
-<h3 id="MiniAxe"><a href="#MiniAxe">MiniAxe</a></h3><p>
-MiniAxe を入手しました。 1 度基盤を壊してしまったので、はんだ付けサービスを再注文しました。 DIY is not for me..<br>
-</p>
+        <figcaption>
+          <span class="figure-number">Figure 2: </span>BOOX Palma とのサイズ比較
+        </figcaption>
+      </figure>
 
+      <p>トラックボールが無くなったので、マウスキーを使っています。<br /></p>
 
-<figure>
-<img src="./img/2024-03-10-miniaxe-2.jpg" alt="2024-03-10-miniaxe-2.jpg"><br>
+      <p>
+        Tap-Hold の動作が
+        <a href="https://docs.qmk.fm/#/tap_hold?id=permissive-hold">Permissive Hold</a>
+        になっていました。設定変更のために、 QMK をビルドしなければ……。<br />
+      </p>
+      <h3 id="Nine キーボード"><a href="#Nine キーボード">Nine キーボード</a></h3>
+      <p>
+        <a href="https://github.com/bsag/nine-nano">Nine</a>
+        キーボードが欲しいです。発注の手間を乗り越えられるのか……。<br />
+      </p>
 
-<figcaption><span class="figure-number">Figure 1: </span>Keyball 44 とのサイズ比較</figcaption>
-</figure>
+      <ul>
+        <li>
+          <a href="https://www.rousette.org.uk/archives/introducing-the-nine-keyboard/"
+            >BSAG » Introducing the Nine keyboard</a
+          ><br />
+        </li>
+        <li>
+          <a href="https://github.com/bsag/nine-nano/blob/main/docs/build_guide.md"
+            >nine-nano/docs/build_guide.md</a
+          ><br />
+        </li>
+      </ul>
+      <h3 id="Youtube"><a href="#Youtube">Youtube</a></h3>
+      <p>
+        <a href="https://www.youtube.com/watch?v=Xgu0Ng0t54o"
+          >サイドフリップ初心者は何日でできるようになる？【側宙】 - YouTube</a
+        ><br />
+      </p>
 
-
-<figure>
-<img src="./img/2024-03-10-miniaxe-1.jpg" alt="2024-03-10-miniaxe-1.jpg"><br>
-
-<figcaption><span class="figure-number">Figure 2: </span>BOOX Palma とのサイズ比較</figcaption>
-</figure>
-
-<p>
-トラックボールが無くなったので、マウスキーを使っています。<br>
-</p>
-
-<p>
-Tap-Hold の動作が <a href="https://docs.qmk.fm/#/tap_hold?id=permissive-hold">Permissive Hold</a> になっていました。設定変更のために、 QMK をビルドしなければ……。<br>
-</p>
-
-<h3 id="Nine キーボード"><a href="#Nine キーボード">Nine キーボード</a></h3><p>
-<a href="https://github.com/bsag/nine-nano">Nine</a> キーボードが欲しいです。発注の手間を乗り越えられるのか……。<br>
-</p>
-
-<ul><li><a href="https://www.rousette.org.uk/archives/introducing-the-nine-keyboard/">BSAG » Introducing the Nine keyboard</a><br></li>
-<li><a href="https://github.com/bsag/nine-nano/blob/main/docs/build_guide.md">nine-nano/docs/build_guide.md</a><br></li>
-</ul>
-
-<h3 id="Youtube"><a href="#Youtube">Youtube</a></h3><p>
-<a href="https://www.youtube.com/watch?v=Xgu0Ng0t54o">サイドフリップ初心者は何日でできるようになる？【側宙】 - YouTube</a><br>
-</p>
-
-<p>
-全動画観ました。なんというナード！　PC だけでもこれにならねばと、初心を思い出しました。<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>
+        全動画観ました。なんというナード！　PC だけでもこれにならねばと、初心を思い出しました。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

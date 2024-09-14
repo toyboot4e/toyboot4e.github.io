@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -77,7 +78,6 @@
           </tr>
         </tbody>
       </table>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc360/tasks/abc360_a">A 問題</a></a>
       </h3>
@@ -95,7 +95,6 @@
 main=interact$f;f s|s&gt;"SR"||s&gt;"R"&amp;&amp;s&lt;"S"="Yes"|0&lt;1="No"
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc360/tasks/abc360_b">B 問題</a></a>
       </h3>
@@ -108,7 +107,6 @@ main=interact$f;f s|s&gt;"SR"||s&gt;"R"&amp;&amp;s&lt;"S"="Yes"|0&lt;1="No"
         <pre><code class="src language-hs">import Data.List.Extra;main=interact$f.words;f[s,t]|elem t$concatMap(transpose.(`chunksOf`s))[1..length s-1]="Yes"|0&lt;1="No"
 </code></pre>
       </div>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc360/tasks/abc360_c">C 問題</a></a>
       </h3>
@@ -121,7 +119,6 @@ main=interact$f;f s|s&gt;"SR"||s&gt;"R"&amp;&amp;s&lt;"S"="Yes"|0&lt;1="No"
         <pre><code class="src language-hs">import Data.List;main=interact$show.f.map read.words;f(n:r)=sum.map(sum.map snd.init).groupBy(\(i,_)(j,_)-&gt;i==j).sort.zipWith(,)r$drop n r
 </code></pre>
       </div>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc360/tasks/abc360_d">D 問題</a></a>
       </h3>
@@ -133,7 +130,6 @@ main=interact$f;f s|s&gt;"SR"||s&gt;"R"&amp;&amp;s&lt;"S"="Yes"|0&lt;1="No"
       </p>
 
       <p>転倒数を使った解答は考察が上手いですね。<br /></p>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc360/tasks/abc360_e">E 問題</a></a>
       </h3>
@@ -168,7 +164,6 @@ main=interact$f;f s|s&gt;"SR"||s&gt;"R"&amp;&amp;s&lt;"S"="Yes"|0&lt;1="No"
         期待値 (答え) は \(\sum\limits_{i=1}^{N} i p_i = p_1 + \sum\limits_{i=2}^{N} {i p_i} = p_1 +
         p_2 (\frac {(2 + N) (N - 1)} {2})\) です。<br />
       </p>
-
       <h2 id="ABC 361"><a href="#ABC 361">ABC 361</a></h2>
       <p><a href="https://atcoder.jp/contests/abc361">ABC 361</a> に参加しました。<br /></p>
 
@@ -226,7 +221,6 @@ main=interact$f;f s|s&gt;"SR"||s&gt;"R"&amp;&amp;s&lt;"S"="Yes"|0&lt;1="No"
           </tr>
         </tbody>
       </table>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc361/tasks/abc361_a">A 問題</a></a>
       </h3>
@@ -236,7 +230,6 @@ main=interact$f;f s|s&gt;"SR"||s&gt;"R"&amp;&amp;s&lt;"S"="Yes"|0&lt;1="No"
         <pre><code class="src language-hs">main=interact$unwords.map show.f.map read.words;f(_:k:x:s)=take k s++[x]++drop k s
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc361/tasks/abc361_b">B 問題</a></a>
       </h3>
@@ -249,7 +242,6 @@ main=interact$f;f s|s&gt;"SR"||s&gt;"R"&amp;&amp;s&lt;"S"="Yes"|0&lt;1="No"
       </p>
 
       <p>初見で解ける人は算数のセンスがあると思います。<br /></p>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc361/tasks/abc361_c">C 問題</a></a>
       </h3>
@@ -260,21 +252,18 @@ main=interact$f;f s|s&gt;"SR"||s&gt;"R"&amp;&amp;s&lt;"S"="Yes"|0&lt;1="No"
         K 個消す、最小値を K - 1 個・最大値を 1 個消す、……、最大値を K 個消す、の (K + 1)
         通りです。<br />
       </p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc361/tasks/abc361_d">D 問題</a></a>
       </h3>
       <p>
         一見 ARC ですが、 BFS の問題でした。状態数を \(3^{n+2}\) にして upsolve しました。<br />
       </p>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc361/tasks/abc361_e">E 問題</a></a>
       </h3>
       <p>
         辺に重みがあるタイプの全包囲木 DP で WA. 木の直径で十分なことに気付いて AC しました。<br />
       </p>
-
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
       <h3 id="Nix Flakes 入門"><a href="#Nix Flakes 入門">Nix Flakes 入門</a></h3>
       <p>

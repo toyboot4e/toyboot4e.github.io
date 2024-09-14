@@ -1,201 +1,305 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 342, Rolling Hash - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 342, Rolling Hash</h1><p>Feb 25, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="ABC 342"><a href="#ABC 342">ABC 342</a></h2><p>
-<a href="https://atcoder.jp/contests/abc342">ABC 342</a> に参加しました。 3 完 (A, B, D) でした。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 342, Rolling Hash - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 342, Rolling Hash</h1>
+      <p>Feb 25, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 342"><a href="#ABC 342">ABC 342</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/abc342">ABC 342</a> に参加しました。 3 完 (A, B, D)
+        でした。<br />
+      </p>
+      <h4 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_a">A 問題</a></a>
+      </h4>
+      <p>1 問目から強敵が来ました。ワシはアプリカティブ・スタイルが大好きじゃ。<br /></p>
 
-<h4 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_a">A 問題</a></a></h4><p>
-1 問目から強敵が来ました。ワシはアプリカティブ・スタイルが大好きじゃ。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">main :: IO ()
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main :: IO ()
 main = do
   !s &lt;- BS.getLine
   let !cns = map ((,) &lt;$&gt; head &lt;*&gt; length) . group $ sort (BS.unpack s)
   let !c = fst . fromJust $ find ((== 1) . snd) cns
   print . succ . fromJust $ findIndex (== c) (BS.unpack s)
 </code></pre>
-</div>
+      </div>
 
-<p>
-どんな方法でも良いので、淀み無く解けることが大事だと感じました。<br>
-</p>
+      <p>どんな方法でも良いので、淀み無く解けることが大事だと感じました。<br /></p>
+      <h4 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_b">B 問題</a></a>
+      </h4>
+      <p>都度 <code>elemIndex</code> を走らせる \(O(NQ)\) の解法が簡潔で良いと思います。<br /></p>
 
-<h4 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_b">B 問題</a></a></h4><p>
-都度 <code>elemIndex</code> を走らせる \(O(NQ)\) の解法が簡潔で良いと思います。<br>
-</p>
+      <p>
+        マップ (人 x \(\mapsto\) その人の位置 i<sub>x</sub>) を作れば \(O(N)\) で解答できます。<br />
+      </p>
 
-<p>
-マップ (人 x \(\mapsto\) その人の位置 i<sub>x</sub>) を作れば \(O(N)\) で解答できます。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">-- 密なマップは配列で実現します
+      <div class="org-src-container">
+        <pre><code class="src language-hs">-- 密なマップは配列で実現します
 let !is = U.accumulate (const id) (U.replicate (n + 1) (-1)) $ U.imap (flip (,)) xs
 </code></pre>
-</div>
+      </div>
+      <h4 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_c">C 問題</a></a>
+      </h4>
+      <h5 id="置換関数を構築する方法">
+        <a href="#置換関数を構築する方法">置換関数を構築する方法</a>
+      </h5>
+      <p>
+        毎回すべての文字を置換すると、計算量は \(O(QN)\) です。ここで文字の置換を \(f_i\) として、
+        \(f_q (f_{q - 1} (.. (f_1 \mathit{xs}) .. ))\) の計算を \((f_q \circ f_{q - 1} \circ ..
+        \circ f_1) \mathit{xs}\) に置き換えると、 \(O(Q f)\) で計算できます。賢い。<br />
+      </p>
+      <h5 id="Union-Find を使った解法">
+        <a href="#Union-Find を使った解法">Union-Find を使った解法</a>
+      </h5>
+      <p>
+        それぞれの文字をバケットに見立てます。文字の書き換えとは、バケットの中身を別のバケットに移すことだと考えると、
+        Union-Find を使うことができます。<br />
+      </p>
 
-<h4 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_c">C 問題</a></a></h4><h5 id="置換関数を構築する方法"><a href="#置換関数を構築する方法">置換関数を構築する方法</a></h5><p>
-毎回すべての文字を置換すると、計算量は \(O(QN)\) です。ここで文字の置換を \(f_i\) として、 \(f_q (f_{q - 1} (.. (f_1 \mathit{xs}) .. ))\) の計算を \((f_q \circ f_{q - 1} \circ .. \circ f_1) \mathit{xs}\) に置き換えると、 \(O(Q f)\) で計算できます。賢い。<br>
-</p>
+      <p>
+        できません。 Union-Find
+        を使う場合は、破棄した文字に対応する新しい頂点を都度追加し、過去の頂点を引きずらないよう工夫する必要があります。ほげえええええええ<br />
+      </p>
 
-<h5 id="Union-Find を使った解法"><a href="#Union-Find を使った解法">Union-Find を使った解法</a></h5><p>
-それぞれの文字をバケットに見立てます。文字の書き換えとは、バケットの中身を別のバケットに移すことだと考えると、 Union-Find を使うことができます。<br>
-</p>
-
-<p>
-できません。 Union-Find を使う場合は、破棄した文字に対応する新しい頂点を都度追加し、過去の頂点を引きずらないよう工夫する必要があります。ほげえええええええ<br>
-</p>
-
-<details>
-<summary>
-撃墜ケース</summary>
-<div class="org-src-container">
-<label class="org-src-name"><span class="listing-number">Listing 1: </span><code>hack-case.in</code></label><pre><code class="src language-txt">3
+      <details>
+        <summary>撃墜ケース</summary>
+        <div class="org-src-container">
+          <label class="org-src-name"
+            ><span class="listing-number">Listing 1: </span><code>hack-case.in</code></label
+          >
+          <pre><code class="src language-txt">3
 abc
 2
 a x
 a z
 </code></pre>
-</div>
+        </div>
 
-<div class="org-src-container">
-<label class="org-src-name"><span class="listing-number">Listing 2: </span><code>hack-case.out</code></label><pre><code class="src language-txt">xbc
+        <div class="org-src-container">
+          <label class="org-src-name"
+            ><span class="listing-number">Listing 2: </span><code>hack-case.out</code></label
+          >
+          <pre><code class="src language-txt">xbc
 </code></pre>
-</div>
+        </div>
 
-<p>
-見事に <code>zbc</code> を出力していました。 <code>x</code>, あなたはもう <code>a</code> じゃないのよ。あるいは <code>a z</code>, を <code>a' z</code> と見做します。<br>
-</p>
+        <p>
+          見事に <code>zbc</code> を出力していました。 <code>x</code>, あなたはもう
+          <code>a</code> じゃないのよ。あるいは <code>a z</code>, を
+          <code>a' z</code> と見做します。<br />
+        </p>
+      </details>
+      <h4 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_d">D 問題</a></a>
+      </h4>
+      <p>
+        これは面白かったです。 \(\{A_{n}\}_{n}\) の走査は一度で済ませたいところですが、 \(A_j\)
+        と掛け合わせて平方数となる \(A_i\) の取り寄せを高速化する必要があります。実はこれを 1
+        点に集約できるスロットの持ち方があって、それは \(2^3 \cdot 3 \cdot 5^2\) に対する \(2 \cdot
+        3\) のような数です。<br />
+      </p>
 
-</details>
+      <p>言語化が辛いのでコードで:<br /></p>
 
-<h4 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_d">D 問題</a></a></h4><p>
-これは面白かったです。 \(\{A_{n}\}_{n}\) の走査は一度で済ませたいところですが、 \(A_j\) と掛け合わせて平方数となる \(A_i\) の取り寄せを高速化する必要があります。実はこれを 1 点に集約できるスロットの持ち方があって、それは \(2^3 \cdot 3 \cdot 5^2\) に対する \(2 \cdot 3\) のような数です。<br>
-</p>
-
-<p>
-言語化が辛いのでコードで:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">feat :: Int -&gt; Int
+      <div class="org-src-container">
+        <pre><code class="src language-hs">feat :: Int -&gt; Int
 feat = foldl' (*) (1 :: Int) . mapMaybe f . primeFactors
   where
     f (!p, !n)
       | n `mod` 2 == 0 = Nothing
       | otherwise = Just p
 </code></pre>
-</div>
+      </div>
 
-<p>
-また \(0 = 0^2\) の処理は頑張ります。<br>
-</p>
+      <p>また \(0 = 0^2\) の処理は頑張ります。<br /></p>
+      <h4 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_e">E 問題</a></a>
+      </h4>
+      <p>
+        終点からの Dijkstra 的なアレです。最も遅い時間を求めるため
+        <code>Max</code> ヒープを使います。<br />
+      </p>
+      <h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2>
+      <h3 id="meooow25/haccepted"><a href="#meooow25/haccepted">meooow25/haccepted</a></h3>
+      <p>
+        <a href="https://github.com/meooow25/haccepted">meooow25/haccepted</a> (<a
+          href="https://meooow25.github.io/haccepted/"
+          >API ドキュメント</a
+        >) を見逃していました。 Array 派 Haskeller や Codeforces 勢は垂涎かも知れません。<br />
+      </p>
 
-<h4 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc342/tasks/abc342_e">E 問題</a></a></h4><p>
-終点からの Dijkstra 的なアレです。最も遅い時間を求めるため <code>Max</code> ヒープを使います。<br>
-</p>
+      <ul>
+        <li>
+          <a href="https://github.com/meooow25/haccepted/blob/master/src/Dijkstra.hs">Dijkstra</a
+          ><br />
+          さらっとヒープ (木) を自作しています。<br />
+        </li>
 
-<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="meooow25/haccepted"><a href="#meooow25/haccepted">meooow25/haccepted</a></h3><p>
-<a href="https://github.com/meooow25/haccepted">meooow25/haccepted</a> (<a href="https://meooow25.github.io/haccepted/">API ドキュメント</a>) を見逃していました。 Array 派 Haskeller や Codeforces 勢は垂涎かも知れません。<br>
-</p>
+        <li>
+          <a href="https://github.com/meooow25/haccepted/blob/master/src/RerootFold.hs"
+            >RerootFold</a
+          ><br />
+          全方位木 DP です。良い命名ですね。<br />
+        </li>
+      </ul>
+      <h3 id="位取り法"><a href="#位取り法">位取り法</a></h3>
+      <ul>
+        <li>
+          辞書順比較のために文字列を整数に単射する際は、無を 0 番、 <code>'a'</code> を 1
+          番とします。<br />
+        </li>
+      </ul>
+      <h3 id="Rolling Hash"><a href="#Rolling Hash">Rolling Hash</a></h3>
+      <p>
+        <a href="https://atcoder.jp/contests/abc331/tasks/abc331_f">ABC 331 - F</a> で rolling hash
+        をセグメント木に載せる問題が出ました。セグメント木に乗るデータ型と言えばモノイドですが、鉄則本の
+        rolling hash はヘビー級コンテナの印象でした。<br />
+      </p>
 
-<ul><li><a href="https://github.com/meooow25/haccepted/blob/master/src/Dijkstra.hs">Dijkstra</a><br>
-さらっとヒープ (木) を自作しています。<br></li>
+      <p>
+        \(\{B^{n}\}_n\) の事前計算は不要なのか問題を解決すべく、我々は
+        <a href="https://github.com/cojna/iota">cojna/iota</a> の
+        <a href="https://cojna.github.io/iota/Data-ByteString-RollingHash.html">Data.RollingHash</a>
+        に向かいます……。<br />
+      </p>
+      <h4 id="群としての rolling hash">
+        <a href="#群としての rolling hash">群としての rolling hash</a>
+      </h4>
+      <p>
+        鉄則本では累積和を使って rolling hash
+        を実装しました。累積和とは、結合と分解のできるデータ型、つまり群の列が与えられた際に、
+        \(O(N)\) の前処理によって任意の \([l, r]\) 区間データの結合が \(O(\mathit{recip \cdot
+        \diamond})\) で得られるアルゴリズムです。<br />
+      </p>
 
-<li><a href="https://github.com/meooow25/haccepted/blob/master/src/RerootFold.hs">RerootFold</a><br>
-全方位木 DP です。良い命名ですね。<br></li>
-</ul>
+      <p>
+        群とは逆元が定義されたモノイドです。狭義の累積和では
+        <code>csum[r] - csum[l]</code> を計算しますが、一般的には \(L^{-1} \diamond (L \diamond R)\)
+        のような群に対する計算だと捉えられます。<br />
+      </p>
 
-<h3 id="位取り法"><a href="#位取り法">位取り法</a></h3><ul><li>辞書順比較のために文字列を整数に単射する際は、無を 0 番、 <code>'a'</code> を 1 番とします。<br></li>
-</ul>
+      <table>
+        <colgroup>
+          <col class="org-left" />
 
-<h3 id="Rolling Hash"><a href="#Rolling Hash">Rolling Hash</a></h3><p>
-<a href="https://atcoder.jp/contests/abc331/tasks/abc331_f">ABC 331 - F</a> で rolling hash をセグメント木に載せる問題が出ました。セグメント木に乗るデータ型と言えばモノイドですが、鉄則本の rolling hash はヘビー級コンテナの印象でした。<br>
-</p>
+          <col class="org-left" />
 
-<p>
-\(\{B^{n}\}_n\) の事前計算は不要なのか問題を解決すべく、我々は <a href="https://github.com/cojna/iota">cojna/iota</a> の <a href="https://cojna.github.io/iota/Data-ByteString-RollingHash.html">Data.RollingHash</a> に向かいます……。<br>
-</p>
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">型</th>
+            <th scope="col" class="org-left">説明</th>
+            <th scope="col" class="org-left">累積和においては</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">半群</td>
+            <td class="org-left">結合的な演算 <code>&lt;&gt;</code> を持つデータ型</td>
+            <td class="org-left"><code>scanl' &lt;&gt;</code> の形で利用</td>
+          </tr>
 
-<h4 id="群としての rolling hash"><a href="#群としての rolling hash">群としての rolling hash</a></h4><p>
-鉄則本では累積和を使って rolling hash を実装しました。累積和とは、結合と分解のできるデータ型、つまり群の列が与えられた際に、 \(O(N)\) の前処理によって任意の \([l, r]\) 区間データの結合が \(O(\mathit{recip \cdot \diamond})\) で得られるアルゴリズムです。<br>
-</p>
+          <tr>
+            <td class="org-left">モノイド</td>
+            <td class="org-left">単位元 <code>mempty</code> が定義された半群</td>
+            <td class="org-left">
+              <code>scanl'</code> の初期値、 <code>csum</code> の番兵として利用
+            </td>
+          </tr>
 
-<p>
-群とは逆元が定義されたモノイドです。狭義の累積和では <code>csum[r] - csum[l]</code> を計算しますが、一般的には \(L^{-1} \diamond (L \diamond R)\) のような群に対する計算だと捉えられます。<br>
-</p>
+          <tr>
+            <td class="org-left">群</td>
+            <td class="org-left">逆元が定義されたモノイド</td>
+            <td class="org-left">\(L^{-1} \diamond (L \diamond R)\) の計算に利用</td>
+          </tr>
+        </tbody>
+      </table>
 
-<table>
+      <p>
+        Rolling hash においては \(L^{-1} \diamond (L \diamond R)\) の計算に \(B^{-n} \bmod p\)
+        が現れ、非常に大きな定数時間の計算が要求されます。したがって \(\{B^{n}\}_{n}\)
+        を事前計算し、 \(B^{-n_1} B^{n_2} = B^{n_2 - n_1}\) として逆元の計算を打ち消すことで、
+        \(O(1)\) でハッシュ値を計算可能にします。<br />
+      </p>
+      <h4 id="モノイドとしての rolling hash">
+        <a href="#モノイドとしての rolling hash">モノイドとしての rolling hash</a>
+      </h4>
+      <p>
+        モノイドとしての rolling hash は \((B^{n}, \mathit{hash})\) です。これがすべて、超簡単！<br />
+      </p>
 
+      <p>
+        \[ \begin{aligned} \mathrm{mempty} &:= (B^{1}, 0) \\ (B^{n_1}, \mathit{hash}_1) \diamond
+        (B^{n_2}, \mathit{hash}_2) &:= (B^{n_1 + n_2}, B^{n_2} \mathit{hash}_1 + \mathit{hash}_2)
+        \end{aligned} \\ \]<br />
+      </p>
 
-<colgroup>
-<col  class="org-left">
+      <p>
+        セグメント木を使って rolling hash を実装する場合、結合の逆操作は必要ありません。
+        \(\{B_{n}\}_{n}\)
+        を持たなくて良くなったため、理解も実装もシンプルになりました。しかもセグメント木は 1
+        点更新ができます。唯一、計算量は \(O(N \log N)\) となりますが、そこを突く問題は AtCoder
+        では出ません。<br />
+      </p>
 
-<col  class="org-left">
+      <p>
+        回文の判定では逆方向のハッシュ値を計算するため、セグメント木が 2 本必要です。逆方向の
+        <code>&lt;&gt;</code> の計算には <code>flip (&lt;&gt;)</code> を使えば良く、それは
+        <a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/Data-Monoid.html#t:Dual"
+          >Dual モノイド</a
+        >
+        なんだって cojna さんのコードが言っていました。<br />
+      </p>
+      <h3 id="cojna/iota の高速化ネタ">
+        <a href="#cojna/iota の高速化ネタ">cojna/iota の高速化ネタ</a>
+      </h3>
+      <h4 id="MagicHash と natVal'">
+        <a href="#MagicHash と natVal'"><code>MagicHash</code> と <code>natVal'</code></a>
+      </h4>
+      <p>
+        <a
+          href="https://hackage.haskell.org/package/base-4.19.1.0/docs/GHC-TypeLits.html#t:KnownNat"
+          >KnownNat</a
+        >
+        からの値の取得を
+        <a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/GHC-TypeLits.html#v:natVal"
+          >natVal</a
+        >
+        から
+        <a
+          href="https://hackage.haskell.org/package/base-4.19.1.0/docs/GHC-TypeLits.html#v:natVal-39-"
+          >natVal'</a
+        >
+        に変えると少し速くなりました。<br />
+      </p>
 
-<col  class="org-left">
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-left">型</th>
-<th scope="col" class="org-left">説明</th>
-<th scope="col" class="org-left">累積和においては</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-left">半群</td>
-<td class="org-left">結合的な演算 <code>&lt;&gt;</code> を持つデータ型</td>
-<td class="org-left"><code>scanl' &lt;&gt;</code> の形で利用</td>
-</tr>
-
-<tr>
-<td class="org-left">モノイド</td>
-<td class="org-left">単位元 <code>mempty</code> が定義された半群</td>
-<td class="org-left"><code>scanl'</code> の初期値、 <code>csum</code> の番兵として利用</td>
-</tr>
-
-<tr>
-<td class="org-left">群</td>
-<td class="org-left">逆元が定義されたモノイド</td>
-<td class="org-left">\(L^{-1} \diamond (L \diamond R)\) の計算に利用</td>
-</tr>
-</tbody>
-</table>
-
-<p>
-Rolling hash においては \(L^{-1} \diamond (L \diamond R)\) の計算に \(B^{-n} \bmod p\) が現れ、非常に大きな定数時間の計算が要求されます。したがって \(\{B^{n}\}_{n}\) を事前計算し、 \(B^{-n_1} B^{n_2} = B^{n_2 - n_1}\) として逆元の計算を打ち消すことで、 \(O(1)\) でハッシュ値を計算可能にします。<br>
-</p>
-
-<h4 id="モノイドとしての rolling hash"><a href="#モノイドとしての rolling hash">モノイドとしての rolling hash</a></h4><p>
-モノイドとしての rolling hash は \((B^{n}, \mathit{hash})\) です。これがすべて、超簡単！<br>
-</p>
-
-<p>
-\[
-\begin{aligned}
-\mathrm{mempty} &:= (B^{1}, 0) \\
-(B^{n_1}, \mathit{hash}_1) \diamond (B^{n_2}, \mathit{hash}_2) &:= (B^{n_1 + n_2}, B^{n_2} \mathit{hash}_1 + \mathit{hash}_2)
-\end{aligned} \\
-\]<br>
-</p>
-
-<p>
-セグメント木を使って rolling hash を実装する場合、結合の逆操作は必要ありません。 \(\{B_{n}\}_{n}\) を持たなくて良くなったため、理解も実装もシンプルになりました。しかもセグメント木は 1 点更新ができます。唯一、計算量は \(O(N \log N)\) となりますが、そこを突く問題は AtCoder では出ません。<br>
-</p>
-
-<p>
-回文の判定では逆方向のハッシュ値を計算するため、セグメント木が 2 本必要です。逆方向の <code>&lt;&gt;</code> の計算には <code>flip (&lt;&gt;)</code> を使えば良く、それは <a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/Data-Monoid.html#t:Dual">Dual モノイド</a> なんだって cojna さんのコードが言っていました。<br>
-</p>
-
-<h3 id="cojna/iota の高速化ネタ"><a href="#cojna/iota の高速化ネタ">cojna/iota の高速化ネタ</a></h3><h4 id="MagicHash と natVal'"><a href="#MagicHash と natVal'"><code>MagicHash</code> と <code>natVal'</code></a></h4><p>
-<a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/GHC-TypeLits.html#t:KnownNat">KnownNat</a> からの値の取得を <a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/GHC-TypeLits.html#v:natVal">natVal</a> から <a href="https://hackage.haskell.org/package/base-4.19.1.0/docs/GHC-TypeLits.html#v:natVal-39-">natVal'</a> に変えると少し速くなりました。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-diff-hs diff-highlight">+{-# LANGUAGE MagicHash #-}
+      <div class="org-src-container">
+        <pre><code class="src language-diff-hs diff-highlight">+{-# LANGUAGE MagicHash #-}
 -import Data.Proxy
 +import GHC.Exts
 import GHC.TypeLits
@@ -203,82 +307,209 @@ import GHC.TypeLits
 -fromInteger (natVal (Proxy @p))
 +fromInteger (natVal' (proxy# @p))
 </code></pre>
-</div>
+      </div>
+      <h4 id="Unbox の実装を SoA から AoS に">
+        <a href="#Unbox の実装を SoA から AoS に"><code>Unbox</code> の実装を SoA から AoS に</a>
+      </h4>
+      <p>
+        2 要素のタプルは 2 本の unboxed vector に格納されますが、 2 要素の配列は 1 本の unboxed
+        vector に詰めてしまえばいいじゃない！　それが
+        <a href="https://cojna.github.io/iota/Data-Monoid-Affine.html">Affine</a> の
+        <code>Unbox</code> の実装です。<br />
+      </p>
 
-<h4 id="Unbox の実装を SoA から AoS に"><a href="#Unbox の実装を SoA から AoS に"><code>Unbox</code> の実装を SoA から AoS に</a></h4><p>
-2 要素のタプルは 2 本の unboxed vector に格納されますが、 2 要素の配列は 1 本の unboxed vector に詰めてしまえばいいじゃない！　それが <a href="https://cojna.github.io/iota/Data-Monoid-Affine.html">Affine</a> の <code>Unbox</code> の実装です。<br>
-</p>
+      <p>
+        効果は……ほぼありません。ただ
+        <a href="https://cojna.github.io/iota/Data-Mat3x3.html">Mat3x3</a> に至っては
+        <code>primitive</code> パッケージの
+        <a
+          href="https://hackage.haskell.org/package/primitive-0.9.0.0/docs/Data-Primitive-ByteArray.html"
+          >ByteArray</a
+        >
+        にすべての要素を詰め込んでいますから、流石に効くのではないかと思います。<br />
+      </p>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="人"><a href="#人">人</a></h3>
+      <h4 id="Codeforces 時代"><a href="#Codeforces 時代">Codeforces 時代</a></h4>
+      <p>少し調べてみました。<br /></p>
 
-<p>
-効果は……ほぼありません。ただ <a href="https://cojna.github.io/iota/Data-Mat3x3.html">Mat3x3</a> に至っては <code>primitive</code> パッケージの <a href="https://hackage.haskell.org/package/primitive-0.9.0.0/docs/Data-Primitive-ByteArray.html">ByteArray</a> にすべての要素を詰め込んでいますから、流石に効くのではないかと思います。<br>
-</p>
+      <details>
+        <summary>確認内容</summary>
+        <ul>
+          <li>
+            2010-06: tanakh 氏
+            <a href="https://codeforces.com/contest/17/submission/76421"
+              >Codeforces にて Haskell 初投</a
+            ><br />
+          </li>
+          <li>
+            2011-12: cojna 氏
+            <a href="https://codeforces.com/contest/137/submission/971480">Codeforces 初投</a><br />
+          </li>
+          <li>2014-08: tanakh 氏 Codeforces での提出を C++ に切り替え<br /></li>
+          <li>
+            2016-01: cojna 氏 Codeforces にて
+            <a href="https://codeforces.com/contest/621/submission/15698096"
+              >vector がコンパイルエラーに</a
+            ><br />
+            <code>vector</code> は <code>import</code> できるが呼び出しできない死に体だった模様
+            (後述)<br />
+          </li>
+          <li>
+            2016-07: cojna 氏
+            <a href="https://atcoder.jp/contests/agc001/submissions/806245">AtCoder rated 初投</a
+            ><br />
+          </li>
+          <li>
+            2016-09: cojna 氏
+            <a href="https://atcoder.jp/contests/code-festival-2016-quala/submissions/890778"
+              >AtCoder 2 戦目より shortest 気味なコードを提出</a
+            ><br />
+          </li>
+          <li>
+            2016-10: kotatsugame 氏
+            <a href="https://atcoder.jp/contests/code-festival-2016-qualb/submissions/924346"
+              >AtCoder 初投</a
+            ><br />
+          </li>
+          <li>
+            2017-06:
+            <a href="https://codeforces.com/blog/entry/52977"
+              >Codeforces では様々なパッケージが使用できない件の共有</a
+            ><br />
+            Safe Haskell (<a
+              href="https://downloads.haskell.org/~ghc/7.8.4/docs/html/users_guide/safe-haskell.html"
+              >-XSafe</a
+            >) が有効なため、 <code>vector</code> も使えなかった模様<br />
+          </li>
+          <li>2018-02: tanakh 氏 Codeforces での提出を Rust に切り替え<br /></li>
+          <li>
+            2018-02: <a href="https://github.com/cojna/iota">cojna/iota</a> 初コミット (当初は
+            <code>algorithm-haskell</code>)<br />
+          </li>
+          <li>
+            2018-04: tanakh 氏 <a href="https://github.com/mattn/vim-tanakh">エディタ拡張と化す</a
+            ><br />
+          </li>
+          <li>
+            2018-08: gksato 氏
+            <a href="https://atcoder.jp/contests/abc106/submissions/3029762">AtCoder 初投</a><br />
+          </li>
+          <li>
+            2018-12: gksato 氏
+            <a href="https://codeforces.com/contest/1088/submission/46590601">Codeforces 初投</a
+            ><br />
+            <code>vector</code> にてコンパイルエラー、以降は array で戦うことに<br />
+          </li>
+          <li>
+            2019-??: Codeforces のビルド環境更新 (脱 Haskell Platform)<br />
+            <code>-XSafe</code> が削除されるも、そもそも
+            <code>vector</code> パッケージが消えた模様<br />
+          </li>
+          <li>
+            2019-02: <a href="https://github.com/cojna/iota">cojna/iota</a> が
+            <a href="https://github.com/cojna/iota/pull/10/files">現在の名前に変更</a><br />
+          </li>
+          <li>
+            2019-02:
+            <a href="https://onlinejudge.u-aizu.ac.jp/challenges/sources/UOA/UAPC/3055"
+              >UAPC 3055 E - こたつがめを燃やさないで</a
+            >
+            が出題<br />
+          </li>
+          <li>
+            2019-10:
+            <a href="https://github.com/cojna/iota/pull/53"><code>iota</code> の bundler 誕生</a
+            ><br />
+          </li>
+          <li>
+            2021-12
+            <a href="https://codeforces.com/blog/entry/97447"
+              >CodeForces の Haskell 環境が 64 bit になった報告</a
+            ><br />
+          </li>
+        </ul>
+      </details>
+      <h4 id="tanakh 氏"><a href="#tanakh 氏">tanakh 氏</a></h4>
+      <p>
+        <a href="https://github.com/mattn/vim-tanakh">エディタ拡張となっていた tanakh 氏</a>
+        を発見。
+        <a href="https://github.com/toyboot4e/tanakh-mode.el">Emacs にポートした</a>
+        。オーバー。<br />
+      </p>
+      <h4 id="DT"><a href="#DT">DT</a></h4>
+      <p>
+        <a href="https://www.youtube.com/@DistroTube">Distro Tube</a> から書籍
+        <a
+          href="https://www.amazon.com/Super-Wheel-Options-Strategy-Financial/dp/B0CVGGD7P6?qid=1708284820&amp;refinements=p_27:Derek+W.+Taylor&amp;s=books&amp;sr=1-2&amp;text=Derek+W.+Taylor&amp;linkCode=sl1&amp;tag=distrotube-20&amp;linkId=804e4d62b3127fbbf2be13e48125c8e6&amp;language=en_US&amp;ref_=as_li_ss_tl"
+          >The Super Wheel Options Strategy</a
+        >
+        が出ました (ポチッ) 。一時は xmonad, Evil Emacs, exwm などで夢中になったチャンネルです。
+        <a href="https://www.youtube.com/channel/UCqyrm14zcbZw6pdQeHXPF8w">新しいチャンネル</a>
+        も観る、かも<br />
+      </p>
+      <h3 id="キーボード"><a href="#キーボード">キーボード</a></h3>
+      <p>
+        <a href="https://kagizaraya.jp/en/products/miniaxe">MiniAxe</a> が届きました。 36
+        キーで組み立てが楽しみです。今後はさらなる操作性の拡張を目指したいです。<br />
+      </p>
+      <h4 id="Steno キーボード"><a href="#Steno キーボード">Steno キーボード</a></h4>
+      <p>
+        Stenography は複数キーの同時押しを活かした文字入力の方式です。キー数は 30 を切る程度。近年は
+        <a href="https://www.openstenoproject.org/">Open Steno Project</a> や
+        <a href="https://stenokeyboards.com/">StenoKeyboards</a> が活躍しており、誰でも 2
+        万円以下で気軽に挑戦できます。<br />
+      </p>
 
-<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="人"><a href="#人">人</a></h3><h4 id="Codeforces 時代"><a href="#Codeforces 時代">Codeforces 時代</a></h4><p>
-少し調べてみました。<br>
-</p>
+      <ul>
+        <li>
+          <a href="https://www.youtube.com/watch?v=uQZp7RX-h6o&amp;t=249s"
+            >Symbols and Shortcuts With Steno! Emily's Symbols And Modifiers</a
+          ><br />
+          数値キーとして 8, 4, 2, 1 を用意します。たとえば <code>5</code> は <code>1</code> と
+          <code>4</code> の同時押しです。天才……！<br />
+        </li>
+        <li>
+          <a href="https://github.com/EPLHREU/emily-symbols">emily-symbols</a><br />
+          Steno キーボードにおけるキーマップ例と図解が載っています。魔境です。<br />
+        </li>
+        <li>
+          <a href="https://github.com/EPLHREU/emily-modifiers">emily-modifiers</a><br />
+          同上です。<br />
+        </li>
+      </ul>
+      <h4 id="18 キーのキーボード"><a href="#18 キーのキーボード">18 キーのキーボード</a></h4>
+      <p>
+        <a href="https://www.youtube.com/@BenVallack">Ben Vallack</a> のキーボードは steno
+        よりもさらにキー数が少なく、驚異の 18
+        キーです。しかも一番目立つ位置に『リピートキー』なるものが置かれており、同じキーを 2
+        回連続で打つ必要が無くなっています。<br />
+      </p>
 
-<details>
-<summary>
-確認内容</summary>
-<ul><li>2010-06: tanakh 氏 <a href="https://codeforces.com/contest/17/submission/76421">Codeforces にて Haskell 初投</a><br></li>
-<li>2011-12: cojna 氏 <a href="https://codeforces.com/contest/137/submission/971480">Codeforces 初投</a><br></li>
-<li>2014-08: tanakh 氏 Codeforces での提出を C++ に切り替え<br></li>
-<li>2016-01: cojna 氏 Codeforces にて <a href="https://codeforces.com/contest/621/submission/15698096">vector がコンパイルエラーに</a><br>
-<code>vector</code> は <code>import</code> できるが呼び出しできない死に体だった模様 (後述)<br></li>
-<li>2016-07: cojna 氏 <a href="https://atcoder.jp/contests/agc001/submissions/806245">AtCoder rated 初投</a><br></li>
-<li>2016-09: cojna 氏 <a href="https://atcoder.jp/contests/code-festival-2016-quala/submissions/890778">AtCoder 2 戦目より shortest 気味なコードを提出</a><br></li>
-<li>2016-10: kotatsugame 氏 <a href="https://atcoder.jp/contests/code-festival-2016-qualb/submissions/924346">AtCoder 初投</a><br></li>
-<li>2017-06: <a href="https://codeforces.com/blog/entry/52977">Codeforces では様々なパッケージが使用できない件の共有</a><br>
-Safe Haskell (<a href="https://downloads.haskell.org/~ghc/7.8.4/docs/html/users_guide/safe-haskell.html">-XSafe</a>) が有効なため、 <code>vector</code> も使えなかった模様<br></li>
-<li>2018-02: tanakh 氏 Codeforces での提出を Rust に切り替え<br></li>
-<li>2018-02: <a href="https://github.com/cojna/iota">cojna/iota</a> 初コミット (当初は <code>algorithm-haskell</code>)<br></li>
-<li>2018-04: tanakh 氏 <a href="https://github.com/mattn/vim-tanakh">エディタ拡張と化す</a><br></li>
-<li>2018-08: gksato 氏 <a href="https://atcoder.jp/contests/abc106/submissions/3029762">AtCoder 初投</a><br></li>
-<li>2018-12: gksato 氏 <a href="https://codeforces.com/contest/1088/submission/46590601">Codeforces 初投</a><br>
-<code>vector</code> にてコンパイルエラー、以降は array で戦うことに<br></li>
-<li>2019-??: Codeforces のビルド環境更新 (脱 Haskell Platform)<br>
-<code>-XSafe</code> が削除されるも、そもそも <code>vector</code> パッケージが消えた模様<br></li>
-<li>2019-02: <a href="https://github.com/cojna/iota">cojna/iota</a> が <a href="https://github.com/cojna/iota/pull/10/files">現在の名前に変更</a><br></li>
-<li>2019-02: <a href="https://onlinejudge.u-aizu.ac.jp/challenges/sources/UOA/UAPC/3055">UAPC 3055 E - こたつがめを燃やさないで</a> が出題<br></li>
-<li>2019-10: <a href="https://github.com/cojna/iota/pull/53"><code>iota</code> の bundler 誕生</a><br></li>
-<li>2021-12 <a href="https://codeforces.com/blog/entry/97447">CodeForces の Haskell 環境が 64 bit になった報告</a><br></li>
-</ul>
+      <ul>
+        <li>
+          <a href="https://www.youtube.com/watch?v=5RN_4PQ0j1A"
+            >Has Your Keyboard Got Too Many Keys? - Ben Vallack (Youtube)</a
+          ><br />
+        </li>
+        <li>
+          <a href="https://www.rousette.org.uk/archives/hold-me-closer-tiny-keyboard/"
+            >BSAG » Hold me closer, tiny keyboard</a
+          ><br />
+        </li>
+      </ul>
 
-</details>
-
-<h4 id="tanakh 氏"><a href="#tanakh 氏">tanakh 氏</a></h4><p>
-<a href="https://github.com/mattn/vim-tanakh">エディタ拡張となっていた tanakh 氏</a> を発見。 <a href="https://github.com/toyboot4e/tanakh-mode.el">Emacs にポートした</a> 。オーバー。<br>
-</p>
-
-<h4 id="DT"><a href="#DT">DT</a></h4><p>
-<a href="https://www.youtube.com/@DistroTube">Distro Tube</a> から書籍 <a href="https://www.amazon.com/Super-Wheel-Options-Strategy-Financial/dp/B0CVGGD7P6?qid=1708284820&amp;refinements=p_27:Derek+W.+Taylor&amp;s=books&amp;sr=1-2&amp;text=Derek+W.+Taylor&amp;linkCode=sl1&amp;tag=distrotube-20&amp;linkId=804e4d62b3127fbbf2be13e48125c8e6&amp;language=en_US&amp;ref_=as_li_ss_tl">The Super Wheel Options Strategy</a> が出ました (ポチッ) 。一時は xmonad, Evil Emacs, exwm などで夢中になったチャンネルです。 <a href="https://www.youtube.com/channel/UCqyrm14zcbZw6pdQeHXPF8w">新しいチャンネル</a> も観る、かも<br>
-</p>
-
-<h3 id="キーボード"><a href="#キーボード">キーボード</a></h3><p>
-<a href="https://kagizaraya.jp/en/products/miniaxe">MiniAxe</a> が届きました。 36 キーで組み立てが楽しみです。今後はさらなる操作性の拡張を目指したいです。<br>
-</p>
-
-<h4 id="Steno キーボード"><a href="#Steno キーボード">Steno キーボード</a></h4><p>
-Stenography は複数キーの同時押しを活かした文字入力の方式です。キー数は 30 を切る程度。近年は <a href="https://www.openstenoproject.org/">Open Steno Project</a> や <a href="https://stenokeyboards.com/">StenoKeyboards</a> が活躍しており、誰でも 2 万円以下で気軽に挑戦できます。<br>
-</p>
-
-<ul><li><a href="https://www.youtube.com/watch?v=uQZp7RX-h6o&amp;t=249s">Symbols and Shortcuts With Steno! Emily's Symbols And Modifiers</a><br>
-数値キーとして 8, 4, 2, 1 を用意します。たとえば <code>5</code> は <code>1</code> と <code>4</code> の同時押しです。天才……！<br></li>
-<li><a href="https://github.com/EPLHREU/emily-symbols">emily-symbols</a><br>
-Steno キーボードにおけるキーマップ例と図解が載っています。魔境です。<br></li>
-<li><a href="https://github.com/EPLHREU/emily-modifiers">emily-modifiers</a><br>
-同上です。<br></li>
-</ul>
-
-<h4 id="18 キーのキーボード"><a href="#18 キーのキーボード">18 キーのキーボード</a></h4><p>
-<a href="https://www.youtube.com/@BenVallack">Ben Vallack</a> のキーボードは steno よりもさらにキー数が少なく、驚異の 18 キーです。しかも一番目立つ位置に『リピートキー』なるものが置かれており、同じキーを 2 回連続で打つ必要が無くなっています。<br>
-</p>
-
-<ul><li><a href="https://www.youtube.com/watch?v=5RN_4PQ0j1A">Has Your Keyboard Got Too Many Keys? - Ben Vallack (Youtube)</a><br></li>
-<li><a href="https://www.rousette.org.uk/archives/hold-me-closer-tiny-keyboard/">BSAG » Hold me closer, tiny keyboard</a><br></li>
-</ul>
-
-<p>
-PCBWay で <a href="https://www.pcbway.com/project/shareproject/The_Piano_by_Ben_Vallack_Ultra_minimal_18_key_keyboard_5b2c99e1.html">買えるらしいです……？</a>　気になります。<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>
+        PCBWay で
+        <a
+          href="https://www.pcbway.com/project/shareproject/The_Piano_by_Ben_Vallack_Ultra_minimal_18_key_keyboard_5b2c99e1.html"
+          >買えるらしいです……？</a
+        >　気になります。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

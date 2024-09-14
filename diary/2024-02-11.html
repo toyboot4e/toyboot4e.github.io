@@ -1,48 +1,79 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 340, exgcd - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 340, exgcd</h1><p>Feb 11, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="ABC 340"><a href="#ABC 340">ABC 340</a></h3><p>
-<a href="https://atcoder.jp/contests/abc340">ABC 340</a> に参加しました。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 340, exgcd - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 340, exgcd</h1>
+      <p>Feb 11, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2>
+      <h3 id="ABC 340"><a href="#ABC 340">ABC 340</a></h3>
+      <p><a href="https://atcoder.jp/contests/abc340">ABC 340</a> に参加しました。<br /></p>
+      <h4 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_a">A 問題</a></a>
+      </h4>
+      <p>
+        数列 \(a, a + d, .., b\) を生成します。リストの range syntax を使ったり、
+        <code>iterate</code> を使うとシンプルに書けるようです:<br />
+      </p>
 
-<h4 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_a">A 問題</a></a></h4><p>
-数列 \(a, a + d, .., b\) を生成します。リストの range syntax を使ったり、 <code>iterate</code> を使うとシンプルに書けるようです:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">[a, a + d .. b]
+      <div class="org-src-container">
+        <pre><code class="src language-hs">[a, a + d .. b]
 takeWhile (&lt;= b) $ iterate (+ d) a
 </code></pre>
-</div>
+      </div>
 
-<p>
-僕は <code>unfoldr</code> を使ってしまいました。<br>
-</p>
+      <p>僕は <code>unfoldr</code> を使ってしまいました。<br /></p>
+      <h4 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_b">B 問題</a></a>
+      </h4>
+      <p>
+        クエリ処理の問題です。 Haskeller にとっては複数の厄介事が絡み合うため、茶 diff
+        相当かもしれません。<br />
+      </p>
+      <h4 id="クエリ処理の方針"><a href="#クエリ処理の方針">クエリ処理の方針</a></h4>
+      <p>スタックを使います。いずれのクエリでも文字列 A の後ろ側に関心があるためです。<br /></p>
 
-<h4 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_b">B 問題</a></a></h4><p>
-クエリ処理の問題です。 Haskeller にとっては複数の厄介事が絡み合うため、茶 diff 相当かもしれません。<br>
-</p>
+      <ul>
+        <li>クエリ <code>1</code>: A の末尾に値 <code>x</code> を追加する<br /></li>
+        <li>
+          クエリ <code>2</code>: A の後ろから <code>k</code> 番目の値を求め、標準出力に出す<br />
+        </li>
+      </ul>
 
-<h4 id="クエリ処理の方針"><a href="#クエリ処理の方針">クエリ処理の方針</a></h4><p>
-スタックを使います。いずれのクエリでも文字列 A の後ろ側に関心があるためです。<br>
-</p>
+      <p>Haskell においてはリストがスタックとして使えます。<br /></p>
+      <h4 id="解答の出力"><a href="#解答の出力">解答の出力</a></h4>
+      <p>
+        クエリ <code>2</code> においては、求めた値を標準出力に出す必要があります。クエリ
+        <code>2</code> が来る度に都度
+        <code>print</code> してしまうのが簡単です。ただしクエリ処理の関数には
+        <code>IO</code> モナドが必要です。<br />
+      </p>
 
-<ul><li>クエリ <code>1</code>: A の末尾に値 <code>x</code> を追加する<br></li>
-<li>クエリ <code>2</code>: A の後ろから <code>k</code> 番目の値を求め、標準出力に出す<br></li>
-</ul>
-
-<p>
-Haskell においてはリストがスタックとして使えます。<br>
-</p>
-
-<h4 id="解答の出力"><a href="#解答の出力">解答の出力</a></h4><p>
-クエリ <code>2</code> においては、求めた値を標準出力に出す必要があります。クエリ <code>2</code> が来る度に都度 <code>print</code> してしまうのが簡単です。ただしクエリ処理の関数には <code>IO</code> モナドが必要です。<br>
-</p>
-
-<details>
-<summary>
-都度 <code>print</code> する解答</summary>
-<div class="org-src-container">
-<pre><code class="src language-hs">main :: IO ()
+      <details>
+        <summary>都度 <code>print</code> する解答</summary>
+        <div class="org-src-container">
+          <pre><code class="src language-hs">main :: IO ()
 main = do
   !q &lt;- ints1
   !qs &lt;- U.replicateM q ints2
@@ -56,19 +87,19 @@ main = do
 
   U.foldM'_ f [] qs
 </code></pre>
-</div>
+        </div>
+      </details>
 
-</details>
+      <p>
+        より Haskell
+        らしい解答としては、クエリ処理を純粋関数とします。戻り値を答えの一覧とし、最後に
+        <code>print</code> します。 <code>unfoldr</code> などが適切な関数だと思います。<br />
+      </p>
 
-<p>
-より Haskell らしい解答としては、クエリ処理を純粋関数とします。戻り値を答えの一覧とし、最後に <code>print</code> します。 <code>unfoldr</code> などが適切な関数だと思います。<br>
-</p>
-
-<details>
-<summary>
-<code>unfoldr</code> による解答</summary>
-<div class="org-src-container">
-<pre><code class="src language-hs">main :: IO ()
+      <details>
+        <summary><code>unfoldr</code> による解答</summary>
+        <div class="org-src-container">
+          <pre><code class="src language-hs">main :: IO ()
 main = do
   !q &lt;- ints1
   !qs0 &lt;- U.replicateM q ints2
@@ -83,24 +114,28 @@ main = do
 
   U.forM_ res print
 </code></pre>
-</div>
+        </div>
+      </details>
 
-</details>
+      <p>
+        答えの一覧をリストに溜めながら <code>foldl'</code> して、最後に
+        <code>reverse</code> するのも OK です。計算量のオーダーは \(O(N)\)
+        のまま変わりません。競技プログラミングにおいては <code>reverse</code> は実質無料です。<br />
+      </p>
+      <h4 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_c">C 問題</a></a>
+      </h4>
+      <p>
+        \(n\) を何度も半分へ割っていきます。 \(n \le 10^{17}\) より大きな \(n\)
+        が与えられる場合に注意します。
+        <a href="https://atcoder.jp/contests/abc340/editorial/9246">解説</a>
+        にある通り、計算結果のキャッシュを持つ (メモ化する) と考察を放棄できます。<br />
+      </p>
 
-<p>
-答えの一覧をリストに溜めながら <code>foldl'</code> して、最後に <code>reverse</code> するのも OK です。計算量のオーダーは \(O(N)\) のまま変わりません。競技プログラミングにおいては <code>reverse</code> は実質無料です。<br>
-</p>
+      <p>ここではメモ化に <code>IntMap</code> を使用します。素直に書くとこうなりました:<br /></p>
 
-<h4 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_c">C 問題</a></a></h4><p>
-\(n\) を何度も半分へ割っていきます。 \(n \le 10^{17}\) より大きな \(n\) が与えられる場合に注意します。 <a href="https://atcoder.jp/contests/abc340/editorial/9246">解説</a> にある通り、計算結果のキャッシュを持つ (メモ化する) と考察を放棄できます。<br>
-</p>
-
-<p>
-ここではメモ化に <code>IntMap</code> を使用します。素直に書くとこうなりました:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">solve :: Int -&gt; IM.IntMap Int -&gt; (Int, IM.IntMap Int)
+      <div class="org-src-container">
+        <pre><code class="src language-hs">solve :: Int -&gt; IM.IntMap Int -&gt; (Int, IM.IntMap Int)
 solve !x !im0 = case IM.lookup x im0 of
   Just !cost -&gt; (cost, im0)
   Nothing -&gt; (cost', IM.insert x cost' im')
@@ -112,14 +147,12 @@ solve !x !im0 = case IM.lookup x im0 of
             (!cost2, !im2) = solve x2 im1
          in (x + cost1 + cost2, im2)
 </code></pre>
-</div>
+      </div>
 
-<p>
-<code>State</code> モナドを使うとこうなりました:<br>
-</p>
+      <p><code>State</code> モナドを使うとこうなりました:<br /></p>
 
-<div class="org-src-container">
-<pre><code class="src language-diff-hs diff-highlight">solve :: Int -&gt; IM.IntMap Int -&gt; (Int, IM.IntMap Int)
+      <div class="org-src-container">
+        <pre><code class="src language-diff-hs diff-highlight">solve :: Int -&gt; IM.IntMap Int -&gt; (Int, IM.IntMap Int)
 solve !x !im0 = case IM.lookup x im0 of
   Just !cost -&gt; (cost, im0)
   Nothing -&gt; (cost', IM.insert x cost' im')
@@ -135,100 +168,99 @@ solve !x !im0 = case IM.lookup x im0 of
 +        !cost2 &lt;- state $ solve x2
 +        return $ x + cost1 + cost2
 </code></pre>
-</div>
+      </div>
 
-<p>
-もっとシュッとした解答の人も多くてさすがです。それがしの提出はスパゲッティゆえに……<br>
-</p>
+      <p>
+        もっとシュッとした解答の人も多くてさすがです。それがしの提出はスパゲッティゆえに……<br />
+      </p>
+      <h4 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_d">D 問題</a></a>
+      </h4>
+      <p>D 問題は Dijkstra 法 (辺に重みがある場合の BFS) をやるだけのようです。<br /></p>
+      <h4 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_e">E 問題</a></a>
+      </h4>
+      <p>遅延セグメント木を使うと区間 add ができます。緑 diff とは……<br /></p>
 
-<h4 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_d">D 問題</a></a></h4><p>
-D 問題は Dijkstra 法 (辺に重みがある場合の BFS) をやるだけのようです。<br>
-</p>
+      <p>
+        遅延セグメント木のはずがないと、メタ読みで F, G
+        に行ってしまいました。メタを外してくるのは面白いですね。<br />
+      </p>
+      <h4 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_f">F 問題</a></a>
+      </h4>
+      <p>
+        解けませんでした。平行四辺形の面積は外積の長さですから、三角形の面積はその半分です。式を整理すると、拡張ユークリッドの互除法で解けるそうです。<br />
+      </p>
 
-<h4 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_e">E 問題</a></a></h4><p>
-遅延セグメント木を使うと区間 add ができます。緑 diff とは……<br>
-</p>
+      <p>
+        外積は行列式を使って表現できます。手計算の際には、行列をループさせると余因子の符号を考えなくて済みます。<br />
+      </p>
 
-<p>
-遅延セグメント木のはずがないと、メタ読みで F, G に行ってしまいました。メタを外してくるのは面白いですね。<br>
-</p>
+      <p>
+        \[ \begin{aligned} \mathbb{U} \times \mathbb{V} &= \begin{vmatrix} \mathbb{U} \mathbb{V}
+        \mathbb{E} \end{vmatrix}^{t} \\ &= \begin{vmatrix} u_{1} & u_{2} & u_{3}\\ v_{1} & v_{2} &
+        v_{3}\\ \mathbb{e}_{x} & \mathbb{e}_{y} & \mathbb{e}_{z} \end{vmatrix} \\ & \{3
+        行目に関する余因子展開\} \\ &= \mathbb{e}_{x} \begin{vmatrix} u_{2} & u_{3} \\ v_{2} & v_{3}
+        \end{vmatrix} + \mathbb{e}_{y} \begin{vmatrix} u_{3} & u_{1} \\ v_{3} & v_{1} \end{vmatrix}
+        + \mathbb{e}_{z} \begin{vmatrix} u_{1} & u_{2} \\ v_{1} & v_{2} \end{vmatrix} \\ &=
+        \mathbb{e_x} (u_2 v_3 - u_3 v_2) + \mathbb{e_y} (u_3 v_1 - u_1 v_3) + \mathbb{e_z} (u_1 v_2
+        - u_2 v_1) \\ & \{2 次元ベクトルの場合 (u_3 = v_3 = 0)\} \\ &= \mathbb{e_z} (u_1 v_2 - u_2
+        v_1) \end{aligned} \\ \]<br />
+      </p>
 
-<h4 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc340/tasks/abc340_f">F 問題</a></a></h4><p>
-解けませんでした。平行四辺形の面積は外積の長さですから、三角形の面積はその半分です。式を整理すると、拡張ユークリッドの互除法で解けるそうです。<br>
-</p>
+      <p>
+        今回の計算においては \(\mathbb{U} = \mathbb{A}, \mathbb{V} = \mathbb{X}\)
+        を代入します。三角形の面積が 1 に等しい条件は、以下の等式が成り立つことです。<br />
+      </p>
 
-<p>
-外積は行列式を使って表現できます。手計算の際には、行列をループさせると余因子の符号を考えなくて済みます。<br>
-</p>
+      <p>
+        \[ \begin{aligned} \mathbb{A} &:= \begin{bmatrix} A\\B\\0 \end{bmatrix}, \mathbb{X} :=
+        \begin{bmatrix} x\\y\\0 \end{bmatrix} \\ \frac {|\mathbb{A} \times \mathbb{X}|} {2} &= 1
+        \iff |Ay - Bx| = 2 \iff Ay - Bx = \pm2 \end{aligned} \\ \]<br />
+      </p>
 
-<p>
-\[
-\begin{aligned}
-\mathbb{U} \times \mathbb{V}
-&= \begin{vmatrix}
-  \mathbb{U} \mathbb{V} \mathbb{E}
-\end{vmatrix}^{t} \\
-&= \begin{vmatrix}
-     u_{1} & u_{2} & u_{3}\\
-     v_{1} & v_{2} & v_{3}\\
-     \mathbb{e}_{x} & \mathbb{e}_{y} & \mathbb{e}_{z}
-\end{vmatrix} \\
-& \{3 行目に関する余因子展開\} \\
-&= \mathbb{e}_{x} \begin{vmatrix}
-  u_{2} & u_{3} \\
-  v_{2} & v_{3}
-\end{vmatrix} + \mathbb{e}_{y} \begin{vmatrix}
-  u_{3} & u_{1} \\
-  v_{3} & v_{1}
-\end{vmatrix} + \mathbb{e}_{z} \begin{vmatrix}
-  u_{1} & u_{2} \\
-  v_{1} & v_{2}
-\end{vmatrix} \\
-&= \mathbb{e_x} (u_2 v_3 - u_3 v_2) + \mathbb{e_y} (u_3 v_1 - u_1 v_3) + \mathbb{e_z} (u_1 v_2 - u_2 v_1) \\
-& \{2 次元ベクトルの場合 (u_3 = v_3 = 0)\} \\
-&= \mathbb{e_z} (u_1 v_2 - u_2 v_1) 
-\end{aligned} \\
-\]<br>
-</p>
+      <p>
+        この等式を満たす整数値 \(x, y\) は拡張ユークリッドの互助法によって求まります。実装は
+        <a href="https://zenn.dev/osushi0x/scraps/51ff0594a1e863#comment-29d659a57ead56"
+          >@4tsuzuru</a
+        >
+        さんの <code>exgcd</code> 関数を拝借しています。<br />
+      </p>
 
-<p>
-今回の計算においては \(\mathbb{U} = \mathbb{A}, \mathbb{V} = \mathbb{X}\) を代入します。三角形の面積が 1 に等しい条件は、以下の等式が成り立つことです。<br>
-</p>
+      <p>TODO: \(x, y\) の変域の考察<br /></p>
+      <h3 id="拡張ユークリッドの互除法">
+        <a href="#拡張ユークリッドの互除法">拡張ユークリッドの互除法</a>
+      </h3>
+      <p>
+        <code>exgcd</code> が活躍する具体例は、算数でよくあるバケツで水を組む問題です。容量 \(A\)
+        のバケツと容量 \(B\) のバケツを使って、お風呂にちょうど \(L\) リットルの水を汲みます。<br />
+      </p>
 
-<p>
-\[
-\begin{aligned}
-\mathbb{A} &:= \begin{bmatrix} A\\B\\0 \end{bmatrix}, \mathbb{X} := \begin{bmatrix} x\\y\\0 \end{bmatrix} \\
-\frac {|\mathbb{A} \times \mathbb{X}|} {2} &= 1 \iff |Ay - Bx| = 2 \iff Ay - Bx = \pm2
-\end{aligned} \\
-\]<br>
-</p>
+      <p>
+        互いに疎な整数 \(A, B\) に対して \(n_A A + n_B B = 1\) を満たす整数 \(n_A, n_B\)
+        の組が存在します。 <code>exgcd</code> によって \(n_A, n_B\) を求めると、両辺を \(L\)
+        倍して任意の \(L \mathrm[L]\) の水を汲むことができます。<br />
+      </p>
 
-<p>
-この等式を満たす整数値 \(x, y\) は拡張ユークリッドの互助法によって求まります。実装は <a href="https://zenn.dev/osushi0x/scraps/51ff0594a1e863#comment-29d659a57ead56">@4tsuzuru</a> さんの <code>exgcd</code> 関数を拝借しています。<br>
-</p>
-
-<p>
-TODO: \(x, y\) の変域の考察<br>
-</p>
-
-<h3 id="拡張ユークリッドの互除法"><a href="#拡張ユークリッドの互除法">拡張ユークリッドの互除法</a></h3><p>
-<code>exgcd</code> が活躍する具体例は、算数でよくあるバケツで水を組む問題です。容量 \(A\) のバケツと容量 \(B\) のバケツを使って、お風呂にちょうど \(L\) リットルの水を汲みます。<br>
-</p>
-
-<p>
-互いに疎な整数 \(A, B\) に対して \(n_A A + n_B B = 1\) を満たす整数 \(n_A, n_B\) の組が存在します。 <code>exgcd</code> によって \(n_A, n_B\) を求めると、両辺を \(L\) 倍して任意の \(L \mathrm[L]\) の水を汲むことができます。<br>
-</p>
-
-<p>
-類題は <a href="https://atcoder.jp/contests/abc186/tasks/abc186_e">ABC 186 - E</a> でした。フレンズさん回で <code>exgcd</code> は頻出ですね。<br>
-</p>
-
-<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="キーボード探し"><a href="#キーボード探し">キーボード探し</a></h3><p>
-<a href="https://kagizaraya.booth.pm/items/1094860">MiniAxe</a> の入荷を待っています。 3 行 5 列 + 親指キーの分割キーボードです。タッチデバイスと Bluetooth が付属しているとなお良いのですが……。<br>
-</p>
-
-<h3 id="React 入門"><a href="#React 入門">React 入門</a></h3><p>
-『Emmet 道場』を開発中です。画面レイアウトを組むだけで一苦労しています。<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>
+        類題は
+        <a href="https://atcoder.jp/contests/abc186/tasks/abc186_e">ABC 186 - E</a>
+        でした。フレンズさん回で <code>exgcd</code> は頻出ですね。<br />
+      </p>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="キーボード探し"><a href="#キーボード探し">キーボード探し</a></h3>
+      <p>
+        <a href="https://kagizaraya.booth.pm/items/1094860">MiniAxe</a> の入荷を待っています。 3 行
+        5 列 + 親指キーの分割キーボードです。タッチデバイスと Bluetooth
+        が付属しているとなお良いのですが……。<br />
+      </p>
+      <h3 id="React 入門"><a href="#React 入門">React 入門</a></h3>
+      <p>『Emmet 道場』を開発中です。画面レイアウトを組むだけで一苦労しています。<br /></p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

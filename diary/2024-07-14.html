@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -77,7 +78,6 @@
           </tr>
         </tbody>
       </table>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc362/tasks/abc362_a">A 問題</a></a>
       </h3>
@@ -87,7 +87,6 @@
         <pre><code class="src language-hs">main=interact$show.(f.map read.init&lt;*&gt;last).words;f[r,g,b](c:_)|c=='R'=0+min g b|c=='G'=min b r|0&lt;1=min r g
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc362/tasks/abc362_b">B 問題</a></a>
       </h3>
@@ -98,7 +97,6 @@
       </p>
 
       <p>前回も幾何でした。珍しい。<br /></p>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc362/tasks/abc362_c">C 問題</a></a>
       </h3>
@@ -124,7 +122,6 @@
         <code>mapAccumL</code> が、 <code>vector</code> ならば <code>mapM</code> +
         <code>State</code> モナドが使えます。再帰関数を作っても良いですね。<br />
       </p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc362/tasks/abc362_d">D 問題</a></a>
       </h3>
@@ -147,7 +144,6 @@
       </ol>
 
       <p>Dijkstra 法は鉄則本やけんちょん本に載っています。枝刈りをお忘れなく！<br /></p>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc362/tasks/abc362_e">E 問題</a></a>
       </h3>
@@ -156,16 +152,13 @@
         <a href="https://atcoder.jp/contests/abc362/submissions/55548303">2 ms</a>
         ってどういうことなんですか？！<br />
       </p>
-
       <h3 id="G 問題">
         <a href="#G 問題"><a href="https://atcoder.jp/contests/abc362/tasks/abc362_g">G 問題</a></a>
       </h3>
       <p>苦手な文字列アルゴリズムです。 Suffix Array は最近作ったので upsolve したいです。<br /></p>
-
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
       <h3 id="Splay tree"><a href="#Splay tree">Splay tree</a></h3>
       <p>Link/cut tree に必要という splay tree を実装しました。<br /></p>
-
       <h4 id="主な情報源"><a href="#主な情報源">主な情報源</a></h4>
       <p>以下から学びました。<br /></p>
 
@@ -191,13 +184,11 @@
           <code>swap_remove</code> のような処理になっています。どうなんでしょう。<br />
         </li>
       </ul>
-
       <h4 id="用途"><a href="#用途">用途</a></h4>
       <p>
         用途はありません。今のところ <strong>ただの遅い木</strong> です。遅延評価とか link/cut tree
         にして初めて使い道が生まれるのかと思います。 Link/cut tree への期待が高まります。<br />
       </p>
-
       <h3 id="なぜ vector の concat / concatMap は \(O(N)\) なのか">
         <a href="#なぜ vector の concat / concatMap は \(O(N)\) なのか"
           >なぜ <code>vector</code> の <code>concat</code> / <code>concatMap</code> は \(O(N)\)
@@ -215,7 +206,6 @@
         \(1\) の配列の \(N\) 個畳み込む場合、長さ \(2, 3, \dots, N\) の配列が生成されて最悪計算量は
         \(O(N^2)\) になります。<br />
       </p>
-
       <h4 id="結論"><a href="#結論">結論</a></h4>
       <p><code>MVector</code> を経由して上手いことやっています。<br /></p>
 
@@ -235,7 +225,6 @@
           程度のアロケーションしかありませんから、 \(O(N)\) です。<br />
         </li>
       </ol>
-
       <h4 id="unstream">
         <a href="#unstream"><code>unstream</code></a>
       </h4>
@@ -385,7 +374,6 @@ vmunstreamUnknown s
 </code></pre>
         </div>
       </details>
-
       <h4 id=""><a href="#"></a></h4>
       <h4 id="concat の計算量">
         <a href="#concat の計算量"><code>concat</code> の計算量</a>
@@ -443,7 +431,6 @@ fromVectors us = Bundle (Stream pstep (Left us))
 </code></pre>
         </div>
       </details>
-
       <h4 id="concatMap の計算量">
         <a href="#concatMap の計算量"><code>concatMap</code> の計算量</a>
       </h4>
@@ -511,7 +498,6 @@ concatVectors Bundle{sElems = Stream step t}
 </code></pre>
         </div>
       </details>
-
       <h4 id="vconcatMapN">
         <a href="#vconcatMapN"><code>vconcatMapN</code></a>
       </h4>
@@ -535,7 +521,6 @@ concatVectors Bundle{sElems = Stream step t}
       </ul>
 
       <p>なぜでしょう？　まあ問題無く使って行けそうです。<br /></p>
-
       <h3 id="SNS 情報"><a href="#SNS 情報">SNS 情報</a></h3>
       <ul>
         <li>
@@ -551,7 +536,6 @@ concatVectors Bundle{sElems = Stream step t}
           が色付きになると、大型技術書を色付きで読めて嬉しいのですが。<br />
         </li>
       </ul>
-
       <h4 id="Emacs"><a href="#Emacs">Emacs</a></h4>
       <ul>
         <li>
@@ -575,7 +559,6 @@ concatVectors Bundle{sElems = Stream step t}
           並に速くなるとか。ひとまず入れました。<br />
         </li>
       </ul>
-
       <h3 id="DTM"><a href="#DTM">DTM</a></h3>
       <h4 id="PC"><a href="#PC">PC</a></h4>
       <p>先々週に買った PC ですが、購買を間違えました。やはりパソコンに疎いようです。<br /></p>
@@ -594,7 +577,6 @@ concatVectors Bundle{sElems = Stream step t}
           から買っておけば大丈夫でしょう。<br />
         </li>
       </ul>
-
       <h4 id="ギター (ど下手)"><a href="#ギター (ど下手)">ギター (ど下手)</a></h4>
       <p>
         急に 160 BPS の 16 分音符が弾けるようになりました (単弦に限る)

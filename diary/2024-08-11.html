@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -39,12 +40,10 @@
           ><a href="https://atcoder-replay.kakira.dev/">AtCoder Replay</a>
         </figcaption>
       </figure>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/arc181/tasks/arc181_a">A 問題</a></a>
       </h3>
       <p>35 分で解いて緑パフォ下位でした。<br /></p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/arc181/tasks/arc181_d">D 問題</a></a>
       </h3>
@@ -62,7 +61,6 @@
         B, C 問題と比べても明らかに解説が薄く、本来 B 問題相当な気がします。それはそれとして、黄
         diff の問題を本番で通せたのは最高でした。<br />
       </p>
-
       <h2 id="ABC 366"><a href="#ABC 366">ABC 366</a></h2>
       <p>
         <a href="https://atcoder.jp/contests/abc366">ABC 366</a> に参加しました。 3
@@ -118,7 +116,6 @@
           </tr>
         </tbody>
       </table>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc366/tasks/abc366_a">A 問題</a></a>
       </h3>
@@ -128,7 +125,6 @@
         <pre><code class="src language-hs">main=interact$f.map read.words;f[n,t,a]|((||)&lt;$&gt;(&lt;t)&lt;*&gt;(&lt;a))(n`div`2)="Yes"|0&lt;1="No"
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc366/tasks/abc366_b">B 問題</a></a>
       </h3>
@@ -149,7 +145,6 @@
         <pre><code class="src language-hs">import Data.List;main=interact$unlines.map(dropWhileEnd(=='*')).transpose.map(++replicate 99'*').reverse.tail.lines
 </code></pre>
       </div>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc366/tasks/abc366_c">C 問題</a></a>
       </h3>
@@ -166,12 +161,10 @@
         クエリ処理の方法としては、 <code>mapAccumL</code> を使うか、 <code>mapMaybeM</code> で
         <code>State</code> モナドに <code>Map</code> を載せるのが正攻法だと思います。<br />
       </p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc366/tasks/abc366_d">D 問題</a></a>
       </h3>
       <p>\(A_{x, y, z}\) を \(A_{z, y, x}\) だと思っていました (＾ω＾) (＾ω＾)<br /></p>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc366/tasks/abc366_e">E 問題</a></a>
       </h3>
@@ -186,7 +179,6 @@
       </p>
 
       <p>2 分探索というのがピンと来ておらず、別解がありそうです。<br /></p>
-
       <h2 id="Wavelet Matrix (1)"><a href="#Wavelet Matrix (1)">Wavelet Matrix (1)</a></h2>
       <p>
         Wavelet Matrix の頭文字は WM.
@@ -197,7 +189,6 @@
         セグメント木が変域 (添字) の 2 分木とするならば、 Wavelet Matrix は値域の 2
         分木と言えそうです。実際強力です。<br />
       </p>
-
       <h3 id="概要"><a href="#概要">概要</a></h3>
       <p>
         入力は座標圧縮済みの数列とします。上位 bit から順番に、その bit の 01
@@ -210,7 +201,6 @@
           alt="2024-08-11-wavelet-matrix-1.png"
         /><br />
       </figure>
-
       <h4 id="kthMin">
         <a href="#kthMin"><code>kthMin</code></a>
       </h4>
@@ -232,7 +222,6 @@
         分されるとき、左へ降りるか右へ降りるかを \(O(1)\) で判定するために、事前に各 bit
         の累積和を作成します。<br />
       </p>
-
       <h4 id="freq">
         <a href="#freq"><code>freq</code></a>
       </h4>
@@ -240,7 +229,6 @@
         1 行降りる度に値域が 2 分されることから、区間内の \(|\{x | x \lt x_{ref}\}|\)
         も取得できます。<br />
       </p>
-
       <h4 id="access">
         <a href="#access"><code>access</code></a>
       </h4>
@@ -248,7 +236,6 @@
         なお元の数列、ソート済みの数列は復元できるため削除します。また累積和では Word (64 bit)
         単位で和を取ることで省メモリ化します。<br />
       </p>
-
       <h3 id="情報源"><a href="#情報源">情報源</a></h3>
       <p>以下 2 つから学びました:<br /></p>
 
@@ -265,7 +252,6 @@
           ><br />
         </li>
       </ul>
-
       <h4 id="気になる"><a href="#気になる">気になる</a></h4>
       <ul>
         <li>
@@ -281,7 +267,6 @@
           これを読んで、まだまだインプットが足りないと自覚しました。<br />
         </li>
       </ul>
-
       <h4 id="未読のコード"><a href="#未読のコード">未読のコード</a></h4>
       <ul>
         <li>
@@ -293,7 +278,6 @@
         <li><a href="https://github.com/ei1333/library">ei1333/library</a><br /></li>
         <li><a href="https://github.com/maspypy/library">maspypy/library</a><br /></li>
       </ul>
-
       <h3 id="Verify"><a href="#Verify">Verify</a></h3>
       <ul>
         <li class="on">
@@ -311,10 +295,8 @@
           Segment Tree on Wavelet Matrix?<br />
         </li>
       </ul>
-
       <h3 id="未実装の API"><a href="#未実装の API">未実装の API</a></h3>
       <p>Wavelet Matrix の機能はまだまだあるようです。<br /></p>
-
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
       <h3 id="ポテンシャル付き Union-Find の抽象化">
         <a href="#ポテンシャル付き Union-Find の抽象化">ポテンシャル付き Union-Find の抽象化</a>
@@ -347,7 +329,6 @@
           >重み付き Union-Find とそれが使える問題のまとめ、および、牛ゲーについて</a
         ><br />
       </p>
-
       <h3 id="遅延伝播セグメント木の型クラス">
         <a href="#遅延伝播セグメント木の型クラス">遅延伝播セグメント木の型クラス</a>
       </h3>
@@ -370,7 +351,6 @@
   segActWithLength op a _  segAct op a
 </code></pre>
       </div>
-
       <h3 id="Emacs"><a href="#Emacs">Emacs</a></h3>
       <h4 id="Ellama"><a href="#Ellama">Ellama</a></h4>
       <p>
@@ -387,7 +367,6 @@
         著者の tomoya さんは Mac ユーザです。現代の Mac (M1 以降) はメモリが RAM 兼 VRAM
         として機能するらしく、 AI 時代には相性が良さそうですね。<br />
       </p>
-
       <h4 id="org-ai">
         <a href="#org-ai"><code>org-ai</code></a>
       </h4>
@@ -402,7 +381,6 @@
         やはりブラウザよりも使い勝手が良いです。フロントエンド (コマンド)
         も充実していて応用が効きそうです。<br />
       </p>
-
       <h3 id="Deno くん？"><a href="#Deno くん？">Deno くん？</a></h3>
       <p>いいですねー。<br /></p>
 
@@ -428,7 +406,6 @@
         >
       </blockquote>
       <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
       <h3 id="HS 5"><a href="#HS 5">HS 5</a></h3>
       <p>
         スタジオモニターの

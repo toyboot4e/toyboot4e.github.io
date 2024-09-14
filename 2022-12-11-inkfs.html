@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -40,7 +41,6 @@
           フレームワークに関する投稿となります。スケールが落ちますがご了承ください 🙇<br />
         </p>
       </blockquote>
-
       <h2 id="背景"><a href="#背景">背景</a></h2>
       <h3 id="作っているもの"><a href="#作っているもの">作っているもの</a></h3>
       <p>
@@ -66,7 +66,6 @@
         ライブラリが担当するのはメディアの処理で、ウィンドウ・インプット・グラフィクス・テキスト・オーディオなどがあたります。その上の薄いレイヤが
         <code>inkfs</code> です。<br />
       </p>
-
       <h3 id="ゲームエンジンとの違い">
         <a href="#ゲームエンジンとの違い">ゲームエンジンとの違い</a>
       </h3>
@@ -79,10 +78,8 @@
       <p>
         あるいは低レイヤ寄りのライブラリを自作していたら、『ゲームエンジン』に当たると思います。必要な知識も段違いです。そうした感覚がぼんやり共通されている気がします。<br />
       </p>
-
       <h2 id="主なモジュール"><a href="#主なモジュール">主なモジュール</a></h2>
       <p><code>inkfs</code> 🦑 の主なモジュールを紹介します。<br /></p>
-
       <h3 id="1. ECS (Entity-Component-System)">
         <a href="#1. ECS (Entity-Component-System)">1. ECS (Entity-Component-System)</a>
       </h3>
@@ -112,7 +109,6 @@
         を使うと一気に解決します。むしろ伝統的なゲームの作り方の方が Rust
         ではチャレンジングだったりします。<br />
       </p>
-
       <h3 id="2. Scene graph"><a href="#2. Scene graph">2. Scene graph</a></h3>
       <p><code>inkfs</code> 🦑 のシーングラフは ECS の上に作っています。<br /></p>
 
@@ -123,7 +119,6 @@
           width="292px"
         /><br />
       </figure>
-
       <h4 id="Renderable の共通コンポーネント">
         <a href="#Renderable の共通コンポーネント">Renderable の共通コンポーネント</a>
       </h4>
@@ -139,7 +134,6 @@
         </li>
         <li><code>ZOrder</code><br /></li>
       </ul>
-
       <h4 id="様々な種類の renderable">
         <a href="#様々な種類の renderable">様々な種類の renderable</a>
       </h4>
@@ -161,7 +155,6 @@
           width="71px"
         /><br />
       </figure>
-
       <h4 id="ソート"><a href="#ソート">ソート</a></h4>
       <p>
         上の renderable
@@ -177,7 +170,6 @@
 }
 </code></pre>
       </div>
-
       <h3 id="3. ウィンドウ・入力 (sdl2)">
         <a href="#3. ウィンドウ・入力 (sdl2)">3. ウィンドウ・入力 (<code>sdl2</code>)</a>
       </h3>
@@ -188,7 +180,6 @@
           width="753px"
         /><br />
       </figure>
-
       <h4 id="主なウィンドウのライブラリ">
         <a href="#主なウィンドウのライブラリ">主なウィンドウのライブラリ</a>
       </h4>
@@ -208,7 +199,6 @@
           での動きがあまりよく無かったのですが、最近の動向はどうなのか……<br />
         </li>
       </ul>
-
       <h4 id="入力処理"><a href="#入力処理">入力処理</a></h4>
       <p>
         イベント駆動にするか、すべてのキー入力イベントを 1 つの
@@ -221,7 +211,6 @@
         を参考に、入力状態のダブルバッファを持っています。また『仮想キー』のモジュールを作り、『Enter
         または Space』のようなキーを定義できるようにしています。<br />
       </p>
-
       <h4 id="FPS カウンター"><a href="#FPS カウンター">FPS カウンター</a></h4>
       <p>
         <a href="https://techblog.kayac.com/approximate-average-fps">平均FPSを楽に近似する</a>
@@ -231,7 +220,6 @@
       <blockquote>
         <p>僕はなぜか spike の計算が上手くいってないですが……<br /></p>
       </blockquote>
-
       <h3 id="4. グラフィクス (wgpu)">
         <a href="#4. グラフィクス (wgpu)">4. グラフィクス (<code>wgpu</code>)</a>
       </h3>
@@ -252,7 +240,6 @@
         <a href="https://sotrh.github.io/learn-wgpu/">Learn Wgpu</a>
         で見ると簡単なフレームワークのようですが、所有権が絡んで独自の制限がかかります。<br />
       </p>
-
       <h4 id="wgpu::RenderPass<'w> と借用ルール">
         <a href="#wgpu::RenderPass<'w> と借用ルール"
           ><code>wgpu::RenderPass&lt;'w&gt;</code> と借用ルール</a
@@ -285,7 +272,6 @@
         になる……と思います。この制限下で伝統的な
         <code>SpriteBatch</code> をそのままポートするのはたぶん無理です。<br />
       </p>
-
       <h4 id="Bevy Engine から学んだこと">
         <a href="#Bevy Engine から学んだこと">Bevy Engine から学んだこと</a>
       </h4>
@@ -296,8 +282,7 @@
         <li>Pipelined rendering<br /></li>
         <li>デフォルトの <code>TextureFormat</code> の設定方法<br /></li>
       </ul>
-
-      <h4 id="TODO"><a href="#TODO">TODO</a></h4>
+      <h4 id=""><a href="#"></a></h4>
       <ul>
         <li>
           Uniform array<br />
@@ -312,19 +297,16 @@
           Draw call を減らせそうなので気になっています。<br />
         </li>
       </ul>
-
       <h3 id="5. アセット管理"><a href="#5. アセット管理">5. アセット管理</a></h3>
       <p>
         同じテクスチャを 2 回ロードしないようする、そんなリソースのキャッシュを作成します。主に 2
         種類の実装が思いつきます。<br />
       </p>
-
       <h4 id="共有ポインタ方式"><a href="#共有ポインタ方式">共有ポインタ方式</a></h4>
       <p>
         共有ポインタ方式です。 Rust だと <code>Deref</code> にするのは無理で、毎回
         <code>asset.get();</code> のような形で <code>&amp;T</code> を復元します。<br />
       </p>
-
       <h4 id="インデクス方式"><a href="#インデクス方式">インデクス方式</a></h4>
       <p>
         アセットのユーザは、アセット配列へのインデクスを持つ形にします。毎回
@@ -335,7 +317,6 @@
         アセット配列をページ制にすれば、ほぼ immutable
         配列として扱える気がしますが、詳細をみたことはありません。<br />
       </p>
-
       <h3 id="6. フォント描画"><a href="#6. フォント描画">6. フォント描画</a></h3>
       <h4 id="方法 1. SDF フォントを用いる">
         <a href="#方法 1. SDF フォントを用いる">方法 1. SDF フォントを用いる</a>
@@ -353,7 +334,6 @@
       </figure>
 
       <p>完璧ですね。完璧にヨレヨレです。<br /></p>
-
       <h4 id="方式 2. フォントテクスチャにラスタライズする">
         <a href="#方式 2. フォントテクスチャにラスタライズする"
           >方式 2. フォントテクスチャにラスタライズする</a
@@ -380,7 +360,6 @@
       <p>
         急に馴れ馴れしい。フォントテクスチャが飽和した際は、フォントテクスチャをリサイズしなければなりません。<br />
       </p>
-
       <h4 id="マークアップテキスト"><a href="#マークアップテキスト">マークアップテキスト</a></h4>
       <p><code>Markup with :b[bold] text.</code><br /></p>
 
@@ -393,14 +372,12 @@
       <figure>
         <img src="./img/2022-12-gfx-markup-kbd.png" alt="2022-12-gfx-markup-kbd.png" /><br />
       </figure>
-
       <h3 id="7. 開発者用 UI"><a href="#7. 開発者用 UI">7. 開発者用 UI</a></h3>
       <p>ImGUI の SDL サポートやレンダラを実装しました。<br /></p>
 
       <figure><img src="./img/2022-12-gfx-omgui.png" alt="2022-12-gfx-omgui.png" /><br /></figure>
 
       <p>すべてが間違っています。<br /></p>
-
       <h3 id="その他"><a href="#その他">その他</a></h3>
       <h4 id="ブラウザ対応、 Android 対応">
         <a href="#ブラウザ対応、 Android 対応">ブラウザ対応、 Android 対応</a>
@@ -408,17 +385,14 @@
       <p>イベント駆動のゲームループやアセットの非同期ロードなどが必要になりようです。<br /></p>
 
       <p>今の僕ではまったく力不足です。<br /></p>
-
       <h4 id="ホットリロードしたい"><a href="#ホットリロードしたい">ホットリロードしたい</a></h4>
       <p>したいのですが……<br /></p>
-
       <h4 id="コルーチンが欲しい"><a href="#コルーチンが欲しい">コルーチンが欲しい</a></h4>
       <p>
         欲しさのあまり、コルーチンを書くための言語を開発中です。
         <a href="https://github.com/salsa-rs/salsa">salsa</a>
         ベースで言語サーバの機能モリモリの予定です。<br />
       </p>
-
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
         Rust で 2D フレームワークを作ってきましたが、他人が快適に使えるとは到底思えません。汎用の 2D

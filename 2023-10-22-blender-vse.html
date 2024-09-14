@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -39,7 +40,6 @@
         <a href="https://archspire.bandcamp.com/album/bleed-the-future">Archspire</a>
         です。ヘドバンが止まりません。<br />
       </p>
-
       <h3 id="合成音声の使い道"><a href="#合成音声の使い道">合成音声の使い道</a></h3>
       <p>
         合成音声は実況動画に使用されることが多いです。匿名性を保って情報共有できますし、ちょっとした実演にも向いているでしょう。<br />
@@ -53,7 +53,6 @@
       <p>
         より簡単な編集方法としては、まず実況動画を撮影し、後から合成音声に差し替えれば良いでしょう。やってみます。<br />
       </p>
-
       <h3 id="デモ"><a href="#デモ">デモ</a></h3>
       <p>AtCoder 実況動画を作ってみました:<br /></p>
 
@@ -71,7 +70,6 @@
         編集時間は 1
         時間程度です。文字起こしや字幕挿入はスクリプトから行いました。以降で方法を解説します。<br />
       </p>
-
       <h2 id="使用ツール"><a href="#使用ツール">使用ツール</a></h2>
       <h3 id="Blender VSE"><a href="#Blender VSE">Blender VSE</a></h3>
       <p>
@@ -97,7 +95,6 @@
         スクリプティングのサポートが強力で、 Python
         から字幕や音声を挿入できます。今回の使用目的に最も合致したツールだったと思います。<br />
       </p>
-
       <h3 id="Whisper"><a href="#Whisper">Whisper</a></h3>
       <p>
         OpenAI の音声認識ソフトです。コマンドラインから音声ファイルの文字起こしができます。<br />
@@ -113,7 +110,6 @@
         RAM の大きな (&gt; 10GB) GPU
         があれば、録音と同時に文字起こしができるようです。いい時代です。<br />
       </p>
-
       <h3 id="VOICEVOX ENGINE"><a href="#VOICEVOX ENGINE">VOICEVOX ENGINE</a></h3>
       <p>
         <a href="https://github.com/VOICEVOX/voicevox_engine">VOICEVOX ENGINE</a>
@@ -124,7 +120,6 @@
         実行するとローカルサーバが立ち上がるので、音声ファイル生成のリクエストを投げれば
         <code>.wav</code> ファイルが生成されます。これも簡単で良いですね。<br />
       </p>
-
       <h2 id="ワークフロー"><a href="#ワークフロー">ワークフロー</a></h2>
       <h3 id="Blender VSE 入門"><a href="#Blender VSE 入門">Blender VSE 入門</a></h3>
       <p>Blender VSE の初期画面は以下です。ゴタついています。<br /></p>
@@ -156,7 +151,6 @@
         <a href="https://github.com/tin2tin/Subtitle_Editor">Subtitle_Editor</a>
         アドオンです。クリックで字幕の表示位置までジャンプしたり、文章も直接編集できます。課金したいレベルで良いです。<br />
       </p>
-
       <h3 id="Whisper で文字起こし"><a href="#Whisper で文字起こし">Whisper で文字起こし</a></h3>
       <p><code>whisper-cpp</code> を使って実況動画を文字起こししました:<br /></p>
 
@@ -191,7 +185,6 @@ ABC325をやります
           。<br />
         </p>
       </blockquote>
-
       <h3 id="VOICEVOX ENGINE 入門"><a href="#VOICEVOX ENGINE 入門">VOICEVOX ENGINE 入門</a></h3>
       <p>
         <code>docker</code> で
@@ -245,7 +238,6 @@ virtualisation = {
 </code></pre>
         </div>
       </details>
-
       <h3 id="Blender Python API"><a href="#Blender Python API">Blender Python API</a></h3>
       <p>
         先駆者がいました！　助かりました。
@@ -286,10 +278,8 @@ Text 98.0 1
         字幕の文字内容や開始位置を取得できています。後は VOICEVOX ENGINE で音声ファイルを生成し、
         <code>se.new_sound</code> で適切な位置に挿入します。実況動画の完成です。<br />
       </p>
-
       <h2 id="課題"><a href="#課題">課題</a></h2>
       <p>上のワークフローでは以下の問題が発生しました。<br /></p>
-
       <h3 id="Whisper"><a href="#Whisper">Whisper</a></h3>
       <p>読み上げ文章の 10% 程度は修正が必要でした。<br /></p>
 
@@ -309,12 +299,10 @@ Text 98.0 1
           <code>accumarray</code> など英語の関数名が謎の言葉に置き換わりました。<br />
         </li>
       </ul>
-
       <h3 id="VOICEVOX"><a href="#VOICEVOX">VOICEVOX</a></h3>
       <p>
         字幕と読みが一致しない場合があります。たとえば『word』を『ダブリューオーアールディー』と読んでしまいました。<br />
       </p>
-
       <h3 id="Blender VSE"><a href="#Blender VSE">Blender VSE</a></h3>
       <p>初期フォントだと中国語の字体になりました。まだ修正方法は探していません。<br /></p>
 
@@ -322,7 +310,6 @@ Text 98.0 1
         Unicode
         が字体を区別しないのは問題ですが、字体くらい変わってもコンテツは変わらないという気もします。<br />
       </p>
-
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
         Blender VSE + Whisper + VOICEVOX

@@ -1,64 +1,88 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ARC 177 / ABC 354 / 寿司打 / Convolution (低速実装) - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ARC 177 / ABC 354 / 寿司打 / Convolution (低速実装)</h1><p>May 19, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="ARC 177"><a href="#ARC 177">ARC 177</a></h2><p>
-<a href="https://atcoder.jp/contests/arc177">ARC 177</a> に参加しました。珍しく低 diff の回でした。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ARC 177 / ABC 354 / 寿司打 / Convolution (低速実装) - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ARC 177 / ABC 354 / 寿司打 / Convolution (低速実装)</h1>
+      <p>May 19, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ARC 177"><a href="#ARC 177">ARC 177</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/arc177">ARC 177</a> に参加しました。珍しく低 diff
+        の回でした。<br />
+      </p>
 
-<details>
-<summary>
-<a href="https://atcoder.jp/contests/arc177/tasks/arc177_a">A 問題</a></summary>
-<p>
-貪欲です。<br>
-</p>
+      <details>
+        <summary>
+          <a href="https://atcoder.jp/contests/arc177/tasks/arc177_a">A 問題</a>
+        </summary>
+        <p>貪欲です。<br /></p>
+      </details>
 
-</details>
+      <details>
+        <summary>
+          <a href="https://atcoder.jp/contests/arc177/tasks/arc177_b">B 問題</a>
+        </summary>
+        <p>貪欲です。<br /></p>
+      </details>
 
-<details>
-<summary>
-<a href="https://atcoder.jp/contests/arc177/tasks/arc177_b">B 問題</a></summary>
-<p>
-貪欲です。<br>
-</p>
+      <details>
+        <summary>
+          <a href="https://atcoder.jp/contests/arc177/tasks/arc177_c">C 問題</a>
+        </summary>
+        <p>貪欲です。<br /></p>
+      </details>
+      <h2 id="ABC 354"><a href="#ABC 354">ABC 354</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc354">ABC 354</a> に参加しました。<br /></p>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc354/tasks/abc354_a">A 問題</a></a>
+      </h3>
+      <p>沼に落ちました。リストを使うべきでした。<br /></p>
 
-</details>
-
-<details>
-<summary>
-<a href="https://atcoder.jp/contests/arc177/tasks/arc177_c">C 問題</a></summary>
-<p>
-貪欲です。<br>
-</p>
-
-</details>
-
-<h2 id="ABC 354"><a href="#ABC 354">ABC 354</a></h2><p>
-<a href="https://atcoder.jp/contests/abc354">ABC 354</a> に参加しました。<br>
-</p>
-
-<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc354/tasks/abc354_a">A 問題</a></a></h3><p>
-沼に落ちました。リストを使うべきでした。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">main=interact$show.f[0..]0.read
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$show.f[0..]0.read
 f(i:r)a k|a&gt;k=i|0&lt;1=f r(a+2^i)k
 </code></pre>
-</div>
+      </div>
 
-<p>
-数学的センスがある人は、 \(\sum_{i \in [0, k-1]} 2^i = 2^k-1\) による簡潔な解答になるようです。<br>
-</p>
+      <p>
+        数学的センスがある人は、 \(\sum_{i \in [0, k-1]} 2^i = 2^k-1\)
+        による簡潔な解答になるようです。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc354/submissions/53641748">待って、これは何ですか</a> (<a href="https://hackage.haskell.org/package/base-4.20.0.0/docs/Prelude.html#v:exponent">exponent</a>) ??　地球は今日も美しい……<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc354/submissions/53641748">待って、これは何ですか</a>
+        (<a href="https://hackage.haskell.org/package/base-4.20.0.0/docs/Prelude.html#v:exponent"
+          >exponent</a
+        >) ??　地球は今日も美しい……<br />
+      </p>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc354/tasks/abc354_b">B 問題</a></a>
+      </h3>
+      <p>ソートして指定番目のデータを抜き出します。<br /></p>
 
-<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc354/tasks/abc354_b">B 問題</a></a></h3><p>
-ソートして指定番目のデータを抜き出します。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">import Data.List
+      <div class="org-src-container">
+        <pre><code class="src language-hs">import Data.List
 main=interact$(g&lt;*&gt;sort.f&lt;*&gt;(0%).tail).words
 s%[]=s
 s%(_:b:r)=s+read b%r
@@ -66,22 +90,26 @@ f[_]=[]
 f(_:n:r)=n:f r
 g(n:_)x t=x!!(t`mod`read n)
 </code></pre>
-</div>
+      </div>
 
-<p>
-Applicative style が精一杯です。いずれコードゴルフ記事を書けるほどの実力が……無くてもいいですね。内輪ネタ過ぎますか。<br>
-</p>
+      <p>
+        Applicative style
+        が精一杯です。いずれコードゴルフ記事を書けるほどの実力が……無くてもいいですね。内輪ネタ過ぎますか。<br />
+      </p>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc354/tasks/abc354_c">C 問題</a></a>
+      </h3>
+      <p>平面走査の一種として捉えると、 1 回の走査で答えを出したくなります。<br /></p>
 
-<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc354/tasks/abc354_c">C 問題</a></a></h3><p>
-平面走査の一種として捉えると、 1 回の走査で答えを出したくなります。<br>
-</p>
+      <p>
+        状態を持って <code>mapMaybe</code> がしたかったので、
+        <code>State</code> モナドを使用しました。
+        <strong>これが模範的な Haskell であるとは決して思いません</strong>
+        が、自分の中では王道です。<br />
+      </p>
 
-<p>
-状態を持って <code>mapMaybe</code> がしたかったので、 <code>State</code> モナドを使用しました。 <strong>これが模範的な Haskell であるとは決して思いません</strong> が、自分の中では王道です。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+      <div class="org-src-container">
+        <pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
 solve = do
   !n &lt;- int'
   !acs &lt;- U.replicateM n ints2'
@@ -94,269 +122,393 @@ solve = do
   printBSB $ G.length res
   printVec $ U.map (+ 1) $ U.modify VAI.sort res
 </code></pre>
-</div>
+      </div>
 
-<p>
-<code>State</code> 以外で状態を持つ方法としては、たとえば以下があります。どれも厳しい要求で、 Haskell には崖があると思います。<br>
-</p>
+      <p>
+        <code>State</code>
+        以外で状態を持つ方法としては、たとえば以下があります。どれも厳しい要求で、 Haskell
+        には崖があると思います。<br />
+      </p>
 
-<ul><li><code>IORef</code> に状態を載せつつ <code>mapMaybeM</code> でループする<br>
-これが無難です。<br></li>
-<li><code>IORef</code> に状態を載せつつ <code>concatMapM</code> でループする<br>
-これもいけますね。<br></li>
-<li><code>mapAccumL</code> で <code>[Maybe Int]</code> に写し、後で <code>catMaybe</code> する<br>
-アリです。<br></li>
-<li><code>foldl'</code> で状態を持ってループしつつ、リストに出力を溜める (後で <code>reverse</code> する)<br>
-動けば良かろうなのだ！<br></li>
-<li>再帰関数で状態を持つ<br></li>
-<li>他にも色々あると思います<br></li>
-</ul>
+      <ul>
+        <li>
+          <code>IORef</code> に状態を載せつつ <code>mapMaybeM</code> でループする<br />
+          これが無難です。<br />
+        </li>
+        <li>
+          <code>IORef</code> に状態を載せつつ <code>concatMapM</code> でループする<br />
+          これもいけますね。<br />
+        </li>
+        <li>
+          <code>mapAccumL</code> で <code>[Maybe Int]</code> に写し、後で
+          <code>catMaybe</code> する<br />
+          アリです。<br />
+        </li>
+        <li>
+          <code>foldl'</code> で状態を持ってループしつつ、リストに出力を溜める (後で
+          <code>reverse</code> する)<br />
+          動けば良かろうなのだ！<br />
+        </li>
+        <li>再帰関数で状態を持つ<br /></li>
+        <li>他にも色々あると思います<br /></li>
+      </ul>
 
-<p>
-初心を思い出しました。解けて良かった…….<br>
-</p>
+      <p>初心を思い出しました。解けて良かった…….<br /></p>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc354/tasks/abc354_d">D 問題</a></a>
+      </h3>
+      <p>Imos 法で解くのが典型です。解けて良かったシリーズに入りました。<br /></p>
 
-<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc354/tasks/abc354_d">D 問題</a></a></h3><p>
-Imos 法で解くのが典型です。解けて良かったシリーズに入りました。<br>
-</p>
+      <p>
+        入力は <code>x1 y1 x2 y2</code> 形式のようです。問題文からは <code>(A, B)</code> が
+        <code>(x, y)</code> なのか
+        <code>(y, x)</code> なのか分からない点が改善の余地ありと思います。<br />
+      </p>
 
-<p>
-入力は <code>x1 y1 x2 y2</code> 形式のようです。問題文からは <code>(A, B)</code> が <code>(x, y)</code> なのか <code>(y, x)</code> なのか分からない点が改善の余地ありと思います。<br>
-</p>
+      <p>
+        同種の問題で高難度版としては
+        <a href="https://atcoder.jp/contests/abc269/tasks/abc269_f">ABC 269 F - Numbered Checker</a>
+        があります。<br />
+      </p>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc354/tasks/abc354_e">E 問題</a></a>
+      </h3>
+      <p>
+        集合 DP で解くのが典型です。遷移先に 1 つでも後手必勝のケースがあれば先手の勝利です。<br />
+      </p>
 
-<p>
-同種の問題で高難度版としては <a href="https://atcoder.jp/contests/abc269/tasks/abc269_f">ABC 269 F - Numbered Checker</a> があります。<br>
-</p>
+      <p>解けて良かったシリーズでした。<br /></p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc354/tasks/abc354_f">F 問題</a></a>
+      </h3>
+      <p>Upsolve します。やはり F が解けないとな〜……<br /></p>
+      <h3 id="Misc"><a href="#Misc">Misc</a></h3>
+      <p>
+        AI で典型問題が解ける点が徐々に物議を醸しています。自分程度の実力でも周囲と相対化される
+        (極端に弱かったりそこそこ強かったりする)
+        のが面白かったわけですが、徐々に元の曖昧な世界へ戻っていくんだなと思いました。<br />
+      </p>
+      <h2 id="寿司打"><a href="#寿司打">寿司打</a></h2>
+      <p>
+        <a href="https://sushida.net/">寿司打</a> で 20,700
+        点を記録しました。元々タイピングが遅かったこともあり、ささやかな栄光でした。<br />
+      </p>
 
-<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc354/tasks/abc354_e">E 問題</a></a></h3><p>
-集合 DP で解くのが典型です。遷移先に 1 つでも後手必勝のケースがあれば先手の勝利です。<br>
-</p>
+      <p>次は 16 キーのキーボードをゲットして、同じ成績を目指してみたいです。誰か氏〜<br /></p>
+      <h2 id="Convolution (低速実装)">
+        <a href="#Convolution (低速実装)">Convolution (低速実装)</a>
+      </h2>
+      <p>
+        前回の日記で FFT の概要と計算方法を理解しました。今回は NTT (数論変換) と convolution
+        (合成積) の概要を学び、 Haskell で実装します。<br />
+      </p>
 
-<p>
-解けて良かったシリーズでした。<br>
-</p>
+      <blockquote>
+        <p>
+          FFT が載っている CS の本として、
+          <a href="https://www.kindaikagaku.co.jp/book_list/detail/9784764906488"
+            >Introduction to Algortihms</a
+          >
+          や
+          <a
+            href="https://www.cambridge.org/core/books/modern-computer-algebra/DB3563D4013401734851CF683D2F03F0"
+            >Modern Computer Algebra</a
+          >
+          があるようです。そっちを読めば良かったかも。<br />
+        </p>
+      </blockquote>
 
-<h3 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc354/tasks/abc354_f">F 問題</a></a></h3><p>
-Upsolve します。やはり F が解けないとな〜……<br>
-</p>
+      <p>※ 今回も自分専用のノートです。<br /></p>
+      <h3 id="地固め"><a href="#地固め">地固め</a></h3>
+      <h4 id="前回の疑問 (DFT)"><a href="#前回の疑問 (DFT)">前回の疑問 (DFT)</a></h4>
+      <p>
+        離散的フーリエ級数が自然に求まるのに対し、なぜ改めてスケール違いの計算式 (DFT)
+        を再定義するのか疑問に思いました (前回の日記) 。<br />
+      </p>
 
-<h3 id="Misc"><a href="#Misc">Misc</a></h3><p>
-AI で典型問題が解ける点が徐々に物議を醸しています。自分程度の実力でも周囲と相対化される (極端に弱かったりそこそこ強かったりする) のが面白かったわけですが、徐々に元の曖昧な世界へ戻っていくんだなと思いました。<br>
-</p>
+      <p>
+        大した理由は無さそうでした。実際、
+        <a href="https://qiita.com/TumoiYorozu/items/5855d75a47ef2c7e62c8"
+          >DFT の定義式が流派によって異なる</a
+        >
+        ようで、正規化パラメータにはブレがあるようです。今回は以下の式を採用します。<br />
+      </p>
 
-<h2 id="寿司打"><a href="#寿司打">寿司打</a></h2><p>
-<a href="https://sushida.net/">寿司打</a> で 20,700 点を記録しました。元々タイピングが遅かったこともあり、ささやかな栄光でした。<br>
-</p>
+      \begin{aligned} W_N^k &:= e^{-i\frac{2\pi}{N}k} \\ X_N^k &:= \sum_{n \in [0, N - 1] \cap
+      \mathbb{Z}} x_n W_N^{nk} \\ x_k &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} X_n
+      W_N^{-nk} \end{aligned}
+      <h4 id="TODO: 周期の規格化"><a href="#TODO: 周期の規格化">TODO: 周期の規格化</a></h4>
+      <p>
+        \(W_N^k\) の定義には周期 \(T\) (または周波数 \(\omega = \frac {2\pi} {T}\))
+        がありませんでした。時間の規格化は係数に吸収されている？　勉強不足です……<br />
+      </p>
+      <h4 id="FFT と線形代数の関連"><a href="#FFT と線形代数の関連">FFT と線形代数の関連</a></h4>
+      <p>
+        DFT は基底変換だと思いました。 FFT を要約すると、『基底変換の際に変換先の基底として 1 の N
+        乗根を選んだ場合、分割統治によって \(O(N \log N)\)
+        で変換先の成分を計算できる』と言えそうです。 NTT への拡張を予感させます。<br />
+      </p>
+      <h3 id="DFT から NTT へ"><a href="#DFT から NTT へ">DFT から NTT へ</a></h3>
+      <h4 id="NTT (数論変換)"><a href="#NTT (数論変換)">NTT (数論変換)</a></h4>
+      <p>
+        <a href="https://sen-comp.hatenablog.com/entry/2021/02/06/180310">FFT は精度が悪く</a>
+        、競技プログラミングでは NTT (数論変換) の方が出題されるようです。<br />
+      </p>
+      <h5 id="結論"><a href="#結論">結論</a></h5>
+      <p>
+        \(W_N\) を \(1^{-\frac 1 N}\) (1 の N 乗根の逆数) とすれば、 \(\bmod p\) の世界でも FFT
+        を実施できます。 \(1^{\frac 1 N}\) は以下の通り求まります。<br />
+      </p>
 
-<p>
-次は 16 キーのキーボードをゲットして、同じ成績を目指してみたいです。誰か氏〜<br>
-</p>
+      <p>
+        \(g\) が『原始根』であるとき、Fermet の小定理から \(1 / 2^m \pmod p\) が分かります:<br />
+      </p>
 
-<h2 id="Convolution (低速実装)"><a href="#Convolution (低速実装)">Convolution (低速実装)</a></h2><p>
-前回の日記で FFT の概要と計算方法を理解しました。今回は NTT (数論変換) と convolution (合成積) の概要を学び、 Haskell で実装します。<br>
-</p>
+      \begin{align} g^{p-1} &= 1 \pmod p \\ (g^{p-1/{2^m}})^{2^m} &= 1 \pmod p \end{align}
 
-<blockquote>
-<p>
-FFT が載っている CS の本として、 <a href="https://www.kindaikagaku.co.jp/book_list/detail/9784764906488">Introduction to Algortihms</a> や <a href="https://www.cambridge.org/core/books/modern-computer-algebra/DB3563D4013401734851CF683D2F03F0">Modern Computer Algebra</a> があるようです。そっちを読めば良かったかも。<br>
-</p>
-</blockquote>
+      <p>
+        \(g^{p-1/2^m}\) を 2 乗していくと、 \(1/2^m, .., 1/4, 1/2\) がすべて求まります。また特に
+        <code>998244353</code> に対する原始根 <code>g</code> は <code>3</code> です (<a
+          href="https://www.wolframalpha.com/"
+          >WolfarmAlpha</a
+        >
+        にて <code>PrimitiveRoot[988244353]</code> の答えを見るか、計算式を調べて実装します)。<br />
+      </p>
+      <h5 id="理論 (未習得)"><a href="#理論 (未習得)">理論 (未習得)</a></h5>
+      <p>
+        原始根って、何ですか……？　理論習得のために
+        <a href="https://zenn.dev/ankoma/articles/72212c58d3f6ef"
+          >【NTT（数論変換）入門（２）】NTT（数論変換）編 - Zenn</a
+        >
+        の理解を目標にします。この記事を理解できないのは『巡回群』に馴染みが無いためで、つまり『<a
+          href="https://www.sbcr.jp/product/4815621353/"
+          >群論への第一歩</a
+        >』を読んでいないためと思います。<br />
+      </p>
 
-<p>
-※ 今回も自分専用のノートです。<br>
-</p>
+      <p>
+        まずは『<a href="https://www.sbcr.jp/product/4815621353/">群論への第一歩</a
+        >』を読もうと思います。しかし、学部レベルの勉強をもっと真っ当にやっていれば、もっと直接的に役立ったのかもしれません。<br />
+      </p>
+      <h3 id="Convolution (畳み込み、合成積)">
+        <a href="#Convolution (畳み込み、合成積)">Convolution (畳み込み、合成積)</a>
+      </h3>
+      <p>
+        いよいよ目的の関数が見えて来ました。 Haskell の文脈では畳み込み = fold
+        のため、ここでは合成積を convlution の訳語とします。<br />
+      </p>
+      <h4 id="連続関数の合成積"><a href="#連続関数の合成積">連続関数の合成積</a></h4>
+      <p>
+        周期 \(T\) の連続関数 \(f(x)\), \(g(x)\) に対し、
+        <a href="https://manabitimes.jp/math/954">合成積</a> \((f * g)(x)\) を次式で定義します:<br />
+      </p>
 
-<h3 id="地固め"><a href="#地固め">地固め</a></h3><h4 id="前回の疑問 (DFT)"><a href="#前回の疑問 (DFT)">前回の疑問 (DFT)</a></h4><p>
-離散的フーリエ級数が自然に求まるのに対し、なぜ改めてスケール違いの計算式 (DFT) を再定義するのか疑問に思いました (前回の日記) 。<br>
-</p>
+      <p>
+        \[ (f * g)(x) := \int_{-\frac{T}{2}}^{\frac{T}{2}} f(\tau)g(x-\tau)\mathrm{d}\tau \]<br />
+      </p>
 
-<p>
-大した理由は無さそうでした。実際、 <a href="https://qiita.com/TumoiYorozu/items/5855d75a47ef2c7e62c8">DFT の定義式が流派によって異なる</a> ようで、正規化パラメータにはブレがあるようです。今回は以下の式を採用します。<br>
-</p>
+      <p>合成積に対するフーリエ変換は、フーリエ変換の積に分解できます:<br /></p>
 
-\begin{aligned}
-W_N^k &:= e^{-i\frac{2\pi}{N}k}
-\\ X_N^k &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{nk}
-\\ x_k &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} X_n W_N^{-nk}
-\end{aligned}
+      \begin{align} ((f * g)(x), e^{i\omega x}) &= \int_{-\frac{T}{2}}^{\frac{T}{2}} (f * g)(x)
+      e^{-i\omega_n x} \mathrm{d}x \\ &= \int_{-\frac{T}{2}}^{\frac{T}{2}}
+      (\int_{-\frac{T}{2}}^{\frac{T}{2}} f(\tau)g(x-\tau)\mathrm{d}\tau) e^{-i\omega_n x}
+      \mathrm{d}x \\ &= \int_{-\frac{T}{2}}^{\frac{T}{2}} (\int_{-\frac{T}{2}}^{\frac{T}{2}}
+      f(\tau)g(x-\tau)\mathrm{d}\tau) e^{-i\omega_n \tau} e^{-i\omega_n (x-\tau)} \mathrm{d}x \\ &:=
+      \int_{-\frac{T}{2}}^{\frac{T}{2}} (\int_{-\frac{T}{2}}^{\frac{T}{2}}
+      f(\tau)g(y)\mathrm{d}\tau) e^{-i\omega_n \tau} e^{-i\omega_n y} \mathrm{d}y \\ &=
+      \int_{-\frac{T}{2}}^{\frac{T}{2}} f(\tau) e^{-i\omega_n \tau} \mathrm{d}\tau
+      \int_{-\frac{T}{2}}^{\frac{T}{2}} g(y) e^{-i\omega_n y} \mathrm{d}y \\ &=
+      \mathcal{F}(x)[\omega] \mathcal{F}(g)(x) \end{align}
 
-<h4 id="TODO: 周期の規格化"><a href="#TODO: 周期の規格化">TODO: 周期の規格化</a></h4><p>
-\(W_N^k\) の定義には周期 \(T\) (または周波数 \(\omega = \frac {2\pi} {T}\)) がありませんでした。時間の規格化は係数に吸収されている？　勉強不足です……<br>
-</p>
+      <blockquote>
+        <p>
+          積分 2 つにバラしているところが納得行きません。 \(y = y(\tau)\) なので \(\tau\)
+          の積分から分離できないと思いますが……？　積分の基礎知識が足りないようです。<br />
+        </p>
+      </blockquote>
+      <h4 id="離散関数の合成積"><a href="#離散関数の合成積">離散関数の合成積</a></h4>
+      <p>
+        数列を \(f(x) = \sum_i \delta(i - x) a_x\)
+        のように離散的な関数として見ることで、次式の合成積が得られると解釈しました:<br />
+      </p>
 
-<h4 id="FFT と線形代数の関連"><a href="#FFT と線形代数の関連">FFT と線形代数の関連</a></h4><p>
-DFT は基底変換だと思いました。 FFT を要約すると、『基底変換の際に変換先の基底として 1 の N 乗根を選んだ場合、分割統治によって \(O(N \log N)\) で変換先の成分を計算できる』と言えそうです。 NTT への拡張を予感させます。<br>
-</p>
+      \begin{align} a &:= (a_0, a_1, .., a_{n-1}) \\ b &:= (b_0, b_1, .., b_{m-1}) \\ (a * b)_n &:=
+      \sum_{t \in [0, n] \cap \mathcal{Z}} a_t b_{n - t} \end{align}
 
-<h3 id="DFT から NTT へ"><a href="#DFT から NTT へ">DFT から NTT へ</a></h3><h4 id="NTT (数論変換)"><a href="#NTT (数論変換)">NTT (数論変換)</a></h4><p>
-<a href="https://sen-comp.hatenablog.com/entry/2021/02/06/180310">FFT は精度が悪く</a> 、競技プログラミングでは NTT (数論変換) の方が出題されるようです。<br>
-</p>
+      <p>
+        数列の例としては多項式の係数があります。多項式の積の係数部分は合成積で表されます。この辺りは
+        <a href="https://manabitimes.jp/math/954">高校数学の美しい物語</a>
+        の図解が良かったです。<br />
+      </p>
 
-<h5 id="結論"><a href="#結論">結論</a></h5><p>
-\(W_N\) を \(1^{-\frac 1 N}\) (1 の N 乗根の逆数) とすれば、 \(\bmod p\) の世界でも FFT を実施できます。 \(1^{\frac 1 N}\) は以下の通り求まります。<br>
-</p>
+      \begin{align} \mathbb{a} &:= \sum_i a_i x^i \\ \mathbb{b} &:= \sum_i b_i x^i \\ (\mathcal{a}
+      \mathbb{b})_n &= (a * b)_n x^n \end{align}
 
-<p>
-\(g\) が『原始根』であるとき、Fermet の小定理から \(1 / 2^m \pmod p\) が分かります:<br>
-</p>
+      <p>
+        よって \(\mathbb{a} * \mathbb{b} = \mathcal{F^{-1}}(\mathcal{F}(\mathbb{a})
+        \mathcal{F}(\mathbb{b}))\) により、多項式の積が \(O(N \log N)\) で求まります。<br />
+      </p>
+      <h4 id="まとめ"><a href="#まとめ">まとめ</a></h4>
+      <p>
+        多項式の積を計算する際に、 1 の N
+        乗根の基底に基底変換し、分割統治で成分を求めた上で、元の基底に対する成分を計算することにより、
+        \(O(N \log N)\) で計算できます。<br />
+      </p>
+      <h4 id="実装"><a href="#実装">実装</a></h4>
+      <p>改めて DFT, IDFT の式を眺めます。<br /></p>
 
-\begin{align}
-g^{p-1} &= 1 \pmod p
-\\ (g^{p-1/{2^m}})^{2^m} &= 1 \pmod p
-\end{align}
+      \begin{aligned} \mathcal{F}&: \{x_i\}_i \mapsto \{X_i\}_i \\ \mathcal{F^{-1}}&: \{X_i\}_i
+      \mapsto \{x_i\}_i \\ X_k &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{nk} \\ x_k &:=
+      \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} X_n W_N^{-nk} \end{aligned}
 
-<p>
-\(g^{p-1/2^m}\) を 2 乗していくと、 \(1/2^m, .., 1/4, 1/2\) がすべて求まります。また特に <code>998244353</code> に対する原始根 <code>g</code> は <code>3</code> です (<a href="https://www.wolframalpha.com/">WolfarmAlpha</a> にて <code>PrimitiveRoot[988244353]</code> の答えを見るか、計算式を調べて実装します)。<br>
-</p>
+      <p>FFT の図は前回同様で、 IDFT の計算方法もこの図から分かります:<br /></p>
 
-<h5 id="理論 (未習得)"><a href="#理論 (未習得)">理論 (未習得)</a></h5><p>
-原始根って、何ですか……？　理論習得のために <a href="https://zenn.dev/ankoma/articles/72212c58d3f6ef">【NTT（数論変換）入門（２）】NTT（数論変換）編 - Zenn</a> の理解を目標にします。この記事を理解できないのは『巡回群』に馴染みが無いためで、つまり『<a href="https://www.sbcr.jp/product/4815621353/">群論への第一歩</a>』を読んでいないためと思います。<br>
-</p>
+      <figure>
+        <img
+          src="./img/2024-05-12-butterfly-8-4-2-1.png"
+          alt="2024-05-12-butterfly-8-4-2-1.png"
+        /><br />
+      </figure>
 
-<p>
-まずは『<a href="https://www.sbcr.jp/product/4815621353/">群論への第一歩</a>』を読もうと思います。しかし、学部レベルの勉強をもっと真っ当にやっていれば、もっと直接的に役立ったのかもしれません。<br>
-</p>
+      <p>以上を元に、各種関数を実装しました:<br /></p>
 
-<h3 id="Convolution (畳み込み、合成積)"><a href="#Convolution (畳み込み、合成積)">Convolution (畳み込み、合成積)</a></h3><p>
-いよいよ目的の関数が見えて来ました。 Haskell の文脈では畳み込み = fold のため、ここでは合成積を convlution の訳語とします。<br>
-</p>
+      <ul>
+        <li>
+          <code>bitRevSort</code>: 引数並び替えの部分<br />
+          <a
+            href="https://www.linkedin.com/pulse/%E7%B5%B6%E5%AF%BE%E3%81%AB%E3%82%84%E3%81%A3%E3%81%A6%E3%81%AF%E3%81%84%E3%81%91%E3%81%AA%E3%81%84%E3%83%93%E3%83%83%E3%83%88%E5%8F%8D%E8%BB%A2-masayuki-tatebe?articleId=6539466321338425345"
+            >絶対にやってはいけないビット反転</a
+          >
+          を参考に実装しました。逆変換は <code>bitRevSort</code> 自身です。<br />
+        </li>
 
-<h4 id="連続関数の合成積"><a href="#連続関数の合成積">連続関数の合成積</a></h4><p>
-周期 \(T\) の連続関数 \(f(x)\), \(g(x)\) に対し、 <a href="https://manabitimes.jp/math/954">合成積</a> \((f * g)(x)\) を次式で定義します:<br>
-</p>
+        <li>
+          <code>butterfly</code>: \(\mathcal{F}(\mathbb{a})\) の内、引数の並び替え以外の部分<br />
+          上図の通り実装します。ただし \(W_N^i := (1^{-\frac i N}) \pmod p\) とします。<br />
+        </li>
 
-<p>
-\[
-(f * g)(x) := \int_{-\frac{T}{2}}^{\frac{T}{2}} f(\tau)g(x-\tau)\mathrm{d}\tau
-\]<br>
-</p>
+        <li>
+          <code>invButtefly</code>: \(\mathcal{F^{-1}(\mathbb{a})}\)
+          の内、引数の並び替え以外の部分<br />
+          上図で右から左へ逆向きに回路を辿る式を考えて実装します。<br />
+        </li>
 
-<p>
-合成積に対するフーリエ変換は、フーリエ変換の積に分解できます:<br>
-</p>
+        <li>
+          <code>convolute</code>: \(\mathbb a * \mathbb b = \mathcal{F^{-1}}(\mathcal{F}(\mathbb{a})
+          \mathcal{F}(\mathbb{b}))\)<br />
+          式の通り実装します。<br />
+        </li>
+      </ul>
 
-\begin{align}
-((f * g)(x), e^{i\omega x}) &= \int_{-\frac{T}{2}}^{\frac{T}{2}} (f * g)(x) e^{-i\omega_n x} \mathrm{d}x
-\\ &= \int_{-\frac{T}{2}}^{\frac{T}{2}} (\int_{-\frac{T}{2}}^{\frac{T}{2}} f(\tau)g(x-\tau)\mathrm{d}\tau) e^{-i\omega_n x} \mathrm{d}x
-\\ &= \int_{-\frac{T}{2}}^{\frac{T}{2}} (\int_{-\frac{T}{2}}^{\frac{T}{2}} f(\tau)g(x-\tau)\mathrm{d}\tau) e^{-i\omega_n \tau} e^{-i\omega_n (x-\tau)} \mathrm{d}x
-\\ &:= \int_{-\frac{T}{2}}^{\frac{T}{2}} (\int_{-\frac{T}{2}}^{\frac{T}{2}} f(\tau)g(y)\mathrm{d}\tau) e^{-i\omega_n \tau} e^{-i\omega_n y} \mathrm{d}y
-\\ &= \int_{-\frac{T}{2}}^{\frac{T}{2}} f(\tau) e^{-i\omega_n \tau} \mathrm{d}\tau \int_{-\frac{T}{2}}^{\frac{T}{2}} g(y) e^{-i\omega_n y} \mathrm{d}y
-\\ &= \mathcal{F}(x)[\omega] \mathcal{F}(g)(x)
-\end{align}
+      <p>
+        詳細は <a href="https://github.com/cojna/iota">cojna/iota</a> の
+        <a href="https://github.com/cojna/iota/blob/master/src/Math/NTT.hs">Math.NTT</a>
+        を参考に実装しました。ただし <code>iota</code> においては bit
+        反転によるソートを実施していない？のか、計算方法に違いがあります。<br />
+      </p>
+      <h3 id="verify"><a href="#verify">verify</a></h3>
+      <p>まだまだ低速ですが、 <code>convolute</code> を使って行きます。<br /></p>
 
-<blockquote>
-<p>
-積分 2 つにバラしているところが納得行きません。 \(y = y(\tau)\) なので \(\tau\) の積分から分離できないと思いますが……？　積分の基礎知識が足りないようです。<br>
-</p>
-</blockquote>
+      <ul>
+        <li>
+          <a href="https://judge.yosupo.jp/problem/convolution_mod">Convolution - Library Checker</a
+          ><br />
+          <code>convolute</code> そのものの問題です。<br />
+        </li>
+        <li>
+          <a href="https://atcoder.jp/contests/practice2/tasks/practice2_f"
+            >ACL Practice Contest F - Convolution</a
+          ><br />
+          Library Checker の問題と同じです。テストケースは弱め (?) です。<br />
+        </li>
+        <li>
+          <a href="https://atcoder.jp/contests/atc001/tasks/fft_c"
+            >AtCoder Typical Contest 001 C - 高速フーリエ変換</a
+          ><br />
+          よく考えると合成積そのものな問題です。テストケースが弱いので解く必要はありませんが、スライドが良いと思います。<br />
+        </li>
+        <li>
+          <a href="https://atcoder.jp/contests/typical90/tasks/typical90_bm"
+            >典型 90 問 065 - RGB Ball 2 (★7)</a
+          ><br />
+          いずれ見ます……<br />
+        </li>
+      </ul>
+      <h3 id="中国剰余定理 (CRT / Garner's algorithm)">
+        <a href="#中国剰余定理 (CRT / Garner's algorithm)"
+          >中国剰余定理 (CRT / Garner's algorithm)</a
+        >
+      </h3>
+      <ul>
+        <li>
+          <a href="https://atcoder.jp/contests/past202203-open/tasks/past202203_n"
+            >PAST 10 N - 400億マス計算</a
+          ><br />
+          2
+          つの項の和について考える時、和を指数部に持っていくことで合成積に持ち込める。天才ですね。ただし
+          \(\bmod\) を取らない？合成積 (<a
+            href="https://atcoder.github.io/ac-library/production/document_ja/convolution.html"
+            >convolution_ll</a
+          >
+          相当) が必要で、そのために中国剰余定理 (CRT / Gerner's algorithm)
+          を使っているようです。<br />
+        </li>
+      </ul>
 
-<h4 id="離散関数の合成積"><a href="#離散関数の合成積">離散関数の合成積</a></h4><p>
-数列を \(f(x) = \sum_i \delta(i - x) a_x\) のように離散的な関数として見ることで、次式の合成積が得られると解釈しました:<br>
-</p>
+      <p>
+        <code>convolutin_ll</code> (<a
+          href="https://github.com/atcoder/ac-library/blob/master/atcoder/convolution.hpp"
+          >convolution.hpp</a
+        >)<br />
+      </p>
 
-\begin{align}
-a &:= (a_0, a_1, .., a_{n-1})
-\\ b &:= (b_0, b_1, .., b_{m-1})
-\\ (a * b)_n &:= \sum_{t \in [0, n] \cap \mathcal{Z}} a_t b_{n - t}
-\end{align}
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          aclのconvolution_llってどうやって実装してるんだと思ったが3本計算してCRTで復元してるのか
+        </p>
+        &mdash; だうなー (@downerkei)
+        <a href="https://twitter.com/downerkei/status/1772349995368304816?ref_src=twsrc%5Etfw"
+          >March 25, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-<p>
-数列の例としては多項式の係数があります。多項式の積の係数部分は合成積で表されます。この辺りは <a href="https://manabitimes.jp/math/954">高校数学の美しい物語</a> の図解が良かったです。<br>
-</p>
-
-\begin{align}
-\mathbb{a} &:= \sum_i a_i x^i
-\\ \mathbb{b} &:= \sum_i b_i x^i
-\\ (\mathcal{a} \mathbb{b})_n &= (a * b)_n x^n
-\end{align}
-
-<p>
-よって \(\mathbb{a} * \mathbb{b} = \mathcal{F^{-1}}(\mathcal{F}(\mathbb{a}) \mathcal{F}(\mathbb{b}))\) により、多項式の積が \(O(N \log N)\) で求まります。<br>
-</p>
-
-<h4 id="まとめ"><a href="#まとめ">まとめ</a></h4><p>
-多項式の積を計算する際に、 1 の N 乗根の基底に基底変換し、分割統治で成分を求めた上で、元の基底に対する成分を計算することにより、 \(O(N \log N)\) で計算できます。<br>
-</p>
-
-<h4 id="実装"><a href="#実装">実装</a></h4><p>
-改めて DFT, IDFT の式を眺めます。<br>
-</p>
-
-\begin{aligned}
-\mathcal{F}&: \{x_i\}_i \mapsto \{X_i\}_i
-\\ \mathcal{F^{-1}}&: \{X_i\}_i \mapsto \{x_i\}_i
-\\ X_k &:= \sum_{n \in [0, N - 1] \cap \mathbb{Z}} x_n W_N^{nk}
-\\ x_k &:= \frac {1} {N} \sum_{n \in [0, N - 1] \cap \mathbb{Z}} X_n W_N^{-nk}
-\end{aligned}
-
-<p>
-FFT の図は前回同様で、 IDFT の計算方法もこの図から分かります:<br>
-</p>
-
-
-<figure>
-<img src="./img/2024-05-12-butterfly-8-4-2-1.png" alt="2024-05-12-butterfly-8-4-2-1.png"><br>
-
-</figure>
-
-<p>
-以上を元に、各種関数を実装しました:<br>
-</p>
-
-<ul><li><code>bitRevSort</code>: 引数並び替えの部分<br>
-<a href="https://www.linkedin.com/pulse/%E7%B5%B6%E5%AF%BE%E3%81%AB%E3%82%84%E3%81%A3%E3%81%A6%E3%81%AF%E3%81%84%E3%81%91%E3%81%AA%E3%81%84%E3%83%93%E3%83%83%E3%83%88%E5%8F%8D%E8%BB%A2-masayuki-tatebe?articleId=6539466321338425345">絶対にやってはいけないビット反転</a> を参考に実装しました。逆変換は <code>bitRevSort</code> 自身です。<br></li>
-
-<li><code>butterfly</code>: \(\mathcal{F}(\mathbb{a})\) の内、引数の並び替え以外の部分<br>
-上図の通り実装します。ただし \(W_N^i := (1^{-\frac i N}) \pmod p\) とします。<br></li>
-
-<li><code>invButtefly</code>: \(\mathcal{F^{-1}(\mathbb{a})}\) の内、引数の並び替え以外の部分<br>
-上図で右から左へ逆向きに回路を辿る式を考えて実装します。<br></li>
-
-<li><code>convolute</code>: \(\mathbb a * \mathbb b = \mathcal{F^{-1}}(\mathcal{F}(\mathbb{a}) \mathcal{F}(\mathbb{b}))\)<br>
-式の通り実装します。<br></li>
-</ul>
-
-<p>
-詳細は <a href="https://github.com/cojna/iota">cojna/iota</a> の <a href="https://github.com/cojna/iota/blob/master/src/Math/NTT.hs">Math.NTT</a> を参考に実装しました。ただし <code>iota</code> においては bit 反転によるソートを実施していない？のか、計算方法に違いがあります。<br>
-</p>
-
-<h3 id="verify"><a href="#verify">verify</a></h3><p>
-まだまだ低速ですが、 <code>convolute</code> を使って行きます。<br>
-</p>
-
-<ul><li><a href="https://judge.yosupo.jp/problem/convolution_mod">Convolution - Library Checker</a><br>
-<code>convolute</code> そのものの問題です。<br></li>
-<li><a href="https://atcoder.jp/contests/practice2/tasks/practice2_f">ACL Practice Contest F - Convolution</a><br>
-Library Checker の問題と同じです。テストケースは弱め (?) です。<br></li>
-<li><a href="https://atcoder.jp/contests/atc001/tasks/fft_c">AtCoder Typical Contest 001 C - 高速フーリエ変換</a><br>
-よく考えると合成積そのものな問題です。テストケースが弱いので解く必要はありませんが、スライドが良いと思います。<br></li>
-<li><a href="https://atcoder.jp/contests/typical90/tasks/typical90_bm">典型 90 問 065 - RGB Ball 2 (★7)</a><br>
-いずれ見ます……<br></li>
-</ul>
-
-<h3 id="中国剰余定理 (CRT / Garner's algorithm)"><a href="#中国剰余定理 (CRT / Garner's algorithm)">中国剰余定理 (CRT / Garner's algorithm)</a></h3><ul><li><a href="https://atcoder.jp/contests/past202203-open/tasks/past202203_n">PAST 10 N - 400億マス計算</a><br>
-2 つの項の和について考える時、和を指数部に持っていくことで合成積に持ち込める。天才ですね。ただし \(\bmod\) を取らない？合成積 (<a href="https://atcoder.github.io/ac-library/production/document_ja/convolution.html">convolution_ll</a> 相当) が必要で、そのために中国剰余定理 (CRT / Gerner's algorithm) を使っているようです。<br></li>
-</ul>
-
-<p>
-<code>convolutin_ll</code> (<a href="https://github.com/atcoder/ac-library/blob/master/atcoder/convolution.hpp">convolution.hpp</a>)<br>
-</p>
-
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">aclのconvolution_llってどうやって実装してるんだと思ったが3本計算してCRTで復元してるのか</p>&mdash; だうなー (@downerkei) <a href="https://twitter.com/downerkei/status/1772349995368304816?ref_src=twsrc%5Etfw">March 25, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
-
-<p>
-CRT は理解していませんが、 ACL を写経して AC しました。解けるから今はヨシ……！<br>
-</p>
-
-<h3 id="今後"><a href="#今後">今後</a></h3><p>
-僕の <code>convolution</code> は、今より 10 倍速くなりそうです。将来的には <a href="https://tayu0110.hatenablog.com/entry/2023/05/06/023244">爆速なNTTを実装したい - 競プロ備忘録</a> などを参考に高速化が必要です。<br>
-</p>
-
-<h3 id="関連"><a href="#関連">関連</a></h3><ul><li><a href="https://zenn.dev/konn/articles/2023-12-14-pure-parallel-fft-in-linear-haskell#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">2023年の Linear Haskell で純粋・並列 FFT を実装する──「Haskell は Rust になれるのか？」補遺</a><br></li>
-<li>FFT のハードウェア実装？<br></li>
-</ul>
-
-<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="SparseGraph から頂点の型パラメータを削除"><a href="#SparseGraph から頂点の型パラメータを削除"><code>SparseGraph</code> から頂点の型パラメータを削除</a></h3><p>
-<code>SparseGraph i w</code> においては頂点の型 <code>i</code> (<code>Index i</code>) を抽象化していましたが、 <code>Int</code> 型に固定しました。 <code>(x, y)</code> のように成分に分けた API が欲しければ、都度グラフをラップした関数を作成します。<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>CRT は理解していませんが、 ACL を写経して AC しました。解けるから今はヨシ……！<br /></p>
+      <h3 id="今後"><a href="#今後">今後</a></h3>
+      <p>
+        僕の <code>convolution</code> は、今より 10 倍速くなりそうです。将来的には
+        <a href="https://tayu0110.hatenablog.com/entry/2023/05/06/023244"
+          >爆速なNTTを実装したい - 競プロ備忘録</a
+        >
+        などを参考に高速化が必要です。<br />
+      </p>
+      <h3 id="関連"><a href="#関連">関連</a></h3>
+      <ul>
+        <li>
+          <a
+            href="https://zenn.dev/konn/articles/2023-12-14-pure-parallel-fft-in-linear-haskell#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"
+            >2023年の Linear Haskell で純粋・並列 FFT を実装する──「Haskell は Rust
+            になれるのか？」補遺</a
+          ><br />
+        </li>
+        <li>FFT のハードウェア実装？<br /></li>
+      </ul>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="SparseGraph から頂点の型パラメータを削除">
+        <a href="#SparseGraph から頂点の型パラメータを削除"
+          ><code>SparseGraph</code> から頂点の型パラメータを削除</a
+        >
+      </h3>
+      <p>
+        <code>SparseGraph i w</code> においては頂点の型 <code>i</code> (<code>Index i</code>)
+        を抽象化していましたが、 <code>Int</code> 型に固定しました。
+        <code>(x, y)</code> のように成分に分けた API
+        が欲しければ、都度グラフをラップした関数を作成します。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

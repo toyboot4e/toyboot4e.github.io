@@ -1,13 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>org-mode 製ブログの改良 (1) - toybeam</title>
+    <title>org-mode 製ブログの改良 (1): ox-slimhtml - toybeam</title>
     <meta name="description" content="devlog of toyboot4e" />
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -18,7 +19,7 @@
   </head>
   <body>
     <header role="banner">
-      <h1><code>org-mode</code> 製ブログの改良 (1)</h1>
+      <h1><code>org-mode</code> 製ブログの改良 (1): <code>ox-slimhtml</code></h1>
       <p>Mar 18, 2023</p>
       <nav role="navigation">
         <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
@@ -30,7 +31,6 @@
         <a href="./2022-10-09-org-mode-blog.html">前の投稿</a> で作った <code>org-mode</code> 製 SSG
         を改良します。マイナな変更が多いです。<br />
       </p>
-
       <h2 id="改良点"><a href="#改良点">改良点</a></h2>
       <h3 id="表現力の強化"><a href="#表現力の強化">表現力の強化</a></h3>
       <h4 id="トップページ (sitemap)">
@@ -47,10 +47,8 @@
       <figure>
         <img src="./img/2023-03-sitemap-2.png" alt="2023-03-sitemap-2.png" width="407px" /><br />
       </figure>
-
       <h4 id="図"><a href="#図">図</a></h4>
       <p>ASCII から画像生成するツールを導入しました。 AsciiDoc でもお馴染みでした。<br /></p>
-
       <h5 id="ditaa">
         <a href="#ditaa"><a href="https://ditaa.sourceforge.net/">ditaa</a></a>
       </h5>
@@ -62,7 +60,6 @@
       </div>
 
       <figure><img src="./img/2023-03-ditaa.png" alt="2023-03-ditaa.png" /><br /></figure>
-
       <h5 id="plantuml">
         <a href="#plantuml"
           ><a href="https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-plantuml.html"
@@ -76,7 +73,6 @@
       </div>
 
       <figure><img src="./img//2023-03-plantuml.png" alt="2023-03-plantuml.png" /><br /></figure>
-
       <h5 id="graphviz">
         <a href="#graphviz"><a href="https://graphviz.org/">graphviz</a></a>
       </h5>
@@ -92,7 +88,6 @@
       <figure><img src="./img/2023-03-graphvi.png" alt="2023-03-graphvi.png" /><br /></figure>
 
       <p>用意しましたが、今後のブログで 1 回使うかどうか……。<br /></p>
-
       <h3 id="html 出力を綺麗に"><a href="#html 出力を綺麗に">html 出力を綺麗に</a></h3>
       <h4 id="prettier で html を整形する">
         <a href="#prettier で html を整形する"><code>prettier</code> で html を整形する</a>
@@ -104,7 +99,6 @@
 $ npx prettier --print-width 100 --write out/*.htm
 </code></pre>
       </div>
-
       <h4 id="ox-slimhtml を ox-html と併用する">
         <a href="#ox-slimhtml を ox-html と併用する"
           ><code>ox-slimhtml</code> を <code>ox-html</code> と併用する</a
@@ -122,7 +116,6 @@ $ npx prettier --print-width 100 --write out/*.htm
         <code>ox-slimhtml</code> で上書きする形に変更しました
         (<code>org-export-define-derived-backend</code>) 。<br />
       </p>
-
       <h2 id="感想"><a href="#感想">感想</a></h2>
       <p>
         最近の自作ブログ界隈 (?) では、既成の SSG を使うか、

@@ -1,271 +1,410 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 326, AHC 025, Thunder 本 / IO, ST, State - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 326, AHC 025, Thunder 本 / IO, ST, State</h1><p>Oct 29, 2023</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="訓練"><a href="#訓練">訓練</a></h3><p>
-先週の <a href="https://atcoder.jp/contests/abc325/tasks/abc325_e">ABC 325 E</a> を upsolve した。 Dijkstra の典型だったが TLE した。人の提出を真似て枝刈りをすると AC になった。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 326, AHC 025, Thunder 本 / IO, ST, State - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 326, AHC 025, Thunder 本 / IO, ST, State</h1>
+      <p>Oct 29, 2023</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2>
+      <h3 id="訓練"><a href="#訓練">訓練</a></h3>
+      <p>
+        先週の <a href="https://atcoder.jp/contests/abc325/tasks/abc325_e">ABC 325 E</a> を upsolve
+        した。 Dijkstra の典型だったが TLE した。人の提出を真似て枝刈りをすると AC になった。<br />
+      </p>
 
-<p>
-<a href="https://www.slideshare.net/yosupo/ss-46612984">色々なダイクストラ高速化 (yosupo 氏)</a> を見ると、枝刈りによって『何十倍も速くなる問題も』あるという (P15) 。オーダーは変わらないと思っていたが……？？<br>
-</p>
+      <p>
+        <a href="https://www.slideshare.net/yosupo/ss-46612984"
+          >色々なダイクストラ高速化 (yosupo 氏)</a
+        >
+        を見ると、枝刈りによって『何十倍も速くなる問題も』あるという (P15)
+        。オーダーは変わらないと思っていたが……？？<br />
+      </p>
 
-<p>
-青 diff DP を 3 問解いた。 TEE を見ると約 2 ヶ月の周期性があったので脱したい。<br>
-</p>
+      <p>青 diff DP を 3 問解いた。 TEE を見ると約 2 ヶ月の周期性があったので脱したい。<br /></p>
 
+      <figure>
+        <img src="./img/2023-10-29-tee.png" alt="2023-10-29-tee.png" /><br />
 
-<figure>
-<img src="./img/2023-10-29-tee.png" alt="2023-10-29-tee.png"><br>
+        <figcaption>
+          <span class="figure-number">Figure 1: </span>4 月初旬から 10 月下旬の TEE の推移
+        </figcaption>
+      </figure>
+      <h3 id="AHC 025"><a href="#AHC 025">AHC 025</a></h3>
+      <p>
+        <a href="https://atcoder.jp/contests/ahc025">AHC 025</a>
+        が終了した。複数の重りをグループ分けし、重さを平均化せよというインタラクティブ問題だった。<br />
+      </p>
 
-<figcaption><span class="figure-number">Figure 1: </span>4 月初旬から 10 月下旬の TEE の推移</figcaption>
-</figure>
+      <p>
+        結果は緑パフォだった。個々の要素をソートして、当てずっぽうに組み合わせることしかできなかった。そろそろ対策してみたい。<br />
+      </p>
 
-<h3 id="AHC 025"><a href="#AHC 025">AHC 025</a></h3><p>
-<a href="https://atcoder.jp/contests/ahc025">AHC 025</a> が終了した。複数の重りをグループ分けし、重さを平均化せよというインタラクティブ問題だった。<br>
-</p>
+      <ul>
+        <li>
+          <a href="https://kaede2020.hatenablog.com/entry/2023/10/22/195315"
+            >kaede_2020 さんのブログ</a
+          ><br />
+        </li>
+        <li><a href="https://www.youtube.com/watch?v=CrzS-Tgnloc">AHC ラジオ</a><br /></li>
+      </ul>
+      <h3 id="ABC 326"><a href="#ABC 326">ABC 326</a></h3>
+      <p><a href="https://atcoder.jp/contests/abc326">ABC 326</a> に参加した。<br /></p>
 
-<p>
-結果は緑パフォだった。個々の要素をソートして、当てずっぽうに組み合わせることしかできなかった。そろそろ対策してみたい。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc326/tasks/abc326_a">A 問題</a>
+        ではセットアップが壊れていて焦った。<br />
+      </p>
 
-<ul><li><a href="https://kaede2020.hatenablog.com/entry/2023/10/22/195315">kaede_2020 さんのブログ</a><br></li>
-<li><a href="https://www.youtube.com/watch?v=CrzS-Tgnloc">AHC ラジオ</a><br></li>
-</ul>
+      <p>
+        <a href="https://atcoder.jp/contests/abc326/tasks/abc326_b">B 問題</a> は算数だった。<br />
+      </p>
 
-<h3 id="ABC 326"><a href="#ABC 326">ABC 326</a></h3><p>
-<a href="https://atcoder.jp/contests/abc326">ABC 326</a> に参加した。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc326/tasks/abc326_c">C 問題</a> では尺取り法 (two
+        pointers) のテンプレートを使った。条件を満たす
+        <code>(l, r)</code> 区間の一覧が返るようになっている:<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc326/tasks/abc326_a">A 問題</a> ではセットアップが壊れていて焦った。<br>
-</p>
-
-<p>
-<a href="https://atcoder.jp/contests/abc326/tasks/abc326_b">B 問題</a> は算数だった。<br>
-</p>
-
-<p>
-<a href="https://atcoder.jp/contests/abc326/tasks/abc326_c">C 問題</a> では尺取り法 (two pointers) のテンプレートを使った。条件を満たす <code>(l, r)</code> 区間の一覧が返るようになっている:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">twoPointers :: Int -&gt; ((Int, Int) -&gt; Bool) -&gt; [(Int, Int)]
+      <div class="org-src-container">
+        <pre><code class="src language-hs">twoPointers :: Int -&gt; ((Int, Int) -&gt; Bool) -&gt; [(Int, Int)]
 twoPointers len p = _ {-# 実装は汚いので省略…… #-}
 </code></pre>
-</div>
+      </div>
 
-<p>
-添字バグに戸惑った。閉区間 <code>[l, r]</code> では <code>len = r + 1 - l</code> となるのが厄介だった。<br>
-</p>
+      <p>
+        添字バグに戸惑った。閉区間 <code>[l, r]</code> では
+        <code>len = r + 1 - l</code> となるのが厄介だった。<br />
+      </p>
 
-<blockquote>
-<p>
-尺取り法は 2 分探索で代替できない場合がある。たとえば <a href="https://atcoder.jp/contests/past202109-open/tasks/past202109_l">第 8 回 PAST - L</a> は 2 分探索だと TLE になった。<br>
-</p>
-</blockquote>
+      <blockquote>
+        <p>
+          尺取り法は 2 分探索で代替できない場合がある。たとえば
+          <a href="https://atcoder.jp/contests/past202109-open/tasks/past202109_l"
+            >第 8 回 PAST - L</a
+          >
+          は 2 分探索だと TLE になった。<br />
+        </p>
+      </blockquote>
 
-<p>
-<a href="https://atcoder.jp/contests/abc326/tasks/abc326_d">D 問題</a> は枝刈りができず見送った。実装も大変だったらしい。まだ upsolve していない。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc326/tasks/abc326_d">D 問題</a>
+        は枝刈りができず見送った。実装も大変だったらしい。まだ upsolve していない。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc326/tasks/abc326_e">E 問題</a> は期待値 DP として解いた。図のような遷移において、 \(E_i = \sum_j (E_j + \Delta x_{i, j}) p_{i, j}\) が成り立つ。実際、期待値の定義 \(E[X] = \sum_i x_i p_i\) に立ち返ると計算式を証明できる (省略) 。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc326/tasks/abc326_e">E 問題</a> は期待値 DP
+        として解いた。図のような遷移において、 \(E_i = \sum_j (E_j + \Delta x_{i, j}) p_{i, j}\)
+        が成り立つ。実際、期待値の定義 \(E[X] = \sum_i x_i p_i\) に立ち返ると計算式を証明できる
+        (省略) 。<br />
+      </p>
 
+      <figure>
+        <img src="./img/2023-10-29-ex-dp.png" alt="2023-10-29-ex-dp.png" width="551px" /><br />
 
-<figure>
-<img src="./img/2023-10-29-ex-dp.png" alt="2023-10-29-ex-dp.png" width="551px"><br>
+        <figcaption><span class="figure-number">Figure 2: </span>期待値 DP の雰囲気</figcaption>
+      </figure>
 
-<figcaption><span class="figure-number">Figure 2: </span>期待値 DP の雰囲気</figcaption>
-</figure>
+      <p>
+        \(dp[i] := E_i\) はトポロジカル順に求める (終点から順に求める)
+        。今回の問題における遷移を整理すると \(E_i = \sum_j (E_j + \Delta x_{i, j}) \frac 1 N =
+        (\sum_j E_j + \sum_j \Delta x_{i j}) \frac 1 N\) であり、それぞれの \(\sum\)
+        をセグメント木と累積和から計算できた。セグメント木も累積和にした方が賢い。<br />
+      </p>
 
-<p>
-\(dp[i] := E_i\) はトポロジカル順に求める (終点から順に求める) 。今回の問題における遷移を整理すると \(E_i = \sum_j (E_j + \Delta x_{i, j}) \frac 1 N = (\sum_j E_j + \sum_j \Delta x_{i j}) \frac 1 N\) であり、それぞれの \(\sum\) をセグメント木と累積和から計算できた。セグメント木も累積和にした方が賢い。<br>
-</p>
+      <blockquote>
+        <p>確率変数 \(X\) などは雰囲気で書いており、人には伝わらないかも……。<br /></p>
+      </blockquote>
 
-<blockquote>
-<p>
-確率変数 \(X\) などは雰囲気で書いており、人には伝わらないかも……。<br>
-</p>
-</blockquote>
+      <p>
+        <a href="https://atcoder.jp/contests/abc326/tasks/abc326_f">F 問題</a> は x, y
+        成分に分けると半分全列挙になるが、経路復元が間に合わなかった。 upsolve したい。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc326/tasks/abc326_f">F 問題</a> は x, y 成分に分けると半分全列挙になるが、経路復元が間に合わなかった。 upsolve したい。<br>
-</p>
+      <p>以上、 C 問題 (尺取り法) と E 問題 (期待値 DP) を貯金で乗り切った。<br /></p>
+      <h3 id="備忘録 (期待値 DP)"><a href="#備忘録 (期待値 DP)">備忘録 (期待値 DP)</a></h3>
+      <p>
+        <a href="https://atcoder.jp/contests/dp/tasks/dp_j">EDPC - J Sushi</a>
+        に通じる類題を考える。<br />
+      </p>
 
-<p>
-以上、 C 問題 (尺取り法) と E 問題 (期待値 DP) を貯金で乗り切った。<br>
-</p>
+      <p>
+        1/2 の確率で表が出るコインがある。 3 回表を出すまでにコインを投げる回数の期待値は？<br />
+      </p>
 
-<h3 id="備忘録 (期待値 DP)"><a href="#備忘録 (期待値 DP)">備忘録 (期待値 DP)</a></h3><p>
-<a href="https://atcoder.jp/contests/dp/tasks/dp_j">EDPC - J Sushi</a> に通じる類題を考える。<br>
-</p>
+      <figure>
+        <img src="./img/2023-10-29-coin-dp.png" alt="2023-10-29-coin-dp.png" width="880px" /><br />
+      </figure>
 
-<p>
-1/2 の確率で表が出るコインがある。 3 回表を出すまでにコインを投げる回数の期待値は？<br>
-</p>
+      <p>
+        DP 的な式整理無しで解くのは無理な気がする。まず \(E_2 = \sum\limits_i p_i x_i =
+        \sum_\limits{n=1}^{\infty} \frac n {2^n} = 2\) 。 \(E_1\) は……考えたくない。。<br />
+      </p>
+      <h2 id="読書"><a href="#読書">読書</a></h2>
+      <h3 id="Thunder 本"><a href="#Thunder 本">Thunder 本</a></h3>
+      <p>
+        AHC 025 の結果に刺激を受けて、
+        <a href="https://gihyo.jp/book/2023/978-4-297-13360-3"
+          >ゲームで学ぶ探索アルゴリズム実践入門</a
+        >
+        を読み始めた。<br />
+      </p>
 
+      <p>著者: <a href="https://thun-c.github.io/">Thunder</a> 氏<br /></p>
 
-<figure>
-<img src="./img/2023-10-29-coin-dp.png" alt="2023-10-29-coin-dp.png" width="880px"><br>
+      <p>
+        Haskell で取り組むため、
+        <a href="https://www.stackage.org/lts-21.6/package/random-1.2.1.1">random</a>
+        パッケージを見た。 <code>StdGen</code> が乱数のシード (?)
+        で、あるシード値からは常に同じ乱数が生成される (決定的である) 点が AHC 向けだと思った。<br />
+      </p>
+      <h3 id="Software Design"><a href="#Software Design">Software Design</a></h3>
+      <p>
+        <a href="https://gihyo.jp/magazine/SD/archive/2023/202311">Software Design 2023年11月号</a>
+        の Bram 氏 (Vim の作者) の追悼記事を読んだ。人生か……<br />
+      </p>
+      <h2 id="Haskell"><a href="#Haskell">Haskell</a></h2>
+      <h3 id="Qiita Conference 2023 Autmun Day2">
+        <a href="#Qiita Conference 2023 Autmun Day2">Qiita Conference 2023 Autmun Day2</a>
+      </h3>
+      <p>naoya さんを (オンラインで) 見た！！！！<br /></p>
 
-</figure>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=pe0vW9AyunQ&amp;t=9530s">Youtube</a><br /></li>
+        <li><a href="https://t.co/WlqKmMlFjo">発表資料 (スライド)</a><br /></li>
+      </ul>
 
-<p>
-DP 的な式整理無しで解くのは無理な気がする。まず \(E_2 = \sum\limits_i p_i x_i = \sum_\limits{n=1}^{\infty} \frac n {2^n} = 2\) 。 \(E_1\) は……考えたくない。。<br>
-</p>
+      <p>ツイートしなかったもの<br /></p>
 
-<h2 id="読書"><a href="#読書">読書</a></h2><h3 id="Thunder 本"><a href="#Thunder 本">Thunder 本</a></h3><p>
-AHC 025 の結果に刺激を受けて、 <a href="https://gihyo.jp/book/2023/978-4-297-13360-3">ゲームで学ぶ探索アルゴリズム実践入門</a> を読み始めた。<br>
-</p>
+      <blockquote>
+        <ul>
+          <li>『メンタルモデル』と音で聞いたのは初めてです<br /></li>
+          <li>『ノイマン型コンピュータ』などの正確な描写が 🧠 に <em>fit boxing</em><br /></li>
+          <li>
+            React, Elm, オニオンアーキテクチャなど現在と過去・似たものを結びつける考えがスマート<br />
+          </li>
+          <li>IO を計算機への命令と表現した端的な解釈で脳みそが脱皮<br /></li>
+          <li><code>accumArrayDP</code> って前から半環でしたっけ<br /></li>
+          <li><code>shakutori</code> が分からない<br /></li>
+          <li>
+            僕は『代数的構造』とか『計算』といった抽象的なものが見えたことが無くて『半環』とか
+            <code>accumArray</code> のような具体的なものばかり考えています<br />
+          </li>
+          <li>いつもながら抽象的なものを手探りしている感じが面白かったです<br /></li>
+        </ul>
+      </blockquote>
+      <h3 id="State モナド">
+        <a href="#State モナド"><code>State</code> モナド</a>
+      </h3>
+      <p>
+        naoya
+        さんと言えば、普段の投稿がぶっちぎっていて面白い。キーボード箱買い……棚買い事件はもちろん、
+        Haskell でも突き抜けている。最近は
+        <code>State</code> モナドの使い方が腑に落ちて面白かった。<br />
+      </p>
 
-<p>
-著者: <a href="https://thun-c.github.io/">Thunder</a> 氏<br>
-</p>
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          一方、そこに State
+          モナドを使って再帰の過程でグローバルな領域に計算結果を書き込むようにする。すると途端に再帰の記述の認知負荷が下がって、楽になる。
+          <a href="https://t.co/y0n64UKXpS">pic.twitter.com/y0n64UKXpS</a>
+        </p>
+        &mdash; naoya (@naoya_ito)
+        <a href="https://twitter.com/naoya_ito/status/1710549396746842281?ref_src=twsrc%5Etfw"
+          >October 7, 2023</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-<p>
-Haskell で取り組むため、 <a href="https://www.stackage.org/lts-21.6/package/random-1.2.1.1">random</a> パッケージを見た。 <code>StdGen</code> が乱数のシード (?) で、あるシード値からは常に同じ乱数が生成される (決定的である) 点が AHC 向けだと思った。<br>
-</p>
+      <blockquote>
+        <p>この『いいね』数、みんな付いて来れなかったか……！<br /></p>
+      </blockquote>
 
-<h3 id="Software Design"><a href="#Software Design">Software Design</a></h3><p>
-<a href="https://gihyo.jp/magazine/SD/archive/2023/202311">Software Design 2023年11月号</a> の Bram 氏 (Vim の作者) の追悼記事を読んだ。人生か……<br>
-</p>
+      <p>
+        <code>State</code> モナドを immutable データに対する
+        <code>ST</code> モナドのように扱えることが示されていて驚いた。むしろ、 <code>ST</code> や
+        <code>IO</code> が <code>State</code> と似ていると考えた方が Haskell 的なのかもしれない。<br />
+      </p>
+      <h3 id="IO の正体">
+        <a href="#IO の正体"><code>IO</code> の正体</a>
+      </h3>
+      <p>
+        mod_poppo 氏
+        <a href="https://zenn.dev/mod_poppo/articles/unsafeperformio"
+          >unsafePerformIOではじめる愉快なHaskellプログラミング</a
+        >
+        の
+        <a href="https://zenn.dev/mod_poppo/articles/unsafeperformio#%E7%B5%90%E8%AB%96">結論</a>
+        によると、 <code>GHC.IO</code> は以下の <code>newtype</code> であるという:<br />
+      </p>
 
-<h2 id="Haskell"><a href="#Haskell">Haskell</a></h2><h3 id="Qiita Conference 2023 Autmun Day2"><a href="#Qiita Conference 2023 Autmun Day2">Qiita Conference 2023 Autmun Day2</a></h3><p>
-naoya さんを (オンラインで) 見た！！！！<br>
-</p>
-
-<ul><li><a href="https://www.youtube.com/watch?v=pe0vW9AyunQ&amp;t=9530s">Youtube</a><br></li>
-<li><a href="https://t.co/WlqKmMlFjo">発表資料 (スライド)</a><br></li>
-</ul>
-
-<p>
-ツイートしなかったもの<br>
-</p>
-
-<blockquote>
-<ul><li>『メンタルモデル』と音で聞いたのは初めてです<br></li>
-<li>『ノイマン型コンピュータ』などの正確な描写が 🧠 に <em>fit boxing</em><br></li>
-<li>React, Elm, オニオンアーキテクチャなど現在と過去・似たものを結びつける考えがスマート<br></li>
-<li>IO を計算機への命令と表現した端的な解釈で脳みそが脱皮<br></li>
-<li><code>accumArrayDP</code> って前から半環でしたっけ<br></li>
-<li><code>shakutori</code> が分からない<br></li>
-<li>僕は『代数的構造』とか『計算』といった抽象的なものが見えたことが無くて『半環』とか <code>accumArray</code> のような具体的なものばかり考えています<br></li>
-<li>いつもながら抽象的なものを手探りしている感じが面白かったです<br></li>
-</ul>
-</blockquote>
-
-<h3 id="State モナド"><a href="#State モナド"><code>State</code> モナド</a></h3><p>
-naoya さんと言えば、普段の投稿がぶっちぎっていて面白い。キーボード箱買い……棚買い事件はもちろん、 Haskell でも突き抜けている。最近は <code>State</code> モナドの使い方が腑に落ちて面白かった。<br>
-</p>
-
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">一方、そこに State モナドを使って再帰の過程でグローバルな領域に計算結果を書き込むようにする。すると途端に再帰の記述の認知負荷が下がって、楽になる。 <a href="https://t.co/y0n64UKXpS">pic.twitter.com/y0n64UKXpS</a></p>&mdash; naoya (@naoya_ito) <a href="https://twitter.com/naoya_ito/status/1710549396746842281?ref_src=twsrc%5Etfw">October 7, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
-
-<blockquote>
-<p>
-この『いいね』数、みんな付いて来れなかったか……！<br>
-</p>
-</blockquote>
-
-<p>
-<code>State</code> モナドを immutable データに対する <code>ST</code> モナドのように扱えることが示されていて驚いた。むしろ、 <code>ST</code> や <code>IO</code> が <code>State</code> と似ていると考えた方が Haskell 的なのかもしれない。<br>
-</p>
-
-<h3 id="IO の正体"><a href="#IO の正体"><code>IO</code> の正体</a></h3><p>
-mod_poppo 氏 <a href="https://zenn.dev/mod_poppo/articles/unsafeperformio">unsafePerformIOではじめる愉快なHaskellプログラミング</a> の <a href="https://zenn.dev/mod_poppo/articles/unsafeperformio#%E7%B5%90%E8%AB%96">結論</a> によると、 <code>GHC.IO</code> は以下の <code>newtype</code> であるという:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">newtype IO a = IO (State# RealWorld -&gt; (# State# RealWorld, a #))
+      <div class="org-src-container">
+        <pre><code class="src language-hs">newtype IO a = IO (State# RealWorld -&gt; (# State# RealWorld, a #))
 </code></pre>
-</div>
+      </div>
 
-<p>
-ほぼ <code>State</code> モナド (?) 。なるほど『純粋』関数型言語 Haskell だ。<br>
-</p>
+      <p>ほぼ <code>State</code> モナド (?) 。なるほど『純粋』関数型言語 Haskell だ。<br /></p>
 
-<p>
-しかしまだ <code>IO</code> と <code>State</code> が同じだとは思えない。以下でギャップを埋めてみた。<br>
-</p>
+      <p>
+        しかしまだ <code>IO</code> と
+        <code>State</code> が同じだとは思えない。以下でギャップを埋めてみた。<br />
+      </p>
+      <h4 id="runIO は無いのか">
+        <a href="#runIO は無いのか"><code>runIO</code> は無いのか</a>
+      </h4>
+      <p>
+        <code>State</code> の <code>evalState</code> に対して、 <code>IO</code> の
+        <code>runIO</code> は無いのか。これは <code>main:: IO ()</code> に対して
+        <code>mainImpl = runIO main RealWorld</code> が隠されていると解釈すれば、
+        <code>main</code> も通常の Haskell であると言える気がする。たぶん。<br />
+      </p>
+      <h4 id="可変変数に関して"><a href="#可変変数に関して">可変変数に関して</a></h4>
+      <p>
+        <code>State</code> ではすべての状態が文脈の中に隠れているのに対して、 <code>IO</code> では
+        <code>ref &lt;- newIORef (0 :: Int)</code>
+        のように識別子が露出する。この違いをどう捉えるべきか。<br />
+      </p>
 
-<h4 id="runIO は無いのか"><a href="#runIO は無いのか"><code>runIO</code> は無いのか</a></h4><p>
-<code>State</code> の <code>evalState</code> に対して、 <code>IO</code> の <code>runIO</code> は無いのか。これは <code>main:: IO ()</code> に対して <code>mainImpl = runIO main RealWorld</code> が隠されていると解釈すれば、 <code>main</code> も通常の Haskell であると言える気がする。たぶん。<br>
-</p>
+      <p>
+        まず <code>ref</code> は
+        <code>IO</code> が使用するハンドル？参照？であって、可変変数ではない。
+        <code>ref</code> 定数である。そして <code>ref</code> ではなく <code>readIORef</code> や
+        <code>writeIORef</code> のような外界 (<code>RealWorld</code>) に触れる操作の方が特別
+        (mutable) であると考えられる。<br />
+      </p>
 
-<h4 id="可変変数に関して"><a href="#可変変数に関して">可変変数に関して</a></h4><p>
-<code>State</code> ではすべての状態が文脈の中に隠れているのに対して、 <code>IO</code> では <code>ref &lt;- newIORef (0 :: Int)</code> のように識別子が露出する。この違いをどう捉えるべきか。<br>
-</p>
-
-<p>
-まず <code>ref</code> は <code>IO</code> が使用するハンドル？参照？であって、可変変数ではない。 <code>ref</code> 定数である。そして <code>ref</code> ではなく <code>readIORef</code> や <code>writeIORef</code> のような外界 (<code>RealWorld</code>) に触れる操作の方が特別 (mutable) であると考えられる。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">-- `IORef` のサンプルコード:
+      <div class="org-src-container">
+        <pre><code class="src language-hs">-- `IORef` のサンプルコード:
 ref &lt;- newIORef (1 :: Int)
 x1 &lt;- readIORef ref -- `ref` が参照する値をコピーして読み出す (`1`)
 writeIORef ref (x1 + 1) -- 参照先の値を更新
 x2 &lt;- readIORef ref -- `ref` が参照する値をコピーして読み出す (`2`)
 </code></pre>
-</div>
+      </div>
 
-<p>
-また <code>State</code> モナドの中にアロケータ相当のデータ (たとえば <code>IntMap Int</code>) を入れれば、 <code>State</code> の文脈で以下のようなコードを書くことも不可能ではない:<br>
-</p>
+      <p>
+        また <code>State</code> モナドの中にアロケータ相当のデータ (たとえば
+        <code>IntMap Int</code>) を入れれば、
+        <code>State</code> の文脈で以下のようなコードを書くことも不可能ではない:<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-hs">ref &lt;- newIntRef (0 :: Int)
+      <div class="org-src-container">
+        <pre><code class="src language-hs">ref &lt;- newIntRef (0 :: Int)
 x1 &lt;- readIntRef ref
 writeIntRef ref (x1 + 1)
 </code></pre>
-</div>
+      </div>
 
-<p>
-よって <code>IO</code> は アロケータ (など) が入った <code>State</code> モナドであるとみなせば、 <code>State</code> と見かけ上の差が無いと言えるはず。<br>
-</p>
+      <p>
+        よって <code>IO</code> は アロケータ (など) が入った
+        <code>State</code> モナドであるとみなせば、
+        <code>State</code> と見かけ上の差が無いと言えるはず。<br />
+      </p>
+      <h4 id="Mutable な primitive 操作">
+        <a href="#Mutable な primitive 操作">Mutable な primitive 操作</a>
+      </h4>
+      <p>
+        <code>State</code> と <code>IO</code> がほぼ同じものであることは分かった。真の違いは、
+        <code>writeIORef</code> など
+        <code>IO</code> でのみ許される関数の実装にある。ここでメモリ領域の書き換えを行い、
+        <code>RealWorld -&gt; RealWorld</code> という幻想を作っているはずだ。<br />
+      </p>
 
-<h4 id="Mutable な primitive 操作"><a href="#Mutable な primitive 操作">Mutable な primitive 操作</a></h4><p>
-<code>State</code> と <code>IO</code> がほぼ同じものであることは分かった。真の違いは、 <code>writeIORef</code> など <code>IO</code> でのみ許される関数の実装にある。ここでメモリ領域の書き換えを行い、 <code>RealWorld -&gt; RealWorld</code> という幻想を作っているはずだ。<br>
-</p>
+      <p>
+        まず
+        <a
+          href="https://hackage.haskell.org/package/base-4.19.0.0/docs/Data-IORef.html#v:writeIORef"
+          >writeIORef</a
+        >
+        は
+        <a
+          href="https://hackage.haskell.org/package/base-4.19.0.0/docs/Data-STRef.html#v:writeSTRef"
+          >writeSTRef</a
+        >
+        を使って実装されていた。 <code>writeSTRef</code> は次の通り
+        <code>writeMutVar#</code> に依存している:<br />
+      </p>
 
-<p>
-まず <a href="https://hackage.haskell.org/package/base-4.19.0.0/docs/Data-IORef.html#v:writeIORef">writeIORef</a> は <a href="https://hackage.haskell.org/package/base-4.19.0.0/docs/Data-STRef.html#v:writeSTRef">writeSTRef</a> を使って実装されていた。 <code>writeSTRef</code> は次の通り <code>writeMutVar#</code> に依存している:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">writeSTRef :: STRef s a -&gt; a -&gt; ST s ()
+      <div class="org-src-container">
+        <pre><code class="src language-hs">writeSTRef :: STRef s a -&gt; a -&gt; ST s ()
 writeSTRef (STRef var#) val = ST $ \s1# -&gt;
     case writeMutVar# var# val s1#      of { s2# -&gt;
     (# s2#, () #) }
 </code></pre>
-</div>
+      </div>
 
-<p>
-そして <code>writeMutVar#</code> の関数定義は <code>base</code> パッケージに無かった。 <a href="https://stackoverflow.com/a/5773136">How are mutable arrays implemented in Haskell?</a> を見ると、 <code>writeMutVar#</code> を始めとした primitive な操作は <a href="https://gitlab.haskell.org/ghc/ghc/-/wikis/commentary/prim-ops">prim-ops</a> に定義されているらしい。その実装は Haskell ではない。<br>
-</p>
+      <p>
+        そして <code>writeMutVar#</code> の関数定義は <code>base</code> パッケージに無かった。
+        <a href="https://stackoverflow.com/a/5773136"
+          >How are mutable arrays implemented in Haskell?</a
+        >
+        を見ると、 <code>writeMutVar#</code> を始めとした primitive な操作は
+        <a href="https://gitlab.haskell.org/ghc/ghc/-/wikis/commentary/prim-ops">prim-ops</a>
+        に定義されているらしい。その実装は Haskell ではない。<br />
+      </p>
+      <h3 id="まとめ"><a href="#まとめ">まとめ</a></h3>
+      <p>
+        <code>IO</code> は <code>State</code> と同じく純粋な Haskell
+        として定義されているが、ランタイム中の？非純粋な関数 (<code>prim-ops</code>)
+        に触れられる点が特別であったと認識できた。<br />
+      </p>
 
-<h3 id="まとめ"><a href="#まとめ">まとめ</a></h3><p>
-<code>IO</code> は <code>State</code> と同じく純粋な Haskell として定義されているが、ランタイム中の？非純粋な関数 (<code>prim-ops</code>) に触れられる点が特別であったと認識できた。<br>
-</p>
+      <p>不正確な理解だが、今はこれでヨシ！<br /></p>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="Haskell 本が書きたい"><a href="#Haskell 本が書きたい">Haskell 本が書きたい</a></h3>
+      <p>
+        Haskell
+        で茶色コーダーになるための本が無い。もちろん素晴らしい本は存在するけれども、各自の試行錯誤と照らし合わせるには分量が足りない。あるいは競プロにフォーカスしていない。<br />
+      </p>
 
-<p>
-不正確な理解だが、今はこれでヨシ！<br>
-</p>
+      <p>よってこの間を埋める投稿がしたい。 Advent calendar に間に合うだろうか。<br /></p>
+      <h4 id="表紙"><a href="#表紙">表紙</a></h4>
+      <p>
+        表紙画像を組んでみた:
+        <a href="https://ibb.co/9Wp0grF">サンプル (3 ヶ月で削除)</a>
+        。グロ注意。アウト過ぎたので、別の案を外注してみた。僅か 6,000 円？！　待機。<br />
+      </p>
 
-<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="Haskell 本が書きたい"><a href="#Haskell 本が書きたい">Haskell 本が書きたい</a></h3><p>
-Haskell で茶色コーダーになるための本が無い。もちろん素晴らしい本は存在するけれども、各自の試行錯誤と照らし合わせるには分量が足りない。あるいは競プロにフォーカスしていない。<br>
-</p>
+      <p>
+        『ラムダスカル』というキャラクターを考えた。ふと Haskell
+        のキャラクターを探してみると、これが出てきた。さすが tanakh 氏。いつ見ても先を行く人だ。<br />
+      </p>
 
-<p>
-よってこの間を埋める投稿がしたい。 Advent calendar に間に合うだろうか。<br>
-</p>
-
-<h4 id="表紙"><a href="#表紙">表紙</a></h4><p>
-表紙画像を組んでみた: <a href="https://ibb.co/9Wp0grF">サンプル (3 ヶ月で削除)</a> 。グロ注意。アウト過ぎたので、別の案を外注してみた。僅か 6,000 円？！　待機。<br>
-</p>
-
-<p>
-『ラムダスカル』というキャラクターを考えた。ふと Haskell のキャラクターを探してみると、これが出てきた。さすが tanakh 氏。いつ見ても先を行く人だ。<br>
-</p>
-
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Haskellのキャラクター作った <a href="http://t.co/fu1jX2yKMP">pic.twitter.com/fu1jX2yKMP</a></p>&mdash; Hideyuki Tanaka (@tanakh) <a href="https://twitter.com/tanakh/status/468959015167623169?ref_src=twsrc%5Etfw">May 21, 2014</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          Haskellのキャラクター作った
+          <a href="http://t.co/fu1jX2yKMP">pic.twitter.com/fu1jX2yKMP</a>
+        </p>
+        &mdash; Hideyuki Tanaka (@tanakh)
+        <a href="https://twitter.com/tanakh/status/468959015167623169?ref_src=twsrc%5Etfw"
+          >May 21, 2014</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

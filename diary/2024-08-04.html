@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -95,7 +96,6 @@
         今夜の ARC
         に出るか迷っています。レーティングって下がるのは一瞬ですが、上げるのは数ヶ月かかりますものね。<br />
       </p>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_a">A 問題</a></a>
       </h3>
@@ -116,7 +116,6 @@
         <pre><code class="src language-hs">import Data.Time.Calendar;main=print.f=&lt;&lt;readLn;f x|isLeapYear x=366|0&lt;1=365
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_b">B 問題</a></a>
       </h3>
@@ -131,14 +130,12 @@
         タプル同士は左端のキーから順に比較されるため、 <code>zip[1..]</code> ではなく
         <code>(`zip`[1..])</code> としました。<br />
       </p>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_c">C 問題</a></a>
       </h3>
       <p>
         2 分探索の問題でした。判定問題を決めて \(O(N \log N)\) で解けました。灰 diff だと……？！<br />
       </p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_d">D 問題</a></a>
       </h3>
@@ -151,14 +148,12 @@
         <a href="https://atcoder.jp/contests/abc365/editorial/10600">貪欲法では解けない考察</a>
         が抜けていました。競プロ以外では、意図せず嘘貪欲を使ってしまうケースの方が多そうです。<br />
       </p>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_e">E 問題</a></a>
       </h3>
       <p>
         初め、 xor ではなく or だと思って架空の問題を解いてしまいました。取り返せて良かった。<br />
       </p>
-
       <h3 id="F 問題">
         <a href="#F 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_f">F 問題</a></a>
       </h3>
@@ -166,7 +161,6 @@
         合成できないやつだと思って飛ばしました。 PAST
         にも似た問題があって解けなかった記憶があります。 <strong>やはり PAST か……！</strong><br />
       </p>
-
       <h3 id="G 問題">
         <a href="#G 問題"><a href="https://atcoder.jp/contests/abc365/tasks/abc365_g">G 問題</a></a>
       </h3>
@@ -174,10 +168,8 @@
         別解のマージテク (?) で解いてみたいです。長い区間の処理が大変そうです
         (座標圧縮と累積和で一括計算する？) 。<br />
       </p>
-
       <h3 id="以上"><a href="#以上">以上</a></h3>
       <p>手抜きですが ABC 振り返りでした。提出が汚いので、あまり振り返りたくないです ()<br /></p>
-
       <h2 id="Segment Tree Beats!"><a href="#Segment Tree Beats!">Segment Tree Beats!</a></h2>
       <p>
         maspy さんのライブラリを読み解き、区間 chmin/chmax
@@ -192,14 +184,12 @@
         >
         に置いています。以下ではアルゴリズム以外の部分をメモします。<br />
       </p>
-
       <h3 id="コードの重複"><a href="#コードの重複">コードの重複</a></h3>
       <p>
         遅延セグメント木と Beats でコードが重複しています。実装の共通化のため、
         <strong>セグメント木のための型クラスを特別に用意</strong>
         した方が良い気がしてきました。<br />
       </p>
-
       <h3 id="多相なフィールドは {-# UNPACK #-} できない">
         <a href="#多相なフィールドは {-# UNPACK #-} できない"
           >多相なフィールドは <code>{-# UNPACK #-}</code> できない</a
@@ -235,7 +225,6 @@
       </div>
 
       <p>これは C++ の方が速いのも仕方ありません。パフォーマンスは諦め気味です。<br /></p>
-
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
       <h3 id="Fortran"><a href="#Fortran">Fortran</a></h3>
       <p>
@@ -263,7 +252,6 @@
         を読んでいます。僕の中の難解言語ランキングは Prolog &gt; Batch Script &gt; Emacs Lisp &gt;
         Haskell だったわけですが、 Fortran は 2 位になるかもです。<br />
       </p>
-
       <h3 id="Emacs"><a href="#Emacs">Emacs</a></h3>
       <p>
         SNS で共有のあった

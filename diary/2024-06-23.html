@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -41,7 +42,6 @@
           よすぽの日記</a
         ><br />
       </p>
-
       <h2 id="ABC 359"><a href="#ABC 359">ABC 359</a></h2>
       <p><a href="https://atcoder.jp/contests/abc359">ABC 359</a> に参加しました。<br /></p>
 
@@ -94,7 +94,6 @@
           </tr>
         </tbody>
       </table>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc359/tasks/abc359_a">A 問題</a></a>
       </h3>
@@ -104,7 +103,6 @@
         <pre><code class="src language-hs">main=interact$show.length.filter(=='T')
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc359/tasks/abc359_b">B 問題</a></a>
       </h3>
@@ -128,12 +126,10 @@
         >
       </blockquote>
       <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc359/tasks/abc359_c">C 問題</a></a>
       </h3>
       <p>無理過ぎる……<br /></p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc359/tasks/abc359_d">D 問題</a></a>
       </h3>
@@ -141,7 +137,6 @@
         直前 K 文字の状態を持って DP します。 \(K\) 文字目までと \(K\)
         文字目以降で処理が変わるのが厄介なところです。<br />
       </p>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc359/tasks/abc359_e">E 問題</a></a>
       </h3>
@@ -150,7 +145,6 @@
         を高さ \(A[i]\) まで埋める必要があります。また \(j - 1\) 番目の壁を乗り越えるためには、
         \(dp[j - 1]\) の水が必要です。<br />
       </p>
-
       <h4 id="DP 解法 1. [x] 区間 Max の 2 分探索">
         <a href="#DP 解法 1. [x] 区間 Max の 2 分探索"
           >DP 解法 1. [x] 区間 <code>Max</code> の 2 分探索</a
@@ -160,7 +154,6 @@
         <code>Max</code> モノイドのセグメント木を持ちます。上記の \(j\) を 2
         分探索によって発見します。計算量は \(O(N \log^2 N)\) ですが、簡単で良い方法だと思います。<br />
       </p>
-
       <h4 id="DP 解法 2. [ ] 区間 Max を伸ばしていくモノイド">
         <a href="#DP 解法 2. [ ] 区間 Max を伸ばしていくモノイド"
           >DP 解法 2. [ ] 区間 <code>Max</code> を伸ばしていくモノイド</a
@@ -171,14 +164,12 @@
         \(O(N \log N)\)
         ですが、真横のモノイド同士しか結合できないなど、細かい判定がかなり大変です。<br />
       </p>
-
       <h4 id="DP 解法 3. [ ] 遅延伝播セグメント木を用いたシミュレーション">
         <a href="#DP 解法 3. [ ] 遅延伝播セグメント木を用いたシミュレーション"
           >DP 解法 3. [ ] 遅延伝播セグメント木を用いたシミュレーション</a
         >
       </h4>
       <p>同様に、重い方針だと思います。<br /></p>
-
       <h4 id="別解. [ ] スタックを持ってシミュレーション">
         <a href="#別解. [ ] スタックを持ってシミュレーション"
           >別解. [ ] スタックを持ってシミュレーション</a
@@ -201,12 +192,10 @@
         >
       </blockquote>
       <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
       <h3 id="F 問題">
         <a href="#F 問題"><a href="https://atcoder.jp/contests/abc359/tasks/abc359_f">F 問題</a></a>
       </h3>
       <p>難しそうですが……。<br /></p>
-
       <h2 id="Floor sum (unsigned)"><a href="#Floor sum (unsigned)">Floor sum (unsigned)</a></h2>
       <p>
         <a href="https://atcoder.jp/contests/practice2">AtCoder Library Practice Contest (ALPC)</a>
@@ -221,7 +210,6 @@
       <p>以下は 100% 自分用のメモです。<br /></p>
 
       <p>TODO: 誤記修正 (多数)<br /></p>
-
       <h3 id="概要"><a href="#概要">概要</a></h3>
       <p>
         Floor sum は 1 次関数 \(y(x) := \frac {ax + b} {m} (a, b \in \mathbb{Z}_{\ge 0}, m \in
@@ -229,10 +217,8 @@
         x) | x \in [0, n), y \in (0, y(x)]]\) 中の格子点の数を \(O(\log aN)\)
         で求めるアルゴリズムです。<br />
       </p>
-
       <h3 id="考察"><a href="#考察">考察</a></h3>
       <p>\(S\) を 3 つに分けて計算します。<br /></p>
-
       <h4 id="\(S_1, S_2\)"><a href="#\(S_1, S_2\)">\(S_1, S_2\)</a></h4>
       <figure>
         <img src="./img/2024-06-23-floor_sum_1.png" alt="2024-06-23-floor_sum_1.png" /><br />
@@ -275,7 +261,6 @@
           </ul>
         </li>
       </ul>
-
       <h4 id="\(S_3\)"><a href="#\(S_3\)">\(S_3\)</a></h4>
       <p>
         残る \(S_3 := [(y, x) | x \in [0, n - 1], \lfloor \frac {a} {m} \rfloor \frac {b} {m} \lt y
@@ -340,12 +325,10 @@
       <figure>
         <img src="./img/2024-06-23-floor_sum_4.png" alt="2024-06-23-floor_sum_4.png" /><br />
       </figure>
-
       <h3 id="計算式"><a href="#計算式">計算式</a></h3>
       \begin{equation} \mathcal{floorSum}(n, m, a, b) = \begin{cases} 0 \text{ if } m = 0, \\ 0
       \text{ if } a = 0, \\ \mathcal{fromS_1} + \mathcal{fromS_2} + \mathcal{floorSum}(n, m, a\%m,
       b\%m) \text{ otherwise.} \end{cases} \end{equation}
-
       <h3 id="実装"><a href="#実装">実装</a></h3>
       <p>
         再帰関数を書きました:
@@ -369,16 +352,13 @@
         >
         。<br />
       </p>
-
       <h3 id="計算量"><a href="#計算量">計算量</a></h3>
       <p>
         傾きが大きいほど計算量が増え、 \(O(\log ma)\)
         らしいです。たぶん互助法の計算量と同じ？　今は理解する体力が残っていません……。<br />
       </p>
-
       <h3 id="感想"><a href="#感想">感想</a></h3>
       <p>消耗しました。この程度の数学に 1 週間を丸ごと費やすとは……絶望ですw<br /></p>
-
       <h3 id="Floor sum (signed)"><a href="#Floor sum (signed)">Floor sum (signed)</a></h3>
       <p>
         上記の <code>floorSum</code> において \(a \ge 0, b \ge 0\)

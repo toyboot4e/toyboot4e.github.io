@@ -1,24 +1,57 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 345 / BL, QMK (MiniAxe) - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 345 / BL, QMK (MiniAxe)</h1><p>Mar 17, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="ABC 345"><a href="#ABC 345">ABC 345</a></h2><p>
-<a href="https://atcoder.jp/contests/abc345">ABC 345</a> に参加しました。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 345 / BL, QMK (MiniAxe) - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 345 / BL, QMK (MiniAxe)</h1>
+      <p>Mar 17, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 345"><a href="#ABC 345">ABC 345</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc345">ABC 345</a> に参加しました。<br /></p>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc345/tasks/abc345_a">A 問題</a></a>
+      </h3>
+      <p>
+        入力に改行文字が入っているため、 <code>getLine</code> を使うか
+        <code>init</code> で落とします。<br />
+      </p>
 
-<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc345/tasks/abc345_a">A 問題</a></a></h3><p>
-入力に改行文字が入っているため、 <code>getLine</code> を使うか <code>init</code> で落とします。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">t=True;i=init;main=interact$(\x-&gt;if x==(t,t,t)then"Yes"else"No").((,,)&lt;$&gt;(=='&lt;').head&lt;*&gt;(=='&gt;').last&lt;*&gt;all(=='=').i.tail).i
+      <div class="org-src-container">
+        <pre><code class="src language-hs">t=True;i=init;main=interact$(\x-&gt;if x==(t,t,t)then"Yes"else"No").((,,)&lt;$&gt;(=='&lt;').head&lt;*&gt;(=='&gt;').last&lt;*&gt;all(=='=').i.tail).i
 </code></pre>
-</div>
+      </div>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc345/tasks/abc345_b">B 問題</a></a>
+      </h3>
+      <p>
+        まず整数除算が切り捨てとは限らないことを思い出します (<a
+          href="https://zenn.dev/mod_poppo/articles/integer-division"
+          >参考</a
+        >):<br />
+      </p>
 
-<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc345/tasks/abc345_b">B 問題</a></a></h3><p>
-まず整数除算が切り捨てとは限らないことを思い出します (<a href="https://zenn.dev/mod_poppo/articles/integer-division">参考</a>):<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">ghci&gt; 5`div`10
+      <div class="org-src-container">
+        <pre><code class="src language-hs">ghci&gt; 5`div`10
 0
 ghci&gt; 5`quot`10
 0
@@ -27,102 +60,114 @@ ghci&gt; (-5)`div`10
 ghci&gt; (-5)`quot`10
 0
 </code></pre>
-</div>
+      </div>
 
-<p>
-思い出してはいけません。 <code>div</code> は切り捨てであると割り切ります:<br>
-</p>
+      <p>思い出してはいけません。 <code>div</code> は切り捨てであると割り切ります:<br /></p>
 
-<div class="org-src-container">
-<pre><code class="src language-hs">main=interact$show.(`div`10).(+9).read
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$show.(`div`10).(+9).read
 </code></pre>
-</div>
+      </div>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc345/tasks/abc345_c">C 問題</a></a>
+      </h3>
+      <p>遅い解法のようですが、次の通り考えました。<br /></p>
 
-<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc345/tasks/abc345_c">C 問題</a></a></h3><p>
-遅い解法のようですが、次の通り考えました。<br>
-</p>
+      <p>
+        左から右へ \(i\) を動かしつつ、 \(i\) &lt; \(j\) となる \(j\) を選択します。 \(S_i \ne S_j\)
+        となる \(S_i, S_j\)
+        を入れ替えた場合は新しい文字列が生成されます。そうでない場合は元の文字列が生成されます。<br />
+      </p>
 
-<p>
-左から右へ \(i\) を動かしつつ、 \(i\) &lt; \(j\) となる \(j\) を選択します。 \(S_i \ne S_j\) となる \(S_i, S_j\) を入れ替えた場合は新しい文字列が生成されます。そうでない場合は元の文字列が生成されます。<br>
-</p>
+      <p>
+        よって文字毎に文字数の累積和を作っておけば、新しい文字が生成される場合の数は \(i,j \in [1,
+        N]\) として \((N - i) - \mathit{csum}[S[i]].\mathit{get}(i + 1, N)\) であり、すべての \(i\)
+        に対する計算結果の総和を取って \(O(WN) (W = 26)\)
+        程度で解答できます。コーナーケースは要注意……<br />
+      </p>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc345/tasks/abc345_d">D 問題</a></a>
+      </h3>
+      <p>ぱっと見で配置の全探索しか思いつかなかったため飛ばしました。普通に解けません。<br /></p>
 
-<p>
-よって文字毎に文字数の累積和を作っておけば、新しい文字が生成される場合の数は \(i,j \in [1, N]\) として \((N - i) - \mathit{csum}[S[i]].\mathit{get}(i + 1, N)\) であり、すべての \(i\) に対する計算結果の総和を取って \(O(WN) (W = 26)\) 程度で解答できます。コーナーケースは要注意……<br>
-</p>
+      <p>
+        タイルの向きと順番を決めたら貪欲に配置すれば良いようです。使わないタイルの決め方としては、条件達成時に枝刈りすれば、後ろの方の順番のタイルは暗に不使用となります。<br />
+      </p>
 
-<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc345/tasks/abc345_d">D 問題</a></a></h3><p>
-ぱっと見で配置の全探索しか思いつかなかったため飛ばしました。普通に解けません。<br>
-</p>
+      <p>Upsolve します。<br /></p>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc345/tasks/abc345_e">E 問題</a></a>
+      </h3>
+      <p>
+        DP にこだわりがあって特攻しました。これは解法が難しいですし、 TLE
+        の回避が困難な問題だと思います。ざっくりメモします。<br />
+      </p>
 
-<p>
-タイルの向きと順番を決めたら貪欲に配置すれば良いようです。使わないタイルの決め方としては、条件達成時に枝刈りすれば、後ろの方の順番のタイルは暗に不使用となります。<br>
-</p>
+      <p>
+        \(n\) 個の入力を走査します。まず思いつく
+        \(\mathit{dp}[i][\mathit{iColor}][\mathit{nDiscard}]\) ですが、 \(O(N^2 K)\)
+        は巨大です。次に \(K\) 個まで入力を破棄できる = 最大 \(K\)
+        個まで振り返ることができると捉え、地理的な DP を考えました。 \(\mathit{dp}[i][iDiscard]\)
+        は最後に \(i\) 番目のボールを取った場合の最大価値とします。<br />
+      </p>
 
-<p>
-Upsolve します。<br>
-</p>
+      <figure>
+        <img src="./img/2024-03-17-abc345-e-1.png" alt="2024-03-17-abc345-e-1.png" /><br />
 
-<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc345/tasks/abc345_e">E 問題</a></a></h3><p>
-DP にこだわりがあって特攻しました。これは解法が難しいですし、 TLE の回避が困難な問題だと思います。ざっくりメモします。<br>
-</p>
+        <figcaption><span class="figure-number">Figure 1: </span>\(K\) 個前まで振り返る</figcaption>
+      </figure>
 
-<p>
-\(n\) 個の入力を走査します。まず思いつく \(\mathit{dp}[i][\mathit{iColor}][\mathit{nDiscard}]\) ですが、 \(O(N^2 K)\) は巨大です。次に \(K\) 個まで入力を破棄できる = 最大 \(K\) 個まで振り返ることができると捉え、地理的な DP を考えました。 \(\mathit{dp}[i][iDiscard]\) は最後に \(i\) 番目のボールを取った場合の最大価値とします。<br>
-</p>
+      <p>
+        ただしこの計算でも \(O(NK^2)\) となって高速化が足りません。 \(K\)
+        個前まで振り返るのは止めて、直前まで振り返る畳み込みを考えれば正解間近です。<br />
+      </p>
 
+      <figure>
+        <img src="./img/2024-03-17-abc345-e-2.png" alt="2024-03-17-abc345-e-2.png" /><br />
 
-<figure>
-<img src="./img/2024-03-17-abc345-e-1.png" alt="2024-03-17-abc345-e-1.png"><br>
+        <figcaption><span class="figure-number">Figure 2: </span>\(1\) 個前まで振り返る</figcaption>
+      </figure>
 
-<figcaption><span class="figure-number">Figure 1: </span>\(K\) 個前まで振り返る</figcaption>
-</figure>
+      <p>
+        DP 配列の各スロットに保存した <code>Max</code> と \(c_i\)
+        の色が被った場合はどうするか。それは 2 色分の <code>Max</code> を保存する
+        <code>Top2</code> モノイドがあれば解決します。そんなのアリ……？<br />
+      </p>
 
-<p>
-ただしこの計算でも \(O(NK^2)\) となって高速化が足りません。 \(K\) 個前まで振り返るのは止めて、直前まで振り返る畳み込みを考えれば正解間近です。<br>
-</p>
+      <details>
+        <summary><code>Top2</code> の高速化</summary>
+        <p>
+          <code>Top2</code> を半群として結合
+          <code>&lt;&gt;</code> するのは難しく、ソートなど使ってみましたが TLE になりました。結局
+          <a href="https://atcoder.jp/contests/abc345/submissions/51357811">cojna さんの提出</a>
+          から高速化のアイデアを借りて AC しました。 <code>&lt;&gt;</code> するのではなく
+          <code>insert</code> します。
+          <strong><code>&lt;&gt;</code> で緩和しない DP</strong> として計算するのはショックでした。
+          <code>sact</code> で緩和するんだと思えなくも無い……？<br />
+        </p>
 
+        <p>
+          ソートしない <code>&lt;&gt;</code> としても AC できますが、倍以上に低速化します。青 diff
+          ぐらいから定数倍にも厳しくなりますから、黄〜コーダーを見習って常に最速の実装を選択できる実力が必要だと思いました。たとえばセグメント木ではなく
+          Imos 法とか尺取り法で実装できるというような……。<br />
+        </p>
+      </details>
 
-<figure>
-<img src="./img/2024-03-17-abc345-e-2.png" alt="2024-03-17-abc345-e-2.png"><br>
+      <p>やはり DP が解けるようになりたいものです。<br /></p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc345/tasks/abc345_f">F 問題</a></a>
+      </h3>
+      <p>難しそうです。<br /></p>
+      <h2 id="繰り返し二乗法"><a href="#繰り返し二乗法">繰り返し二乗法</a></h2>
+      <p>ダブリング (binary lifting) を書き直しました。<br /></p>
+      <h3 id="高速化"><a href="#高速化">高速化</a></h3>
+      <p>
+        ビットの取り出しを
+        <code>U.generate 63 id</code> から以下に変更しました。枝刈りが効きますね。<br />
+      </p>
 
-<figcaption><span class="figure-number">Figure 2: </span>\(1\) 個前まで振り返る</figcaption>
-</figure>
-
-<p>
-DP 配列の各スロットに保存した <code>Max</code> と \(c_i\) の色が被った場合はどうするか。それは 2 色分の <code>Max</code> を保存する <code>Top2</code> モノイドがあれば解決します。そんなのアリ……？<br>
-</p>
-
-<details>
-<summary>
-<code>Top2</code> の高速化</summary>
-<p>
-<code>Top2</code> を半群として結合 <code>&lt;&gt;</code> するのは難しく、ソートなど使ってみましたが TLE になりました。結局 <a href="https://atcoder.jp/contests/abc345/submissions/51357811">cojna さんの提出</a> から高速化のアイデアを借りて AC しました。 <code>&lt;&gt;</code> するのではなく <code>insert</code> します。 <strong><code>&lt;&gt;</code> で緩和しない DP</strong> として計算するのはショックでした。 <code>sact</code> で緩和するんだと思えなくも無い……？<br>
-</p>
-
-<p>
-ソートしない <code>&lt;&gt;</code> としても AC できますが、倍以上に低速化します。青 diff ぐらいから定数倍にも厳しくなりますから、黄〜コーダーを見習って常に最速の実装を選択できる実力が必要だと思いました。たとえばセグメント木ではなく Imos 法とか尺取り法で実装できるというような……。<br>
-</p>
-
-</details>
-
-<p>
-やはり DP が解けるようになりたいものです。<br>
-</p>
-
-<h3 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc345/tasks/abc345_f">F 問題</a></a></h3><p>
-難しそうです。<br>
-</p>
-
-<h2 id="繰り返し二乗法"><a href="#繰り返し二乗法">繰り返し二乗法</a></h2><p>
-ダブリング (binary lifting) を書き直しました。<br>
-</p>
-
-<h3 id="高速化"><a href="#高速化">高速化</a></h3><p>
-ビットの取り出しを <code>U.generate 63 id</code> から以下に変更しました。枝刈りが効きますね。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">{-# INLINE bitsOf #-}
+      <div class="org-src-container">
+        <pre><code class="src language-hs">{-# INLINE bitsOf #-}
 bitsOf :: Int -&gt; U.Vector Int
 bitsOf x0 = U.unfoldrExactN (popCount x0) f x0
   where
@@ -130,14 +175,13 @@ bitsOf x0 = U.unfoldrExactN (popCount x0) f x0
       let !lsb = countTrailingZeros x
        in (lsb, clearBit x lsb)
 </code></pre>
-</div>
+      </div>
+      <h3 id="API"><a href="#API">API</a></h3>
+      <h4 id="配列生成"><a href="#配列生成">配列生成</a></h4>
+      <p>繰り返し二乗法のための配列生成を関数化しました:<br /></p>
 
-<h3 id="API"><a href="#API">API</a></h3><h4 id="配列生成"><a href="#配列生成">配列生成</a></h4><p>
-繰り返し二乗法のための配列生成を関数化しました:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">-- | Binary lifting.
+      <div class="org-src-container">
+        <pre><code class="src language-hs">-- | Binary lifting.
 class BinaryLifting a where
   -- | @V.Vector a@ or @U.Vector a@
   type VecBL a
@@ -152,121 +196,164 @@ cacheBLU = U.iterateN 63 (\x -&gt; x &lt;&gt; x)
 cacheBLV :: (Semigroup a) =&gt; a -&gt; V.Vector a
 cacheBLV = V.iterateN 63 (\x -&gt; x &lt;&gt; x)
 </code></pre>
-</div>
+      </div>
+      <h4 id="半群の n 回結合 (stimesBL)">
+        <a href="#半群の n 回結合 (stimesBL)"
+          >半群の <code>n</code> 回結合 (<code>stimesBL</code>)</a
+        >
+      </h4>
+      <p>繰り返し二乗法を実施します:<br /></p>
 
-<h4 id="半群の n 回結合 (stimesBL)"><a href="#半群の n 回結合 (stimesBL)">半群の <code>n</code> 回結合 (<code>stimesBL</code>)</a></h4><p>
-繰り返し二乗法を実施します:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">{-# INLINE stimesBL #-}
+      <div class="org-src-container">
+        <pre><code class="src language-hs">{-# INLINE stimesBL #-}
 stimesBL :: (Semigroup a, G.Vector v a) =&gt; v a -&gt; Int -&gt; a -&gt; a
 stimesBL cache n !s0 = U.foldl' step s0 (bitsOf n)
   where
     {-# INLINE step #-}
     step !s i = let !s' = s &lt;&gt; cache G.! i in s'
 </code></pre>
-</div>
+      </div>
 
-<p>
-型はこの方が良いかもしれません:<br>
-</p>
+      <p>型はこの方が良いかもしれません:<br /></p>
 
-<div class="org-src-container">
-<pre><code class="src language-hs">stimesBL :: (Semigroup a, BinaryLifting a) =&gt; VecBL a -&gt; Int -&gt; a -&gt; a
+      <div class="org-src-container">
+        <pre><code class="src language-hs">stimesBL :: (Semigroup a, BinaryLifting a) =&gt; VecBL a -&gt; Int -&gt; a -&gt; a
 </code></pre>
-</div>
+      </div>
+      <h4 id="n 回の半群作用 (sactBL)">
+        <a href="#n 回の半群作用 (sactBL)"><code>n</code> 回の半群作用 (<code>sactBL</code>)</a>
+      </h4>
+      <p>
+        たとえば \(M^7 \mathbb{x}\) の計算には \((M^4 M^2 M) \mathbb{x}\) よりも \(M^4 (M^2 (M
+        \mathbb{x})))\) の方が効率が良いので、専用の関数を作っておきました:<br />
+      </p>
 
-<h4 id="n 回の半群作用 (sactBL)"><a href="#n 回の半群作用 (sactBL)"><code>n</code> 回の半群作用 (<code>sactBL</code>)</a></h4><p>
-たとえば \(M^7 \mathbb{x}\) の計算には \((M^4 M^2 M) \mathbb{x}\) よりも \(M^4 (M^2 (M \mathbb{x})))\) の方が効率が良いので、専用の関数を作っておきました:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">{-# INLINE sactBL #-}
+      <div class="org-src-container">
+        <pre><code class="src language-hs">{-# INLINE sactBL #-}
 sactBL :: (SemigroupAction a b, G.Vector v a) =&gt; v a -&gt; Int -&gt; b -&gt; b
 sactBL cache n !b0 = U.foldl' step b0 (bitsOf n)
   where
     {-# INLINE step #-}
     step !b i = let !b' = cache G.! i `sact` b in b'
 </code></pre>
-</div>
+      </div>
+      <h3 id="問題演習"><a href="#問題演習">問題演習</a></h3>
+      <p>Binary lifting を使った主な計算を整理しました。<br /></p>
 
-<h3 id="問題演習"><a href="#問題演習">問題演習</a></h3><p>
-Binary lifting を使った主な計算を整理しました。<br>
-</p>
+      <ul>
+        <li>
+          \(b^{-1} \bmod p (b < p) = b^{p - 2} \bmod p\)<br />
+          フェルマーの小定理を使った mod 上の逆元の計算です。
+          <code>Product ModInt</code> を半群として
+          <code>stimesBL</code>
+          を使って実装できます。が、面倒くさくてリファクタリングしませんでした。<br />
+        </li>
 
-<ul><li>\(b^{-1} \bmod p (b < p) = b^{p - 2} \bmod p\)<br>
-フェルマーの小定理を使った mod 上の逆元の計算です。 <code>Product ModInt</code> を半群として <code>stimesBL</code> を使って実装できます。が、面倒くさくてリファクタリングしませんでした。<br></li>
+        <li>
+          <a href="https://atcoder.jp/contests/dp/tasks/dp_r">EDPC R - Walk</a><br />
+          行列累乗の問題です。 <code>Semigroup (Mat e)</code> および
+          <code>SemigroupAction (Mat e) (Col e)</code> を実装しました。行列の実装は
+          <code>array</code> から <code>vector</code> に乗り換えました。<br />
+        </li>
 
-<li><a href="https://atcoder.jp/contests/dp/tasks/dp_r">EDPC R - Walk</a><br>
-行列累乗の問題です。 <code>Semigroup (Mat e)</code> および <code>SemigroupAction (Mat e) (Col e)</code> を実装しました。行列の実装は <code>array</code> から <code>vector</code> に乗り換えました。<br></li>
+        <li>
+          <a href="https://atcoder.jp/contests/tdpc/tasks/tdpc_house">TDPC M - 家</a><br />
+          同上です。 <code>vector</code> には直接 <code>ModInt</code> が載るので楽ですね。<br />
+        </li>
 
-<li><a href="https://atcoder.jp/contests/tdpc/tasks/tdpc_house">TDPC M - 家</a><br>
-同上です。 <code>vector</code> には直接 <code>ModInt</code> が載るので楽ですね。<br></li>
+        <li>
+          <a href="https://atcoder.jp/contests/abc235/tasks/abc235_e">ABC 235 E - MST + 1</a><br />
+          LCA で解けます (<a href="https://atcoder.jp/contests/abc235/editorial/3258"
+            >フレンズさんの解説</a
+          >) 。 <code>TransitionalAction a</code> を遷移 + 半群として LCA
+          を実装しました。半群が不要な場合は <code>a = ()</code> を割り当てます。<br />
+        </li>
+      </ul>
 
-<li><a href="https://atcoder.jp/contests/abc235/tasks/abc235_e">ABC 235 E - MST + 1</a><br>
-LCA で解けます (<a href="https://atcoder.jp/contests/abc235/editorial/3258">フレンズさんの解説</a>) 。 <code>TransitionalAction a</code> を遷移 + 半群として LCA を実装しました。半群が不要な場合は <code>a = ()</code> を割り当てます。<br></li>
-</ul>
+      <p>
+        ちなみに
+        <a
+          href="https://hackage.haskell.org/package/vector-0.13.1.0/docs/src/Data.Vector.Unboxed.Base.html#line-103"
+          ><code>()</code> に対する unboxed <code>Vector</code> (関連型、もとい data family)
+          の割り当て</a
+        >
+        は単なる <code>Int</code> (配列長) です。ヒープ使用量 0, ほぼゼロコストですね。
+        <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Rust の <code>Vec</code></a>
+        も似た振る舞いをしますが、ドキュメントを見た感じ、 <code>mem::size_of::&lt;T&gt;()</code> が
+        <code>0</code> の場合で実行時に分岐する <em>っぽい</em> です。<br />
+      </p>
+      <h2 id="MiniAxe (WIP)"><a href="#MiniAxe (WIP)">MiniAxe (WIP)</a></h2>
+      <p>以下、完全に自分用です。<br /></p>
+      <h3 id="背景"><a href="#背景">背景</a></h3>
+      <p>
+        MiniAxe (はんだ付けサービス) の Tap-Hold が
+        <a href="https://docs.qmk.fm/#/tap_hold?id=permissive-hold">Permissive Hold</a> だった (?)
+        ので、設定変更のために『QMK をビルドする』方法を調べています。<br />
+      </p>
+      <h3 id="関連"><a href="#関連">関連</a></h3>
+      <ul>
+        <li>
+          <a href="https://nixos.wiki/wiki/Qmk">Qmk - NixOS Wiki</a><br />
+          <code>nixpkgs</code> 上の <code>qmk</code> を入れて
+          <a href="https://docs.qmk.fm/#/newbs_building_firmware">公式ドキュメント</a>
+          を読みなさいとのことです。<br />
+        </li>
 
-<p>
-ちなみに <a href="https://hackage.haskell.org/package/vector-0.13.1.0/docs/src/Data.Vector.Unboxed.Base.html#line-103"><code>()</code> に対する unboxed <code>Vector</code> (関連型、もとい data family) の割り当て</a> は単なる <code>Int</code> (配列長) です。ヒープ使用量 0, ほぼゼロコストですね。 <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Rust の <code>Vec</code></a> も似た振る舞いをしますが、ドキュメントを見た感じ、 <code>mem::size_of::&lt;T&gt;()</code> が <code>0</code> の場合で実行時に分岐する <em>っぽい</em> です。<br>
-</p>
+        <li>
+          <a href="https://docs.qmk.fm/#/">QMK Firmware</a><br />
+          公式ドキュメントを見てみます。<br />
+        </li>
+      </ul>
+      <h3 id="Setup">
+        <a href="#Setup"><a href="https://docs.qmk.fm/#/newbs_getting_started">Setup</a></a>
+      </h3>
+      <p>コマンドを打つだけで良いようです:<br /></p>
 
-<h2 id="MiniAxe (WIP)"><a href="#MiniAxe (WIP)">MiniAxe (WIP)</a></h2><p>
-以下、完全に自分用です。<br>
-</p>
-
-<h3 id="背景"><a href="#背景">背景</a></h3><p>
-MiniAxe (はんだ付けサービス) の Tap-Hold が <a href="https://docs.qmk.fm/#/tap_hold?id=permissive-hold">Permissive Hold</a> だった (?) ので、設定変更のために『QMK をビルドする』方法を調べています。<br>
-</p>
-
-<h3 id="関連"><a href="#関連">関連</a></h3><ul><li><a href="https://nixos.wiki/wiki/Qmk">Qmk - NixOS Wiki</a><br>
-<code>nixpkgs</code> 上の <code>qmk</code> を入れて <a href="https://docs.qmk.fm/#/newbs_building_firmware">公式ドキュメント</a> を読みなさいとのことです。<br></li>
-
-<li><a href="https://docs.qmk.fm/#/">QMK Firmware</a><br>
-公式ドキュメントを見てみます。<br></li>
-</ul>
-
-<h3 id="Setup"><a href="#Setup"><a href="https://docs.qmk.fm/#/newbs_getting_started">Setup</a></a></h3><p>
-コマンドを打つだけで良いようです:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-sh">$ qmk setup
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ qmk setup
 ..
 Ψ QMK is ready to go
 $ # `$HOME/` 直下に `qmk_firmware/` が clone された
 </code></pre>
-</div>
+      </div>
+      <h4 id="Building Your First Firmware">
+        <a href="#Building Your First Firmware"
+          ><a href="https://docs.qmk.fm/#/newbs_building_firmware"
+            >Building Your First Firmware</a
+          ></a
+        >
+      </h4>
+      <p>
+        QMK のリポジトリに
+        <a href="https://github.com/qmk/qmk_firmware/tree/master/keyboards/kagizaraya/miniaxe"
+          >kagizaraya/miniaxe</a
+        >
+        が入っています。画像付き！<br />
+      </p>
 
-<h4 id="Building Your First Firmware"><a href="#Building Your First Firmware"><a href="https://docs.qmk.fm/#/newbs_building_firmware">Building Your First Firmware</a></a></h4><p>
-QMK のリポジトリに <a href="https://github.com/qmk/qmk_firmware/tree/master/keyboards/kagizaraya/miniaxe">kagizaraya/miniaxe</a> が入っています。画像付き！<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-sh">$ qmk list-keyboards | rg miniaxe
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ qmk list-keyboards | rg miniaxe
 kagizaraya/miniaxe
 </code></pre>
-</div>
+      </div>
 
-<p>
-<code>qmk compile</code> で <code>miniaxe</code> を指定すればビルドできます。設定変更が必要な場合は <code>miniaxe</code> フォルダ内のファイルを編集すれば良いようです。<br>
-</p>
+      <p>
+        <code>qmk compile</code> で
+        <code>miniaxe</code> を指定すればビルドできます。設定変更が必要な場合は
+        <code>miniaxe</code> フォルダ内のファイルを編集すれば良いようです。<br />
+      </p>
 
-<p>
-ひとまず初期設定のままビルドしてみます:<br>
-</p>
+      <p>ひとまず初期設定のままビルドしてみます:<br /></p>
 
-<div class="org-src-container">
-<pre><code class="src language-sh">$ qmk compile -kb miniaxe -km default
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ qmk compile -kb miniaxe -km default
 </code></pre>
-</div>
+      </div>
 
-<details>
-<summary>
-出力 (長い)</summary>
-<div class="org-src-container">
-<pre><code class="src language-txt">Ψ Compiling keymap with make -r -R -f builddefs/build_keyboard.mk -s KEYBOARD=kagizaraya/miniaxe KEYMAP=default KEYBOARD_FILESAFE=kagizaraya_miniaxe TARGET=kagizaraya_miniaxe_default INTERMEDIATE_OUTPUT=.build/obj_kagizaraya_miniaxe_default VERBOSE=false COLOR=true SILENT=false QMK_BIN="qmk"
+      <details>
+        <summary>出力 (長い)</summary>
+        <div class="org-src-container">
+          <pre><code class="src language-txt">Ψ Compiling keymap with make -r -R -f builddefs/build_keyboard.mk -s KEYBOARD=kagizaraya/miniaxe KEYMAP=default KEYBOARD_FILESAFE=kagizaraya_miniaxe TARGET=kagizaraya_miniaxe_default INTERMEDIATE_OUTPUT=.build/obj_kagizaraya_miniaxe_default VERBOSE=false COLOR=true SILENT=false QMK_BIN="qmk"
 
 
 Generating: .build/obj_kagizaraya_miniaxe_default/src/info_deps.d                                   [OK]
@@ -348,34 +435,42 @@ Creating load file for flashing: .build/kagizaraya_miniaxe_default.hex          
 Copying kagizaraya_miniaxe_default.hex to qmk_firmware folder                                       [OK]
 Checking file size of kagizaraya_miniaxe_default.hex                                                [OK]
 </code></pre>
-</div>
+        </div>
+      </details>
 
-</details>
+      <p>
+        特に依存追加など不要でビルドに成功しました。ビルド結果は
+        <code>.build/</code> ディレクトリに入っています:<br />
+      </p>
 
-<p>
-特に依存追加など不要でビルドに成功しました。ビルド結果は <code>.build/</code> ディレクトリに入っています:<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-sh">$ ls ~/qmk_firmware/.build/
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ ls ~/qmk_firmware/.build/
 kagizaraya_miniaxe_default.elf*  kagizaraya_miniaxe_default.map
 kagizaraya_miniaxe_default.hex	obj_kagizaraya_miniaxe_default/
 </code></pre>
-</div>
+      </div>
 
-<p>
-この結果をキーボードに書き込めば良いようです。<br>
-</p>
+      <p>この結果をキーボードに書き込めば良いようです。<br /></p>
+      <h3 id="Flashing Your Keyboard">
+        <a href="#Flashing Your Keyboard"
+          ><a href="https://docs.qmk.fm/#/newbs_flashing">Flashing Your Keyboard</a></a
+        >
+      </h3>
+      <p>
+        なぜか permissive hold の設定など無かったため、デフォルトのファームウェアをそのまま MiniAxe
+        に書き込んでみます。 (Permissive hold じゃなかった……？)<br />
+      </p>
 
-<h3 id="Flashing Your Keyboard"><a href="#Flashing Your Keyboard"><a href="https://docs.qmk.fm/#/newbs_flashing">Flashing Your Keyboard</a></a></h3><p>
-なぜか permissive hold の設定など無かったため、デフォルトのファームウェアをそのまま MiniAxe に書き込んでみます。 (Permissive hold じゃなかった……？)<br>
-</p>
+      <p>
+        QMK Toolbox という GUI ツールでファームウェアの書き込みができるそうです。 Linux
+        は非対応でした。<br />
+      </p>
 
-<p>
-QMK Toolbox という GUI ツールでファームウェアの書き込みができるそうです。 Linux は非対応でした。<br>
-</p>
-
-<p>
-TODO: MiniAxe をブートローダーモードに持っていく？<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>TODO: MiniAxe をブートローダーモードに持っていく？<br /></p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

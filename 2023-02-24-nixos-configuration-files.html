@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -30,7 +31,6 @@
         <a href="https://nixos.org/">NixOS</a>
         をインストールしました。すでに一ヶ月以上四苦八苦していますが、永住するつもりで末永く取り組んでいこうと思います。<br />
       </p>
-
       <h2 id="NixOS の設定方法"><a href="#NixOS の設定方法">NixOS の設定方法</a></h2>
       <h3 id="設定ファイル"><a href="#設定ファイル">設定ファイル</a></h3>
       <p>NixOS における設定方法は、主に 3 種類あります:<br /></p>
@@ -97,7 +97,6 @@
           を導入すれば話は変わってくるようですが、まだそれは調べられていません。<br />
         </p>
       </blockquote>
-
       <h3 id="設定ファイルを現環境に反映するとは">
         <a href="#設定ファイルを現環境に反映するとは">設定ファイルを現環境に反映するとは</a>
       </h3>
@@ -131,7 +130,6 @@ $ ls /usr/bin
       </div>
 
       <p>しかし実際には多数のコマンドをインストールしています。<br /></p>
-
       <h2 id="NixOS における環境"><a href="#NixOS における環境">NixOS における環境</a></h2>
       <h3 id="バイナリはどこへ？"><a href="#バイナリはどこへ？">バイナリはどこへ？</a></h3>
       <p>
@@ -152,7 +150,6 @@ $ ls /usr/bin
 /nix/store/zzzmz1yzhd0p648h447f7lwn18mhw4xz-nixos-system-nixos-22.11.2050.cc4bb87f545
 </code></pre>
       </div>
-
       <h3 id="プロファイルはどこに？">
         <a href="#プロファイルはどこに？">プロファイルはどこに？</a>
       </h3>
@@ -187,14 +184,12 @@ $ realpath /nix/var/nix/profiles/per-user/tbm/profile
       <p>
         どちらも <code>/nix/var/nix/profiles</code> 以下の最新プロファイルと一致しました。<br />
       </p>
-
       <h3 id="シェルの wrapper"><a href="#シェルの wrapper">シェルの wrapper</a></h3>
       <p>
         特に設定を書いていないのに
         <code>/run/current-system/sw/bin</code> がシェルのパスに入っていたということは、
         <code>nixpkgs</code> 上のシェルには何らかの細工が成されているはずです。<br />
       </p>
-
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
         バイナリとパスについては、だいたいイメージできました。動的ライブラリ (共有ライブラリ)

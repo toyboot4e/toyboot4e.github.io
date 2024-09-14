@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -19,7 +20,7 @@
   <body>
     <header role="banner">
       <h1>ABC 368, Splay tree (2), SWAG</h1>
-      <p>Aug 18, 2024</p>
+      <p>Aug 25, 2024</p>
       <nav role="navigation">
         <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
       </nav>
@@ -82,7 +83,6 @@
           </tr>
         </tbody>
       </table>
-
       <h3 id="oj が動かない……？">
         <a href="#oj が動かない……？"><code>oj</code> が動かない……？</a>
       </h3>
@@ -121,7 +121,6 @@ Node.js v20.15.1
 </code></pre>
         </div>
       </details>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc368/tasks/abc368_a">A 問題</a></a>
       </h3>
@@ -131,7 +130,6 @@ Node.js v20.15.1
         <pre><code class="src language-hs">main=interact$unwords.f.words;f(n:k:x)=(++).snd&lt;*&gt;fst$splitAt(read n-read k)x
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc368/tasks/abc368_b">B 問題</a></a>
       </h3>
@@ -153,12 +151,10 @@ Node.js v20.15.1
     loop
 </code></pre>
       </div>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc368/tasks/abc368_c">C 問題</a></a>
       </h3>
       <p>40 分苦戦しました。素直にループを書きましょう……！<br /></p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc368/tasks/abc368_d">D 問題</a></a>
       </h3>
@@ -184,17 +180,14 @@ Node.js v20.15.1
     {- ~~ -}
 </code></pre>
       </div>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc368/tasks/abc368_e">E 問題</a></a>
       </h3>
       <p>hogeeee<br /></p>
-
       <h3 id="F 問題">
         <a href="#F 問題"><a href="https://atcoder.jp/contests/abc368/tasks/abc368_f">F 問題</a></a>
       </h3>
       <p>hogeeee<br /></p>
-
       <h2 id="Splay tree (2)"><a href="#Splay tree (2)">Splay tree (2)</a></h2>
       <h3 id="Splay tree とは何者なのか">
         <a href="#Splay tree とは何者なのか">Splay tree とは何者なのか</a>
@@ -207,7 +200,6 @@ Node.js v20.15.1
         を作りました。しかし top-down splaying
         で集約の計算ができず、単なるマップになったのでした。欲しいやつじゃなかった……！<br />
       </p>
-
       <h4 id="Yes: SplaySeq (遅延伝播反転可能 splay tree)">
         <a href="#Yes: SplaySeq (遅延伝播反転可能 splay tree)"
           >Yes: <code>SplaySeq</code> (遅延伝播反転可能 splay tree)</a
@@ -238,7 +230,6 @@ Node.js v20.15.1
         区間反転は左右の子を貪欲に swap
         して実装できます。また可換モノイドの畳み込みは反転の影響を受けないため、反転の反映は遅延させます。<br />
       </p>
-
       <h3 id="verify"><a href="#verify">verify</a></h3>
       <ul>
         <li class="on">
@@ -254,7 +245,6 @@ Node.js v20.15.1
           ><br />
         </li>
       </ul>
-
       <h3 id="余談"><a href="#余談">余談</a></h3>
       <ul>
         <li>
@@ -282,12 +272,10 @@ Node.js v20.15.1
           までの畳み込みができます。これは真似してみたいです。<br />
         </li>
       </ul>
-
       <h2 id="SWAG (sliding window aggregation)">
         <a href="#SWAG (sliding window aggregation)">SWAG (sliding window aggregation)</a>
       </h2>
       <p>SWAG は簡単かつマイナ過ぎて解説が少ない気がします。<br /></p>
-
       <h3 id="Stack ベースの SWAG"><a href="#Stack ベースの SWAG">Stack ベースの SWAG</a></h3>
       <p>
         尺取り方でモノイドの畳み込みを償却 \(O(1)\) で求めるためのデータ構造 (?)
@@ -332,7 +320,6 @@ Node.js v20.15.1
         で双対右スキャンが空になったとき、バッファ中の値を双対右スキャンへ移動します。よって償却
         \(O(1)\) です。<br />
       </p>
-
       <h3 id="Deque ベースの swag"><a href="#Deque ベースの swag">Deque ベースの swag</a></h3>
       <p>
         push/pop を左右から操作可能にします。これは左右方向にスタックとスキャンを持てば良いです。<br />
@@ -350,7 +337,6 @@ Node.js v20.15.1
         もう pop できない時は、要素を左右均等に振り分けてバランスをとります。これで償却 \(O(1)\)
         になるみたいです。未証明……<br />
       </p>
-
       <h3 id="verify"><a href="#verify">verify</a></h3>
       <ul>
         <li>
@@ -367,12 +353,10 @@ Node.js v20.15.1
           <a href="https://judge.yosupo.jp/submission/230774">220 ms</a>. Deque 版 SWAG です。<br />
         </li>
       </ul>
-
       <h3 id="セグ木で \(O(N \log N)\) で良くない？">
         <a href="#セグ木で \(O(N \log N)\) で良くない？">セグ木で \(O(N \log N)\) で良くない？</a>
       </h3>
       <p>セグ木で十分だと思いました。競プロ小説を書くなら主人公は SegTree です。<br /></p>
-
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
       <ul>
         <li>

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style/simple.min.css" />
     <link rel="stylesheet" href="/style/style.css" />
     <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
     <script type="text/javascript" async="" src="/style/prism.js"></script>
     <!-- MathJax -->
     <script
@@ -82,7 +83,6 @@
           </tr>
         </tbody>
       </table>
-
       <h3 id="A 問題">
         <a href="#A 問題"><a href="https://atcoder.jp/contests/abc364/tasks/abc364_a">A 問題</a></a>
       </h3>
@@ -98,7 +98,6 @@
         <pre><code class="src language-hs">main=interact$y.or.(zipWith(&amp;&amp;)&lt;*&gt;tail).map(elem 'w').init.words;y b|b="No"|0&lt;1="Yes"
 </code></pre>
       </div>
-
       <h3 id="B 問題">
         <a href="#B 問題"><a href="https://atcoder.jp/contests/abc364/tasks/abc364_b">B 問題</a></a>
       </h3>
@@ -129,7 +128,6 @@ foldl' (+) (0 :: Int) [0 :: Int, 1, 2, 3]
 foldl' walk (y0, x0) "LRUUDDLR"
 </code></pre>
       </div>
-
       <h4 id="脱線"><a href="#脱線">脱線</a></h4>
       <p>naoya さんのコードには、以下の <code>lrud</code> が登場しました:<br /></p>
 
@@ -142,7 +140,6 @@ foldl' walk (y0, x0) "LRUUDDLR"
         そういえばトップレベルでパタンマッチできるのですね。トップレベルのタプルの中身を正格評価しつつ
         <code>{-# NOINLINE #-}</code> を付けるなど、活用できそうです。<br />
       </p>
-
       <h3 id="C 問題">
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc364/tasks/abc364_c">C 問題</a></a>
       </h3>
@@ -151,7 +148,6 @@ foldl' walk (y0, x0) "LRUUDDLR"
         \gt\)) です。 Strict な演算子というのは競プロ方言か何かで、英語では普通に greater/greater
         than と言うはずです。<br />
       </p>
-
       <h3 id="D 問題">
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc364/tasks/abc364_d">D 問題</a></a>
       </h3>
@@ -162,7 +158,6 @@ foldl' walk (y0, x0) "LRUUDDLR"
         <code>ok</code>, <code>ng</code> が出てきますが、 yes/no
         の方が適切かと思います。この辺りも自由に決めて良いのが競プロ！<br />
       </p>
-
       <h3 id="E 問題">
         <a href="#E 問題"><a href="https://atcoder.jp/contests/abc364/tasks/abc364_e">E 問題</a></a>
       </h3>
@@ -175,7 +170,6 @@ foldl' walk (y0, x0) "LRUUDDLR"
         公式解説は
         <a href="https://atcoder.jp/contests/dp/tasks/dp_e">Kpapsack 2</a> でした。ガーン……<br />
       </p>
-
       <h3 id="F 問題">
         <a href="#F 問題"><a href="https://atcoder.jp/contests/abc364/tasks/abc364_f">F 問題</a></a>
       </h3>
@@ -200,13 +194,11 @@ foldl' walk (y0, x0) "LRUUDDLR"
         >
       </blockquote>
       <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
       <h2 id="Splay tree メモ"><a href="#Splay tree メモ">Splay tree メモ</a></h2>
       <p>
         Link/cut tree の前準備で splay tree を (まだ)
         作っています。前提知識が見えて来たのでメモします。<br />
       </p>
-
       <h3 id="[1] 2 種類の API"><a href="#[1] 2 種類の API">[1] 2 種類の API</a></h3>
       <h4 id="Indexed API (列としての API)">
         <a href="#Indexed API (列としての API)">Indexed API (列としての API)</a>
@@ -260,7 +252,6 @@ foldl' walk (y0, x0) "LRUUDDLR"
           区間反転があり高難度のため、まずは自分で簡単なテストを作った方が良さそうです)<br />
         </li>
       </ul>
-
       <h4 id="Ord k ベースの API (平衡木としての API)">
         <a href="#Ord k ベースの API (平衡木としての API)"
           ><code>Ord k</code> ベースの API (平衡木としての API)</a
@@ -294,7 +285,6 @@ foldl' walk (y0, x0) "LRUUDDLR"
           API の verify に使える問題です。<br />
         </li>
       </ul>
-
       <h3 id="[2] 2 種類の splay 実装">
         <a href="#[2] 2 種類の splay 実装">[2] 2 種類の splay 実装</a>
       </h3>
@@ -313,7 +303,6 @@ foldl' walk (y0, x0) "LRUUDDLR"
           Bottom-up 実装の定数倍高速化の手法を整理しています。<br />
         </li>
       </ul>
-
       <h4 id="Top-down splaying"><a href="#Top-down splaying">Top-down splaying</a></h4>
       <p>
         Tarjan 氏の論文では top-down splaying が速くて良いぞとなっています (そうかな？) 。 Top-down
@@ -354,27 +343,22 @@ foldl' walk (y0, x0) "LRUUDDLR"
           </ul>
         </li>
       </ul>
-
       <h3 id="[3] 集約 (畳み込み) ・作用">
         <a href="#[3] 集約 (畳み込み) ・作用">[3] 集約 (畳み込み) ・作用</a>
       </h3>
       <p>
         ノードに部分木のサイズや畳み込みを持たせます。区間反転用のフラグを載せてあれこれする場合もあるようです。<br />
       </p>
-
       <h3 id="以上"><a href="#以上">以上</a></h3>
       <p>Splay tree は作り直しになりそうです。 Link/cut tree の情報も集めないとー<br /></p>
-
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
       <p>この頃は問題も解かずゴロゴロしています。<br /></p>
-
       <h3 id="maspy さんの遅延伝播セグメント木の定数倍高速化">
         <a href="#maspy さんの遅延伝播セグメント木の定数倍高速化"
           >maspy さんの遅延伝播セグメント木の定数倍高速化</a
         >
       </h3>
       <p>遅延セグ木の実装を PAST 上級本から maspy さん準拠に変更しました。<br /></p>
-
       <h4 id="枝刈り"><a href="#枝刈り">枝刈り</a></h4>
       <p>
         <a href="https://maspypy.com/segment-tree-%E3%81%AE%E3%81%8A%E5%8B%89%E5%BC%B72"
@@ -384,7 +368,6 @@ foldl' walk (y0, x0) "LRUUDDLR"
         において葉まで降りない実装になっていることが分かります。真似してみると、作用が重いときは若干高速になりました。作用が軽いときは
         PAST 上級本のように葉まで降りたほうが速かったです。やらなくても良かったかも。<br />
       </p>
-
       <h4 id="作用が長さを引数に取る">
         <a href="#作用が長さを引数に取る">作用が長さを引数に取る</a>
       </h4>
@@ -393,7 +376,6 @@ foldl' walk (y0, x0) "LRUUDDLR"
         (1.5 倍ほど？　未実装) 。真似して
         <code>SemigroupActionWithLength</code> みたいな型クラスを作るかもしれません。<br />
       </p>
-
       <h3 id="繰り返し 2 乗法の再整理">
         <a href="#繰り返し 2 乗法の再整理">繰り返し 2 乗法の再整理</a>
       </h3>
@@ -447,7 +429,6 @@ mulTimes n0 op x0
         >
         関係も整理がついて良かったです。<br />
       </p>
-
       <h3 id="nextPermutation">
         <a href="#nextPermutation"><code>nextPermutation</code></a>
       </h3>

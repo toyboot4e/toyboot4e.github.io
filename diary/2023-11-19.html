@@ -1,23 +1,52 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 329 - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 329</h1><p>Nov 19, 2023</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main">
-<h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2><h3 id="訓練"><a href="#訓練">訓練</a></h3><p>
-Keyball 44 で <a href="https://sushida.net/">寿司打</a> をやっていた。僕は何を‥‥<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 329 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 329</h1>
+      <p>Nov 19, 2023</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="競技プログラミング"><a href="#競技プログラミング">競技プログラミング</a></h2>
+      <h3 id="訓練"><a href="#訓練">訓練</a></h3>
+      <p>Keyball 44 で <a href="https://sushida.net/">寿司打</a> をやっていた。僕は何を‥‥<br /></p>
 
-<p>
-ミスせずタイピングを継続すると、追加でボーナス時間が与えられる。このためタイプミスを大幅に減らす訓練になった。現在のスコアは 30 皿 12,000 円を安定して超える程度。あまり速くないみたい。<br>
-</p>
+      <p>
+        ミスせずタイピングを継続すると、追加でボーナス時間が与えられる。このためタイプミスを大幅に減らす訓練になった。現在のスコアは
+        30 皿 12,000 円を安定して超える程度。あまり速くないみたい。<br />
+      </p>
+      <h3 id="ABC 329"><a href="#ABC 329">ABC 329</a></h3>
+      <p>
+        <a href="https://atcoder.jp/contests/abc329">ABC 329</a>
+        に参加した。寿司打をやった意味があるほどタイピングしなかった。<br />
+      </p>
+      <h4 id="本番"><a href="#本番">本番</a></h4>
+      <p>
+        <a href="https://atcoder.jp/contests/abc329/tasks/abc329_a">A 問題</a>
+        ではお手本のような手続き型プログラミングを行った。酷いよ。<br />
+      </p>
 
-<h3 id="ABC 329"><a href="#ABC 329">ABC 329</a></h3><p>
-<a href="https://atcoder.jp/contests/abc329">ABC 329</a> に参加した。寿司打をやった意味があるほどタイピングしなかった。<br>
-</p>
-
-<h4 id="本番"><a href="#本番">本番</a></h4><p>
-<a href="https://atcoder.jp/contests/abc329/tasks/abc329_a">A 問題</a> ではお手本のような手続き型プログラミングを行った。酷いよ。<br>
-</p>
-
-<div class="org-src-container">
-<pre><code class="src language-hs">main :: IO ()
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main :: IO ()
 main = do
   !s &lt;- BS.getLine
   forM_ (BS.unpack (BS.init s)) $ \ch -&gt; do
@@ -25,67 +54,102 @@ main = do
     putChar ' '
   putChar (BS.last s)
 </code></pre>
-</div>
+      </div>
 
-<p>
-<a href="https://atcoder.jp/contests/abc329/tasks/abc329_b">B 問題</a> では降順ソートして <code>uniq</code> を取ったら 2 番目の要素が答えとなる。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc329/tasks/abc329_b">B 問題</a> では降順ソートして
+        <code>uniq</code> を取ったら 2 番目の要素が答えとなる。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc329/tasks/abc329_c">C 問題</a> は <code>U.accumulate</code> で解いた。 <code>U.accumulate</code> の引数は <code>U.accumulate op initialVec commands</code> という形で <code>accumArray</code> とやや異なる。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc329/tasks/abc329_c">C 問題</a> は
+        <code>U.accumulate</code> で解いた。 <code>U.accumulate</code> の引数は
+        <code>U.accumulate op initialVec commands</code> という形で
+        <code>accumArray</code> とやや異なる。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc329/tasks/abc329_d">D 問題</a> ではヒープを使ってしまったが、最大値を持って <code>mapAccumL</code> すれば良かった。セグメント木に <code>Max (Int, Down Int)</code> を載せると、区間クエリの問題であっても対応できるとのこと。なるほど。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc329/tasks/abc329_d">D 問題</a>
+        ではヒープを使ってしまったが、最大値を持って
+        <code>mapAccumL</code> すれば良かった。セグメント木に
+        <code>Max (Int, Down Int)</code>
+        を載せると、区間クエリの問題であっても対応できるとのこと。なるほど。<br />
+      </p>
+      <h4 id="Upsolve"><a href="#Upsolve">Upsolve</a></h4>
+      <p>
+        <a href="https://atcoder.jp/contests/abc329/tasks/abc329_e">E 問題</a>
+        では時系列を遡ると貪欲に解ける。すなわち元の文字列に対して # を塗っていくと、 #
+        で覆った部分は上書きされるようになるため、 #
+        になった箇所はワイルドカードであると見做せる。<br />
+      </p>
 
-<h4 id="Upsolve"><a href="#Upsolve">Upsolve</a></h4><p>
-<a href="https://atcoder.jp/contests/abc329/tasks/abc329_e">E 問題</a> では時系列を遡ると貪欲に解ける。すなわち元の文字列に対して # を塗っていくと、 # で覆った部分は上書きされるようになるため、 # になった箇所はワイルドカードであると見做せる。<br>
-</p>
+      <p>
+        後は一度塗った箇所の近辺を再度見直すために、キューやスタックを使用する。この辺のディテールも実装力ということか。<br />
+      </p>
 
-<p>
-後は一度塗った箇所の近辺を再度見直すために、キューやスタックを使用する。この辺のディテールも実装力ということか。<br>
-</p>
+      <p>
+        タイムラインでは、
+        <a href="https://twitter.com/310icecrystal/status/1725887202327163107"
+          >左右に 1 回ずつ走査すれば良いのではないか</a
+        >
+        という解法が流れてきた。実に ARC 的な解答だ。<br />
+      </p>
 
-<p>
-タイムラインでは、 <a href="https://twitter.com/310icecrystal/status/1725887202327163107">左右に 1 回ずつ走査すれば良いのではないか</a> という解法が流れてきた。実に ARC 的な解答だ。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc329/submissions/47705828">gksato 氏の提出</a>
+        においては可変配列が出現せず、 DP で解いている。ビット列を持って scanl した後に tail と last
+        を見ているが……？　まだ基本的なアイデアを読み取れていない。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc329/submissions/47705828">gksato 氏の提出</a> においては可変配列が出現せず、 DP で解いている。ビット列を持って scanl した後に tail と last を見ているが……？　まだ基本的なアイデアを読み取れていない。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc329/tasks/abc329_f">F 問題</a> では
+        <a href="https://atcoder.jp/contests/abc279/tasks/abc279_f">ABC 279 F</a> からの連想で
+        union-find を使ってしまい失敗した。
+        <code>Set</code> を使うと指示通りシミュレーションするだけとなった。<br />
+      </p>
 
-<p>
-<a href="https://atcoder.jp/contests/abc329/tasks/abc329_f">F 問題</a> では <a href="https://atcoder.jp/contests/abc279/tasks/abc279_f">ABC 279 F</a> からの連想で union-find を使ってしまい失敗した。 <code>Set</code> を使うと指示通りシミュレーションするだけとなった。<br>
-</p>
+      <p>
+        F 問題でよく聞くマージテクとは、 union-find における union by rank とか union by size
+        と同じ話で、極端にバランスの崩れた木を作らないように工夫することが、最悪計算量を均すことに繋がる。<br />
+      </p>
 
-<p>
-F 問題でよく聞くマージテクとは、 union-find における union by rank とか union by size と同じ話で、極端にバランスの崩れた木を作らないように工夫することが、最悪計算量を均すことに繋がる。<br>
-</p>
+      <p>
+        なお <code>Set</code> においてはマージテクが自動適用される (たぶん) ほか、
+        <code>IntSet</code> は深さ 64 の完全二分木を圧縮した形であるため、あまり Haskell
+        では使わないテクニックかもしれない。<br />
+      </p>
+      <h2 id="Haskell 本"><a href="#Haskell 本">Haskell 本</a></h2>
+      <h3 id="表紙、完成"><a href="#表紙、完成">表紙、完成</a></h3>
+      <p>ラフから 2 週間で完成品を納入頂いた。見合った内容目指して頑張るぞい！<br /></p>
+      <h3 id="進捗: 8%"><a href="#進捗: 8%">進捗: 8%</a></h3>
+      <p>ニッチな疑問が尽きず進捗が芳しくない。最近の収穫で言うと、<br /></p>
 
-<p>
-なお <code>Set</code> においてはマージテクが自動適用される (たぶん) ほか、 <code>IntSet</code> は深さ 64 の完全二分木を圧縮した形であるため、あまり Haskell では使わないテクニックかもしれない。<br>
-</p>
+      <ul>
+        <li>
+          haddock の <code>$setup</code> で型の <code>default</code> を指定すれば
+          <code>doctest</code> から <code>(0 :​: Int)</code> のような型表記を省略できる<br />
+        </li>
+        <li>
+          Boxed な <code>Vector</code> は GC だけではなく MUT も長いのはなぜか<br />
+          未解決 (質問するかも)<br />
+        </li>
+        <li>
+          計算過程の <code>IntMap</code> をすべて vector に保存すると GC が長い (MUT
+          は変わらない)<br />
+        </li>
+      </ul>
 
-<h2 id="Haskell 本"><a href="#Haskell 本">Haskell 本</a></h2><h3 id="表紙、完成"><a href="#表紙、完成">表紙、完成</a></h3><p>
-ラフから 2 週間で完成品を納入頂いた。見合った内容目指して頑張るぞい！<br>
-</p>
-
-<h3 id="進捗: 8%"><a href="#進捗: 8%">進捗: 8%</a></h3><p>
-ニッチな疑問が尽きず進捗が芳しくない。最近の収穫で言うと、<br>
-</p>
-
-<ul><li>haddock の <code>$setup</code> で型の <code>default</code> を指定すれば <code>doctest</code> から <code>(0 :​: Int)</code> のような型表記を省略できる<br></li>
-<li>Boxed な <code>Vector</code> は GC だけではなく MUT も長いのはなぜか<br>
-未解決 (質問するかも)<br></li>
-<li>計算過程の <code>IntMap</code> をすべて vector に保存すると GC が長い (MUT は変わらない)<br></li>
-</ul>
-
-<p>
-茶色コーダーを目指すための tips からはかけ離れてきた。すべて載せるスタイルに方向展開したい。<br>
-</p>
-
-<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="Vim Conf 2023 Tiny"><a href="#Vim Conf 2023 Tiny">Vim Conf 2023 Tiny</a></h3><p>
-カンファレンスをやっていたみたい。楽しそうでいいな。<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>
+        茶色コーダーを目指すための tips
+        からはかけ離れてきた。すべて載せるスタイルに方向展開したい。<br />
+      </p>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="Vim Conf 2023 Tiny"><a href="#Vim Conf 2023 Tiny">Vim Conf 2023 Tiny</a></h3>
+      <p>カンファレンスをやっていたみたい。楽しそうでいいな。<br /></p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
