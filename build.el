@@ -146,8 +146,13 @@
 
 ;;; Backend (HTML template)
 
+(defvar my-codeblock-counter 0
+    "Identifies coderefs in different code blocks.")
+
 ;; Returns `<head>' SXML
 (defun my-html-head (info)
+    ;; Reset `my-codeblock-counter' on new file. TODO: move it to more appropriate place
+    (setq my-codeblock-counter 0)
     ;; NOTE: `esxml-html' is not on MELPA
     `(head
       (meta (@ (charset "utf-8")))
@@ -225,6 +230,8 @@
     "Transcode a SRC-BLOCK element from Org to HTML.
   CONTENTS holds the contents of the item.  INFO is a plist holding
   contextual information."
+    ;; NOTE(toyboot): increment code block count for unique coderef IDs.
+    (setq my-codeblock-counter (+ 1 my-codeblock-counter))
     (if (org-export-read-attribute :attr_html src-block :textarea)
             (org-html--textarea-block src-block)
         (let* ((lang (org-element-property :language src-block))
@@ -308,11 +315,12 @@ wrapped in code elements."
              ;; Mark transcoded line as an anchor, if needed.
              (if (not ref) loc
                  ;; REMARK(toyboot): added a wrapper `span' with `href', adding mouseover/click to `jump-href-*'.
-                 (let ((in (format "onmouseover=\"CodeHighlightOn(this,'jump-coderef-%s');\"" ref))
-                       (out (format "onmouseout=\"CodeHighlightOff(this,'jump-coderef-%s');\"" ref))
-                       (content (format "<a href=\"#coderef-%s\">%s</a>" ref loc)))
-	                 (format "<span id=\"coderef-%s\" %s %s class=\"coderef-off\">%s</span>"
-		                     ref in out content))))
+                 (let* ((coderef (format "coderef-%d-%s" my-codeblock-counter ref))
+                        (in (format "onmouseover=\"CodeHighlightOn(this,'jump-');\"" coderef))
+                        (out (format "onmouseout=\"CodeHighlightOff(this,'jump-');\"" coderef))
+                        (content (format "<a href=\"#%s\">%s</a>" coderef loc)))
+	                 (format "<span id=\"%s\" %s %s class=\"coderef-off\">%s</span>"
+		                     coderef in out content))))
          num-start refs)))
 
 ;; Ovewrite the wrap image function and remove `id' attribute for the `<figure>' tag:
@@ -528,7 +536,7 @@ INFO is a plist holding contextual information.  See
          ;; Coderef: replace link with the reference name or the
          ;; equivalent line number.
          ((string= type "coderef")
-          (let ((fragment (concat "coderef-" (org-html-encode-plain-text path))))
+          (let ((fragment (format "coderef-%d-%s" my-codeblock-counter (org-html-encode-plain-text path))))
               ;; NOTE(toyboot): added id (`jump-coderef-*')
 	          (format "<a href=\"#%s\" id=\"jump-%s\" %s%s>%s</a>"
 		              fragment
