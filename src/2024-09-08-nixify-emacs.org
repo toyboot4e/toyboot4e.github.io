@@ -1,0 +1,378 @@
+
+#+TITLE: Nixify your Emacs
+#+DATE: <2024-09-14 Sat>
+
+* Nix + Emacs
+
+Nix が流行っています。僕は 1 年半 NixOS を使っていますが、僅か 1 週間で完全に抜き去られました。インテリだ〜〜。この波に乗って Nix のパワーユーザを目指します。
+
+** やりたいこと
+
+今一番面白い [[https://github.com/takeokunn/nixos-configuration][takeokunn/nixos-configuration]] を参考に、 Emacs パッケージを Nix で管理してみます。これでパッケージのバージョン固定や rollback が可能になるはずです。反面、エディタの更新に =nixos-rebuild= が必要になって面倒……ということもなく、 Nix 化されていないパッケージは従来どおり =elpa/= に保存されます。
+
+** 先に結論
+
+進捗は以下のコミットです。ほぼ変更無しで Emacs パッケージを Nix 化できます。
+
+- [[https://github.com/toyboot4e/dotfiles/commit/10181af8ede15d14d0aa77a6afd6b04c719b63ab][nixify your emacs]]
+  [[https://github.com/nix-community/emacs-overlay][emacs-overlay]] により依存パッケージが自動的に Nix 化されました。
+- [[https://github.com/toyboot4e/dotfiles/commit/7bbdc9deff22a73b718982620b56c8a94110a473][introduce =nvfetcher=]]
+  =nixpkgs= に無いパッケージを =melpaBuild= でビルドし、更新には =nvfetcher= を使う方法を確認しました。
+
+* ファイル分割を読む
+
+[[https://github.com/takeokunn/nixos-configuration][takeokunn/nixos-configuration]] を読んで基本的な Nix Flakes を学びます。
+
+** =nvfetcher.toml=
+
+[[https://github.com/berberman/nvfetcher][nvfetcher]] は =nvfetcher.toml= を元に [[https://nixos.wiki/wiki/Nix_Hash][hash 値]] の集まりを生成します。最新のソースを表す hash 値への更新がコマンド 1 つで実施できる点が便利です。
+
+=nixpkgs= に登録されていないパッケージは =nvfetcher.toml= に記載し、自分でビルドする方針のようです。詳しくは後ほど紹介します。
+
+*** =flake.nix=
+
+設定ファイルを読んでいきます。 NixOS, macOS に両対応しています。
+
+#+CAPTION: =flake.nix= (抜粋)
+#+BEGIN_SRC nix
+{
+  inputs = { # (ref:1)
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
+    # Emacs の HEAD ビルド等ができる `overlay`.
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-stable.follows = "nixpkgs-stable";
+    };
+    # `org-babel-tangle` の Nix 式による実装 (すごい)
+    org-babel.url = "github:emacs-twist/org-babel";
+  };
+  # (ref:2)
+  outputs = { self, nixpkgs, home-manager, org-babel, emacs-overlay, ... }: {
+      # macOS における設定
+      darwinConfigurations = (import ./hosts/OPL2212-2 {
+        inherit self nixpkgs nix-darwin home-manager org-babel emacs-overlay
+          wezterm-flake neovim-nightly-overlay;
+      });
+      # NixOS における設定
+      nixosConfigurations = (import ./hosts/X13Gen2 { # (ref:3)
+        inherit self nixpkgs home-manager org-babel emacs-overlay; # (ref:4)
+      });
+    };
+}
+#+END_SRC
+
+- [[(1)]] [[https://nixos-and-flakes.thiscute.world/other-usage-of-flakes/inputs][=inputs=]] ~= { .. };~
+  =flake.nix= の入力 (依存)を書きます。
+- [[(2)]] [[https://nixos-and-flakes.thiscute.world/other-usage-of-flakes/outputs][=outputs=]] ~= {self, .. }: { .. };~
+  =flake.nix= の出力を関数の形で書きます。 [[https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-flake-configuration-explained#special-parameter-self-of-outputs-function][=self= は =outputs= 自身を指す]] 自己参照ですが、以降の使用は無さそうです。
+- [[(3)]] ~nixosConfigurations = (import ./hosts/X13Gen2) { .. })~
+  - [[https://nix.dev/tutorials/nix-language.html#import][=import=]] ~./hosts/X13Gen2 { .. };~
+    =import ./hosts/X13Gen2/default.nix { .. };= と等価です。 =default.nix= の内容 (後述) は関数であるため、直後に引数として attribute set ={ .. }= を与えています。
+  - [[(4)]] [[https://nix.dev/manual/nix/2.18/language/constructs#inheriting-attributes][={ inherit x y z; }=]]
+    ~{ x = x; y = y; z = z; }~ と等価です。常時 =inherit= されてほしかったですが、 Nix も古い言語なので仕方がありません。
+
+** =hosts/X13Gen2/default.nix=
+
+ここから NixOS の設定ファイルを読み込んでいます。
+
+#+CAPTION: =hosts/X13Gen2/default.nix= (抜粋)
+#+BEGIN_SRC hs
+{ self, nixpkgs, home-manager, org-babel, emacs-overlay }: #(ref:1)
+let
+  username = "<name>";
+  system = "x86_64-linux";
+in {
+  X13Gen2 = nixpkgs.lib.nixosSystem { # (ref:2)
+    inherit system;
+    specialArgs = { inherit xremap username; }; # (ref:3)
+    # `configuration.nix` および `hardware-configuration.nix` 相当
+    modules = [ #(ref:4)
+      # ルートユーザの設定
+      ../../nixos
+      # ハードウェアとかドライブの情報 (?)
+      ./hardware-configuration.nix
+      # ログインユーザ (?) の設定
+      home-manager.nixosModules.home-manager
+      {
+        home-manager.useUserPackages = true;
+        home-manager.users."${username}" = import ../../home-manager { # (ref:5)
+          inherit system nixpkgs org-babel emacs-overlay;
+        };
+      }
+    ];
+  };
+}
+#+END_SRC
+
+- [[(1)]] ={ .. }: let .. in ..;=
+  前述の通り、このファイルは ={ .. }= を引数に取る関数を定義しています。
+- [[(2)]] ~{ X13Gen2 = nixpkgs.lib.nixosSystem { .. }; }~
+  先の =flake.nix= から見ると ~nixosConfigurations = { X13Gen2 = nixpkgs.lib.nixosSystem { .. }; }~ のような式になります。 =nixosConfigurations= 以下には複数の設定を配置できます。特定の設定を =sudo nixos-rebuild switch --flake #X13Gen2 switch= の形で指定してシステムに適用します。
+- [[(3)]] [[https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-flake-and-module-system#pass-non-default-parameters-to-submodules][=specialArgs=]] ~= { .. };~
+  [[https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-flake-configuration-explained#simple-introduction-to-nixpkgs-lib-nixos-system][nixpkgs.lib.nixosSystem]] の引数です。 =modules= で指定したファイル (関数) が引数として取れる値になります (後述) 。
+- [[(4)]] ~modules = [ .. ];~
+  設定内容の一覧です ([[https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-flake-configuration-explained#simple-introduction-to-nixpkgs-lib-nixos-system][nixpkgs.lib.nixosSystem]] への引数です) 。利便性のためか、複数の設定ファイルを指定できます。
+- [[(5)]] =import ../../home-manager=
+  これがユーザ設定です。
+
+** =home-manager/default.nix=
+
+分割された設定ファイルを =imports= で指定しています。
+
+#+CAPTION: =home-manager/default.nix= (抜粋)
+#+BEGIN_SRC nix
+{ system, nixpkgs, org-babel, emacs-overlay }:
+let
+  lib = nixpkgs.lib;
+  pkgs = import nixpkgs {
+    inherit system;
+    config.allowUnfree = true;
+    overlays = import ./overlay { inherit emacs-overlay; }; # (ref:1)
+  };
+  advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };
+  sources = pkgs.callPackage ../_sources/generated.nix { }; # (ref:2)
+  # その他省略
+in {
+  # (ref:3)
+  imports = modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
+  home.stateVersion = "24.05";
+  home.packages = basicPkgs ++ advancedPkgs ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs;
+}
+#+END_SRC
+
+- [[(1)]] =nixpkgs= に対して Emacs の [[https://nixos.wiki/wiki/Overlays][overlay]] を設定しています。
+- [[(2)]] =generated.nix= はある種のロックファイルです。 [[https://github.com/berberman/nvfetcher][nvfetcher]] により生成され、 Git リポジトリへのリンクや [[https://nixos.wiki/wiki/Nix_Hash][hash 値]] を含みます。この中に Emacs パッケージのリポジトリも含まれており、後ほど利用します。
+- [[(3)]] [[https://nixos.wiki/wiki/NixOS_modules][NixOS Module]] として =imports= によりファイル分割できます。モジュール全体の出力は、各ファイルの出力の和です。
+
+** =home-manager/programs/advanced.nix=
+
+Emacs 部分に注目すると、 =import= しているだけです:
+
+#+CAPTION: =home-manager/programs/advanced.nix= (抜粋)
+#+BEGIN_SRC nix
+{ lib, pkgs, org-babel, sources }:
+let
+  emacs = import ./emacs { inherit pkgs org-babel sources; };
+in [
+  emacs
+]
+#+END_SRC
+
+=./emacs/default.nix= が肝心の Emacs の設定ファイルですね。
+
+* Emacs 部分を読む
+
+本題です。 Emacs の部分はどうなっているのでしょうか。
+
+** =home-manager/programs/emacs/default.nix=
+
+[[https://github.com/nix-community/emacs-overlay][emacs-overlay]] を使用しています。
+
+#+BEGIN_SRC nix
+{ pkgs, org-babel, sources }:
+# (ref:1)
+let tangle = org-babel.lib.tangleOrgBabel { languages = [ "emacs-lisp" ]; };
+in {
+  programs.emacs = { # (ref:2)
+    enable = true;
+    package = pkgs.emacsWithPackagesFromUsePackage { # (ref:3)
+      config = ./elisp/init.org;
+      defaultInitFile = true;
+      package = pkgs.emacs-git; # (ref:4)
+      alwaysTangle = true;
+      extraEmacsPackages = import ./epkgs { inherit pkgs sources; }; # (ref:5)
+    };
+  };
+
+  home.file = { # (ref:6)
+    ".config/emacs/init.el".text = tangle (builtins.readFile ./elisp/init.org);
+    ".config/emacs/early-init.el".text =
+      tangle (builtins.readFile ./elisp/early-init.org);
+    ".config/emacs/yasnippet.org".source = ./yasnippet.org;
+  };
+
+  home.packages = with pkgs; [ emacs-lsp-booster pinentry-emacs cmigemo ];
+}
+#+END_SRC
+
+- [[(1)]] [[https://github.com/emacs-twist/org-babel][emacs-twist/org-babel]] は =org-babel-tangle= の Nix 実装です (え？) 。 =$HOME= 以下に各種 =.el= を配置するため使用されています。
+- [[(2)]] [[https://github.com/nix-community/home-manager/blob/503af483e1b328691ea3a434d331995595fb2e3d/modules/programs/emacs.nix][programs.emacs]] は =home-manager= 定義です。 =user.packages= と =programs= の違いとしては、 =programs= の方が追加設定を実施してくれるイメージがあります。
+- [[(3)]] [[https://github.com/nix-community/emacs-overlay/blob/795d5dc72088bd6c758826c56284b0024b045194/elisp.nix][emacsWithPackagesFromUsePackage]] は [[https://github.com/nix-community/emacs-overlay][emacs-overlay]] の関数です。設定ファイル中の =use-package= / =leaf= 式をパースして、本家の =emacsWithPackages= に渡してくれるようです。
+- [[(4)]] =emacs-git= は HEAD, =emacs-unstable= は latest リリースを指します。 HEAD ビルドを選択しています。
+- [[(5)]] =extraEmacsPackages= で Emacs パッケージを指定しています。
+- [[(6)]] [[https://github.com/emacs-twist/org-babel][emacs-twist/org-babel]] で設定ファイルを配置しています。
+
+** =home-manager/programs/emacs/epkgs/default.nix=
+
+これはパッケージのリストを作るだけですね。リストされたパッケージは =load-path= に入ります。
+
+#+BEGIN_SRC nix
+{ pkgs, sources }:
+epkgs:
+let
+  ai = import ./packages/ai { inherit epkgs pkgs sources; };
+  # 略
+in ai ++ awesome ++ buffer ++ client ++ coding ++ cursor ++ dired ++ elfeed
+++ eshell ++ eww ++ exwm ++ file ++ ime ++ language ++ language_specific
+++ monitor ++ org ++ project ++ remote_access ++ themes ++ search ++ window
+#+END_SRC
+
+nixpkgs に無いパッケージは、 =nvfetcher= によりソース指定して =melpaBuild= により Nix 化しています。
+
+#+BEGIN_SRC nix
+{ sources, epkgs }: {
+  rainbow-csv = epkgs.melpaBuild {
+    pname = "rainbow-csv";
+    version = "0.0.1";
+    src = sources.emacs-rainbow-csv.src;
+
+    packageRequires = with epkgs; [ csv-mode ];
+
+    ignoreCompilationError = false;
+  };
+  ## ~~
+}
+#+END_SRC
+
+……ハッ、それだけ？！　すごいエコシステムです。使い方を調べるのは非常に大変だと思いますが、今回は take さんに便乗できて楽できました。今後もフォースペンギンぐらいの歩き方をして行こうかなと……。
+
+* 備考: =nvfetcher= の使い方
+
+[[https://github.com/tacit7/smyx/pull/14][=smyx= への修正]] マージまでの間、 fork を =nvfetcher= 経由で使ってみることにしました。
+
+#+BEGIN_QUOTE
+もちろん =straight= や =elpaca= を使っても良いです。
+#+END_QUOTE
+
+** =source= を作成する
+
+以下の =nvfetcher.toml= にリポジトリの一覧を記載します:
+
+#+CAPTION: =nvfetcher.toml=
+#+BEGIN_SRC toml
+[emacs-smyx]
+src.git = "https://github.com/toyboot4e/smyx"
+src.branch = "master"
+fetch.github = "toyboot4e/smyx"
+#+END_SRC
+
+=nvfetcher= コマンドで =.nix= を生成します:
+
+#+BEGIN_SRC sh
+$ nvfetcher
+# CheckGit
+    url: https://github.com/toyboot4e/smyx
+    branch: master
+Changes:
+emacs-smyx: ∅ → 97a2e1ef2bcffd34e43b1cabad17d317e41258ec
+#+END_SRC
+
+#+BEGIN_SRC sh
+$ ls _sources/
+generated.json  generated.nix
+#+END_SRC
+
+ファイル内容は次の通りです:
+
+#+CAPTION: =_sources/generated.nix=
+#+BEGIN_SRC nix
+# This file was generated by nvfetcher, please do not modify it manually.
+{ fetchgit, fetchurl, fetchFromGitHub, dockerTools }:
+{
+  emacs-smyx = {
+    pname = "emacs-smyx";
+    version = "97a2e1ef2bcffd34e43b1cabad17d317e41258ec";
+    src = fetchFromGitHub {
+      owner = "toyboot4e";
+      repo = "smyx";
+      rev = "97a2e1ef2bcffd34e43b1cabad17d317e41258ec";
+      fetchSubmodules = false;
+      sha256 = "sha256-1UZRtQ74p4xAuB6JXFHMxrNBO9BG6JPRYLvEeCOz5rc=";
+    };
+    date = "2024-09-14";
+  };
+}
+#+END_SRC
+
+** =generated.nix= を読み込みビルドする
+
+=generated.nix= の読み込みには [[https://nixos-and-flakes.thiscute.world/nixpkgs/callpackage][pkgs.callPackage]] が使われています:
+
+#+BEGIN_SRC hs
+let sources = pkgs.callPackage ./_sources/generated.nix { };
+in {
+  # 以降 import の度に `sources` を渡して行く
+}
+#+END_SRC
+
+=extraPackages= は =epkgs.el= で指定することにします:
+
+#+CAPTION: =tbm/default.nix=
+#+BEGIN_SRC nix
+# home-manager の各ユーザ設定ファイルにて
+programs.emacs = {
+  enable = true;
+  package = pkgs.emacsWithPackagesFromUsePackage {
+    config = ../../editor/emacs-leaf/init.org;
+    defaultInitFile = false; # true;
+    package = pkgs.emacs-unstable; # pkgs.emacs-git;
+    alwaysTangle = true;
+    alwaysEnsure = true;
+    extraEmacsPackages import ./epkgs { inherit pkgs sources; }; # (ref:1)
+  };
+};
+#+END_SRC
+
+- [[(1)]] take さんのファイル分割を丸パクリ
+
+Emacs パッケージは =epkgs.melpaBuild= でビルドできます:
+
+#+CAPTION: =tbm/epkgs.nix=
+#+BEGIN_SRC nix
+# emacs packages
+{ pkgs, sources }: epkgs: [
+  # meplaBuild:
+  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/emacs/build-support/melpa.nix
+
+  (epkgs.melpaBuild {
+    # pname = "smyx";
+    pname = "smyx-theme";
+    version = "0.0.1";
+    src = sources.emacs-smyx.src;
+    # packageRequires = with epkgs; [];
+    # files = ["smyx-theme.el"];
+    ignoreCompilationError = false;
+  })
+]
+#+END_SRC
+
+=nixos-rebuild= して完成です:
+
+#+BEGIN_SRC sh
+$ git add _sources
+$ git add epkgs.nix
+$ sudo nixos-rebuild --flake .#tbm switch
+#+END_SRC
+
+* まとめ
+
+[[https://github.com/nix-community/emacs-overlay][emacs-overlay]] により一挙に Emacs の Nix 化ができることが分かりました。
+
+- [[https://github.com/nix-community/emacs-overlay][emacs-overlay]] がすごい
+  - =use-package= や =leaf= ユーザは自動的に Nix に移行できる (=emacsWithPackagesFromUsePackage=)
+  - Nix 化しないパッケージは、今までどおり =elpa/= や =straight/= に入れてしまえば良い
+- nixpkgs がすごい
+  - elpa や melpa に登録されていない Emacs パッケージも nixpkgs にはある
+  - =melpaBuild= で大抵のパッケージを自分で取り込める
+- [[https://github.com/berberman/nvfetcher][nvfetcher]] が便利
+  - 依存リポジトリの一覧を管理し、一括でバージョンを更新できる
+
+** 課題
+
+- 外部コマンドに依存するパッケージをビルドする方法を知りたい
+  たとえば =straight= は =git= に依存するため、単純な =melpaBuild= ではビルドできないようです (?)
+- パッケージを Pin できているのかイマイチ分からない
+  =emacs-overlay= のバージョン = 依存パッケージ全体のバージョンだと思って良い？
+

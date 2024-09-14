@@ -1,0 +1,42 @@
+#+TITLE: =org-mode= 製ブログの改良 (3): callouts
+#+DATE: <2024-09-15 Sun>
+
+* 機能追加
+
+久しぶりに =org-mode= 製ブログを改良しました。
+
+** Callouts
+
+AsciiDoc でお馴染みの [[https://docs.asciidoctor.org/asciidoc/latest/verbatim/callouts/][callouts]] を org-mode の [[https://emacs.stackexchange.com/a/60795][coderef]] と呼ばれる機能で再現しました。
+
+*** 例
+
+#+BEGIN_SRC nix
+{
+  inputs = { # (ref:1)
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
+  };
+  outputs = { self, nixpkgs, home-manager, org-babel, emacs-overlay, ... }: {
+      nixosConfigurations = (import ./hosts/tbm { # (ref:2)
+      nixosConfigurations = (import ./hosts/tbm {nixosConfigurations = (import ./hosts/tbm { # (ref:2)
+        inherit self nixpkgs home-manager;
+      });
+    };
+}
+#+END_SRC
+
+- [[(1)]] =(ref:1)= の形でコード中に coderef (callout) を書きます
+- [[(2)]] ← のように =[[(2)]]= といった形で参照できます
+- マウスホバー時に JS によってハイライトします
+
+*** 実装
+
+- =ox-html= の HTML 変換関数を上書きして頑張ります。
+- [[https://github.com/emacs-mirror/emacs/blob/691f441717e968b1a497ed5d7792dbbe02cba609/lisp/org/ox-html.el#L249][org-html-scripts]] に =<script>= タグの埋め込みがあるため、コピーします (マウスホバー処理) 。
+- ユニークな ID 作成のため、何番目の codeblock を処理中かグローバル変数で記録しました。
+
+** 記事のソートを降順に変更
+
+最新記事が一番上に表示されるようにしました。
+
