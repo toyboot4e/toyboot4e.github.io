@@ -316,8 +316,8 @@ wrapped in code elements."
              (if (not ref) loc
                  ;; REMARK(toyboot): added a wrapper `span' with `href', adding mouseover/click to `jump-href-*'.
                  (let* ((coderef (format "coderef-%d-%s" my-codeblock-counter ref))
-                        (in (format "onmouseover=\"CodeHighlightOn(this,'jump-');\"" coderef))
-                        (out (format "onmouseout=\"CodeHighlightOff(this,'jump-');\"" coderef))
+                        (in (format "onmouseover=\"CodeHighlightOn(this,'jump-%s');\"" coderef))
+                        (out (format "onmouseout=\"CodeHighlightOff(this,'jump-%s');\"" coderef))
                         (content (format "<a href=\"#%s\">%s</a>" coderef loc)))
 	                 (format "<span id=\"%s\" %s %s class=\"coderef-off\">%s</span>"
 		                     coderef in out content))))
