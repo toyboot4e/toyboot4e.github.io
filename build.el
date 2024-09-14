@@ -131,7 +131,7 @@
 
         ("static"
          :base-directory "./src"
-         :base-extension "js\\|css\\|png\\|jpg\\|gif"
+         :base-extension "js\\|css\\|png\\|jpg\\|gif\\|mp4"
          :publishing-directory  "./out"
          :recursive t
          :publishing-function org-publish-attachment)))
