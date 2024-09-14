@@ -649,9 +649,25 @@ generated.json  generated.nix
 }
 </code></pre>
       </div>
-      <h3 id="source を読み込みビルドする">
-        <a href="#source を読み込みビルドする"><code>source</code> を読み込みビルドする</a>
+      <h3 id="generated.nix を読み込みビルドする">
+        <a href="#generated.nix を読み込みビルドする"
+          ><code>generated.nix</code> を読み込みビルドする</a
+        >
       </h3>
+      <p>
+        <code>generated.nix</code> の読み込みには
+        <a href="https://nixos-and-flakes.thiscute.world/nixpkgs/callpackage">pkgs.callPackage</a>
+        が使われています:<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">let sources = pkgs.callPackage ./_sources/generated.nix { };
+in {
+  # 以降 import の度に `sources` を渡して行く
+}
+</code></pre>
+      </div>
+
       <p><code>extraPackages</code> を <code>epkgs.el</code> で指定することにします:<br /></p>
 
       <div class="org-src-container">
@@ -667,7 +683,7 @@ programs.emacs = {
     package = pkgs.emacs-unstable; # pkgs.emacs-git;
     alwaysTangle = true;
     alwaysEnsure = true;
-<span id="coderef-12-1" onmouseover="CodeHighlightOn(this,'jump-coderef-12-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-12-1');" class="coderef-off"><a href="#coderef-12-1">    extraEmacsPackages import ./epkgs { inherit pkgs sources; }; # <span class="coderef-anchor">1</span></a></span>
+<span id="coderef-13-1" onmouseover="CodeHighlightOn(this,'jump-coderef-13-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-13-1');" class="coderef-off"><a href="#coderef-13-1">    extraEmacsPackages import ./epkgs { inherit pkgs sources; }; # <span class="coderef-anchor">1</span></a></span>
   };
 };
 </code></pre>
@@ -676,11 +692,11 @@ programs.emacs = {
       <ul>
         <li>
           <a
-            href="#coderef-12-1"
-            id="jump-coderef-12-1"
+            href="#coderef-13-1"
+            id="jump-coderef-13-1"
             class="coderef"
-            onmouseover="CodeHighlightOn(this,'coderef-12-1');"
-            onmouseout="CodeHighlightOff(this, 'coderef-12-1');"
+            onmouseover="CodeHighlightOn(this,'coderef-13-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-13-1');"
             ><span class="coderef-anchor">1</span></a
           >
           take さんのファイル分割を丸パクリ<br />
