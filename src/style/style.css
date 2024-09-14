@@ -137,10 +137,10 @@ div.WARNING {
 
 span.code-highlighted {
     display: inline-block;
-    width: 100%;
+    min-width: 100%;
 }
 
 .code-highlighted {
-    background: hsla(60, 30%, 50%,.25);
+    background: hsla(60, 30%, 50%,.50);
 }
 
