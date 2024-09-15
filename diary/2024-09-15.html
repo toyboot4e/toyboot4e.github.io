@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 371, AHC 037 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 371, AHC 037</h1>
+      <p>Sep 15, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 371"><a href="#ABC 371">ABC 371</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/abc371">ABC 371</a> に参加しました。 B → A → D → E → C
+        の順に解くことになった危険な回でした。<br />
+      </p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">予想</td>
+            <td class="org-right">100</td>
+            <td class="org-right">300</td>
+            <td class="org-right">700</td>
+            <td class="org-left">1,100</td>
+            <td class="org-left">1,200</td>
+            <td class="org-left">1,700</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際</td>
+            <td class="org-right">34</td>
+            <td class="org-right">40</td>
+            <td class="org-right">408</td>
+            <td class="org-left">886</td>
+            <td class="org-left">981</td>
+            <td class="org-left">2152</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc371/tasks/abc371_a">A 問題</a></a>
+      </h3>
+      <p>
+        A, B, C の大小関係が与えられたとき、真ん中の要素がどれか答えよ。 6
+        パターンを網羅しました。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+solve = do
+  ss &lt;- words . BS.unpack &lt;$&gt; line'
+
+  printBSB . ("ABC" !!) $ case ss of
+    -- a -&gt; b -&gt; c
+    ["&lt;", _, "&lt;"] -&gt; 1
+    -- a -&gt; c -&gt; b
+    [_, "&lt;", "&gt;"] -&gt; 2
+    -- b -&gt; c -&gt; a
+    [_, "&gt;", "&lt;"] -&gt; 2
+    -- b -&gt; a -&gt; c
+    ["&gt;", "&lt;", _] -&gt; 0
+    -- c -&gt; a -&gt; b
+    ["&lt;", "&gt;", _] -&gt; 0
+    -- c -&gt; b -&gt; a
+    ["&gt;", _, "&gt;"] -&gt; 1
+</code></pre>
+      </div>
+
+      <p>
+        Prolog を試しましたが、入力処理が無限ループして EoF
+        エラーになりました。まったく糸口の掴めない言語です。<br />
+      </p>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc371/tasks/abc371_b">B 問題</a></a>
+      </h3>
+      <p>
+        それぞれの村で最初に生まれた男児を判定せよ。村ごとに最初に生まれた男児を記録してから、答えを計算します。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !m) &lt;- ints2'
+  abs &lt;- U.replicateM m ((,) &lt;$&gt; int' &lt;*&gt; char')
+  let !initials = U.update (U.replicate n (maxBound @Int))
+        . U.reverse
+        $ U.imapMaybe (\i (!a, !b) -&gt; if b == 'M' then Just (a - 1, i) else Nothing) abs
+  let !res = U.imap (\i (!a, !_) -&gt; initials G.! (a - 1) == i) abs
+  U.forM_ res printYn
+</code></pre>
+      </div>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc371/tasks/abc371_c">C 問題</a></a>
+      </h3>
+      <p>
+        グラフ G をグラフ H と『同型』にするための最小コストを求めよ。 G, H の頂点の対応 (順列)
+        を全探索して答えます。<br />
+      </p>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc371/tasks/abc371_d">D 問題</a></a>
+      </h3>
+      <p>
+        座標圧縮して累積和を取得する典型問題です。累積和を半開区間で取得することにすると、実装が非常に簡単です。しかし僕は常に閉区間を使っています。したがって下の図のように
+        ← 方向の 2 分探索も必要で詰まりました。<br />
+      </p>
+
+      <figure><img src="./img/2024-09-15-bisect.png" alt="2024-09-15-bisect.png" /><br /></figure>
+
+      <p>
+        今のところ閉区間で得した経験は皆無です。めぐる式 (?) を採用したので、右から左へ伸ばす 2
+        分探索も <em>やや</em> 直感的になりました。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">let solve l r
+      | l' == -1 || r' == -1 = 0
+      | otherwise = csum +! (l', r')
+      where
+        !_ = dbg ((l, r), (l', r'))
+        l' = fromMaybe (-1) $ bisectR 0 (G.length dict - 1) $ \i -&gt; dict G.! i &lt; l
+        r' = fromMaybe (-1) $ bisectR (G.length dict - 1) 0 $ \i -&gt; r &lt; dict G.! i
+
+let !res = U.map (\(!l, !r) -&gt; solve l r) qs
+putBSB $ unlinesBSB res
+</code></pre>
+      </div>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc371/tasks/abc371_e">E 問題</a></a>
+      </h3>
+      <p>
+        数列 \(\{A_i\}_i\) に対して各 \([l, r] (l \le r)\)
+        区間中の要素数の和を求めよ。愚直に計算すると \([l, r]\) 区間の取り方が \(\frac {N (N + 1)}
+        {2}\) 通りであり、区間ごとの要素数のカウントにも \(N\)
+        回程度の計算が必要です。高速化を目指します。<br />
+      </p>
+
+      <p>
+        区間の大きさを広げていくとき、集合の要素数は単調増加します。また要素数への寄与は、集合の要素毎に独立して計算できます。値ごとに集合に含まれない場合の数を高速
+        (合計 \(N\) 回程度) で計算できることが分かり、全事象から余事象を引いて \(O(N)\)
+        で解けます。<br />
+      </p>
+
+      <p>
+        実装は
+        <a href="https://atcoder.jp/contests/abc371/submissions/57777116"
+          >cojna さんの <code>zipWith</code> を使った提出</a
+        >
+        が良かったです。けっこう難しい問題だと思いましたが、主客転倒の問題としては基礎的な方だったかもしれません。<br />
+      </p>
+      <h2 id="AHC 037 (短期コン)"><a href="#AHC 037 (短期コン)">AHC 037 (短期コン)</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/ahc037">AHC 037</a>
+        に参加しました。頂点を追加して最小コストの全域木を作れ。ただし辺で繋がれた 2 頂点の関係は
+        \(x_1 < x_2\) かつ \(y_1 < y_2\) に限る。といった問題でした。<br />
+      </p>
+
+      <p>
+        頂点を y, x
+        の順でソートすると、ナップサック問題の要領で最小コストを計算できます。後はランダムに頂点を追加し、スコアが上昇する場合は採用としました。<br />
+      </p>
+
+      <figure>
+        <img src="./img/2024-09-15-ahc037.gif" alt="2024-09-15-ahc037.gif" /><br />
+
+        <figcaption><span class="figure-number">Figure 1: </span>ビジュアライザ (GIF)</figcaption>
+      </figure>
+
+      <p>
+        ランダムな方法では 9
+        割方スコアが減少するようで、僅かな頂点しか追加できませんでした。貪欲解に頂点を追加する方法があるようなので、解説放送見るなどして
+        upsolve したいです。<br />
+      </p>
+
+      <p>gksato さんの提出が相当なハイスコアでした。理解したいです。<br /></p>
+
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          <a href="https://twitter.com/hashtag/AtCoder?src=hash&amp;ref_src=twsrc%5Etfw"
+            >#AtCoder</a
+          >
+          <a href="https://twitter.com/hashtag/AHC037?src=hash&amp;ref_src=twsrc%5Etfw">#AHC037</a>
+          with Haskell<br />score 5,388,249,433 (rank 23)<br /><br />焼きなましとか何もわからなかったので、「binary
+          tree(正確には、入力に含まれず(0,0)でもない飲み物の頂点は次数が3である)として良い」ことを使ってただ葉から貪欲をして、それをただ1回提出しました。結果に驚いています。
+        </p>
+        &mdash; 符号/gksato (@Fine_sugar_hill)
+        <a href="https://twitter.com/Fine_sugar_hill/status/1835323029926351270?ref_src=twsrc%5Etfw"
+          >September 15, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <ul>
+        <li>
+          PAST (リアルタイム受験)<br />
+          見送りました。<br />
+        </li>
+
+        <li>
+          Libary Checker<br />
+          そろそろ再開したいと思います。憧れの link/cut tree
+          がまったく理解できないので、写経するところからです。<br />
+        </li>
+
+        <li>
+          <code>fcitx5-mozc</code> メモ (NixOS)<br />
+          <ul>
+            <li>
+              <p>
+                <code>mozc_tool</code> の場所<br />
+                <code>/run/current-system/sw/bin</code> から消えていました。本来は
+                <code>.desktop</code>
+                ファイルが作られるべきですから、コントリビュートチャンスでしょうか。
+                <code>home-manager</code> も確認が必要です。<br />
+              </p>
+              <div class="org-src-container">
+                <pre><code class="src language-hs">    $ nix eval nixpkgs#fcitx5-mozc.outPath
+    "/nix/store/7iwjmjfvbwc1q8qgfh9ban5xzq5rjmjj-fcitx5-mozc-2.26.4220.102"
+    $ /nix/store/7iwjmjfvbwc1q8qgfh9ban5xzq5rjmjj-fcitx5-mozc-2.26.4220.102/lib/mozc/mozc_tool --mode=config_dialog
+</code></pre>
+              </div>
+            </li>
+            <li>
+              IME の ON/OFF で日本語・英語を切り替える<br />
+              キーバインドからToggle Alpha なんとかを消しました。<br />
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
