@@ -238,6 +238,7 @@ putBSB $ unlinesBSB res
       </blockquote>
       <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="競プロ"><a href="#競プロ">競プロ</a></h3>
       <ul>
         <li>
           PAST (リアルタイム受験)<br />
@@ -247,32 +248,80 @@ putBSB $ unlinesBSB res
         <li>
           Libary Checker<br />
           そろそろ再開したいと思います。憧れの link/cut tree
-          がまったく理解できないので、写経するところからです。<br />
+          がまったく理解できないので、写経から始めます。<br />
         </li>
+      </ul>
+      <h3 id="ブログ"><a href="#ブログ">ブログ</a></h3>
+      <p>
+        AsciDoc で言うところの
+        <a href="https://docs.asciidoctor.org/asciidoc/latest/verbatim/callouts/"
+          ><span class="underline">callouts</span></a
+        >
+        を org-mode 上で再現しました。<br />
+      </p>
 
+      <div class="org-src-container">
+        <pre><code class="src language-nix">{
+<span id="coderef-4-1" onmouseover="CodeHighlightOn(this,'jump-coderef-4-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-4-1');" class="coderef-off"><a href="#coderef-4-1">  inputs = { # <span class="coderef-anchor">1</span></a></span>
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
+  };
+  outputs = { self, nixpkgs, home-manager, org-babel, emacs-overlay, ... }: {
+<span id="coderef-4-2" onmouseover="CodeHighlightOn(this,'jump-coderef-4-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-4-2');" class="coderef-off"><a href="#coderef-4-2">      nixosConfigurations = (import ./hosts/tbm { # <span class="coderef-anchor">2</span></a></span>
+        inherit self nixpkgs home-manager;
+      });
+    };
+}
+</code></pre>
+      </div>
+
+      <ul>
         <li>
-          <code>fcitx5-mozc</code> メモ (NixOS)<br />
-          <ul>
-            <li>
-              <p>
-                <code>mozc_tool</code> の場所<br />
-                <code>/run/current-system/sw/bin</code> から消えていました。本来は
-                <code>.desktop</code>
-                ファイルが作られるべきですから、コントリビュートチャンスでしょうか。
-                <code>home-manager</code> も確認が必要です。<br />
-              </p>
-              <div class="org-src-container">
-                <pre><code class="src language-hs">    $ nix eval nixpkgs#fcitx5-mozc.outPath
+          <a
+            href="#coderef-4-1"
+            id="jump-coderef-4-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-4-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-4-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          <code>(ref:1)</code> の形でコード中に coderef (callout) を書きます<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-4-2"
+            id="jump-coderef-4-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-4-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-4-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          ← のように <code>[[(2)]]</code> といった形で参照できます<br />
+        </li>
+        <li>マウスホバー時に JS によってハイライトします<br /></li>
+      </ul>
+      <h3 id="fcitx5-mozc メモ (NixOS)">
+        <a href="#fcitx5-mozc メモ (NixOS)"><code>fcitx5-mozc</code> メモ (NixOS)</a>
+      </h3>
+      <ul>
+        <li>
+          <p>
+            <code>mozc_tool</code> の場所<br />
+            <code>/run/current-system/sw/bin</code> から消えていました。本来は
+            <code>.desktop</code>
+            ファイルが作られるべきですから、コントリビュートチャンスでしょうか。
+            <code>home-manager</code> も確認が必要です。<br />
+          </p>
+          <div class="org-src-container">
+            <pre><code class="src language-hs">    $ nix eval nixpkgs#fcitx5-mozc.outPath
     "/nix/store/7iwjmjfvbwc1q8qgfh9ban5xzq5rjmjj-fcitx5-mozc-2.26.4220.102"
     $ /nix/store/7iwjmjfvbwc1q8qgfh9ban5xzq5rjmjj-fcitx5-mozc-2.26.4220.102/lib/mozc/mozc_tool --mode=config_dialog
 </code></pre>
-              </div>
-            </li>
-            <li>
-              IME の ON/OFF で日本語・英語を切り替える<br />
-              キーバインドからToggle Alpha なんとかを消しました。<br />
-            </li>
-          </ul>
+          </div>
+        </li>
+        <li>
+          IME の ON/OFF で日本語・英語を切り替える<br />
+          キーバインドからToggle Alpha なんとかを消しました。<br />
         </li>
       </ul>
     </main>
