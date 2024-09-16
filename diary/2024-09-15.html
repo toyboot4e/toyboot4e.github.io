@@ -47,9 +47,7 @@
 
           <col class="org-right" />
 
-          <col class="org-left" />
-
-          <col class="org-left" />
+          <col class="org-right" />
 
           <col class="org-left" />
         </colgroup>
@@ -59,30 +57,27 @@
             <th scope="col" class="org-right">A 問題</th>
             <th scope="col" class="org-right">B 問題</th>
             <th scope="col" class="org-right">C 問題</th>
-            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-right">D 問題</th>
             <th scope="col" class="org-left">E 問題</th>
-            <th scope="col" class="org-left">F 問題</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td class="org-left">予想</td>
             <td class="org-right">100</td>
-            <td class="org-right">300</td>
+            <td class="org-right">100</td>
             <td class="org-right">700</td>
-            <td class="org-left">1,100</td>
-            <td class="org-left">1,200</td>
-            <td class="org-left">1,700</td>
+            <td class="org-right">600</td>
+            <td class="org-left">1,300</td>
           </tr>
 
           <tr>
             <td class="org-left">実際</td>
             <td class="org-right">34</td>
-            <td class="org-right">40</td>
+            <td class="org-right">21</td>
+            <td class="org-right">849</td>
             <td class="org-right">408</td>
-            <td class="org-left">886</td>
-            <td class="org-left">981</td>
-            <td class="org-left">2152</td>
+            <td class="org-left">987</td>
           </tr>
         </tbody>
       </table>
@@ -149,7 +144,7 @@ solve = do
         <a href="#D 問題"><a href="https://atcoder.jp/contests/abc371/tasks/abc371_d">D 問題</a></a>
       </h3>
       <p>
-        座標圧縮して累積和を取得する典型問題です。累積和を半開区間で取得することにすると、実装が非常に簡単です。しかし僕は常に閉区間を使っています。したがって下の図のように
+        座標圧縮して累積和を取得する典型問題です。累積和を半開区間で取得することにすると、実装が楽です。しかし僕は常に閉区間を使っています。したがって下の図のように
         ← 方向の 2 分探索も必要で詰まりました。<br />
       </p>
 
