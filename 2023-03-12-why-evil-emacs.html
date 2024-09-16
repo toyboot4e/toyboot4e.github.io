@@ -27,14 +27,18 @@
     </header>
     <main role="main">
       <h2 id="背景"><a href="#背景">背景</a></h2>
-      <p>僕はエディタに拘りがありません。 Vim キーバインドさえあれば何でも良いのです。<br /></p>
+      <p>
+        Vim バインドはキーボード操作のメインストリームです。ブラウザ、 CLI
+        アプリ、もちろんテキストエディタも Vim バインドで操作できます。<br />
+      </p>
 
       <p>
-        しかし Emacs の workflow は一皮剥けている気がします。ここでは『多重化』の観点から僕の Emacs
+        Sublime, VSCode, NeoVim, Emacs など様々なエディタが Vim バインドで操作可能ですが、 Emacs
+        のワークフローは一皮剥けている気がします。ここでは『多重化』の観点から (僕の) Evil Emacs
         を紹介します。<br />
       </p>
-      <h2 id="主な workflow"><a href="#主な workflow">主な workflow</a></h2>
-      <p>僕の環境は多重化に力が入っています。多重化には 3 段階あります。<br /></p>
+      <h2 id="多重化"><a href="#多重化">多重化</a></h2>
+      <p>多重化には 3 段階あります。<br /></p>
 
       <ol>
         <li>画面分割<br /></li>
@@ -42,10 +46,10 @@
         <li>マルチ・マルチタブ<br /></li>
       </ol>
 
-      <p>僕は Emacs をターミナルから起動するので、ターミナルの多重化から説明します。<br /></p>
+      <p>3 段階の多重化は Emacs の中とターミナルの両方で行われます。<br /></p>
       <h3 id="ターミナルの多重化"><a href="#ターミナルの多重化">ターミナルの多重化</a></h3>
       <p>
-        <code>tmux</code> を使うと、ターミナルの画面分割ができます。マルチタブ機能もあります。<br />
+        <code>tmux</code> を使うとターミナルの画面分割ができます。マルチタブ機能もあります。<br />
       </p>
 
       <figure>
@@ -59,7 +63,7 @@
       <p>
         画面下部の <code>ABC</code>, <code>dotfiles</code>,
         <code>ranger</code> というのがタブです。マルチタブを持つ
-        <span class="underline">session</span> も多重化できます。マルチ・マルチタブです。<br />
+        <em>session</em> も多重化できます。マルチ・マルチタブです。<br />
       </p>
 
       <figure>
@@ -71,18 +75,17 @@
         </figcaption>
       </figure>
       <h3 id="Emacs の多重化"><a href="#Emacs の多重化">Emacs の多重化</a></h3>
-      <p>ターミナルの中で Emacs を起動します。 Emacs の中でも画面分割が可能です。<br /></p>
+      <p>Emacs の中でも 3 段階の画面分割が可能です。<br /></p>
 
       <figure>
         <img src="./img/2023-03-windows.png" alt="2023-03-windows.png" /><br />
 
-        <figcaption><span class="figure-number">Figure 3: </span>画面分割</figcaption>
+        <figcaption><span class="figure-number">Figure 3: </span>Emacs の画面分割</figcaption>
       </figure>
 
       <p>
         最上部の <code>config</code>, <code>ABC</code>,
-        <code>Server</code>
-        にお気づきでしょうか。これらがマルチ・マルチタブであり、プロジェクトの切り替えに相当します。<br />
+        <code>Server</code> がマルチ・マルチタブであり、プロジェクトの切り替えに相当します。<br />
       </p>
 
       <p><code>Server</code> タブに切り替えてみました:<br /></p>
@@ -90,12 +93,15 @@
       <figure>
         <img src="./img/2023-03-tabs.png" alt="2023-03-tabs.png" /><br />
 
-        <figcaption><span class="figure-number">Figure 4: </span>マルチ・マルチタブ</figcaption>
+        <figcaption>
+          <span class="figure-number">Figure 4: </span>Emacs のマルチ・マルチタブ
+        </figcaption>
       </figure>
+      <h2 id="Emacs の UI"><a href="#Emacs の UI">Emacs の UI</a></h2>
       <h3 id="Emacs のウィジェット"><a href="#Emacs のウィジェット">Emacs のウィジェット</a></h3>
       <p>
-        サイドバーにはプログラムのアウトラインを表示することもできます。僕はハードコアな環境を求めているわけではなく、リッチで優しい
-        UI が好きです。<br />
+        Emacs
+        でもサイドバーが作れます。サイドバーにはプログラムのアウトラインを表示することもできます。<br />
       </p>
 
       <figure>
@@ -107,9 +113,7 @@
       </figure>
 
       <p>
-        ついでに <code>magit</code> にも触れておきます。 <code>magit</code> と言えば Emacs の killer
-        feature です。 <code>git add</code> を始め、 <code>rebase</code>, <code>squash</code> /
-        <code>fixup</code> のような複雑な操作も比較的簡単にガイドしてくれます。<br />
+        <code>magit</code> も紹介します。 Git の複雑な操作も丁寧にガイドしてくれる相棒です。<br />
       </p>
 
       <figure>
@@ -120,7 +124,7 @@
         </figcaption>
       </figure>
       <h3 id="Emacs における検索"><a href="#Emacs における検索">Emacs における検索</a></h3>
-      <p>ファジー検索とプレビュー機能も欠かせません。 Emacs もこうした機能は得意です。<br /></p>
+      <p>ファジー検索は開発に書かせません。これも Emacs の得意技です。<br /></p>
 
       <figure>
         <img src="./img/2023-03-find-file.png" alt="2023-03-find-file.png" /><br />
@@ -137,13 +141,9 @@
       </figure>
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
-        僕はエディタの表面的な部分に関心があったので、結果的に Emacs に流れました。 Emacs は
-        <code>Notepad++++++++++++++</code> として使っています。<br />
-      </p>
-
-      <p>
-        なぜ他のエディタを使わないのか聞かれたときは、上記のような多重化機能が他のエディタには無い
-        (と認識している) からと答えるつもりです。<br />
+        Emacs は UI のリッチなエディタです。他のエディタで Emacs
+        に匹敵する多重化機能を持つもの無いと思います。 Magit を始めとした豊富な画面も魅力で、 Emacs
+        が実際に強力なため使用している点が伝われば幸いです。<br />
       </p>
     </main>
     <footer role="contentinfo">
