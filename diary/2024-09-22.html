@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 372, スライド最小値、 Link/cut tree (1) - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 372, スライド最小値、 Link/cut tree (1)</h1>
+      <p>Sep 22, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 372"><a href="#ABC 372">ABC 372</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc372">ABC 372</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">提出</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-left">AC</td>
+            <td class="org-left">AC</td>
+            <td class="org-left">-</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">Diff 予想</td>
+            <td class="org-right">1</td>
+            <td class="org-right">300</td>
+            <td class="org-right">400</td>
+            <td class="org-left">1,200</td>
+            <td class="org-left">1,200</td>
+            <td class="org-left">1,600</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">Diff 実際</td>
+            <td class="org-right">12</td>
+            <td class="org-right">131</td>
+            <td class="org-right">341</td>
+            <td class="org-left">901</td>
+            <td class="org-left">1,042</td>
+            <td class="org-left">1,722</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc372/tasks/abc372_a">A 問題</a></a>
+      </h3>
+      <p><code>.</code> を除外せよ。 <code>filter</code> します。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$filter(/='.')
+</code></pre>
+      </div>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc372/tasks/abc372_b">B 問題</a></a>
+      </h3>
+      <p>
+        \(M\) をなるべく少ない数の \(3^{A_i}\) に分解せよ。大きな \(3^{A_i}\)
+        から順に割っていきます。<br />
+      </p>
+
+      <p>再帰を使いました。 <code>concatMapM</code> があれば良かったのですが。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">eat :: Int -&gt; [Int] -&gt; [Int]
+eat = inner
+  where
+    inner 0 _ = []
+    inner x (i : is)
+      | y &gt; x = inner x is
+      | otherwise = replicate q i ++ inner r is
+      where
+        !y = 3 ^ i :: Int
+        (!q, !r) = x `divMod` y
+    inner x y = error $ show (x, y)
+
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !m &lt;- int'
+  let !res = eat m $ revese [0 .. 10]
+  printBSB $ length res
+  printList res
+</code></pre>
+      </div>
+
+      <p>
+        <a href="https://atcoder.jp/contests/abc372/submissions/58001292">cojna さんの提出</a> (91
+        Byte) は素朴なコードですが真似できません。極まっています。<br />
+      </p>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc372/tasks/abc372_c">C 問題</a></a>
+      </h3>
+      <p>
+        文字列 <code>s</code> を書き換えるとき、連続部分列
+        <code>ABC</code> の数を追跡せよ。可変配列を持って愚直に解きました。<br />
+      </p>
+
+      <p><code>MaybeT</code> の使い方を理解しました。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">isABC &lt;- fmap (fromMaybe False) . runMaybeT $ do
+  a &lt;- MaybeT $ UM.readMaybe s i
+  b &lt;- MaybeT $ UM.readMaybe s $ i + 1
+  c &lt;- MaybeT $ UM.readMaybe s $ i + 2
+  return $ [a, b, c] == "ABC"
+</code></pre>
+      </div>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc372/tasks/abc372_d">D 問題</a></a>
+      </h3>
+      <p>
+        ビルの列 \(\{H_i\}_i\) が与えられた時、 \(\forall k \in (i, j), H_k \le H_j\) が成り立つ
+        \(j\) の数を \(i\) ごとに求めよ。原文よりややこしいですね。<br />
+      </p>
+
+      <p>
+        問題文とは逆に、右端のビル <code>j</code> を固定します。 <code>i = j</code> から始めると、
+        <code>(i, j]</code> の区間最大値は
+        <code>i</code> を左へ動かすごとに単調減少します。したがって <code>j</code> 毎の
+        <code>i</code> への寄与は区間加算となり、 Imos 法で計算できます。<br />
+      </p>
+      <h4 id="\(O(N \log^2 N)\) 解 (\(O(N \log N)\) 解)">
+        <a href="#\(O(N \log^2 N)\) 解 (\(O(N \log N)\) 解)"
+          >\(O(N \log^2 N)\) 解 (\(O(N \log N)\) 解)</a
+        >
+      </h4>
+      <p>
+        セグメント木の 2 分探索を使ってしましました。
+        <a href="https://atcoder.jp/contests/abc372/submissions/57980633">301 ms</a>.<br />
+      </p>
+      <h4 id="\(O(N)\) 解"><a href="#\(O(N)\) 解">\(O(N)\) 解</a></h4>
+      <p>
+        スライド最小値で解けると教えてもらいました。
+        <a href="https://atcoder.jp/contests/abc372/submissions/58011675">21 ms</a>.
+        アルゴリズムは後述します。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+solve = do
+  !n &lt;- int'
+  !hs &lt;- intsU'
+
+  let !imos = U.create $ do
+         vec &lt;- UM.replicate n (0 :: Int)
+         -- スライド最小値により、各ビルよりも左のビルであって、
+         -- そのビルよりも高い最寄りのビルを求める
+         let !ls = lookBackHigherIndices hs
+         U.iforM_ ls $ \r l_ -&gt; do
+           let !l = max 0 l_
+           GM.modify vec (+ 1) l
+           GM.modify vec (subtract 1) r
+         return vec
+
+  printVec $ U.scanl1' (+) imos
+</code></pre>
+      </div>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc372/tasks/abc372_e">E 問題</a></a>
+      </h3>
+      <p>
+        \(N\) 頂点 \(0\) 辺のグラフがあり、以下の 2 種類のクエリを処理します。 1. 辺を追加する。 2.
+        頂点 <code>v</code> が属する連続成分の中で
+        <code>k</code> 番目に大きな頂点の番号を求める。<br />
+      </p>
+      <h4 id="TLE 解"><a href="#TLE 解">TLE 解</a></h4>
+      <p>
+        頂点の集合を Union-FInd で管理しつつ、別途頂点番号の集合もマージして行きます。
+        <code>Set</code> を使えば
+        <strong>マージテクによりマージが償却 \(O(\log N)\) になる気がしていました</strong> が、 TLE
+        しました。どうして……。<br />
+      </p>
+      <h4 id="AC 解 (制約を活かす)"><a href="#AC 解 (制約を活かす)">AC 解 (制約を活かす)</a></h4>
+      <p>
+        実は集合のサイズは <code>10</code> まで持てば良い制約でした。
+        <code>Set (Down Int)</code> を持って <code>take 10</code> すれば TLE 解が高速になります。<br />
+      </p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc372/tasks/abc372_f">F 問題</a></a>
+      </h3>
+      <p>これは面白いですね。ムキーッ<br /></p>
+      <h2 id="スライド最小値"><a href="#スライド最小値">スライド最小値</a></h2>
+      <p>
+        私はスライド最小値のアルゴリズムを思い出すため、写経ライブラリを覗き込みました。それには虫が付いていました。私は悲しいです。<br />
+      </p>
+      <h3 id="参照"><a href="#参照">参照</a></h3>
+      <p>
+        元ネタはこちら:
+        <a href="https://qiita.com/kuuso1/items/318d42cd089a49eeb332"
+          >スライド最大（最小）値・ヒストグラム内最大長方形問題を俯瞰する</a
+        >
+        。写経して理解しました。ありがとうございます！<br />
+      </p>
+
+      <p>以降は完全に焼き直しです。<br /></p>
+      <h3 id="(1) 固定幅の窓で見るスライド最小値">
+        <a href="#(1) 固定幅の窓で見るスライド最小値">(1) 固定幅の窓で見るスライド最小値</a>
+      </h3>
+      <h4 id="概要"><a href="#概要">概要</a></h4>
+      <p>
+        数列 <code>xs</code> を幅 <code>k</code> の窓で見た時に、それぞれの窓の中の最小値 (の添字)
+        を \(O(N)\) で求めます:<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-txt">indices: 0 1 2 3 4 5  |
+values:  5 1 2 4 0 3  | min value indices
+----------------------+-----------------------------
+        [--*--]       | 1
+          [*----]     | 1
+            [----*]   | 4
+              [--*--] | 4
+</code></pre>
+      </div>
+      <h4 id="操作"><a href="#操作">操作</a></h4>
+      <p>
+        窓 <code>[---]</code> と合わせて deque を持ち、窓を動かす度に以下の処理を実施します:<br />
+      </p>
+
+      <ol>
+        <li>窓の左側に出た値 (の添字) は捨てる<br /></li>
+        <li>
+          窓の右端の値 \(\ge\) (\(\gt\)) 新しく追加する値 \(\Rightarrow\) 捨てる (繰り返す)<br />
+          言い換えると <code>(a, Down Int)</code> の広義 (狭義) 単調性を保つように deque
+          を更新します。<br />
+        </li>
+      </ol>
+
+      <p>これにより deque の左端の値が常に窓の中の最小値 (の添字) を表します。頭良いです。<br /></p>
+      <h4 id="例"><a href="#例">例</a></h4>
+      <p>
+        以下の例では窓と合わせて deque (<code>&lt;i1 i2 ..&gt;</code>)
+        を管理してスライド最小値を計算します。 Deque の中の左端の値が窓の中の最小値です。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-txt">indices: 0 1 2 3 4 5 |
+values:  5 1 2 4 0 3 | max value indices:
+----------------------+-----------------------------
+        [--*--]      | 1
+        &lt;  1 2&gt;      |
+          [*----]    | 1
+          &lt;1 2 3&gt;    |
+            [----*]  | 4
+            &lt;    4&gt;  |
+              [--*--]| 4
+              &lt;  4 5&gt;|
+</code></pre>
+      </div>
+
+      <p>もう少し分かりやすい図を……募集しています。<br /></p>
+      <h3 id="(2) ヒストグラム問題"><a href="#(2) ヒストグラム問題">(2) ヒストグラム問題</a></h3>
+      <p>
+        固定幅の窓で見るスライド最小値を改造します。前述の操作 <code>1.</code> を削除し、 deque
+        の末尾にある値を読むことにすると、各ビル
+        <code>i</code> よりも高い最寄りのビルが分かります。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">-- | \(O(N)\) Solution to the histogram problem. Find the nearest higher building for each @i@..
+--
+-- @
+-- index:  -1  0   1   2   3   4
+-- height: --  1   5   2   4   3
+--           &lt;---- |
+--                 | &lt;---- |
+--                 |       | &lt;-|
+--                 | &lt;-|   |   |
+--           &lt;-|   |   |   |   |
+-- look back: -1  -1   1   1   3
+-- @
+lookBackHigherIndices :: U.Vector Int -&gt; U.Vector Int
+</code></pre>
+      </div>
+
+      <p>これで今回の ABC 372 - D も一発撃墜です。頭良い！<br /></p>
+      <h3 id="Q & A"><a href="#Q & A">Q &amp; A</a></h3>
+      <ul>
+        <li>
+          Q. セグメント木で OK ですか？<br />
+          A. セグメント木で OK です<br />
+        </li>
+      </ul>
+      <h2 id="Link/cut tree (1)"><a href="#Link/cut tree (1)">Link/cut tree (1)</a></h2>
+      <p>
+        Link/cut tree は憧れのデータ構造でした。
+        <a href="https://judge.yosupo.jp/">Library Checker</a> で大活躍します。
+        <a href="https://judge.yosupo.jp/submission/237053">1 問解けた</a>
+        ので、取り急ぎ教材だけメモします。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a href="https://en.wikipedia.org/wiki/Link/cut_tree">Link/cut tree - Wikipedia</a><br />
+          木を列 (preferred path) に分け、それぞれの列を splay tree に載せます。列同士は (preferred)
+          path-parent と呼ばれる一方向の辺で繋ぎます。<br />
+        </li>
+        <li>
+          <a href="https://hackmd.io/@CharlieChuang/By-UlEPFS#LinkCut-Tree"
+            >Lecture 5 - Splay Tree, Link/Cut Tree and ET-Tree</a
+          ><br />
+          Wiki の内容を図で詳細に説明してくれています。<br />
+        </li>
+        <li>
+          <a href="https://www.slideshare.net/slideshow/2-12188845/12188845"
+            >プログラミングコンテストでのデータ構造 2　～動的木編～ | PPT</a
+          ><br />
+          さっと見ました。<br />
+        </li>
+      </ul>
+
+      <p>
+        後は maspy さんの
+        <a href="https://maspypy.github.io/library/graph/ds/link_cut_tree.hpp"
+          >graph/ds/link_cut_tree.hpp</a
+        >
+        を写経すれば分かってきました。 Wiki とは言葉遣いがやや異なります。<br />
+      </p>
+
+      <table>
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">Wiki</th>
+            <th scope="col" class="org-left">maspy さんのライブラリ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">Preferred path</td>
+            <td class="org-left">Heavy path</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">Path-parent</td>
+            <td class="org-left">Light edge</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">Access</td>
+            <td class="org-left">Expose</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Top tree? も意外と簡単らしいので、制覇したいです。<br /></p>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="NixOS"><a href="#NixOS">NixOS</a></h3>
+      <ul>
+        <li>
+          Kitty ターミナル上のカーソルサイズ<br />
+          マウスカーソルの大きさの設定が Kitty terminal 上でも反映されるようになりました。最高の OS
+          になって行く！<br />
+        </li>
+
+        <li>
+          Suspend 後、復帰しなくなった<br />
+          Linux でありがちなバグですが、デスクトップ機でも発生しました。 3
+          年ぐらい待てばたぶん直る。<br />
+        </li>
+      </ul>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
