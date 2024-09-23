@@ -221,6 +221,26 @@ solve = do
         <strong>マージテクによりマージが償却 \(O(\log N)\) になる気がしていました</strong> が、 TLE
         しました。どうして……。<br />
       </p>
+      <h4 id="追記: TLE 解への修正"><a href="#追記: TLE 解への修正">追記: TLE 解への修正</a></h4>
+      <p>
+        同一集合のマージが \(O(N)\)
+        になっていると指摘を頂きました。完全に盲点！　ありがとうございます！<br />
+      </p>
+
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          しばらく気になっていたんですが、どうももともと２頂点が同一連結成分にすでに属している場合に問題が発生しているような気がします。実際、when
+          (root1 /= root2) $ do を挟むとACしました：
+          <a href="https://t.co/6YrNwypsVV">https://t.co/6YrNwypsVV</a>
+        </p>
+        &mdash; 符号/gksato (@Fine_sugar_hill)
+        <a href="https://twitter.com/Fine_sugar_hill/status/1838189459239780553?ref_src=twsrc%5Etfw"
+          >September 23, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+      <p>類似の問題でも要注意です。<br /></p>
       <h4 id="AC 解 (制約を活かす)"><a href="#AC 解 (制約を活かす)">AC 解 (制約を活かす)</a></h4>
       <p>
         実は集合のサイズは <code>10</code> まで持てば良い制約でした。
