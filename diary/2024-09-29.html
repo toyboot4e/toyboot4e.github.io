@@ -298,8 +298,8 @@ solve = do
           頂点 \(i\) から頂点 \(i + \mathrm{lsb}(i)\) への移動を続けると上手く状態更新できます。<br />
         </li>
         <li>
-          \([1, i]\) の区間和の取得 (<code>prefixSum</code>)<br />
-          頂点 \(i\) から親頂点 \(i - \mathrm{lsb}(i)\) への移動を繰り返して =[1, i]$ の区間和
+          \([1, i)\) の区間和の取得 (<code>prefixSum</code>)<br />
+          頂点 \(i\) から親頂点 \(i - \mathrm{lsb}(i)\) への移動を繰り返して \([1, i)\) の区間和
           (prefix sum) を取得できます。<br />
         </li>
         <li>
