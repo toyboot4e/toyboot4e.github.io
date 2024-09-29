@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 373, Fenwick Tree, ACL 移植開始 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 373, Fenwick Tree, ACL 移植開始</h1>
+      <p>Sep 29, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 373"><a href="#ABC 373">ABC 373</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc373">ABC 373</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">提出</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-left">AC</td>
+            <td class="org-left">-</td>
+            <td class="org-left">AC</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">予想 Diff</td>
+            <td class="org-right">40</td>
+            <td class="org-right">200</td>
+            <td class="org-right">10</td>
+            <td class="org-left">1,000</td>
+            <td class="org-left">1,800</td>
+            <td class="org-left">1,600</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際 Diff</td>
+            <td class="org-right">11</td>
+            <td class="org-right">54</td>
+            <td class="org-right">75</td>
+            <td class="org-left">765</td>
+            <td class="org-left">1,592</td>
+            <td class="org-left">2,018</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc373/tasks/abc373_a">A 問題</a></a>
+      </h3>
+      <p>
+        文字列の列 \(\{s_i\}_i (i \ge 1)\) に対し \(\mathrm{length}\ s_i = i\) である \(i\)
+        の数を求めよ。リスト内包表記で文字数を節約します。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">main=interact$show.f.lines;f x=sum[1|(i,s)&lt;-zip [1..]x,i==length s]
+</code></pre>
+      </div>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc373/tasks/abc373_b">B 問題</a></a>
+      </h3>
+      <p>
+        <code>A, B, .., Z</code> の順列が与えられたとき、 <code>(A, B)</code> 間、
+        <code>(B, C)</code> 間、 .., <code>(Y, Z)</code> 間の距離の和を求めよ。
+        <code>vector</code> 芸でサクっと解けて楽しい問題でした。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+solve = do
+<span id="coderef-2-1" onmouseover="CodeHighlightOn(this,'jump-coderef-2-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-1');" class="coderef-off"><a href="#coderef-2-1">  !s &lt;- U.fromList . map (subtract (ord 'A') . ord) . BS.unpack &lt;$&gt; line' -- # <span class="coderef-anchor">1</span></a></span>
+<span id="coderef-2-2" onmouseover="CodeHighlightOn(this,'jump-coderef-2-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-2');" class="coderef-off"><a href="#coderef-2-2">  let !is = U.update (U.replicate 26 (-1 :: Int)) $ U.imap (flip (,)) s -- # <span class="coderef-anchor">2</span></a></span>
+<span id="coderef-2-3" onmouseover="CodeHighlightOn(this,'jump-coderef-2-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-3');" class="coderef-off"><a href="#coderef-2-3">  let !ds = U.zipWith ((abs.) . (-)) is (U.tail is) -- #(ref:1) -- # <span class="coderef-anchor">3</span></a></span>
+  printBSB $ U.sum ds
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-2-1"
+            id="jump-coderef-2-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          <a href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html#v:ord"
+            >ord</a
+          >
+          関数を活かして英大文字を <code>0, 1, ..</code> に写します。これは (位置 → アルファベット)
+          の数列になっています。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-2-2"
+            id="jump-coderef-2-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          逆に (アルファベット → 位置) の配列を作ります。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-2-3"
+            id="jump-coderef-2-3"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-3');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-3');"
+            ><span class="coderef-anchor">3</span></a
+          >
+          この配列の隣接二項間の差の絶対値の和が答えです。<br />
+        </li>
+      </ul>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc373/tasks/abc373_c">C 問題</a></a>
+      </h3>
+      <p>
+        2 つの数列それぞれの最大値の和を求めよ。
+        <code>maximum</code> のエイリアスを作って文字数を節約しました。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"><span class="listing-number">Listing 1: </span>1,852 ms</label>
+        <pre><code class="src language-hs">main=interact$show.f.map read.words;f(n:x)=m(take n x)+m(drop n x);m=maximum
+</code></pre>
+      </div>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc373/tasks/abc373_d">D 問題</a></a>
+      </h3>
+      <p>
+        頂点間の距離の制約が与えられた時、制約を満たす重みの割り当てを 1 つ求めよ。 WA
+        後、解法を思いつかず重み付き Union-Find に手を出してしまいました。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span
+          >末端の頂点が複数あり、単純なトポロジカルソートでは解けない</label
+        >
+        <pre><code class="src language-txt">      4
+      ^
+      |
+1 --&gt; 2 --&gt; 3
+      ^
+0-----|
+</code></pre>
+      </div>
+
+      <p>
+        より正統的な解法としては、辺 <code>(u, v, w)</code> に対して辺
+        <code>(v, u, -w)</code> を加え、連結成分の重みを DFS
+        で一挙に確定します。順序付きグラフだと思い込むと出てこない発想でした。難しくないですか……？<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-hs">solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !m) &lt;- ints2'
+  !uvws &lt;- U.replicateM m ints110'
+  let !gr = buildWSG n $ (uvws U.++) $ U.map (\(!u, !v, !dw) -&gt; (v, u, -dw)) uvws
+
+  printVec $ U.create $ do
+    res &lt;- UM.replicate n (0 :: Int)
+    done &lt;- UM.replicate n False
+    forM_ [0 .. n - 1] $ \u0 -&gt; do
+      flip fix u0 $ \dfs u -&gt; do
+        unlessM (GM.exchange done u True) $ do
+          w0 &lt;- GM.read res u
+          U.forM_ (gr `adjW` u) $ \(!v, !dw) -&gt; do
+            GM.write res v $! w0 + dw
+            dfs v
+    return res
+</code></pre>
+      </div>
+
+      <p>
+        ちなみに重み付き Union-Find は DFS と同速でした。償却 \(O(\alpha)\), の衝撃の実力！<br />
+      </p>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc373/tasks/abc373_e">E 問題</a></a>
+      </h3>
+      <p>
+        数列 \(\{A_i\}_i\) に \(K\) を分配するとき、 \(i\) 毎に上位 \(M\)
+        に入りが確定するための最小の割り当てを求めよ (同率でも良い) 。未だに解けていません。<br />
+      </p>
+
+      <p>
+        畳み込みできる <code>Map</code> があれば、挿入・削除で楽できるのかなと思いました。
+        <a href="https://qiita.com/NokonoKotlin/items/c108a603622c03c4c67b"
+          >おこていゆさんの得意技</a
+        >
+        です。<br />
+      </p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc373/tasks/abc373_f">F 問題</a></a>
+      </h3>
+      <p>
+        EDPC の Tower を見に行って、近くの問題を見返すと Z - Frog が類題だと思いました。つまり CHT!
+        CHT の式整理を真似ると 2 乗が消えませんでした。ところが \(\{i^2\}_i\) は \(\{0, 1, 4, 9, 16,
+        ..\}\) という形ですから、 \(\{(i+1)^2 - i^2\}_i\) は \(\{1, 3, 5, 7, ..\}\)
+        の等差数列になります。よって 1 ステップ手前を振り返るだけの単純な DP になります。<br />
+      </p>
+
+      <p>
+        \(\mathrm{dp}[i]\) を (重さ → 最大価値) の配列とします。 \(\mathrm{dp}[i]\) と合わせて
+        \(\mathrm{set}[i]\) にて各品物の使用数を記録して AC しました。しかし
+        <strong>よくよく</strong> 考えると <strong>嘘解法</strong> だった気がします。
+        \(\mathrm{dp}[i]\)
+        の候補が複数あるとき、どの品物の使い方が将来的に最適であるか分からないためです。<br />
+      </p>
+
+      <p>嘘解法が無ければ緑パフォでした。残念。<br /></p>
+      <h3 id="G 問題">
+        <a href="#G 問題"
+          ><a href="https://www.youtube.com/watch?v=qXmLBNBKBDA&amp;t=285s">G 問題</a></a
+        >
+      </h3>
+      <p>
+        <a href="https://www.youtube.com/watch?v=qXmLBNBKBDA&amp;t=285s">evima さんの解説</a>
+        を見ると最小費用流で解けそうで
+        <a href="https://www.youtube.com/watch?v=fNpcVEK67EI">ジ・エンド</a>
+        です。ジ・エンド！<br />
+      </p>
+      <h2 id="Fenwick Tree"><a href="#Fenwick Tree">Fenwick Tree</a></h2>
+      <p>
+        Fenwick Tree (Binary Index Tree; BIT) は群の区間和が \(O(\log N)\)
+        で求めるデータ構造です。セグメント木よりも定数倍が良く、盆栽コンテンツとして重要です。<br />
+      </p>
+
+      <p>
+        まだ理解しておらず、詳細は
+        <a href="https://en.wikipedia.org/wiki/Fenwick_tree">Wikipedia</a>
+        の通りとします。図を見れば確かにそうなんですが、 LSB を使った動きがマジック……！<br />
+      </p>
+
+      <ul>
+        <li>Fenwick Tree の頂点数は \(N\) です。<br /></li>
+        <li>\(i\) 番目の頂点は \([i - \mathrm{lsb}(i), i)\) の区間和を持ちます。<br /></li>
+      </ul>
+
+      <p>操作<br /></p>
+
+      <ul>
+        <li>
+          1 点加算 (<code>add</code>)<br />
+          頂点 \(i\) から頂点 \(i + \mathrm{lsb}(i)\) への移動を続けると上手く状態更新できます。<br />
+        </li>
+        <li>
+          \([1, i]\) の区間和の取得 (<code>prefixSum</code>)<br />
+          頂点 \(i\) から親頂点 \(i - \mathrm{lsb}(i)\) への移動を繰り返して =[1, i]$ の区間和
+          (prefix sum) を取得できます。<br />
+        </li>
+        <li>
+          区間取得 (<code>sum</code>)<br />
+          <code>prefixSum</code> の差により求めます。<br />
+        </li>
+      </ul>
+      <h2 id="Haskell"><a href="#Haskell">Haskell</a></h2>
+      <h3 id="Unbox vector に非 boxed なデータ型を保存する">
+        <a href="#Unbox vector に非 boxed なデータ型を保存する"
+          ><code>Unbox</code> vector に非 boxed なデータ型を保存する</a
+        >
+      </h3>
+      <p>
+        Unboxed vector における
+        <a
+          href="https://hackage.haskell.org/package/vector-0.13.1.0/docs/Data-Vector-Unboxed.html#t:Vector"
+          >Vector</a
+        >
+        とはデータ族 (≒ 関連型) であり、効率の良い配列型を返します。 Boxed
+        化された配列型を返しても問題は無く、 <code>newtype Boxed a</code> により boxed vector
+        を割り当てられることにします。なるほど……！<br />
+      </p>
+
+      <p>
+        <a href="https://github.com/haskell/vector/issues/503"
+          >https://github.com/haskell/vector/issues/503</a
+        ><br />
+      </p>
+
+      <p>
+        たとえば cojna さんの
+        <a href="https://cojna.github.io/iota/Data-Buffer.html">Data.Buffer</a>
+        にリッチなコレクションを入れることができるようになるはずです。
+        <a
+          href="https://github.com/toyboot4e/toy-lib/commit/29fe7fe0cdc2dc026730bc5e4e061de36bec2c99"
+          >未検証ですが <code>Boxed</code> 型を導入しました</a
+        >
+        。<br />
+      </p>
+      <h3 id="ac-library を Haskell に移植します">
+        <a href="#ac-library を Haskell に移植します">ac-library を Haskell に移植します</a>
+      </h3>
+      <p>
+        <code>ac-library</code> の移植を始めました:
+        <a href="https://github.com/toyboot4e/ac-library-hs">toyboot4e/ac-library-hs</a>
+        。ワシが作ったと言いたいだけです。放っておいても完成しますが、完成後にさっと目を通してもらえると大変助かります。<br />
+      </p>
+      <h4 id="iota 速すぎ問題">
+        <a href="#iota 速すぎ問題"><code>iota</code> 速すぎ問題</a>
+      </h4>
+      <p>
+        自分で ACL を移植するよりも、
+        <a href="https://github.com/cojna/iota">cojna/iota</a> の縮小版を ACL
+        とした方が高速なライブラリができます。実際、
+        <a href="https://github.com/cojna/iota">cojna/iota</a> はしばしば ACL よりも高速です。 ACL
+        としてはレギュレーション違反と言えなくもないですね (?) 。<br />
+      </p>
+      <h4 id="意図"><a href="#意図">意図</a></h4>
+      <p>
+        このように欲を出すと再現が無く、合意できる線を探るのも困難です。そこで
+        <code>ac-library</code> の写経をベースラインにしようと思います。<br />
+      </p>
+
+      <ul>
+        <li>Yes: 盆栽無しでも問題を解けるようにしよう<br /></li>
+        <li>No: 良いコードを書こう<br /></li>
+        <li>No: みんなで最強の Haskell ライブラリを作ろう<br /></li>
+      </ul>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <ul>
+        <li>
+          Google の言語設定を英語にできない<br />
+          なぜか日本語設定に巻き戻されるようになり厄介です。<br />
+        </li>
+      </ul>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
