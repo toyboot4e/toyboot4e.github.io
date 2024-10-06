@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 374, PrimArray - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 374, PrimArray</h1>
+      <p></p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 374"><a href="#ABC 374">ABC 374</a></h2>
+
+      <h2 id="ABC 374"><a href="#ABC 374">ABC 374</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc374">ABC 374</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-right">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">提出</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-left">AC</td>
+            <td class="org-left">-</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">予想 diff</td>
+            <td class="org-right">10</td>
+            <td class="org-right">100</td>
+            <td class="org-right">400</td>
+            <td class="org-right">800</td>
+            <td class="org-left">1,000</td>
+            <td class="org-left">1,600</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際 diff</td>
+            <td class="org-right">11</td>
+            <td class="org-right">28</td>
+            <td class="org-right">226</td>
+            <td class="org-right">694</td>
+            <td class="org-left">1,504</td>
+            <td class="org-left">2,026</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc374/tasks/abc374_a">A 問題</a></a>
+      </h3>
+      <p>
+        文字列が <code>san</code> で終わるなら <code>Yes</code>, そうでなければ
+        <code>No</code> を印字せよ。改行文字に注意して答えます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">main=interact$y.take 4.reverse;y"\nnas"="Yes";y _="No"
+</code></pre>
+      </div>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc374/tasks/abc374_b">B 問題</a></a>
+      </h3>
+      <p>
+        文字列 <code>s</code>, <code>t</code> が等しいならば
+        <code>0</code> を、異なるならば最初に不一致となる位置を答えよ。<br />
+      </p>
+
+      <p>
+        <a href="https://atcoder.jp/contests/abc374/submissions/58488085">cojna さんの提出</a>
+        を見てみましょう。短過ぎです。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">main=interact$show.f.lines
+<span id="coderef-2-1" onmouseover="CodeHighlightOn(this,'jump-coderef-2-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-1');" class="coderef-off"><a href="#coderef-2-1">f[s,t]=sum[s%t|s/=t] -- <span class="coderef-anchor">1</span></a></span>
+<span id="coderef-2-2" onmouseover="CodeHighlightOn(this,'jump-coderef-2-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-2');" class="coderef-off"><a href="#coderef-2-2">(x:s)%(y:t)|x==y=1+s%t -- <span class="coderef-anchor">2</span></a></span>
+<span id="coderef-2-3" onmouseover="CodeHighlightOn(this,'jump-coderef-2-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-3');" class="coderef-off"><a href="#coderef-2-3">_%_=1 -- <span class="coderef-anchor">3</span></a></span>
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-2-1"
+            id="jump-coderef-2-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          <code>s</code> と <code>t</code> が一致する場合を
+          <code>sum</code> とガードで暗に処理しています。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-2-2"
+            id="jump-coderef-2-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          再帰演算子で文字数を節約しています。<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-2-3"
+            id="jump-coderef-2-3"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-3');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-3');"
+            ><span class="coderef-anchor">3</span></a
+          >
+          エッジケースの処理も万全！<br />
+        </li>
+      </ul>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc374/tasks/abc374_c">C 問題</a></a>
+      </h3>
+      <p>
+        整数列 \(\{K_i\}_i\) を 2
+        つのグループに分けたとき、グループ毎の和を最小化せよ。慣れると反射で書ける問題ですね。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+solve = do
+  !n &lt;- int'
+  !xs &lt;- intsU'
+
+  let !s = U.sum xs
+<span id="coderef-3-1" onmouseover="CodeHighlightOn(this,'jump-coderef-3-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-3-1');" class="coderef-off"><a href="#coderef-3-1">  let candidates = U.generate (bit n) id -- <span class="coderef-anchor">1</span></a></span>
+  let eval bits =
+<span id="coderef-3-2" onmouseover="CodeHighlightOn(this,'jump-coderef-3-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-3-2');" class="coderef-off"><a href="#coderef-3-2">        let is = U.findIndices (testBit bits) $ U.generate n id -- <span class="coderef-anchor">2</span></a></span>
+<span id="coderef-3-3" onmouseover="CodeHighlightOn(this,'jump-coderef-3-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-3-3');" class="coderef-off"><a href="#coderef-3-3">            sum1 = U.sum $ U.backpermute xs is -- <span class="coderef-anchor">3</span></a></span>
+            sum2 = s - sum1
+         in max sum1 sum2
+
+  printBSB . U.minimum $ U.map eval candidates
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-3-1"
+            id="jump-coderef-3-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-3-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-3-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          Bit 全探索<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-3-2"
+            id="jump-coderef-3-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-3-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-3-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          <code
+            >testBit x iBit == (x .&amp;. bit iBit) /= 0 == (x .&amp;. (bit .&gt;&gt;. iBit)) /=
+            0</code
+          ><br />
+          (<a href="https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Bits.html"
+            >Data.Bits</a
+          >)<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-3-3"
+            id="jump-coderef-3-3"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-3-3');"
+            onmouseout="CodeHighlightOff(this, 'coderef-3-3');"
+            ><span class="coderef-anchor">3</span></a
+          >
+          <code>U.backpermute xs is == U.map (xs U.!) is</code><br />
+        </li>
+      </ul>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc374/tasks/abc374_d">D 問題</a></a>
+      </h3>
+      <p>
+        順列と bit mask を全探索せよ。最近ほぼ同じ問題が最近出た覚えが？　順列を固定した上で、 bit
+        mask の適用は DP にするとさらに良しです。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">dist :: Int -&gt; Int -&gt; Int -&gt; Int -&gt; Double
+dist !x1 !y1 !x2 !y2 = sqrt . intToDouble $ (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
+
+solveDP :: [(Int, Int, Int, Int)] -&gt; Double
+solveDP = inner 0.0 0 0
+  where
+    inner :: Double -&gt; Int -&gt; Int -&gt; [(Int, Int, Int, Int)] -&gt; Double
+    inner !acc !_ !_ [] = acc
+    inner !acc !x1 !y1 ((!x2, !y2, !x3, !y3) : rest) =
+      let !cand1 = inner (acc + dist x1 y1 x2 y2) x3 y3 rest
+          !cand2 = inner (acc + dist x1 y1 x3 y3) x2 y2 rest
+<span id="coderef-4-2" onmouseover="CodeHighlightOn(this,'jump-coderef-4-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-4-2');" class="coderef-off"><a href="#coderef-4-2">       in min cand1 cand2 -- <span class="coderef-anchor">2</span></a></span>
+
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !speedM, !speedL) &lt;- ints3'
+  !lines &lt;- U.replicateM n ints4'
+
+  let lengthL = U.sum $ U.map (\(!x1, !y1, !x2, !y2) -&gt; dist x1 y1 x2 y2) lines
+<span id="coderef-4-1" onmouseover="CodeHighlightOn(this,'jump-coderef-4-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-4-1');" class="coderef-off"><a href="#coderef-4-1">  let lengthM = minimum . G.map (solveDP . U.toList) $ lexPerms lines -- <span class="coderef-anchor">1</span></a></span>
+<span id="coderef-4-3" onmouseover="CodeHighlightOn(this,'jump-coderef-4-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-4-3');" class="coderef-off"><a href="#coderef-4-3">  printBSB $ lengthM / intToDouble speedM + lengthL / intToDouble speedL -- <span class="coderef-anchor">3</span></a></span>
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="https://hackage.haskell.org/package/extra-1.7.16/docs/Numeric-Extra.html#v:intToDouble"
+            >intToDouble</a
+          ><br />
+        </li>
+        <li>
+          <a
+            href="#coderef-4-1"
+            id="jump-coderef-4-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-4-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-4-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          <a
+            href="https://github.com/toyboot4e/toy-lib/blob/63e3640e076e443ab976d90e4f5f17c1e10d93d2/src/ToyLib/DP.hs#L258"
+            >lexPerms</a
+          >
+          で順列全探索<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-4-2"
+            id="jump-coderef-4-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-4-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-4-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          辺の向きを両方試して DP します<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-4-3"
+            id="jump-coderef-4-3"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-4-3');"
+            onmouseout="CodeHighlightOff(this, 'coderef-4-3');"
+            ><span class="coderef-anchor">3</span></a
+          >
+          移動 (M) 距離とレーザー (L) の距離に分けて考えます<br />
+        </li>
+      </ul>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc374/tasks/abc374_e">E 問題</a></a>
+      </h3>
+      <p>
+        工程のボトルネックを最大化する機械の購入方法を答えよ。反射で答えると、判定問題で 2
+        分探索ができそうです。<br />
+      </p>
+
+      <p>
+        判定問題では \(ax + by \ge w\) の下で \(px + qy\)
+        を最大化します。基本的に効率の良い機械を購入すれば良いのですが、実は \(w \bmod
+        \mathrm{lcm}(a, b)\) 部分の最適解が分かりません。ここで \(a, b \le 100\)
+        より余りの部分は全探索できます。<br />
+      </p>
+
+      <p>ヤケクソで探索範囲を広げたら通りました。運です。<br /></p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc374/tasks/abc374_f">F 問題</a></a>
+      </h3>
+      <p>
+        DP です。 \(O(M^2 \log M) (M = 10^4)\) 解法は思いつくつもりなのですが……。考えます。<br />
+      </p>
+      <h3 id="Note"><a href="#Note">Note</a></h3>
+      <p>
+        最近は満足の行く実装が書けるようになり、以前ほど人の提出を読まなくなりました。良いのか悪いのか……。
+        Common Lisp, Fortran, OCaml あたりも読んでみたいですが、手つかずのままです。<br />
+      </p>
+      <h2 id="Haskell"><a href="#Haskell">Haskell</a></h2>
+      <h3 id="Data.Primitive.PrimArray はあまり使わない">
+        <a href="#Data.Primitive.PrimArray はあまり使わない"
+          ><a
+            href="https://hackage.haskell.org/package/primitive-0.9.0.0/docs/Data-Primitive-PrimArray.html"
+            >Data.Primitive.PrimArray</a
+          >
+          はあまり使わない</a
+        >
+      </h3>
+      <p>
+        Mutable なデータを <code>IORef</code> に入れると (2 重に) box 化されて重くなります。 Library
+        Checker の問題で 200 - 300 ms 程度影響が出る程度には遅く、絶対に避けたいレベルです。<br />
+      </p>
+
+      <p>
+        代わりに unboxed な <code>MVector</code> にデータを入れることが多いのですが、
+        <a
+          href="https://hackage.haskell.org/package/primitive-0.9.0.0/docs/Data-Primitive-PrimArray.html"
+          >PrimArray</a
+        >
+        の方が速い可能性が出てきました。<br />
+      </p>
+
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          先日「可変な変数を使うのにIORefを使うか1要素Vectorを使うか」みたいな話があったけど、Data.Primitive.PrimArrayにあるMutablePrimArrayの方が2ワードほどメモリ使用量が少ないので良いのかもしれない（検出できる違いは出ないと思うけど）
+        </p>
+        &mdash; mod_poppo (@mod_poppo)
+        <a href="https://twitter.com/mod_poppo/status/1121438040587587584?ref_src=twsrc%5Etfw"
+          >April 25, 2019</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          中身は ByteArray で違いがなさそうなんだけど、Primitive Vector は offset と length
+          の情報を持っている分のメモリのオーバーヘッドあるいはslicing の安価さというのはありそう
+        </p>
+        &mdash; スマートコン (@mr_konn)
+        <a href="https://twitter.com/mr_konn/status/1286243239209480192?ref_src=twsrc%5Etfw"
+          >July 23, 2020</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <h4 id="検証"><a href="#検証">検証</a></h4>
+      <p>
+        雑な検証になりますが、 Library Checker の
+        <a href="https://judge.yosupo.jp/problem/dynamic_sequence_range_affine_range_sum"
+          >Splay Tree の問題 (Dynamic Sequence Range Affine Range Sum)</a
+        >
+        で比較しました。
+        <a
+          href="https://github.com/toyboot4e/toy-lib/commit/4c8929c478c03eb039b81ac202561e007b940e50"
+          >コード差分</a
+        >
+        。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a href="https://judge.yosupo.jp/submission/239843"
+            ><code>MVector</code> 版の提出 (3,565 ms)</a
+          ><br />
+        </li>
+        <li>
+          <a href="https://judge.yosupo.jp/submission/239846"
+            ><code>MutablePrimArray</code> 版の提出 (3,596 ms)</a
+          ><br />
+        </li>
+      </ul>
+
+      <p>誤差レベルで遅くなりました (!?) 。リジャッジすれば結果はひっくり返るかも。<br /></p>
+
+      <p>
+        なお <code>MVector</code> 版で使用していた
+        <a
+          href="https://github.com/haskell/vector/blob/eb605264be1811472b447b57627b2074e63614fe/vector/src/Data/Vector/Generic/Mutable.hs#L735"
+          ><code>unsafeModifyM</code> の実装</a
+        >
+        を見てみると、 <code>stToPrim</code> により型パラメータ <code>m</code> を
+        <code>ST</code> に確定させ最適化しています。とりあえず使う分には
+        <code>MVector</code> の方が無難かもしれません。<br />
+      </p>
+      <h2 id="ACL 移植メモ"><a href="#ACL 移植メモ">ACL 移植メモ</a></h2>
+      <h3 id="Disjoint Set Union (Union-Find Tree)">
+        <a href="#Disjoint Set Union (Union-Find Tree)">Disjoint Set Union (Union-Find Tree)</a>
+      </h3>
+      <p>サクっと移植できました。先行きの良いスタートです。<br /></p>
+      <h3 id="Fenwick Tree (Binary Index Tree)">
+        <a href="#Fenwick Tree (Binary Index Tree)">Fenwick Tree (Binary Index Tree)</a>
+      </h3>
+      <p>添字の動きに戸惑いながら移植しました。群の区間和が取れて定数倍が良いです。<br /></p>
+      <h3 id="Floor sum"><a href="#Floor sum">Floor sum</a></h3>
+      <p>何も分からない。離散化すると周期性が出てくる覚えはあります。完全な写経です。<br /></p>
+      <h3 id="Max flow"><a href="#Max flow">Max flow</a></h3>
+      <h4 id="可変長配列"><a href="#可変長配列">可変長配列</a></h4>
+      <p>
+        可変長配列 (<code>std::vector</code>) に依存しています。
+        <code>VUM.MVector</code> をラップして可変長配列を実装しました。しかし
+        <code>MVector</code> を <code>MutVar</code> の中に入れるため効率は落ちます。<br />
+      </p>
+      <h4 id="Break"><a href="#Break">Break</a></h4>
+      <p>
+        ループの <code>break</code> のため、ループを再帰関数で表現しました。
+        <code>break</code> しなくて済む場合でも、なるべく忠実に実装したいと思います。<br />
+      </p>
+      <h4 id="イテレーションと destructuring">
+        <a href="#イテレーションと destructuring">イテレーションと destructuring</a>
+      </h4>
+      <p>
+        タプルの unboxed vector は
+        <a href="https://en.wikipedia.org/wiki/AoS_and_SoA">SoA (struct of arrays)</a>
+        なので、走査しない配列はスキップした方が速そうな気がしています。速度の比較はしていません。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">(VUM.MV_3 _ vecTo _ vecCap) &lt;- mutableVector
+neighbors &lt;- VU.zip &lt;$&gt; VU.unsafeFreeze vecTo &lt;*&gt; VU.unsafeFreeze vecCap
+VU.forM_ neighbors $ \(!to, !cap) -&gt; do
+  -- ~~
+</code></pre>
+      </div>
+      <h4 id="テスト"><a href="#テスト">テスト</a></h4>
+      <p>
+        ac-library の単体テストの一部を写経しました (<a
+          href="https://github.com/toyboot4e/ac-library-hs/blob/fcb4130e731fbb4314f734badbd5a76d9600e98e/test/Tests/MaxFlow.hs"
+          >Tests/MaxFlow.hs</a
+        >) 。ランダムテストや PBT の方がカバレッジは良さそうです。<br />
+      </p>
+      <h3 id="[WIP] Min cost flow"><a href="#[WIP] Min cost flow">[WIP] Min cost flow</a></h3>
+      <h4 id="CSR (comperssed sparse row)">
+        <a href="#CSR (comperssed sparse row)">CSR (comperssed sparse row)</a>
+      </h4>
+      <p>
+        CSR の抽象が Haskell だと上手く行きません。一部の要素が可変だったり、イテレーションの効率
+        (前述) であったり……。 cojna さんと同様に、 min cost flow 専用の CSR
+        を作るのが良いと思いました。汎用の CSR を作るのは難しそうです。<br />
+      </p>
+      <h4 id="Binary Heap"><a href="#Binary Heap">Binary Heap</a></h4>
+      <p>
+        <a href="https://en.wikipedia.org/wiki/Binary_heap">Binary Heap</a> の実現に
+        <a href="https://cpprefjp.github.io/reference/algorithm/push_heap.html">std::push_heap</a>
+        と
+        <a href="https://cpprefjp.github.io/reference/algorithm/pop_heap.html">std::pop_heap</a>
+        が使われていました。
+        <code>std::vector</code>
+        をヒープとして使うための関数で、やや原始的なため戸惑いました。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
