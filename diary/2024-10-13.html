@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 375, PC 用照明 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 375, PC 用照明</h1>
+      <p>Oct 13, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 375"><a href="#ABC 375">ABC 375</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc375">ABC 375</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-left">C 問題</th>
+            <th scope="col" class="org-right">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">提出</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-left">-</td>
+            <td class="org-right">AC</td>
+            <td class="org-left">TLE</td>
+            <td class="org-left">AC</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">予想 diff</td>
+            <td class="org-right">10</td>
+            <td class="org-right">20</td>
+            <td class="org-left">1,200</td>
+            <td class="org-right">800</td>
+            <td class="org-left">1,600</td>
+            <td class="org-left">1,200</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際 diff</td>
+            <td class="org-right">20</td>
+            <td class="org-right">65</td>
+            <td class="org-left">972</td>
+            <td class="org-right">658</td>
+            <td class="org-left">1,424</td>
+            <td class="org-left">1,546</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc375/tasks/abc375_a">A 問題</a></a>
+      </h3>
+      <p>
+        文字列 <code>s</code> を長さ <code>3</code> の窓で見て <code>#.#</code> の数を数えよ。
+        <code>tails</code> を思いつくと良かったです。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+solve = do
+  !n &lt;- int'
+  !s &lt;- BS.unpack &lt;$&gt; line'
+  printBSB . length . filter (isPrefixOf "#.#") $ tails s
+</code></pre>
+      </div>
+
+      <p>なんとなく suffix array っぽい？<br /></p>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc375/tasks/abc375_b">B 問題</a></a>
+      </h3>
+      <p>点から点への移動距離の和を小数型で求めよ。 <code>zipWith</code> 案件でした。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">dist :: (Int, Int) -&gt; (Int, Int) -&gt; Double
+dist (!x, !y) (!x', !y') = sqrt $ dx * dx + dy * dy
+  where
+    dx = intToDouble $ x - x'
+    dy = intToDouble $ y - y'
+
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n &lt;- int'
+  !xys &lt;- (`U.snoc` (0, 0)) . U.cons (0, 0) &lt;$&gt; U.replicateM n ints2'
+  let res = U.sum $ U.zipWith dist xys $ U.tail xys
+  printBSB res
+</code></pre>
+      </div>
+
+      <p>
+        経験上、 \(10^{-6}\) までなら 64 bit 整数ならでも大丈夫！　CS 的な知識も補填しないと……。<br />
+      </p>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc375/tasks/abc375_c">C 問題</a></a>
+      </h3>
+      <p>
+        グリッドの部分的な回転を繰り返したとき、最終的なグリッドの形を求めよ。回転の中心は常に一定のため、回転回数
+        mod 4 を考えます。<br />
+      </p>
+
+      <p>回転は以下:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">rot90, rot180, rot270 :: Int -&gt; (Int, Int) -&gt; (Int, Int)
+rot90 n (!y, !x) = (n - 1 - x, y)
+rot180 n = rot90 n . rot90 n
+rot270 n = rot90 n . rot90 n . rot90 n
+</code></pre>
+      </div>
+
+      <p>グリッド生成を以下としました:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+solve = do
+  !n &lt;- int'
+  !gr &lt;- getGrid' n n
+
+  let res = U.generate (n * n) $ \i -&gt;
+        let (!y, !x) = i `divMod` n
+            d = (y `min` x `min` (n - 1 - y) `min` (n - 1 - x) + 1) `mod` 4
+         in case d of
+              0 -&gt; gr @! (y, x)
+              1 -&gt; gr @! rot90 n (y, x)
+              2 -&gt; gr @! rot180 n (y, x)
+              3 -&gt; gr @! rot270 n (y, x)
+              _ -&gt; error "unreachable"
+
+  printGrid $ IxVector (zero2 n n) res
+</code></pre>
+      </div>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc375/tasks/abc375_d">D 問題</a></a>
+      </h3>
+      <p>
+        文字列 <code>s</code> の相異なる 3
+        点が回文となる場合の数を求めよ。左右端の文字種類毎に解いて足し合わせます。<br />
+      </p>
+
+      <p>累積和から区間和を取得する演算子を定義しました:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">(++!) :: (HasCallStack) =&gt; U.Vector (Sum Int, Sum Int) -&gt; (Int, Int) -&gt; (Sum Int, Sum Int)
+(++!) csum (!l, !r) = sub2 (csum G.! (r + 1)) (csum G.! l)
+  where
+    sub2 (!a, !b) (!c, !d) = (a - c, b - d)
+</code></pre>
+      </div>
+
+      <p>紙の上で計算式を考え、ゴリゴリ解きます:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+solve = do
+  !s &lt;- U.map (subtract (ord 'A') . ord) . U.fromList . BS.unpack &lt;$&gt; line'
+
+  let solve is
+        | G.length is &lt; 2 = 0
+        | otherwise = U.sum $ U.imap f (U.init is)
+        where
+          n = G.length is
+          input = U.map ((, Sum 1) . Sum) is
+          csum = U.scanl' (&lt;&gt;) mempty input
+          f i xl =
+            let (Sum !sumR, Sum nr) = csum ++! (i + 1, n - 1)
+             in sumR - (xl * nr) - nr
+
+  let iss = V.generate 26 $ \i -&gt; U.elemIndices i s
+  printBSB $ G.sum $ G.map solve iss
+</code></pre>
+      </div>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc375/tasks/abc375_e">E 問題</a></a>
+      </h3>
+      <p>解説を読みました。適正難度 DP に負けたのは厳しい。。後ほど upsolve したいです。<br /></p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc375/tasks/abc375_f">F 問題</a></a>
+      </h3>
+      <p>辺の追加クエリと最短経路クエリに答えよ。以下の制約が重要です。<br /></p>
+
+      <blockquote>
+        <ul>
+          <li>\(1 \le N \le 300\)<br /></li>
+          <li>1 種類目 (辺の追加) クエリは 300 回以下である<br /></li>
+        </ul>
+      </blockquote>
+
+      <p>
+        辺の追加を \(O(N^2)\) 程度で処理できれば、全体で \(O(N^3)\) 程度の解答になります。<br />
+      </p>
+
+      <p>
+        まず全点間距離を Floyd-Warshall で求めます。辺 <code>(u, v, w)</code> の追加の際は、各頂点
+        <code>i, j</code> の最短距離を経路 <code>i -&gt; u -&gt; v -&gt; j</code>, および
+        <code>i -&gt; v -&gt; u -&gt; j</code> の距離と比較して更新します。<br />
+      </p>
+
+      <p>
+        実は何も考えなくても
+        <a href="https://img.atcoder.jp/arc035/editorial.pdf">このスライドの P11</a>
+        を書き写して解けました。 3 回連続、運に救われています。<br />
+      </p>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="BenQ Screenbar Pro"><a href="#BenQ Screenbar Pro">BenQ Screenbar Pro</a></h3>
+      <p>
+        <a href="https://www.benq.com/ja-jp/lighting/monitor-light/screenbar-pro.html"
+          >BenQ Screenbar Pro</a
+        >
+        を買ってしまいました。手元が明るくなるのは良いのですが、モニタの周囲が暗いため、これはこれで目が疲れます。追加で間接照明を買うべきです。<br />
+      </p>
+
+      <p>これ一本で全部解決してくれると嬉しかったなと思います。そんな物は無い……！<br /></p>
+      <h3 id="Windows の使い道"><a href="#Windows の使い道">Windows の使い道</a></h3>
+      <p>
+        以前 DTM 用途で Windows
+        機を購入ました。玄人志向の電源初期不良などを乗り越えましたが、その後ほぼ使っていません。<br />
+      </p>
+
+      <p>
+        Android のエミュレータを入れて
+        <a href="https://www.arknights.jp/">アークナイツ</a>
+        をインストールしました。うーんやるかなぁ<br />
+      </p>
+      <h3 id="GNU Guix"><a href="#GNU Guix">GNU Guix</a></h3>
+      <p>Shell-based install に失敗しています。素直に GUI で入れるべきか……。<br /></p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
