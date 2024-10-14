@@ -1,0 +1,114 @@
+#+TITLE: ABC 369
+#+DATE: <2024-09-01 Sun>
+
+* ABC 369
+
+[[https://atcoder.jp/contests/abc369][ABC 369]] に参加しました。
+
+#+CAPTION: Diff 予想
+| 問題 | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|-----+-------+-------+-------+-------+-------+-------|
+| 提出 |     AC |     AC |     AC |     AC | AC     | -      |
+| 予想 |     50 |    400 |    500 |    500 | 1,500  | 1,200  |
+| 実際 |     28 |     62 |    323 |    621 | 1,301  | 1,618  |
+
+** [[https://atcoder.jp/contests/abc369/tasks/abc369_a][A 問題]]
+
+思い切って全探索する問題だと思いました。
+
+#+BEGIN_SRC hs
+import Data.List;main=interact$f.map read.words;f[a,b]=show$sum[1|x<-[-300..300],(==1).length.nub.(zipWith(-)<*>tail)$sort[a,b,x]]
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc369/tasks/abc369_b][B 問題]]
+
+入力で 1 行内に整数と文字が混じっているのが厄介です。 =words <$> getLine= または、 =StateT= ベースのパーサがあれば合成 (?) できます:
+
+#+BEGIN_SRC hs
+!ass <- U.replicateM n $ (,) <$> int' <*> char'
+#+END_SRC
+
+=(左手の位置, 右手の位置)= を持って畳み込みで解けました。
+
+#+BEGIN_SRC hs
+let !res = U.foldl' step s0 as
+      where
+        s0 = (-1 :: Int, -1 :: Int, 0 :: Int)
+        step (!l, !r, !acc) (!i, 'L')
+          | l == -1 = (i, r, acc)
+          | otherwise = (i, r, acc + abs (i - l))
+        step (!l, !r, !acc) (!i, 'R')
+          | r == -1 = (l, i, acc)
+          | otherwise = (l, i, acc + abs (i - r))
+#+END_SRC
+
+左手と右手は独立した問題なので、実装の共通化もできるようです。
+
+** [[https://atcoder.jp/contests/abc369/tasks/abc369_c][C 問題]]
+
+苦戦しました。差を取れば素直に RLE (run-length encoding) にできたようです。
+
+Union-Find でも同じようなことができます。なるほど:
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">C みたいな問題はこんな感じに UF で繋ぐとクソ楽にできる <a href="https://t.co/xmcUTBkSCH">pic.twitter.com/xmcUTBkSCH</a></p>&mdash; あちゃぴ🍋 (@achapi_kyopuro) <a href="https://twitter.com/achapi_kyopuro/status/1829881170424934617?ref_src=twsrc%5Etfw">August 31, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+** [[https://atcoder.jp/contests/abc369/tasks/abc369_d][D 問題]]
+
+素直な DP です。畳み込みで解けます。
+
+#+BEGIN_SRC hs
+let (!r1, !r2) = U.foldl' step s0 xs
+      where
+        s0 = ((-1) :: Int, 0 :: Int)
+        step (!accOdd, !accEven) x = dbgId (accOdd', accEven')
+          where
+            accOdd' = max accOdd (accEven + x)
+            accEven'
+              | accOdd == -1 = 0
+              | otherwise = max accEven (accOdd + 2 * x)
+ printBSB $ max r1 r2
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc369/tasks/abc369_e][E 問題]]
+
+整理すると [[https://atcoder.jp/contests/abc369/submissions/57337838][短いコードになりました]] 。
+
+学びの多い問題でした。
+
+*** Floyd–Warshall vs 全頂点 Dijkstra
+
+計算量は $O(V^3)$ vs $O(V(E+V)\log V)$ で Dijkstra の方が小さい *はず* です。実際は、同程度の速さになりました。案外 *Floyd–Warshall の方が無難で良さそう* です。
+
+*** 盆栽要素
+
+ライブラリを整理しました。
+
+- =vertor= 版 permutations (のバグ修正)
+- Floyd–Warshall
+  - 自分自身への遷移 (=v -> v=) をコスト =0= で初期化する
+  - 多重辺を正しく処理する
+    初期化で初回遷移を書き込む際に、単純な上書きではなく =min= で緩和する
+
+** [[https://atcoder.jp/contests/abc369/tasks/abc369_f][F 問題]]
+
+LIS + 経路復元の問題でした。最大値と共に親頂点の位置を記録します。最大値が更新される度に、経路復元用 =Map= が持つ親の位置を更新します。
+
+出力は =Bulider= を使うのが計算量の観点で無難です。
+
+* Misc
+
+- [[https://alpacahack.com/][Alpaca Hack]] Round 2 (Web)
+  ちょっとだけやってみます。
+
+- [[https://www.kickstarter.com/projects/charachorder/the-master-forge-a-keyboard-built-for-you?ref=6fbf3o][The Master Forge]]
+  CharaChorder の新作キーボードの Kickstarter が出ました。すべてのキーがフリック入力で、 chording (ステノタイプみたいな機能) が搭載されています。欲しいけれども、結局 Keyball に戻ってくるのも目に見えていて……？
+
+- [[https://github.com/haskell-suite/haskell-names][haskell-names]]
+  これで名前解決する bundler が作れそうですが、乗り気ではありません。
+  -  =haskell-src-exts= べースです
+    最新の構文には対応できません。
+  - =Environment= (名前空間の情報) を作る必要があります
+    AtCoder 環境のパッケージが export するシンボルをすべて =Environment= に載せる必要があり、自動化の検討が必要です。
+

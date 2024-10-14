@@ -1,0 +1,155 @@
+#+TITLE: ABC 375, PC 用照明
+#+DATE: <2024-10-13 Sun>
+
+* ABC 375
+
+[[https://atcoder.jp/contests/abc375][ABC 375]] に参加しました。
+
+#+CAPTION: Diff 予想
+| 問題       | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|------------+--------+--------+--------+--------+--------+--------|
+| 提出       |     AC |     AC | -      |     AC | TLE    | AC     |
+| 予想 diff |     10 |     20 | 1,200  |    800 | 1,600  | 1,200  |
+| 実際 diff |     20 |     65 | 972    |    658 | 1,424  | 1,546  |
+
+** [[https://atcoder.jp/contests/abc375/tasks/abc375_a][A 問題]]
+
+文字列 =s= を長さ =3= の窓で見て =#.#= の数を数えよ。 =tails= を思いつくと良かったです。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !s <- BS.unpack <$> line'
+  printBSB . length . filter (isPrefixOf "#.#") $ tails s
+#+END_SRC
+
+なんとなく suffix array っぽい？
+
+** [[https://atcoder.jp/contests/abc375/tasks/abc375_b][B 問題]]
+
+点から点への移動距離の和を小数型で求めよ。 =zipWith= 案件でした。
+
+#+BEGIN_SRC haskell
+dist :: (Int, Int) -> (Int, Int) -> Double
+dist (!x, !y) (!x', !y') = sqrt $ dx * dx + dy * dy
+  where
+    dx = intToDouble $ x - x'
+    dy = intToDouble $ y - y'
+
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !xys <- (`U.snoc` (0, 0)) . U.cons (0, 0) <$> U.replicateM n ints2'
+  let res = U.sum $ U.zipWith dist xys $ U.tail xys
+  printBSB res
+#+END_SRC
+
+経験上、 $10^{-6}$ までなら 64 bit 整数ならでも大丈夫！　CS 的な知識も補填しないと……。
+
+** [[https://atcoder.jp/contests/abc375/tasks/abc375_c][C 問題]]
+
+グリッドの部分的な回転を繰り返したとき、最終的なグリッドの形を求めよ。回転の中心は常に一定のため、回転回数 mod 4 を考えます。
+
+回転は以下:
+
+#+BEGIN_SRC haskell
+rot90, rot180, rot270 :: Int -> (Int, Int) -> (Int, Int)
+rot90 n (!y, !x) = (n - 1 - x, y)
+rot180 n = rot90 n . rot90 n
+rot270 n = rot90 n . rot90 n . rot90 n
+#+END_SRC
+
+グリッド生成を以下としました:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !gr <- getGrid' n n
+
+  let res = U.generate (n * n) $ \i ->
+        let (!y, !x) = i `divMod` n
+            d = (y `min` x `min` (n - 1 - y) `min` (n - 1 - x) + 1) `mod` 4
+         in case d of
+              0 -> gr @! (y, x)
+              1 -> gr @! rot90 n (y, x)
+              2 -> gr @! rot180 n (y, x)
+              3 -> gr @! rot270 n (y, x)
+              _ -> error "unreachable"
+
+  printGrid $ IxVector (zero2 n n) res
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc375/tasks/abc375_d][D 問題]]
+
+文字列 =s= の相異なる 3 点が回文となる場合の数を求めよ。左右端の文字種類毎に解いて足し合わせます。
+
+累積和から区間和を取得する演算子を定義しました:
+
+#+BEGIN_SRC haskell
+(++!) :: (HasCallStack) => U.Vector (Sum Int, Sum Int) -> (Int, Int) -> (Sum Int, Sum Int)
+(++!) csum (!l, !r) = sub2 (csum G.! (r + 1)) (csum G.! l)
+  where
+    sub2 (!a, !b) (!c, !d) = (a - c, b - d)
+#+END_SRC
+
+紙の上で計算式を考え、ゴリゴリ解きます:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !s <- U.map (subtract (ord 'A') . ord) . U.fromList . BS.unpack <$> line'
+
+  let solve is
+        | G.length is < 2 = 0
+        | otherwise = U.sum $ U.imap f (U.init is)
+        where
+          n = G.length is
+          input = U.map ((, Sum 1) . Sum) is
+          csum = U.scanl' (<>) mempty input
+          f i xl =
+            let (Sum !sumR, Sum nr) = csum ++! (i + 1, n - 1)
+             in sumR - (xl * nr) - nr
+
+  let iss = V.generate 26 $ \i -> U.elemIndices i s
+  printBSB $ G.sum $ G.map solve iss
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc375/tasks/abc375_e][E 問題]]
+
+解説を読みました。適正難度 DP に負けたのは厳しい。。後ほど upsolve したいです。
+
+** [[https://atcoder.jp/contests/abc375/tasks/abc375_f][F 問題]]
+
+辺の追加クエリと最短経路クエリに答えよ。以下の制約が重要です。
+
+#+BEGIN_QUOTE
+- $1 \le N \le 300$
+- 1 種類目 (辺の追加) クエリは 300 回以下である
+#+END_QUOTE
+
+辺の追加を $O(N^2)$ 程度で処理できれば、全体で $O(N^3)$ 程度の解答になります。
+
+まず全点間距離を Floyd-Warshall で求めます。辺 =(u, v, w)= の追加の際は、各頂点 =i, j= の最短距離を経路 =i -> u -> v -> j=, および =i -> v -> u -> j=  の距離と比較して更新します。
+
+実は何も考えなくても [[https://img.atcoder.jp/arc035/editorial.pdf][このスライドの P11]] を書き写して解けました。 3 回連続、運に救われています。
+
+* Misc
+
+** BenQ Screenbar Pro
+
+[[https://www.benq.com/ja-jp/lighting/monitor-light/screenbar-pro.html][BenQ Screenbar Pro]] を買ってしまいました。手元が明るくなるのは良いのですが、モニタの周囲が暗いため、これはこれで目が疲れます。追加で間接照明を買うべきです。
+
+これ一本で全部解決してくれると嬉しかったなと思います。そんな物は無い……！
+
+** Windows の使い道
+
+以前 DTM 用途で Windows 機を購入ました。玄人志向の電源初期不良などを乗り越えましたが、その後ほぼ使っていません。
+
+Android のエミュレータを入れて [[https://www.arknights.jp/][アークナイツ]] をインストールしました。うーんやるかなぁ
+
+** GNU Guix
+
+Shell-based install に失敗しています。素直に GUI で入れるべきか……。
+

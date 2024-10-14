@@ -1,0 +1,192 @@
+#+TITLE: ARC 182, ABC 367, Wavelet Matirx (2)
+#+DATE: <2024-08-18 Sun>
+
+* ARC 182
+
+[[https://atcoder.jp/contests/arc182][ARC 182]] に参加しました。
+
+** [[https://atcoder.jp/contests/arc182/tasks/arc182_a][A 問題]]
+
+各操作で点 $P_i$ を基点に右または左へ =chmax= 操作をします。過去と未来の $(P_i, V_i)$ を元に各操作が可能な方向に制約が課せられると考えて、矛盾しない場合は $2^{\mathcal{nFree}}$ が答えです。
+
+** [[https://atcoder.jp/contests/arc182/tasks/arc182_b][B 問題]]
+
+こちらの方が解かれている……？？
+
+* ABC 367
+
+[[https://atcoder.jp/contests/abc367][ABC 367]] に参加しました。 C 問題で崩壊しましたが、灰 diff でしたか……
+
+#+CAPTION: Diff 予想
+| 問題 | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|-----+-------+-------+-------+-------+-------+-------|
+| 予想 |    200 |    300 | 1,100  | 1,200  | 1,000  | 1,800  |
+| 実際 |     43 |     43 | 234    | 1,037  | 1,370  | 1,540  |
+
+** [[https://atcoder.jp/contests/abc367/tasks/abc367_a][A 問題]]
+
+起床時刻を基点として 定刻 < 起床時刻 $\pmod {24}$ ならば ="Yes"=!
+
+#+CAPTION: たこやき愛してる！！
+#+BEGIN_SRC hs
+main=interact$f.map read.words;f[a,b,c]|mod(b-c)24>mod(a-c)24="Yes"|0<1="No"
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc367/tasks/abc367_b][B 問題]]
+
+末尾の =0= と =.= を切り落とします:
+
+#+BEGIN_SRC hs
+import Data.List;main=getLine>>=putStrLn.dropWhileEnd(=='.').dropWhileEnd(=='0')
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc367/tasks/abc367_c][C 問題]]
+
+七転八倒して 6 進数を列挙して解きました。リストを使うべきですね。
+
+#+BEGIN_SRC hs
+let result :: [[Int]]
+    result = inner 0 $ U.toList constraints
+      where
+        inner !acc []
+          | acc `mod` k == 0 = [[]]
+          -- 一応枝刈りしました:
+          | otherwise = []
+        inner !acc (a : as) = do
+          d <- [1 .. a]
+          -- map == (<$>)
+          -- 再帰的なリスト内包表記が書けないマンです
+          (d :) <$> inner (acc + d) as
+#+END_SRC
+
+ちなみに =bytestring= の =Builder= 生成は =foldMap'= よりも =foldMap= の方が速かったです。いずれも =print= まで遅延される気がしていましたが……。
+
+** [[https://atcoder.jp/contests/abc367/tasks/abc367_d][D 問題]]
+
+円環上の頂点を幅 (N - 1) の窓で見ます:
+
+#+BEGIN_SRC txt
+1---2---3---4---1---2---3---4
+x---o---o---o
+.   x---o---o---o
+.   .   x---o---o---o
+.   .   .   x---o---o---o
+#+END_SRC
+
+整理後、以下の形になりました:
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !m) <- ints2'
+  !ds <- intsU'
+
+  let !sumMod = U.sum ds `mod` m
+
+  -- 各点の位相 (各点の位置 mod m):
+  let !pos = U.init $ U.scanl' (addMod m) (0 :: Int) ds
+
+  -- 位相の分布 (distribution):
+  !dist <- U.unsafeThaw $ U.accumulate (+) (U.replicate m (0 :: Int)) $ U.map (,1) pos
+
+  -- カウンタを `StateT` に載せて以下の処理を実施する:
+  printBSB <=< (`execStateT` (0 :: Int)) $ U.forM_ pos $ \x -> do
+    -- x を分布から消す:
+    -- x---o---o---o
+    GM.modify dist pred x
+    -- x と同相の点数をカウントに追加する:
+    modify' . (+) =<< GM.read dist x
+    -- 尺取り虫:
+    -- .   o---o---o---o
+    GM.modify dist succ (addMod m x sumMod)
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc367/tasks/abc367_e][E 問題]]
+
+ダブリングの API を再整理しました。
+
+#+CAPTION: =Permutation= よりも適切な言葉を募集中！
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !k) <- ints2'
+  !perm <- U.map pred <$> intsU'
+  !xs <- intsU'
+  printVec $ sactTimes k (Permutation perm) xs
+#+END_SRC
+
+One-shot なダブリングは [[https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Semigroup.html#v:stimes][stimes]] (の正格評価版) で実施すべきですね。半群作用の形にすればなおヨシ！
+
+** [[https://atcoder.jp/contests/abc367/tasks/abc367_f][F 問題]]
+
+一瞬 Mo を考え、すぐに解けないことが分かりました。もうっ
+
+* Wavelet Matrix (2)
+
+** 追加の API
+
+*** =ran= (=freq=, =count=)
+
+後述します。
+
+*** =lookupGT wm x=
+
+=kthMin wm (countLE wm x)= の形で実装できます。
+
+** Segment Tree on Wavelet Matrix
+
+先週の図を前提として、 =rank= (=freq=, =count=) や =fold= は以下のように実装します:
+
+[[./img/2024-08-18-segment-tree-on-wavelet-matrix-1.png]]
+
+たとえば 2 番目の =1= に注目すると、ちょうど 1 回だけ =fold= の対象になっていることが分かります:
+
+[[./img/2024-08-18-segment-tree-on-wavelet-matrix-2.png]]
+
+したがって bit 毎に (各行に) セグメント木を持って畳み込めば、 =freq= と同じ要領で =fold= を実装できます。凄いなー……
+
+** Distinct =count=
+
+=[l, r)= 区間中の重複しない要素数を数えよ。これも Wavelet Matrix で解けるようです。
+
+#+BEGIN_SRC hs
+-- 重複する点を数える。以下のように近隣の重複点の位置を WM に入れる:
+--
+-- input      A  .  .  A  .  A  .  A
+-- i          0  1  2  3  4  5  6  7
+-- input'     -        0     3     5
+--                     <----->        [3, 5] 中の x \in [3, 5] の数は 1 (重複数が 1)
+--                     <----------->  [3, 7] 中の x \in [3, 7] の数は 2 (重複数が 2)
+#+END_SRC
+
+- [[https://judge.yosupo.jp/problem/static_range_count_distinct][Static Range Count Distinct]]
+- [[https://codeforces.com/blog/entry/8962][spoj Problem D-query]]
+
+** Distinct =kthMin=
+
+思いつきません。
+
+** 実際、 Wavelet Matrix に使い道はあるのか
+
+機能豊富かと思いきや、高速なのは特殊な操作ばかりでした。役立つかはかなり疑問です。
+
+* Misc
+
+** 最近買った本
+
+買っただけです。
+
+- [[https://www.unp.or.jp/ISBN/ISBN978-4-8158-1087-0.html][みんなの Fortran]]
+  Fortran.. あまりにも辛いです。
+- [[https://leanpub.com/optics-by-example/][Optics by Example]]
+  =lens= のワンライナは格好いいですね。読んでいこうと思います。 =lens= の _path_ がメソッドチェイン風の順序になるのは違和感があります。
+- [[https://gihyo.jp/book/2022/978-4-297-13180-7][入門セキュリティコンテスト]]
+  CTF のハードルの高さをどう超えるか……
+- [[https://book.mynavi.jp/ec/products/detail/id=42421][セキュリティコンテストチャレンジブック]]
+  CTF のハードルの高さをどう超えるか……
+
+** セール
+
+- ハルヒが全巻 100 円
+  間違えてコミックスを買わないように……
+

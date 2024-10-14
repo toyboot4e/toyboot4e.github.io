@@ -1,0 +1,103 @@
+#+TITLE: ARC 178 / ABC 355 / rm -rf ~
+#+DATE: <2024-05-26 Sun>
+
+* ARC 178
+
+[[https://atcoder.jp/contests/arc178][ARC 178]] に参加しました。
+
+** [[https://atcoder.jp/contests/arc178/tasks/arc178_a][A 問題]]
+
+=1 .. N= のような数列の一部を swap します。
+
+#+BEGIN_DETAILS 思い出話
+ゲーム開発で似た計算がありました。元ネタは [[https://skypjack.github.io/2019-11-19-ecs-baf-part-6/][ECS back and forth Part 6 - Nested groups and perfect SoA to the rescue]] で、以下の処理を実施しました (詳細略):
+
+#+CAPTION: =X= を =A= グループに移動する
+[[../img/2023-12-toecs-group-sync.png]]
+
+#+CAPTION: =X= を A グループから削除する
+[[../img/2023-12-toecs-group-unsync.png]]
+#+END_DETAILS
+
+* ABC 355
+
+[[https://atcoder.jp/contests/abc355][ABC 355]] に参加しました。
+
+** [[https://atcoder.jp/contests/abc355/tasks/abc355_a][A 問題]]
+
+~a == b~ で分岐するのが良さそうですね。
+
+#+BEGIN_SRC hs
+main=interact$show.f.map read.words
+f[a,b]|a==b=(-1)|0<1=[i|i<-[1..3],notElem i[a,b]]!!0
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc355/tasks/abc355_b][B 問題]]
+
+隣接 2 項を見るためには =zipWith= が便利です。
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  _ <- line'
+  !xs <- U.map (,True) <$> intsU'
+  !ys <- U.map (,False) <$> intsU'
+  let !zs = U.map snd $ U.modify (VAI.sortBy (comparing fst)) $ xs U.++ ys
+  let !res = U.or $ U.zipWith (&&) zs (U.tail zs)
+  printYn res
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc355/tasks/abc355_c][C 問題]]
+
+ビンゴの判定をします。斜め方向の判定で少し頭を使います。
+
+1. ＼ 上のセルであるかの判定
+   row == column ならば ＼ の上のセルです
+
+2. ／ 上のセルであるかの判定
+   左右反転すれば＼字と同じ条件で判定できます。左右反転は平行移動と Y 軸対象に分けて考えました。
+   [[./img/2024-05-26-diag.png]]
+
+** [[https://atcoder.jp/contests/abc355/tasks/abc355_d][D 問題]]
+
+閉区間 =[l, r]= を 2 つのイベントに分けました。
+
+1. 区間の追加イベント (位置 =l=)
+2. 区間の削除イベント (位置 =r + 1=)
+
+お気持ち解説ですが、これらのイベントを位置でソートすると、 =(答え, 今有効な区間数)= を状態に持ってイベント列を走査することで解答できます。
+
+こうした基礎的な考えは [[https://book.mynavi.jp/ec/products/detail/id=131288][競技プログラミングの鉄則]] で網羅されています。たぶん茶 diff ギリギリの問題ですが、反射的に平面走査や Mo を考えるとハマりますね。
+
+** [[https://atcoder.jp/contests/abc355/tasks/abc355_e][E 問題]]
+
+分かりません……。
+
+** [[https://atcoder.jp/contests/abc355/tasks/abc355_f][F 問題]]
+
+Upsolve します。
+
+** 余談
+
+AI が D 問題まで一瞬で解けるようです。リア充気取りでしたが、偏屈世捨て人に戻ります。
+
+* Misc
+
+** 年刊 私は =rm -rf ~= を実行しました
+
+=rm -rf ~/ .wine=. あれ、無い…… (すべてが……)
+
+環境構築はすぐ終わりました。書きかけの文章を失ったのが痛かったです。
+
+** 巡回群
+
+[[https://www.sbcr.jp/product/4815621353/][群論への第一歩]] を見ると、巡回群 $(G, \times)$ とは $G = \{ g^n | n \in \mathcal{Z} \} := \langle g \rangle$ であるような群 $(G, \times)$ を指すようです。適度な数学が中二病を癒やします。
+
+……まだ 10 分しか読んでいません。こういうのをやらないとですね。
+
+** 音楽
+
+Linux 環境なので、 [[https://www.bitwig.com/][Bitwig Studio]] と [[https://github.com/robbert-vdh/yabridge][yabridge]] によって簡単な打ち込みをやってみました。脳筋なので、クリシェ進行で全然満足してしまいます。
+
+質の上げ方に悩みます。西尾維新は『小説なんて読むのと同じようにしか書けない』と言っていた気がしますが、音楽においても同様に、まず音の認識がペラペラなのを改めなければならない……？
+

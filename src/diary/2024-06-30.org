@@ -1,0 +1,97 @@
+#+TITLE: ARC 180 / Library Checker / サブ PC
+#+DATE: <2024-06-30 Sun>
+
+* ARC 180
+
+[[https://atcoder.jp/contests/arc180][ARC 180]] に参加しました。 A ~ D 問題まで、分からないことが分かっただけでした。愚直解と比較して WA のケースを発見し、これは確かにダメだとなっていました。
+
+* 盆栽
+
+[[https://judge.yosupo.jp/][Library Checker]] を進めてみました ([[https://zenn.dev/toyboot4e/scraps/3c7b727551b820#comment-737b0b6abd86ec][スクラップ]]) 。
+
+** 破格の待遇
+
+Haskell には *言語名『GHC』で完璧なジャッジ環境が用意されています* 。明らかに Haskell は恵まれた言語です。たとえば *C*, Common Lisp, Fortran, Kotlin, Nim, Zig などはジャッジ非対応ですから、ローカルジャッジで我慢するしかありません。先人の人、ありがとう……！！
+
+** いつやるか？
+
+今で (略) ABC の E 問題までに必要なコードを揃えた頃に Library Checker に挑戦すると、ちょうどいいと思いました。
+
+** ローカルジャッジの実行方法
+
+=verifycation-helper= によりテストケースをダウンロードし、ローカル環境でジャッジを実施できます。特に Library Checker に対しては本物のジャッジが動作するため、答えが 1 意に定まらない問題も正しくジャッジできます。
+
+ローカルジャッジの実行方法は、調べるのが大変です。 [[https://online-judge-tools.github.io/verification-helper/document.ja.html][Online Judge Verification Helper の細かい仕様]] や [[https://github.com/toyboot4e/toy-lib/tree/main/verify][toy-lib/verify]], =oj= のエラーメッセージが参考になると思います。 NixOS でも (やや脱獄気味ですが？) 動きました。
+
+** 新設
+
+- =HashMap= (=Int= キーのみ)
+  [[https://github.com/maspypy/library/blob/main/ds/hashmap.hpp][ds/hashmap.hpp]] を写経しました。至って普通の =HashMap= ですが、 unboxed vector を使った分爆速になりました。 Mutable なのも使い勝手良しです。
+
+- 64 分木 (=Int= キーかつ $[0, n)$ の範囲のみ可)
+  [[https://github.com/maspypy/library/blob/main/ds/fastset.hpp][da/fastset.hpp]] を写経しました。 64 分木と呼ばれていますが、原理は [[https://docs.rs/hibitset][hibitset]] です。なぜか大して速くありません。 maspy さんの提出は爆速なので、僕の実装が悪いかも……？
+
+- 閉路検出
+  [[https://drken1215.hatenablog.com/entry/2023/05/20/200517][けんちょんさんの記事]] を元に閉路検出・復元を実装しました。 Functional graph だったら SCC で十分ですが、一般のグラフではそうも行きません (気付いてなかった……) 。
+
+- UndoableUnionFind (未実装)
+  Undoable な vector を使って union-find を実装すれば良いようです。 Undoable な vector は、 =(key, value)= ペアを更新履歴として持っておけば良いです。
+
+** 改良
+
+- =STRef= / =IORef= / =MutVar= → unboxed =Vector= に変更
+  =MutVar= も boxing なデータ型であり、 =Vector= の方が圧倒的に速かったです。一番速いのは、たぶん =State= モナドでしょうか。
+
+- 全包囲木 DP
+  辺に重みがあるタイプの全包囲木 DP に対応しました。 =onEdge :: op -> (Vertex, w) -> op= を追加しただけです。
+
+- グラフ探索のコード共通化
+  重み無しグラフ = 辺の重みが =1= のグラフとすることで、 BFS/DFS のコードを統一できました。本当は、重さの型に応じて関数を overload できたら良かったです。
+
+- BFS, Dijkstra
+  =whenJustM= (=Data.Tuple.Extra=) を使って簡潔なコードになりました。
+
+- HLD (heavy-light decomposition)
+  - 部分木の畳み込み
+    Index 後の頂点 (頂点') において *部分木の頂点番号は連続している* ため、部分木のサイズを覚えておけば 1 発で取得できます (可換モノイドに限る) 。部分木のサイズをフィールドに追加しました。
+  - Ancestor / level ancestor
+    セグメント、もとい heavy/light edge 毎に一括で登って $O(\log N)$ です。 (頂点' → 頂点) をフィールドに追加しました。
+  - Jump
+    Ancestor を使って =(u, v)= 間の =i= 番目の頂点を求めます。各頂点の深さの情報をフィールドに追加しました。
+
+* サブ PC 購入
+
+先週サブ PC を発注しました。明日マザーボードが届きます。
+
+** 動機
+
+DTM です。 Linux の =yabridge= で動かない VST の方が遥かに多かったです。 DTM をやってみたければ、結局 Mac/Windows が必要なんだと思い購入しました。
+
+**** 購買
+
+約 20 万円になりました。 GPU も無いのに……！
+
+| 項目         | 購入品                     | 値段   | 備考                               |
+|-------------+---------------------------+-------+-----------------------------------|
+| CPU          | Intel Core i7 14700K        | 75,363 | [[https://browser.geekbench.com/processors/intel-core-i7-14700k][スコア 2,945 / 19,264]]               |
+| メモリ       | Patriot Viper Steel DDR4    | 18,560 | 3600MHz PC4-28800 64GB (32GB x2)     |
+| ストレージ   | Fikwot FN970               | 31,280 | 4 TB, M.2 2280 PCIe Gen4 x4 NVMe 1.4 |
+| マザーボード | MAG B760 TOMAHAWK WIFI DDR4 | 43,145 | ATX, B760                          |
+| 電源         | 玄人志向 80Plus GOLD 750W   | 11,209 | ATX, 750W, 80PLUS Gold              |
+| CPU クーラ   | DEEPCOOL AK620             | 7,433  | サイド                             |
+| PC ケース    | CORSAIR 4000D              | 12,755 | ATX                                |
+| OS           | Windows 11 Home             | 16,545 |                                   |
+| グリス       | ARCTIC MX-4                | 1,080  |                                   |
+
+既に後悔している点は以下です。
+
+- CPU: AMD Ryzen 7 5700X BOX にすれば 5 万円安くできました。
+- SSD: メーカが謎です。ある意味 1 番重要なパーツなのに、即壊れそうで不安です。
+
+** 参考: 自作以外
+
+- Mac (iMac / Mac mini / Mac Studio)
+  高過ぎました。
+
+- [[https://www.dospara.co.jp/TC798/MC13960-SN3440.html][raytrek スリープフリークス監修 DTMモデル EM7＋/G 4060]]
+  Core i7-14700F / RTX 4060 / 32 GB / 2 TB で 20 万円です。これも良かったですね。

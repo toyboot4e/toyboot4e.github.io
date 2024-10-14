@@ -1,0 +1,191 @@
+#+TITLE: ABC 364, 遅延セグ木の定数倍高速化
+#+DATE: <2024-07-28 Sun>
+
+* ABC 364
+
+[[https://atcoder.jp/contests/abc364][ABC 364]] に参加しました。
+
+#+CAPTION: 体感 diff
+| 問題 | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|-----+-------+-------+-------+-------+-------+-------|
+| 体感 |    400 |    400 |    300 | 1,000  | 1,600  | 1,700  |
+| 実際 |     29 |     40 |    189 | 1,136  | 1,496  | 1,878  |
+
+** [[https://atcoder.jp/contests/abc364/tasks/abc364_a][A 問題]]
+
+長さ 2 の窓で見るのが良いですね。僕は =group= 関数に飛びついてしまい、厄介な処理になりました。
+
+#+CAPTION: ワンライナ (汚い)
+#+BEGIN_SRC hs
+main=interact$y.or.(zipWith(&&)<*>tail).map(elem 'w').init.words;y b|b="No"|0<1="Yes"
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc364/tasks/abc364_b][B 問題]]
+
+グリッドの問題です。 [[https://zenn.dev/toyboot4e/books/seriously-haskell/viewer/3-1-typical-io#4.-%E3%82%B0%E3%83%AA%E3%83%83%E3%83%89][グリッドの入力処理]] では =Array= が登場しますし、 Haskell 入門者には難問です。高橋くんの位置の追跡には畳み込みが登場します。
+
+#+CAPTION: 単純な畳込み
+#+BEGIN_SRC hs
+-- 和の計算
+foldl' (+) (0 :: Int) [0 :: Int, 1, 2, 3]
+#+END_SRC
+
+#+CAPTION: 今回の問題も、実は単純な畳込み
+#+BEGIN_SRC hs
+-- 高橋くんの移動の計算
+foldl' walk (y0, x0) "LRUUDDLR"
+#+END_SRC
+
+*** 脱線
+
+naoya さんのコードには、以下の =lrud= が登場しました:
+
+#+BEGIN_SRC hs
+lrud@[left, right, up, down] = [(0, -1), (0, 1), (-1, 0), (1, 0)] :: [(Int, Int)]
+#+END_SRC
+
+そういえばトップレベルでパタンマッチできるのですね。トップレベルのタプルの中身を正格評価しつつ ={-# NOINLINE #-}= を付けるなど、活用できそうです。
+
+** [[https://atcoder.jp/contests/abc364/tasks/abc364_c][C 問題]]
+
+それぞれの系列を降順ソートして貪欲に解きます。比較演算は strict な方 ($x \ge$ ではなく $x \gt$) です。 Strict な演算子というのは競プロ方言か何かで、英語では普通に greater/greater than と言うはずです。
+
+** [[https://atcoder.jp/contests/abc364/tasks/abc364_d][D 問題]]
+
+主に 2 分探索の問題です。 2 分探索の説明は [[https://zenn.dev/forcia_tech/articles/20191223_advent_calendar][FORCIA 社の記事]] が一番分かりやすかったと思います。『めぐる式 2 分探索』なので元ネタにちなんで =ok=, =ng= が出てきますが、 yes/no の方が適切かと思います。この辺りも自由に決めて良いのが競プロ！
+
+** [[https://atcoder.jp/contests/abc364/tasks/abc364_e][E 問題]]
+
+ひと目見て最大流の問題だと思ったのですが、違いました。重さが 2 次元のナップサック問題と見て =IntMap= で枝刈りしてみましたが、 WA が取れず失敗しました。
+
+公式解説は [[https://atcoder.jp/contests/dp/tasks/dp_e][Kpapsack 2]] でした。ガーン……
+
+** [[https://atcoder.jp/contests/abc364/tasks/abc364_f][F 問題]]
+
+遅延セグメント木の解法を考えていました。区間を set で管理するテクニックでも解けるらしいです？　Upsolve します。
+
+この問題は [[https://judge.yosupo.jp/][Library Chercker]] の問題案にあったらしいです。いずれテストケース生成係もやりたいですね……。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">問題案がABCの先回りになっていることも結構多いので、他の問題案もぜひ</p>&mdash; maspy (@maspy_stars) <a href="https://twitter.com/maspy_stars/status/1817228765967335528?ref_src=twsrc%5Etfw">July 27, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+* Splay tree メモ
+
+Link/cut tree の前準備で splay tree を (まだ) 作っています。前提知識が見えて来たのでメモします。
+
+** [1] 2 種類の API
+
+*** Indexed API (列としての API)
+
+[[https://www.stackage.org/haddock/nightly-2024-07-27/containers-0.6.8/Data-Map-Strict.html][Data.Map.Strict]] の [[https://www.stackage.org/haddock/nightly-2024-07-27/containers-0.6.8/Data-Map-Strict.html#g:28][Indexed]] API (=elemAt=, =deleteAt=) がこのカテゴリに相当します。 [[https://qiita.com/NokonoKotlin/items/9441856089f44a38100b#----%E5%88%97%E6%93%8D%E4%BD%9C-splitmerge][split/merge]] のような splay tree 特有の API もあります。
+
+maspy さんの splay tree は、値の列を管理するためのデータ型として実装されています。
+
+- [[https://github.com/maspypy/library][maspypy/library]]
+  素直にこれを写経しておけば良かったです
+  - [[https://github.com/maspypy/library/blob/ae783f093ffac1b12c584fb599865f25fa2260e0/ds/splaytree/splaytree.hpp][splaytree.hpp]]
+  - [[https://github.com/maspypy/library/blob/ae783f093ffac1b12c584fb599865f25fa2260e0/test/library_checker/datastructure/dynamic_sequence_range_affine_range_sum_splay.test.cpp][dynamic\under{}sequence\under{}range\under{}affine\under{}range\under{}sum\under{}splay.test.cpp]]
+- [[https://judge.yosupo.jp/problem/dynamic_sequence_range_affine_range_sum][Dynamic Sequence Range Affine Range Sum - Library Checker]]
+  API の verify に使える問題です (※ 区間反転があり高難度のため、まずは自分で簡単なテストを作った方が良さそうです)
+
+*** =Ord k= ベースの API (平衡木としての API)
+
+[[https://www.stackage.org/haddock/nightly-2024-07-27/containers-0.6.8/Data-Map-Strict.html][Data.Map.Strict]] の主な API (insert/delete や 2 分探索) がこのカテゴリに相当します。が、競プロでは必要の無い機能だったかもしれません。
+
+Tarjan 氏の論文では平衡二分木の実装として splay tree が紹介されていますから、こちらの機能がフィーチャーされています。
+
+- [[https://www.cs.cmu.edu/~sleator/papers/self-adjusting.pdf][Self-Adjusting Binary Search Trees]]
+  これが一番分かりやすいのですが、競プロにはやや回り道かもしれません。
+- [[https://judge.yosupo.jp/problem/predecessor_problem][Predecessor Problem - Library Checker]]
+  API の verify に使える問題です。
+
+** [2] 2 種類の splay 実装
+
+*** Bottom-up splaying
+
+maspy さんの splay tree は bottom-up splaying を使って実装されています。たぶん。特に集約 (畳み込み) の計算は bottom-up 実装でなければ難しそうです (後述) 。
+
+- [[https://qiita.com/ngtkana/items/4d0b84d45210771aa074][エッ！？ 平衝二分木の update, push (eval, propagate) のタイミングがわからないですって？ フッフッフ……]]
+  Bottom-up 実装の定数倍高速化の手法を整理しています。
+
+*** Top-down splaying
+
+Tarjan 氏の論文では top-down splaying が速くて良いぞとなっています (そうかな？) 。 Top-down splaying でサイズを求める実装も見つかりましたが、 bottom-up 実装と比べてそこまで優位なのかは疑問です。
+
+- [[https://www.cs.cmu.edu/~sleator/papers/self-adjusting.pdf][Self-Adjusting Binary Search Trees]] (再掲)
+- [[http://www.nct9.ne.jp/m_hiroi/light/pyalgo21.html#top_down][Algorithms with Python / スプレー木 - M.Hiroi's Home Page]]
+- [[https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-splay.c][top-down-splay.c]] (サイズ計算無し)
+- [[https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-size-splay.c][top-down-size-splay.c]] (サイズ計算有り)
+  - [[https://codeforces.com/blog/entry/10498][splay tree (top down) - Codeforces]]
+    =top-down-size-spaly.c= へのリンクがあります。
+
+** [3] 集約 (畳み込み) ・作用
+
+ノードに部分木のサイズや畳み込みを持たせます。区間反転用のフラグを載せてあれこれする場合もあるようです。
+
+** 以上
+
+Splay tree は作り直しになりそうです。 Link/cut tree の情報も集めないとー
+
+* Misc
+
+この頃は問題も解かずゴロゴロしています。
+
+** maspy さんの遅延伝播セグメント木の定数倍高速化
+
+遅延セグ木の実装を PAST 上級本から maspy さん準拠に変更しました。
+
+*** 枝刈り
+
+[[https://maspypy.com/segment-tree-%E3%81%AE%E3%81%8A%E5%8B%89%E5%BC%B72][maspy さんのブログ記事]] を読むと、 (1) 上から伝播 と (3) 上側を計算し直し において葉まで降りない実装になっていることが分かります。真似してみると、作用が重いときは若干高速になりました。作用が軽いときは PAST 上級本のように葉まで降りたほうが速かったです。やらなくても良かったかも。
+
+*** 作用が長さを引数に取る
+
+区間の長さをモノイドに載せるより、セグメント木の畳み込み関数側から与えた方が速くなるようです (1.5 倍ほど？　未実装) 。真似して =SemigroupActionWithLength= みたいな型クラスを作るかもしれません。
+
+** 繰り返し 2 乗法の再整理
+
+[[https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Semigroup.html#v:stimes][stimes]] は繰り返し 2 乗法の効率的な実装ですが、正確評価をしないため遅いです。コピペで正格評価版を作りました。
+
+#+BEGIN_SRC hs
+-- | Strict, much faster `stimes`.
+{-# INLINE stimes' #-}
+stimes' :: (Semigroup a) => Int -> a -> a
+stimes' n0 x0
+  | n0 <= 0 = errorWithoutStackTrace "stimes: positive multiplier expected"
+  | otherwise = mulTimes n0 (<>) x0
+
+-- | Strict, much faster `mtimes`.
+{-# INLINE mtimes' #-}
+mtimes' :: (Monoid a) => Int -> a -> a
+mtimes' n0 x0 = case compare n0 0 of
+  LT -> errorWithoutStackTrace "mtimes: zero or positive multiplier expected"
+  EQ -> mempty
+  GT -> mulTimes n0 (<>) x0
+
+-- | Multiplies @x@ by @n@ (N > 0) times using the binary lifting technique.
+{-# INLINE mulTimes #-}
+mulTimes :: Int -> (a -> a -> a) -> a -> a
+mulTimes n0 op x0
+  | n0 <= 0 = errorWithoutStackTrace "mulTimes: positive multiplier expected"
+  | otherwise = f x0 n0
+  where
+    f !x !n
+      | even n = f (x `op` x) (n .>>. 1)
+      | n == 1 = x
+      | otherwise = g (x `op` x) (n .>>. 1) x
+    g !x !n !z
+      | even n = g (x `op` x) (n .>>. 1) z
+      | n == 1 = x `op` z
+      | otherwise = g (x `op` x) (n .>>. 1) (x `op` z)
+#+END_SRC
+
+[[https://github.com/toyboot4e/toy-lib/blob/41a572fc6a60415bf8970b10e51b6ef7d1320e67/src/Math/PowMod.hs][powMod]] 関係も整理がついて良かったです。
+
+** =nextPermutation=
+
+[[https://github.com/haskell/vector/pull/498][gksato さんの =nextPermutation=]] がマージ間近です。マージカル！　=INLINE= 化、アルゴリズムの改善、 =prevPermutation= の追加など、贅沢な内容です。
+
+自ライブラリの =Compat= モジュールにコピーしました。
+

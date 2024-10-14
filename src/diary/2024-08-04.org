@@ -1,0 +1,117 @@
+#+TITLE: ABC 365, Segment Tree Beats!
+#+DATE: <2024-08-04 Sun>
+
+* ABC 365
+
+[[https://atcoder.jp/contests/abc365][ABC 365]] に参加しました。 2 完灰パフォの悪夢が夢で良かったです。
+
+#+CAPTION: Diff 予想
+| 問題 | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 | G 問題 |
+|------+--------+-------+--------+--------+-------+-------+--------|
+| 予想 |     50 |   100 |    400 |    700 | 1,300 | 1,800 | 1,600  |
+| 実際 |     10 |    22 |    269 |    730 | 1,102 | 2,561 | 2,254  |
+
+今夜の ARC に出るか迷っています。レーティングって下がるのは一瞬ですが、上げるのは数ヶ月かかりますものね。
+
+** [[https://atcoder.jp/contests/abc365/tasks/abc365_a][A 問題]]
+
+cojna さんが流石で、 [[https://hackage.haskell.org/package/time-1.14/docs/Data-Time-Calendar.html][Data.Time.Calendar]] に [[https://hackage.haskell.org/package/time-1.14/docs/Data-Time-Calendar.html#v:isLeapYear][isLeapYear]] (閏年の判定関数) がありました。
+
+#+BEGIN_SRC hs
+import Data.Time.Calendar;main=print.f=<<readLn;f x|isLeapYear x=366|0<1=365
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc365/tasks/abc365_b][B 問題]]
+
+ソートして 2 番目に大きい数を抜き出すのが良さそうですね。
+
+#+BEGIN_SRC hs
+import Data.List;main=interact$show.snd.last.init.sort.(`zip`[1..]).tail.map (read @Int).words
+#+END_SRC
+
+タプル同士は左端のキーから順に比較されるため、 =zip[1..]= ではなく =(`zip`[1..])= としました。
+
+** [[https://atcoder.jp/contests/abc365/tasks/abc365_c][C 問題]]
+
+2 分探索の問題でした。判定問題を決めて $O(N \log N)$ で解けました。灰 diff だと……？！
+
+** [[https://atcoder.jp/contests/abc365/tasks/abc365_d][D 問題]]
+
+直前の手 (R, P, S) 毎に最大の勝利回数を持って畳み込みします。畳み込みで解ける DP は茶 diff 典型ですね。
+
+[[https://atcoder.jp/contests/abc365/editorial/10600][貪欲法では解けない考察]] が抜けていました。競プロ以外では、意図せず嘘貪欲を使ってしまうケースの方が多そうです。
+
+** [[https://atcoder.jp/contests/abc365/tasks/abc365_e][E 問題]]
+
+初め、 xor ではなく or だと思って架空の問題を解いてしまいました。取り返せて良かった。
+
+** [[https://atcoder.jp/contests/abc365/tasks/abc365_f][F 問題]]
+
+合成できないやつだと思って飛ばしました。 PAST にも似た問題があって解けなかった記憶があります。 *やはり PAST か……！*
+
+** [[https://atcoder.jp/contests/abc365/tasks/abc365_g][G 問題]]
+
+別解のマージテク (?) で解いてみたいです。長い区間の処理が大変そうです (座標圧縮と累積和で一括計算する？) 。
+
+** 以上
+
+手抜きですが ABC 振り返りでした。提出が汚いので、あまり振り返りたくないです ()
+
+* Segment Tree Beats!
+
+maspy さんのライブラリを読み解き、区間 chmin/chmax が扱える特殊なセグメント木を実装しました。命名の元ネタは [[https://codeforces.com/blog/entry/57319][Angle Beats! らしい]] です。
+
+主なメモは [[https://zenn.dev/toyboot4e/scraps/3c7b727551b820#comment-9c63c125c4f2ec][Zeen スクラップ]] に置いています。以下ではアルゴリズム以外の部分をメモします。
+
+** コードの重複
+
+遅延セグメント木と Beats でコードが重複しています。実装の共通化のため、 *セグメント木のための型クラスを特別に用意* した方が良い気がしてきました。
+
+** 多相なフィールドは ={-# UNPACK #-}= できない
+
+Haskell の多相は特殊化されず、動的な実装になることが多いです。関数もそうですが、レコードでも起こります。
+
+多相化されたフィールドは ={-# UNPACK #-}= できません:
+
+#+BEGIN_SRC hs
+data AddChminChmax a = AddChminChmax
+  { addACC :: !a,
+    chminACC :: !a,
+    chmaxACC :: !a
+  }
+  deriving (Show, Eq)
+#+END_SRC
+
+これを特殊化すると box 化が消えて高速になるようです:
+
+#+BEGIN_SRC hs
+data AddChminChmaxInt = AddChminChmaxInt
+  { addACCInt :: {-# UNPACK #-} !Int,
+    chminACCInt :: {-# UNPACK #-} !Int,
+    chmaxACCInt :: {-# UNPACK #-} !Int
+  }
+  deriving (Show, Eq)
+#+END_SRC
+
+これは C++ の方が速いのも仕方ありません。パフォーマンスは諦め気味です。
+
+* Misc
+
+** Fortran
+
+yum さんこと MrTired が [[https://atcoder.jp/contests/abc365/submissions/56296646][新しいランダムキャラ (ギャンブラー猿)]] を追加してくれました。
+
+#+CAPTION: ギャンブラー猿 (カッコいい)
+#+BEGIN_SRC fortran
+!> This file was processed by `fypp`.
+!> Today's fortune: "Lucky WA", really OK?
+!> ランダムウォーク猿「'半分全列挙' で はっぴー.」
+!> ギャンブラー猿「AtCoder はゲームだ.」
+#+END_SRC
+
+僕は [[https://www.unp.or.jp/ISBN/ISBN978-4-8158-1087-0.html][みんなの Fortran]] を読んでいます。僕の中の難解言語ランキングは Prolog > Batch Script > Emacs Lisp > Haskell だったわけですが、 Fortran は 2 位になるかもです。
+
+** Emacs
+
+SNS で共有のあった [[https://github.com/jcfk/org-sliced-images][org-sliced-images]] が良かったです。 (=org-mode= に限り) 画像を visual 行単位でカーソル移動・スクロールできます。
+

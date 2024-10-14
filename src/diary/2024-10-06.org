@@ -1,0 +1,190 @@
+#+TITLE: ABC 374, PrimArray
+#+DATE: <2024-10-06 Sun>
+
+* ABC 374
+
+[[https://atcoder.jp/contests/abc374][ABC 374]] に参加しました。
+
+#+CAPTION: Diff 予想
+| 問題       | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|------------+--------+--------+--------+--------+--------+--------|
+| 提出       |     AC |     AC |     AC |     AC | AC     | -      |
+| 予想 diff |     10 |    100 |    400 |    800 | 1,000  | 1,600  |
+| 実際 diff |     11 |     28 |    226 |    694 | 1,504  | 2,026  |
+
+** [[https://atcoder.jp/contests/abc374/tasks/abc374_a][A 問題]]
+
+文字列が =san= で終わるなら =Yes=, そうでなければ =No= を印字せよ。改行文字に注意して答えます。
+
+#+BEGIN_SRC haskell
+main=interact$y.take 4.reverse;y"\nnas"="Yes";y _="No"
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc374/tasks/abc374_b][B 問題]]
+
+文字列 =s=, =t= が等しいならば =0= を、異なるならば最初に不一致となる位置を答えよ。
+
+[[https://atcoder.jp/contests/abc374/submissions/58488085][cojna さんの提出]] を見てみましょう。短過ぎです。
+
+#+BEGIN_SRC haskell
+main=interact$show.f.lines
+f[s,t]=sum[s%t|s/=t] -- (ref:1)
+(x:s)%(y:t)|x==y=1+s%t -- (ref:2)
+_%_=1 -- (ref:3)
+#+END_SRC
+
+- [[(1)]] =s= と =t= が一致する場合を =sum= とガードで暗に処理しています。
+- [[(2)]] 再帰演算子で文字数を節約しています。
+- [[(3)]] エッジケースの処理も万全！
+
+** [[https://atcoder.jp/contests/abc374/tasks/abc374_c][C 問題]]
+
+整数列 $\{K_i\}_i$ を 2 つのグループに分けたとき、グループ毎の和の差を最小化せよ。慣れると反射で書ける問題ですね。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !xs <- intsU'
+
+  let !s = U.sum xs
+  let candidates = U.generate (bit n) id -- (ref:1)
+  let eval bits =
+        let is = U.findIndices (testBit bits) $ U.generate n id -- (ref:2)
+            sum1 = U.sum $ U.backpermute xs is -- (ref:3)
+            sum2 = s - sum1
+         in max sum1 sum2
+
+  printBSB . U.minimum $ U.map eval candidates
+#+END_SRC
+
+- [[(1)]] Bit 全探索
+- [[(2)]] ~testBit x iBit == (x .&. bit iBit) /= 0 == (x .&. (1 .>>. iBit)) /= 0~
+  ([[https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Bits.html][Data.Bits]])
+- [[(3)]] ~U.backpermute xs is == U.map (xs U.!) is~
+
+** [[https://atcoder.jp/contests/abc374/tasks/abc374_d][D 問題]]
+
+順列と bit mask を全探索せよ。最近ほぼ同じ問題が最近出た覚えが？　順列を固定した上で、 bit mask の適用は DP にするとさらに良しです。
+
+#+BEGIN_SRC haskell
+dist :: Int -> Int -> Int -> Int -> Double
+dist !x1 !y1 !x2 !y2 = sqrt . intToDouble $ (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
+
+solveDP :: [(Int, Int, Int, Int)] -> Double
+solveDP = inner 0.0 0 0
+  where
+    inner :: Double -> Int -> Int -> [(Int, Int, Int, Int)] -> Double
+    inner !acc !_ !_ [] = acc
+    inner !acc !x1 !y1 ((!x2, !y2, !x3, !y3) : rest) =
+      let !cand1 = inner (acc + dist x1 y1 x2 y2) x3 y3 rest
+          !cand2 = inner (acc + dist x1 y1 x3 y3) x2 y2 rest
+       in min cand1 cand2 -- (ref:2)
+
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !speedM, !speedL) <- ints3'
+  !lines <- U.replicateM n ints4'
+
+  let lengthL = U.sum $ U.map (\(!x1, !y1, !x2, !y2) -> dist x1 y1 x2 y2) lines
+  let lengthM = minimum . G.map (solveDP . U.toList) $ lexPerms lines -- (ref:1)
+  printBSB $ lengthM / intToDouble speedM + lengthL / intToDouble speedL -- (ref:3)
+#+END_SRC
+
+- [[https://hackage.haskell.org/package/extra-1.7.16/docs/Numeric-Extra.html#v:intToDouble][intToDouble]]
+- [[(1)]] [[https://github.com/toyboot4e/toy-lib/blob/63e3640e076e443ab976d90e4f5f17c1e10d93d2/src/ToyLib/DP.hs#L258][lexPerms]] で順列全探索
+- [[(2)]] 辺の向きを両方試して DP します
+- [[(3)]] 移動 (M) 距離とレーザー (L) の距離に分けて考えます
+
+** [[https://atcoder.jp/contests/abc374/tasks/abc374_e][E 問題]]
+
+工程のボトルネックを最大化する機械の購入方法を答えよ。反射で答えると、判定問題で 2 分探索ができそうです。
+
+判定問題では $ax + by \ge w$ の下で $px + qy$ を最大化します。基本的に効率の良い機械を購入すれば良いのですが、実は $w \bmod \mathrm{lcm}(a, b)$ 部分の最適解が分かりません。ここで $a, b \le 100$ より余りの部分は全探索できます。
+
+ヤケクソで探索範囲を広げたら通りました。運です。
+
+** [[https://atcoder.jp/contests/abc374/tasks/abc374_f][F 問題]]
+
+DP です。 $O(M^2 \log M) (M = 10^4)$ 解法は思いつくつもりなのですが……。考えます。
+
+** Note
+
+最近は満足の行く実装が書けるようになり、以前ほど人の提出を読まなくなりました。良いのか悪いのか……。 Common Lisp, Fortran, OCaml あたりも読んでみたいですが、手つかずのままです。
+
+* Haskell
+
+** [[https://hackage.haskell.org/package/primitive-0.9.0.0/docs/Data-Primitive-PrimArray.html][Data.Primitive.PrimArray]] はあまり使わない
+
+Mutable なデータを =IORef= に入れると (2 重に) box 化されて重くなります。 Library Checker の問題で 200 - 300 ms 程度影響が出る程度には遅く、絶対に避けたいレベルです。
+
+代わりに unboxed な =MVector= にデータを入れることが多いのですが、 [[https://hackage.haskell.org/package/primitive-0.9.0.0/docs/Data-Primitive-PrimArray.html][PrimArray]] の方が速い可能性が出てきました。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">先日「可変な変数を使うのにIORefを使うか1要素Vectorを使うか」みたいな話があったけど、Data.Primitive.PrimArrayにあるMutablePrimArrayの方が2ワードほどメモリ使用量が少ないので良いのかもしれない（検出できる違いは出ないと思うけど）</p>&mdash; mod_poppo (@mod_poppo) <a href="https://twitter.com/mod_poppo/status/1121438040587587584?ref_src=twsrc%5Etfw">April 25, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">中身は ByteArray で違いがなさそうなんだけど、Primitive Vector は offset と length の情報を持っている分のメモリのオーバーヘッドあるいはslicing の安価さというのはありそう</p>&mdash; スマートコン (@mr_konn) <a href="https://twitter.com/mr_konn/status/1286243239209480192?ref_src=twsrc%5Etfw">July 23, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+*** 検証
+
+雑な検証になりますが、 Library Checker の [[https://judge.yosupo.jp/problem/dynamic_sequence_range_affine_range_sum][Splay Tree の問題 (Dynamic Sequence Range Affine Range Sum)]] で比較しました。 [[https://github.com/toyboot4e/toy-lib/commit/4c8929c478c03eb039b81ac202561e007b940e50][コード差分]]  。
+
+- [[https://judge.yosupo.jp/submission/239843][=MVector= 版の提出 (3,565 ms)]]
+- [[https://judge.yosupo.jp/submission/239846][=MutablePrimArray= 版の提出 (3,596 ms)]]
+
+誤差レベルで遅くなりました (!?) 。リジャッジすれば結果はひっくり返るかも。
+
+なお =MVector= 版で使用していた [[https://github.com/haskell/vector/blob/eb605264be1811472b447b57627b2074e63614fe/vector/src/Data/Vector/Generic/Mutable.hs#L735][=unsafeModifyM= の実装]] を見てみると、 =stToPrim= により型パラメータ =m= を =ST= に確定させ最適化しています。とりあえず使う分には =MVector= の方が無難かもしれません。
+
+* ACL 移植メモ
+
+** Disjoint Set Union (Union-Find Tree)
+
+サクっと移植できました。先行きの良いスタートです。
+
+** Fenwick Tree (Binary Index Tree)
+
+添字の動きに戸惑いながら移植しました。群の区間和が取れて定数倍が良いです。
+
+** Floor sum
+
+何も分からない。離散化すると周期性が出てくる覚えはあります。完全な写経です。
+
+** Max flow
+
+*** 可変長配列
+
+可変長配列 (=std::vector=) に依存しています。 =VUM.MVector= をラップして可変長配列を実装しました。しかし =MVector= を =MutVar= の中に入れるため効率は落ちます。
+
+*** Break
+
+ループの =break= のため、ループを再帰関数で表現しました。 =break= しなくて済む場合でも、なるべく忠実に実装したいと思います。
+
+*** イテレーションと destructuring
+
+タプルの unboxed vector は [[https://en.wikipedia.org/wiki/AoS_and_SoA][SoA (struct of arrays)]] なので、走査しない配列はスキップした方が速そうな気がしています。速度の比較はしていません。
+
+#+BEGIN_SRC haskell
+(VUM.MV_3 _ vecTo _ vecCap) <- mutableVector
+neighbors <- VU.zip <$> VU.unsafeFreeze vecTo <*> VU.unsafeFreeze vecCap
+VU.forM_ neighbors $ \(!to, !cap) -> do
+  -- ~~
+#+END_SRC
+
+*** テスト
+
+ac-library の単体テストの一部を写経しました ([[https://github.com/toyboot4e/ac-library-hs/blob/fcb4130e731fbb4314f734badbd5a76d9600e98e/test/Tests/MaxFlow.hs][Tests/MaxFlow.hs]]) 。ランダムテストや PBT の方がカバレッジは良さそうです。
+
+** [WIP] Min cost flow
+
+*** CSR (comperssed sparse row)
+
+CSR の抽象が Haskell だと上手く行きません。一部の要素が可変だったり、イテレーションの効率 (前述) であったり……。 cojna さんと同様に、 min cost flow 専用の CSR を作るのが良いと思いました。汎用の CSR を作るのは難しそうです。
+
+*** Binary Heap
+
+[[https://en.wikipedia.org/wiki/Binary_heap][Binary Heap]] の実現に [[https://cpprefjp.github.io/reference/algorithm/push_heap.html][std::push\under{}heap]] と [[https://cpprefjp.github.io/reference/algorithm/pop_heap.html][std::pop\under{}heap]] が使われていました。 =std::vector= をヒープとして使うための関数で、やや原始的なため戸惑いました。
+

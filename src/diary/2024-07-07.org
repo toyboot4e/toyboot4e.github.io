@@ -1,0 +1,155 @@
+#+TITLE: ABC 360 / ABC 361 / Flakes
+#+DATE: <2024-07-07 Sun>
+
+* ABC 360
+
+[[https://atcoder.jp/contests/abc360][ABC 360]] に参加しました。
+
+#+CAPTION: Diff 予想
+| 問題 | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 |
+|-----+-------+-------+-------+-------+-------|
+| 予想 |     10 |    150 |    380 |    600 | 1,200  |
+| 実際 |     18 |     40 |    568 |    886 | 1506   |
+
+** [[https://atcoder.jp/contests/abc360/tasks/abc360_a][A 問題]]
+
+=elemIndex= を比較するのが無難です。
+
+真の場合を列挙し、それ以外は偽とするのも良い手です。
+
+#+BEGIN_SRC hs
+main=interact$f;f('R':_)="Yes";f('S':'R':_)="Yes";f _="No"
+#+END_SRC
+
+#+BEGIN_SRC hs
+-- 比較を短縮した場合:
+main=interact$f;f s|s>"SR"||s>"R"&&s<"S"="Yes"|0<1="No"
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc360/tasks/abc360_b][B 問題]]
+
+=extra= パッケージの =chunksOf= でリストを row-major 行列に変換し、 =transpose= によって column-major 行列に変換できます。なるほど。
+
+#+BEGIN_SRC hs
+import Data.List.Extra;main=interact$f.words;f[s,t]|elem t$concatMap(transpose.(`chunksOf`s))[1..length s-1]="Yes"|0<1="No"
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc360/tasks/abc360_c][C 問題]]
+
+同じ箱に複数の荷物が詰められたとき、最も重い荷物以外を他の箱に移動させるのが最適です。 =accumArray= や =group . sort= などで解きます。
+
+#+BEGIN_SRC hs
+import Data.List;main=interact$show.f.map read.words;f(n:r)=sum.map(sum.map snd.init).groupBy(\(i,_)(j,_)->i==j).sort.zipWith(,)r$drop n r
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc360/tasks/abc360_d][D 問題]]
+
+左向きの蟻と右向きの蟻に分けます。右向きの蟻の位置を固定し、左向きの蟻が =2T= 移動すると考えると、左向きの蟻は =[x - 2T, x]= の範囲の右向きの蟻とすれ違います。よって累積和によって解答できます。
+
+転倒数を使った解答は考察が上手いですね。
+
+** [[https://atcoder.jp/contests/abc360/tasks/abc360_e][E 問題]]
+
+遷移は次の形です:
+
+$$
+\begin{bmatrix}
+   p_1 \\ p_2 \\ \vdots \\ p_N \end
+{bmatrix} =
+\begin{bmatrix}
+    a & b & \dots & b \\
+    b & a & \dots & b \\
+    \vdots & \vdots & \dots & \vdots \\
+    b & b & \dots & a \\
+\end{bmatrix}^k
+\begin{bmatrix}
+   1 \\ 0 \\ \vdots \\ 0 \end
+{bmatrix}
+$$
+
+$a, b$ の値は次の通り:
+
+\begin{aligned}
+a &= \frac {1} {N} \frac {1} {N} + \frac {N - 1} {N} \frac {N - 1} {N} \\
+b &= \frac {1 - a} {N - 1}
+\end{aligned}
+
+遷移行列は巨大ですが、対角成分とその他に分けて計算できます。
+
+$$
+\begin{bmatrix}
+    a & b & \dots & b \\
+    b & a & \dots & b \\
+    \vdots & \vdots & \dots & \vdots \\
+    b & b & \dots & a \\
+\end{bmatrix}^{ }
+\begin{bmatrix}
+    a' & b' & \dots & b' \\
+    b' & a' & \dots & b' \\
+    \vdots & \vdots & \dots & \vdots \\
+    b' & b' & \dots & a' \\
+\end{bmatrix}^{ }
+:=
+\begin{bmatrix}
+    a'' & b'' & \dots & b'' \\
+    b'' & a'' & \dots & b'' \\
+    \vdots & \vdots & \dots & \vdots \\
+    b'' & b'' & \dots & a'' \\
+\end{bmatrix}^{ }
+$$
+
+したがって、以下を遷移とすれば良いです:
+
+\begin{aligned}
+a'' &= a a' + (n - 1) b b' \\
+b'' &= a b' + b a' + (n - 2) b b'
+\end{aligned}
+
+期待値 (答え) は $\sum\limits_{i=1}^{N} i p_i = p_1 + \sum\limits_{i=2}^{N} {i p_i} = p_1 + p_2 (\frac {(2 + N) (N - 1)} {2})$ です。
+
+* ABC 361
+
+[[https://atcoder.jp/contests/abc361][ABC 361]] に参加しました。
+
+#+CAPTION: Diff 予想
+| 問題 | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|-----+-------+-------+-------+-------+-------+-------|
+| 予想 |     10 |    600 |    800 | 1,500  | 1,000  | 1,900  |
+| 実際 |     15 |    299 |    342 | 1,202  | 1,213  | 1,606  |
+
+** [[https://atcoder.jp/contests/abc361/tasks/abc361_a][A 問題]]
+
+=splitAt k= して間に =x= を挿入する問題です。
+
+#+BEGIN_SRC hs
+main=interact$unwords.map show.f.map read.words;f(_:k:x:s)=take k s++[x]++drop k s
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc361/tasks/abc361_b][B 問題]]
+
+直方体の面が軸と並行なのがポイントです。
+
+それぞれの立方体を (x, y, z) 成分の区間 (interval) 3 つで表します。立方体同士の共通部分は、各成分の区間 (interval) 同士の共通部分 (intersection) の積です。
+
+初見で解ける人は算数のセンスがあると思います。
+
+** [[https://atcoder.jp/contests/abc361/tasks/abc361_c][C 問題]]
+
+これが解けなくて先に E に行ってしまいました。
+
+好きな要素を消して良いので、ソート後の列を考えます。最善としてありえるケースを全探索します。そのケースは、最小値を K 個消す、最小値を K - 1 個・最大値を 1 個消す、……、最大値を K 個消す、の (K + 1) 通りです。
+
+** [[https://atcoder.jp/contests/abc361/tasks/abc361_d][D 問題]]
+
+一見 ARC ですが、 BFS の問題でした。状態数を $3^{n+2}$ にして upsolve しました。
+
+** [[https://atcoder.jp/contests/abc361/tasks/abc361_e][E 問題]]
+
+辺に重みがあるタイプの全包囲木 DP で WA. 木の直径で十分なことに気付いて AC しました。
+
+* Misc
+
+** Nix Flakes 入門
+
+[[../2024-07-07-nix-flakes.html][Nix Flakes に入門してみました]] 。 =configuration.nix= を =flake.nix= に置き換えただけですが……。
+

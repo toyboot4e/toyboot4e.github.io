@@ -1,0 +1,352 @@
+#+TITLE: ABC 362 / Splay tree
+#+DATE: <2024-07-14 Sun>
+
+* ABC 362
+
+[[https://atcoder.jp/contests/abc362][ABC 362]] に参加しました。
+
+#+CAPTION: 体感 Diff
+| 問題 | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 |
+|------+--------+-------+--------+--------+-------|
+| 予想 |    100 |   300 |    600 | 8,00   | 1,500 |
+| 実際 |     12 |    66 |    521 | 634    | 1225  |
+
+** [[https://atcoder.jp/contests/abc362/tasks/abc362_a][A 問題]]
+
+指定色以外のペンの =min= を取ります。
+
+#+BEGIN_SRC hs
+main=interact$show.(f.map read.init<*>last).words;f[r,g,b](c:_)|c=='R'=0+min g b|c=='G'=min b r|0<1=min r g
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc362/tasks/abc362_b][B 問題]]
+
+三平方の定理かベクトルの内積で直角三角形を判定します。内積は $a \cdot b = \sum_i a_i b_i = |a| |b| \cos (\angle (a - b))$ より $|a| \ne 0, |b| \ne 0$ ならば $\sum_i a_i b_i = 0$ で直角を判定できます。
+
+前回も幾何でした。珍しい。
+
+** [[https://atcoder.jp/contests/abc362/tasks/abc362_c][C 問題]]
+
+Haskeller 的には難問です。解説も難しいのですが、一応書きました。
+
+$\{[\mathcal{dl}_i, \mathcal{dr}_i]\}_i$ が与えられ、各ステップでは $[\mathcal{dl}_i, \mathcal{dr}_i]$ の範囲内で移動します。 =inRange (sum dls, sum drs) 0= が成り立つならば =0= で停止できます。 =0= で停止できるなら、各ステップの移動量を決めて行きます。
+
+まず各ステップ $i$ で $\mathcal{dl}_i$ だけ移動するものとして、 =0= に近づくために必要な分だけ $\mathcal{dl}_i$ を $\mathcal{dr}_i$ に近づけていきます。この差分を $\mathcal{delta}_i$ とすると、 $\mathcal{delta}_i$ 列を求めて $\mathcal{dl}_i$ 列に加算することで解答できます。
+
+$\mathcal{delta}_i$ を決めるためには、必要な正方向への移動量を状態に持って $\{[\mathcal{dl}_i, \mathcal{dr}_i]\}_i$ を走査すれば良いです。リストならば =mapAccumL= が、 =vector= ならば =mapM= + =State= モナドが使えます。再帰関数を作っても良いですね。
+
+** [[https://atcoder.jp/contests/abc362/tasks/abc362_d][D 問題]]
+
+$v_1$ と各点間の最短距離を求めます。 Dijkstra 法を実施したいのですが、辺と頂点の両方に重みがあります。解法は 2 つあります:
+
+1. 頂点の重みを辺の重みに繰り込む
+   辺を作るときに頂点の重みを加算しておきます。
+
+2. 頂点倍化
+   [[https://atcoder.jp/contests/abc362/editorial/10421][evima さんの解説]] です。 $v_{in}, v_{out}$ に分けることで、頂点の重みを辺に組み込めるとか。
+
+Dijkstra 法は鉄則本やけんちょん本に載っています。枝刈りをお忘れなく！
+
+** [[https://atcoder.jp/contests/abc362/tasks/abc362_e][E 問題]]
+
+辛い……。 [[https://atcoder.jp/contests/abc362/submissions/55548303][2 ms]] ってどういうことなんですか？！
+
+** [[https://atcoder.jp/contests/abc362/tasks/abc362_g][G 問題]]
+
+苦手な文字列アルゴリズムです。 Suffix Array は最近作ったので upsolve したいです。
+
+* Misc
+
+** Splay tree
+
+Link/cut tree に必要という splay tree を実装しました。
+
+*** 主な情報源
+
+以下から学びました。
+
+- [[https://www.slideshare.net/slideshow/2013-spaceships2/17575244#137][Spaceships 解説]]
+  概要を掴むのに最適です。計算量解析は飛ばします……。
+
+- [[http://www.cs.cmu.edu/~sleator/papers/self-adjusting.pdf][Self-Adjusting Binary Search Trees]]
+  元論文に top-down splaying の解説がありました。結局これが一番良さそうですね。
+
+- [[https://github.com/sile/splay_tree][sile/splay\under{}tree]]
+  Top-down splaying を行う splay tree です。内部データを密に保つため、 =delete= は =swap_remove= のような処理になっています。どうなんでしょう。
+
+*** 用途
+
+用途はありません。今のところ *ただの遅い木* です。遅延評価とか link/cut tree にして初めて使い道が生まれるのかと思います。 Link/cut tree への期待が高まります。
+
+** なぜ =vector= の =concat= / =concatMap= は $O(N)$ なのか
+
+=vector= の [[https://hackage.haskell.org/package/vector-0.13.1.0/docs/Data-Vector-Generic.html#v:concat][concat]] は $O(N)$ と書かれています。単純に =(++)= で畳み込むわけではないようです。たとえば =(++)= を使って長さ $1$ の配列の $N$ 個畳み込む場合、長さ $2, 3, \dots, N$ の配列が生成されて最悪計算量は $O(N^2)$ になります。
+
+*** 結論
+
+=MVector= を経由して上手いことやっています。
+
+1. =concat= の場合
+  最終配列長が事前に分かるとしています。長さ =n= の配列を作って埋めていきます。
+
+2. =concatMap= の場合
+  最終配列長が事前に分からないものとしています (なぜ？) 。適当な長さの配列を作り、サイズを倍々にして行くようです。 =concatMap= が $O(N)$ で済むのは、 Rust における N 回の =Vec::push= 呼び出しが $O(N)$ なのと似ています。実際、長さ $1, 2, 4, \dots, 2^k$ の配列を生成した場合、高々 $4N$ 程度のアロケーションしかありませんから、 $O(N)$ です。
+
+*** =unstream=
+
+[[https://hackage.haskell.org/package/vector-0.13.1.0/docs/Data-Vector-Generic.html#v:concat][concat]] の中身を見ると、 =New.unstream= によって実装されています。 =unstream= 処理を追っていきましょう。
+
+#+BEGIN_SRC hs
+-- | /O(n)/ Concatenate all vectors in the list.
+concat :: Vector v a => [v a] -> v a
+{-# INLINE concat #-}
+concat = unstream . Bundle.fromVectors
+#+END_SRC
+
+#+BEGIN_DETAILS =concat= の関数呼び出しを辿る
+#+CAPTION: =Generic.hs=
+#+BEGIN_SRC hs
+-- | /O(n)/ Construct a vector from a 'Bundle'.
+unstream :: Vector v a => Bundle v a -> v a
+{-# INLINE unstream #-}
+unstream s = new (New.unstream s)
+
+-- | Construct a vector from a monadic initialiser.
+new :: Vector v a => New v a -> v a
+{-# INLINE_FUSED new #-}
+new m = m `seq` runST (unsafeFreeze =<< New.run m)
+#+END_SRC
+
+=New.unstream= は =MVector.vunstream= を呼んでいます。
+
+#+CAPTION: =New.hs=
+#+BEGIN_SRC hs
+-- ほぼ `MVector`
+data New v a = New (forall s. ST s (Mutable v s a))
+
+unstream :: Vector v a => Bundle v a -> New v a
+{-# INLINE_FUSED unstream #-}
+unstream s = s `seq` New (MVector.vunstream s)
+#+END_SRC
+
+さらに追いかけます。
+
+#+CAPTION: =Mutable.hs=
+#+BEGIN_SRC hs
+-- | Create a new mutable vector and fill it with elements from the 'Bundle'.
+-- The vector will grow exponentially if the maximum size of the 'Bundle' is
+-- unknown.
+vunstream :: (PrimMonad m, V.Vector v a)
+         => Bundle v a -> m (V.Mutable v (PrimState m) a)
+-- NOTE: replace INLINE_FUSED by INLINE? (also in unstreamR)
+{-# INLINE_FUSED vunstream #-}
+vunstream s = vmunstream (Bundle.lift s)
+#+END_SRC
+#+END_DETAILS
+
+結局 =Mutable= モジュールの =vmunstream= を呼び出しており、これは bundle の最大サイズが事前に分かるかで分岐しています。
+
+#+CAPTION: =Mutable.hs=
+#+BEGIN_SRC hs
+-- | Create a new mutable vector and fill it with elements from the monadic
+-- stream. The vector will grow exponentially if the maximum size of the stream
+-- is unknown.
+vmunstream :: (PrimMonad m, V.Vector v a)
+           => MBundle m v a -> m (V.Mutable v (PrimState m) a)
+{-# INLINE_FUSED vmunstream #-}
+vmunstream s = case upperBound (MBundle.size s) of
+               Just n  -> vmunstreamMax     s n
+               Nothing -> vmunstreamUnknown s
+#+END_SRC
+
+サイズ =n= が事前に分かる場合は、長さ =n= の =MVector= を作って埋めていきます。これが =concat= の場合です。
+
+#+BEGIN_DETAILS =vmunsteramMax=: bundle の最大サイズが事前に分かっている場合
+#+BEGIN_SRC hs
+vmunstreamMax :: (PrimMonad m, V.Vector v a)
+              => MBundle m v a -> Int -> m (V.Mutable v (PrimState m) a)
+{-# INLINE vmunstreamMax #-}
+vmunstreamMax s n
+  = do
+      v <- checkLength Internal n $ unsafeNew n
+      let {-# INLINE_INNER copyChunk #-}
+          copyChunk i (Chunk m f) =
+            checkSlice Internal i m (length v) $ do
+              f (basicUnsafeSlice i m v)
+              return (i+m)
+
+      n' <- Stream.foldlM' copyChunk 0 (MBundle.chunks s)
+      return $ checkSlice Internal 0 n' n
+             $ unsafeSlice 0 n' v
+#+END_SRC
+#+END_DETAILS
+
+サイズが不明の場合は、 =MVector= のサイズを倍々に増やしつつ埋めていきます。これが =concatMap= の場合です。
+
+#+BEGIN_DETAILS =vmunstreamUnknown=: bundle の最大サイズが事前に分からない場合
+#+BEGIN_SRC hs
+vmunstreamUnknown :: (PrimMonad m, V.Vector v a)
+                 => MBundle m v a -> m (V.Mutable v (PrimState m) a)
+{-# INLINE vmunstreamUnknown #-}
+vmunstreamUnknown s
+  = do
+      v <- unsafeNew 0
+      (v', n) <- Stream.foldlM copyChunk (v,0) (MBundle.chunks s)
+      return $ checkSlice Internal 0 n (length v')
+             $ unsafeSlice 0 n v'
+  where
+    {-# INLINE_INNER copyChunk #-}
+    copyChunk (v,i) (Chunk n f)
+      = do
+          let j = i+n
+          v' <- if basicLength v < j
+                  then unsafeGrow v (delay_inline max (enlarge_delta v) (j - basicLength v))
+                  else return v
+          checkSlice Internal i n (length v') $ f (basicUnsafeSlice i n v')
+          return (v',j)
+#+END_SRC
+#+END_DETAILS
+
+*** 
+*** =concat= の計算量
+
+=concat= はサイズが =Exact n= の =Bundle= を作って =unstream= にかけています。
+
+#+BEGIN_SRC hs
+-- | /O(n)/ Concatenate all vectors in the list.
+concat :: Vector v a => [v a] -> v a
+{-# INLINE concat #-}
+concat = unstream . Bundle.fromVectors
+#+END_SRC
+
+Fusion 関係のコードは読み込めていませんが、ひとまずサイズ指定の部分だけ見れば良いかと思います (=Exact n= です) 。
+
+#+BEGIN_DETAILS =Data/Vector/Fusion/Bundle/Monadic.hs=
+#+BEGIN_SRC hs
+fromVectors :: forall m v a. (Monad m, Vector v a) => [v a] -> Bundle m v a
+{-# INLINE_FUSED fromVectors #-}
+fromVectors us = Bundle (Stream pstep (Left us))
+                        (Stream vstep us)
+                        Nothing
+                        (Exact n) -- ***** これ
+  where
+    n = List.foldl' (\k v -> k + basicLength v) 0 us
+
+    pstep (Left []) = return Done
+    pstep (Left (v:vs)) = basicLength v `seq` return (Skip (Right (v,0,vs)))
+
+    pstep (Right (v,i,vs))
+      | i >= basicLength v = return $ Skip (Left vs)
+      | otherwise          = case basicUnsafeIndexM v i of
+                               Box x -> return $ Yield x (Right (v,i+1,vs))
+
+    -- FIXME: work around bug in GHC 7.6.1
+    vstep :: HasCallStack => [v a] -> m (Step [v a] (Chunk v a))
+    vstep [] = return Done
+    vstep (v:vs) = return $ Yield (Chunk (basicLength v)
+                                         (\mv -> check
+                                                 Internal
+                                                 "length mismatch"
+                                                 (M.basicLength mv == basicLength v)
+                                                 $ stToPrim $ basicUnsafeCopy mv v)) vs
+#+END_SRC
+#+END_DETAILS
+
+*** =concatMap= の計算量
+
+[[https://hackage.haskell.org/package/vector-0.13.1.0/docs/Data-Vector-Generic.html#v:concatMap][concatMap]] はサイズ =Unknown= の =Bundle= を作って =unstream= にかけています。
+
+#+BEGIN_SRC hs
+-- | Map a function over a vector and concatenate the results.
+concatMap :: (Vector v a, Vector v b) => (a -> v b) -> v a -> v b
+{-# INLINE concatMap #-}
+-- NOTE: We can't fuse concatMap anyway so don't pretend we do.
+-- ..
+concatMap f = unstream
+            . Bundle.concatVectors
+            . Bundle.map f
+            . stream
+#+END_SRC
+
+=Bundle= のサイズは =Unknown= です。
+
+#+BEGIN_DETAILS =Data/Vector/Fusion/Bundle/Monadic.hs=
+#+BEGIN_SRC hs
+concatVectors :: (Monad m, Vector v a) => Bundle m u (v a) -> Bundle m v a
+{-# INLINE_FUSED concatVectors #-}
+concatVectors Bundle{sElems = Stream step t}
+  = Bundle (Stream pstep (Left t))
+           (Stream vstep t)
+           Nothing
+           Unknown -- ***** これ
+  where
+    pstep (Left s) = do
+      r <- step s
+      case r of
+        Yield v s' -> basicLength v `seq` return (Skip (Right (v,0,s')))
+        Skip    s' -> return (Skip (Left s'))
+        Done       -> return Done
+
+    pstep (Right (v,i,s))
+      | i >= basicLength v = return (Skip (Left s))
+      | otherwise          = case basicUnsafeIndexM v i of
+                               Box x -> return (Yield x (Right (v,i+1,s)))
+
+
+    vstep s = do
+      r <- step s
+      case r of
+        Yield v s' -> return (Yield (Chunk (basicLength v)
+                                           (\mv -> check
+                                                   Internal
+                                                   "length mismatch"
+                                                   (M.basicLength mv == basicLength v)
+                                                   $ stToPrim $ basicUnsafeCopy mv v)) s')
+        Skip    s' -> return (Skip s')
+        Done       -> return Done
+#+END_SRC
+#+END_DETAILS
+
+*** =vconcatMapN=
+
+上記 =concatMap= において、 =Bundle= のサイズ指定を =Unknown= から =Exact n= に変更してみました。が、実行速度には無影響でした。
+
+- [[https://atcoder.jp/contests/abc362/submissions/55535867][=concatMap= を使った場合: 143 ms]]
+- [[https://atcoder.jp/contests/abc362/submissions/55594325][=vconcatMap= を使った場合: 144 ms]]
+
+なぜでしょう？　まあ問題無く使って行けそうです。
+
+** SNS 情報
+
+- [[https://audee.jp/program/show/300008578][vim-jp ラジオ]] 爆誕
+  めでたい！
+
+- [[https://sktgroup.co.jp/go7/][Boox Go Color 7]]
+  7 インチの色付き E-Ink 端末です。 _It just works_ ということで良さそうですが、 7 インチなのでパスです。 Kindle Scribe が色付きになると、大型技術書を色付きで読めて嬉しいのですが。
+
+*** Emacs
+
+- [[https://github.com/oantolin/embark][oantolin/embark]]
+  ポスト =completing-read= 時代の人気パッケージです。 =find-file= で選んだファイルを [[https://github.com/abo-abo/ace-window][abo-abo/ace-window]] で指定したウィンドウで開く ([[https://karthinks.com/software/fifteen-ways-to-use-embark/#:~:text=to%20suitable%20keys.-,Open%20any%20buffer%20by%20splitting%20any%20window,-This%20needs%20a][記事]]) など、活用できると良さそうですね。
+
+- [[https://github.com/blahgeek/emacs-lsp-booster][slotThe/emacs-lsp-booster]], [[https://github.com/slotThe/emacs-lsp-booster-flake][slotThe/emacs-lsp-booster-flake]]
+  LSP のメッセージ処理を並列処理にすることで、 =lsp-mode= も [[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] 並に速くなるとか。ひとまず入れました。
+
+** DTM
+
+*** PC
+
+先々週に買った PC ですが、購買を間違えました。やはりパソコンに疎いようです。
+
+- Intel の 13, 14 世代 CPU は発熱の問題が [[https://gazlog.jp/entry/intel-cpu-degrade-issue/][非常に深刻だった]]
+  ひとまず BIOS を更新して推奨設定にすれば問題無いと思いたいですが……。
+
+- SSD の開発元が怪しかった
+  幸い (?) 初期不良なので返品します。公式サイトが http なのは何とかしてほしいですね……。次は高級ブランド (Samsung) から買っておけば大丈夫でしょう。
+
+*** ギター (ど下手)
+
+急に 160 BPS の 16 分音符が弾けるようになりました (単弦に限る) 。手首というより、指でピッキングして良いことを理解しました。たぶん。
+
+トレモロの音が出せると色々遊べてデカいですが、どうでしょう。 SSD 到着待ちです。
+

@@ -1,0 +1,239 @@
+#+TITLE: ABC 372, スライド最小値、 Link/cut tree (1)
+#+DATE: <2024-09-22 Sun>
+
+* ABC 372
+
+[[https://atcoder.jp/contests/abc372][ABC 372]] に参加しました。
+
+#+CAPTION: Diff 予想
+| 問題      | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|-----------+--------+--------+--------+--------+--------+--------|
+| 提出      |     AC |     AC |     AC | AC     | AC     | -      |
+| Diff 予想 |      1 |    300 |    400 | 1,200  | 1,200  | 1,600  |
+| Diff 実際 |     12 |    131 |    341 | 901    | 1,042  | 1,722  |
+
+** [[https://atcoder.jp/contests/abc372/tasks/abc372_a][A 問題]]
+
+=.= を除外せよ。 =filter= します。
+
+#+BEGIN_SRC hs
+main=interact$filter(/='.')
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc372/tasks/abc372_b][B 問題]]
+
+$M$ をなるべく少ない数の $3^{A_i}$ の和に分解せよ。大きな $3^{A_i}$ から順に割っていきます。
+
+再帰を使いました。 =concatMapM= があれば良かったのですが。
+
+#+BEGIN_SRC hs
+eat :: Int -> [Int] -> [Int]
+eat = inner
+  where
+    inner 0 _ = []
+    inner x (i : is)
+      | y > x = inner x is
+      | otherwise = replicate q i ++ inner r is
+      where
+        !y = 3 ^ i :: Int
+        (!q, !r) = x `divMod` y
+    inner x y = error $ show (x, y)
+
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !m <- int'
+  let !res = eat m $ revese [0 .. 10]
+  printBSB $ length res
+  printList res
+#+END_SRC
+
+[[https://atcoder.jp/contests/abc372/submissions/58001292][cojna さんの提出]] (91 Byte) は素朴なコードですが真似できません。極まっています。
+
+** [[https://atcoder.jp/contests/abc372/tasks/abc372_c][C 問題]]
+
+文字列 =s= を書き換えるとき、連続部分列 =ABC= の数を追跡せよ。可変配列を持って愚直に解きました。
+
+=MaybeT= の使い方を理解しました。
+
+#+BEGIN_SRC hs
+isABC <- fmap (fromMaybe False) . runMaybeT $ do
+  a <- MaybeT $ UM.readMaybe s i
+  b <- MaybeT $ UM.readMaybe s $ i + 1
+  c <- MaybeT $ UM.readMaybe s $ i + 2
+  return $ [a, b, c] == "ABC"
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc372/tasks/abc372_d][D 問題]]
+
+ビルの列 $\{H_i\}_i$ が与えられた時、 $\forall k \in (i, j), H_k \le H_j$ が成り立つ $j$ の数を $i$ ごとに求めよ。原文よりややこしいですね。
+
+問題文とは逆に、右端のビル =j= を固定します。 ~i = j~ から始めると、 =(i, j]= の区間最大値は =i= を左へ動かすごとに単調増加します。したがって =j= 毎の =i= への寄与は区間加算となり、 Imos 法で計算できます。
+
+*** $O(N \log^2 N)$ 解 ($O(N \log N)$ 解)
+
+セグメント木の 2 分探索を使ってしましました。 [[https://atcoder.jp/contests/abc372/submissions/57980633][301 ms]].
+
+*** $O(N)$ 解
+
+スライド最小値で解けると教えてもらいました。 [[https://atcoder.jp/contests/abc372/submissions/58011675][21 ms]]. アルゴリズムは後述します。
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !hs <- intsU'
+
+  let !imos = U.create $ do
+         vec <- UM.replicate n (0 :: Int)
+         -- スライド最小値により、各ビルよりも左のビルであって、
+         -- そのビルよりも高い最寄りのビルを求める
+         let !ls = lookBackHigherIndices hs
+         U.iforM_ ls $ \r l_ -> do
+           let !l = max 0 l_
+           GM.modify vec (+ 1) l
+           GM.modify vec (subtract 1) r
+         return vec
+
+  printVec $ U.scanl1' (+) imos
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc372/tasks/abc372_e][E 問題]]
+
+$N$ 頂点 $0$ 辺のグラフがあり、以下の 2 種類のクエリを処理します。 1. 辺を追加する。 2. 頂点 =v= が属する連続成分の中で =k= 番目に大きな頂点の番号を求める。
+
+*** TLE 解
+
+頂点の集合を Union-FInd で管理しつつ、別途頂点番号の集合もマージして行きます。 =Set= を使えば *マージテクによりマージが償却 $O(\log N)$ になる気がしていました* が、 TLE しました。どうして……。
+
+*** 追記: TLE 解への修正
+
+同一集合のマージが $O(N)$ になっていると指摘を頂きました。完全に盲点！　ありがとうございます！
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">しばらく気になっていたんですが、どうももともと２頂点が同一連結成分にすでに属している場合に問題が発生しているような気がします。実際、when (root1 /= root2) $ do を挟むとACしました： <a href="https://t.co/6YrNwypsVV">https://t.co/6YrNwypsVV</a></p>&mdash; 符号/gksato (@Fine_sugar_hill) <a href="https://twitter.com/Fine_sugar_hill/status/1838189459239780553?ref_src=twsrc%5Etfw">September 23, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+類似の問題でも要注意です。
+
+*** AC 解 (制約を活かす)
+
+実は集合のサイズは =10= まで持てば良い制約でした。 =Set (Down Int)= を持って =take 10= すれば TLE 解が高速になります。
+
+** [[https://atcoder.jp/contests/abc372/tasks/abc372_f][F 問題]]
+
+これは面白いですね。ムキーッ
+
+* スライド最小値
+
+私はスライド最小値のアルゴリズムを思い出すため、写経ライブラリを覗き込みました。それには虫が付いていました。私は悲しいです。
+
+** 参照
+
+元ネタはこちら: [[https://qiita.com/kuuso1/items/318d42cd089a49eeb332][スライド最大（最小）値・ヒストグラム内最大長方形問題を俯瞰する]] 。写経して理解しました。ありがとうございます！
+
+以降は完全に焼き直しです。
+
+** (1) 固定幅の窓で見るスライド最小値
+
+*** 概要
+
+数列 =xs= を幅 =k= の窓で見た時に、それぞれの窓の中の最小値 (の添字) を $O(N)$ で求めます:
+
+#+BEGIN_SRC txt
+indices: 0 1 2 3 4 5  |
+values:  5 1 2 4 0 3  | min value indices
+----------------------+-----------------------------
+        [--*--]       | 1
+          [*----]     | 1
+            [----*]   | 4
+              [--*--] | 4
+#+END_SRC
+
+*** 操作
+
+窓 =[---]= と合わせて deque を持ち、窓を動かす度に以下の処理を実施します:
+
+1. 窓の左側に出た値 (の添字) は捨てる
+2. 窓の右端の値 $\ge$ ($\gt$) 新しく追加する値 $\Rightarrow$ 捨てる (繰り返す)
+  言い換えると =(a, Down Int)= の広義 (狭義) 単調性を保つように deque を更新します。
+
+これにより deque の左端の値が常に窓の中の最小値 (の添字) を表します。頭良いです。
+
+*** 例
+
+以下の例では窓と合わせて deque (=<i1 i2 ..>=) を管理してスライド最小値を計算します。 Deque の中の左端の値が窓の中の最小値です。
+
+#+BEGIN_SRC txt
+indices: 0 1 2 3 4 5 |
+values:  5 1 2 4 0 3 | max value indices:
+----------------------+-----------------------------
+        [--*--]      | 1
+        <  1 2>      |
+          [*----]    | 1
+          <1 2 3>    |
+            [----*]  | 4
+            <    4>  |
+              [--*--]| 4
+              <  4 5>|
+#+END_SRC
+
+もう少し分かりやすい図を……募集しています。
+
+** (2) ヒストグラム問題
+
+固定幅の窓で見るスライド最小値を改造します。前述の操作 =1.= を削除し、 deque の末尾にある値を読むことにすると、各ビル =i= よりも高い最寄りのビルが分かります。
+
+#+BEGIN_SRC hs
+-- | \(O(N)\) Solution to the histogram problem. Find the nearest higher building for each @i@..
+--
+-- @
+-- index:  -1  0   1   2   3   4
+-- height: --  1   5   2   4   3
+--           <---- |
+--                 | <---- |
+--                 |       | <-|
+--                 | <-|   |   |
+--           <-|   |   |   |   |
+-- look back: -1  -1   1   1   3
+-- @
+lookBackHigherIndices :: U.Vector Int -> U.Vector Int
+#+END_SRC
+
+これで今回の ABC 372 - D も一発撃墜です。頭良い！
+
+** Q & A
+
+- Q. セグメント木で OK ですか？
+  A. セグメント木で OK です
+
+* Link/cut tree (1)
+
+Link/cut tree は憧れのデータ構造でした。 [[https://judge.yosupo.jp/][Library Checker]] で大活躍します。 [[https://judge.yosupo.jp/submission/237053][1 問解けた]] ので、取り急ぎ教材だけメモします。
+
+- [[https://en.wikipedia.org/wiki/Link/cut_tree][Link/cut tree - Wikipedia]]
+  木を列 (preferred path) に分け、それぞれの列を splay tree に載せます。列同士は (preferred) path-parent と呼ばれる一方向の辺で繋ぎます。
+- [[https://hackmd.io/@CharlieChuang/By-UlEPFS#LinkCut-Tree][Lecture 5 - Splay Tree, Link/Cut Tree and ET-Tree]]
+  Wiki の内容を図で詳細に説明してくれています。
+- [[https://www.slideshare.net/slideshow/2-12188845/12188845][プログラミングコンテストでのデータ構造 2　～動的木編～ | PPT]]
+  さっと見ました。
+
+後は maspy さんの [[https://maspypy.github.io/library/graph/ds/link_cut_tree.hpp][graph/ds/link\under{}cut\under{}tree.hpp]] を写経すれば分かってきました。 Wiki とは言葉遣いがやや異なります。
+
+| Wiki           | maspy さんのライブラリ |
+|----------------+------------------------|
+| Preferred path | Heavy path             |
+| Path-parent    | Light edge             |
+| Access         | Expose                 |
+
+Top tree? も意外と簡単らしいので、制覇したいです。
+
+* Misc
+
+** NixOS
+
+- Kitty ターミナル上のカーソルサイズ
+  マウスカーソルの大きさの設定が Kitty terminal 上でも反映されるようになりました。最高の OS になって行く！
+
+- Suspend 後、復帰しなくなった
+  Linux でありがちなバグですが、デスクトップ機でも発生しました。 3 年ぐらい待てばたぶん直る。
+

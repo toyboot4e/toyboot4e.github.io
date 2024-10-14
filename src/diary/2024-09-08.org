@@ -1,0 +1,107 @@
+#+TITLE: ABC 370
+#+DATE: <2024-09-08 Sun>
+
+* ABC 370
+
+[[https://atcoder.jp/contests/abc370][ABC 370]] に参加しました。
+
+| 問題      | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 |
+|-----------+--------+-------+--------+--------+-------|
+| 提出      |     AC |    AC |     AC | AC     | -      |
+| Diff 予想 |      5 |   300 |    600 | 800    | 1,700 |
+| Diff 結果 |     11 |    84 |    228 | 1,088  | 1,453 |
+
+** [[https://atcoder.jp/contests/abc370/tasks/abc370 _a][A 問題]]
+
+パターンマッチです。 [[https://atcoder.jp/contests/abc370/submissions/57586511][ワンライナにする意味がありません]] ！
+
+#+BEGIN_SRC hs
+main=interact$(["Invalid","Yes","No"]!!).(`mod`3).sum.zipWith(*)[1,2].map read.words
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc370/tasks/abc370_b][B 問題]]
+
+畳み込みの問題です。ゴリ押しワンライナ……
+
+#+BEGIN_SRC hs
+main=interact$show.f.map(map(pred.read).words).lines;f([n]:x)=foldl(\i j->x!!max i j!!min i j)(x!!0!!0)[1..n]+1
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc370/tasks/abc370_c][C 問題]]
+
+コンパイルエラーと戦いました。エラーの原因は、 =UM.MVector= に対して =VM.MVector= の関数を使っていたことでした。 Haskell のコンパイルエラーは、 2 分探索とエスパーで戦うしかありません。。辛いです。
+
+** [[https://atcoder.jp/contests/abc370/tasks/abc370_d][D 問題]]
+
+行ごと、列ごとに =Set= で壁マスを持つとシミュレーションできます。
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!h, !w, !q) <- ints3'
+  !qs <- U.replicateM q ints11'
+
+  rows <- VM.replicate h (IS.fromList [0 .. w - 1])
+  cols <- VM.replicate w (IS.fromList [0 .. h - 1])
+
+  U.forM_ qs $ \(!y, !x) -> do
+    row <- VM.read rows y
+    col <- VM.read cols x
+    if IS.member x row
+      then do
+        -- この壁を削除
+        let !row' = IS.delete x row
+        let !col' = IS.delete y col
+        VM.write rows y row'
+        VM.write cols x col'
+      else do
+        -- 4 方の壁を削除
+        let !x1 = fromMaybe (-1) $ IS.lookupLT x row
+        let !x2 = fromMaybe (-1) $ IS.lookupGT x row
+        let !y1 = fromMaybe (-1) $ IS.lookupLT y col
+        let !y2 = fromMaybe (-1) $ IS.lookupGT y col
+
+        let !row' = (IS.delete x2 . IS.delete x1) row
+        let !col' = (IS.delete y2 . IS.delete y1) col
+        GM.write rows y row'
+        GM.write cols x col'
+
+        unless (y1 == -1) $ GM.modify rows (IS.delete x) y1
+        unless (y2 == -1) $ GM.modify rows (IS.delete x) y2
+        unless (x1 == -1) $ GM.modify cols (IS.delete y) x1
+        unless (x2 == -1) $ GM.modify cols (IS.delete y) x2
+
+  res <- V.sum . V.map IS.size <$> V.unsafeFreeze rows
+  printBSB res
+#+END_SRC
+
+=Set= に床マスを入れた場合は、より大きなグリッドの制約でも解くことができるそうです ([[https://atcoder.jp/contests/abc370/editorial/10905][hiro さんの解説]]) 。しかし 2 分探索パートが理解できません……。
+
+** [[https://atcoder.jp/contests/abc370/tasks/abc370_e][E 問題]]
+
+$DP[i]$ を $A_i$ で切ったときの、 $A_i$ までの有効な切り分けの数とします。位置 $x$ への流入は、全流入から位置 $x - k$ からの流入を引いたものです。なるほど。
+
+理解すればあっさり解けるのが〜青 diff 帯の DP ですが、やはり理解が難しい。
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !k) <- ints2'
+  !xs <- intsU'
+
+  let !positions = U.postscanl' (+) (0 :: Int) xs
+
+  let (!res, !_, !_) = U.foldl' step s0 positions
+        where
+          -- nTot: the number of valid splits so far
+          -- cnts: position -> count
+          s0 = (modInt 0, modInt 1, IM.singleton 0 1)
+          step (!_, !nTot, !cnts) !pos = (incoming, nTot', cnts')
+            where
+              !incoming = nTot - fromMaybe 0 (cnts IM.!? (pos - k))
+              !nTot' = nTot + incoming
+              !cnts' = IM.insertWith (+) pos incoming cnts
+
+  printBSB res
+#+END_SRC
+

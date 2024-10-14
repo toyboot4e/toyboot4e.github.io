@@ -1,0 +1,153 @@
+#+TITLE: ABC 373, Fenwick Tree, ACL 移植開始
+#+DATE: <2024-09-29 Sun>
+
+* ABC 373
+
+[[https://atcoder.jp/contests/abc373][ABC 373]] に参加しました。
+
+#+CAPTION: Diff 予想
+| 問題      | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|-----------+--------+--------+--------+--------+--------+--------|
+| 提出      |     AC |     AC |     AC | AC     | -      | AC     |
+| 予想 Diff |     40 |    200 |     10 | 1,000  | 1,800  | 1,600  |
+| 実際 Diff |     11 |     54 |     75 | 765    | 1,592  | 2,018  |
+
+** [[https://atcoder.jp/contests/abc373/tasks/abc373_a][A 問題]]
+
+文字列の列 $\{s_i\}_i (i \ge 1)$ に対し $\mathrm{length}\ s_i = i$ である $i$ の数を求めよ。リスト内包表記で文字数を節約します。
+
+#+BEGIN_SRC hs
+main=interact$show.f.lines;f x=sum[1|(i,s)<-zip [1..]x,i==length s]
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc373/tasks/abc373_b][B 問題]]
+
+=A, B, .., Z= の順列が与えられたとき、 =(A, B)= 間、 =(B, C)= 間、 .., =(Y, Z)= 間の距離の和を求めよ。 =vector= 芸でサクっと解けて楽しい問題でした。
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !s <- U.fromList . map (subtract (ord 'A') . ord) . BS.unpack <$> line' -- #(ref:1)
+  let !is = U.update (U.replicate 26 (-1 :: Int)) $ U.imap (flip (,)) s -- #(ref:2)
+  let !ds = U.zipWith ((abs.) . (-)) is (U.tail is) -- #(ref:1) -- #(ref:3)
+  printBSB $ U.sum ds
+#+END_SRC
+
+- [[(1)]] [[https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html#v:ord][ord]] 関数を活かして英大文字を =0, 1, ..= に写します。これは (位置 → アルファベット) の数列になっています。
+- [[(2)]] 逆に (アルファベット → 位置) の配列を作ります。
+- [[(3)]] この配列の隣接二項間の差の絶対値の和が答えです。
+
+** [[https://atcoder.jp/contests/abc373/tasks/abc373_c][C 問題]]
+
+2 つの数列それぞれの最大値の和を求めよ。 =maximum= のエイリアスを作って文字数を節約しました。
+
+#+CAPTION: 1,852 ms
+#+BEGIN_SRC hs
+main=interact$show.f.map read.words;f(n:x)=m(take n x)+m(drop n x);m=maximum
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc373/tasks/abc373_d][D 問題]]
+
+頂点間の距離の制約が与えられた時、制約を満たす重みの割り当てを 1 つ求めよ。 WA 後、解法を思いつかず重み付き Union-Find に手を出してしまいました。
+
+#+CAPTION: 末端の頂点が複数あり、単純なトポロジカルソートでは解けない
+#+BEGIN_SRC txt
+      4
+      ^
+      |
+1 --> 2 --> 3
+      ^
+0-----|
+#+END_SRC
+
+より正統的な解法としては、辺 =(u, v, w)= に対して辺 =(v, u, -w)= を加え、連結成分の重みを DFS で一挙に確定します。順序付きグラフだと思い込むと出てこない発想でした。難しくないですか……？
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !m) <- ints2'
+  !uvws <- U.replicateM m ints110'
+  let !gr = buildWSG n $ (uvws U.++) $ U.map (\(!u, !v, !dw) -> (v, u, -dw)) uvws
+
+  printVec $ U.create $ do
+    res <- UM.replicate n (0 :: Int)
+    done <- UM.replicate n False
+    forM_ [0 .. n - 1] $ \u0 -> do
+      flip fix u0 $ \dfs u -> do
+        unlessM (GM.exchange done u True) $ do
+          w0 <- GM.read res u
+          U.forM_ (gr `adjW` u) $ \(!v, !dw) -> do
+            GM.write res v $! w0 + dw
+            dfs v
+    return res
+#+END_SRC
+
+ちなみに重み付き Union-Find は DFS と同速でした。償却 $O(\alpha)$, の衝撃の実力！
+
+** [[https://atcoder.jp/contests/abc373/tasks/abc373_e][E 問題]]
+
+数列 $\{A_i\}_i$  に $K$ を分配するとき、 $i$ 毎に上位 $M$ に入りが確定するための最小の割り当てを求めよ (同率でも良い) 。未だに解けていません。
+
+畳み込みできる =Map= があれば、挿入・削除で楽できるのかなと思いました。 [[https://qiita.com/NokonoKotlin/items/c108a603622c03c4c67b][おこていゆさんの得意技]] です。
+
+** [[https://atcoder.jp/contests/abc373/tasks/abc373_f][F 問題]]
+
+EDPC の Tower を見に行って、近くの問題を見返すと Z - Frog が類題だと思いました。つまり CHT! CHT の式整理を真似ると 2 乗が消えませんでした。ところが $\{i^2\}_i$ は $\{0, 1, 4, 9, 16, ..\}$ という形ですから、 $\{(i+1)^2 - i^2\}_i$ は $\{1, 3, 5, 7, ..\}$ の等差数列になります。よって 1 ステップ手前を振り返るだけの単純な DP になります。
+
+$\mathrm{dp}[i]$ を (重さ → 最大価値) の配列とします。 $\mathrm{dp}[i]$ と合わせて $\mathrm{set}[i]$ にて各品物の使用数を記録して AC しました。しかし *よくよく* 考えると *嘘解法* だった気がします。 $\mathrm{dp}[i]$ の候補が複数あるとき、どの品物の使い方が将来的に最適であるか分からないためです。
+
+嘘解法が無ければ緑パフォでした。残念。
+
+** [[https://www.youtube.com/watch?v=qXmLBNBKBDA&t=285s][G 問題]]
+
+[[https://www.youtube.com/watch?v=qXmLBNBKBDA&t=285s][evima さんの解説]] を見ると最小費用流で解けそうで [[https://www.youtube.com/watch?v=fNpcVEK67EI][ジ・エンド]] です。ジ・エンド！
+
+* Fenwick Tree
+
+Fenwick Tree (Binary Index Tree; BIT) は群の区間和が $O(\log N)$ で求めるデータ構造です。セグメント木よりも定数倍が良く、盆栽コンテンツとして重要です。
+
+まだ理解しておらず、詳細は [[https://en.wikipedia.org/wiki/Fenwick_tree][Wikipedia]] の通りとします。図を見れば確かにそうなんですが、 LSB を使った動きがマジック……！
+
+- Fenwick Tree の頂点数は $N$ です。
+- $i$ 番目の頂点は $[i - \mathrm{lsb}(i), i)$ の区間和を持ちます。
+
+操作
+
+- 1 点加算 (=add=)
+  頂点 $i$ から頂点 $i + \mathrm{lsb}(i)$ への移動を続けると上手く状態更新できます。
+- $[1, i)$ の区間和の取得 (=prefixSum=)
+  頂点 $i$ から親頂点 $i - \mathrm{lsb}(i)$ への移動を繰り返して $[1, i)$ の区間和 (prefix sum) を取得できます。
+- 区間取得 (=sum=)
+  =prefixSum= の差により求めます。
+
+* Haskell
+
+** =Unbox= vector に boxed なデータ型を保存する
+
+Unboxed vector における [[https://hackage.haskell.org/package/vector-0.13.1.0/docs/Data-Vector-Unboxed.html#t:Vector][Vector]] とはデータ族 (≒ 関連型) であり、効率の良い配列型を返します。 Boxed 化された配列型を返しても問題は無く、 =newtype Boxed a= により boxed vector を割り当てられることにします。なるほど……！
+
+https://github.com/haskell/vector/issues/503
+
+たとえば cojna さんの [[https://cojna.github.io/iota/Data-Buffer.html][Data.Buffer]] にリッチなコレクションを入れることができるようになるはずです。 [[https://github.com/toyboot4e/toy-lib/commit/29fe7fe0cdc2dc026730bc5e4e061de36bec2c99][未検証ですが =Boxed= 型を導入しました]] 。
+
+** ac-library を Haskell に移植します
+
+=ac-library= の移植を始めました: [[https://github.com/toyboot4e/ac-library-hs][toyboot4e/ac-library-hs]] 。ワシが作ったと言いたいだけです。放っておいても完成しますが、完成後にさっと目を通してもらえると大変助かります。
+
+*** =iota= 速すぎ問題
+
+自分で ACL を移植するよりも、 [[https://github.com/cojna/iota][cojna/iota]] の縮小版を ACL とした方が高速なライブラリができます。実際、 [[https://github.com/cojna/iota][cojna/iota]] はしばしば ACL よりも高速です。 ACL としてはレギュレーション違反と言えなくもないですね (?) 。
+
+*** 意図
+
+このように欲を出すと際限が無く、合意できる線を探るのも困難です。そこで =ac-library= の写経をベースラインにしようと思います。
+
+- Yes: 盆栽無しでも問題を解けるようにしよう
+- No: 良いコードを書こう
+- No: みんなで最強の Haskell ライブラリを作ろう
+
+* Misc
+
+- Google の言語設定を英語にできない
+  なぜか日本語設定に巻き戻されるようになり厄介です。
+

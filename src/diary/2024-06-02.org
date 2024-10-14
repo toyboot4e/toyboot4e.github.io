@@ -1,0 +1,188 @@
+#+TITLE: ABC 356 / PAST 上級
+#+DATE: <2024-06-02 Sun>
+
+* ABC 356
+
+[[https://atcoder.jp/contests/abc356][ABC 356]] に参加しました。今回から diff の予想結果を記載します。
+
+#+CAPTION: Diff 予想
+| 問題 | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|------+--------+-------+--------+--------+-------+-------|
+| 予想 |    100 |   300 |    700 | 1,100  | 2,000 | 1,700 |
+| 実際 |     18 |    40 |    568 | 886    | 1506  | 2152  |
+
+改めて、序盤の振り返りではコードゴルフをやっています。自己満ですが、億劫になって『やるだけ』と書くよりは良い気がしています。
+
+** [[https://atcoder.jp/contests/abc356/tasks/abc356_a][A 問題]]
+
+無名関数 =(\-> .. )= を通常の関数にすると 1 文字節約できるみたいです。
+
+#+BEGIN_SRC hs
+main=interact$unwords.map show.f.map read.words;f[n,l,r]=[1..l-1]++reverse[l..r]++[r+1..n]
+main=interact$unwords.map show.(\[n,l,r]->[1..l-1]++reverse[l..r]++[r+1..n]).map read.words
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc356/tasks/abc356_b][B 問題]]
+
+=zipWith= 祭りで面白かったです。 =zipWith= の良い点は 2 変数関数が使える点で、演算子をポイントフリースタイルで書けます。
+
+#+BEGIN_SRC hs
+main=interact$f.map read.words
+f(n:m:r)=y.and$zipWith(<=)(take m r)$foldl(zipWith(+))[0|_<-[1..m]]$take n.tail$iterate(drop m)r
+y True="Yes"
+y False="No"
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc356/tasks/abc356_c][C 問題]]
+
+読解の難しい問題でした。 [[https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Bits.html][Data.Bits]] を使用しました。
+
+#+BEGIN_DETAILS =bit= 関数と =.&.= 演算子の使い方
+#+BEGIN_SRC hs
+ghci> -- i 番目の bit (のみ) を立てる
+ghci> bit 0 :: Int
+1
+ghci> bit 1 :: Int
+2
+ghci> bit 2 :: Int
+4
+
+ghci> -- bit 積を取る
+ghci> 0b11 .&. 0b01 :: Int -- 3 .&. 1
+1
+ghci> 0b11 .&. 0b10 :: Int -- 3 .&. 2
+2
+ghci> 0b11 .&. 0b11 :: Int -- 3 .&. 3
+3
+
+ghci> -- 立っている bit の数を数える
+ghci> popCount (0b11 :: Int)
+2
+ghci> popCount (0b10 :: Int)
+1
+ghci> popCount (0b00 :: Int)
+0
+#+END_SRC
+#+END_DETAILS
+
+ビット全探索は =[0 .. bit n - 1]= (リスト) または =U.generate (bit n) id= (vector) です。
+
+** [[https://atcoder.jp/contests/abc356/tasks/abc356_d][D 問題]]
+
+D 問題は桁 DP で解きました。 $k < N$ ならば各 bit は =0= または =1= を自由に取ることができるため、 $k = N$ と $k < N$ で場合分けします。
+
+難し過ぎて、 QuickCheck で愚直解と高速解を比較しました。参考: [[https://blog.miz-ar.info/2020/08/debugging-with-quickcheck/][QuickCheckで競プロ用Haskellコードをデバッグする]]
+
+#+CAPTION: QuickCheck によるテスト
+#+BEGIN_SRC hs
+-- 0 ~ 7 の N, M に対して愚直回と高速解を比較する
+propQC :: QC.Property
+propQC =
+  QC.forAll (QC.choose (0, maxN)) $ \n -> do
+    QC.forAll (QC.choose (0, maxN)) $ \m -> do
+      solveNaive n m QC.=== solve' n m
+  where
+    maxN = bit 3 - 1 :: Int
+
+-- 100 ケースをテストする
+runQC :: IO ()
+runQC = QC.quickCheck (QC.withMaxSuccess 100 propQC)
+#+END_SRC
+
+今回は REPL からテスト実行していました。コード編集の度に =:r= (reload) します:
+
+#+CAPTION: REPL からテスト実行
+#+ATTR_HTML: :class aa
+#+BEGIN_SRC txt
+$ stack repl d/Main.hs
+Ok, one module loaded.
+Loaded GHCi configuration ..
+
+REPL に入ったお                          ＿＿＿
+                                      ／　　　 　 ＼
+ghci> runQC                         ／⌒　　 ⌒　　　＼
++++ OK, passed 100 tests.        ／（● ）　（● ）　　　ヽ
+                                |　⌒（__人__）⌒　 　 　 |
+100 ケース通ったみたいだけど、    ＼ 　 ｀⌒ ´　　　　　／
+これで提出して大丈夫なんだお？       /　　　　 　 　 　 　 ＼
+
+　　 ／￣￣＼
+　／　　 _ノ　　＼
+　|　　　 （ ●）（●）     このサイズなら 100 も試せば十分だろ、
+.　|　　　　 （__人__）    常識的に考えて……
+　 |　　　　　｀ ⌒´ﾉ　　　
+.　 |　　　　　　 　 }
+.　 ヽ　　　　　 　 }
+　　 ヽ　　　　　ノ　　　　　　　　＼
+　　　/　　　 く　　＼　　　　　　　 ＼
+　　　|　　　　 ＼ 　 ＼ 　 　　　　　　＼
+　 　 |　　　　|ヽ、二⌒)､　 　 　　　　　 ＼
+#+END_SRC
+
+なお quickcheck を使わずとも =forM_= で全ケースをチェックすれば良いです。
+
+** [[https://atcoder.jp/contests/abc356/tasks/abc356_e][E 問題]]
+
+$\sum$ の一括計算が思いつかず飛ばしました。調和級数と言われても何も思いつきません。 Upsolve します。
+
+** [[https://atcoder.jp/contests/abc356/tasks/abc356_f][F 問題]]
+
+平方分割を考えていましたが、セグメント木で解けますね。
+
+セグ木を 2 本用意しました。モノイドも 2 種類です。
+
+- 左から右へ区間を繋げていくモノイド
+- 右から左へ区間を繋げていくモノイド
+
+これで 1 点から左右に伸ばせる区間が分かります。また区間和を取るために 3 本目のセグ木を使いました。
+
+その他気になる解法には区間を set で管理するテクニックがあります。解説も読んでみます。
+
+* PAST (アルゴリズム実技検定)
+
+PAST で出題される問題は典型問題が多いようです。実感としては、 upsolve するのも困難な骨太の問題ばかりです。 PAST (典型問題) が解けるなら十二分の実力があると思います。
+
+** PAST 18
+
+第 18 回アルゴリズム実技検定を受験し、結果は中級でした。時間はあったのに解ける問題がありませんでした。やはり上級は相当厳しいです。
+
+** PAST 19
+
+第 19 回アルゴリズム実技検定を受験し、上級を取得しました。
+
+#+CAPTION: 15 問中 12 問が解ければ上級
+[[./img/2024-06-02-past.png]]
+
+試験期間終了まで、これ以上言及できません。
+
+** PAST の出題傾向
+
+- 序盤は場合分けが煩雑になる問題が多い
+  序盤でも困難な問題が多いです。ただしランダムテストによってコーナーケースを発見できるため、確実に解ける問題にできます。 [[https://atcoder.jp/contests/past15-open/tasks/past202306_d][この問題]] だけは解答が間違っている気がしますが……
+
+- 中盤は典型問題が多い
+  過去問を解いて典型を網羅しました。グラフと DP が特に出ますね。
+
+- 中盤はテストケースが強い
+  $\log$ を付けると落とされる場合が多く、尺取り法や Warshall-Floyd などアルゴリズムの選択に慎重になる必要があります。
+
+- 後半は高度典型が出る
+  アルゴリズム一発の問題もあれば、典型 90 問のような考察テクニックが要求される問題もあります。今後、本格的に取り組んでみたいです。
+
+* Misc
+
+** Haskell にはコールスタックが無い
+
+Arithmetic overflow が出ました。
+
+#+BEGIN_SRC hs
+ ghci> testBit (0 :: Int) (-1 :: Int)
+ *** Exception: arithmetic overflow
+#+END_SRC
+
+厄介なのは、どのコールが例外を出したのか分からない点です。そもそも Haskell にはコールスタックが無いとかなんとか。確認中です。
+
+[[https://0xd34df00d.me/posts/2020/08/callstacks.html][Call stacks aren't really call stacks — 0xd34df00d.me]]
+
+次回は Haskell のデバッガや DAP の使い方を調べていこうかと思います。メモ: アルゴリズム面は区間を set で管理するテクニック
+

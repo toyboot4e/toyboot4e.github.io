@@ -1,0 +1,132 @@
+#+TITLE: ABC 363
+#+DATE: <2024-07-21 Sun>
+
+* ABC 363
+
+[[https://atcoder.jp/contests/abc363][ABC 363]] に参加しました。回分回でした。爆死された方が多かったようです。
+
+#+CAPTION: 体感 Diff
+| 問題 | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 |
+|-----+-------+-------+-------+-------+-------|
+| 予想 |     10 |    200 |    600 | 1,500  | 1,000  |
+| 実際 |     18 |     32 |    602 | 975 | 1,307  |
+
+** [[https://atcoder.jp/contests/abc363/tasks/abc363_a][A 問題]]
+
+$A$ を 100 の倍数に切り上げたとき、元の数よりどれだけ大きくなるか。 $100 - a\%100$ で解けます。
+
+#+BEGIN_SRC hs
+main=print.((100-).(`mod`100))=<<readLn
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc363/tasks/abc363_b][B 問題]]
+
+愚直テストを 2 分探索しました。
+
+今考えると、降順ソートして前から P 番目の人に注目するのが良さそうです。
+
+#+CAPTION: 昇順ソートして後ろから $N - P + 1$ 番目の人に注目しても良し
+#+BEGIN_SRC hs
+import Data.List;main=interact$show.f.map read.words;f(n:t:p:l)=max 0$t-sort l!!(n-p)
+#+END_SRC
+
+よくあるソートは $O(N \log N)$ ですが、 [[https://hackage.haskell.org/package/vector-algorithms-0.9.0.2/docs/Data-Vector-Algorithms-Intro.html#v:selectBy][selectBy]] を使えば $O(N)$ で解けるそうです？　CS をやった人ならピンと来るかもしれません。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">そういえば　Data.Vector.Algorithms.Intro.selectBy を使うとABC363-BはO(N) で解けますね</p>&mdash; 符号/gksato (@Fine_sugar_hill) <a href="https://twitter.com/Fine_sugar_hill/status/1814663774252769741?ref_src=twsrc%5Etfw">July 20, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+** [[https://atcoder.jp/contests/abc363/tasks/abc363_c][C 問題]]
+
+$O(N \cdot N!)$ が通るため、すべての (ユニークな) 順列を全探索します。 vector の [[https://hackage.haskell.org/package/vector-0.13.1.0/docs/Data-Vector-Generic-Mutable.html#v:nextPermutation][nextPermutation]] で解けそうですね。
+
+実際は TLE します。 2014 年の =TODO= が原因だったので、 [[https://github.com/haskell/vector/pull/497][vector に PR を投げました]] 。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet" data-conversation="none"><p lang="ja" dir="ltr">ちなみにstrictness analysisでうまくいかないのは一般のPrimMonad だからっぽいので、そこにbang patternを突っ込む代わりに 処理開始時に stToPrim を噛ませても解決します:<a href="https://t.co/trLQ7ZvTX2">https://t.co/trLQ7ZvTX2</a></p>&mdash; 符号/gksato (@Fine_sugar_hill) <a href="https://twitter.com/Fine_sugar_hill/status/1814853993526665641?ref_src=twsrc%5Etfw">July 21, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+=stToPrim= でさらに速くなります。型クラスを使うと遅くなる (*) ので、モナドのインスタンスを =ST= に確定させた方が速いんですね。勉強になりました。
+
+(*): 正確性解析や辞書渡しが原因
+
+辞書順列を列強する [[https://github.com/toyboot4e/toy-lib/blob/7c87d5cd25343c9a800eab2d1b0383d48a348268/src/ToyLib/DP.hs#L224][lexPerm]] で upsolve しました。本来は軽い問題ですね。
+
+#+CAPTION: ほぼワンライナ
+#+BEGIN_SRC hs
+  -- p の定義は省略
+  printBSB $ V.length $ V.filter p $ lexPerms xs
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc363/tasks/abc363_d][D 問題]]
+
+難しくないですか？　考察中です。
+
+** [[https://atcoder.jp/contests/abc363/tasks/abc363_e][E 問題]]
+
+ヒープで解きます。 cojna さんの [[https://github.com/cojna/iota/blob/4257f2c1ec2718ce17d23651eddda74800771105/src/Data/Heap/Binary.hs][BinaryHeap]] は最高だぜの問題でした。
+
+* Misc
+
+** ビルド環境の改善
+
+自作ライブラリを =Main.hs= に埋め込むのを止め、外部ライブラリとして参照する形に変更しました。例: [[https://github.com/toyboot4e/abc-hs/blob/17743fe1abc8c70edc7d938474c47f069e954b4a/abc363/c/Main.hs][直近の =Main.hs=]], [[https://atcoder.jp/contests/abc363/submissions/55836610][提出 (埋め込み)]] 。
+
+プロジェクトファイルはこんな感じです:
+
+#+CAPTION: =cabal.project=
+#+BEGIN_SRC yaml
+packages:
+  ./abc363.cabal
+  -- 絶対パス (仮)
+  ~/dev/hs/toy-lib/toy-lib.cabal
+
+constraints: (
+  -- debug ログ ON
+  toy-lib +debug
+#+END_SRC
+
+#+CAPTION: =abc363.cabal=
+#+BEGIN_SRC yaml
+common deps
+  build-depends:
+    , adjunctions                    ^>=4.4.2
+    -- ~~
+    , toy-lib
+    -- ~~
+#+END_SRC
+
+提出直前にライブラリを埋め込んで =.submit.hs= を作成します。提出ファイルも変更しました:
+
+#+CAPTION: =template.json= ([[https://github.com/Tatamo/atcoder-cli][atcoder-cli]])
+#+BEGIN_SRC json
+{
+    "task": {
+        "program": [
+            "Main.hs"
+        ],
+        "submit": ".submit.hs"
+    }
+}
+#+END_SRC
+
+初回ビルドが遅いので、 Nix か何かでビルドキャッシュを共有したいところです。
+
+** コンテスト用コードの短縮
+
+全ライブラリの埋め込みを止め、指定モジュールのみ埋め込むことにしました。 Haskell longest コードゴルフ王者、引退です。
+
+#+CAPTION: =toy-lib import= セクションを提出時に埋め込む
+#+BEGIN_SRC hs
+-- {{{ toy-lib import
+import ToyLib.Contest.Prelude
+-- import ToyLib.Contest.Bisect
+-- import ToyLib.Contest.Graph
+-- import ToyLib.Contest.Grid
+-- import ToyLib.Contest.Tree
+import ToyLib.DP
+-- }}} toy-lib import
+#+END_SRC
+
+いずれ使用モジュールのみ自動的に埋め込むようにしたいです。
+

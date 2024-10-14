@@ -1,0 +1,165 @@
+#+TITLE: ABC 357 / 区間を set で管理するテク
+#+DATE: <2024-06-09 Sun>
+
+* ABC 357
+
+[[https://atcoder.jp/contests/abc357][ABC 357]] に参加しました。 Diff 予想は全然当たりません。
+
+#+CAPTION: Diff 予想
+| 問題 | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|------+--------+-------+--------+--------+-------+-------|
+| 予想 |    200 |    50 |    600 |    600 | 1,100 | 1,600 |
+| 実際 |     19 |    26 |    371 |    970 | 1295  | 1793  |
+
+** [[https://atcoder.jp/contests/abc357/tasks/abc357_a][A 問題]]
+
+1 問目から飛ばし気味です。累積和を考えると良いですね。
+
+#+BEGIN_SRC hs
+main=interact$show.f.map read.words;f(_:m:r)=length.takeWhile(<=m)$scanl1(+)r
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc357/tasks/abc357_b][B 問題]]
+
+[[https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html][Data.Char]] に [[https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html#v:isUpper][isUpper]], [[https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html#v:toUpper][toUpper]], [[https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html#v:isLower][isLower]], [[https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html#v:toLower][toLower]] があります。 [[https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Char.html#v:ord][ord :: Char -> Int]] もよく使います。
+
+#+BEGIN_SRC hs
+import Data.Char
+main=interact$flip map<*>f.sum.map(g.isUpper).init
+g b|b=1|0<1=(-1)
+f n|n>0=toUpper|1>0=toLower
+#+END_SRC
+
+=interact= には改行文字が付いてくるので =init= で切り落としました。
+
+** [[https://atcoder.jp/contests/abc357/tasks/abc357_c][C 問題]]
+
+手続き的にごり押ししました。皆さんの解答が美しくて良かったです。グリッドと戦う時は、いつもグシャグシャになってしまう……
+
+** [[https://atcoder.jp/contests/abc357/tasks/abc357_d][D 問題]]
+
+入力値を $x$ とすると、 $\sum\limits_{i \in [0, \mathcal{x})} p^i x (p := 10^{\mathcal{len}})$ を計算します。
+
+$S := \sum\limits_{i \in [0, x)} p^i$ の計算方法は、数列でしこたまやったやつですね。
+
+\begin{aligned}
+S &= p^0 + p^1 + \dots + p^{x - 1} \\
+p S &= 0 + p^1 + \dots + p^{x - 1} + p^{x} \\
+S &= \frac {p^{x} - p^0} {p - 1}
+\end{aligned}
+
+$p^x$ の部分は [[https://booth.pm/ja/items/1577541][【電子版単体】Haskellで戦う競技プログラミング 第2版]] でおなじみの Fermet の小定理およびダブリング (binary lifting) で計算しました。オーバーフローには要注意です。パワー！
+
+** [[https://atcoder.jp/contests/abc357/tasks/abc357_e][E 問題]]
+
+Functional graph の問題です。閉路の部分をサイズ K の頂点 1 つに置き換えるようなイメージで解きました。グラフと戦う時は、いつもグシャグシャになってしまう……
+
+** [[https://atcoder.jp/contests/abc357/tasks/abc357_f][F 問題]]
+
+課題を感じさせる問題でした。
+
+- 平方分割力
+  平方分割が安定した場合に稼げるレーティングはデカい！　良いテンプレートを作りたいです。
+
+- 遅延セグメント木力
+  形式的には $(f_1 \diamond f_2) * (x_1 \diamond x_2) = (f_1 * x_1) \diamond (f_2 * x_2)$ が成り立つように計算を考えれば良いのですが、これもイメージが乏しく対策の必要性を感じました。
+
+* 区間を set で管理するテクニック
+
+** 概要
+
+=IntervalMap= はある種の区間クエリを捌くシンプルなデータ型です。
+
+- =insertIM :​: Int -> Int -> a -> IntervalMap a -> IntervalMap a=
+  =[l, r]= 区間の値を =x= にします。区間同士の重複した部分は、後から挿入された区間によって上書きされるものとします。
+
+- =deleteIM :​: Int -> Int -> IntervalMap a -> IntervalMap a=
+  =[l, r]= 区間の値を削除します。
+
+*** 例
+
+#+BEGIN_SRC txt
+初期状態:
+    [---------]       [---------]  [-------]
+         x                 y           z
+
+値 a の区間を挿入する:
+                             ********
+    [---------]       [-----][------][-----]
+         x               y      a       z
+
+区間を削除する:
+          ***************
+    [----]               [--][------][-----]
+       x                 y      a      z
+#+END_SRC
+
+*** 償却計算量について (お気持ち解説)
+
+区間の数は 1 度の挿入で高だが 2 つしか増えません。また多数の区間を上書き／削除した場合、区間の数はごっそりと減ります。よって insert/delete の償却計算量は区間数に比例しません。
+
+*** 命名について
+
+区間 =[l, r]= の訳は interval =[l, r]= であり、 range map よりも interval map と呼ぶのが適切なようです。
+
+と言いつつ Haskell には [[https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Ix.html#v:inRange][inRange]] 関数があるため、 Haskell においては =RangeMap= と呼ぶのも問題無い気がします。
+
+** リファレンス実装
+
+[[https://atcoder.jp/contests/past202104-open/tasks/past202104_m][PAST 06 M - 等しい数]] は、上記のテクを持っていると「やるだけ」な問題です。解説 [[https://noimi.hatenablog.com/entry/2021/05/02/195143][区間を管理する構造体 - のいみのいみのいみのいみ]] を写経して =IntervalMap= を実装しました。
+
+C++ の =std::set= は [[https://cpprefjp.github.io/reference/set/set/upper_bound.html][upper\under{}bound]] が左から右へのイテレータを返す点などが良さそうでした。実際、 [[https://atcoder.jp/contests/past202104-open/submissions/22259205][noimi さんの提出]] が 328 ms で [[https://atcoder.jp/contests/past202104-open/submissions/54303097][僕の提出]] が 1055 ~ 1304 ms です。速い木が欲しい……！
+
+** Quickcheck
+
+Insert/delete のクエリを生成し、 =IntervalMap= の計算結果を愚直解と比較する quickcheck を作成しました。あまり個々の property をチェックする必要性を感じません。
+
+** 感想
+
+素直な方法でした。アルゴリズムとしては Union-Find よりも簡単な気がしますが、なぜか『高度典型』に含まれるようです。
+
+* Misc
+
+** デバッグ
+
+未だに runtime error の発生箇所が分からない問題……悲しいです。至るところに =HasCallStack= があれば良いのに……。
+
+vector に関しては =U.(!)= に =HasCallStack= が付いていない問題を理解し、 [[https://github.com/haskell/vector/issues/494][issue を立てました]] 。 =U.(!)= の実行時エラーは発生箇所が分かりませんが、 =G.(!)= の方はフルでスタックトレースが出ます。 =G.(!)= を好んで使うべきでしょう。
+
+実行時エラーの際に、常にスタックトレースを表示するようなデバッグビルドを探しています。たとえば =stack= で =--trace= 引数を使うと……何も起きません。気長に調べます。
+
+- [[https://docs.haskellstack.org/en/stable/debugging/][Debugging - The Haskell Tool Stack]]
+- [[https://wiki.haskell.org/Debugging][Debugging - HaskellWiki]]
+- [[https://downloads.haskell.org/ghc/latest/docs/users_guide/ghci.html#the-ghci-debugger][3.5. The GHCi Debugger]] (公式ドキュメント)
+- [[https://github.com/phoityne/hdx4emacs][https://github.com/phoityne/hdx4emacs]] (dap-mode の設定)
+
+** Quickcheck の書き方の調べ方
+
+ChatGPT にタプルのジェネレータの書き方を教えてもらいました。
+
+#+BEGIN_SRC hs
+valueSpanGen :: Int -> Int -> Int -> Int -> Gen (Bool, (Int, Int, Int))
+valueSpanGen l0 r0 xl xr = do
+  l <- QC.chooseInt (l0, r0)
+  r <- QC.chooseInt (l, r0)
+  x <- QC.chooseInt (xl, xr)
+  return (True, (l, r, x))
+#+END_SRC
+
+=Property= を作る際には、それぞれの =Gen= を =QC.forAll= にかける必要があります。 =forAll= のネストを減らしたければ、 =Gen= の方をタプルにまとめてしまえば良いようです。
+
+** ガチ言語 Haskell
+
+99 likes まで言っていました。ありがとう……読みづらくてごめんなさい……
+
+入門とはトラブルシューティングのことだと思っていたので、そうした事例の寄せ集めになっているかと思います。 **読み通すだけでレベルアップできるような構成** を目指すべきだと反省しています。書き直したい……！
+
+** やる夫
+
+やる夫を書いてみたかったのですが、厳しい状況でした。
+
+-  [[https://yaruo.fandom.com/wiki/%EF%BC%88%C2%B4%D0%B4%EF%BD%80%EF%BC%89Edit][(´Д｀)Edit]] は 2010 年辺りで開発が止まっている
+-  そもそも Windows 以外の環境で表示崩れしがち (MS Gothic 前提)
+
+Haskeller やる夫、 brainf*ck 霊夢、 Nibbles の妖精などを見てみたかったです。
+
