@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ac-library-hs を作ります - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1><code>ac-library-hs</code> を作ります</h1>
+      <p>Oct 17, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="初めに"><a href="#初めに">初めに</a></h2>
+      <p>
+        <a href="https://atcoder.jp/posts/517">AtCoder Library (ACL)</a> を Haskell
+        に移植します。リポジトリはこちら:
+        <a href="https://github.com/toyboot4e/ac-library-hs">toyboot4e/ac-library-hs</a>
+        。次回言語アップデートでは、 AtCoder 環境で
+        <code>ac-library-hs</code> を利用可能にしたいです。<br />
+      </p>
+      <h3 id="進捗"><a href="#進捗">進捗</a></h3>
+      <p>
+        全体の約 40% を移植し、
+        <a href="https://atcoder.jp/contests/practice2/tasks">AtCoder Library Practice Contest</a>
+        を 12 問中 5 問 解けました。 (<a
+          href="https://github.com/toyboot4e/ac-library-hs/tree/main/verify/app"
+          >コードはこちら</a
+        >) 。移植が完了したら、他の Haskeller の方々に諸々の方針を伺って改善して行きます。<br />
+      </p>
+      <h2 id="背景"><a href="#背景">背景</a></h2>
+      <h3 id="あなたは誰？"><a href="#あなたは誰？">あなたは誰？</a></h3>
+      <p>
+        僕 (toyboot4e) は 2 年間 Haskell で競技プログラミングをやっています。競プロ以外では Haskell
+        を使っていません。 Haskell
+        に詳しくはないものの、競プロの範囲では問題無く使っていけるレベルです。<br />
+      </p>
+      <h3 id="外的モチベーション"><a href="#外的モチベーション">外的モチベーション</a></h3>
+      <p>誰かに少しでも良い影響があると嬉しいです。<br /></p>
+
+      <ul>
+        <li>
+          Haskell で AtCoder をやっている人<br />
+          競プロ x Haskell コンテンツとして刺激になれば幸いです。<br />
+        </li>
+
+        <li>
+          Haskell を使ってみたい人<br />
+          Haskell で解く AtCoder を真剣に検討する機会になれば幸いです。<br />
+        </li>
+
+        <li>
+          Haskell / AtCoder 初心者<br />
+          AtCoder への取り組みが心的に楽になれば幸いです。<br />
+        </li>
+      </ul>
+      <h3 id="私的モチベーション"><a href="#私的モチベーション">私的モチベーション</a></h3>
+      <p>移植作業は大きな手間ですが、至って利己的な理由で取り組んでいます。<br /></p>
+
+      <ul>
+        <li>
+          <a href="https://github.com/atcoder/ac-library">ac-library</a>
+          から学びたいことがある<br />
+          SA-IS 法、最小費用流の <code>slope</code>, 高速な NTT, 高速な SCC など<br />
+        </li>
+
+        <li>
+          Haskell ライブラリのプラクティスを集めたい<br />
+          <ul>
+            <li>テストの書き方 (特に QuickCheck)<br /></li>
+            <li>ベンチマークテストの書き方<br /></li>
+            <li>依存パッケージの適切なバージョン指定<br /></li>
+            <li>複数のバージョンの GHC をサポートする方法<br /></li>
+            <li>Nix を使ったビルド方法<br /></li>
+            <li>Docker を使った環境構築<br /></li>
+            <li>などなど……<br /></li>
+          </ul>
+        </li>
+      </ul>
+      <h2 id="ac-library-hs の方針">
+        <a href="#ac-library-hs の方針"><code>ac-library-hs</code> の方針</a>
+      </h2>
+      <p><code>toyboot4e/ac-library-hs</code> では以下を目標にしています。<br /></p>
+      <h3 id="目標 1. ac-library の API を再現する">
+        <a href="#目標 1. ac-library の API を再現する"
+          >目標 1. <code>ac-library</code> の API を再現する</a
+        >
+      </h3>
+      <p>基本的に <code>ac-library</code> を愚直に書き写し、 API は変更しません。<br /></p>
+
+      <ul>
+        <li>半開区間を使う API があれば従う<br /></li>
+        <li>
+          2 値タプル or 2 引数の指定に従う (例: <code>(l, r)</code> 引数 or
+          <code>l r</code> 引数の指定に従う)<br />
+        </li>
+        <li>
+          暗に可変長配列を前提とした API があれば従う (例: 最大データ数を引数に取らない)<br />
+        </li>
+        <li>
+          Haskell 特有の事情で API を追加するのは良しとする (例: <code>merge</code> と
+          <code>merge_</code> を分ける)<br />
+        </li>
+        <li>追加機能は作成しない (例: <code>Extra</code> モジュールを作らない)<br /></li>
+      </ul>
+
+      <p>より細かな方針は以下です。<br /></p>
+
+      <ul>
+        <li><code>vector</code> を使用する。 <code>array</code> やリストは極力使用しない<br /></li>
+        <li>
+          <code>HasCallStack</code> を使う。 <code>VUM.write</code> よりも
+          <code>VGM.write</code> を使う<br />
+        </li>
+        <li>
+          <code>assert</code> を書く (最適化時も削除されない
+          <code>runtimeAssert</code> 関数を作成し使う)<br />
+        </li>
+        <li>
+          <code>new</code> のようなコンストラクタでは、
+          <code>@Type</code> 指定すべき型パラメータを先頭に置く (状態トークンは末尾に置く)<br />
+        </li>
+        <li>独自の型クラスを追加しない (特にセグメント木において)<br /></li>
+      </ul>
+
+      <p>内部実装の方針は以下です:<br /></p>
+
+      <ul>
+        <li>タプルは必ず正確評価する。多相な型を持つ値を正確評価する<br /></li>
+        <li><code>MagicHash</code> は (まだ) 使わなくても良い<br /></li>
+      </ul>
+      <h3 id="目標 2. ドキュメントを充実させる">
+        <a href="#目標 2. ドキュメントを充実させる">目標 2. ドキュメントを充実させる</a>
+      </h3>
+      <p>
+        最低限、 haddock, doctest, README,
+        日英対応ドキュメントを用意します。またメタ的なドキュメント (テスト実行、 doctest, haddock,
+        veirfy, ベンチマークテストなど) をまとめ、開発者体験向上パックを目指したいです。<br />
+      </p>
+      <h3 id="努力目標. Bundler を作る">
+        <a href="#努力目標. Bundler を作る">努力目標. Bundler を作る</a>
+      </h3>
+      <p>
+        <code>ac-library-hs</code> の欠如よりも上位の問題は、名前解決できる bundler
+        が無いことです。<br />
+      </p>
+
+      <p>
+        AtCoder では、問題への解答として <code>Main.hs</code> 単体ファイルを提出します。ユーザは
+        <code>Main.hs</code> の中で名前衝突を避ける工夫が要求されます。たとえば
+        <code>pushHeap</code> と <code>pushBuffer</code> のような名前分けが要求されます。<br />
+      </p>
+
+      <p>
+        理想的には <code>Heap.push</code>,
+        <code>Buffer.push</code> のように名前空間を使ってソースを作成し、提出直前に
+        <code>pushHeap</code>, <code>pushBuffer</code> のような形で 1 つのファイルに bundling
+        したいです。これが可能なら、より自由に自作ライブラリを使用できますし、言語アップデート前に
+        <code>ac-library-hs</code> が使えることにもなります。<br />
+      </p>
+
+      <p>
+        このような完全な bunlder
+        を作るのは現実的ではないため、単純な単語置換で対応する方法を考えたいです。たとえば qualified
+        import の名前空間はグローバル (名前の重複が無い) と仮定すれば、打つ手がある気がします。<br />
+      </p>
+      <h3 id="補足 (Q&A 形式)"><a href="#補足 (Q&A 形式)">補足 (Q&amp;A 形式)</a></h3>
+      <ul>
+        <li>
+          実装は分担しますか<br />
+          Issue を開いて頂ければ、即分担します！　放っておくと toyboot4e が実装します。<br />
+        </li>
+
+        <li>
+          みんなで共有のライブラリを作るのはどうですか<br />
+          人によって好みの差が激しいと思うので、 ACL を移植します！<br />
+        </li>
+
+        <li>
+          コラボレーションの場ですか<br />
+          あまりそうではないですが、情報交換の機会にして頂けると嬉しいです！<br />
+        </li>
+      </ul>
+      <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
+      <p>
+        <a href="https://atcoder.jp/posts/517">AtCoder Library (ACL)</a>
+        を移植しています。ライブラリの提供よりも上位の目標としては、 AtCoder
+        で競プロをやる人たちの娯楽になったり、開発者経験の向上を目指したいです。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
