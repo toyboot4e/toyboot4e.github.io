@@ -128,7 +128,7 @@
 
       <p>
         円環を開きます。正方向の回転の可否を \(L < R'\) かつ \(L < T'\) となる最小の \(R', T'\)
-        (\(R' \equiv R \mod N, T' \equiv T \bmod N\)) を使って検証します。移動経路中に \(R'\)
+        (\(R' \equiv R \bmod N, T' \equiv T \bmod N\)) を使って検証します。移動経路中に \(R'\)
         があるかを <code>inRange</code> で判定すれば良いです。<br />
       </p>
 
@@ -140,8 +140,7 @@
         <a href="#C 問題"><a href="https://atcoder.jp/contests/abc376/tasks/abc376_c">C 問題</a></a>
       </h3>
       <p>
-        \(N\) 個の物体と \(N - 1\) 個の箱がある。
-        <code>大きさ(物体) \le 大きさ(箱)</code>
+        \(N\) 個の物体と \(N - 1\) 個の箱がある。 <code>大きさ(物体) &lt;</code> 大きさ(箱)=
         となるようマッチングさせたとき、最も小さな物体のみを余らせよ。<br />
       </p>
 
@@ -154,9 +153,9 @@
 eat :: [Int] -&gt; [Int] -&gt; ([Int], [Int])
 eat = inner ([], [])
   where
-    -- 箱が無くなった場合
-    inner (!ls, !rs) [] restR = (ls, rs ++ restR)
     -- 物体が無くなった場合
+    inner (!ls, !rs) [] restR = (ls, rs ++ restR)
+    -- 箱が無くなった場合
     inner (!ls, !rs) restL [] = (ls ++ restL, rs)
     -- 箱も物体もある場合
     inner (!ls, !rs) (x : xs) (y : ys)
@@ -248,9 +247,8 @@ eat = inner ([], [])
 
       <p>
         その状態数を一定数のスロットに削減するのが DP! 2 物体の位置 \((l, r)\) をキーに
-        <code>Map</code> で緩和すると \(O(NM \log N)\)
-        ぐらいで解けました。対象の物体は必ず同じ位置で止まりますから、 \(|\{(l_i, r)_i\}_i| = O(N)\)
-        なんですね。<br />
+        <code>Map</code> で緩和すると \(O(NM \log N)\) ぐらいで解けました (運！)
+        。対象の物体は必ず同じ位置で止まりますから、 \(|\{(l_i, r)_i\}_i| = O(N)\) なんですね。<br />
       </p>
       <h3 id="感想"><a href="#感想">感想</a></h3>
       <p>
