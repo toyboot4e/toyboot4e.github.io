@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 376 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 376</h1>
+      <p>Oct 20, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 376"><a href="#ABC 376">ABC 376</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc376">ABC 376</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-right">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">提出</td>
+            <td class="org-right">4:48</td>
+            <td class="org-right">11:52</td>
+            <td class="org-right">19:46</td>
+            <td class="org-right">28:09</td>
+            <td class="org-left">49:35</td>
+            <td class="org-left">96:17</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">予想 diff</td>
+            <td class="org-right">100</td>
+            <td class="org-right">400</td>
+            <td class="org-right">400</td>
+            <td class="org-right">1,000</td>
+            <td class="org-left">1,200</td>
+            <td class="org-left">1,600</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際 diff</td>
+            <td class="org-right">19</td>
+            <td class="org-right">290</td>
+            <td class="org-right">366</td>
+            <td class="org-right">743</td>
+            <td class="org-left">1,063</td>
+            <td class="org-left">2,089</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>226 位を取ってレーティング爆上がりです。<br /></p>
+
+      <figure>
+        <img src="./img/2024-10-20-rating.png" alt="2024-10-20-rating.png" /><br />
+
+        <figcaption><span class="figure-number">Figure 1: </span>水ものレーティング</figcaption>
+      </figure>
+
+      <p>
+        レーティングは適正値へ収束していくものなので、今後の大敗は覚悟します。悔しいだろうなー……<br />
+      </p>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc376/tasks/abc376_a">A 問題</a></a>
+      </h3>
+      <p>
+        単調増加数列の隣接項の差が \(c\)
+        以上となるように項を間引く時、残った数列の最大の長さを求めよ。最終項を状態として畳み込みます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">main=interact$show.f.map read.tail.words;f(c:a:t:r)|t-a&lt;c=f(c:a:r)|0&lt;1=1+f(c:t:r);f _=1
+</code></pre>
+      </div>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc376/tasks/abc376_b">B 問題</a></a>
+      </h3>
+      <p>
+        円環上の 2 物体に対し
+        <code>(物体, 移動先)</code>
+        の形で操作指令が与えられる。物体同士が衝突しない方向に指定の物体を動かして、操作指令を実行せよ。<br />
+      </p>
+
+      <p>
+        円環を開きます。正方向の回転の可否を \(L < R'\) かつ \(L < T'\) となる最小の \(R', T'\)
+        (\(R' \equiv R \mod N, T' \equiv T \bmod N\)) を使って検証します。移動経路中に \(T'\)
+        があるかを <code>inRange</code> で判定すれば良いです。<br />
+      </p>
+
+      <p>
+        負方向の回転も、同様に \(R' < L\) かつ \(T' < L\) となる最大の \(R', T'\) を使って検証します
+        。<br />
+      </p>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc376/tasks/abc376_c">C 問題</a></a>
+      </h3>
+      <p>
+        \(N\) 個の物体と \(N - 1\) 個の箱がある。
+        <code>大きさ(物体) \le 大きさ(箱)</code>
+        となるようマッチングさせたとき、最も小さな物体のみを余らせよ。<br />
+      </p>
+
+      <p>
+        物体、箱をそれぞれ降順ソートし貪欲にマッチングすれば \(O(N)\) で解けます。未証明ですが。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">-- 降順ソートされた [物体], [箱] を引数に ([余った物体],[余った箱]) を返す
+eat :: [Int] -&gt; [Int] -&gt; ([Int], [Int])
+eat = inner ([], [])
+  where
+    -- 箱が無くなった場合
+    inner (!ls, !rs) [] restR = (ls, rs ++ restR)
+    -- 物体が無くなった場合
+    inner (!ls, !rs) restL [] = (ls ++ restL, rs)
+    -- 箱も物体もある場合
+    inner (!ls, !rs) (x : xs) (y : ys)
+      -- 物体と箱がマッチする (物体 &lt;= 箱)
+      | x &lt;= y = inner (ls, rs) xs ys
+      -- 物体 x を余った物体の列に移動する
+      | otherwise = inner (x : ls, rs) xs (y : ys)
+</code></pre>
+      </div>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc376/tasks/abc376_d">D 問題</a></a>
+      </h3>
+      <p>
+        辺に重みを持つ有向グラフが与えられる。始点を頂点
+        <code>1</code> として、最小閉路の長さを求めよ。<br />
+      </p>
+
+      <p>これが茶 diff なのはヤバい……。知っていたことは以下です:<br /></p>
+
+      <ul>
+        <li>
+          強連結成分分解 (SCC) は functional graph でのみ有効です<br />
+          <ul>
+            <li>
+              有向グラフでは、多分すべての閉路が釣れてしまい、絞り込みが必要です<br />
+              <ul>
+                <li>頂点 <code>1</code> を含む SCC に対する DP で解ける気はします<br /></li>
+              </ul>
+            </li>
+            <li>なお無向グラフでは無意味です<br /></li>
+          </ul>
+        </li>
+        <li>
+          <a href="https://drken1215.hatenablog.com/entry/2023/05/20/200517">閉路検出</a> の問題では
+          1 つの閉路を復元しますが、最短の閉路は取れません。<br />
+        </li>
+      </ul>
+
+      <p>
+        DFS で全経路を見ると、明らかに TLE します (極端に言えば密グラフでは \(O(N!)\) です) 。<br />
+      </p>
+
+      <p>
+        多重始点の Dijkstra 法に帰着しました。すなわち頂点 <code>1</code> から出た重み付き辺の集合
+        \(\{(v_i, w_i)\}_i\) を距離一覧やヒープの初期値とし、 Dijkstra 法を実施します。面白い！<br />
+      </p>
+
+      <p>
+        <a href="https://atcoder.jp/contests/abc376/editorial/11186">公式解説</a>
+        では、到達までの辺の数が \(K\) となる頂点の集合を求めていました。これは難しい。<br />
+      </p>
+
+      <p>原案は evima さんでした。流石です。<br /></p>
+
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          ABC376おつかれさまでした。Dの原案でした。（一周回ってまだ出ていなかったはず……）（解説動画の代わり？に
+          <a href="https://t.co/l1nO3LswU9">https://t.co/l1nO3LswU9</a> があります。）
+        </p>
+        &mdash; えびま (@evima0)
+        <a href="https://twitter.com/evima0/status/1847633801687523373?ref_src=twsrc%5Etfw"
+          >October 19, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc376/tasks/abc376_e">E 問題</a></a>
+      </h3>
+      <p>
+        数列 \(\{(A_i, B_i)\}_i\) から \(K\) 項を選ぶとき \(\mathrm{max} \{A_i\}_i \cdot \sum_i
+        B_i\) を最小にせよ。<br />
+      </p>
+
+      <p>
+        \(\mathrm{max} \{A_i\}_i\) を全探索すると効率的に解答できます。すなわち \(\{(A_i, B_i)\}\)
+        を降順ソートし、最初の \(K\) 項を初期値に畳み込みます。状態としては \(\sum_i B_i\) と
+        multiset を持てば良いです。<br />
+      </p>
+
+      <p>けっこう難しい。<br /></p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc376/tasks/abc376_f">F 問題</a></a>
+      </h3>
+      <p>
+        B
+        問題の設定において、未指定の物体も動かしても良いとする。対象の物体は正方向と負方向のどちらに回せることになり、状態数が跳ね上がります
+        (\(2^Q\)) 。<br />
+      </p>
+
+      <p>
+        その状態数を一定数のスロットに削減するのが DP! 2 物体の位置 \((l, r)\) をキーに
+        <code>Map</code> で緩和すると \(O(NM \log N)\)
+        ぐらいで解けました。対象の物体は必ず同じ位置で止まりますから、 \(|\{(l_i, r)_i\}_i| = O(N)\)
+        なんですね。<br />
+      </p>
+      <h3 id="感想"><a href="#感想">感想</a></h3>
+      <p>
+        Library Checker で閉路検出を経験したため、 D 問題をスムーズに考察できました。 Library
+        Checker は良いぞー<br />
+      </p>
+      <h2 id="Haskell"><a href="#Haskell">Haskell</a></h2>
+      <h3 id="次の言語アップデート"><a href="#次の言語アップデート">次の言語アップデート</a></h3>
+      <p>
+        <a href="https://toyboot4e.github.io/2024-10-17-ac-library-hs-1.html"
+          ><code>ac-library-hs</code> を作ります</a
+        >
+        を投稿しました。リポスト・ライク等ありがとうございました！<br />
+      </p>
+
+      <p>
+        関心のトピックは
+        <a href="https://github.com/toyboot4e/ac-library-hs/issues">Issue に上げており</a>
+        、開発が進めばまたブログにします。アドベントカレンダーにも投稿するかも。<br />
+      </p>
+      <h4 id="案: プロジェクトを提出する">
+        <a href="#案: プロジェクトを提出する">案: プロジェクトを提出する</a>
+      </h4>
+      <p>
+        ジャッジに細工すれば、プロジェクトを丸ごと提出できるようにできます。確実に qualified import
+        ができてアリ <em>かも</em> 。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span>提出ファイル (イメージ)</label
+        >
+        <pre><code class="src language-haskell">{- AC_PROJECT src/MyLib/F.hs -}
+module F (f) where
+
+f :: Int -&gt; Int
+f = (+ 1)
+
+{- AC_PROJECT app/Main.hs -}
+import MyLib.F qualified as F
+main :: IO ()
+main = print $ F.f 1
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span>展開結果 (イメージ)</label
+        >
+        <pre><code class="src language-sh">.
+├── app/
+│    └── Main.hs
+└── src/
+      └── MyLib/
+            └── F.hs
+</code></pre>
+      </div>
+      <h4 id="ac-library-hs で注目のパッケージ">
+        <a href="#ac-library-hs で注目のパッケージ"
+          ><code>ac-library-hs</code> で注目のパッケージ</a
+        >
+      </h4>
+      <ul>
+        <li>
+          <a href="https://hackage.haskell.org/package/recover-rtti">recovery-rtti</a><br />
+          <code>Show a</code> 制約が無くとも <code>anythingToString</code> できるスグレモノです。
+          <a href="https://zenn.dev/mod_poppo/books/haskell-forest">Haskell の森</a>
+          に紹介があります。デバッグに役立つ他、詳細なエラー出力に使用すべきか検討です。<br />
+        </li>
+
+        <li>
+          <p>
+            <a href="https://github.com/ocharles/tasty-rerun">tasty-rerun</a><br />
+            <code>tasty</code> で失敗したテストのみを再実行する機能です。助かる！<br />
+          </p>
+          <div class="org-src-container">
+            <pre><code class="src language-sh">  $ cargo test --test-options --rerun
+</code></pre>
+          </div>
+        </li>
+
+        <li>
+          <code>tasty-golden</code>, <code>tasty-silver</code>, <code>hspec-golden</code><br />
+          <a href="https://docs.rs/insta/latest/insta/">insta</a>
+          みたいにエラー出力をテストするために使いたいです。<br />
+        </li>
+      </ul>
+      <h3 id="本物のプログラマはHaskellを使う">
+        <a href="#本物のプログラマはHaskellを使う">本物のプログラマはHaskellを使う</a>
+      </h3>
+      <p>
+        <a href="https://xtech.nikkei.com/it/article/COLUMN/20060801/244810/"
+          >本物のプログラマはHaskellを使う</a
+        >
+        。一連の記事が響くようになって来ました。 QuickCheck の記事などを読んでいます。<br />
+      </p>
+      <h3 id="FastMutInt">
+        <a href="#FastMutInt"><code>FastMutInt</code></a>
+      </h3>
+      <p>
+        <a href="https://old.reddit.com/r/haskell/comments/knne96/statet_vs_ioref_a_benchmark/"
+          >StateT vs IORef: a benchmark - r/haskell</a
+        >
+        にて
+        <a href="https://hackage.haskell.org/package/ghc-9.10.1/docs/GHC-Data-FastMutInt.html"
+          ><code>FastMutInt</code></a
+        >
+        なるものを知りました。<br />
+      </p>
+
+      <ul>
+        <li>結局中身は <code>ByteArray#</code> なので、あまり速度は変わらない気がします<br /></li>
+        <li><code>PrimMonad</code> ではなく <code>IO</code> が要求されます<br /></li>
+      </ul>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="Emacs 秋フェス"><a href="#Emacs 秋フェス">Emacs 秋フェス</a></h3>
+      <p>
+        調子に乗って
+        <a href="https://tokyo-emacs.connpass.com/event/330572/">Emacs 秋フェス</a>
+        の登壇枠を取っていました。 leaf, Evil 辺りの当たり障り無い話をしようと思っています。 Embark,
+        bufler, popper など最近のパッケージを調べてみても良いかも。<br />
+      </p>
+
+      <p>Pixiv は怖過ぎるものの、エディタバーが楽しみ過ぎる！<br /></p>
+
+      <p>
+        我は陰の者、前日の
+        <a href="https://nix-ja.connpass.com/event/330557/">Nix Meetup</a> には参加できません。
+        Emacs 勉強会自体、ハードル高杉建築でした。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
