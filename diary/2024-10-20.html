@@ -249,7 +249,7 @@ eat = inner ([], [])
       <p>
         その状態数を一定数のスロットに削減するのが DP! 2 物体の位置 \((l, r)\) をキーに
         <code>Map</code> で緩和すると \(O(NM \log N)\) ぐらいで解けました (運！)
-        。対象の物体は必ず同じ位置で止まりますから、 \(|\{(l_i, r)_i\}_i| = O(N)\) なんですね。<br />
+        。対象の物体は必ず同じ位置で止まりますから、 \(|\{(l_i, r_i)\}_i| = O(N)\) なんですね。<br />
       </p>
       <h3 id="感想"><a href="#感想">感想</a></h3>
       <p>
@@ -290,6 +290,7 @@ f = (+ 1)
 
 {- AC_PROJECT app/Main.hs -}
 import MyLib.F qualified as F
+
 main :: IO ()
 main = print $ F.f 1
 </code></pre>
@@ -301,10 +302,10 @@ main = print $ F.f 1
         >
         <pre><code class="src language-sh">.
 ├── app/
-│    └── Main.hs
+│  └── Main.hs
 └── src/
-      └── MyLib/
-            └── F.hs
+    └── MyLib/
+        └── F.hs
 </code></pre>
       </div>
       <h4 id="ac-library-hs で注目のパッケージ">
@@ -317,7 +318,7 @@ main = print $ F.f 1
           <a href="https://hackage.haskell.org/package/recover-rtti">recovery-rtti</a><br />
           <code>Show a</code> 制約が無くとも <code>anythingToString</code> できるスグレモノです。
           <a href="https://zenn.dev/mod_poppo/books/haskell-forest">Haskell の森</a>
-          に紹介があります。デバッグに役立つ他、詳細なエラー出力に使用すべきか検討です。<br />
+          に紹介があります。デバッグに役立つ他、詳細なエラー出力に使用すべきか検討中です。<br />
         </li>
 
         <li>
@@ -357,11 +358,14 @@ main = print $ F.f 1
         <a href="https://hackage.haskell.org/package/ghc-9.10.1/docs/GHC-Data-FastMutInt.html"
           ><code>FastMutInt</code></a
         >
-        なるものを知りました。<br />
+        を知りました。<br />
       </p>
 
       <ul>
-        <li>結局中身は <code>ByteArray#</code> なので、あまり速度は変わらない気がします<br /></li>
+        <li>
+          結局中身は <code>ByteArray#</code> なので、
+          <code>MutablePrimArray</code> と速度は変わらない気がします<br />
+        </li>
         <li><code>PrimMonad</code> ではなく <code>IO</code> が要求されます<br /></li>
       </ul>
       <h2 id="Misc"><a href="#Misc">Misc</a></h2>
@@ -370,7 +374,7 @@ main = print $ F.f 1
         調子に乗って
         <a href="https://tokyo-emacs.connpass.com/event/330572/">Emacs 秋フェス</a>
         の登壇枠を取っていました。 leaf, Evil 辺りの当たり障り無い話をしようと思っています。 Embark,
-        bufler, popper など最近のパッケージを調べてみても良いかも。<br />
+        activities,bufler, popper など最近のパッケージを調べてみても良いかも。<br />
       </p>
 
       <p>Pixiv は怖過ぎるものの、エディタバーが楽しみ過ぎる！<br /></p>
