@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>東京 Emacs 勉強会 2024/10 発表資料 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>東京 Emacs 勉強会 2024/10 発表資料</h1>
+      <p>Oct 27, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="初めに"><a href="#初めに">初めに</a></h2>
+      <p>
+        これは
+        <a href="https://tokyo-emacs.connpass.com/event/330572/"
+          >東京Emacs勉強会 オクトーバーフェスティバル2024</a
+        >
+        の発表用資料です。<br />
+      </p>
+
+      <p>発表時間: 15 分前後 <del>正直荷が重い</del><br /></p>
+      <h3 id="権利表記"><a href="#権利表記">権利表記</a></h3>
+      <p>
+        <a href="https://commons.nicovideo.jp/works/nc355601"
+          >好きな惣菜発表ドラゴンのドラゴン - ニコニ・コモンズ</a
+        >
+        を拝借いたしました。ありがとうございます！<br />
+      </p>
+
+      <ul>
+        <li>
+          著作者「ンバヂ」様 (X: <a href="https://x.com/nbaji9">https://x.com/nbaji9</a>)<br />
+        </li>
+        <li>
+          原曲『好きな惣菜発表ドラゴン』 (<a href="https://www.youtube.com/watch?v=OnCFEo_pXaY"
+            >Youtube</a
+          >, <a href="https://www.nicovideo.jp/watch/sm42515407">ニコニコ動画</a>)<br />
+        </li>
+      </ul>
+
+      <blockquote>
+        <p>権利表記は 2024 年 6 月時点の規約に従います。<br /></p>
+      </blockquote>
+      <h2 id="ELisp パッケージを紹介します">
+        <a href="#ELisp パッケージを紹介します">ELisp パッケージを紹介します</a>
+      </h2>
+      <p>conaoware 3 本と evil の話をします。<br /></p>
+      <h3 id="1. conao3/leaf.el">
+        <a href="#1. conao3/leaf.el"
+          >1. <a href="https://github.com/conao3/leaf.el"><code>conao3/leaf.el</code></a></a
+        >
+      </h3>
+      <figure>
+        <img src="./img/2024-10-27-dragon-leaf.png" alt="2024-10-27-dragon-leaf.png" /><br />
+      </figure>
+
+      <p>
+        <a href="https://github.com/conao3/leaf.el"><code>leaf</code></a> を使おう！ (定期)<br />
+      </p>
+
+      <ul>
+        <li><code>leaf</code> = modern <code>use-package</code>.<br /></li>
+        <li>
+          起動が速い (7.2 秒 → 2.5 秒)<br />
+          <ul>
+            <li><code>leaf</code> を導入して PC を買い換えれば無敵<br /></li>
+          </ul>
+        </li>
+      </ul>
+
+      <p><code>use-package</code> ユーザは腰を上げてください<br /></p>
+
+      <ul>
+        <li>
+          <a href="https://emacs-jp.github.io/">Emacs JP</a> 逆張りで
+          <code>use-package</code> を使っていませんか？ 🪃 🪃 その技は俺に効く<br />
+        </li>
+        <li>
+          <a href="https://github.com/nix-community/emacs-overlay">nix-community/emacs-overlay</a>
+          も <code>leaf</code> に対応しており、セミ・ワールドスタンダード DSL
+          の風格を感じました。<br />
+        </li>
+        <li>移行コストは低い (<code>use-package</code> と構文がほぼ同じ)<br /></li>
+      </ul>
+
+      <details>
+        <summary>逆張りの参考</summary>
+        <ul>
+          <li><a href="https://a.conao3.com/blog/2023/b275-bb4c/">leafのつくりかた</a><br /></li>
+          <li>
+            <a
+              href="https://blog.rocktakey.com/files/2024-tokyo-emacs-summer/Emacs-%E5%A4%8F%E3%83%95%E3%82%A7%E3%82%B9-2024.pdf"
+              >micで自作use-package!</a
+            ><br />
+          </li>
+          <li>
+            <a href="https://apribase.net/2024/05/29/emacs-elpaca-setup-el/"
+              >Elpaca + setup.el でわかりやすく非同期にパッケージを管理する</a
+            ><br />
+            <a href="https://github.com/emacs-straight/setup/tree/master">emacs-straight/setup</a
+            ><br />
+          </li>
+          <li>
+            <a href="https://zenn.dev/zk_phi/books/cba129aacd4c1418ade4"
+              >Emacs の起動時間を""詰める""</a
+            ><br />
+            <a href="https://github.com/zk-phi/setup">zk-phi/setup</a><br />
+          </li>
+          <li>
+            <a href="https://zenn.dev/takeokunn/articles/56010618502ccc"
+              >Emacsを世界最速級で起動する方法</a
+            ><br />
+            DSL なんて要らねぇ！　<del>蛮族</del> パワースタイル<br />
+          </li>
+          <li>Vanilla Emacs<br /></li>
+        </ul>
+      </details>
+      <h3 id="2. conao3/leaf-manager.el">
+        <a href="#2. conao3/leaf-manager.el"
+          >2.
+          <a href="https://github.com/conao3/leaf-manager.el"
+            ><code>conao3/leaf-manager.el</code></a
+          ></a
+        >
+      </h3>
+      <figure>
+        <img
+          src="./img/2024-10-27-dragon-leaf-manager.png"
+          alt="2024-10-27-dragon-leaf-manager.png"
+        /><br />
+      </figure>
+
+      <p>
+        <a href="https://github.com/conao3/leaf-manager.el"><code>leaf-manager</code></a> は
+        <code>init.el</code> の基本的な捉え方を塗り替えてくれたパッケージでした。<br />
+      </p>
+
+      <p>
+        <code>leaf-manager</code> の世界観: <code>init.el</code> ≒ <code>leaf</code> 式の DB.
+        <code>init.el</code> の中身としては:<br />
+      </p>
+
+      <ul>
+        <li>bootstrapping (<code>leaf</code>, <code>leaf-manager</code>)<br /></li>
+        <li><code>leaf</code> 式の集まり<br /></li>
+      </ul>
+      <h4 id="Demo"><a href="#Demo">Demo</a></h4>
+      <ul>
+        <li><code>leaf-manager</code> 管理下のファイルを確認<br /></li>
+        <li><code>adoc-mode</code> の <code>leaf</code> 式を編集してみる<br /></li>
+      </ul>
+
+      <p>パッケージの追加も <code>leaf-manager</code> から実施します。<br /></p>
+      <h4 id="すべての設定はパッケージに対する設定である">
+        <a href="#すべての設定はパッケージに対する設定である"
+          >すべての設定はパッケージに対する設定である</a
+        >
+      </h4>
+      <p>通常の設定ではトップレベルに <code>setopt</code> を書きます:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-elisp">(setopt custom-file (locate-user-emacs-file "custom.el"))
+</code></pre>
+      </div>
+
+      <p>
+        <code>leaf</code> ベースのアグレッシブ設定では、 builtin パッケージの設定として
+        <code>:custom</code> を書きます:<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-elisp">(leaf *initialize-emacs
+  :config
+  (leaf cus-edit
+    :doc "tools for customizing Emacs and Lisp packages"
+    :tag "builtin" "faces" "help"
+    :added "2020-03-24"
+    :custom `((custom-file \,
+                           (locate-user-emacs-file "custom.el"))))
+
+  (leaf cus-start
+    :doc "define customization properties of builtins"
+    :tag "builtin" "internal"
+    :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"
+    :added "2020-03-24"
+    :preface
+    ;; 以下略
+    ))
+</code></pre>
+      </div>
+
+      <p>
+        conao3 さんの作ってくれた世界観、フレームワークに沿って
+        <code>init.el</code> を捉えられるようになりました。作家性を感じます。良すギアッチョ<br />
+      </p>
+      <h4 id="補足"><a href="#補足">補足</a></h4>
+      <p>(Demo) 今日の僕の設定ファイルは <code>org</code> ベースです。<br /></p>
+
+      <ul>
+        <li>見出しの検索がパッケージの選択になります。<br /></li>
+        <li>設定はトップレベルで書くことも多いです。<br /></li>
+      </ul>
+
+      <p>僕の設定が汚くても、 conao3 さんの設定は整然としています。癒し！<br /></p>
+
+      <p>
+        See also:
+        <a href="https://a.conao3.com/blog/2024/7c7c265/">2025年からを生きるためのEmacs入門</a
+        ><br />
+      </p>
+      <h3 id="3. conao3/ox-zenn.el">
+        <a href="#3. conao3/ox-zenn.el"
+          >3. <a href="https://github.com/conao3/ox-zenn.el"><code>conao3/ox-zenn.el</code></a></a
+        >
+      </h3>
+      <figure>
+        <img src="./img/2024-10-27-dragon-ox-zenn.png" alt="2024-10-27-dragon-ox-zenn.png" /><br />
+
+        <figcaption><span class="figure-number">Figure 1: </span>マジでいい</figcaption>
+      </figure>
+
+      <ul>
+        <li><a href="https://ox-hugo.scripter.co/">ox-hugo</a> が元ネタだとか<br /></li>
+      </ul>
+      <h4 id="Zenn とは、 Zenn Book とは">
+        <a href="#Zenn とは、 Zenn Book とは">Zenn とは、 Zenn Book とは</a>
+      </h4>
+      <ul>
+        <li><a href="https://zenn.dev">Zenn</a>: 技術記事の投稿サイト<br /></li>
+        <li>
+          Zenn Book: 自称技術書<br />
+          <ul>
+            <li>
+              e.g.
+              <a href="https://zenn.dev/toyboot4e/books/seriously-haskell"
+                >AtCoder ガチ言語 Haskell 🔥</a
+              ><br />
+            </li>
+            <li>e.g. わだば Lisper になる<br /></li>
+          </ul>
+        </li>
+      </ul>
+      <h4 id="Zenn Book のファイル構成と不満点">
+        <a href="#Zenn Book のファイル構成と不満点">Zenn Book のファイル構成と不満点</a>
+      </h4>
+      <p>1 章 1 ファイル。章の並びは <code>config.yaml</code> で定義する。<br /></p>
+
+      <p>見出しの入れ替えが手間<br /></p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span>ファイル構成</label
+        >
+        <pre><code class="src language-sh">.
+├── 1-1-hello-world.md
+├── ..
+├── config.yaml
+├── ..
+└── toc.md
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span>この投稿、本物かトンデモか……</label
+        >
+        <pre><code class="src language-yaml">title: "AtCoder ガチ言語 Haskell 🔥"
+summary: "Haskell で AtCoder に入門しましょう"
+topics: ["haskell"]
+published: true
+price: 0
+chapters:
+  - cover
+  - intro
+  - toc
+  # ~~
+</code></pre>
+      </div>
+
+      <p>Demo: <code>config.yaml</code> からの章の入れ替え<br /></p>
+      <h4 id="ox-zenn でできること">
+        <a href="#ox-zenn でできること"><code>ox-zenn</code> でできること</a>
+      </h4>
+      <p>Subtree の markdown への変換<br /></p>
+
+      <p>活用例: 1 org file = 1 zenn book<br /></p>
+      <h3 id="4. emacs-evil/evil.el">
+        <a href="#4. emacs-evil/evil.el"
+          >4. <a href="https://github.com/emacs-evil/evil"><code>emacs-evil/evil.el</code></a></a
+        >
+      </h3>
+      <p>Extensible VI Layer (Vim バインドのパッケージ)<br /></p>
+
+      <figure>
+        <img src="./img/2024-10-27-dragon-evil.png" alt="2024-10-27-dragon-evil.png" /><br />
+      </figure>
+      <h4 id="Evil ユーザの割合は？"><a href="#Evil ユーザの割合は？">Evil ユーザの割合は？</a></h4>
+      <p>
+        <a href="https://emacssurvey.org/2020/">Emacs User Survey 2020 Results</a>: 7,344 人が回答
+        (servey としての精度は不明)<br />
+      </p>
+
+      <p>約 30% の Emacsen が Vim バインドを利用するようです。<br /></p>
+
+      <figure>
+        <img
+          src="./img/2024-10-27-evil-percent.svg"
+          alt="2024-10-27-evil-percent.svg"
+          class="org-svg"
+        /><br />
+      </figure>
+
+      <p>挙手希望: 会場の Evil ユーザは？<br /></p>
+
+      <p>挙手希望: Evil 以外の modal editing パッケージのユーザは？<br /></p>
+      <h4 id="Evil の何が良いのか"><a href="#Evil の何が良いのか">Evil の何が良いのか</a></h4>
+      <p>
+        Vim
+        っぽくないところ。具体的には、履歴単位がマクロっぽくなりがちな点！　テキスト編集において、履歴単位はユーザ
+        (僕) にとって都合の良い単位であって欲しい。<br />
+      </p>
+
+      <ul>
+        <li>undo/redo がやりやすい<br /></li>
+        <li>ドットリピート (繰り返し操作) で有用<br /></li>
+        <li>マルチラインインサートもより優秀に<br /></li>
+      </ul>
+      <h4 id="お題 1"><a href="#お題 1">お題 1</a></h4>
+      <p>テキスト編集の簡単なお題を出します！　Vim バインドで demo します。<br /></p>
+
+      <blockquote>
+        <p>皆さんのやり方を教えてください。特に Emacs バインドをご利用の方！<br /></p>
+      </blockquote>
+
+      <div class="org-src-container">
+        <label class="org-src-name"><span class="listing-number">Listing 3: </span>Before</label>
+        <pre><code class="src language-org">嫉妬
+強欲
+憤怒
+暴食
+傲慢
+怠惰
+色欲
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <label class="org-src-name"><span class="listing-number">Listing 4: </span>After</label>
+        <pre><code class="src language-org">- [ ] 嫉妬 :yasunori:
+- [ ] 強欲 :yasunori:
+- [ ] 憤怒 :yasunori:
+- [ ] 暴食 :yasunori:
+- [ ] 傲慢 :yasunori:
+- [ ] 怠惰 :yasunori:
+- [ ] 色欲 :yasunori:
+</code></pre>
+      </div>
+
+      <p>Demo: Neovim, Evil, <code>evil-mc</code><br /></p>
+      <h4 id="お題 2"><a href="#お題 2">お題 2</a></h4>
+      <p>先ほどの例で改行が加わります:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">嫉妬
+強欲
+憤怒
+暴食
+傲慢
+怠惰
+色欲
+</code></pre>
+      </div>
+
+      <div class="org-src-container">
+        <pre><code class="src language-org">- [ ] 嫉妬 :yasunori:
+  TODO
+- [ ] 強欲 :yasunori:
+  TODO
+- [ ] 憤怒 :yasunori:
+  TODO
+- [ ] 暴食 :yasunori:
+  TODO
+- [ ] 傲慢 :yasunori:
+  TODO
+- [ ] 怠惰 :yasunori:
+  TODO
+- [ ] 色欲 :yasunori:
+  TODO
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <code>evil-insert-vcount</code>: <code>(LINE COLUMN COUNT)</code> リスト<br />
+          <ul>
+            <li>改行の入力で位置がズレる<br /></li>
+            <li>直してくれば良かったのに……<br /></li>
+          </ul>
+        </li>
+      </ul>
+      <h2 id="終わりに"><a href="#終わりに">終わりに</a></h2>
+      <ol>
+        <li>conaoware は素敵！<br /></li>
+        <li>org-mode 最高！<br /></li>
+        <li>evil はいいぞ！<br /></li>
+      </ol>
+
+      <details>
+        <summary>メモ: 質問用</summary>
+        <ol>
+          <li>使用 OS<br /></li>
+          <li>使用 WM (あれば)<br /></li>
+          <li>使用キーボード<br /></li>
+          <li>使用キーボード配列<br /></li>
+          <li>Emacs のバージョン<br /></li>
+          <li>Emacs のカラーテーマ<br /></li>
+          <li>Emacs は主に GUI/CLI を使う<br /></li>
+          <li>主な自作 ELisp パッケージ (あれば)<br /></li>
+          <li>Emacs バインド使いである<br /></li>
+          <li>Evil や meow 使いである<br /></li>
+          <li>General 使いである<br /></li>
+          <li>Emacs Distribution の利用 (Doom, Spacemacs, Centaur 他)<br /></li>
+          <li>本日の目的<br /></li>
+          <li>本日お目当ての人<br /></li>
+          <li>注目している ELisp パッケージ開発者<br /></li>
+          <li>身の回りに Emacsen がいる<br /></li>
+          <li>Emacs JP に参加している<br /></li>
+          <li>身の回りに Vimmer がいる<br /></li>
+          <li>Vim JP に参加している<br /></li>
+          <li>ヴィムジェイピィレディオオオォォォォッォ<br /></li>
+          <li>Vim Conference 2024 を知っている、参加する<br /></li>
+          <li>Yasunori を知っている<br /></li>
+          <li>自分は yasunori である<br /></li>
+          <li>全ての yasunori をスニペットに入れている<br /></li>
+          <li>いつでも yasunori する覚悟がある<br /></li>
+          <li>awesome.yasunori.dev を知っている<br /></li>
+          <li>自分は senpan だ<br /></li>
+          <li>Emacs 内でのシェルの利用 (あれば)<br /></li>
+          <li>ターミナルや tmux の使い方 (あれば)<br /></li>
+          <li>SKK or IME<br /></li>
+          <li><code>eglot</code> or <code>lsp-mode</code><br /></li>
+          <li><code>dap-mode</code> のユーザである<br /></li>
+          <li><code>tempel</code>, <code>yasnippet</code>, etc.<br /></li>
+          <li>Emacs のフレームの起動数<br /></li>
+          <li>バッファ管理の方法 (グループ分けなど)<br /></li>
+          <li>バッファバーの表示・非表示<br /></li>
+          <li>バッファバー以外のバッファ表示方法 (<code>dired</code> など)<br /></li>
+          <li><code>tab-bar-mode</code> や関連パッケージの利用<br /></li>
+          <li><code>desktop-mode</code> や関連パッケージの利用<br /></li>
+          <li>サイドバー相当のパッケージの利用<br /></li>
+          <li>ステータスバーに Nyancat がいる<br /></li>
+          <li>ステータスバーに tanakh がいる<br /></li>
+          <li><code>all-the-icons</code> or <code>nerd-icons</code><br /></li>
+          <li>検索・補完系パッケージの利用<br /></li>
+          <li>Embark の利用<br /></li>
+          <li>Nix の利用<br /></li>
+          <li><code>org-nix-shell</code> の利用<br /></li>
+          <li><code>exec-path</code> の設定方法<br /></li>
+          <li>Org mode の用途 (あれば)<br /></li>
+          <li><code>org-babel</code> の用途 (あれば)<br /></li>
+          <li>
+            ブログでの使用ツール (<code>org-publish</code>, <code>ox-hugo</code>,
+            <code>markdown-mode</code> など)<br />
+          </li>
+          <li>Emacs はブラウザである<br /></li>
+          <li>Emacs は動画再生ソフトである<br /></li>
+          <li>Emacs はメーラーである<br /></li>
+          <li>Emacs は RSS リーダーである (以下略)<br /></li>
+          <li>Emacs で LLM と喋る<br /></li>
+          <li>Magit を使う<br /></li>
+          <li>Zenn での原稿ファイル形式 (markdown, org, etc.)<br /></li>
+          <li>風になりたいやつだけが Emacs を使えばいい<br /></li>
+          <li>Emacs の足りないパッケージ<br /></li>
+          <li>今後 Emacs でやりたいこと<br /></li>
+          <li>Emacs に実装されて欲しい機能<br /></li>
+        </ol>
+      </details>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
