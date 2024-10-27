@@ -188,7 +188,7 @@
       <div class="org-src-container">
         <pre><code class="src language-elisp">(leaf *initialize-emacs
   :config
-  (leaf cus-edit
+<span id="coderef-2-1" onmouseover="CodeHighlightOn(this,'jump-coderef-2-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-1');" class="coderef-off"><a href="#coderef-2-1">  (leaf cus-edit ;; <span class="coderef-anchor">1</span></a></span>
     :doc "tools for customizing Emacs and Lisp packages"
     :tag "builtin" "faces" "help"
     :added "2020-03-24"
@@ -205,6 +205,20 @@
     ))
 </code></pre>
       </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-2-1"
+            id="jump-coderef-2-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          Builtin パッケージ<br />
+        </li>
+      </ul>
 
       <p>
         conao3 さんの作ってくれた世界観、フレームワークに沿って
@@ -298,9 +312,11 @@ chapters:
       <h4 id="ox-zenn でできること">
         <a href="#ox-zenn でできること"><code>ox-zenn</code> でできること</a>
       </h4>
-      <p>Subtree の markdown への変換<br /></p>
+      <p>Subtree (見出し) の markdown への変換<br /></p>
 
       <p>活用例: 1 org file = 1 zenn book<br /></p>
+
+      <p>Demo: <code>kyopro-bonsai-hs.org</code> からの章の入れ替え<br /></p>
       <h3 id="4. emacs-evil/evil.el">
         <a href="#4. emacs-evil/evil.el"
           >4. <a href="https://github.com/emacs-evil/evil"><code>emacs-evil/evil.el</code></a></a
@@ -327,14 +343,16 @@ chapters:
         /><br />
       </figure>
 
-      <p>挙手希望: 会場の Evil ユーザは？<br /></p>
+      <p>挙手希望: 会場の Evil ユーザは？: xx/32<br /></p>
 
-      <p>挙手希望: Evil 以外の modal editing パッケージのユーザは？<br /></p>
+      <p>挙手希望: Evil 以外の modal editing パッケージのユーザは？: xx/32<br /></p>
       <h4 id="Evil の何が良いのか"><a href="#Evil の何が良いのか">Evil の何が良いのか</a></h4>
+      <blockquote>
+        <p>Evil は生粋の Vimmer には不評<br /></p>
+      </blockquote>
+
       <p>
-        Vim
-        っぽくないところ。具体的には、履歴単位がマクロっぽくなりがちな点！　テキスト編集において、履歴単位はユーザ
-        (僕) にとって都合の良い単位であって欲しい。<br />
+        Evil は Vim っぽくないところが良いです。具体的には、履歴単位がマクロっぽくなりがちな点！<br />
       </p>
 
       <ul>
@@ -342,11 +360,15 @@ chapters:
         <li>ドットリピート (繰り返し操作) で有用<br /></li>
         <li>マルチラインインサートもより優秀に<br /></li>
       </ul>
+
+      <p>
+        テキスト編集において、履歴単位はユーザ (僕) にとって都合の良い単位であって欲しい物です。<br />
+      </p>
       <h4 id="お題 1"><a href="#お題 1">お題 1</a></h4>
       <p>テキスト編集の簡単なお題を出します！　Vim バインドで demo します。<br /></p>
 
       <blockquote>
-        <p>皆さんのやり方を教えてください。特に Emacs バインドをご利用の方！<br /></p>
+        <p>Emacs バインドでの編集方法をぜひ教えてください！<br /></p>
       </blockquote>
 
       <div class="org-src-container">
@@ -375,9 +397,10 @@ chapters:
 
       <p>Demo: Neovim, Evil, <code>evil-mc</code><br /></p>
       <h4 id="お題 2"><a href="#お題 2">お題 2</a></h4>
-      <p>先ほどの例で改行が加わります:<br /></p>
+      <p>先ほどの例に改行が加わります:<br /></p>
 
       <div class="org-src-container">
+        <label class="org-src-name"><span class="listing-number">Listing 5: </span>Before</label>
         <pre><code class="src language-haskell">嫉妬
 強欲
 憤怒
@@ -389,6 +412,7 @@ chapters:
       </div>
 
       <div class="org-src-container">
+        <label class="org-src-name"><span class="listing-number">Listing 6: </span>After</label>
         <pre><code class="src language-org">- [ ] 嫉妬 :yasunori:
   TODO
 - [ ] 強欲 :yasunori:
