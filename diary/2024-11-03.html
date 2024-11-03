@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 378 / 東京観光、 Emacs - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 378 / 東京観光、 Emacs</h1>
+      <p>Nov 3, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 378"><a href="#ABC 378">ABC 378</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/abc378">ABC 378</a>
+        に参加しました。レーティング微減です。<br />
+      </p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-right">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">提出</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-left">TLE</td>
+            <td class="org-left">AC</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">Diff 予想</td>
+            <td class="org-right">10</td>
+            <td class="org-right">20</td>
+            <td class="org-right">400</td>
+            <td class="org-right">800</td>
+            <td class="org-left">1,500</td>
+            <td class="org-left">1,100</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">Diff 実際</td>
+            <td class="org-right">22</td>
+            <td class="org-right">118</td>
+            <td class="org-right">191</td>
+            <td class="org-right">587</td>
+            <td class="org-left">1,406</td>
+            <td class="org-left">1,436</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc378/tasks/abc378_a">A 問題</a></a>
+      </h3>
+      <p>
+        同じ色のボールを 2
+        つずつ捨てていくとき、捨てられるペアの数を求めよ。色ごとにボールの数を数えて 2
+        で割った和が答えです。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">import Data.List;main=interact$show.sum.map((`div`2).length).group.sort.map(read @Int).words
+</code></pre>
+      </div>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc378/tasks/abc378_b">B 問題</a></a>
+      </h3>
+      <p>
+        ゴミが定期的に収集されるとき、最寄りのゴミ収集日を求めよ。愚直に分岐するのが簡単だと思います。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">let !d' = d `mod` q
+(d +) $ case compare d' r of
+  EQ -&gt; 0
+  GT -&gt; r + q - d'
+  LT -&gt; r - d'
+</code></pre>
+      </div>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc378/tasks/abc378_c">C 問題</a></a>
+      </h3>
+      <p>
+        数列を走査するとき、それぞれの \(A_i\) と同じ値が出現した最寄りの位置を求めよ。
+        <code>Map</code> を持って数列を走査します。<br />
+      </p>
+
+      <p>
+        <code>mapAccumL</code> 案件ですが、 <code>vector</code> には無いので
+        <code>State</code> モナドを使いました:<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">let !res = (`evalState` IM.empty) $ U.imapM (\i x -&gt; state (step i x)) xs
+      where
+        -- step :: i -&gt; x -&gt; state -&gt; (x', state)
+        step (succ -&gt; i) x im = case IM.lookup x im of
+          Just i' -&gt; (i', im')
+          Nothing -&gt; (-1, im')
+          where
+            !im' = IM.insert x i im
+</code></pre>
+      </div>
+
+      <p>
+        上のコードの提出は、 <code>mapAccumL</code> よりも 100 ms 程度遅かったです。
+        <code>mapM</code> + <code>State</code> は遅い！　cojna さんの
+        <a
+          href="https://github.com/cojna/iota/blob/e77bb3087f8a5231d0ae1320d93fd2649de37149/src/My/Prelude.hs#L213"
+          >mapAccum</a
+        >
+        を借りると <code>mapAccumL</code> と同速程度に速くなります。<br />
+      </p>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc378/tasks/abc378_d">D 問題</a></a>
+      </h3>
+      <p>
+        グリッド上で長さ K の
+        <a
+          href="https://ja.wikipedia.org/wiki/%E9%81%93_(%E3%82%B0%E3%83%A9%E3%83%95%E7%90%86%E8%AB%96)"
+          >単純道</a
+        >
+        (頂点の重複が無いパス) の数を求めよ。愚直解が通ります。大雑把に見積もると \(O(HW \cdot N!)\)
+        は TLE しますが、もう少し正確に考えると \(O(HW \cdot 4 \cdot 3^{K-1})\) になります (<a
+          href="https://atcoder.jp/contests/abc378/editorial/11288"
+          >公式解説</a
+        >) 。<br />
+      </p>
+
+      <p>この DFS は大まかに次の形で実装できます:<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">!dist &lt;- UM.replicate (h * w) undef
+(\f -&gt; fix f (0 :: Int) source) $ \loop d1 v1 -&gt; do
+  GM.write dist v1 d1    -- 訪問済みにする
+  -- 隣接頂点を調べる、など (省略)
+  GM.write dist v1 undef -- 未訪問にする
+</code></pre>
+      </div>
+
+      <p>
+        計算量の見積もりを間違えました。順位表を見るとペナルティの数が少なかったため、メタ読みで愚直解が通ると分かりました。<br />
+      </p>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc378/tasks/abc378_e">E 問題</a></a>
+      </h3>
+      <p>
+        数列 \(\{A_i\}_i\) に対し \(\sum\limits_{1 \le l \le r \le N} {(\sum\limits_{l \le i \le
+        r}A_i \bmod M)}\) を求めよ。考察中……<br />
+      </p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc378/tasks/abc378_f">F 問題</a></a>
+      </h3>
+      <p>
+        木に対し 1 つの辺を追加し閉路を作る。閉路中の頂点がすべて次数 3
+        となり、かつ単純グラフのままである (<strong>重複辺ではない</strong>)
+        辺の張り方の数を求めよ。<br />
+      </p>
+
+      <p>
+        辺の追加によって次数が増加します。閉路に含まれる頂点が (次数 2, 次数 3, 次数 3, .., 次数 2)
+        となる辺の張り方の数が答えです。次数 3 の頂点の『島』を Union-Find で作って解答しました。<br />
+      </p>
+
+      <p>
+        <a href="https://atcoder.jp/contests/abc282/tasks/abc282_d">Make Bipartite 2</a>
+        よりも簡単な気がしますが、こちらは水 diff になりました。<br />
+      </p>
+      <h3 id="感想"><a href="#感想">感想</a></h3>
+      <p>今回もレーティングが減少しました。維持には速解きが必要です。<br /></p>
+      <h2 id="東京観光"><a href="#東京観光">東京観光</a></h2>
+      <h3 id="アーユル・チェアー"><a href="#アーユル・チェアー">アーユル・チェアー</a></h3>
+      <p>
+        <a href="https://www.ayur-chair.com/">アーユル・チェアー</a>
+        に座ってきました。座っている間は何ともないですが、
+        <strong>立つ時の負荷がほぼ無い</strong>
+        のが印象的でした。ちょっと気持ち良かったぐらいです。次にセール・ポイント還元では買いです。<br />
+      </p>
+
+      <p>高級モデルも座席部分は変わりません。高さのみが変わるようです。<br /></p>
+
+      <ul>
+        <li>
+          <a
+            href="https://www.ayur-chair.com/f/octpus?gclid=Cj0KCQjwm5e5BhCWARIsANwm06hrGIcjRX2_YV20hr3ehjpqbK6pNV7Efj_XZCaShA-wnpFArBvjSnYaAid4EALw_wcB"
+            >オクトパス</a
+          >
+          でも高さ 0.7m のテーブルにフィットしました<br />
+        </li>
+        <li>ハイレンジモデルを買う場合、足置きをオプションとして追加すべきです<br /></li>
+        <li>
+          <a
+            href="https://www.ayur-chair.com/f/medical-seat?gclid=Cj0KCQjwm5e5BhCWARIsANwm06hrGIcjRX2_YV20hr3ehjpqbK6pNV7Efj_XZCaShA-wnpFArBvjSnYaAid4EALw_wcB&amp;_gl=1*1iztyik*_gcl_aw*R0NMLjE3MzA2MTAyNzguQ2owS0NRandtNWU1QmhDV0FSSXNBTndtMDZockdJY2pSWDJfWVYyMGhyM2VoanBxYks2cE5WN0Vmal9YWkNhU2hBLXducEZBckJ2alNuWWFBaWQ0RUFMd193Y0I.*_gcl_au*MTcwMjExMzE3LjE3MjkxNzM0NzE.*_ga*MTY5OTIyNDM1MC4xNzI5MTczNDcx*_ga_2C70TXWT4F*MTczMDYwOTczNS4yLjEuMTczMDYxMDI3Ny4zNi4wLjA."
+            >座椅子モデル</a
+          >
+          や
+          <a
+            href="https://www.ayur-chair.com/f/agura?gclid=Cj0KCQjwm5e5BhCWARIsANwm06hrGIcjRX2_YV20hr3ehjpqbK6pNV7Efj_XZCaShA-wnpFArBvjSnYaAid4EALw_wcB&amp;_gl=1*1s3bgvm*_gcl_aw*R0NMLjE3MzA2MTAyODUuQ2owS0NRandtNWU1QmhDV0FSSXNBTndtMDZockdJY2pSWDJfWVYyMGhyM2VoanBxYks2cE5WN0Vmal9YWkNhU2hBLXducEZBckJ2alNuWWFBaWQ0RUFMd193Y0I.*_gcl_au*MTcwMjExMzE3LjE3MjkxNzM0NzE.*_ga*MTY5OTIyNDM1MC4xNzI5MTczNDcx*_ga_2C70TXWT4F*MTczMDYwOTczNS4yLjEuMTczMDYxMDI4NC4yOS4wLjA."
+            >あぐらイスモデル</a
+          >
+          もあります<br />
+        </li>
+      </ul>
+      <h3 id="Bang & Olufsen"><a href="#Bang & Olufsen">Bang &amp; Olufsen</a></h3>
+      <p>
+        高級オーディメーカの B&amp;O で空間オーディオや 15
+        万円のヘッドフォンを体験して来ました。耳が悪いのか、自宅の装備とあまり差が分かりません。<br />
+      </p>
+
+      <p>
+        自宅装備は
+        <a href="https://www.youtube.com/watch?v=kSm8tlirF1I"
+          >HS5 - YAMAHAが最強である理由 / レビュー</a
+        >
+        と大体同じ (HS5 + FOSTEX のヘッドフォン) です。これ以上、もう上は無いのか……？<br />
+      </p>
+      <h3 id="インターネットカフェ"><a href="#インターネットカフェ">インターネットカフェ</a></h3>
+      <p>
+        入店・退店処理が無人で、ちょっとしたホテルのような内装も印象的でした。シャワーもあります。もうホテルに宿泊しないかもしれません。<br />
+      </p>
+      <h3 id="東京Emacs勉強会 オクトーバーフェスティバル2024">
+        <a href="#東京Emacs勉強会 オクトーバーフェスティバル2024"
+          >東京Emacs勉強会 オクトーバーフェスティバル2024</a
+        >
+      </h3>
+      <p>
+        登壇の機会を頂きました。こういう機会でも無いとオフラインイベントには参加しませんものね。本当にありがたかったです。<br />
+      </p>
+
+      <p>
+        もっとも、発表は大失敗でした。めちゃめちゃフォローして頂いて、申し訳ない気持ちばかりです。せっかく話しかけてもらっても、マクロは
+        LSP と相性が悪いので興味無いっすとか言っちゃって、何やってんだろう……。<br />
+      </p>
+
+      <p>現地で得た情報としては、以下を真似したいです。特に <code>dmacro</code> が面白い。<br /></p>
+
+      <ul>
+        <li>
+          <code>w3m</code> のフィルターで必要な部分だけ切り出す<br />
+          Emacs で AtCoder を読めるようにしたいものです<br />
+        </li>
+        <li>
+          AI の出力を org 形式にする (プロンプトで頑張る)<br />
+          閲覧性が高まります<br />
+        </li>
+        <li>
+          <code>dmacro</code> を使う<br />
+          繰り返し入力をいい感じに挿入してくれる機能です。基本操作が増えて良さそうです<br />
+        </li>
+      </ul>
+
+      <p>
+        懇親会では、主に Lisp に関する異常に詳しい話を伺いました。圧巻でした。実質 Lisp
+        博物館です。これがインテリオタク……！　こうなりたいものです。<br />
+      </p>
+
+      <p>
+        技能習得に興味があり、 Lisp を実装したとしても Lisp
+        を理解したとは限らない、型システムを実装したからと言って型システムを理解したとは限らない、といった話をしてもらえたのが嬉しかったです。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
