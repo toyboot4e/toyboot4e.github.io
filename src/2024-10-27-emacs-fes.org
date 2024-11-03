@@ -1,0 +1,341 @@
+#+TITLE: 東京 Emacs 勉強会 2024/10 発表資料
+#+DATE: <2024-10-27 Sun>
+
+* 初めに
+
+これは [[https://tokyo-emacs.connpass.com/event/330572/][東京Emacs勉強会 オクトーバーフェスティバル2024]] の発表用資料です。
+
+発表時間: 15 分前後 +正直荷が重い+
+
+** 権利表記
+
+[[https://commons.nicovideo.jp/works/nc355601][好きな惣菜発表ドラゴンのドラゴン - ニコニ・コモンズ]] を拝借いたしました。ありがとうございます！
+
+- 著作者「ンバヂ」様 (X: https://x.com/nbaji9)
+- 原曲『好きな惣菜発表ドラゴン』 ([[https://www.youtube.com/watch?v=OnCFEo_pXaY][Youtube]], [[https://www.nicovideo.jp/watch/sm42515407][ニコニコ動画]])
+
+#+BEGIN_QUOTE
+権利表記は 2024 年 6 月時点の規約に従います。
+#+END_QUOTE
+
+* ELisp パッケージを紹介します
+
+conaoware 3 本と evil の話をします。
+
+** 1. [[https://github.com/conao3/leaf.el][=conao3/leaf.el=]]
+
+[[./img/2024-10-27-dragon-leaf.png]]
+
+[[https://github.com/conao3/leaf.el][=leaf=]] を使おう！ (定期)
+
+- =leaf= = modern =use-package=.
+- 起動が速い (7.2 秒 → 2.5 秒)
+  - =leaf= を導入して PC を買い換えれば無敵
+
+=use-package= ユーザは腰を上げてください
+
+- [[https://emacs-jp.github.io/][Emacs JP]] 逆張りで =use-package= を使っていませんか？ 🪃 🪃 その技は俺に効く
+- [[https://github.com/nix-community/emacs-overlay][nix-community/emacs-overlay]] も =leaf= に対応しており、セミ・ワールドスタンダード DSL の風格を感じました。
+- 移行コストは低い (=use-package= と構文がほぼ同じ)
+
+#+BEGIN_DETAILS 逆張りの参考
+- [[https://a.conao3.com/blog/2023/b275-bb4c/][leafのつくりかた]]
+- [[https://blog.rocktakey.com/files/2024-tokyo-emacs-summer/Emacs-%E5%A4%8F%E3%83%95%E3%82%A7%E3%82%B9-2024.pdf][micで自作use-package!]]
+- [[https://apribase.net/2024/05/29/emacs-elpaca-setup-el/][Elpaca + setup.el でわかりやすく非同期にパッケージを管理する]]
+  [[https://github.com/emacs-straight/setup/tree/master][emacs-straight/setup]]
+- [[https://zenn.dev/zk_phi/books/cba129aacd4c1418ade4][Emacs の起動時間を""詰める""]]
+  [[https://github.com/zk-phi/setup][zk-phi/setup]]
+- [[https://zenn.dev/takeokunn/articles/56010618502ccc][Emacsを世界最速級で起動する方法]]
+  DSL なんて要らねぇ！　+蛮族+ パワースタイル
+- Vanilla Emacs
+#+END_DETAILS
+
+** 2. [[https://github.com/conao3/leaf-manager.el][=conao3/leaf-manager.el=]]
+
+[[./img/2024-10-27-dragon-leaf-manager.png]]
+
+[[https://github.com/conao3/leaf-manager.el][=leaf-manager=]] は =init.el= の基本的な捉え方を塗り替えてくれたパッケージでした。
+
+=leaf-manager= の世界観: =init.el= ≒ =leaf= 式の DB. =init.el= の中身としては:
+
+- bootstrapping (=leaf=, =leaf-manager=)
+- =leaf= 式の集まり
+
+*** Demo
+
+- =leaf-manager= 管理下のファイルを確認
+- =adoc-mode= の =leaf= 式を編集してみる
+
+パッケージの追加も =leaf-manager= から実施します。
+
+*** すべての設定はパッケージに対する設定である
+
+通常の設定ではトップレベルに =setopt= を書きます:
+
+#+BEGIN_SRC elisp
+(setopt custom-file (locate-user-emacs-file "custom.el"))
+#+END_SRC
+
+=leaf= ベースのアグレッシブ設定では、 builtin パッケージの設定として =:custom= を書きます:
+
+#+BEGIN_SRC elisp
+(leaf *initialize-emacs
+  :config
+  (leaf cus-edit ;; (ref:1)
+    :doc "tools for customizing Emacs and Lisp packages"
+    :tag "builtin" "faces" "help"
+    :added "2020-03-24"
+    :custom `((custom-file \,
+                           (locate-user-emacs-file "custom.el"))))
+
+  (leaf cus-start
+    :doc "define customization properties of builtins"
+    :tag "builtin" "internal"
+    :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"
+    :added "2020-03-24"
+    :preface
+    ;; 以下略
+    ))
+#+END_SRC
+
+- [[(1)]] Builtin パッケージ
+
+conao3 さんの作ってくれた世界観、フレームワークに沿って =init.el= を捉えられるようになりました。作家性を感じます。良すギアッチョ
+
+*** 補足
+
+(Demo) 今日の僕の設定ファイルは =org= ベースです。
+
+- 見出しの検索がパッケージの選択になります。
+- 設定はトップレベルで書くことも多いです。
+
+僕の設定が汚くても、 conao3 さんの設定は整然としています。癒し！
+
+See also: [[https://a.conao3.com/blog/2024/7c7c265/][2025年からを生きるためのEmacs入門]]
+
+** 3. [[https://github.com/conao3/ox-zenn.el][=conao3/ox-zenn.el=]]
+
+#+CAPTION: マジでいい
+[[./img/2024-10-27-dragon-ox-zenn.png]]
+
+- [[https://ox-hugo.scripter.co/][ox-hugo]] が元ネタだとか
+
+*** Zenn とは、 Zenn Book とは
+
+- [[https://zenn.dev][Zenn]]: 技術記事の投稿サイト
+- Zenn Book: 自称技術書
+  - e.g. [[https://zenn.dev/toyboot4e/books/seriously-haskell][AtCoder ガチ言語 Haskell 🔥]]
+  - e.g. わだば Lisper になる
+
+*** Zenn Book のファイル構成と不満点
+
+1 章 1 ファイル。章の並びは =config.yaml= で定義する。
+
+見出しの入れ替えが手間
+
+#+CAPTION: ファイル構成
+#+BEGIN_SRC sh
+.
+├── 1-1-hello-world.md
+├── ..
+├── config.yaml
+├── ..
+└── toc.md
+#+END_SRC
+
+#+CAPTION: この投稿、本物かトンデモか……
+#+BEGIN_SRC yaml
+title: "AtCoder ガチ言語 Haskell 🔥"
+summary: "Haskell で AtCoder に入門しましょう"
+topics: ["haskell"]
+published: true
+price: 0
+chapters:
+  - cover
+  - intro
+  - toc
+  # ~~
+#+END_SRC
+
+Demo: =config.yaml= からの章の入れ替え
+
+*** =ox-zenn= でできること
+
+Subtree (見出し) の markdown への変換
+
+活用例: 1 org file = 1 zenn book
+
+Demo: =kyopro-bonsai-hs.org= からの章の入れ替え
+
+** 4. [[https://github.com/emacs-evil/evil][=emacs-evil/evil.el=]]
+
+Extensible VI Layer (Vim バインドのパッケージ)
+
+[[./img/2024-10-27-dragon-evil.png]]
+
+*** Evil ユーザの割合は？
+
+[[https://emacssurvey.org/2020/][Emacs User Survey 2020 Results]]: 7,344 人が回答 (servey としての精度は不明)
+
+約 30% の Emacsen が Vim バインドを利用するようです。
+
+#+CAPTION: 風になりたいやつと Vimmer が Emacs を使えばいい
+[[./img/2024-10-27-evil-percent.svg]]
+
+挙手希望: 会場の Evil ユーザは？: xx/32
+
+挙手希望: Evil 以外の modal editing パッケージのユーザは？: xx/32
+
+*** Evil の何が良いのか
+
+#+BEGIN_QUOTE
+Evil は生粋の Vimmer には不評
+#+END_QUOTE
+
+Evil は Vim っぽくないところが良いです。具体的には、履歴単位がマクロっぽくなりがちな点！
+
+- undo/redo がやりやすい
+- ドットリピート (繰り返し操作) で有用
+- マルチラインインサートもより優秀に
+
+テキスト編集において、履歴単位はユーザ (僕) にとって都合の良い単位であって欲しい物です。
+
+*** お題 1
+
+テキスト編集の簡単なお題を出します！　Vim バインドで demo します。
+
+#+BEGIN_QUOTE
+Emacs バインドでの編集方法をぜひ教えてください！
+#+END_QUOTE
+
+#+CAPTION: Before
+#+BEGIN_SRC org
+嫉妬
+強欲
+憤怒
+暴食
+傲慢
+怠惰
+色欲
+#+END_SRC
+
+#+CAPTION: After
+#+BEGIN_SRC org
+- [ ] 嫉妬 :yasunori:
+- [ ] 強欲 :yasunori:
+- [ ] 憤怒 :yasunori:
+- [ ] 暴食 :yasunori:
+- [ ] 傲慢 :yasunori:
+- [ ] 怠惰 :yasunori:
+- [ ] 色欲 :yasunori:
+#+END_SRC
+
+Demo: Neovim, Evil, =evil-mc=
+
+*** お題 2
+
+先ほどの例に改行が加わります:
+
+#+CAPTION: Before
+#+BEGIN_SRC haskell
+嫉妬
+強欲
+憤怒
+暴食
+傲慢
+怠惰
+色欲
+#+END_SRC
+
+#+CAPTION: After
+#+BEGIN_SRC org
+- [ ] 嫉妬 :yasunori:
+  TODO
+- [ ] 強欲 :yasunori:
+  TODO
+- [ ] 憤怒 :yasunori:
+  TODO
+- [ ] 暴食 :yasunori:
+  TODO
+- [ ] 傲慢 :yasunori:
+  TODO
+- [ ] 怠惰 :yasunori:
+  TODO
+- [ ] 色欲 :yasunori:
+  TODO
+#+END_SRC
+
+- =evil-insert-vcount=: =(LINE COLUMN COUNT)= リスト
+  - 改行の入力で位置がズレる
+  - 直してくれば良かったのに……
+
+* 終わりに
+
+1. conaoware は素敵！
+2. org-mode 最高！
+3. evil はいいぞ！
+
+#+BEGIN_DETAILS メモ: 質問用
+1. 使用 OS
+2. 使用 WM (あれば)
+3. 使用キーボード
+4. 使用キーボード配列
+5. Emacs のバージョン
+6. Emacs のカラーテーマ
+7. Emacs は主に GUI/CLI を使う
+8. 主な自作 ELisp パッケージ (あれば)
+9. Emacs バインド使いである
+10. Evil や meow 使いである
+11. General 使いである
+12. Emacs Distribution の利用 (Doom, Spacemacs, Centaur 他)
+13. 本日の目的
+14. 本日お目当ての人
+15. 注目している ELisp パッケージ開発者
+16. 身の回りに Emacsen がいる
+17. Emacs JP に参加している
+18. 身の回りに Vimmer がいる
+19. Vim JP に参加している
+20. ヴィムジェイピィレディオオオォォォォッォ
+21. Vim Conference 2024 を知っている、参加する
+22. Yasunori を知っている
+23. 自分は yasunori である
+24. 全ての yasunori をスニペットに入れている
+25. いつでも yasunori する覚悟がある
+26. awesome.yasunori.dev を知っている
+27. 自分は senpan だ
+28. Emacs 内でのシェルの利用 (あれば)
+29. ターミナルや tmux の使い方 (あれば)
+30. SKK or IME
+31. =eglot= or =lsp-mode=
+32. =dap-mode= のユーザである
+33. =tempel=, =yasnippet=, etc.
+34. Emacs のフレームの起動数
+35. バッファ管理の方法 (グループ分けなど)
+36. バッファバーの表示・非表示
+37. バッファバー以外のバッファ表示方法 (=dired= など)
+38. =tab-bar-mode= や関連パッケージの利用
+39. =desktop-mode= や関連パッケージの利用
+40. サイドバー相当のパッケージの利用
+41. ステータスバーに Nyancat がいる
+42. ステータスバーに tanakh がいる
+43. =all-the-icons= or =nerd-icons=
+44. 検索・補完系パッケージの利用
+45. Embark の利用
+46. Nix の利用
+47. =org-nix-shell= の利用
+48. =exec-path= の設定方法
+49. Org mode の用途 (あれば)
+50. =org-babel= の用途 (あれば)
+51. ブログでの使用ツール (=org-publish=, =ox-hugo=, =markdown-mode= など)
+52. Emacs はブラウザである
+53. Emacs は動画再生ソフトである
+54. Emacs はメーラーである
+55. Emacs は RSS リーダーである (以下略)
+56. Emacs で LLM と喋る
+57. Magit を使う
+58. Zenn での原稿ファイル形式 (markdown, org, etc.)
+59. 風になりたいやつだけが Emacs を使えばいい
+60. Emacs の足りないパッケージ
+61. 今後 Emacs でやりたいこと
+62. Emacs に実装されて欲しい機能
+#+END_DETAILS
