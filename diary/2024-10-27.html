@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 377 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 377</h1>
+      <p>Oct 27, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 377"><a href="#ABC 377">ABC 377</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc377">ABC 377</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-right">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">提出</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-left">-</td>
+            <td class="org-left">-</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">予想 diff</td>
+            <td class="org-right">16</td>
+            <td class="org-right">240</td>
+            <td class="org-right">400</td>
+            <td class="org-right">700</td>
+            <td class="org-left">1,200</td>
+            <td class="org-left">1,800</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際 diff</td>
+            <td class="org-right">12</td>
+            <td class="org-right">50</td>
+            <td class="org-right">274</td>
+            <td class="org-right">987</td>
+            <td class="org-left">1,685</td>
+            <td class="org-left">2,232</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc377/tasks/abc377_a">A 問題</a></a>
+      </h3>
+      <p>与えられた文字列が ABC の順列であるかを求めよ。ソートして ABC と比較します。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">import Data.List;main=getLine&gt;&gt;=y.sort;y"ABC"="Yes";y _="No"
+</code></pre>
+      </div>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc377/tasks/abc377_b">B 問題</a></a>
+      </h3>
+      <p>
+        小さなグリッドにルークを複数置いたとき、ルークの移動範囲外のセルの数を数えよ。愚直にグリッドを塗って解けます。<br />
+      </p>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc377/tasks/abc377_c">C 問題</a></a>
+      </h3>
+      <p>
+        巨大なグリッドにナイトを複数置いたとき、ナイトの移動範囲外のセルを数えよ。すべてのセルの数から移動範囲内のセルの数を引くことで効率的に解答できます。<br />
+      </p>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc377/tasks/abc377_d">D 問題</a></a>
+      </h3>
+      <p>
+        区間の列 \(\{[L_i, R_i]\}_i\) が与えられとき、 \([1, N]\) 内の区間であってどの \([L, R] \in
+        \{[L_i, R_i]\}_i\) も包含しない区間の数を求めよ。<br />
+      </p>
+
+      <p>
+        区間の左端を \(N, N - 1, .., 1\)
+        の順で走査します。区間の右端として設定可能な値は単調減少していくことが分かります。<br />
+      </p>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc377/tasks/abc377_e">E 問題</a></a>
+      </h3>
+      <p>
+        順列 \(P^1\) を結合し \(P^1 \diamond P^1 := P^2\) を作成する、 \(P^2 \diamond P^2 := P^4\)
+        を作成する、……という操作を繰り返し \(P^{2^k}\) を求めよ。順列は functional graph
+        であるため、強連結成分毎にループします。<br />
+      </p>
+
+      <p>
+        解法は合っているはずなのに、どうしてもサンプルが合いません。後日考えると、 SCC
+        の頂点が逆トポロジカル順になっていたことが原因でした。<br />
+      </p>
+
+      <p>
+        やはり盆栽不足の範囲では、曖昧な理解が弱みになります。もしも
+        <code>ac-library</code> の写経で高速な SCC
+        を作っていれば、問題無く解けていたでしょう。盆栽が足りませんでした。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
