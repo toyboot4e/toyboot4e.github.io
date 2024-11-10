@@ -17,7 +17,7 @@ Nix が流行っています。僕は 1 年半 NixOS を使っていますが、
 - [[https://github.com/toyboot4e/dotfiles/commit/10181af8ede15d14d0aa77a6afd6b04c719b63ab][nixify your emacs]]
   [[https://github.com/nix-community/emacs-overlay][emacs-overlay]] により依存パッケージが自動的に Nix 化されました。
 - [[https://github.com/toyboot4e/dotfiles/commit/7bbdc9deff22a73b718982620b56c8a94110a473][introduce =nvfetcher=]]
-  =nixpkgs= に無いパッケージを =melpaBuild= でビルドし、更新には =nvfetcher= を使う方法を確認しました。
+  =nixpkgs= に無いパッケージを =melpaBuild= でビルドし、更新には [[https://github.com/berberman/nvfetcher][nvfetcher]] を使う方法を確認しました。
 
 * ファイル分割を読む
 

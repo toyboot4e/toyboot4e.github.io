@@ -1,0 +1,126 @@
+#+TITLE: ABC 378 / 東京観光、 Emacs
+#+DATE: <2024-11-03 Sun>
+
+* ABC 378
+
+[[https://atcoder.jp/contests/abc378][ABC 378]] に参加しました。レーティング微減です。
+
+#+CAPTION: Diff 予想
+| 問題      | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|-----------+--------+--------+--------+--------+--------+--------|
+| 提出      |     AC |     AC |     AC |     AC | TLE    | AC     |
+| Diff 予想 |     10 |     20 |    400 |    800 | 1,500  | 1,100  |
+| Diff 実際 |     22 |    118 |    191 |    587 | 1,406  | 1,436  |
+
+** [[https://atcoder.jp/contests/abc378/tasks/abc378_a][A 問題]]
+
+同じ色のボールを 2 つずつ捨てていくとき、捨てられるペアの数を求めよ。色ごとにボールの数を数えて 2 で割った和が答えです。
+
+#+BEGIN_SRC haskell
+import Data.List;main=interact$show.sum.map((`div`2).length).group.sort.map(read @Int).words
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc378/tasks/abc378_b][B 問題]]
+
+ゴミが定期的に収集されるとき、最寄りのゴミ収集日を求めよ。愚直に分岐するのが簡単だと思います。
+
+#+BEGIN_SRC haskell
+let !d' = d `mod` q
+(d +) $ case compare d' r of
+  EQ -> 0
+  GT -> r + q - d'
+  LT -> r - d'
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc378/tasks/abc378_c][C 問題]]
+
+数列を走査するとき、それぞれの $A_i$ と同じ値が出現した最寄りの位置を求めよ。 =Map= を持って数列を走査します。
+
+=mapAccumL= 案件ですが、 =vector= には無いので =State= モナドを使いました:
+
+#+BEGIN_SRC haskell
+let !res = (`evalState` IM.empty) $ U.imapM (\i x -> state (step i x)) xs
+      where
+        -- step :: i -> x -> state -> (x', state)
+        step (succ -> i) x im = case IM.lookup x im of
+          Just i' -> (i', im')
+          Nothing -> (-1, im')
+          where
+            !im' = IM.insert x i im
+#+END_SRC
+
+上のコードの提出は、 =mapAccumL= よりも 100 ms 程度遅かったです。 =mapM= + =State= は遅い！　cojna さんの [[https://github.com/cojna/iota/blob/e77bb3087f8a5231d0ae1320d93fd2649de37149/src/My/Prelude.hs#L213][mapAccum]] を借りると =mapAccumL= と同速程度に速くなります。
+
+** [[https://atcoder.jp/contests/abc378/tasks/abc378_d][D 問題]]
+
+グリッド上で長さ K の [[https://ja.wikipedia.org/wiki/%E9%81%93_(%E3%82%B0%E3%83%A9%E3%83%95%E7%90%86%E8%AB%96)][単純道]] (頂点の重複が無いパス) の数を求めよ。愚直解が通ります。大雑把に見積もると $O(HW \cdot N!)$ は TLE しますが、もう少し正確に考えると $O(HW \cdot 4 \cdot 3^{K-1})$ になります ([[https://atcoder.jp/contests/abc378/editorial/11288][公式解説]]) 。
+
+この DFS は大まかに次の形で実装できます:
+
+#+BEGIN_SRC haskell
+!dist <- UM.replicate (h * w) undef
+(\f -> fix f (0 :: Int) source) $ \loop d1 v1 -> do
+  GM.write dist v1 d1    -- 訪問済みにする
+  -- 隣接頂点を調べる、など (省略)
+  GM.write dist v1 undef -- 未訪問にする
+#+END_SRC
+
+計算量の見積もりを間違えました。順位表を見るとペナルティの数が少なかったため、メタ読みで愚直解が通ると分かりました。
+
+** [[https://atcoder.jp/contests/abc378/tasks/abc378_e][E 問題]]
+
+数列 $\{A_i\}_i$ に対し $\sum\limits_{1 \le l \le r \le N} {(\sum\limits_{l \le i \le r}A_i \bmod M)}$ を求めよ。考察中……
+
+** [[https://atcoder.jp/contests/abc378/tasks/abc378_f][F 問題]]
+
+木に対し 1 つの辺を追加し閉路を作る。閉路中の頂点がすべて次数 3 となり、かつ単純グラフのままである (*重複辺ではない*) 辺の張り方の数を求めよ。
+
+辺の追加によって次数が増加します。閉路に含まれる頂点が (次数 2, 次数 3, 次数 3, .., 次数 2) となる辺の張り方の数が答えです。次数 3 の頂点の『島』を Union-Find で作って解答しました。
+
+[[https://atcoder.jp/contests/abc282/tasks/abc282_d][Make Bipartite 2]] よりも簡単な気がしますが、こちらは水 diff になりました。
+
+** 感想
+
+今回もレーティングが減少しました。維持には速解きが必要です。
+
+* 東京観光
+
+** アーユル・チェアー
+
+[[https://www.ayur-chair.com/][アーユル・チェアー]] に座ってきました。座っている間は何ともないですが、 *立つ時の負荷がほぼ無い* のが印象的でした。ちょっと気持ち良かったぐらいです。次のセール・ポイント還元では買いです。
+
+高級モデルも座席部分は変わりません。高さのみが変わるようです。
+
+- [[https://www.ayur-chair.com/f/octpus?gclid=Cj0KCQjwm5e5BhCWARIsANwm06hrGIcjRX2_YV20hr3ehjpqbK6pNV7Efj_XZCaShA-wnpFArBvjSnYaAid4EALw_wcB][オクトパス]] でも高さ 0.7m のテーブルにフィットしました
+- ハイレンジモデルを買う場合、足置きをオプションとして追加すべきです
+- [[https://www.ayur-chair.com/f/medical-seat?gclid=Cj0KCQjwm5e5BhCWARIsANwm06hrGIcjRX2_YV20hr3ehjpqbK6pNV7Efj_XZCaShA-wnpFArBvjSnYaAid4EALw_wcB&_gl=1*1iztyik*_gcl_aw*R0NMLjE3MzA2MTAyNzguQ2owS0NRandtNWU1QmhDV0FSSXNBTndtMDZockdJY2pSWDJfWVYyMGhyM2VoanBxYks2cE5WN0Vmal9YWkNhU2hBLXducEZBckJ2alNuWWFBaWQ0RUFMd193Y0I.*_gcl_au*MTcwMjExMzE3LjE3MjkxNzM0NzE.*_ga*MTY5OTIyNDM1MC4xNzI5MTczNDcx*_ga_2C70TXWT4F*MTczMDYwOTczNS4yLjEuMTczMDYxMDI3Ny4zNi4wLjA.][座椅子モデル]] や [[https://www.ayur-chair.com/f/agura?gclid=Cj0KCQjwm5e5BhCWARIsANwm06hrGIcjRX2_YV20hr3ehjpqbK6pNV7Efj_XZCaShA-wnpFArBvjSnYaAid4EALw_wcB&_gl=1*1s3bgvm*_gcl_aw*R0NMLjE3MzA2MTAyODUuQ2owS0NRandtNWU1QmhDV0FSSXNBTndtMDZockdJY2pSWDJfWVYyMGhyM2VoanBxYks2cE5WN0Vmal9YWkNhU2hBLXducEZBckJ2alNuWWFBaWQ0RUFMd193Y0I.*_gcl_au*MTcwMjExMzE3LjE3MjkxNzM0NzE.*_ga*MTY5OTIyNDM1MC4xNzI5MTczNDcx*_ga_2C70TXWT4F*MTczMDYwOTczNS4yLjEuMTczMDYxMDI4NC4yOS4wLjA.][あぐらイスモデル]] もあります
+
+** Bang & Olufsen
+
+高級オーディメーカの B&O で空間オーディオや 15 万円のヘッドフォンを体験して来ました。耳が悪いのか、自宅の装備とあまり差が分かりません。
+
+自宅装備は [[https://www.youtube.com/watch?v=kSm8tlirF1I][HS5 - YAMAHAが最強である理由 / レビュー]] と大体同じ (HS5 + FOSTEX のヘッドフォン) です。これ以上、もう上は無いのか……？
+
+** インターネットカフェ
+
+入店・退店処理が無人で、ちょっとしたホテルのような内装も印象的でした。シャワーもあります。もうホテルに宿泊しないかもしれません。
+
+** 東京Emacs勉強会 オクトーバーフェスティバル2024
+
+登壇の機会を頂きました。こういう機会でも無いとオフラインイベントには参加しませんものね。本当にありがたかったです。
+
+もっとも、発表は大失敗でした。めちゃめちゃフォローして頂いて、申し訳ない気持ちばかりです。せっかく話しかけてもらっても、マクロは LSP と相性が悪いので興味無いっすとか言っちゃって、何やってんだろう……。
+
+現地で得た情報としては、以下を真似したいです。特に =dmacro= が面白い。
+
+- =w3m= のフィルターで必要な部分だけ切り出す
+  Emacs で AtCoder を読めるようにしたいです
+- AI の出力を org 形式にする (プロンプトで頑張る)
+  閲覧性が高まります
+- =dmacro= を使う
+  繰り返し入力をいい感じに挿入してくれる機能です。基本操作が増えて良さそうです
+
+懇親会では、主に Lisp に関する異常に詳しい話を伺いました。圧巻でした。実質 Lisp 博物館で、こうなりたいものです。
+
+技能習得に興味があり、 Lisp を実装したとしても Lisp を理解したとは限らない、型システムを実装したからと言って型システムを理解したとは限らない、といった話をしてもらえたのが嬉しかったです。
+

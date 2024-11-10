@@ -1,0 +1,174 @@
+#+TITLE: ABC 379
+#+DATE: <2024-11-10 Sun>
+
+* ABC 379
+
+[[https://atcoder.jp/contests/abc379][ABC 379]] に参加しました。
+
+#+CAPTION: Diff 予想
+| 問題      | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|-----------+--------+--------+--------+--------+--------+--------|
+| 提出      |     AC |     AC |     AC | AC     | TLE    | -      |
+| 予想 diff |      8 |     20 |    600 | 1,200  | 1,400  |        |
+| 実際 diff |     11 |     39 |    951 | 745    | 1,246  |        |
+
+** [[https://atcoder.jp/contests/abc379/tasks/abc379_a][A 問題]]
+
+[[https://atcoder.jp/contests/abc379/submissions/59573839][cojna さんの提出]] の通りです。シンプル！
+
+#+BEGIN_SRC haskell
+main=interact(\(a:b:c:_)->[b,c,a,' ',c,a,b])
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc379/tasks/abc379_b][B 問題]]
+
+=O= または =X= から成る文字列が与えられたとき、連続する =k= 個の =O= を最大何個切り出せるか。 RLE (run-length encoding) を元に答えます。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !k) <- ints2'
+  !s <- sum . map ((`div` k) . length) . filter ((== 'O') . head) . group . BS.unpack <$> line'
+  printBSB s
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc379/tasks/abc379_c][C 問題]]
+
+長さ $N$ の配列に対し、 $\{(位置_i, 値_i)\}_i$ の形で正の値の分布が与えられる。それぞれの値を右へ引き伸ばして行ったとき、配列上のすべての値を $1$ とする操作回数を求めよ。
+
+制約 $N \leq 10^9$ のため、効率的な計算が必要です。値の分布を位置 $X_i$ でソートし、左端から順に塗り終えた位置 $r$ を持つと、それぞれの分布値を $O(1)$ で処理できます。
+
+[[https://atcoder.jp/contests/abc379/submissions/59580847][gksato さんの提出]] が =Maybe= 型の =foldM= によって計算の中断を表現しており、流石でした。この書き方、そろそろ身に付けたいですね。
+
+** [[https://atcoder.jp/contests/abc379/tasks/abc379_d][D 問題]]
+
+以下のクエリを処理せよ。 1. 数列に値 0 を追加する。 2. 全要素に $T_i$ を加算する。 3. $H_i$ 以上の値を数列から削除する。
+
+クエリ 1. にて追加する値が $0$ であることから、早く追加した値ほど大きくなり単調性が成り立ちます。したがって値の削除は貪欲に実施すれば良く、キュー (=Seq= 等) で解けるようです。
+
+僕の解法はクエリ 1. にて任意の値を追加できそうです。クエリ $2$ にて $H_i$ の値を加算すると捉え、それぞれのクエリ $1$ がどのクエリ $3$ によって削除されるかを 2 分探索で検討します。
+
+** [[https://atcoder.jp/contests/abc379/tasks/abc379_e][E 問題]]
+
+どでかい数の計算を桁上がり法で実施せよ。計算式の整理で失敗しました。遅延セグ木よりも imos 法で解くのがシンプルで良かったですね。
+
+** [[https://atcoder.jp/contests/abc379/tasks/abc379_f][F 問題]]
+
+奇妙な問題設定が話題になりました。
+
+#+CAPTION: "競プロ準拠の人体"
+[[./img/2024-11-10-chokudai.png]]
+
+** 感想
+
+緑パフォで妥当な結果になりました。ちゃんと upsolve しないとダメですね〜
+
+* ac-library-hs
+
+** 言語アップデートが近づいている！
+
+今、僕の中で一番熱いのはこれです。 [[https://atcoder.jp/posts/1342][AtCoderの言語アップデートに関して (2024-25年度)]]
+
+公式 Discord ができたので、そこで議論することになりそうです。なんとしても =ac-library= の移植版をジャッジ環境に追加したいので、急速に実装しています。
+
+** =Internal.Assert=
+
+添字範囲チェックの関数などを集約しました。
+
+#+BEGIN_SRC haskell
+-- | Asserts \(0 \leq i \lt n\) for an array index \(i\).
+{-# INLINE checkIndex #-}
+checkIndex :: (HasCallStack) => String -> Int -> Int -> ()
+checkIndex funcName i n
+  | 0 <= i && i < n = ()
+  | otherwise = error $ funcName ++ ": given invalid index`" ++ show i ++ "` over length `" ++ show n ++ "`"
+#+END_SRC
+
+** =SCC=
+
+Tarjan の SCC を写経しました。 DFS 木を作っていく際に、どの親まで逆向きの辺を使って遡ることができるか (強連結成分であるか) を記録して行きます。これを low-link と呼ぶようです。ちゃんと勉強したい。
+
+** =TwoSat=
+
+無心で写経しました。 =GrowVec= (可変長配列) を作成済みのため、忠実に写経できました。
+
+** =SegTree=
+
+=ac-library= (C++) では関数を型パラメータとして渡していました。引数渡しじゃなかったですね。
+
+#+BEGIN_SRC cpp
+template <class S, auto op, auto e> struct segtree {
+    static_assert(std::is_convertible_v<decltype(op), std::function<S(S, S)>>,
+                  "op must work as S(S, S)");
+    static_assert(std::is_convertible_v<decltype(e), std::function<S()>>,
+                  "e must work as S()");
+  // ~~
+}
+#+END_SRC
+
+型を活かすならば、と =Monoid= を使う実装にしました。
+
+** =LazySegTree=
+
+大分迷いました。 ac-library-rs の場合、 [[https://docs.rs/ac-library-rs/latest/ac_library/lazysegtree/trait.MapMonoid.html][=MapMonoid=]] に関数を集約しているのが良さそうです。しかし Haskell 標準の =Monoid= を活かすのが自然な気もします。
+
+以下の =SegAct= で提案したいと思います。
+
+#+BEGIN_SRC haskell
+class (Monoid f, VU.Unbox f, Monoid a, VU.Unbox a) => SegAct f a where
+  segAct :: f -> a -> a
+#+END_SRC
+
+弱点は、ユーザが orphan instance を作りがち (例: =instance SegAct (Sum Int) (Max Int)=) です。デフォルト実装を多めに提供すべきかと思います。 =Affine2d= とかも入れちゃうか……？
+
+** 残り作業
+
+*** 必須作業
+
+11 月下旬を目指して作業します。
+
+- [ ] 実装
+  残るは convolution, math, modint, string です。意外と多い。
+- [ ] ドキュメントの作成
+  =ac-library= の en ドキュメントをコピペします。ライセンス的には問題ありません。
+- [ ] =doctest= の作成
+  使い方を haddock に載せます。
+- [ ] 追加のテスト作成
+  遅延セグ木の =maxRight=, =minLeft= など。その他、カバレッジ外の関数が無いか確認します。
+- [ ] GHC 9.8.3 への移行
+  GHC 2024 でデフォルト拡張が増えたりします。
+- [ ] 最終整理
+  不要パッケージの削除、依存バージョンの指定方法などを確認します。
+- [ ] Hackage への登録
+  アップロード権をもらうためメールするところからです。 haskell-jp 名義を借りるか、一人作業なので自分で出してしまうか……。
+
+*** できればやりたい
+
+- [ ] ベンチマーク、他ライブラリとの比較
+- [ ] =modify=, =exchange= など Haskell ならではの関数追加
+- [ ] =SegAct= のデフォルトインスタンスの追加
+
+* Misc
+
+** Kindle Scribe 破損
+
+ついに Scribe を壊してしましました。例に漏れず圧力に弱いですね。累計 12 万円分くらい壊してきたので、 Kindle 製品の購入は打ち止めにします。
+
+技術書が読めるサイズの e-ink 端末であって耐久性が高いものがあれば買いです。
+
+** OpenRun Pro 2
+
+[[https://jp.shokz.com/products/openrun-pro2][OpenRun Pro 2]] が出ていました。低音の性能が上がっているようです。欲しいけどな〜
+
+しばらくは、手持ちの OpenRun Pro (無印) は低音カットの EQ が入った OpenRun Pro 2 だと思いこむ生活になります。月末の Amazon セールでまた考えます。
+
+** =cargo check= 相当のコマンド？
+
+コード生成を飛ばしてビルドすると、コンパイル済みのコードへの警告も一挙に確認できるようです。
+
+#+BEGIN_SRC sh
+$ cabal build --ghc-options="-fforce-recomp -fno-code"
+#+END_SRC
+
+https://stackoverflow.com/questions/12273315/how-to-recompile-haskell-with-cabal-build-showing-only-warnings
+
