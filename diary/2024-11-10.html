@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 379 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 379</h1>
+      <p>Nov 10, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 379"><a href="#ABC 379">ABC 379</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc379">ABC 379</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">提出</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-left">AC</td>
+            <td class="org-left">TLE</td>
+            <td class="org-left">-</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">予想 diff</td>
+            <td class="org-right">8</td>
+            <td class="org-right">20</td>
+            <td class="org-right">600</td>
+            <td class="org-left">1,200</td>
+            <td class="org-left">1,400</td>
+            <td class="org-left">&#xa0;</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際 diff</td>
+            <td class="org-right">11</td>
+            <td class="org-right">39</td>
+            <td class="org-right">951</td>
+            <td class="org-left">745</td>
+            <td class="org-left">1,246</td>
+            <td class="org-left">&#xa0;</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc379/tasks/abc379_a">A 問題</a></a>
+      </h3>
+      <p>
+        <a href="https://atcoder.jp/contests/abc379/submissions/59573839">cojna さんの提出</a>
+        の通りです。シンプル！<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">main=interact(\(a:b:c:_)-&gt;[b,c,a,' ',c,a,b])
+</code></pre>
+      </div>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc379/tasks/abc379_b">B 問題</a></a>
+      </h3>
+      <p>
+        <code>O</code> または <code>X</code> から成る文字列が与えられたとき、連続する
+        <code>k</code> 個の <code>O</code> を最大何個切り出せるか。 RLE (run-length encoding)
+        を元に答えます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !k) &lt;- ints2'
+  !s &lt;- sum . map ((`div` k) . length) . filter ((== 'O') . head) . group . BS.unpack &lt;$&gt; line'
+  printBSB s
+</code></pre>
+      </div>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc379/tasks/abc379_c">C 問題</a></a>
+      </h3>
+      <p>
+        長さ \(N\) の配列に対し、 \(\{(位置_i, 値_i)\}_i\)
+        の形で正の値の分布が与えられる。それぞれの値を右へ引き伸ばして行ったとき、配列上のすべての値を
+        \(1\) とする操作回数を求めよ。<br />
+      </p>
+
+      <p>
+        制約 \(N \leq 10^9\) のため、効率的な計算が必要です。値の分布を位置 \(X_i\)
+        でソートし、左端から順に塗り終えた位置 \(r\) を持つと、それぞれの分布値を \(O(1)\)
+        で処理できます。<br />
+      </p>
+
+      <p>
+        <a href="https://atcoder.jp/contests/abc379/submissions/59580847">gksato さんの提出</a> が
+        <code>Maybe</code> 型の
+        <code>foldM</code>
+        によって計算の中断を表現しており、流石でした。この書き方、そろそろ身に付けたいですね。<br />
+      </p>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc379/tasks/abc379_d">D 問題</a></a>
+      </h3>
+      <p>
+        以下のクエリを処理せよ。 1. 数列に値 0 を追加する。 2. 全要素に \(T_i\) を加算する。 3.
+        \(H_i\) 以上の値を数列から削除する。<br />
+      </p>
+
+      <p>
+        クエリ 1. にて追加する値が \(0\)
+        であることから、早く追加した値ほど大きくなり単調性が成り立ちます。したがって値の削除は貪欲に実施すれば良く、キュー
+        (<code>Seq</code> 等) で解けるようです。<br />
+      </p>
+
+      <p>
+        僕の解法はクエリ 1. にて任意の値を追加できそうです。クエリ \(2\) にて \(H_i\)
+        の値を加算すると捉え、それぞれのクエリ \(1\) がどのクエリ \(3\)
+        によって削除されるかを検討します。<br />
+      </p>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc379/tasks/abc379_e">E 問題</a></a>
+      </h3>
+      <p>
+        どでかい数の計算を桁上がり法で実施せよ。計算式の整理で失敗しました。遅延セグ木よりも imos
+        法で解くのがシンプルで良かったですね。<br />
+      </p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc379/tasks/abc379_f">F 問題</a></a>
+      </h3>
+      <p>奇妙な問題設定が話題になりました。<br /></p>
+
+      <figure>
+        <img src="./img/2024-11-10-chokudai.png" alt="2024-11-10-chokudai.png" /><br />
+
+        <figcaption><span class="figure-number">Figure 1: </span>"競プロ準拠の人体"</figcaption>
+      </figure>
+      <h3 id="感想"><a href="#感想">感想</a></h3>
+      <p>緑パフォで妥当な結果になりました。ちゃんと upsolve しないとダメですね〜<br /></p>
+      <h2 id="ac-library-hs"><a href="#ac-library-hs">ac-library-hs</a></h2>
+      <h3 id="言語アップデートが近づいている！">
+        <a href="#言語アップデートが近づいている！">言語アップデートが近づいている！</a>
+      </h3>
+      <p>
+        今、僕の中で一番熱いのはこれです。
+        <a href="https://atcoder.jp/posts/1342">AtCoderの言語アップデートに関して (2024-25年度)</a
+        ><br />
+      </p>
+
+      <p>
+        公式 Discord ができたので、そこで議論することになりそうです。なんとしても
+        <code>ac-library</code> の移植版をジャッジ環境に追加したいので、急速に実装しています。<br />
+      </p>
+      <h3 id="Internal.Assert">
+        <a href="#Internal.Assert"><code>Internal.Assert</code></a>
+      </h3>
+      <p>添字範囲チェックの関数などを集約しました。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">-- | Asserts \(0 \leq i \lt n\) for an array index \(i\).
+{-# INLINE checkIndex #-}
+checkIndex :: (HasCallStack) =&gt; String -&gt; Int -&gt; Int -&gt; ()
+checkIndex funcName i n
+  | 0 &lt;= i &amp;&amp; i &lt; n = ()
+  | otherwise = error $ funcName ++ ": given invalid index`" ++ show i ++ "` over length `" ++ show n ++ "`"
+</code></pre>
+      </div>
+      <h3 id="SCC">
+        <a href="#SCC"><code>SCC</code></a>
+      </h3>
+      <p>
+        Tarjan の SCC を写経しました。 DFS
+        木を作っていく際に、どの親まで逆向きの辺を使って遡ることができるか (強連結成分であるか)
+        を記録して行きます。これを low-link と呼ぶようです。ちゃんと勉強したい。<br />
+      </p>
+      <h3 id="TwoSat">
+        <a href="#TwoSat"><code>TwoSat</code></a>
+      </h3>
+      <p>
+        無心で写経しました。 <code>GrowVec</code> (可変長配列)
+        を作成済みのため、忠実に写経できました。<br />
+      </p>
+      <h3 id="SegTree">
+        <a href="#SegTree"><code>SegTree</code></a>
+      </h3>
+      <p>
+        <code>ac-library</code> (C++)
+        では関数を型パラメータとして渡していました。引数渡しじゃなかったですね。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-cpp">template &lt;class S, auto op, auto e&gt; struct segtree {
+    static_assert(std::is_convertible_v&lt;decltype(op), std::function&lt;S(S, S)&gt;&gt;,
+                  "op must work as S(S, S)");
+    static_assert(std::is_convertible_v&lt;decltype(e), std::function&lt;S()&gt;&gt;,
+                  "e must work as S()");
+  // ~~
+}
+</code></pre>
+      </div>
+
+      <p>型を活かすならば、と <code>Monoid</code> を使う実装にしました。<br /></p>
+      <h3 id="LazySegTree">
+        <a href="#LazySegTree"><code>LazySegTree</code></a>
+      </h3>
+      <p>
+        大分迷いました。 ac-library-rs の場合、
+        <a href="https://docs.rs/ac-library-rs/latest/ac_library/lazysegtree/trait.MapMonoid.html"
+          ><code>MapMonoid</code></a
+        >
+        に関数を集約しているのが良さそうです。しかし Haskell 標準の
+        <code>Monoid</code> を活かすのが自然な気もします。<br />
+      </p>
+
+      <p>以下の <code>SegAct</code> で提案したいと思います。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">class (Monoid f, VU.Unbox f, Monoid a, VU.Unbox a) =&gt; SegAct f a where
+  segAct :: f -&gt; a -&gt; a
+</code></pre>
+      </div>
+
+      <p>
+        弱点は、ユーザが orphan instance を作りがち (例:
+        <code>instance SegAct (Sum Int) (Max Int)</code>)
+        です。デフォルト実装を多めに提供すべきかと思います。
+        <code>Affine2d</code> とかも入れちゃうか……？<br />
+      </p>
+      <h3 id="残り作業"><a href="#残り作業">残り作業</a></h3>
+      <h4 id="必須作業"><a href="#必須作業">必須作業</a></h4>
+      <p>11 月下旬を目指して作業します。<br /></p>
+
+      <ul>
+        <li class="off">
+          <code>[&#xa0;]</code> 実装<br />
+          残るは convolution, math, modint, string です。意外と多い。<br />
+        </li>
+        <li class="off">
+          <code>[&#xa0;]</code> ドキュメントの作成<br />
+          <code>ac-library</code> の en
+          ドキュメントをコピペします。ライセンス的には問題ありません。<br />
+        </li>
+        <li class="off">
+          <code>[&#xa0;]</code> <code>doctest</code> の作成<br />
+          使い方を haddock に載せます。<br />
+        </li>
+        <li class="off">
+          <code>[&#xa0;]</code> 追加のテスト作成<br />
+          遅延セグ木の <code>maxRight</code>,
+          <code>minLeft</code> など。その他、カバレッジ外の関数が無いか確認します。<br />
+        </li>
+        <li class="off">
+          <code>[&#xa0;]</code> GHC 9.8.3 への移行<br />
+          GHC 2024 でデフォルト拡張が増えたりします。<br />
+        </li>
+        <li class="off">
+          <code>[&#xa0;]</code> 最終整理<br />
+          不要パッケージの削除、依存バージョンの指定方法などを確認します。<br />
+        </li>
+        <li class="off">
+          <code>[&#xa0;]</code> Hackage への登録<br />
+          アップロード権をもらうためメールするところからです。 haskell-jp
+          名義を借りるか、一人作業なので自分で出してしまうか……。<br />
+        </li>
+      </ul>
+      <h4 id="できればやりたい"><a href="#できればやりたい">できればやりたい</a></h4>
+      <ul>
+        <li class="off"><code>[&#xa0;]</code> ベンチマーク、他ライブラリとの比較<br /></li>
+        <li class="off">
+          <code>[&#xa0;]</code> <code>modify</code>, <code>exchange</code> など Haskell
+          ならではの関数追加<br />
+        </li>
+        <li class="off">
+          <code>[&#xa0;]</code> <code>SegAct</code> のデフォルトインスタンスの追加<br />
+        </li>
+      </ul>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="Kindle Scribe 破損"><a href="#Kindle Scribe 破損">Kindle Scribe 破損</a></h3>
+      <p>
+        ついに Scribe を壊してしましました。例に漏れず圧力に弱いですね。累計 12
+        万円分くらい壊してきたので、 Kindle 製品の購入は打ち止めにします。<br />
+      </p>
+
+      <p>技術書が読めるサイズの e-ink 端末であって耐久性が高いものがあれば買いです。<br /></p>
+      <h3 id="OpenRun Pro 2"><a href="#OpenRun Pro 2">OpenRun Pro 2</a></h3>
+      <p>
+        <a href="https://jp.shokz.com/products/openrun-pro2">OpenRun Pro 2</a>
+        が出ていました。低音の性能が上がっているようです。欲しいけどな〜<br />
+      </p>
+
+      <p>
+        しばらくは、手持ちの OpenRun Pro (無印) は低音カットの EQ が入った OpenRun Pro 2
+        だと思いこむ生活になります。月末の Amazon セールでまた考えます。<br />
+      </p>
+      <h3 id="cargo check 相当のコマンド？">
+        <a href="#cargo check 相当のコマンド？"><code>cargo check</code> 相当のコマンド？</a>
+      </h3>
+      <p>
+        コード生成を飛ばしてビルドすると、コンパイル済みのコードへの警告も一挙に確認できるようです。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-sh">$ cabal build --ghc-options="-fforce-recomp -fno-code"
+</code></pre>
+      </div>
+
+      <p>
+        <a
+          href="https://stackoverflow.com/questions/12273315/how-to-recompile-haskell-with-cabal-build-showing-only-warnings"
+          >https://stackoverflow.com/questions/12273315/how-to-recompile-haskell-with-cabal-build-showing-only-warnings</a
+        ><br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
