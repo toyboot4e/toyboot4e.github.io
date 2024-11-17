@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 380 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 380</h1>
+      <p>Nov 17, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 380"><a href="#ABC 380">ABC 380</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc380">ABC 380</a> に参加しました。<br /></p>
+
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
+
+        <colgroup>
+          <col class="org-left" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-right" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+            <th scope="col" class="org-left">G 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">提出</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-left">AC</td>
+            <td class="org-left">AC</td>
+            <td class="org-left">-</td>
+            <td class="org-left">AC</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">予想 diff</td>
+            <td class="org-right">40</td>
+            <td class="org-right">100</td>
+            <td class="org-right">200</td>
+            <td class="org-left">1,200</td>
+            <td class="org-left">1,500</td>
+            <td class="org-left">2,000</td>
+            <td class="org-left">1,600</td>
+          </tr>
+
+          <tr>
+            <td class="org-left">実際 diff</td>
+            <td class="org-right">16</td>
+            <td class="org-right">27</td>
+            <td class="org-right">223</td>
+            <td class="org-left">849</td>
+            <td class="org-left">1,230</td>
+            <td class="org-left">1,769</td>
+            <td class="org-left">1,995</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc380/tasks/abc380_a">A 問題</a></a>
+      </h3>
+      <p>
+        6 桁の整数が与えられる。 <code>(1, 2, 3)</code> の出現回数がそれぞれ
+        <code>(1, 2, 3)</code> 回であるか判定せよ。ソートして比較します。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">import Data.List;main=interact$y.sort;y"122333\n"="Yes";y _="No"
+</code></pre>
+      </div>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc380/tasks/abc380_b">B 問題</a></a>
+      </h3>
+      <p>
+        正規表現 (ERE) で <code>^\|(-+\|+)+$</code> にマッチする文字列が与えられたとき、それぞれの
+        <code>-</code> の長さを求めよ。連続した文字を <code>group</code> 関数でまとめます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">import Data.List;main=interact$unwords.map(show.length).filter((=='-').head).group
+</code></pre>
+      </div>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc380/tasks/abc380_c">C 問題</a></a>
+      </h3>
+      <p>
+        正規表現 (ERE) で <code>^(0|1)+$</code> とマッチする文字列を連長圧縮したとき、
+        <code>k</code> 番目の <code>1</code> の『塊』を 1 つ手前の
+        <code>0</code> の塊と入れ替えよ。<br />
+      </p>
+
+      <p>
+        <code>k</code> 番目の <code>1</code> の塊を累積和で見つけました。なかなか大変です。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !k) &lt;- ints2'
+  !s &lt;- line'
+  let spans = V.fromList $ BS.group s
+  let nSpans = V.length spans
+  let csum = U.scanl1' (+) . U.convert $ V.map (subtract (ord '0') . ord . BS.head) spans
+  let ik = fromJust $ U.elemIndex k csum
+  let is = U.generate nSpans id U.// [(ik - 1, ik), (ik, ik - 1)]
+  putBSB . V.foldMap showBSB . V.backpermute spans $ U.convert is
+</code></pre>
+      </div>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc380/tasks/abc380_d">D 問題</a></a>
+      </h3>
+      <p>
+        文字列 <code>S</code> に対し、写像 <code>S → ST</code> (<code>T</code>: 大小文字を入れ替えた
+        <code>S</code>) を繰り返し適用したとき、 \(\{K_i\}_i\) 番目の文字を求めよ。<br />
+      </p>
+
+      <p>
+        生成される文字列の列は <code>STTSTSST..</code> です。これを <code>01101001</code> と見て
+        <a href="https://oeis.org/search?q=01101001&amp;language=english&amp;go=Search"
+          >OEIS で検索する</a
+        >
+        と、
+        <a href="https://en.wikipedia.org/wiki/Thue%E2%80%93Morse_sequence">Thue-Morse sequence</a>
+        がヒットしました。<br />
+      </p>
+
+      \begin{aligned} t_0 &= 0 \\ t_{2n} &= t_n \\ t_{2n+1} &= 1 - t_n \end{aligned}
+
+      <p>
+        これを関数 <code>t</code> として実装すると、大小文字を反転すべきかが分かります。したがって
+        \(K_i\) は次のように計算できます:<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">let f i =
+      let (!q, !r) = i `divMod` BS.length s
+       in if even (t q)
+            then BS.index s r
+            else flipCase $ BS.index s r
+</code></pre>
+      </div>
+
+      <p>OEIS が無ければ自力で解けなかった可能性が高いです。危なかった。<br /></p>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc380/tasks/abc380_e">E 問題</a></a>
+      </h3>
+      <p>
+        1xN
+        ピクセルが異なる色で塗られている。バケツツールで塗っていくとき、それぞれの色のピクセルが何ピクセルあるか追跡せよ。<br />
+      </p>
+
+      <p>
+        <a href="https://noimi.hatenablog.com/entry/2021/05/02/195143">区間を管理する構造体</a>
+        、俗称区間をセットで管理するテクニックで AC
+        しました。これは区間セットためのデータ構造で、区間の分割や連結を自動的に処理してくれます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-haskell"> :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !q) &lt;- ints2'
+  qs &lt;- U.replicateM q $ do
+    int' &gt;&gt;= \case
+      1 -&gt; (1 :: Int,,) &lt;$&gt; int1' &lt;*&gt; int1'
+      2 -&gt; (2,,-1) &lt;$&gt; int1'
+
+  cnt &lt;- UM.replicate n (1 :: Int)
+  dm &lt;- fromVecDM (U.generate n id)
+
+  let onAdd l r c = do
+        let dn = r + 1 - l
+        GM.modify cnt (+ dn) c
+
+  let onDel l r c = do
+        let dn = r + 1 - l
+        GM.modify cnt (subtract dn) c
+
+  res &lt;- (`U.mapMaybeM` qs) $ \case
+    (1, !i, !c) -&gt; do
+      writeMDM dm i i c onAdd onDel
+      return Nothing
+    (2, !c, !_) -&gt; do
+      Just &lt;$&gt; GM.read cnt c
+
+  putBSB $ unlinesBSB res
+</code></pre>
+      </div>
+
+      <p>PAST で高度典型をやったのが効いています。<br /></p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc380/tasks/abc380_f">F 問題</a></a>
+      </h3>
+      <p>分からない……<br /></p>
+      <h3 id="G 問題">
+        <a href="#G 問題"><a href="https://atcoder.jp/contests/abc380/tasks/abc380_g">G 問題</a></a>
+      </h3>
+      <p>
+        <strong>順列</strong> が与えられる。長さ
+        <code>K</code>
+        の区間をランダムに選び、ランダムにシャッフルするとき、転倒数の期待値を求めよ。<br />
+      </p>
+
+      <p>
+        シャッフルした範囲は、座標圧縮すればランダムな順列です。この転倒数の期待値は \(\frac {k(k -
+        1)} {4}\) になることが知られており、幅 \(K\)
+        の窓で転倒数の期待値を求めていくと解答できます。<br />
+      </p>
+      <h2 id="Misc"><a href="#Misc">Misc</a></h2>
+      <h3 id="ac-library-hs の進捗">
+        <a href="#ac-library-hs の進捗"><code>ac-library-hs</code> の進捗</a>
+      </h3>
+      <p>
+        API ドキュメントや <code>doctest</code> を追加しました。 11 月中に残るモジュールを実装し、
+        12 月中にベンチマークテストを実施できればと思います。<br />
+      </p>
+
+      <p>
+        現在は suffix array を実装 (写経) していますが、バグ修正が進まず難儀しています。先に modint
+        や convolution を進めるべきかもしれません。<br />
+      </p>
+      <h3 id="ラップトップの流行り"><a href="#ラップトップの流行り">ラップトップの流行り</a></h3>
+      <ul>
+        <li>
+          ゲーミング PC<br />
+          最近の機種は相当イケているようです。重さと排熱・性能もそこそこ良いとか。<br />
+        </li>
+
+        <li>
+          MacBook シリーズ<br />
+          Mac のメモリは GPU メモリを兼ねるため、 AI に使えて良さそうですね。<br />
+        </li>
+      </ul>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
