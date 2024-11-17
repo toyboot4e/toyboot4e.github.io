@@ -195,9 +195,10 @@ solve = do
       <p>
         <a href="https://noimi.hatenablog.com/entry/2021/05/02/195143">区間を管理する構造体</a>
         、俗称区間をセットで管理するテクニックで AC
-        しました。これは区間セットためのデータ構造で、区間の分割や連結を自動的に処理してくれます。<br />
+        しました。これは区間書き込みのためのデータ構造で、区間の分割や連結を自動的に処理してくれます。そこにフック
+        (<code>onAdd</code>, <code>onDel</code>) を挟んでピクセル数の変化を追跡します。<br />
       </p>
-
+      <h3 id=""><a href="#"></a></h3>
       <div class="org-src-container">
         <pre><code class="src language-haskell"> :: StateT BS.ByteString IO ()
 solve = do
