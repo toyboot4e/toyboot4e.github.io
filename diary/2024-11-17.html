@@ -198,9 +198,9 @@ solve = do
         しました。これは区間書き込みのためのデータ構造で、区間の分割や連結を自動的に処理してくれます。そこにフック
         (<code>onAdd</code>, <code>onDel</code>) を挟んでピクセル数の変化を追跡します。<br />
       </p>
-      <h3 id=""><a href="#"></a></h3>
+
       <div class="org-src-container">
-        <pre><code class="src language-haskell"> :: StateT BS.ByteString IO ()
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
 solve = do
   (!n, !q) &lt;- ints2'
   qs &lt;- U.replicateM q $ do
