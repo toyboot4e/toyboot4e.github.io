@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ac-library-hs を作成しました - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1><code>ac-library-hs</code> を作成しました</h1>
+      <p>Dec 4, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="背景"><a href="#背景">背景</a></h2>
+      <p>
+        <a href="https://github.com/atcoder/ac-library">AtCoder Library (ACL)</a> を Haskell
+        に移植しました。<a href="https://atcoder.jp/posts/1342">次回の『言語アップデート』</a>以降、
+        <a href="https://atcoder.jp/home">AtCoder</a> 環境にインストールされると思います。<br />
+      </p>
+
+      <blockquote>
+        <p>今すぐ使えるわけではありません！<br /></p>
+      </blockquote>
+      <h3 id="リンク"><a href="#リンク">リンク</a></h3>
+      <p>以下でソース・ドキュメントを確認できます。<br /></p>
+
+      <ul>
+        <li>
+          <a href="https://github.com/toyboot4e/ac-library-hs">toyboot4e/ac-library-hs</a><br />
+        </li>
+        <li><a href="https://toyboot4e.github.io/ac-library-hs/">API ドキュメント</a><br /></li>
+      </ul>
+      <h2 id="ac-library-hs">
+        <a href="#ac-library-hs"><code>ac-library-hs</code></a>
+      </h2>
+      <p>
+        言語アップデート以降、 Haskell で
+        <code>AtCoder</code>
+        モジュールが利用可能になる予定です。新規加入者が解きやすい問題が増え、より快適に遊べると思います。<br />
+      </p>
+      <h3 id="何が変わるか"><a href="#何が変わるか">何が変わるか</a></h3>
+      <p>
+        たとえば
+        <a href="https://toyboot4e.github.io/ac-library-hs/AtCoder-Dsu.html">AtCoder.DSU</a> や
+        <a href="https://toyboot4e.github.io/ac-library-hs/AtCoder-SegTree.html">AtCoder.SegTree</a>
+        が利用できます。これらは頻出のデータ型ですが、自作する場合はそれなりに時間がかかります。
+        <code>ac-library-hs</code>
+        があれば、これらの実装を後回しにして、どんどん問題を解いていくことができます。<br />
+      </p>
+      <h3 id="Haskell 事情"><a href="#Haskell 事情">Haskell 事情</a></h3>
+      <p>
+        古参の人にも名前空間がメリットです。各人の自作ライブラリは、提出ファイルに埋め込むため、グローバルな名前空間に配置されます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span>自作ライブラリ (グローバルな名前空間)
+          を使用</label
+        >
+        <pre><code class="src language-haskell">-- 自作ライブラリを提出ファイルに埋め込む
+data SegTree = { .. }
+newST = ..
+
+-- 名前衝突を避けるため、 `**ST` という名前の関数を使用する
+seg &lt;- newST @_ @(Sum Int) 16
+insertST seg 0 $ Sum 77
+</code></pre>
+      </div>
+
+      <p>
+        <code>ac-library-hs</code> は AtCoder 環境にインストールされ、
+        <code>AtCoder.**</code> モジュールとして利用できます。これは相当便利です。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span
+          ><code>AtCoder</code> モジュールを使用</label
+        >
+        <pre><code class="src language-haskell">-- AtCoder 環境にインストールされたライブラリを使用
+import AtCoder.SegTree qualified as ST
+
+-- `ST.**` という名前空間を利用するため、名前衝突の心配が無い
+seg &lt;- ST.new @_ @(Sum Int) 16
+ST.insert seg 0 $ Sum 77
+</code></pre>
+      </div>
+
+      <p>逆に言うと、普段はグローバルな名前空間を強制されて不自由です。まあ仕方がない……！<br /></p>
+      <h3 id="Extra モジュールについて">
+        <a href="#Extra モジュールについて"><code>Extra</code> モジュールについて</a>
+      </h3>
+      <p>
+        名前空間があまりに便利なため、
+        <code>AtCoder.Extra</code> に追加モジュールを加えたいと思います。避難所として使いますので、
+        <strong>何でも躊躇いなく PR をお送りください！</strong><br />
+      </p>
+
+      <p>
+        僕としては、ポテンシャル付き DSU, 区間を管理する構造体などを追加したいです。速い hashmap や
+        64 分木があっても良いですね。他に欲しいものがあれば、気軽に
+        <a href="https://github.com/toyboot4e/ac-library-hs/issues">issue</a>
+        にメモしてください。余裕があれば実装します。<br />
+      </p>
+      <h2 id="開発状況の報告"><a href="#開発状況の報告">開発状況の報告</a></h2>
+      <h3 id="実装範囲について"><a href="#実装範囲について">実装範囲について</a></h3>
+      <p>
+        <a href="https://github.com/atcoder/ac-library">オリジナル</a> の <code>atcoder/</code>,
+        <code>test/unittest/</code>, <code>test/example/</code> 以下を移植しました。<br />
+      </p>
+
+      <ul>
+        <li>
+          <a href="https://atcoder.github.io/ac-library/master/document_ja/modint.html"
+            >dynamic_modint&lt;T&gt;</a
+          >
+          のみ未実装です。使用機会が無いため、実装予定はありません。<br />
+        </li>
+        <li>
+          ドキュメントは <code>document_en/</code> よりコピーしました (CC-0
+          ライセンスのため問題ありません) 。<br />
+        </li>
+      </ul>
+      <h3 id="API について"><a href="#API について">API について</a></h3>
+      <ul>
+        <li>配列・ストリームは <code>vector</code> です。<br /></li>
+        <li>
+          <a href="https://toyboot4e.github.io/ac-library-hs/AtCoder-SegTree.html">SegTree</a> は
+          <code>Monoid</code> ベースです。<br />
+        </li>
+        <li>
+          <a href="https://toyboot4e.github.io/ac-library-hs/AtCoder-LazySegTree.html"
+            >LazySegTree</a
+          >
+          は <code>Monoid</code> と
+          <a href="https://toyboot4e.github.io/ac-library-hs/AtCoder-LazySegTree.html#t:SegAct"
+            >SegAct</a
+          >
+          ベースです。<br />
+          いかがでしょうか。<br />
+        </li>
+        <li>
+          <code>SegTree</code>, <code>LazySegTree</code> の <code>get</code> / <code>set</code> は
+          <code>vector</code> にならって <code>read</code> / <code>write</code> にしました。<br />
+        </li>
+        <li>
+          コンストラクタのオーバーロードは <code>new</code> と
+          <code>build</code> のように関数が分かれました。<br />
+        </li>
+      </ul>
+      <h3 id="コードについて"><a href="#コードについて">コードについて</a></h3>
+      <p>
+        僕の Haskell
+        は井の中の蛙です。実装を見たら、『これは酷い』と思われるかもしれません。改善点や意見を頂けたら、喜んで修正します！<br />
+      </p>
+      <h3 id="今後の開発について"><a href="#今後の開発について">今後の開発について</a></h3>
+      <p>
+        一通りソースを作りましたが、まだまだ残り作業があります。主な
+        <a href="https://github.com/toyboot4e/ac-library-hs/issues">Issue</a> の内容としては、<br />
+      </p>
+
+      <ul>
+        <li>さらなる単体テストの追加<br /></li>
+        <li>ドキュメントの改善<br /></li>
+        <li>
+          Stackage への登録<br />
+          <ul>
+            <li>GHC 9.8.3 対応<br /></li>
+            <li>パッケージのバージョン指定の見直し<br /></li>
+          </ul>
+        </li>
+        <li>ベンチマークテストの作成<br /></li>
+        <li>高速化 (<code>INLINE</code> や <code>stToPrim</code>)<br /></li>
+        <li>高速化 (<code>StaticModInt</code>)<br /></li>
+        <li>CI のセットアップ<br /></li>
+      </ul>
+      <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
+      <p>
+        <a href="https://github.com/atcoder/ac-library">AtCoder Library (ACL)</a> を Haskell
+        に移植しました。
+        <code>AtCoder.Extra</code>
+        以下に追加したいものがあれば、どんどん送ってください。名前空間を使っていきましょう！<br />
+      </p>
+
+      <p>
+        それでは次回の言語アップデートをお楽しみに！　早ければ来年 1 月かと予想しています。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
