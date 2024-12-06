@@ -2,19 +2,17 @@
 #+DATE: <2022-10-09 Sun>
 #+FILETAGS: :blog:emacs:org_mode:
 
+* =org-publish= ベースの SSG
+
 =org-mode= で本ブログを生成しました ([[https://github.com/toyboot4e/toyboot4e.github.io][リポジトリ]]) 。簡単に紹介します。
 
 #+BEGIN_QUOTE
 本当はミラーボールを回したかったですが、力不足だったようです。
 #+END_QUOTE
 
-* =org-publish= ベースの SSG
-
 ** 背景
 
-Org はマークアップ言語です。主に Emacs ユーザに利用されています。
-
-Emacs のエディタ拡張 =org-mode= には、 =.org= ファイルを任意のフォーマットに変換するコマンド (=org-publish=) が付属します。これを SSG として利用すると、フラットなサイトを簡単に生成できます。
+Org はマークアップ言語です。主に Emacs ユーザに利用されています。 Emacs のエディタ拡張 =org-mode= には、 =.org= ファイルを前提とした SSG (=org-publish=) が付属します。 =org-publish= によってフラットなファイル構成のサイトを簡単に生成できます。
 
 ** ファイル構成
 

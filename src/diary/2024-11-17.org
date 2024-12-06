@@ -1,0 +1,137 @@
+#+TITLE: ABC 380
+#+DATE: <2024-11-17 Sun>
+
+* ABC 380
+
+[[https://atcoder.jp/contests/abc380][ABC 380]] に参加しました。
+
+#+CAPTION: Diff 予想
+| 問題      | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 | G 問題 |
+|-----------+--------+--------+--------+--------+--------+--------+--------|
+| 提出      |     AC |     AC | AC     | AC     | AC     | -      | AC     |
+| 予想 diff |     40 |    100 | 200    | 1,200  | 1,500 | 2,000  | 1,600  |
+| 実際 diff |     16 |     27 | 223   | 849   | 1,230  | 1,769  | 1,995 |
+
+** [[https://atcoder.jp/contests/abc380/tasks/abc380_a][A 問題]]
+
+6 桁の整数が与えられる。 =(1, 2, 3)= の出現回数がそれぞれ =(1, 2, 3)= 回であるか判定せよ。ソートして比較します。
+
+#+BEGIN_SRC haskell
+import Data.List;main=interact$y.sort;y"122333\n"="Yes";y _="No"
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc380/tasks/abc380_b][B 問題]]
+
+正規表現 (ERE) で =^\|(-+\|+)+$= にマッチする文字列が与えられたとき、それぞれの =-= の長さを求めよ。連続した文字を =group= 関数でまとめます。
+
+#+BEGIN_SRC haskell
+import Data.List;main=interact$unwords.map(show.length).filter((=='-').head).group
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc380/tasks/abc380_c][C 問題]]
+
+正規表現 (ERE) で =^(0|1)+$= とマッチする文字列を連長圧縮したとき、 =k= 番目の =1= の『塊』を 1 つ手前の =0= の塊と入れ替えよ。
+
+=k= 番目の =1= の塊を累積和で見つけました。なかなか大変です。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !k) <- ints2'
+  !s <- line'
+  let spans = V.fromList $ BS.group s
+  let nSpans = V.length spans
+  let csum = U.scanl1' (+) . U.convert $ V.map (subtract (ord '0') . ord . BS.head) spans
+  let ik = fromJust $ U.elemIndex k csum
+  let is = U.generate nSpans id U.// [(ik - 1, ik), (ik, ik - 1)]
+  putBSB . V.foldMap showBSB . V.backpermute spans $ U.convert is
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc380/tasks/abc380_d][D 問題]]
+
+文字列 =S= に対し、写像 =S → ST= (=T=: 大小文字を入れ替えた =S=) を繰り返し適用したとき、 $\{K_i\}_i$ 番目の文字を求めよ。
+
+生成される文字列の列は =STTSTSST..= です。これを =01101001= と見て [[https://oeis.org/search?q=01101001&language=english&go=Search][OEIS で検索する]] と、 [[https://en.wikipedia.org/wiki/Thue%E2%80%93Morse_sequence][Thue-Morse sequence]] がヒットしました。
+
+\begin{aligned}
+t_0 &= 0 \\
+t_{2n} &= t_n \\
+t_{2n+1} &= 1 - t_n
+\end{aligned}
+
+これを関数 =t= として実装すると、大小文字を反転すべきかが分かります。したがって $K_i$ は次のように計算できます:
+
+#+BEGIN_SRC haskell
+let f i =
+      let (!q, !r) = i `divMod` BS.length s
+       in if even (t q)
+            then BS.index s r
+            else flipCase $ BS.index s r
+#+END_SRC
+
+OEIS が無ければ自力で解けなかった可能性が高いです。危なかった。
+
+** [[https://atcoder.jp/contests/abc380/tasks/abc380_e][E 問題]]
+
+1xN ピクセルが異なる色で塗られている。バケツツールで塗っていくとき、それぞれの色のピクセルが何ピクセルあるか追跡せよ。
+
+[[https://noimi.hatenablog.com/entry/2021/05/02/195143][区間を管理する構造体]] 、俗称区間をセットで管理するテクニックで AC しました。これは区間書き込みのためのデータ構造で、区間の分割や連結を自動的に処理してくれます。そこにフック (=onAdd=, =onDel=) を挟んでピクセル数の変化を追跡します。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !q) <- ints2'
+  qs <- U.replicateM q $ do
+    int' >>= \case
+      1 -> (1 :: Int,,) <$> int1' <*> int1'
+      2 -> (2,,-1) <$> int1'
+
+  cnt <- UM.replicate n (1 :: Int)
+  dm <- fromVecDM (U.generate n id)
+
+  let onAdd l r c = do
+        let dn = r + 1 - l
+        GM.modify cnt (+ dn) c
+
+  let onDel l r c = do
+        let dn = r + 1 - l
+        GM.modify cnt (subtract dn) c
+
+  res <- (`U.mapMaybeM` qs) $ \case
+    (1, !i, !c) -> do
+      writeMDM dm i i c onAdd onDel
+      return Nothing
+    (2, !c, !_) -> do
+      Just <$> GM.read cnt c
+
+  putBSB $ unlinesBSB res
+#+END_SRC
+
+PAST で高度典型をやったのが効いています。
+
+** [[https://atcoder.jp/contests/abc380/tasks/abc380_f][F 問題]]
+
+分からない……
+
+** [[https://atcoder.jp/contests/abc380/tasks/abc380_g][G 問題]]
+
+*順列* が与えられる。長さ =K= の区間をランダムに選び、ランダムにシャッフルするとき、転倒数の期待値を求めよ。
+
+シャッフルした範囲は、座標圧縮すればランダムな順列です。この転倒数の期待値は $\frac {k(k - 1)} {4}$ になることが知られており、幅 $K$ の窓で転倒数の期待値を求めていくと解答できます。
+
+* Misc
+
+** =ac-library-hs= の進捗
+
+API ドキュメントや =doctest= を追加しました。 11 月中に残るモジュールを実装し、 12 月中にベンチマークテストを実施できればと思います。
+
+現在は suffix array を実装 (写経) していますが、バグ修正が進まず難儀しています。先に modint や convolution を進めるべきかもしれません。
+
+** ラップトップの流行り
+
+- ゲーミング PC
+  最近の機種は相当イケているようです。重さと排熱・性能もそこそこ良いとか。
+
+- MacBook シリーズ
+  Mac のメモリは GPU メモリを兼ねるため、 AI に使えて良さそうですね。
+

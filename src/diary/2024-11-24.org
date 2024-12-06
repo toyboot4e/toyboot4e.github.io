@@ -1,0 +1,110 @@
+#+TITLE: ABC 381
+#+DATE: <2024-11-22 Fri>
+
+* ABC 381
+
+[[https://atcoder.jp/contests/abc381][ABC 381]] に参加しました。今回はダメダメでした。
+
+#+CAPTION: Diff 予想
+| 問題      | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|-----------+--------+--------+--------+--------+--------+--------|
+| 提出      |     AC |     AC |     AC | AC     | -      | -      |
+| 予想 diff |     40 |    400 |    300 | 1,000  |       |        |
+| 実際 diff |     31 |     52 |    209 |  921   |        |        |
+
+** [[https://atcoder.jp/contests/abc381/tasks/abc381_a][A 問題]]
+
+文字列 =s= 全体が正規表現 =1+/2+= とマッチし、かつ =/= が文字列の中央にあるか答えよ。前と後ろからマッチさせて調べました。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !s <- BS.unpack <$> line'
+  let lf = length $ takeWhile (== '1') s
+  let lb = length . takeWhile (== '2') $ reverse s
+  printYn $ lf == lb && lf + lb + 1 == n
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc381/tasks/abc381_b][B 問題]]
+
+文字列 =s= 全体が正規表現 =(a-z)\1= とマッチし、かつ同じ文字が =2= 回のみ現れるか判定せよ。愚直に判定しましたが、やや実装が重い。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !s <- BS.unpack <$> line'
+  let n = length s
+  let b1 = all (even . length) $ group s
+  let cnt = U.accumulate (+) (U.replicate 26 (0 :: Int)) $ U.map ((,1) . subtract (ord 'a') . ord) $ U.fromListN n s
+  let b2 = U.all (`elem` [0, 2]) cnt
+  printYn $ even n && b1 && b2
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc381/tasks/abc381_c][C 問題]]
+
+文字列 =s= の中で =111/222= と同じ形の最長連続部分列を求めよ。 RLE に変換し =zipWith3= で見るのが簡単そうです。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !s <- line'
+  let rle = U.fromList . map ((,) <$> head <*> length) . group $ BS.unpack s
+  let res
+        | U.length rle < 3 = bool 0 1 $ BS.elem '/' s
+        | otherwise = U.maximum $ U.zipWith3 f rle (U.tail rle) (U.tail (U.tail rle))
+        where
+          f ('1', !n1) ('/', 1) ('2', !n2) = 2 * min n1 n2 + 1
+          f _ ('/', !_) _ = 1
+          f _ _ _ = 0
+  printBSB res
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc381/tasks/abc381_d][D 問題]]
+
+文字列 =s= から B 問題と同じ条件を満たす最長の連続部分列を求めよ。基本的なアイデアは尺取り法ですが、綺麗に落とし込めなかったため、クシャクシャの再帰ループで通しました。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !xs <- U.map pred <$> intsU'
+
+  let run :: Int -> Int -> Int -> Seq.Seq Int -> IS.IntSet -> [Int] -> Int
+      run !accMax !lastC !acc !cPop !is [] = accMax
+      run !accMax !lastC !acc !cPop !is (c1 : c2 : rest)
+        | c1 == c2 =
+            if IS.member c1 is
+              then
+                let loop :: Int -> IS.IntSet -> Seq.Seq Int -> (Int, IS.IntSet, Seq.Seq Int)
+                    loop !acc' !is' Seq.Empty = error "unreachable"
+                    loop !acc' !is' (c Seq.:<| popRest)
+                      | c == c1 = {- insert c to the end -} (acc', is', popRest Seq.|> c1)
+                      | otherwise = loop (acc' - 2) (IS.delete c is') popRest
+                    (!acc', !is', !cPop') = loop acc is cPop
+                 in run accMax c1 acc' cPop' is' rest
+              else run (max accMax (acc + 2)) c1 (acc + 2) (cPop Seq.|> c1) (IS.insert c1 is) rest
+      run !accMax !cLast !_ !_ !_ (c : rest)
+        | c == cLast = run accMax c 2 (Seq.singleton c) (IS.singleton c) rest -- (ref:1)
+        | otherwise = run accMax c 0 Seq.Empty IS.empty rest
+
+  printBSB $ run 0 (-1) 0 Seq.Empty IS.empty (U.toList xs)
+#+END_SRC
+
+- [[(1)]]: =aaxxx= のような文字列があった場合、末尾の =xx= からリスタートします。
+
+** [[https://atcoder.jp/contests/abc381/tasks/abc381_e][E 問題]]
+
+XXXX (伏せ字) で解けるらしいですが、未だにイメージできていません。久しぶりに公式解説を観ようかと思います。
+
+** [[https://atcoder.jp/contests/abc381/tasks/abc381_f][F 問題]]
+
+* =ac-library-hs=
+
+=string=, =math=, =internal_math= を移植しました。残るは =modint= と =convolution= です ([[https://github.com/toyboot4e/ac-library-hs/issues/1][#1]]) 。 11 月中に移植可能です。
+
+[[https://en.wikipedia.org/wiki/Barrett_reduction][Barrett reduction]] の実装で [[https://hackage.haskell.org/package/wide-word][wide-word]] の 128 bit 整数 (=Word128=) に依存しようと思います。言語アップデートの Discord でも  [[https://hackage.haskell.org/package/wide-word][wide-word]] の追加を提案しました。
+
+=MagicHash= 無しだと =Barrett= や =ModInt= のパフォーマンスが悪い気がします。ベンチマークテストを用意して、リリース前にヘルプを出そうと思います。
+

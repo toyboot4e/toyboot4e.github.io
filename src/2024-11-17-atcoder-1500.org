@@ -1,0 +1,41 @@
+#+TITLE: Haskell / AtCoder レーティング 1,500 到達
+#+DATE: <2024-11-17 Sun>
+
+* 始めに
+
+AtCoder でレーティング 1,500 に到達しました！
+
+[[./img/2024-11-17-rating-1500.png]]
+
+[[https://kenkoooo.com/atcoder/#/table/][AtCoder Problems]] における進捗は以下です:
+
+[[./img/2024-11-17-problems.png]]
+
+人と比べると、 [[https://judge.yosupo.jp/][Library Checker]] をやった方だと思います。
+
+[[./img/2024-10-21-library-checker.png]]
+#+CAPTION: 51 AC, 141 位
+
+* 振り返り
+
+[[./2023-11-17-rating-1500.html][1,400 に到達した (該当記事)]] のが本年 10 月でした。なぜかまぐれ勝ちが続き今に至ります。
+
+** 運か実力か
+
+現状は運でした。次のグラフで一発屋が一目瞭然です:
+
+#+CAPTION: [[https://atcoder-graphs.vercel.app/][AtCoder Graphs β より]] 。コンテストの成績とレーティングへの寄与が分かります。
+[[./img/2024-11-17-contrib.png]]
+
+** この 1 ヶ月間やっていたこと
+
+この 1 ヶ月は =ac-library= の Haskell 移植版を作っていました。 *バグが取れません〜〜*
+
+** この先やりたいこと
+
+Idris 2 を AtCoder のジャッジ環境に追加したり、 Pure Script で Hello, world! してみたいと思います。 Haskell はアドベントカレンダー記事を頑張りたいですねー
+
+* 文脈
+
+[[./2024-10-21-atcoder-1400.html][Haskell / AtCoder レーティング 1,400 到達]] のセルフパロディでした。
+

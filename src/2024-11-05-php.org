@@ -1,0 +1,277 @@
+#+TITLE: PHP 速習 (ナップサック問題)
+#+DATE: <2024-11-05 Tue>
+
+PHP 8.2 を環境構築し、ナップサック問題を解いてみました。
+
+* 環境構築
+
+PHP のセットアップは初めてです。
+
+** AtCoder のジャッジ環境の確認
+
+[[https://img.atcoder.jp/file/language-update/language-list.html][AtCoder のジャッジ環境]] から PHP の実行環境を調べました。 *PHP 8.2* を使っています。今どきの PHP なら、僕にも使いこなせるでしょうか。
+
+
+#+CAPTION: コンパイルコマンド
+#+BEGIN_SRC php
+php -l Main.php && touch OK
+#+END_SRC
+
+#+CAPTION: 実行コマンド
+#+BEGIN_SRC sh
+php Main.php
+#+END_SRC
+
+#+CAPTION: ライブラリ
+#+BEGIN_SRC txt
+php8.2-gmp
+php8.2-bcmath
+php8.2-sqlite3
+#+END_SRC
+
+** インストール (Nix Flakes)
+
+[[https://github.com/loophp/nix-shell][loophp/nix-shell]] を使ってインストールしてみます。この辺りは [[https://fortee.jp/phpcon-fukuoka-2024/proposal/fde5c43f-885e-455b-9b4f-6fdb4c697a19][たけてぃ氏]] が詳しそうですが、 PHP こそ Nix が活躍する場面ではないでしょうか。
+
+テンプレートが用意されているので、使ってみます。
+
+#+BEGIN_SRC sh
+$ nix flake init --template github:loophp/nix-shell#basic
+wrote: /home/tbm/dev/php/atcoder-php/flake.lock
+wrote: /home/tbm/dev/php/atcoder-php/README.md
+wrote: /home/tbm/dev/php/atcoder-php/flake.nix
+wrote: /home/tbm/dev/php/atcoder-php/.envrc
+#+END_SRC
+
+=nix-direnv= で =PATH= を通します。
+
+#+BEGIN_SRC sh
+$ direnv allow
+direnv: loading ~/dev/php/atcoder-php/.envrc
+direnv: using flake
+[1/0/1 copied (69.6/142.6 MiB), 11.2/23.3 MiB DL] fetching source from https://cache.nixos.orgdirenv: ([/nix/store/3mydh7746lji25ry2aygsy5i4s0i23x2-direnv-2.35.0/bin/direnv export fish]) is taking a while to execute. Use CTRL-C to give up.
+direnv: export +CONFIG_SHELL +HOST_PATH +IN_NIX_SHELL +NIX_BUILD_CORES +NIX_BUILD_TOP +NIX_CFLAGS_COMPILE +NIX_ENFORCE_NO_NATIVE +NIX_LDFLAGS +NIX_STORE +SOURCE_DATE_EPOCH +TEMP +TEMPDIR +TMP +TMPDIR +__structuredAttrs +buildInputs +buildPhase +builder +cmakeFlags +configureFlags +depsBuildBuild +depsBuildBuildPropagated +depsBuildTarget +depsBuildTargetPropagated +depsHostHost +depsHostHostPropagated +depsTargetTarget +depsTargetTargetPropagated +doCheck +doInstallCheck +dontAddDisableDepTrack +mesonFlags +name +nativeBuildInputs +out +outputs +patches +phases +preferLocalBuild +propagatedBuildInputs +propagatedNativeBuildInputs +shell +shellHook +stdenv +strictDeps +system ~PATH ~XDG_DATA_DIRS
+#+END_SRC
+
+これで PHP が =PATH= に入りました。しかし PHP のバージョンが 8.1 です:
+
+#+BEGIN_SRC sh
+$ php --version
+PHP 8.1.24 (cli) (built: Sep 26 2023 23:43:49) (NTS)
+Copyright (c) The PHP Group
+Zend Engine v4.1.24, Copyright (c) Zend Technologies
+    with Zend OPcache v8.1.24, Copyright (c), by Zend Technologies
+#+END_SRC
+
+PHP 8.2 に差し替えてインストール完了とします。
+
+#+CAPTION: =flake.nix=
+#+BEGIN_SRC diff-php
+-            php = pkgs.php81; # Change to php56, php70, ..., php81, php82, php83 etc.
++            php = pkgs.php82; # Change to php56, php70, ..., php81, php82, php83 etc.
+#+END_SRC
+
+#+BEGIN_SRC php
+$ php --version
+PHP 8.2.11 (cli) (built: Sep 26 2023 11:11:58) (NTS)
+Copyright (c) The PHP Group
+Zend Engine v4.2.11, Copyright (c) Zend Technologies
+    with Zend OPcache v8.2.11, Copyright (c), by Zend Technologies
+#+END_SRC
+
+普通はここまで簡単に行きませんが、整備されていて助かりました。
+
+#+BEGIN_QUOTE
+=drupal= など余分なパッケージが入っていますが、ひとまず良しとします。
+#+END_QUOTE
+
+** Emacs の環境構築
+
+*** =php-mode=
+
+[[https://github.com/emacs-php/php-mode][emacs-php/php-mode]] は tadsan 氏がメインメンテナの Emacs パッケージです。自分がお世話になる日が来るとは思いませんでした。
+
+README の内容を =leaf= 式に起こすとこんな感じです (※ 正確さは不確かです):
+
+#+BEGIN_SRC elisp
+(leaf php-mode
+  :custom
+  ((php-mode-coding-style . 'psr2)
+   (php-mode-template-compatibility . nil)
+   (php-imenu-generic-expression . 'php-imenu-generic-expression-simple))
+  :defer-config
+  (subword-mode 1)
+  (setq-local show-trailing-whitespace t)
+  (setq-local ac-disable-faces '(font-lock-comment-face font-lock-string-face))
+  (add-hook 'hack-local-variables-hook 'php-ide-turn-on nil t)
+  (when (require 'flycheck nil)
+    (add-to-list 'flycheck-disabled-checkers 'php-phpmd)
+    (add-to-list 'flycheck-disabled-checkers 'php-phpcs)))
+#+END_SRC
+
+*** =flycheck-phpstan= + =flycheck-inline-mode=
+
+[[https://phpstan.org/][PHPStan]] が PHP の静的解析ツールのように見えます。 [[https://github.com/emacs-php/flycheck-phpstan.el][emacs-php/flycheck-phpstan.el]] を導入します:
+
+#+BEGIN_SRC elisp
+(leaf flycheck-phpstan
+  :init
+  (defun my-flycheck-phpstan-setup ()
+    (flycheck-mode t))
+  :hook (php-mode-hook . my-flycheck-phpstan-setup)
+  :defer-config
+  (flycheck-mode t)
+  (flycheck-inline-mode t))
+#+END_SRC
+
+これにて構文エラーがリアルタイムで表示されるようになりました:
+
+#+CAPTION: =flycheck-phpstan.el= + =flycheck-inline-mode=
+#+ATTR_HTML: :width 388px
+[[./img/2024-11-05-phpstan.png]]
+
+他にも =composer= など様々なツールがあるようですが、今回は無視します。
+
+* 演習
+
+** 標準入出力のテンプレート
+
+競技プログラミングの解答プログラムは、標準入出力を通じてジャッジとデータをやり取りします。最低限、標準入出力のイディオムを見つける必要があります。
+
+[[https://qiita.com/noko206/items/800649132ff050635ff0][【PHP】標準入力・標準出力を楽に記述するための工夫【AtCoder】]] を参考にテンプレートを作成しました。
+
+#+BEGIN_SRC php
+// 標準入力を 1 行読み、単語列に分解する
+function words() {
+    return explode(' ', trim(fgets(STDIN)));
+}
+
+// 標準入力を 1 行読み、整数列に分解する
+function ints() {
+    return array_map('intval', words());
+}
+
+// データ列を空白区切りで標準出力に書き込む
+function echo_words(...$args) {
+    echo implode(' ', $args), "\n";
+}
+#+END_SRC
+
+以下のように疑問は尽きませんが、スピード優先で先へ進みます。
+
+#+BEGIN_QUOTE
+- 実は JS/TS のようにアロー関数を使った方が良いのか？
+- =array_map= とは？
+#+END_QUOTE
+
+** ナップサック問題
+
+[[https://atcoder.jp/contests/dp][Educational DP Contest]] の [[https://atcoder.jp/contests/dp/tasks/dp_d][D - Knapsack 1]] を解きます。
+
+*** 問題設定
+
+ナップサック問題は動的計画法の問題です。問題設定は次のとおりです。
+
+$(重さ w_i, 価値 v_i)$ を持った $N$ 個の荷物があります 。これらの荷物を重さ $W$ まで収納可能なバッグに詰めていくとき、バッグの中の荷物の価値の総和の最大値を求めてください。
+
+*** 解法: 動的計画法
+
+具体例として、重さ $4$ まで荷物を詰められるバッグがあるとして、以下の初期配列を作成します。
+
+#+ATTR_HTML: :width 570px
+[[./img/2024-11-05-knapsack-1.png]]
+
+- 配列の添字は重さです。
+- 配列の各スロットには、その重さを達成する最大価値を記録します。
+
+具体的には、次のように計算します:
+
+[[./img/2024-11-05-knapsack-2.png]]
+
+- それぞれの荷物をバックに詰める・詰めないをすべて試すと $O(2^N)$ になります
+- 動的計画法により状態数を $W$ 程度に削減したことで、 $O(NW)$ で計算できます
+
+このように $N$ 個の荷物を処理し、最後に残った配列の中で最大の値 (価値) が答えです。
+
+*** 実装
+
+以下の提出が受理されました ([[https://atcoder.jp/contests/dp/submissions/59465896][340 ms]]) 。良い PHP のコードではないかもしれませんが、スクリプト言語としては妥当な速度のように思いました (コンパイル言語の 10 倍遅い程度です) 。
+
+#+BEGIN_SRC php
+<?php
+
+// -------------------------------------------------------------------------------------------------
+// テンプレート
+// -------------------------------------------------------------------------------------------------
+
+// 標準入力を 1 行読み、単語列に分解する
+function words() {
+    return explode(' ', trim(fgets(STDIN)));
+}
+
+// 標準入力を 1 行読み、整数列に分解する
+function ints() {
+    return array_map('intval', words());
+}
+
+// データ列を空白区切りで標準出力に書き込む
+function echo_words(...$args) {
+    echo implode(' ', $args), "\n";
+}
+
+// -------------------------------------------------------------------------------------------------
+// Main
+// -------------------------------------------------------------------------------------------------
+
+function main() {
+    // 荷物の数と最大の重さを取得する
+    // 注: $w は上書きされるため $wMax とする
+    list($n, $wMax) = ints();
+
+    // 荷物の情報を取得する
+    $ws = [];
+    $vs = [];
+    for ($i = 0; $i < $n; $i++) {
+        list($w, $v) = ints();
+        $ws[$i] = $w;
+        $vs[$i] = $v;
+        // list($ws[], $vs[]) = ints();
+    }
+
+    // DP 配列を初期化する
+    $dp = array_fill(0, $wMax + 1,  PHP_INT_MIN);
+    $dp[0] = 0;
+    $next_dp = array_fill(0, $wMax + 1,  PHP_INT_MIN);
+
+    // 荷物を 1 つずつ処理して DP を実施
+    for ($i = 0; $i < $n; $i++) {
+        // この荷物の情報を取得
+        $dw = $ws[$i];
+        $dv = $vs[$i];
+        // この荷物を収納した場合・しなかった場合の内、
+        // より高い価値を各スロットに記録する:
+        for ($iw = 0; $iw <= $wMax; $iw++) {
+            if ($iw >= $dw) {
+                $next_dp[$iw] = max($dp[$iw], $dp[$iw - $dw] + $dv);
+            } else {
+                $next_dp[$iw] = $dp[$iw];
+            }
+        }
+
+        [$dp, $next_dp] = [$next_dp, $dp]; // 昔の PHP だと動かない？
+    }
+
+    // 解答
+    $result = max($dp);
+    echo $result;
+}
+
+main();
+#+END_SRC
+
+* 終わりに
+
+PHP 8.2 を環境構築し、競技プログラミングの問題を解いてみました。まだまだ変なプログラムを書いている気がしますから、本格的に PHP に取り組む場合は知識を補填します。
+
+また僕はテキストエディタや環境構築には強い方だと思いますが、 Web プログラミング・設計等の知識はほぼありません。イチからやり直し積み上げて行きたいと思います。
+

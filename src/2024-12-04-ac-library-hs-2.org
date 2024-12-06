@@ -1,0 +1,105 @@
+#+TITLE: =ac-library-hs= を作成しました
+#+DATE: <2024-12-04 Wed>
+
+[[https://qiita.com/advent-calendar/2024/haskell][Haskell アドベントカレンダー 2024]] の 4 日目の投稿です。
+
+* 背景
+
+[[https://github.com/atcoder/ac-library][AtCoder Library (ACL)]] を Haskell に移植しました。[[https://atcoder.jp/posts/1342][次回の『言語アップデート』]]以降、 [[https://atcoder.jp/home][AtCoder]] 環境にインストールされると思います。
+
+#+BEGIN_QUOTE
+今すぐ使えるわけではありません！
+#+END_QUOTE
+
+** リンク
+
+以下でソース・ドキュメントを確認できます。
+
+- [[https://github.com/toyboot4e/ac-library-hs][toyboot4e/ac-library-hs]]
+- [[https://toyboot4e.github.io/ac-library-hs/][API ドキュメント]]
+
+* =ac-library-hs=
+
+言語アップデート以降、 Haskell で =AtCoder= モジュールが利用可能になる予定です。新規加入者が解きやすい問題が増え、より快適に遊べると思います。
+
+** 何が変わるか
+
+たとえば [[https://toyboot4e.github.io/ac-library-hs/AtCoder-Dsu.html][AtCoder.DSU]] や [[https://toyboot4e.github.io/ac-library-hs/AtCoder-SegTree.html][AtCoder.SegTree]] が利用できます。これらは頻出のデータ型ですが、自作する場合はそれなりに時間がかかります。 =ac-library-hs= があれば、これらの実装を後回しにして、どんどん問題を解いていくことができます。
+
+** Haskell 事情
+
+古参の人にも名前空間がメリットです。各人の自作ライブラリは、提出ファイルに埋め込むため、グローバルな名前空間に配置されます。
+
+#+CAPTION: 自作ライブラリ (グローバルな名前空間) を使用
+#+BEGIN_SRC haskell
+-- 自作ライブラリを提出ファイルに埋め込む
+data SegTree = { .. }
+newST = ..
+
+-- 名前衝突を避けるため、 `**ST` という名前の関数を使用する
+seg <- newST @_ @(Sum Int) 16
+insertST seg 0 $ Sum 77
+#+END_SRC
+
+=ac-library-hs= は AtCoder 環境にインストールされ、 =AtCoder.**= モジュールとして利用できます。これは相当便利です。
+
+#+CAPTION: =AtCoder= モジュールを使用
+#+BEGIN_SRC haskell
+-- AtCoder 環境にインストールされたライブラリを使用
+import AtCoder.SegTree qualified as ST
+
+-- `ST.**` という名前空間を利用するため、名前衝突の心配が無い
+seg <- ST.new @_ @(Sum Int) 16
+ST.insert seg 0 $ Sum 77
+#+END_SRC
+
+逆に言うと、普段はグローバルな名前空間を強制されて不自由です。まあ仕方がない……！
+
+** =Extra= モジュールについて
+
+名前空間があまりに便利なため、 =AtCoder.Extra= に追加モジュールを加えたいと思います。避難所として使いますので、 *何でも躊躇いなく PR をお送りください！*
+
+僕としては、ポテンシャル付き DSU, 区間を管理する構造体などを追加したいです。速い hashmap や 64 分木があっても良いですね。他に欲しいものがあれば、気軽に [[https://github.com/toyboot4e/ac-library-hs/issues][issue]] にメモしてください。余裕があれば実装します。
+
+* 開発状況の報告
+
+** 実装範囲について
+
+[[https://github.com/atcoder/ac-library][オリジナル]] の =atcoder/=, =test/unittest/=, =test/example/= 以下を移植しました。
+
+- [[https://atcoder.github.io/ac-library/master/document_ja/modint.html][dynamic\under{}modint<T>]] のみ未実装です。使用機会が無いため、実装予定はありません。
+- ドキュメントは =document_en/= よりコピーしました (CC-0 ライセンスのため問題ありません) 。
+
+** API について
+
+- 配列・ストリームは =vector= です。
+- [[https://toyboot4e.github.io/ac-library-hs/AtCoder-SegTree.html][SegTree]] は =Monoid= ベースです。
+- [[https://toyboot4e.github.io/ac-library-hs/AtCoder-LazySegTree.html][LazySegTree]] は =Monoid= と [[https://toyboot4e.github.io/ac-library-hs/AtCoder-LazySegTree.html#t:SegAct][SegAct]] ベースです。
+  いかがでしょうか。
+- =SegTree=, =LazySegTree= の =get= / =set= は =vector= にならって =read= / =write= にしました。
+- コンストラクタのオーバーロードは =new= と =build= のように関数が分かれました。
+
+** コードについて
+
+僕の Haskell は井の中の蛙です。実装を見たら、『これは酷い』と思われるかもしれません。改善点や意見を頂けたら、喜んで修正します！
+
+** 今後の開発について
+
+一通りソースを作りましたが、まだまだ残り作業があります。主な [[https://github.com/toyboot4e/ac-library-hs/issues][Issue]] の内容としては、
+
+- さらなる単体テストの追加
+- ドキュメントの改善
+- Stackage への登録
+  - GHC 9.8.3 対応
+  - パッケージのバージョン指定の見直し
+- ベンチマークテストの作成
+- 高速化 (=INLINE= や =stToPrim=)
+- 高速化 (=StaticModInt=)
+- CI のセットアップ
+
+* まとめ
+
+[[https://github.com/atcoder/ac-library][AtCoder Library (ACL)]] を Haskell に移植しました。 =AtCoder.Extra= 以下に追加したいものがあれば、どんどん送ってください。名前空間を使っていきましょう！
+
+それでは次回の言語アップデートをお楽しみに！　早ければ来年 1 月かと予想しています。
+

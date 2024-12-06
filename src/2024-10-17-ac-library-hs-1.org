@@ -1,0 +1,102 @@
+#+TITLE: =ac-library-hs= を作ります
+#+DATE: <2024-10-17 Thu>
+
+* 始めに
+
+[[https://atcoder.jp/posts/517][AtCoder Library (ACL)]]  を Haskell に移植します。リポジトリはこちら: [[https://github.com/toyboot4e/ac-library-hs][toyboot4e/ac-library-hs]] 。次回言語アップデートでは、 AtCoder 環境で =ac-library-hs= を利用可能にしたいです。
+
+** 進捗
+
+全体の約 40% を移植し、 [[https://atcoder.jp/contests/practice2/tasks][AtCoder Library Practice Contest]] を 12 問中 5 問 解けました。 ([[https://github.com/toyboot4e/ac-library-hs/tree/main/verify/app][解答コードはこちら]]) 。移植が完了したら、他の Haskeller の方々に諸々の方針を伺って改善して行きます。
+
+* 背景
+
+** あなたは誰？
+
+僕 (toyboot4e) は 2 年間 Haskell で競技プログラミングをやっています。競プロ以外では Haskell を使っていません。 Haskell に詳しくはないものの、競プロの範囲では問題無く使っていけるレベルです。
+
+** 外的モチベーション
+
+誰かに少しでも良い影響があると嬉しいです。
+
+- Haskell で AtCoder をやっている人
+  競プロ x Haskell コンテンツとして刺激になれば幸いです。
+
+- Haskell を使ってみたい人
+  Haskell で解く AtCoder を真剣に検討する機会になれば幸いです。
+
+- Haskell / AtCoder 初心者
+  AtCoder への取り組みが心的に楽になれば幸いです。
+
+** 私的モチベーション
+
+移植作業は大きな手間ですが、至って利己的な理由で取り組んでいます。
+
+- [[https://github.com/atcoder/ac-library][ac-library]] から学びたいことがある
+  SA-IS 法、最小費用流の =slope=, 高速な NTT, 高速な SCC など
+
+- Haskell ライブラリのプラクティスを集めたい
+  - テストの書き方 (特に QuickCheck)
+  - ベンチマークテストの書き方
+  - 依存パッケージの適切なバージョン指定
+  - 複数のバージョンの GHC をサポートする方法
+  - Nix を使ったビルド方法
+  - Docker を使った環境構築
+  - などなど……
+
+* =ac-library-hs= の方針
+
+=toyboot4e/ac-library-hs= では以下を目標にしています。
+
+** 目標 1. =ac-library= の API を再現する
+
+基本的に =ac-library= を愚直に書き写し、 API は変更しません。
+
+- 半開区間を使う API があれば従う
+- 2 値タプル or 2 引数の指定に従う (例: =(l, r)= 引数 or =l r= 引数の指定に従う)
+- 暗に可変長配列を前提とした API があれば従う (例: 最大データ数を引数に取らない)
+- Haskell 特有の事情で API を追加するのは良しとする (例: =merge= と =merge_= を分ける)
+- 追加機能は作成しない (例: =Extra= モジュールを作らない)
+
+より細かな方針は以下です。
+
+- =vector= を使用する。 =array= やリストは極力使用しない
+- =HasCallStack= を使う。 =VUM.write= よりも =VGM.write= を使う
+- =assert= を書く (最適化時も削除されない =runtimeAssert= 関数を作成し使う)
+- =new= のようなコンストラクタでは、 =@Type= 指定すべき型パラメータを先頭に置く (状態トークンは末尾に置く)
+- 独自の型クラスを追加しない (特にセグメント木において)
+
+内部実装の方針は以下です:
+
+- タプルは必ず正格評価する。多相な型を持つ値を正格評価する
+- =MagicHash= は (まだ) 使わなくても良い
+
+** 目標 2. ドキュメントを充実させる
+
+最低限、 haddock, doctest, README, 日英対応ドキュメントを用意します。またメタ的なドキュメント (テスト実行、 doctest, haddock, veirfy, ベンチマークテストなど) をまとめ、開発者体験向上パックを目指したいです。
+
+** 努力目標. Bundler を作る
+
+=ac-library-hs= の欠如よりも上位の問題は、名前解決できる bundler が無いことです。
+
+AtCoder では、問題への解答として =Main.hs= 単体ファイルを提出します。ユーザは =Main.hs= の中で名前衝突を避ける工夫が要求されます。たとえば =pushHeap= と =pushBuffer= のような名前分けが要求されます。
+
+理想的には =Heap.push=, =Buffer.push= のように名前空間を使ってソースを作成し、提出直前に =pushHeap=, =pushBuffer= のような形で 1 つのファイルに bundling したいです。これが可能なら、より自由に自作ライブラリを使用できますし、言語アップデート前に =ac-library-hs= が使えることにもなります。
+
+このような完全な bunlder を作るのは現実的ではないため、単純な単語置換で対応する方法を考えたいです。たとえば qualified import の名前空間はグローバル (名前の重複が無い) と仮定すれば、打つ手がある気がします。
+
+** 補足 (Q&A 形式)
+
+- 実装は分担しますか
+  Issue を開いて頂ければ、即分担します！　放っておくと toyboot4e が実装します。
+
+- みんなで共有のライブラリを作るのはどうですか
+  人によって好みの差が激しいと思うので、 ACL を移植します！
+
+- コラボレーションの場ですか
+  あまりそうではないですが、情報交換の機会にして頂けると嬉しいです！
+
+* まとめ
+
+[[https://atcoder.jp/posts/517][AtCoder Library (ACL)]] を移植しています。ライブラリの提供よりも上位の目標としては、 AtCoder で競プロをやる人たちの娯楽になったり、開発者経験の向上を目指したいです。
+

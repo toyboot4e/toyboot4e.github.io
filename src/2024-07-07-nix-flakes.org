@@ -1,0 +1,253 @@
+#+TITLE: Nix Flakes 入門
+#+DATE: <2024-07-07 Sun>
+
+* Flakes 事始め
+
+[[https://nixos-and-flakes.thiscute.world/][NixOS & Flakes Book]] を参考に Nix Flakes に移行しました。
+
+** Flakes を使うメリット
+
+Flakes へのモチベーションは以下です。
+
+1. =shell.nix= → =flake.nix=:
+  キャッシュが効くようになり、環境の切り替えが爆速になります。
+
+2. =configuration.nix= → =flake.nix=
+  モジュール分けや dotfiles リポジトリからの設定反映が簡単になります。
+
+** Flakes の注意点
+
+Nix Flakes は git worktree 中のファイルを =/etc/nixos= 以下にファイルコピーしますが、全ユーザから読めるファイル権限となるため要注意とあります。特に cachix で *重要なファイルが外部のサーバにコピーされる* と相当まずいですね。
+
+#+BEGIN_QUOTE
+Warning: Since contents of flake files are copied to the world-readable Nix store folder, do not put any unencrypted secrets in flake files. You should instead use a secret managing scheme. - [[https://wiki.nixos.org/wiki/Flakes][Flakes - NixOS Wiki]]
+#+END_QUOTE
+
+ひとまずプライベートなファイルは =.git= プロジェクトに置かないことにします。その方がまだ安全です。今後プライバシーの守り方を学びたいと思います。
+
+* 設定の実施
+
+** Flakes の有効化
+
+Flakes は初期状態では無効ですから、 =configuration.nix= を編集して有効化します。
+
+- [[https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-with-flakes-enabled][NixOS with Flakes Enabled]]
+- [[https://wiki.nixos.org/wiki/Flakes][Flakes - NixOS Wiki]]
+
+** =shell.nix= → =flake.nix=
+
+=shell.nix= を =flake.nix= に置き換えると、キャッシュが効いて爆速になります。 [[https://github.com/nix-community/nix-direnv][nix-direnv]] などで非常に有用です。
+
+Flake は git worktree (index) 上のファイルしか見えません。 =flake.nix= をコミットしないリポジトリであっても、一時的に =flake.nix= をコミットする必要があります。
+
+#+BEGIN_DETAILS =.envrc= 例 ([[https://github.com/nix-community/nix-direnv?tab=readme-ov-file#flakes-support][Flakes support]] のテンプレートにより生成)
+#+BEGIN_SRC nix
+if ! has nix_direnv_version || ! nix_direnv_version 3.0.4; then
+    source_url "https://raw.githubusercontent.com/nix-community/nix-direnv/3.0.4/direnvrc" "sha256-DzlYZ33mWF/Gs8DDeyjr8mnVmQGx7ASYqA5WlxwvBG4="
+fi
+use flake
+#+END_SRC
+#+END_DETAILS
+
+#+BEGIN_DETAILS =flake.nix= 例
+ひとまずこれで =shell.nix= と同様にパッケージを追加できます:
+
+#+BEGIN_SRC nix
+{
+  description = "A basic flake with a shell";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  inputs.flake-utils.url = "github:numtide/flake-utils";
+
+  outputs = { nixpkgs, flake-utils, ... }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+      {
+        devShells.default = with pkgs; mkShell {
+          nativeBuildInputs = [
+            pkg-config
+            stack
+            cabal-install
+            llvmPackages.bintools
+          ];
+
+          packages = [
+            # atcoder-cli is from npm
+
+            online-judge-tools
+            python311Packages.selenium
+            python311Packages.pyaml
+            python311Packages.importlab
+            nodejs
+
+            hlint
+            haskell.compiler.ghc946
+            (haskell-language-server.override { supportedGhcVersions = [ "946" ]; })
+            haskellPackages.hoogle
+            haskellPackages.ghcid
+            haskellPackages.ghcide
+          ];
+        };
+      });
+}
+#+END_SRC
+#+END_DETAILS
+
+↑ =flake.nix= 例の書き方は古いので、いずれモダンな書き方に直す必要があります。
+
+** NixOS の設定ファイルの flake 化
+
+=/etc/nixos/= 以下の設定ファイルをローカルなリポジトリに移動することができます。
+
+#+BEGIN_SRC sh
+.
+├── configuration.nix
+├── flake.nix
+├── hardware-configuration.nix
+└── home.nix
+#+END_SRC
+
+このようなディレクトリ下で =sudo nixos-rebuild --flake .#<ホスト名>= を実行すると、 =flake.nix= を基点に OS の設定を更新することができます。
+
+*** =flake.nix=, =configuration.nix=
+
+[[https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-flake-configuration-explained][NixOS's =flake.nix= explained - NixOS & Flakes Book]] を参考に、 =flake.nix= から =configuration.nix= を読み込みます:
+
+#+CAPTION: =flake.nix= 例
+#+BEGIN_SRC nix
+{
+  # sudo nixos-rebuild --flake .#tbm
+  description = "My NixOS configuration";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  outputs = inputs@{ nixpkgs, home-manager, ... }: {
+    nixosConfigurations.tbm = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./configuration.nix
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.tbm = import ./home.nix;
+        }
+      ];
+    };
+  };
+}
+#+END_SRC
+
+*** =home.nix=
+
+主に Home Manager Manual を参考に =flake.nix= から =home.nix= を読み込みます。 =configuration.nix= からの =home.nix= の読み込みは削除します。
+
+- [[https://nixos-and-flakes.thiscute.world/nixos-with-flakes/start-using-home-manager][Getting Started with Home Manager | NixOS & Flakes Book]]
+- [[https://nix-community.github.io/home-manager/index.xhtml#ch-nix-flakes][Nix Flakes - Home Manager Manual]]
+
+ここまでで =nixos-rebuild switch --flake .#<host 名>= が動くことを確認しました。
+
+** Trouble shooting
+
+ファイル分割するとエラーが出ました。謎のエラーですが、今回は最下行に原因が出ています:
+
+#+BEGIN_SRC sh
+error:
+       … while calling the 'seq' builtin
+
+         at /nix/store/j4jzjbr302cw5bl0n3pch5j9bh5qwmaj-source/lib/modules.nix:322:18:
+
+          321|         options = checked options;
+          322|         config = checked (removeAttrs config [ "_module" ]);
+             |                  ^
+          323|         _module = checked (config._module);
+
+       … while evaluating a branch condition
+
+         at /nix/store/j4jzjbr302cw5bl0n3pch5j9bh5qwmaj-source/lib/modules.nix:261:9:
+
+          260|       checkUnmatched =
+          261|         if config._module.check && config._module.freeformType == null && merged.unmatchedDefns != [] then
+             |         ^
+          262|           let
+
+       (stack trace truncated; use '--show-trace' to show the full trace)
+
+       error: getting status of '/nix/store/djv4hwa1gsl3043wjxvzw7jf690rlcx2-source/nixos/nixos': No such file or directory
+#+END_SRC
+
+最終行を抜粋すると、分割したファイルを =git add= していないことが原因でした:
+
+#+BEGIN_SRC sh
+       error: getting status of '/nix/store/djv4hwa1gsl3043wjxvzw7jf690rlcx2-source/nixos/nixos': No such file or directory
+#+END_SRC
+
+これが最大の壁でした……
+
+** =fenix= を overlay として導入する
+
+=flake.nix= においても、 [[https://github.com/nix-community/fenix][fenix]] をある種 rustup の代わりとして使えます:
+
+#+BEGIN_SRC diff-nix
+{
+  # sudo nixos-rebuild --flake .#tbm
+  description = "NixOS configuration";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
++    fenix.url = "github:nix-community/fenix/monthly";
+  };
+
+  outputs = inputs@{ nixpkgs, home-manager, ... }: {
++     packages.x86_64-linux.default = inputs.fenix.packages.x86_64-linux.default.toolchain;
+    nixosConfigurations.tbm = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
++        {
++          nixpkgs.overlays = [ fenix.overlays ];
++        }
+        ./nixos
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.tbm = import ./tbm;
+        }
+      ];
+    };
+  };
+}
+#+END_SRC
+
+これで =pkgs.fenix= が使えるようになるため、 =(fenix.complete.withComponents [ "cargo" "clippy" "rust-src" "rustc" "rustfmt" ])= のようにパッケージ指定できます。
+
+** ファイル分割
+
+=imports= でファイル指定すると設定ファイルを読み込みできます。
+
+#+BEGIN_SRC nix
+{
+  imports = [
+    ./desktop.nix
+    ./input-mozc.nix
+    ./services.nix
+    ./virtual.nix
+  ];
+}
+#+END_SRC
+
+サブディレクトリのファイルを指定する場合、 =./dir/file.nix= と書いても良いですが、 =./dir= と書くと =./dir/default.nix= に自動的に名前解決されます。
+
+* まとめ
+
+最小限の変更で =shell.nix= および =configuration.nix= を =flake.nix= に置き換える方法を確認しました。 Nix Flakes は Git に強く依存するものの、バージョンのロックやキャッシュなどのエコシステムが充実しており、有力な選択肢だと思います。
+
+まだまだ Nix / Flakes の本領は引き出せていないと思いますから、今後も調べて行きたいと思います。
+

@@ -1,0 +1,49 @@
+#+TITLE: Haskell / AtCoder レーティング 1,400 到達
+#+DATE: <2024-10-21 Mon>
+
+* 始めに
+
+AtCoder でレーティング 1,400 に到達しました！
+
+#+CAPTION: 1,465!
+[[./diary/img/2024-10-20-rating.png]]
+
+[[https://kenkoooo.com/atcoder/#/table/][AtCoder Problems]] における進捗は以下です:
+
+[[./img/2024-10-21-problems.png]]
+#+CAPTION: 1,248 AC
+
+人と比べると、 [[https://judge.yosupo.jp/][Library Checker]] をやった方だと思います。
+
+[[./img/2024-10-21-library-checker.png]]
+#+CAPTION: 51 AC, 141 位
+
+* 振り返り
+
+[[./2023-09-10-light-blue-haskell.html][1,200 に到達した (該当記事)]] のが昨年 9 月でした。約一年間泣かず飛ばずで、急に大勝が続き今に至ります。
+
+** 運か実力か
+
+現状は運でした。次のグラフで一発屋が一目瞭然です:
+
+#+CAPTION: [[https://atcoder-graphs.vercel.app/][AtCoder Graphs β より]] 。コンテストの成績とレーティングへの寄与が分かります。
+[[./img/2024-10-21-contrib.png]]
+
+** この 1 年間やっていたこと
+
+この 1 年はレーティング向上よりもプログラム作成の楽しみを優先し、主に [[https://judge.yosupo.jp/][Library Checker]] の問題を解いていました。
+
+主な達成項目は以下です:
+
+- [[https://sushida.net/][寿司打]] 2 万点 達成
+- アルゴリズム実技検定 上級 取得
+- [[https://judge.yosupo.jp/][Library Checker]] 50 問 AC
+
+** この先やりたいこと
+
+[[https://github.com/toyboot4e/ac-library-hs][=ac-library-hs=]] の [[https://toyboot4e.github.io/2024-10-17-ac-library-hs-1.html][開発を開始した (ブログ記事)]] ので、この機会に Haskell のライブラリ作法を一通り習得したいと思います。たとえば PBT (property-based testing) を使いこなしたら、競プロ生活が大きく変化するかもしれません。引き続き、面白おかしくやって行きたいものです。
+
+* 終わりに
+
+2,000 超えパフォはホームラン級の一撃でした。またレーティングは下がると思いますが、取り返せる地力を付けて行きたいと思います。
+
