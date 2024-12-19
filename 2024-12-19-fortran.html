@@ -287,24 +287,53 @@ write (output_unit, '(A)') 'Even'
         <label class="org-src-name"
           ><span class="listing-number">Listing 3: </span><code>ast_to_src.cpp</code></label
         >
-        <pre><code class="src language-fortran">    void visit_GenericRead(const GenericRead_t &amp;x) {
-        std::string r;
-        r += syn(gr::String);
-        r.append("generic");
+        <pre><code class="src language-fortran">    void visit_Read(const Read_t &amp;x) {
+        std::string r=indent;
+        r += print_label(x);
+        r += syn(gr::Keyword);
+<span id="coderef-11-1" onmouseover="CodeHighlightOn(this,'jump-coderef-11-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-11-1');" class="coderef-off"><a href="#coderef-11-1">        r += "read"; ! <span class="coderef-anchor">1</span></a></span>
         r += syn();
-        if(x.n_attr &gt; 0 &amp;&amp; x.m_attr[0] != nullptr){
-            r += ", ";
-            this-&gt;visit_decl_attribute(*x.m_attr[0]);
+        if (x.m_format) {
+            r += " ";
+            this-&gt;visit_expr(*x.m_format);
             r.append(s);
         }
-        r += " :: ";
-<span id="coderef-11-1" onmouseover="CodeHighlightOn(this,'jump-coderef-11-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-11-1');" class="coderef-off"><a href="#coderef-11-1">        r += "read("; ! <span class="coderef-anchor">1</span></a></span>
-        r.append(x.m_id);
-        r += ")";
-        r += " =&gt; ";
-        for (size_t i=0; i&lt;x.n_names; i++) {
-            r.append(x.m_names[i]);
-            if (i &lt; x.n_names-1) r.append(", ");
+        if(x.n_args || x.n_kwargs) {
+            r += "(";
+            for (size_t i=0; i&lt;x.n_args; i++) {
+                if (x.m_args[i].m_value == nullptr) {
+                    r += "*";
+                } else {
+                    this-&gt;visit_expr(*x.m_args[i].m_value);
+                    r += s;
+                }
+                if (i &lt; x.n_args-1 || x.n_kwargs &gt; 0) r += ", ";
+            }
+            for (size_t i=0; i&lt;x.n_kwargs; i++) {
+                r += x.m_kwargs[i].m_arg;
+                r += "=";
+                if (x.m_kwargs[i].m_value == nullptr) {
+                    r += "*";
+                } else {
+                    this-&gt;visit_expr(*x.m_kwargs[i].m_value);
+                    r += s;
+                }
+                if (i &lt; x.n_kwargs-1) r += ", ";
+            }
+            r += ")";
+        } else if(!x.m_format) {
+            r += " *,";
+        }
+        if (x.n_values &gt; 0) {
+            if (x.m_format) {
+                r += ",";
+            }
+            r += " ";
+            for (size_t i=0; i&lt;x.n_values; i++) {
+                this-&gt;visit_expr(*x.m_values[i]);
+                r += s;
+                if (i &lt; x.n_values-1) r += ", ";
+            }
         }
         if(x.m_trivia){
             r += print_trivia_after(*x.m_trivia);
