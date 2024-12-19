@@ -85,11 +85,11 @@ character(len=3) :: s ! (ref:5)
 Fortran の revision によって関数や変数の型が変わるっぽいのも難しい。 Fortran 2018 では =mod= 関数の 2 引数の /type/ と /kind/ がマッチする必要があります。たぶん。要は型が一致する必要があります。
 
 #+BEGIN_SRC fortran
-mod(4_int64, 2_int32) ! コンパイルエラー=! コンパイルエラー
+mod(4_int64, 2_int32) ! コンパイルエラー
 mod(4_int64, 2_int64) ! OK
 #+END_SRC
 
-ところで比較は型が合っていなくても良さそうです。どうしてここではキャストを共要しないのか……？！
+ところで比較は型が合っていなくても良さそうです。どうしてここではキャストを強要しないのか……？！
 
 #+BEGIN_SRC fortran
 mod(4_int64, 2_int64) == 0_int32
@@ -120,35 +120,64 @@ stmt
       ..
 #+END_SRC
 
-この文法があの read/write には見えません。特に文法中に =()= の記載がありません。
+この文法があの read/write には見えません。特に文法中に =read= とか =()= の記載がありません。
 
 #+BEGIN_SRC fortran
 read (input_unit, *) a, b
 write (output_unit, '(A)') 'Even'
 #+END_SRC
 
-ということは、 AST の構築時に =()= の情報が失われている可能性があります。 CST (concrete syntax tree) ではなかったか……！　ソース文字列に変換するコードを覗いてみましょう。
+ということは、 AST の構築時に =read= や =()= といった構文の情報が失われている可能性があります。 CST (concrete syntax tree) ではなかったか……！　ソース文字列に変換するコードを覗いてみましょう。
 
 #+CAPTION: =ast_to_src.cpp=
 #+BEGIN_SRC fortran
-    void visit_GenericRead(const GenericRead_t &x) {
-        std::string r;
-        r += syn(gr::String);
-        r.append("generic");
+    void visit_Read(const Read_t &x) {
+        std::string r=indent;
+        r += print_label(x);
+        r += syn(gr::Keyword);
+        r += "read"; ! (ref:1)
         r += syn();
-        if(x.n_attr > 0 && x.m_attr[0] != nullptr){
-            r += ", ";
-            this->visit_decl_attribute(*x.m_attr[0]);
+        if (x.m_format) {
+            r += " ";
+            this->visit_expr(*x.m_format);
             r.append(s);
         }
-        r += " :: ";
-        r += "read("; ! (ref:1)
-        r.append(x.m_id);
-        r += ")";
-        r += " => ";
-        for (size_t i=0; i<x.n_names; i++) {
-            r.append(x.m_names[i]);
-            if (i < x.n_names-1) r.append(", ");
+        if(x.n_args || x.n_kwargs) {
+            r += "(";
+            for (size_t i=0; i<x.n_args; i++) {
+                if (x.m_args[i].m_value == nullptr) {
+                    r += "*";
+                } else {
+                    this->visit_expr(*x.m_args[i].m_value);
+                    r += s;
+                }
+                if (i < x.n_args-1 || x.n_kwargs > 0) r += ", ";
+            }
+            for (size_t i=0; i<x.n_kwargs; i++) {
+                r += x.m_kwargs[i].m_arg;
+                r += "=";
+                if (x.m_kwargs[i].m_value == nullptr) {
+                    r += "*";
+                } else {
+                    this->visit_expr(*x.m_kwargs[i].m_value);
+                    r += s;
+                }
+                if (i < x.n_kwargs-1) r += ", ";
+            }
+            r += ")";
+        } else if(!x.m_format) {
+            r += " *,";
+        }
+        if (x.n_values > 0) {
+            if (x.m_format) {
+                r += ",";
+            }
+            r += " ";
+            for (size_t i=0; i<x.n_values; i++) {
+                this->visit_expr(*x.m_values[i]);
+                r += s;
+                if (i < x.n_values-1) r += ", ";
+            }
         }
         if(x.m_trivia){
             r += print_trivia_after(*x.m_trivia);
@@ -159,13 +188,13 @@ write (output_unit, '(A)') 'Even'
     }
 #+END_SRC
 
-- [[(1)]] ああー、 =read( .. )= だ……
+- [[(1)]] ああー、 =read( .. )= を復元している……！
 
 というわけで、 AST を見てもあまり文法を一望できませんでした。
 
 * まとめ
 
-Fortran 難しい難しい言いながら LFortran の AST を見てみました。今回は空振りでしたが、次に Fortran にアプローチするときは、 LFortran のパーサを見てみようかと思います。パーサを見れば文法が分かるでしょう。
+Fortran 難しい難しい言いながら LFortran の AST を見てみました。今回は空振りでしたが、次に Fortran にアプローチするときは、 LFortran のパーサを見てみようかと思います。さすがにパーサを見れば文法が分かるでしょう。
 
 Fortran Advelnt Calender 19 日目の記事でした〜。明日の記事は、 [[https://qiita.com/amasaki203][雨崎 しのぶ]] さんの『できるだけ全部ビルドするPLplotインストール【Linux編】』です。お楽しみにー
 
