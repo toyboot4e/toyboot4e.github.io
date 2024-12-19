@@ -203,13 +203,13 @@ end program ABC086A
       </p>
 
       <div class="org-src-container">
-        <pre><code class="src language-fortran">mod(4_int64, 2_int32) ! コンパイルエラー=! コンパイルエラー
+        <pre><code class="src language-fortran">mod(4_int64, 2_int32) ! コンパイルエラー
 mod(4_int64, 2_int64) ! OK
 </code></pre>
       </div>
 
       <p>
-        ところで比較は型が合っていなくても良さそうです。どうしてここではキャストを共要しないのか……？！<br />
+        ところで比較は型が合っていなくても良さそうです。どうしてここではキャストを強要しないのか……？！<br />
       </p>
 
       <div class="org-src-container">
@@ -267,7 +267,7 @@ mod(4_int64, 2_int64) ! OK
       </div>
 
       <p>
-        この文法があの read/write には見えません。特に文法中に
+        この文法があの read/write には見えません。特に文法中に <code>read</code> とか
         <code>()</code> の記載がありません。<br />
       </p>
 
@@ -278,9 +278,9 @@ write (output_unit, '(A)') 'Even'
       </div>
 
       <p>
-        ということは、 AST の構築時に <code>()</code> の情報が失われている可能性があります。 CST
-        (concrete syntax tree)
-        ではなかったか……！　ソース文字列に変換するコードを覗いてみましょう。<br />
+        ということは、 AST の構築時に <code>read</code> や
+        <code>()</code> といった構文の情報が失われている可能性があります。 CST (concrete syntax
+        tree) ではなかったか……！　ソース文字列に変換するコードを覗いてみましょう。<br />
       </p>
 
       <div class="org-src-container">
@@ -326,7 +326,7 @@ write (output_unit, '(A)') 'Even'
             onmouseout="CodeHighlightOff(this, 'coderef-11-1');"
             ><span class="coderef-anchor">1</span></a
           >
-          ああー、 <code>read( .. )</code> だ……<br />
+          ああー、 <code>read( .. )</code> を復元している……！<br />
         </li>
       </ul>
 
@@ -335,7 +335,7 @@ write (output_unit, '(A)') 'Even'
       <p>
         Fortran 難しい難しい言いながら LFortran の AST を見てみました。今回は空振りでしたが、次に
         Fortran にアプローチするときは、 LFortran
-        のパーサを見てみようかと思います。パーサを見れば文法が分かるでしょう。<br />
+        のパーサを見てみようかと思います。さすがにパーサを見れば文法が分かるでしょう。<br />
       </p>
 
       <p>
