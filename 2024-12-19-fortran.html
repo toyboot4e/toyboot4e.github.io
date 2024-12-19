@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fortran, 難し過ぎる - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>Fortran, 難し過ぎる</h1>
+      <p>Dec 19, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <p>
+        <a href="https://qiita.com/advent-calendar/2024/fortran">Fortran Advent Calendar 2024</a> の
+        19 日目の記事です。 Fortran 入門の三歩手前ぐらいの内容です。<br />
+      </p>
+      <h2 id="背景"><a href="#背景">背景</a></h2>
+      <h3 id="モチベーション"><a href="#モチベーション">モチベーション</a></h3>
+      <p>
+        競プロ界で Fortran を代表する人類に
+        <a href="https://atcoder.jp/users/MrTired">MrTired</a>
+        がいます。彼／彼女の提出プログラムの頭には『<a
+          href="https://github.com/osada-yum/Fortran_competitive_library/blob/fe03a1841bc1223db955efc0d7ea1a29aaeb36ce/src/special.fypp#L7"
+          >ランダムウォーク猿</a
+        >』を始めとした乱数キャラが登場したり、さり気なく Discord
+        で僕の懸念事項を質問してくれたりと、ユーモラスで素敵な方です。好きだ！<br />
+      </p>
+
+      <p>
+        すべての言語を使いこなしたい、という意味で僕は Fortran に興味がありますが、ちゃんと MrTired
+        のコードを読んだり、もう少しお近づきしたいなー、という気持ちもあって、普通の人よりはモチベーションが高いと思います。<br />
+      </p>
+      <h3 id="やったみたこと"><a href="#やったみたこと">やったみたこと</a></h3>
+      <p>
+        興味はありつつも、 Fortran 入門には二の足を踏んでいます。
+        <a href="https://www.unp.or.jp/ISBN/ISBN978-4-8158-1087-0.html">みんなの Fortran</a>
+        を購入して読んでいなかったり、 Emacs の環境構築をしたり、<br />
+      </p>
+
+      <figure>
+        <img src="./img/2024-12-19-emacs.png" alt="2024-12-19-emacs.png" width="405dpx" /><br />
+
+        <figcaption><span class="figure-number">Figure 1: </span>Emacs</figcaption>
+      </figure>
+
+      <p>
+        <a href="https://atcoder.jp/contests/abs/tasks/abc086_a?lang=ja"
+          >AtCoder の一番簡単な問題</a
+        >
+        を解いてみましたが、その後の進捗がありません。エアプで良いので、もう少し理解を進める手立ては無いものでしょうか？<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 1: </span>書いてみたプログラム</label
+        >
+        <pre><code class="src language-fortran">program ABC086A
+    use, intrinsic :: iso_fortran_env
+    implicit none
+
+    integer(int64) :: a, b
+    read (input_unit, *) a, b
+
+    if (mod(a*b, 2_int64) == 0_int64) then
+        write (output_unit, '(A)') 'Even'
+    else
+        write (output_unit, '(A)') 'Odd'
+    end if
+end program ABC086A
+</code></pre>
+      </div>
+      <h2 id="Fortran 学習へのアプローチ……の検討">
+        <a href="#Fortran 学習へのアプローチ……の検討">Fortran 学習へのアプローチ……の検討</a>
+      </h2>
+      <p>
+        Fortran
+        の学習曲線が急なのは間違い無いと思います。学習過程なので寛容に捉えて欲しいのですが、僕は以下の辺りに引っかかっています。<br />
+      </p>
+      <h3 id="構文の難しさ"><a href="#構文の難しさ">構文の難しさ</a></h3>
+      <p>プログラム全体の構造がなかなか頭に定着しません。歴史的経緯が色々ありそうです。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-fortran">program ABC086A
+<span id="coderef-2-1" onmouseover="CodeHighlightOn(this,'jump-coderef-2-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-1');" class="coderef-off"><a href="#coderef-2-1">    use, intrinsic :: iso_fortran_env ! <span class="coderef-anchor">1</span></a></span>
+    implicit none
+    ! ~~
+end program ABC086A
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-2-1"
+            id="jump-coderef-2-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-1');"
+            ><span class="coderef-anchor">1</span></a
+          >: 特殊な構文に見えてしまうが、 <code>#pragma</code> 的な一律の記法であって欲しい？<br />
+        </li>
+      </ul>
+
+      <p>変数の宣言もなんだかピンと来ません。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-fortran"><span id="coderef-3-2" onmouseover="CodeHighlightOn(this,'jump-coderef-3-2');" onmouseout="CodeHighlightOff(this,'jump-coderef-3-2');" class="coderef-off"><a href="#coderef-3-2">integer(int64) :: a, b ! <span class="coderef-anchor">2</span></a></span>
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-3-2"
+            id="jump-coderef-3-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-3-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-3-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          どうして <code>::</code> なんだろう<br />
+        </li>
+      </ul>
+
+      <p>
+        標準入出力も構文が謎です。関数呼び出しの普遍的な構文ではなく、 read/write
+        文の専用構文が用意されている雰囲気があります。どうして関数呼び出しじゃないんだ！　と悩んでいる間は集中力
+        50% 減です。これが慣れない言語の難しさですね。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-fortran"><span id="coderef-4-3" onmouseover="CodeHighlightOn(this,'jump-coderef-4-3');" onmouseout="CodeHighlightOff(this,'jump-coderef-4-3');" class="coderef-off"><a href="#coderef-4-3">read (input_unit, *) a, b ! <span class="coderef-anchor">3</span></a></span>
+<span id="coderef-4-4" onmouseover="CodeHighlightOn(this,'jump-coderef-4-4');" onmouseout="CodeHighlightOff(this,'jump-coderef-4-4');" class="coderef-off"><a href="#coderef-4-4">write (output_unit, '(A)') 'Even' ! <span class="coderef-anchor">4</span></a></span>
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-4-3"
+            id="jump-coderef-4-3"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-4-3');"
+            onmouseout="CodeHighlightOff(this, 'coderef-4-3');"
+            ><span class="coderef-anchor">3</span></a
+          >
+          なぜ <code>(unit, format)</code> なのか……？<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-4-4"
+            id="jump-coderef-4-4"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-4-4');"
+            onmouseout="CodeHighlightOff(this, 'coderef-4-4');"
+            ><span class="coderef-anchor">4</span></a
+          >
+          <code>(A)</code> って何だ……！<br />
+        </li>
+      </ul>
+
+      <p>そして文字列が出てくるとノックアウトされます。<br /></p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-fortran"><span id="coderef-5-5" onmouseover="CodeHighlightOn(this,'jump-coderef-5-5');" onmouseout="CodeHighlightOff(this,'jump-coderef-5-5');" class="coderef-off"><a href="#coderef-5-5">character(len=3) :: s ! <span class="coderef-anchor">5</span></a></span>
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-5-5"
+            id="jump-coderef-5-5"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-5-5');"
+            onmouseout="CodeHighlightOff(this, 'coderef-5-5');"
+            ><span class="coderef-anchor">5</span></a
+          >
+          <code>len</code> の出自が不明…… (コンストラクタの構文だったりする？)<br />
+        </li>
+      </ul>
+
+      <p>
+        Fortran の revision によって関数や変数の型が変わるっぽいのも難しい。 Fortran 2018 では
+        <code>mod</code> 関数の 2 引数の <em>type</em> と
+        <em>kind</em> がマッチする必要があります。たぶん。要は型が一致する必要があります。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-fortran">mod(4_int64, 2_int32) ! コンパイルエラー=! コンパイルエラー
+mod(4_int64, 2_int64) ! OK
+</code></pre>
+      </div>
+
+      <p>
+        ところで比較は型が合っていなくても良さそうです。どうしてここではキャストを共要しないのか……？！<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-fortran">mod(4_int64, 2_int64) == 0_int32
+</code></pre>
+      </div>
+
+      <p>
+        いずれも僕の練習不足を表すもので、 50 時間ぐらい Fortran
+        を書けばあっさり慣れると思いますが、今はあぐらをかいたまま前に進みたい。そこで思いつきました。
+        AST だ！<br />
+      </p>
+      <h3 id="AST を見てみよう"><a href="#AST を見てみよう">AST を見てみよう</a></h3>
+      <p>
+        <a href="https://docs.lfortran.org/en/design/">LFortran Design</a> を覗いてみると、 AST
+        に言及があります。 AST
+        は単純に文法をパースしたものらしいので、これを見れば一通り文法を把握できるはずです。<br />
+      </p>
+
+      <p>
+        <a
+          href="https://github.com/lfortran/lfortran/blob/5ebf07740600ccdbeeab8db143f1bb0f320a0f7a/grammar/AST.asdl"
+          >AST.asdl</a
+        >
+        にて文法が定義されており、これを元に
+        <code>&lt;lfortran/ast.h&gt;</code> を生成できます。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 2: </span><code>ast.h</code> を生成する</label
+        >
+        <pre><code class="src language-sh">$ python src/libasr/asdl_cpp.py grammar/AST.asdl src/lfortran/ast.h
+</code></pre>
+      </div>
+
+      <p>
+        まあでも <code>.asdl</code> の方が分かりやすそうです。
+        <a
+          href="https://github.com/lfortran/lfortran/blob/5ebf07740600ccdbeeab8db143f1bb0f320a0f7a/grammar/AST.asdl"
+          >AST.asdl</a
+        >
+        から一部抜粋すると、 read/write 文の文法が記載されています。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-asdl">stmt
+    = ..
+    | Read(int label, expr? format, argstar* args,
+            kw_argstar* kwargs, expr* values, trivia? trivia)
+      ..
+    | Write(int label, argstar* args, kw_argstar* kwargs, expr* values, trivia? trivia)
+      ..
+</code></pre>
+      </div>
+
+      <p>
+        この文法があの read/write には見えません。特に文法中に
+        <code>()</code> の記載がありません。<br />
+      </p>
+
+      <div class="org-src-container">
+        <pre><code class="src language-fortran">read (input_unit, *) a, b
+write (output_unit, '(A)') 'Even'
+</code></pre>
+      </div>
+
+      <p>
+        ということは、 AST の構築時に <code>()</code> の情報が失われている可能性があります。 CST
+        (concrete syntax tree)
+        ではなかったか……！　ソース文字列に変換するコードを覗いてみましょう。<br />
+      </p>
+
+      <div class="org-src-container">
+        <label class="org-src-name"
+          ><span class="listing-number">Listing 3: </span><code>ast_to_src.cpp</code></label
+        >
+        <pre><code class="src language-fortran">    void visit_GenericRead(const GenericRead_t &amp;x) {
+        std::string r;
+        r += syn(gr::String);
+        r.append("generic");
+        r += syn();
+        if(x.n_attr &gt; 0 &amp;&amp; x.m_attr[0] != nullptr){
+            r += ", ";
+            this-&gt;visit_decl_attribute(*x.m_attr[0]);
+            r.append(s);
+        }
+        r += " :: ";
+<span id="coderef-11-1" onmouseover="CodeHighlightOn(this,'jump-coderef-11-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-11-1');" class="coderef-off"><a href="#coderef-11-1">        r += "read("; ! <span class="coderef-anchor">1</span></a></span>
+        r.append(x.m_id);
+        r += ")";
+        r += " =&gt; ";
+        for (size_t i=0; i&lt;x.n_names; i++) {
+            r.append(x.m_names[i]);
+            if (i &lt; x.n_names-1) r.append(", ");
+        }
+        if(x.m_trivia){
+            r += print_trivia_after(*x.m_trivia);
+        } else {
+            r.append("\n");
+        }
+        s = r;
+    }
+</code></pre>
+      </div>
+
+      <ul>
+        <li>
+          <a
+            href="#coderef-11-1"
+            id="jump-coderef-11-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-11-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-11-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          ああー、 <code>read( .. )</code> だ……<br />
+        </li>
+      </ul>
+
+      <p>というわけで、 AST を見てもあまり文法を一望できませんでした。<br /></p>
+      <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
+      <p>
+        Fortran 難しい難しい言いながら LFortran の AST を見てみました。今回は空振りでしたが、次に
+        Fortran にアプローチするときは、 LFortran
+        のパーサを見てみようかと思います。パーサを見れば文法が分かるでしょう。<br />
+      </p>
+
+      <p>
+        Fortran Advelnt Calender 19 日目の記事でした〜。明日の記事は、
+        <a href="https://qiita.com/amasaki203">雨崎 しのぶ</a>
+        さんの『できるだけ全部ビルドするPLplotインストール【Linux編】』です。お楽しみにー<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
