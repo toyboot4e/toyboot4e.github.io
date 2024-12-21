@@ -80,7 +80,14 @@ solve = do
 </p>
 
 <div class="org-src-container">
-<pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+<pre><code class="src language-haskell">dir :: Char -&gt; (Int, Int)
+dir 'U' = (-1, 0)
+dir 'D' = (1, 0)
+dir 'L' = (0, -1)
+dir 'R' = (0, 1)
+dir _ = error "unreachable"
+
+solve :: StateT BS.ByteString IO ()
 solve = do
 <span id="coderef-2-1" onmouseover="CodeHighlightOn(this,'jump-coderef-2-1');" onmouseout="CodeHighlightOff(this,'jump-coderef-2-1');" class="coderef-off"><a href="#coderef-2-1">  (!h, !w, pred -&gt; !y0, pred -&gt; !x0) &lt;- ints4' -- <span class="coderef-anchor">1</span></a></span>
   !gr &lt;- getGrid' h w
