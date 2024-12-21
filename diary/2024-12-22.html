@@ -106,6 +106,10 @@ solve = do
 整数列を任意の K 個飛ばしで見たとき、等しい値の列の長さの最大値を求めよ。すべての点から \(1, 2, 3, .. N - 1\) 個飛ばしを全探索するとします。 <a href="https://ja.wikipedia.org/wiki/%E8%AA%BF%E5%92%8C%E7%B4%9A%E6%95%B0">調和級数</a> の和 \(\sum\limits_{i \in [1, n] \cap \mathbb{Z}} \frac {1} {i}\) は \(\log n\) 程度の大きさであり、愚直に探索すれば \(O(N \log N)\) で解けます。実際は枝刈りでほぼ \(O(N)\) だと思います。<br>
 </p>
 
+<p>
+追記: 計算量の考察が間違ってそうです…… orz<br>
+</p>
+
 <div class="org-src-container">
 <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
 solve = do
@@ -131,7 +135,7 @@ solve = do
 </div>
 
 <ul><li><a href="#coderef-3-1" id="jump-coderef-3-1" class="coderef" onmouseover="CodeHighlightOn(this,'coderef-3-1');" onmouseout="CodeHighlightOff(this, 'coderef-3-1');"><span class="coderef-anchor">1</span></a> \(n = 1\) の場合に <code>1</code> 個以上飛ばしのケースが無くなるため、初期値 <code>1</code> が必須です<br></li>
-<li><a href="#coderef-3-2" id="jump-coderef-3-2" class="coderef" onmouseover="CodeHighlightOn(this,'coderef-3-2');" onmouseout="CodeHighlightOff(this, 'coderef-3-2');"><span class="coderef-anchor">2</span></a> <a href="https://hackage.haskell.org/package/vector-0.13.2.0/docs/Data-Vector.html#v:foldMap"><code>foldMap :​: Monoid m =&gt; (a -&gt; m) -&gt; Vector a -&gt; m</code></a> で <code>fold</code> のネスト避けてみました<br></li>
+<li><a href="#coderef-3-2" id="jump-coderef-3-2" class="coderef" onmouseover="CodeHighlightOn(this,'coderef-3-2');" onmouseout="CodeHighlightOff(this, 'coderef-3-2');"><span class="coderef-anchor">2</span></a> <a href="https://hackage.haskell.org/package/vector-0.13.2.0/docs/Data-Vector.html#v:foldMap"><code>foldMap :​: Monoid m =&gt; (a -&gt; m) -&gt; Vector a -&gt; m</code></a> で <code>fold</code> のネストを避けてみました<br></li>
 </ul>
 <h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_d">D 問題</a></a></h3><p>
 B 問題の sparse 版です。苦戦しました。なお B 問題とは異なり、 \(X, Y\) という名前で本当に <code>x, y</code> 座標の値が与えられる上に、 Y 軸の向きが反転しています。<br>
