@@ -116,7 +116,7 @@ solve = do
   !n &lt;- int'
   !xs &lt;- intsU'
 
-  -- 位置 `i` から `d` 個飛ばしで等しい数を求める
+  -- 位置 `i` から `d` 個飛ばしで等しい値の列の長さを求める
   let step :: Int -&gt; Int -&gt; Int
       step i0 d = inner $ i0 + d
         where
