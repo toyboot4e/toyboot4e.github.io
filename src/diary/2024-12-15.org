@@ -1,0 +1,158 @@
+#+TITLE: ABC 384
+#+DATE: <2024-12-15 Sun>
+
+* ABC 384
+
+[[https://atcoder.jp/contests/abc384][ABC 384]] に参加しました。前回と前々回の日記は大敗したのでサボっています。
+
+#+CAPTION: Diff 予想
+| 問題       | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|------------+--------+--------+--------+--------+--------+--------|
+| 提出       | AC   | AC     | AC     | AC     | AC     | TLE    |
+| 予想 diff | 10     | 10     | 300    | 400    | 800    | 1600   |
+| 実際 diff |  10    |  30    |   187  | 600    |  1002  |   1908 |
+
+** [[https://atcoder.jp/contests/abc384/tasks/abc384_a][A 問題]]
+
+文字列 $S$ の各文字を置換せよ。指示通り実施します。
+
+#+BEGIN_SRC haskell
+main=interact$f.words;f[_,[c],[d],s]=map(\x->if x==c then c else d)s
+#+END_SRC
+
+[[https://atcoder.jp/contests/abc384/submissions/60720817][cojna さんの提出 (21:02)]] は ABC 本番で提出された上に、これよりも短いです。ヤバい。
+
+** [[https://atcoder.jp/contests/abc384/tasks/abc384_b][B 問題]]
+
+n 回の ARC (div 1, div 2) に参加した後のレーティングを求めよ。シミュレートします。
+
+#+BEGIN_SRC haskell
+main=interact$f.tail.map read.words;f(x:d:c:r)|d==1&&x>=1600&&x<2800||d==2&&x>=1200&&x<2400=f(x+c:r)|0<1=f(x:r);f(x:_)=show x
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc384/tasks/abc384_c][C 問題]]
+
+5 つの問題の解き方を点数順でソートして出力せよ。 Bit 全探索ですね。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !xs <- intsU'
+  let !cs = U.fromListN 5 "ABCDE"
+  let sets = U.generate (bit 5) $ \set ->
+        (U.sum (U.backpermute xs (U.filter (testBit set) (U.generate 5 id))), set)
+  let res =
+        V.modify (VAI.sortBy (comparing (first Down)))
+          . G.map (second (U.toList . U.backpermute cs . (\set -> U.filter (testBit set) (U.generate 5 id))))
+          $ U.convert sets
+  printBSB . unlinesBSB $ G.map snd res
+#+END_SRC
+
+- なぜか $2^{32}$ 個の候補があると勘違いして、枝刈りが必要な気がしていました。
+- [[https://publish.obsidian.md/naoya/atcoder/ABC384+%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8A][naoya さんの振り返り]] では点数で安定ソートすれば良いとありました。確かにそうです。勉強になります。
+
+** [[https://atcoder.jp/contests/abc384/tasks/abc384_d][D 問題]]
+
+数列 $\{A_i\}_i$ が無限に繰り替えされるとき、和が $S$ と等しい連続部分列が存在するか調べよ。 $S \bmod \sum_i A_i$ に対して解くと、数列 $\{A_i\}_i$ を 2 つ連結した数列の連続部分列のみを考えれば良く尺取り法が使えます。
+
+累積和を用意すれば、 $[l, r]$ 区間の和が $O(1)$ で求まり、区間の状態を持たずに済みます。こうしたステートレスな尺取り法には、専用の関数を用意してありました:
+
+#+BEGIN_SRC haskell
+twoPointersU :: Int -> (Int -> Int -> Bool) -> U.Vector (Int, Int)
+#+END_SRC
+
+以下のように解けました。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !s_) <- ints2'
+  !xs <- intsU'
+  let !s = s_ `mod` U.sum xs
+  let csum = csum1D $ xs U.++ xs
+  let res = twoPointersU (2 * n) $ \l r -> csum +! (l, r) <= s
+  printYn $ s == 0 || U.any ((== s) . (csum +!)) res
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc384/tasks/abc384_e][E 問題]]
+
+ヒープの問題です。手続き的に解きました。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!h, !w, !xxx) <- ints3'
+  (!y0, !x0) <- ints11'
+  !gr <- getMat' h w
+
+  let p acc y
+        | y < (acc + (xxx - 1)) `div` xxx = True
+        | otherwise = False
+
+  let !bounds = zero2 h w
+  let addAdj bs heap (!y, !x) = do
+        U.forM_ (U.map (add2 (y, x)) ortho4) $ \(!y', !x') -> do
+          when (inRange bounds (y', x')) $ do
+            unlessM (readIV bs (y', x')) $ do
+              writeIV bs (y', x') True
+              insertBH heap (gr @! (y', x'), (y', x'))
+
+  bs <- IxVector bounds <$> UM.replicate (h * w) False
+  writeIV bs (y0, x0) True
+
+  heap <- newMinBH (4 * h * w)
+  addAdj bs heap (y0, x0)
+
+  res <- (`execStateT` (gr @! (y0, x0))) $ fix $ \loop -> do -- (ref:1)
+    whenJustM (deleteMaybeBH heap) $ \(!dx, (!y, !x)) -> do
+      whenM (gets (`p` dx)) $ do
+        lift $ addAdj bs heap (y, x)
+        modify' (+ dx)
+        loop
+
+  printBSB res
+#+END_SRC
+
+- [[(1)]] =StateT= モナドに高橋くんの強さを載せます
+
+** [[https://atcoder.jp/contests/abc384/tasks/abc384_f][F 問題]]
+
+畳み込みの問題です。畳み込みの問題なんです。
+
+畳み込み (=convolution=) は多項式の積 $(\sum\limits_i a_i x^i) (\sum\limits_i b_i x^i) := \sum\limits_i c_i x^i$ の係数部分 $c_i$ を計算してくれます。応用して $N^2$ 個の和を高速で計算できます。たとえば $\sum\limits_i \sum\limits_j A_i A_j$ は $\sum\limits_i \sum\limits_j x^{A_i} x^{B_i} = \sum\limits_i \sum\limits_j x^{A_i + B_i} = \sum\limits_i c_i x^i$ のように指数として計算すれば、 $O(v \log v)$ ($v$: 値域) で解けます。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !xs <- intsU'
+
+  let !m = (2 * 10 ^ 7) + 1 :: Int
+  let !ps = U.accumulate (+) (U.replicate m (0 :: Int)) $ U.map (,1) xs -- (ref:1)
+  let !qs = U.accumulate (+) (U.replicate m (0 :: Int)) $ U.map (,1) xs
+  let !res = convolute64 ps qs -- (ref:2)
+
+  let div2 x = x .>>. countTrailingZeros x
+  let !res' = U.sum $ U.imap f res
+        where
+          f i nx
+            | nx == 0 = 0
+            | otherwise = div2 i * nx
+  printBSB $ (res' + U.sum (U.map (div2 . (* 2)) xs)) `div` 2
+#+END_SRC
+
+- [[(1)]] 値毎に数を数える
+- [[(2)]] 畳み込み (convolution)
+
+TLE しましたが、速い NTT なら AC できるようです。今回も、盆栽力が足りませんでした。
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">現代のコンピュータは長さ10^7 でも畳み込める</p>&mdash; うし (@ei1333) <a href="https://twitter.com/ei1333/status/1867933769203880171?ref_src=twsrc%5Etfw">December 14, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">畳み込みの長さ制限に悩んでいる人は、yosupo judgeのconvolution(large)を通そう</p>&mdash; tayu (@tayu_kyopro) <a href="https://twitter.com/tayu_kyopro/status/1868187177164931408?ref_src=twsrc%5Etfw">December 15, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+Convolution (Large) に [[https://judge.yosupo.jp/submission/256437][ACL で投げてみました]] が、メモリ使用量の問題で RE になりました。どうやるんだ、爆速 convolution.. 。 [[https://judge.yosupo.jp/submission/74241][maspy]] さんの提出を見ると、入力が巨大な場合は特別処理に分岐しています。じっくり読むしかなさそうです。
+

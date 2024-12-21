@@ -1,0 +1,102 @@
+#+TITLE: ABC 385
+#+DATE: <2024-12-22 Sun>
+
+* ABC 385
+
+[[https://atcoder.jp/contests/abc385][ABC 385]] に参加しました。
+
+#+CAPTION: Diff 予想
+| 問題       | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|------------+--------+--------+--------+--------+--------+--------|
+| 提出       | AC     | AC     | AC     | AC     | -      | WA     |
+| 予想 diff |     10 |    300 |    200 | 1,000  | ?      | 1,600  |
+| 実際 diff |     14 |     77 |    446 | 1,171  | 1,406  | 1,905  |
+
+** [[https://atcoder.jp/contests/abc385/tasks/abc385_a][A 問題]]
+
+3 つの整数を 2 つまたは 3 つのグループに分けたとき、それぞれのグループの整数の和がすべて等しくできるか判定せよ。こんな感じでどうでしょう。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !xs <- intsU'
+  printYn $ U.any (\x -> 2 * x == U.sum xs || 3 * x == U.sum xs) xs
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc385/tasks/abc385_b][B 問題]]
+
+グリッド上を指示通り動くとき、訪問できる家の数を求めよ。 $X, Y$ という名前で =y, x= 座標の値が与えられて、こういう問題はいつも疑問です。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!h, !w, pred -> !y0, pred -> !x0) <- ints4' -- (ref:1)
+  !gr <- getGrid' h w
+  moves <- U.map dir . U.fromList . BS.unpack <$> line'
+  let points = U.scanl' step (y0, x0) moves -- (ref:2)
+        where
+          step yx@(!y, !x) dir
+            | gr @! yx' == '#' = yx
+            | otherwise = yx'
+            where
+              !yx' = add2 yx dir
+  let res = U.length . U.filter ((== '@') . (gr @!)) . U.uniq $ U.modify VAI.sort points -- (ref:3)
+  let (!resY, !resX) = U.last points
+  printBSB (resY + 1, resX + 1, res)
+#+END_SRC
+
+- [[(1)]] [[https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/view_patterns.html][ViewPatterns]] で =pred= 関数の適用結果を取得します (0-based で座標を得ます)
+- [[(2)]] 移動経路を求めます
+- [[(3)]] 移動経路上の家の数を重複が出ないように数えます
+
+** [[https://atcoder.jp/contests/abc385/tasks/abc385_c][C 問題]]
+
+整数列を任意の K 個飛ばしで見たとき、等しい値の列の長さの最大値を求めよ。すべての点から $1, 2, 3, .. N - 1$ 個飛ばしを全探索するとします。 [[https://ja.wikipedia.org/wiki/%E8%AA%BF%E5%92%8C%E7%B4%9A%E6%95%B0][調和級数]] の和 $\sum\limits_{i \in [1, n] \cap \mathbb{Z}} \frac {1} {i}$ は $\log n$ 程度の大きさであり、愚直に探索すれば $O(N \log N)$ で解けます。実際は枝刈りでほぼ $O(N)$ だと思います。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !xs <- intsU'
+
+  -- 位置 `i` から `d` 個飛ばしで等しい数を求める
+  let step :: Int -> Int -> Int
+      step i0 d = inner $ i0 + d
+        where
+          x0 = xs G.! i0
+          inner i
+            | i >= n || xs G.! i /= x0 = 1
+            | otherwise = 1 + inner (i + d)
+
+  let Max res =
+        Max 1 -- (ref:1)
+          <> U.foldMap' -- (ref:2)
+            (\i0 -> U.foldMap (Max . step i0) (U.generate (n - 1) (+ 1)))
+            (U.generate n id)
+  printBSB res
+#+END_SRC
+
+- [[(1)]] $n = 1$ の場合に =1= 個以上飛ばしのケースが無くなるため、初期値 =1= が必須です
+- [[(2)]] [[https://hackage.haskell.org/package/vector-0.13.2.0/docs/Data-Vector.html#v:foldMap][~foldMap :​: Monoid m => (a -> m) -> Vector a -> m~]] で =fold= のネスト避けてみました
+
+** [[https://atcoder.jp/contests/abc385/tasks/abc385_d][D 問題]]
+
+B 問題の sparse 版です。苦戦しました。なお B 問題とは異なり、 $X, Y$ という名前で本当に =x, y= 座標の値が与えられる上に、 Y 軸の向きが反転しています。
+
+以下の方法で解きました。
+
+- 各行・各列の家を =IntMap IntSet= で持ちます。
+- 移動ごとに =rows=, =cols= を更新します。
+  - 行移動の場合は =rows= *のみを* 更新します。
+  - 列移動の場合は =cols= *のみを* 更新します。
+- =rows=, =cols= から =(x, y)= 座標を復元し、座標ごとにカウントします。カウントが 2 である地点の家 (=rows= からも =cols= からも削除されていない家) は未訪問の家です。
+- 答えは =すべての家の数 - 未訪問の家の数= です。
+
+** [[https://atcoder.jp/contests/abc385/tasks/abc385_e][E 問題]]
+
+Advent Calendar が終わってから考えます。
+
+** [[https://atcoder.jp/contests/abc385/tasks/abc385_f][F 問題]]
+
+同上です。
+
