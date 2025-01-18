@@ -1,0 +1,435 @@
+#+TITLE: お試しタスクランナー (make, just, shake, ..)
+#+DATE: <2025-01-18 Sat>
+
+* 背景
+
+日頃長いコマンドを打つことが多く、 [[https://github.com/fish-shell/fish-shell][fish]] のコマンド履歴に頼り切りになっています。何度も履歴を遡ると、それなりの手間です。
+
+#+BEGIN_SRC sh
+$ # テスト実行
+$ cabal test --enable-options
+
+$ # 特定のテスト実行
+$ cabal test --enable-options --test-options '-p /SegTree/'
+
+$ # doctest の実行
+$ cabal repl --with-ghc=doctest --repl-options='-w -Wdefault'
+
+$ # などなど
+#+END_SRC
+
+ここではタスクランナーを導入し、より簡単にコマンドを打てるようにします。
+
+* タスクランナー
+
+haskell-jp の皆様の動向を伺いつつ、幾つかのタスクランナーを試してみました。
+
+** =bash=
+
+無意識に選択肢から外していましたが、凄腕の方も =bash= を使われていました。僕も =man bash= を読んだので bash script が書けます:
+
+#+BEGIN_DETAILS =x= スクリプト
+#+BEGIN_SRC bash
+#!/usr/bin/env -S bash -euE
+
+IFS=$'\n\t'
+_ME="$(basename "$0")"
+
+_cmd_help() {
+    cat <<EOS
+${_ME} is a simple task runner
+
+help       Shows this message
+doctest    Generates Haddock document
+test       Runs cabal test
+EOS
+}
+
+_cmd_doctest() {
+    cd "$(dirname "$0")"
+    cabal repl --with-ghc=doctest --repl-options='-w -Wdefault' "$@"
+}
+
+_cmd_test() {
+    cd "$(dirname "$0")"
+    cabal test --enable-tests --test-options ''"$@"
+}
+
+_run() {
+    if [ $# -eq 0 ] ; then
+        _cmd_help "$@"
+        return
+    fi
+
+    local _cmd="${1}"
+    shift 1
+
+    case "${_cmd}" in
+        'h' | 'help' | '-h' | '--help')
+            _cmd_help "$@" ;;
+        'dt' | 'doctest')
+            _cmd_doctest "$@" ;;
+        't' | 'test')
+            _cmd_test "$@" ;;
+        *)
+            echo "no such command ${_cmd}" ;;
+    esac
+}
+
+_run "$@"
+#+END_SRC
+#+END_DETAILS
+
+使い勝手は良いと思います:
+
+#+CAPTION: ヘルプ表示
+#+BEGIN_SRC sh
+$ ./x
+x is a simple task runner
+
+help       Shows this message
+doctest    Generates Haddock document
+test       Runs cabal test
+#+END_SRC
+
+#+CAPTION: =doctest= を実行
+#+BEGIN_SRC sh
+$ ./x dt
+#+END_SRC
+
+#+CAPTION: =SegTree= にマッチするテストを実行
+#+BEGIN_SRC sh
+$ ./x t '-p /SegTree/'
+#+END_SRC
+
+サブコマンドを [[https://github.com/junegunn/fzf][fzf]] で選ぶようにしても良いですね。問題は、見ての通りスクリプトが長く、スマートではありません。よりきらびやかな世界を探してみます。
+
+** =make=
+
+=make= も無意識に選択肢から除外していましたが、やはり凄腕の方々が使われており、普通に便利なツールに見えます。 [[https://www.sigbus.info/compilerbook][compilerbook]] (挫折) 以来ですが、 =Makefile= も試してみます。
+
+*** 主な文法
+
+=make <target>= で定義されたコマンドを実行できます。参考: [[https://makefiletutorial.com/][Makefile Tutorial]]
+
+#+CAPTION: =Makefile= の主な文法
+#+BEGIN_SRC make
+target: prerequisites
+	command
+#+END_SRC
+
+- シェルコマンドの =$= は =$$= の形でエスケープします
+- =@= を付けるとコマンドの実行履歴の表示を抑制できます
+
+*** (脱線) Emacs でタブ文字を表示する
+
+エディタの設定でタブ文字と行末の空白を表示します:
+
+#+BEGIN_SRC elisp
+(setopt show-trailing-whitespace t)
+(setopt whitespace-style '(tabs  tab-mark))
+(require 'whitespace)
+(global-whitespace-mode 1)
+#+END_SRC
+
+[[https://github.crookster.org/macOS-Emacs-26-display-line-numbers-and-me/][この記事]] を参考に、サイドバー ([[https://github.com/jaypei/emacs-neotree][neotree]]) ではタブ表示 (と行番号表示) を抑制します:
+
+#+BEGIN_SRC elisp
+(defun my-neotree-setup (&rest _)
+  (display-line-numbers-mode -1)
+  (whitespace-mode -1))
+
+:hook (neo-after-create-hook . my-neotree-setup)
+#+END_SRC
+
+準備できました:
+
+#+CAPTION: タブ文字を可視化
+[[./img/2025-01-18-tabs.png]]
+
+*** リスト
+
+まずはサブコマンド (/target/) の一覧を表示してます。 Stack overflow からコマンドを拾ってきました:
+
+#+CAPTION: =Makefile=
+#+BEGIN_SRC makefile
+.PHONY: help
+help:	## Shows this help.
+	@echo 'Makefile targets'
+	@echo ''
+	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
+
+.PHONY: doctest
+doc:	## Runs doctest.
+	cabal repl --with-ghc=doctest --repl-options='-w -Wdefault'
+
+.PHONY: test
+test:		## Runs local test
+	cabal test --enable-tests --test-options "$(p)"
+#+END_SRC
+
+これで target の一覧を表示できます:
+
+#+BEGIN_SRC sh
+$ make
+Makefile targets
+
+help:	Shows this help.
+doc:	Runs doctest.
+test:	Runs local test.
+#+END_SRC
+
+ただ =target: prerequisites= の形でコマンドを書くと破綻します。また最近の =make= には =--print-targets= オプションもあるとか。
+
+*** エイリアスを定義する
+
+エイリアス相当の target も作れます:
+
+#+CAPTION: =Makefile=
+#+BEGIN_SRC make
+.PHONY: t
+t: test
+#+END_SRC
+
+#+BEGIN_SRC sh
+$ make dt p=/SegTree/
+#+END_SRC
+
+*** 引数を渡す
+
+Target に引数を渡すためには、 ~arg=value~ の形で変数定義します:
+
+#+BEGIN_SRC makefike
+.PHONY: test
+test:		## Runs local test
+	cabal test --enable-tests --test-options "$(p)"
+#+END_SRC
+
+あまり使い勝手は良くないですね:
+
+#+BEGIN_SRC sh
+$ make test p='-p /SegTree'
+cabal test --enable-tests --test-options "-p /SegTree"
+Build profile: -w ghc-9.8.4 -O1
+In order, the following will be built (use -v for more details):
+ - ac-library-hs-1.1.0.0 (test:ac-library-hs-test) (file /home/tbm/dev/hs/ac-library-hs/dist-newstyle/build/x86_64-linux/ghc-9.8.4/ac-library-hs-1.1.0.0/cache/build changed)
+ - ac-library-hs-1.1.0.0 (test:benchlib-test) (file /home/tbm/dev/hs/ac-library-hs/dist-newstyle/build/x86_64-linux/ghc-9.8.4/ac-library-hs-1.1.0.0/cache/build changed)
+#+END_SRC
+
+[[https://qiita.com/algas/items/499d0d69d51a1cc7639f][強引に引数を扱うハック]] も見ましたが、制限があります。
+
+*** サブディレクトリからの実行
+
+サブディレクトリからは =make <target>= できませんでした。残念。
+
+** =just=
+
+[[https://github.com/casey/just][just]] もベター =make= に見えます。
+
+*** エディタの設定 (Emacs)
+
+#+BEGIN_SRC elisp
+;; https://github.com/leon-barrett/just-mode.el/blob/main/just-mode.el
+(leaf just-mode) ;; :ensure t
+
+;; https://github.com/psibi/justl.el
+(leaf justl)
+#+END_SRC
+
+*** シェルの設定 (=fish=)
+
+#+CAPTION: =config.fish=
+#+BEGIN_SRC sh
+if command -sq just
+    alias j just
+end
+#+END_SRC
+
+*** Justfile
+
+早速使ってみます。先程の =Makefile= より綺麗です:
+
+#+CAPTION: =Justfile=
+#+BEGIN_SRC makefile
+# shows this help message
+help:
+    @just -l
+
+# runs the benchmark
+bench:
+    cabal bench --benchmark-options='--output a.html'
+
+# generates Haddock document
+doc:
+    cabal haddock "$@"
+
+[private]
+alias d := doc
+
+test opts='':
+    cabal test --enable-tests --test-options opts
+
+# 略
+#+END_SRC
+
+リスト表示が素敵です:
+
+#+CAPTION: =just=
+[[./img/2025-01-18-just.png]]
+
+実際のコマンド実行も良い感じに:
+
+#+BEGIN_SRC sh
+$ just t
+$ just t '-p /SegTree'/
+$ just dt
+#+END_SRC
+
+その他メリットとしては、
+
+- =$= のエスケープが必要ありませんでした。
+- サブディレクトリから =just= コマンド実行すると、ルートからの実行になりました。
+
+** =task=
+
+[[https://taskfile.dev/usage/][=task=]] も良さそうですね。未だに書いたことがありませんが、 GitHub Actions の独自言語に近そうです。
+
+#+CAPTION: =Taskfile.yml=
+#+BEGIN_SRC yml
+version: '3'
+
+tasks:
+  doctest:
+    aliases: [dt]
+    cmds:
+      - cabal repl --with-ghc=doctest --repl-options='-w -Wdefault'
+
+  test:
+    aliases: [t]
+    cmds:
+      - cabal test --enable-tests --test-options ''{{.CLI_ARGS}}
+#+END_SRC
+
+引数を渡すには =--= で区切る必要がありそうです。これだけちょっと面倒です:
+
+#+BEGIN_SRC sh
+$ task t -- '-p /SegTree/'
+#+END_SRC
+
+** =cargo-make=
+
+[[https://github.com/sagiegurari/cargo-make][=cargo-make=]] もベター =make= 的なツールです。 =cargo make= として実行できる他、 =makers= がスタンドアローン版としてインストールされます。
+
+Rust プロジェクトを前提にしている節はあります:
+
+#+BEGIN_SRC sh
+$ makers
+[cargo-make] INFO - cargo make 0.37.23
+[cargo-make] INFO -
+[cargo-make] INFO - Build File: Makefile.toml
+[cargo-make] INFO - Task: default
+[cargo-make] INFO - Profile: development
+[cargo-make] INFO - Execute Command: "cargo" "fmt"
+`cargo metadata` exited with an error: error: could not find `Cargo.toml` in `/home/tbm/dev/hs/ac-library-hs/verify` or any parent directory
+
+This utility formats all bin and lib files of the current crate using rustfmt.
+
+Usage: cargo fmt [OPTIONS] [-- <rustfmt_options>...]
+#+END_SRC
+
+=Makefile.toml= を書いてみます:
+
+#+CAPTION: =Makefile.toml=
+#+BEGIN_SRC haskell
+[tasks.bench]
+alias = "b"
+command = "cabal"
+args = ["bench", "--benchmark-options='--output a.html'"]
+
+[tasks.doc]
+command = "cabal"
+args = ["haddock", "$@"]
+
+[tasks.d]
+alias = "doc"
+
+[tasks.test]
+command = "cabal"
+args = ["test", "--enable-tests", "--test-options", "${@:}"]
+
+[tasks.t]
+alias = "test"
+#+END_SRC
+
+ちゃんと使えますね:
+
+#+BEGIN_SRC sh
+$ makers t
+$ makers t '-p /SegTree/'
+#+END_SRC
+
+サブディレクトリから実行すると、親ディレクトリの =Makefile.toml= を見つけてくれませんでした。そこは残念です。
+
+** [[https://github.com/ndmitchell/shake][=shake=]]
+
+[[https://github.com/ndmitchell/shake][=shake=]] も =make= の代替です。タスクランナーとしても利用できます:
+
+#+BEGIN_SRC haskell
+{- cabal:
+build-depends: base, shake
+-}
+
+import Development.Shake
+import Development.Shake.Command
+import Development.Shake.FilePath
+import Development.Shake.Util
+
+main :: IO ()
+main = shakeArgs shakeOptions {shakeFiles = "_build"} $ do
+  phony "doc" $ do
+    cmd_ ["cabal", "haddock"]
+
+  phony "doctest" $ do
+    cmd_ ["cabal", "repl", "--with-ghc=doctest", "--repl-options='-w -Wdefault'"]
+
+  -- alias の代わり
+  phony "dt" $ need ["doctest"]
+
+  phony "test" $ do
+    cmd_ ["cabal", "test", "--enable-tests"]
+
+  phony "t" $ need ["test"]
+#+END_SRC
+
+呼び出し方はもう少しスマートにしたいところです:
+
+#+BEGIN_SRC sh
+$ cabal run Shakefile.hs -- t
+#+END_SRC
+
+リスト機能は [[https://github.com/ndmitchell/shake/issues/107#issuecomment-303232225][minad 神からもリクエストされていました]]:
+
+#+BEGIN_SRC sh
+$ cabal run Shakefile.hs -- --help
+<略>
+Targets:
+  - doc
+  - doctest
+  - dt
+  - test
+  -
+#+END_SRC
+
+引数を受け取るには [[https://hackage.haskell.org/package/shake-0.19.8/docs/Development-Shake.html#v:shakeArgsWith][=shakeArgsWith=]] を使うことになりそうですが、使い方を理解するのが大変そうです。
+
+** その他の選択肢
+
+- [[https://github.com/matklad/cargo-xtask][=cargo-xtask=]]
+  参考: [[https://matklad.github.io/2018/01/03/make-your-own-make.html][Make your own make]]
+
+- =nix run=
+
+* 感想
+
+シンプルなタスクランナーとしては、 [[https://github.com/casey/just][=just=]] と [[https://taskfile.dev/usage/][=task=]] が良さそうです。特に =just= が好みだったので、僕のリポジトリには追加していくと思います。
+
