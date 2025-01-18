@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 389, Justfile, 競プロ盆栽.hs - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" src="/style/style.js"></script><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 389, <code>Justfile</code>, 競プロ盆栽.hs</h1><p>Jan 19, 2025</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main"><h2 id="ABC 389"><a href="#ABC 389">ABC 389</a></h2><p>
+<a href="https://atcoder.jp/contests/abc389">ABC 389</a> に参加しました。後半は高 diff 二分探索の良問だった模様です。<br>
+</p>
+
+<table>
+<caption class="t-above"><span class="table-number">Table 1:</span> Diff 予想</caption>
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-right">
+
+<col  class="org-right">
+
+<col  class="org-right">
+
+<col  class="org-right">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">問題</th>
+<th scope="col" class="org-right">A 問題</th>
+<th scope="col" class="org-right">B 問題</th>
+<th scope="col" class="org-right">C 問題</th>
+<th scope="col" class="org-right">D 問題</th>
+<th scope="col" class="org-left">E 問題</th>
+<th scope="col" class="org-left">F 問題</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">提出</td>
+<td class="org-right">AC</td>
+<td class="org-right">AC</td>
+<td class="org-right">AC</td>
+<td class="org-right">AC</td>
+<td class="org-left">-</td>
+<td class="org-left">-</td>
+</tr>
+
+<tr>
+<td class="org-left">体感 diff</td>
+<td class="org-right">10</td>
+<td class="org-right">100</td>
+<td class="org-right">400</td>
+<td class="org-right">600</td>
+<td class="org-left">1,200</td>
+<td class="org-left">1,600</td>
+</tr>
+
+<tr>
+<td class="org-left">実際 diff</td>
+<td class="org-right">8</td>
+<td class="org-right">25</td>
+<td class="org-right">255</td>
+<td class="org-right">749</td>
+<td class="org-left">1,897</td>
+<td class="org-left">1,642</td>
+</tr>
+</tbody>
+</table>
+<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc389/tasks/abc389_a">A 問題</a></a></h3><p>
+文字列 <code>AxB</code> が与えられたとき、 <code>A * B</code> を計算せよ。パターンマッチします:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+solve = do
+  [!a, !_, !b] &lt;- BS.unpack &lt;$&gt; line'
+  printBSB $ digitToInt a * digitToInt b
+</code></pre>
+</div>
+<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc389/tasks/abc389_b">B 問題</a></a></h3><p>
+文字列 \(X\) が与えられとき、 \(N! = X\) となる \(N\) を求めよ。遅延評価の出番です:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+solve = do
+  !x &lt;- int'
+  printBSB $ fromJust $ elemIndex x $ scanl' (*) (1 :: Int) [1..]
+</code></pre>
+</div>
+<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc389/tasks/abc389_c">C 問題</a></a></h3><p>
+キューに要素追加・削除していく時、キューの中で \(k - 1\) 番目の要素の累積和を求めよ。先に全要素の累積和配列を作っておけば、 pop 回数 \(\mathrm{nPop}\) を用いて \(S[k + \mathrm{nPop}] - S[\mathrm{nPop}]\) が答えになります。<br>
+</p>
+
+<p>
+まずクエリをパースします:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+solve = do
+  !q &lt;- int'
+  !qs &lt;-
+    U.replicateM q $
+      int' &gt;&gt;= \case
+        1 -&gt; (1 :: Int,) &lt;$&gt; int'
+        2 -&gt; pure (2 :: Int, -1)
+        3 -&gt; (3 :: Int,) &lt;$&gt; int'
+        _ -&gt; error "unreachable"
+</code></pre>
+</div>
+
+<p>
+Push クエリを先読みし、累積和配列を作ります:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-haskell">  let (!spawns, !other) = U.partition ((== 1) . fst) qs
+  let pos = dbgId $ U.scanl' (+) (0 :: Int) $ U.map snd spawns
+</code></pre>
+</div>
+
+<p>
+<code>unfoldr</code> でクエリ <code>3</code> の答えを作ります:<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-haskell">  let res = U.unfoldr f (0 :: Int, other)
+        where
+          f :: (Int, U.Vector (Int, Int)) -&gt; Maybe (Int, (Int, U.Vector (Int, Int)))
+          f (!nPop, !qs_) = do
+            (!q, !rest) &lt;- U.uncons qs_
+            case q of
+              (1, !_) -&gt; f (nPop, rest)
+              (2, !_) -&gt; f (nPop + 1, rest)
+              (3, pred -&gt; k) -&gt; pure (pos G.! (k + nPop) - pos G.! nPop, (nPop, rest))
+
+  printBSB $ unlinesBSB res
+</code></pre>
+</div>
+<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc389/tasks/abc389_d">D 問題</a></a></h3><p>
+半径 \(r\) の円に内包される正方形の数を数えよ。第一象限 (\(Q_1 = \{ (x, y) \mid x > 0, y > 0 \}\)) 中のカウントを 4 倍し、 X, Y 軸上の正方形の数を足すと答えになります。行ごとに右端の正方形の位置を二分探索すれば、 \(O(r \log r)\) で解答できます。<br>
+</p>
+
+<div class="org-src-container">
+<pre><code class="src language-haskell">-- | 正方形の 4 点と原点の間の距離が r 以下ならば true
+testPoint :: Int -&gt; Int -&gt; Int -&gt; Bool
+testPoint r y x = all (&lt;= 4 * r * r) [d1, d2, d3, d4]
+  where
+    y2 = 2 * y + 1
+    y1 = 2 * y - 1
+    x2 = 2 * x + 1
+    x1 = 2 * x - 1
+    dist a b = a * a + b * b
+    d1 = dist y1 x1
+    d2 = dist y1 x2
+    d3 = dist y2 x1
+    d4 = dist y2 x2
+
+-- | 行をカウント
+solveRow :: Int -&gt; Int -&gt; Int
+solveRow r y = fromMaybe 0 $ bisectL 0 r $ \x -&gt; testPoint r y x
+
+-- | 四分円をカウント
+solveQuater :: Int -&gt; Int
+solveQuater r = sum [solveRow r y | y &lt;- [1 .. r + 1]]
+
+-- | 円全体をカウント
+f :: Int -&gt; Int
+f r = solveQuater r * 4 + 4 * (r - 1) + 1
+
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !r &lt;- int'
+  printBSB $ f r
+</code></pre>
+</div>
+<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc389/tasks/abc389_e">E 問題</a></a></h3><p>
+頑張って解説 AC するかも……？<br>
+</p>
+<h3 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc389/tasks/abc389_f">F 問題</a></a></h3><p>
+頑張って解説 AC するかも……？<br>
+</p>
+<h2 id="Misc"><a href="#Misc">Misc</a></h2><h3 id="just"><a href="#just">just</a></h3><p>
+<a href="https://toyboot4e.github.io/2025-01-18-task-runners.html">お試しタスクランナー</a> の後、 <code>ac-library-hs</code> に <code>Justfile</code> を導入しました <a href="https://github.com/toyboot4e/ac-library-hs/commit/d74035fb2528c65a41833d1d8e7d61ec48558174">(該当のコミット)</a> 。これが結構良い感じです。書き味良し、見た目良し！:<br>
+</p>
+
+
+<figure>
+<img src="./img/2025-01-19-just.png" alt="2025-01-19-just.png"><br>
+
+<figcaption><span class="figure-number">Figure 1: </span><code>Justfile</code> のコマンド一覧</figcaption>
+</figure>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 1: </span>テスト実行の例</label><pre><code class="src language-sh">$ j t # サブディレクトリからも実行可
+</code></pre>
+</div>
+
+<p>
+ABC 環境にも導入しました (<a href="https://github.com/toyboot4e/abc-hs/commit/215a58db27301d2ec61c7fecf1ccce60b8c1553b">該当のコミット</a>) 。リポジトリ毎に簡潔なコマンドレシピを持てるようになり、見通しが良くなったと思います。<br>
+</p>
+
+<p>
+<code>just</code> の解説は <a href="https://minerva.mamansoft.net/Notes/%F0%9F%93%9C%E3%82%BF%E3%82%B9%E3%82%AF%E3%83%A9%E3%83%B3%E3%83%8A%E3%83%BC%E3%81%AEjust%E3%82%92%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F">📜タスクランナーのjustを試してみた - Minerva</a> が良いです。 <a href="https://blog.tomoya.dev/">tomoya さんのブログ</a> と同系統のレイアウトで、ページも格好いい。<br>
+</p>
+<h3 id="言語アップデート 2025"><a href="#言語アップデート 2025">言語アップデート 2025</a></h3><p>
+<a href="https://github.com/haskell-hvr/cabal-plan"><code>cabal-plan</code></a> の <code>license-report</code> および gksato さんの <a href="https://github.com/gksato/haskell-atcoder-server-gen">server gen</a> のおかげで、特に問題無く更新できそうです。最悪、 10 分あれば今すぐに更新を申請できます。良かった〜〜！<br>
+</p>
+
+<p>
+未だ天下の C++, Python の更新申請が無いので、新ジャッジ環境のテストは 2 月になると予想しています。今振り返ると、 <a href="https://github.com/toyboot4e/ac-library-hs"><code>ac-library-hs</code></a> を作り始めたタイミング (昨年 10 月) は、ちょうど十分な時間が得られて良かったと思います。十二分にバッファを取ったつもりでしたが、テストが重かったです。<br>
+</p>
+<h3 id="競プロ盆栽.hs"><a href="#競プロ盆栽.hs">競プロ盆栽.hs</a></h3><p>
+<code>ac-library-hs</code> 開発については、大体 <a href="https://zenn.dev/toyboot4e/books/kyopro-bonsai-hs">競プロ盆栽.hs</a> に載せています。直前まで <code>ac-library-hs</code> を弄っていたので、ほぼ 3 日で書きました。ブログ替わりの <a href="https://github.com/toyboot4e/ac-library-hs/issues?q=is%3Aissue%20">Issue</a> を下敷きにしたため、成果を書き下すだけで全く悩むことなく筆が進んだのを覚えています。<br>
+</p>
+
+<p>
+競プロ盆栽.hs は半分以上テストの話です。ユニットテストも書きましたが、何と言っても QuickCheck が大活躍しました。サクっと乱数生成してエラー内容を確認できるのが嬉しい。 PBT というか、要は肝心な所がバグっていないかを早期確認できます。ましてや、単位元、モノイド則のように明らかに重要な法則がある場合は効果抜群です。<br>
+</p>
+
+<p>
+2025 年に Haskell でやりたいことがあるとすれば、 Heuristic コンテストでどれだけ戦えるかに興味があります。 Heuristic の能力を磨くのは相当しんどいはずですが、 CTF よりはマシです。やっていくのか……？？<br>
+</p>
+</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
