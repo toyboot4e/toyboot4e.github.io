@@ -23,11 +23,24 @@ solve = do
   printYn $ U.any (\x -> 2 * x == U.sum xs || 3 * x == U.sum xs) xs
 #+END_SRC
 
+追記: 嘘解法の指摘を頂きました。うわあああああ
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">A 問題，<br>2 3 4<br>とかで変なことが起こりませんか？</p>&mdash; とーらす🌸📦🌕✨🌂🎧 (@torus711) <a href="https://twitter.com/torus711/status/1870499500034523496?ref_src=twsrc%5Etfw">December 21, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
 ** [[https://atcoder.jp/contests/abc385/tasks/abc385_b][B 問題]]
 
 グリッド上を指示通り動くとき、訪問できる家の数を求めよ。 $X, Y$ という名前で =y, x= 座標の値が与えられて、こういう問題はいつも疑問です。
 
 #+BEGIN_SRC haskell
+dir :: Char -> (Int, Int)
+dir 'U' = (-1, 0)
+dir 'D' = (1, 0)
+dir 'L' = (0, -1)
+dir 'R' = (0, 1)
+dir _ = error "unreachable"
+
 solve :: StateT BS.ByteString IO ()
 solve = do
   (!h, !w, pred -> !y0, pred -> !x0) <- ints4' -- (ref:1)
@@ -53,13 +66,15 @@ solve = do
 
 整数列を任意の K 個飛ばしで見たとき、等しい値の列の長さの最大値を求めよ。すべての点から $1, 2, 3, .. N - 1$ 個飛ばしを全探索するとします。 [[https://ja.wikipedia.org/wiki/%E8%AA%BF%E5%92%8C%E7%B4%9A%E6%95%B0][調和級数]] の和 $\sum\limits_{i \in [1, n] \cap \mathbb{Z}} \frac {1} {i}$ は $\log n$ 程度の大きさであり、愚直に探索すれば $O(N \log N)$ で解けます。実際は枝刈りでほぼ $O(N)$ だと思います。
 
+追記: 計算量の考察が間違ってそうです…… orz
+
 #+BEGIN_SRC haskell
 solve :: StateT BS.ByteString IO ()
 solve = do
   !n <- int'
   !xs <- intsU'
 
-  -- 位置 `i` から `d` 個飛ばしで等しい数を求める
+  -- 位置 `i` から `d` 個間隔で等しい値の列の長さを求める
   let step :: Int -> Int -> Int
       step i0 d = inner $ i0 + d
         where
@@ -77,7 +92,7 @@ solve = do
 #+END_SRC
 
 - [[(1)]] $n = 1$ の場合に =1= 個以上飛ばしのケースが無くなるため、初期値 =1= が必須です
-- [[(2)]] [[https://hackage.haskell.org/package/vector-0.13.2.0/docs/Data-Vector.html#v:foldMap][~foldMap :​: Monoid m => (a -> m) -> Vector a -> m~]] で =fold= のネスト避けてみました
+- [[(2)]] [[https://hackage.haskell.org/package/vector-0.13.2.0/docs/Data-Vector.html#v:foldMap][~foldMap :​: Monoid m => (a -> m) -> Vector a -> m~]] で =fold= のネストを避けてみました
 
 ** [[https://atcoder.jp/contests/abc385/tasks/abc385_d][D 問題]]
 
@@ -89,7 +104,7 @@ B 問題の sparse 版です。苦戦しました。なお B 問題とは異な�
 - 移動ごとに =rows=, =cols= を更新します。
   - 行移動の場合は =rows= *のみを* 更新します。
   - 列移動の場合は =cols= *のみを* 更新します。
-- =rows=, =cols= から =(x, y)= 座標を復元し、座標ごとにカウントします。カウントが 2 である地点の家 (=rows= からも =cols= からも削除されていない家) は未訪問の家です。
+- =rows=, =cols= から =(x, y)= 座標を復元し、座標ごとにカウントを取ります。カウントが 2 である地点の家 (=rows= からも =cols= からも削除されていない家) は未訪問の家です。
 - 答えは =すべての家の数 - 未訪問の家の数= です。
 
 ** [[https://atcoder.jp/contests/abc385/tasks/abc385_e][E 問題]]

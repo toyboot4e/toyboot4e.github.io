@@ -1,0 +1,166 @@
+#+TITLE: ABC 390, 言語アップデート 2025
+#+DATE: <2025-01-26 Sun>
+
+* ABC 390
+
+[[https://atcoder.jp/contests/abc390][ABC 390]] に参加しました。
+
+#+CAPTION: Diff 予想
+| 問題       | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|------------+--------+--------+--------+--------+--------+--------|
+| 提出       |     AC |     AC |     AC | TLE    | AC     | -      |
+| 予想 diff |     10 |     50 |    150 | 1,000  | 1,400  | 2,000  |
+| 実際 diff |     43 |    147 |    247 | 1,607  | 1,227  | 1,801  |
+
+** [[https://atcoder.jp/contests/abc390/tasks/abc390_a][A 問題]]
+
+$1, 2, 3, 4, 5$ の順列が与えられたとき、隣接項の入れ替えによって $1, 2, 3, 4, 5$ と一致させられるか答えよ。
+
+[[https://hackage.haskell.org/package/vector-0.13.2.0/docs/Data-Vector-Unboxed.html#v:modify][=modify=]] と [[https://hackage.haskell.org/package/vector-0.13.2.0/docs/Data-Vector-Generic-Mutable.html#v:swap][=swap=]] の組み合わせで解けます。 Haskeller の A 問題はハードモードです:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !xs <- intsU'
+  let trySwap i =
+        let xs' = U.modify (\vec -> GM.swap vec i (i + 1)) xs
+         in xs' == U.generate 5 (+ 1)
+  printYn . U.or $ U.generate 4 trySwap
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc390/tasks/abc390_b][B 問題]]
+
+与えられた数列が等比数列であるか調べよ。公比が分数の場合があり、除算を回避するのが無難です。 $a : b = c : d \iff ad = bc$ より比率を比較できます:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !xs <- intsU'
+  let x1 = xs G.! 0
+  let x2 = xs G.! 1
+  let test y1 y2 = y2 * x1 == x2 * y1
+  printYn . U.and $ U.zipWith test xs (U.tail xs)
+#+END_SRC
+
+[[https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-Ratio.html][=Data.Ratio=]] を使う回答が上手いです:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !xs <- intsU'
+  let r = xs G.! 0 % xs G.! 1
+  let test y1 y2 = y1 % y2 == r
+  printYn . U.and $ U.zipWith test xs (U.tail xs)
+#+END_SRC
+
+なお [[https://hackage.haskell.org/package/base-4.21.0.0/docs/GHC-Real.html#t:Ratio][=(%)=]] のソースを見ると、ちゃんと約分してから (GCD で割ってから) =Ratio= に包んでいるようです。確かに約分しての比較で良いですね:
+
+#+BEGIN_SRC haskell
+-- | 'reduce' is a subsidiary function used only in this module.
+-- It normalises a ratio by dividing both numerator and denominator by
+-- their greatest common divisor.
+reduce ::  (Integral a) => a -> a -> Ratio a
+{-# SPECIALISE reduce :: Integer -> Integer -> Rational #-}
+reduce _ 0              =  ratioZeroDenominatorError
+reduce x y              =  (x `quot` d) :% (y `quot` d)
+                           where d = gcd x y
+
+x % y                   =  reduce (x * signum y) (abs y)
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc390/tasks/abc390_c][C 問題]]
+
+2 次元グリッドが与えられたとき、ある長方形 $R := [x1, x2] \times [y1, y2]$ の中にすべての =#= が収まり、かつ $R$ の中に =.= が無いかを調べよ。
+
+2 次元配列のテンプレートを持っていると、定型的なプログラムで処理できます:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!h, !w) <- ints2'
+  !gr <- getGrid' h w
+  let (!ys, !xs) = U.unzip $ findIndicesIV (== '#') gr
+  let y1 = U.minimum ys
+  let y2 = U.maximum ys
+  let x1 = U.minimum xs
+  let x2 = U.maximum xs
+  printYn $ and [gr @! (y, x) /= '.' | y <- [y1 .. y2], x <- [x1 .. x2]]
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc390/tasks/abc390_d][D 問題]]
+
+集合 $S := \{ A_i \}_i$ を $\{ S_i \}$ に分割したとき、ユニークな $\mathrm{XOR} \{ \mathrm{sum}(S_i) \}_i$ の数を求めよ。 (雰囲気で書きました)
+
+$A_i$ の値域が広い ($A_i \lt 10^{17}$) のが絶望的ですが、集合分割の場合の数は [[https://ja.wikipedia.org/wiki/%E3%83%99%E3%83%AB%E6%95%B0][ベル数]] らしく、 $N = 12$ の場合は $10^7$ 未満に収まるそうです。
+
+というわけで、すべての分割 (partition) を列挙すれば解けます。 TLE が厳しい:
+
+#+CAPTION: [[https://atcoder.jp/contests/abc390/submissions/62126850][2,217 ms]]
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !xs <- intsU'
+  let eval = foldl' xor 0 . map (U.sum . U.backpermute xs . unBitSet n)
+  let results = map eval $ partitionsOf (bit n - 1)
+  let count = U.length . U.uniq . U.modify (VAI.sortBy compare) $ U.fromList results
+  printBSB count
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc390/tasks/abc390_e][E 問題]]
+
+制約 $X \le 5000$ に注目します。ビタミンを価値 (=v=) 、カロリーを重さ (=w=) と言い換えると、概ねナップサック問題です。実装はそんなに難しくないですが、コンテスト中に気付くのが難しい。
+
+** [[https://atcoder.jp/contests/abc390/tasks/abc390_f][F 問題]]
+
+数列の孤島の数を数えよ。うーん
+
+* Misc
+
+** 言語アップデート 2025
+
+AtCoder の [[https://atcoder.jp/posts/1342][言語アップデート 2025]] (Discord) にて、対応作業を実施しました。
+
+gksato さんの [[https://github.com/gksato/haskell-atcoder-server-gen][server-gen]] のおかげでスムーズに更新できました。レビューも懇切丁寧に実施頂きありがとうございました。
+
+一旦インストールスクリプトを提出しました ([[https://gist.github.com/toyboot4e/2f2c29cc86149de2cd6064636d2feb5e][=install.toml=]]) 。 GHC 9.8.4 に更新された他、以下のパッケージが追加されます:
+
+- [[https://hackage.haskell.org/package/ac-library-hs][=ac-library-hs=]]
+  [[https://github.com/atcoder/ac-library][=ac-library=]] の移植版です。まだ更新します。
+- [[https://hackage.haskell.org/package/ilist][=ilist=]]
+  リスト用の =imap= 関数などが生えます。 MagicHash も使っていて良さそうに見えます。
+- [[https://hackage.haskell.org/package/hmatrix][=hmatrix=]]
+  blas/lapack のラッパーです。
+  - [[https://hackage.haskell.org/package/hmatrix-glpk][=hmatrix-glpk=]]
+  - [[https://hackage.haskell.org/package/hmatrix-gsl][=hmatrix-gsl=]]
+  - [[https://hackage.haskell.org/package/hmatrix-special][=hmatrix-speical=]]
+- [[https://hackage.haskell.org/package/monad-memo][=monad-memo=]]
+  メモ化のパッケージです。
+- [[https://hackage.haskell.org/package/vector-split][=vector-split=]]
+  [[https://hackage.haskell.org/package/split-0.2.5][=split=]] の vector 版です。
+- [[https://hackage.haskell.org/package/wide-word][=wide-word=]]
+  128 bit 整数、 256 bit 整数のパッケージです。 Barrett reduction などに使用できます。
+- [[https://hackage.haskell.org/package/witherable][=witherable=]]
+  これが面白そうで気になっています。
+
+まだ若干の更新点があるため、 PR を投げて行きたいと思います。
+
+** =INLINE= 以外信用しない
+
+Haskell は 1 行の違いで 10 倍遅くなる言語です。 =Main.hs= 単ファイルだと問題無いのですが、ファイル分割すると顕著な違いが現れます。特に =INLINE= を付けなければ目を当たられなくなるほど遅くなる場合があります。
+
+[[https://hackage.haskell.org/package/vector-algorithms-0.9.0.3/docs/Data-Vector-Algorithms.html][=Data.Vector.Algorithms=]] の関数には =INLINE= が付いていないため、 =nub=, =nubBy=, =nubByMut= が鈍足のようです。 gksato さん情報です。
+
+またこちらも gksato さん情報ですが、 [[https://hackage.haskell.org/package/vector-algorithms-0.9.0.3/docs/Data-Vector-Algorithms-Intro.html#v:sort][=Intro.sort=]] などは =INLINABLE= 指定です。 =INLINABLE= は実質何もしない pragma (体感) なので、やはり特殊化されず低速です。この辺り、 [[https://github.com/toyboot4e/va-bench][ベンチマークを根拠に]] PR を出そうと思います。
+
+** キーボード
+
+[[https://booth.pm/ja/items/6376654][moNa2]] が欲しいかと言われると、本当に欲しいのは 34 キーの keyball, あるいは狂気の 16 キー・キーボードです。今持っていないということは、喉から手が出るほど欲しいわけでもないですね……。
+
+** 音楽
+
+[[https://www.youtube.com/watch?v=D-_l0wSuPqQ][Eluveitie の新曲]] が出ていました。やはり僕の好みからは外れますが、 [[https://www.youtube.com/watch?v=kb8WGig0MLU][Thousandfold]] でスペースリークの悲哀を歌っていて (※) 関心を惹かれます。 ※ 嘘です
+。
+
