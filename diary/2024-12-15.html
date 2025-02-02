@@ -1,95 +1,135 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 384 - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" src="/style/style.js"></script><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 384</h1><p>Dec 15, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main"><h2 id="ABC 384"><a href="#ABC 384">ABC 384</a></h2><p>
-<a href="https://atcoder.jp/contests/abc384">ABC 384</a> に参加しました。前回と前々回の日記は大敗したのでサボっています。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 384 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 384</h1>
+      <p>Dec 15, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 384"><a href="#ABC 384">ABC 384</a></h2>
+      <p>
+        <a href="https://atcoder.jp/contests/abc384">ABC 384</a>
+        に参加しました。前回と前々回の日記は大敗したのでサボっています。<br />
+      </p>
 
-<table>
-<caption class="t-above"><span class="table-number">Table 1:</span> Diff 予想</caption>
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
 
-<colgroup>
-<col  class="org-left">
+        <colgroup>
+          <col class="org-left" />
 
-<col  class="org-right">
+          <col class="org-right" />
 
-<col  class="org-right">
+          <col class="org-right" />
 
-<col  class="org-right">
+          <col class="org-right" />
 
-<col  class="org-right">
+          <col class="org-right" />
 
-<col  class="org-right">
+          <col class="org-right" />
 
-<col  class="org-right">
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-left">問題</th>
-<th scope="col" class="org-right">A 問題</th>
-<th scope="col" class="org-right">B 問題</th>
-<th scope="col" class="org-right">C 問題</th>
-<th scope="col" class="org-right">D 問題</th>
-<th scope="col" class="org-right">E 問題</th>
-<th scope="col" class="org-right">F 問題</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-left">提出</td>
-<td class="org-right">AC</td>
-<td class="org-right">AC</td>
-<td class="org-right">AC</td>
-<td class="org-right">AC</td>
-<td class="org-right">AC</td>
-<td class="org-right">TLE</td>
-</tr>
+          <col class="org-right" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-right">D 問題</th>
+            <th scope="col" class="org-right">E 問題</th>
+            <th scope="col" class="org-right">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">提出</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">TLE</td>
+          </tr>
 
-<tr>
-<td class="org-left">予想 diff</td>
-<td class="org-right">10</td>
-<td class="org-right">10</td>
-<td class="org-right">300</td>
-<td class="org-right">400</td>
-<td class="org-right">800</td>
-<td class="org-right">1600</td>
-</tr>
+          <tr>
+            <td class="org-left">予想 diff</td>
+            <td class="org-right">10</td>
+            <td class="org-right">10</td>
+            <td class="org-right">300</td>
+            <td class="org-right">400</td>
+            <td class="org-right">800</td>
+            <td class="org-right">1600</td>
+          </tr>
 
-<tr>
-<td class="org-left">実際 diff</td>
-<td class="org-right">10</td>
-<td class="org-right">30</td>
-<td class="org-right">187</td>
-<td class="org-right">600</td>
-<td class="org-right">1002</td>
-<td class="org-right">1908</td>
-</tr>
-</tbody>
-</table>
-<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc384/tasks/abc384_a">A 問題</a></a></h3><p>
-文字列 \(S\) の各文字を置換せよ。指示通り実施します。<br>
-</p>
+          <tr>
+            <td class="org-left">実際 diff</td>
+            <td class="org-right">10</td>
+            <td class="org-right">30</td>
+            <td class="org-right">187</td>
+            <td class="org-right">600</td>
+            <td class="org-right">1002</td>
+            <td class="org-right">1908</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc384/tasks/abc384_a">A 問題</a></a>
+      </h3>
+      <p>文字列 \(S\) の各文字を置換せよ。指示通り実施します。<br /></p>
 
-<div class="org-src-container">
-<pre><code class="src language-haskell">main=interact$f.words;f[_,[c],[d],s]=map(\x-&gt;if x==c then c else d)s
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">main=interact$f.words;f[_,[c],[d],s]=map(\x-&gt;if x==c then c else d)s
 </code></pre>
-</div>
+      </div>
 
-<p>
-<a href="https://atcoder.jp/contests/abc384/submissions/60720817">cojna さんの提出 (21:02)</a> は ABC 本番で提出された上に、これよりも短いです。ヤバい。<br>
-</p>
-<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc384/tasks/abc384_b">B 問題</a></a></h3><p>
-n 回の ARC (div 1, div 2) に参加した後のレーティングを求めよ。シミュレートします。<br>
-</p>
+      <p>
+        <a href="https://atcoder.jp/contests/abc384/submissions/60720817"
+          >cojna さんの提出 (21:02)</a
+        >
+        は ABC 本番で提出された上に、これよりも短いです。ヤバい。<br />
+      </p>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc384/tasks/abc384_b">B 問題</a></a>
+      </h3>
+      <p>
+        n 回の ARC (div 1, div 2) に参加した後のレーティングを求めよ。シミュレートします。<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-haskell">main=interact$f.tail.map read.words;f(x:d:c:r)|d==1&amp;&amp;x&gt;=1600&amp;&amp;x&lt;2800||d==2&amp;&amp;x&gt;=1200&amp;&amp;x&lt;2400=f(x+c:r)|0&lt;1=f(x:r);f(x:_)=show x
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">main=interact$f.tail.map read.words;f(x:d:c:r)|d==1&amp;&amp;x&gt;=1600&amp;&amp;x&lt;2800||d==2&amp;&amp;x&gt;=1200&amp;&amp;x&lt;2400=f(x+c:r)|0&lt;1=f(x:r);f(x:_)=show x
 </code></pre>
-</div>
-<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc384/tasks/abc384_c">C 問題</a></a></h3><p>
-5 つの問題の解き方を点数順でソートして出力せよ。 Bit 全探索ですね。<br>
-</p>
+      </div>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc384/tasks/abc384_c">C 問題</a></a>
+      </h3>
+      <p>5 つの問題の解き方を点数順でソートして出力せよ。 Bit 全探索ですね。<br /></p>
 
-<div class="org-src-container">
-<pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
 solve = do
   !xs &lt;- intsU'
   let !cs = U.fromListN 5 "ABCDE"
@@ -101,30 +141,43 @@ solve = do
           $ U.convert sets
   printBSB . unlinesBSB $ G.map snd res
 </code></pre>
-</div>
+      </div>
 
-<ul><li>なぜか \(2^{32}\) 個の候補があると勘違いして、枝刈りが必要な気がしていました。<br></li>
-<li><a href="https://publish.obsidian.md/naoya/atcoder/ABC384+%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8A">naoya さんの振り返り</a> では点数で安定ソートすれば良いとありました。確かにそうです。勉強になります。<br></li>
-</ul>
-<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc384/tasks/abc384_d">D 問題</a></a></h3><p>
-数列 \(\{A_i\}_i\) が無限に繰り替えされるとき、和が \(S\) と等しい連続部分列が存在するか調べよ。 \(S \bmod \sum_i A_i\) に対して解くと、数列 \(\{A_i\}_i\) を 2 つ連結した数列の連続部分列のみを考えれば良く尺取り法が使えます。<br>
-</p>
+      <ul>
+        <li>
+          なぜか \(2^{32}\) 個の候補があると勘違いして、枝刈りが必要な気がしていました。<br />
+        </li>
+        <li>
+          <a
+            href="https://publish.obsidian.md/naoya/atcoder/ABC384+%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8A"
+            >naoya さんの振り返り</a
+          >
+          では点数で安定ソートすれば良いとありました。確かにそうです。勉強になります。<br />
+        </li>
+      </ul>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc384/tasks/abc384_d">D 問題</a></a>
+      </h3>
+      <p>
+        数列 \(\{A_i\}_i\) が無限に繰り替えされるとき、和が \(S\)
+        と等しい連続部分列が存在するか調べよ。 \(S \bmod \sum_i A_i\) に対して解くと、数列
+        \(\{A_i\}_i\) を 2 つ連結した数列の連続部分列のみを考えれば良く尺取り法が使えます。<br />
+      </p>
 
-<p>
-累積和を用意すれば、 \([l, r]\) 区間の和が \(O(1)\) で求まり、区間の状態を持たずに済みます。こうしたステートレスな尺取り法には、専用の関数を用意してありました:<br>
-</p>
+      <p>
+        累積和を用意すれば、 \([l, r]\) 区間の和が \(O(1)\)
+        で求まり、区間の状態を持たずに済みます。こうしたステートレスな尺取り法には、専用の関数を用意してありました:<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-haskell">twoPointersU :: Int -&gt; (Int -&gt; Int -&gt; Bool) -&gt; U.Vector (Int, Int)
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">twoPointersU :: Int -&gt; (Int -&gt; Int -&gt; Bool) -&gt; U.Vector (Int, Int)
 </code></pre>
-</div>
+      </div>
 
-<p>
-以下のように解けました。<br>
-</p>
+      <p>以下のように解けました。<br /></p>
 
-<div class="org-src-container">
-<pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
 solve = do
   (!n, !s_) &lt;- ints2'
   !xs &lt;- intsU'
@@ -133,13 +186,14 @@ solve = do
   let res = twoPointersU (2 * n) $ \l r -&gt; csum +! (l, r) &lt;= s
   printYn $ s == 0 || U.any ((== s) . (csum +!)) res
 </code></pre>
-</div>
-<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc384/tasks/abc384_e">E 問題</a></a></h3><p>
-ヒープの問題です。手続き的に解きました。<br>
-</p>
+      </div>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc384/tasks/abc384_e">E 問題</a></a>
+      </h3>
+      <p>ヒープの問題です。手続き的に解きました。<br /></p>
 
-<div class="org-src-container">
-<pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
 solve = do
   (!h, !w, !xxx) &lt;- ints3'
   (!y0, !x0) &lt;- ints11'
@@ -172,20 +226,37 @@ solve = do
 
   printBSB res
 </code></pre>
-</div>
+      </div>
 
-<ul><li><a href="#coderef-6-1" id="jump-coderef-6-1" class="coderef" onmouseover="CodeHighlightOn(this,'coderef-6-1');" onmouseout="CodeHighlightOff(this, 'coderef-6-1');"><span class="coderef-anchor">1</span></a> <code>StateT</code> モナドに高橋くんの強さを載せます<br></li>
-</ul>
-<h3 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc384/tasks/abc384_f">F 問題</a></a></h3><p>
-畳み込みの問題です。畳み込みの問題なんです。<br>
-</p>
+      <ul>
+        <li>
+          <a
+            href="#coderef-6-1"
+            id="jump-coderef-6-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-6-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-6-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          <code>StateT</code> モナドに高橋くんの強さを載せます<br />
+        </li>
+      </ul>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc384/tasks/abc384_f">F 問題</a></a>
+      </h3>
+      <p>畳み込みの問題です。畳み込みの問題なんです。<br /></p>
 
-<p>
-畳み込み (<code>convolution</code>) は多項式の積 \((\sum\limits_i a_i x^i) (\sum\limits_i b_i x^i) := \sum\limits_i c_i x^i\) の係数部分 \(c_i\) を計算してくれます。応用して \(N^2\) 個の和を高速で計算できます。たとえば \(\sum\limits_i \sum\limits_j A_i A_j\) は \(\sum\limits_i \sum\limits_j x^{A_i} x^{B_i} = \sum\limits_i \sum\limits_j x^{A_i + B_i} = \sum\limits_i c_i x^i\) のように指数として計算すれば、 \(O(v \log v)\) (\(v\): 値域) で解けます。<br>
-</p>
+      <p>
+        畳み込み (<code>convolution</code>) は多項式の積 \((\sum\limits_i a_i x^i) (\sum\limits_i
+        b_i x^i) := \sum\limits_i c_i x^i\) の係数部分 \(c_i\) を計算してくれます。応用して \(N^2\)
+        個の和を高速で計算できます。たとえば \(\sum\limits_i \sum\limits_j A_i A_j\) は
+        \(\sum\limits_i \sum\limits_j x^{A_i} x^{B_i} = \sum\limits_i \sum\limits_j x^{A_i + B_i} =
+        \sum\limits_i c_i x^i\) のように指数として計算すれば、 \(O(v \log v)\) (\(v\): 値域)
+        で解けます。<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
 solve = do
   !n &lt;- int'
   !xs &lt;- intsU'
@@ -203,21 +274,68 @@ solve = do
             | otherwise = div2 i * nx
   printBSB $ (res' + U.sum (U.map (div2 . (* 2)) xs)) `div` 2
 </code></pre>
-</div>
+      </div>
 
-<ul><li><a href="#coderef-7-1" id="jump-coderef-7-1" class="coderef" onmouseover="CodeHighlightOn(this,'coderef-7-1');" onmouseout="CodeHighlightOff(this, 'coderef-7-1');"><span class="coderef-anchor">1</span></a> 値毎に数を数える<br></li>
-<li><a href="#coderef-7-2" id="jump-coderef-7-2" class="coderef" onmouseover="CodeHighlightOn(this,'coderef-7-2');" onmouseout="CodeHighlightOff(this, 'coderef-7-2');"><span class="coderef-anchor">2</span></a> 畳み込み (convolution)<br></li>
-</ul>
+      <ul>
+        <li>
+          <a
+            href="#coderef-7-1"
+            id="jump-coderef-7-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-7-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-7-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          値毎に数を数える<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-7-2"
+            id="jump-coderef-7-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-7-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-7-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          畳み込み (convolution)<br />
+        </li>
+      </ul>
 
-<p>
-TLE しましたが、速い NTT なら AC できるようです。今回も、盆栽力が足りませんでした。<br>
-</p>
+      <p>
+        TLE しましたが、速い NTT なら AC できるようです。今回も、盆栽力が足りませんでした。<br />
+      </p>
 
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">現代のコンピュータは長さ10^7 でも畳み込める</p>&mdash; うし (@ei1333) <a href="https://twitter.com/ei1333/status/1867933769203880171?ref_src=twsrc%5Etfw">December 14, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">現代のコンピュータは長さ10^7 でも畳み込める</p>
+        &mdash; うし (@ei1333)
+        <a href="https://twitter.com/ei1333/status/1867933769203880171?ref_src=twsrc%5Etfw"
+          >December 14, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">畳み込みの長さ制限に悩んでいる人は、yosupo judgeのconvolution(large)を通そう</p>&mdash; tayu (@tayu_kyopro) <a href="https://twitter.com/tayu_kyopro/status/1868187177164931408?ref_src=twsrc%5Etfw">December 15, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          畳み込みの長さ制限に悩んでいる人は、yosupo judgeのconvolution(large)を通そう
+        </p>
+        &mdash; tayu (@tayu_kyopro)
+        <a href="https://twitter.com/tayu_kyopro/status/1868187177164931408?ref_src=twsrc%5Etfw"
+          >December 15, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-<p>
-Convolution (Large) に <a href="https://judge.yosupo.jp/submission/256437">ACL で投げてみました</a> が、メモリ使用量の問題で RE になりました。どうやるんだ、爆速 convolution.. 。 <a href="https://judge.yosupo.jp/submission/74241">maspy</a> さんの提出を見ると、入力が巨大な場合は特別処理に分岐しています。じっくり読むしかなさそうです。<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <p>
+        Convolution (Large) に
+        <a href="https://judge.yosupo.jp/submission/256437">ACL で投げてみました</a>
+        が、メモリ使用量の問題で RE になりました。どうやるんだ、爆速 convolution.. 。
+        <a href="https://judge.yosupo.jp/submission/74241">maspy</a>
+        さんの提出を見ると、入力が巨大な場合は特別処理に分岐しています。じっくり読むしかなさそうです。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>

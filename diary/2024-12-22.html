@@ -1,92 +1,134 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ABC 385 - toybeam</title><meta name="description" content="devlog of toyboot4e"/><link rel="stylesheet" href="/style/simple.min.css"/><link rel="stylesheet" href="/style/style.css"/><link rel="stylesheet" href="/style/prism.css"/><script type="text/javascript" src="/style/style.js"></script><script type="text/javascript" async="" src="/style/prism.js"></script><!-- MathJax --><script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script></head><body><header role="banner"><h1>ABC 385</h1><p>Dec 22, 2024</p><nav role="navigation"><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></nav></header><main role="main"><h2 id="ABC 385"><a href="#ABC 385">ABC 385</a></h2><p>
-<a href="https://atcoder.jp/contests/abc385">ABC 385</a> に参加しました。<br>
-</p>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC 385 - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>ABC 385</h1>
+      <p>Dec 22, 2024</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="ABC 385"><a href="#ABC 385">ABC 385</a></h2>
+      <p><a href="https://atcoder.jp/contests/abc385">ABC 385</a> に参加しました。<br /></p>
 
-<table>
-<caption class="t-above"><span class="table-number">Table 1:</span> Diff 予想</caption>
+      <table>
+        <caption class="t-above">
+          <span class="table-number">Table 1:</span>
+          Diff 予想
+        </caption>
 
-<colgroup>
-<col  class="org-left">
+        <colgroup>
+          <col class="org-left" />
 
-<col  class="org-right">
+          <col class="org-right" />
 
-<col  class="org-right">
+          <col class="org-right" />
 
-<col  class="org-right">
+          <col class="org-right" />
 
-<col  class="org-left">
+          <col class="org-left" />
 
-<col  class="org-left">
+          <col class="org-left" />
 
-<col  class="org-left">
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-left">問題</th>
-<th scope="col" class="org-right">A 問題</th>
-<th scope="col" class="org-right">B 問題</th>
-<th scope="col" class="org-right">C 問題</th>
-<th scope="col" class="org-left">D 問題</th>
-<th scope="col" class="org-left">E 問題</th>
-<th scope="col" class="org-left">F 問題</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-left">提出</td>
-<td class="org-right">AC</td>
-<td class="org-right">AC</td>
-<td class="org-right">AC</td>
-<td class="org-left">AC</td>
-<td class="org-left">-</td>
-<td class="org-left">WA</td>
-</tr>
+          <col class="org-left" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="org-left">問題</th>
+            <th scope="col" class="org-right">A 問題</th>
+            <th scope="col" class="org-right">B 問題</th>
+            <th scope="col" class="org-right">C 問題</th>
+            <th scope="col" class="org-left">D 問題</th>
+            <th scope="col" class="org-left">E 問題</th>
+            <th scope="col" class="org-left">F 問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org-left">提出</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-right">AC</td>
+            <td class="org-left">AC</td>
+            <td class="org-left">-</td>
+            <td class="org-left">WA</td>
+          </tr>
 
-<tr>
-<td class="org-left">予想 diff</td>
-<td class="org-right">10</td>
-<td class="org-right">300</td>
-<td class="org-right">200</td>
-<td class="org-left">1,000</td>
-<td class="org-left">?</td>
-<td class="org-left">1,600</td>
-</tr>
+          <tr>
+            <td class="org-left">予想 diff</td>
+            <td class="org-right">10</td>
+            <td class="org-right">300</td>
+            <td class="org-right">200</td>
+            <td class="org-left">1,000</td>
+            <td class="org-left">?</td>
+            <td class="org-left">1,600</td>
+          </tr>
 
-<tr>
-<td class="org-left">実際 diff</td>
-<td class="org-right">14</td>
-<td class="org-right">77</td>
-<td class="org-right">446</td>
-<td class="org-left">1,171</td>
-<td class="org-left">1,406</td>
-<td class="org-left">1,905</td>
-</tr>
-</tbody>
-</table>
-<h3 id="A 問題"><a href="#A 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_a">A 問題</a></a></h3><p>
-3 つの整数を 2 つまたは 3 つのグループに分けたとき、それぞれのグループの整数の和がすべて等しくできるか判定せよ。こんな感じでどうでしょう。<br>
-</p>
+          <tr>
+            <td class="org-left">実際 diff</td>
+            <td class="org-right">14</td>
+            <td class="org-right">77</td>
+            <td class="org-right">446</td>
+            <td class="org-left">1,171</td>
+            <td class="org-left">1,406</td>
+            <td class="org-left">1,905</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 id="A 問題">
+        <a href="#A 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_a">A 問題</a></a>
+      </h3>
+      <p>
+        3 つの整数を 2 つまたは 3
+        つのグループに分けたとき、それぞれのグループの整数の和がすべて等しくできるか判定せよ。こんな感じでどうでしょう。<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
 solve = do
   !xs &lt;- intsU'
   printYn $ U.any (\x -&gt; 2 * x == U.sum xs || 3 * x == U.sum xs) xs
 </code></pre>
-</div>
+      </div>
 
-<p>
-追記: 嘘解法の指摘を頂きました。うわあああああ<br>
-</p>
+      <p>追記: 嘘解法の指摘を頂きました。うわあああああ<br /></p>
 
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">A 問題，<br>2 3 4<br>とかで変なことが起こりませんか？</p>&mdash; とーらす🌸📦🌕✨🌂🎧 (@torus711) <a href="https://twitter.com/torus711/status/1870499500034523496?ref_src=twsrc%5Etfw">December 21, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<h3 id="B 問題"><a href="#B 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_b">B 問題</a></a></h3><p>
-グリッド上を指示通り動くとき、訪問できる家の数を求めよ。 \(X, Y\) という名前で <code>y, x</code> 座標の値が与えられて、こういう問題はいつも疑問です。<br>
-</p>
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">A 問題，<br />2 3 4<br />とかで変なことが起こりませんか？</p>
+        &mdash; とーらす🌸📦🌕✨🌂🎧 (@torus711)
+        <a href="https://twitter.com/torus711/status/1870499500034523496?ref_src=twsrc%5Etfw"
+          >December 21, 2024</a
+        >
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <h3 id="B 問題">
+        <a href="#B 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_b">B 問題</a></a>
+      </h3>
+      <p>
+        グリッド上を指示通り動くとき、訪問できる家の数を求めよ。 \(X, Y\) という名前で
+        <code>y, x</code> 座標の値が与えられて、こういう問題はいつも疑問です。<br />
+      </p>
 
-<div class="org-src-container">
-<pre><code class="src language-haskell">dir :: Char -&gt; (Int, Int)
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">dir :: Char -&gt; (Int, Int)
 dir 'U' = (-1, 0)
 dir 'D' = (1, 0)
 dir 'L' = (0, -1)
@@ -109,27 +151,67 @@ solve = do
   let (!resY, !resX) = U.last points
   printBSB (resY + 1, resX + 1, res)
 </code></pre>
-</div>
+      </div>
 
-<ul><li><a href="#coderef-2-1" id="jump-coderef-2-1" class="coderef" onmouseover="CodeHighlightOn(this,'coderef-2-1');" onmouseout="CodeHighlightOff(this, 'coderef-2-1');"><span class="coderef-anchor">1</span></a> <a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/view_patterns.html">ViewPatterns</a> で <code>pred</code> 関数の適用結果を取得します (0-based で座標を得ます)<br></li>
-<li><a href="#coderef-2-2" id="jump-coderef-2-2" class="coderef" onmouseover="CodeHighlightOn(this,'coderef-2-2');" onmouseout="CodeHighlightOff(this, 'coderef-2-2');"><span class="coderef-anchor">2</span></a> 移動経路を求めます<br></li>
-<li><a href="#coderef-2-3" id="jump-coderef-2-3" class="coderef" onmouseover="CodeHighlightOn(this,'coderef-2-3');" onmouseout="CodeHighlightOff(this, 'coderef-2-3');"><span class="coderef-anchor">3</span></a> 移動経路上の家の数を重複が出ないように数えます<br></li>
-</ul>
-<h3 id="C 問題"><a href="#C 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_c">C 問題</a></a></h3><p>
-整数列を任意の K 個飛ばしで見たとき、等しい値の列の長さの最大値を求めよ。すべての点から \(1, 2, 3, .. N - 1\) 個飛ばしを全探索するとします。 <a href="https://ja.wikipedia.org/wiki/%E8%AA%BF%E5%92%8C%E7%B4%9A%E6%95%B0">調和級数</a> の和 \(\sum\limits_{i \in [1, n] \cap \mathbb{Z}} \frac {1} {i}\) は \(\log n\) 程度の大きさであり、愚直に探索すれば \(O(N \log N)\) で解けます。実際は枝刈りでほぼ \(O(N)\) だと思います。<br>
-</p>
+      <ul>
+        <li>
+          <a
+            href="#coderef-2-1"
+            id="jump-coderef-2-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          <a href="https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/view_patterns.html"
+            >ViewPatterns</a
+          >
+          で <code>pred</code> 関数の適用結果を取得します (0-based で座標を得ます)<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-2-2"
+            id="jump-coderef-2-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          移動経路を求めます<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-2-3"
+            id="jump-coderef-2-3"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-2-3');"
+            onmouseout="CodeHighlightOff(this, 'coderef-2-3');"
+            ><span class="coderef-anchor">3</span></a
+          >
+          移動経路上の家の数を重複が出ないように数えます<br />
+        </li>
+      </ul>
+      <h3 id="C 問題">
+        <a href="#C 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_c">C 問題</a></a>
+      </h3>
+      <p>
+        整数列を任意の K 個飛ばしで見たとき、等しい値の列の長さの最大値を求めよ。すべての点から \(1,
+        2, 3, .. N - 1\) 個飛ばしを全探索するとします。
+        <a href="https://ja.wikipedia.org/wiki/%E8%AA%BF%E5%92%8C%E7%B4%9A%E6%95%B0">調和級数</a>
+        の和 \(\sum\limits_{i \in [1, n] \cap \mathbb{Z}} \frac {1} {i}\) は \(\log n\)
+        程度の大きさであり、愚直に探索すれば \(O(N \log N)\) で解けます。実際は枝刈りでほぼ \(O(N)\)
+        だと思います。<br />
+      </p>
 
-<p>
-追記: 計算量の考察が間違ってそうです…… orz<br>
-</p>
+      <p>追記: 計算量の考察が間違ってそうです…… orz<br /></p>
 
-<div class="org-src-container">
-<pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
+      <div class="org-src-container">
+        <pre><code class="src language-haskell">solve :: StateT BS.ByteString IO ()
 solve = do
   !n &lt;- int'
   !xs &lt;- intsU'
 
-  -- 位置 `i` から `d` 個飛ばしで等しい値の列の長さを求める
+  -- 位置 `i` から `d` 個間隔で等しい値の列の長さを求める
   let step :: Int -&gt; Int -&gt; Int
       step i0 d = inner $ i0 + d
         where
@@ -145,31 +227,76 @@ solve = do
             (U.generate n id)
   printBSB res
 </code></pre>
-</div>
+      </div>
 
-<ul><li><a href="#coderef-3-1" id="jump-coderef-3-1" class="coderef" onmouseover="CodeHighlightOn(this,'coderef-3-1');" onmouseout="CodeHighlightOff(this, 'coderef-3-1');"><span class="coderef-anchor">1</span></a> \(n = 1\) の場合に <code>1</code> 個以上飛ばしのケースが無くなるため、初期値 <code>1</code> が必須です<br></li>
-<li><a href="#coderef-3-2" id="jump-coderef-3-2" class="coderef" onmouseover="CodeHighlightOn(this,'coderef-3-2');" onmouseout="CodeHighlightOff(this, 'coderef-3-2');"><span class="coderef-anchor">2</span></a> <a href="https://hackage.haskell.org/package/vector-0.13.2.0/docs/Data-Vector.html#v:foldMap"><code>foldMap :​: Monoid m =&gt; (a -&gt; m) -&gt; Vector a -&gt; m</code></a> で <code>fold</code> のネストを避けてみました<br></li>
-</ul>
-<h3 id="D 問題"><a href="#D 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_d">D 問題</a></a></h3><p>
-B 問題の sparse 版です。苦戦しました。なお B 問題とは異なり、 \(X, Y\) という名前で本当に <code>x, y</code> 座標の値が与えられる上に、 Y 軸の向きが反転しています。<br>
-</p>
+      <ul>
+        <li>
+          <a
+            href="#coderef-3-1"
+            id="jump-coderef-3-1"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-3-1');"
+            onmouseout="CodeHighlightOff(this, 'coderef-3-1');"
+            ><span class="coderef-anchor">1</span></a
+          >
+          \(n = 1\) の場合に <code>1</code> 個以上飛ばしのケースが無くなるため、初期値
+          <code>1</code> が必須です<br />
+        </li>
+        <li>
+          <a
+            href="#coderef-3-2"
+            id="jump-coderef-3-2"
+            class="coderef"
+            onmouseover="CodeHighlightOn(this,'coderef-3-2');"
+            onmouseout="CodeHighlightOff(this, 'coderef-3-2');"
+            ><span class="coderef-anchor">2</span></a
+          >
+          <a
+            href="https://hackage.haskell.org/package/vector-0.13.2.0/docs/Data-Vector.html#v:foldMap"
+            ><code>foldMap :​: Monoid m =&gt; (a -&gt; m) -&gt; Vector a -&gt; m</code></a
+          >
+          で <code>fold</code> のネストを避けてみました<br />
+        </li>
+      </ul>
+      <h3 id="D 問題">
+        <a href="#D 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_d">D 問題</a></a>
+      </h3>
+      <p>
+        B 問題の sparse 版です。苦戦しました。なお B 問題とは異なり、 \(X, Y\) という名前で本当に
+        <code>x, y</code> 座標の値が与えられる上に、 Y 軸の向きが反転しています。<br />
+      </p>
 
-<p>
-以下の方法で解きました。<br>
-</p>
+      <p>以下の方法で解きました。<br /></p>
 
-<ul><li>各行・各列の家を <code>IntMap IntSet</code> で持ちます。<br></li>
-<li>移動ごとに <code>rows</code>, <code>cols</code> を更新します。<br>
-<ul><li>行移動の場合は <code>rows</code> <strong>のみを</strong> 更新します。<br></li>
-<li>列移動の場合は <code>cols</code> <strong>のみを</strong> 更新します。<br></li>
-</ul></li>
-<li><code>rows</code>, <code>cols</code> から <code>(x, y)</code> 座標を復元し、座標ごとにカウントします。カウントが 2 である地点の家 (<code>rows</code> からも <code>cols</code> からも削除されていない家) は未訪問の家です。<br></li>
-<li>答えは <code>すべての家の数 - 未訪問の家の数</code> です。<br></li>
-</ul>
-<h3 id="E 問題"><a href="#E 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_e">E 問題</a></a></h3><p>
-Advent Calendar が終わってから考えます。<br>
-</p>
-<h3 id="F 問題"><a href="#F 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_f">F 問題</a></a></h3><p>
-同上です。<br>
-</p>
-</main><footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div></footer></body></html>
+      <ul>
+        <li>各行・各列の家を <code>IntMap IntSet</code> で持ちます。<br /></li>
+        <li>
+          移動ごとに <code>rows</code>, <code>cols</code> を更新します。<br />
+          <ul>
+            <li>行移動の場合は <code>rows</code> <strong>のみを</strong> 更新します。<br /></li>
+            <li>列移動の場合は <code>cols</code> <strong>のみを</strong> 更新します。<br /></li>
+          </ul>
+        </li>
+        <li>
+          <code>rows</code>, <code>cols</code> から
+          <code>(x, y)</code> 座標を復元し、座標ごとにカウントを取ります。カウントが 2
+          である地点の家 (<code>rows</code> からも <code>cols</code> からも削除されていない家)
+          は未訪問の家です。<br />
+        </li>
+        <li>答えは <code>すべての家の数 - 未訪問の家の数</code> です。<br /></li>
+      </ul>
+      <h3 id="E 問題">
+        <a href="#E 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_e">E 問題</a></a>
+      </h3>
+      <p>Advent Calendar が終わってから考えます。<br /></p>
+      <h3 id="F 問題">
+        <a href="#F 問題"><a href="https://atcoder.jp/contests/abc385/tasks/abc385_f">F 問題</a></a>
+      </h3>
+      <p>同上です。<br /></p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
