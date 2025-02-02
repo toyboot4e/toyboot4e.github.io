@@ -194,9 +194,8 @@ reduce = V.convert . V.map eval . chunks3
         <a href="#INLINE 以外の信じられるもの"><code>INLINE</code> 以外の信じられるもの</a>
       </h3>
       <p>
-        Haskell は 1 行の差で 10
-        倍遅くなることで有名な言語です。特にモジュールを跨ぐ場合には、低速になること必至！　しかし
-        link/cut tree の関数は巨大で、すべてを
+        Haskell は 1 行の差で 10 倍遅くなることで有名な言語です。特にモジュールを跨ぐ場合には、
+        pragma 無しだと低速になること必至！　しかし link/cut tree の関数は巨大で、すべてを
         <code>INLINE</code> 化するとコンパイルに失敗しました。 <code>INLINE</code> 無しだと C++ の
         10 倍遅いので、対策が必須です。<br />
       </p>
