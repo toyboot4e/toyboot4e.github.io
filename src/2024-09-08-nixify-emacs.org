@@ -1,4 +1,3 @@
-
 #+TITLE: Nixify your Emacs
 #+DATE: <2024-09-14 Sat>
 

@@ -1,0 +1,214 @@
+#+TITLE: ABC 391, 関数の特殊化
+#+DATE: <2025-02-02 Sun>
+
+* ABC 391
+
+[[https://atcoder.jp/contests/abc391][ABC 391]] に参加しました。
+
+#+CAPTION: Diff 予想
+| 問題       | A 問題 | B 問題 | C 問題 | D 問題 | E 問題 | F 問題 |
+|------------+--------+--------+--------+--------+--------+--------|
+| 提出       |     AC |     AC | AC     | AC     | AC     | TLE    |
+| 予想 diff |     10 |    100 | 400    | 1,300  | 1,000  | 1,800  |
+| 実際 diff |     10 |    110 | 209    | 924    | 1,165  | 1,534  |
+
+** [[https://atcoder.jp/contests/abc391/tasks/abc391_a][A 問題]]
+
+八方位が =N, NE, E, ..= の形式で与えられる。反対方向を出力せよ。
+
+八方位を配列に入れれば、添字 $i$ を $i + 4 \pmod 8$ すれば良いです:
+
+#+BEGIN_SRC haskell
+dirs :: [String]
+dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !s <- BS.unpack <$> line'
+  let i = fromJust $ elemIndex s dirs
+  printBSB $ dirs !! ((i + 4) `mod` 8)
+#+END_SRC
+
+天才解法は文字列置換です:
+
+#+BEGIN_SRC bash
+tr NESW SWNE # bash
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc391/tasks/abc391_b][B 問題]]
+
+2 つの長方形が与えられたとき、模様がマッチする部分を答えよ。例によって 2 次元配列のテンプレートを使います:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !m) <- ints2'
+  !s <- getGrid' n n
+  !t <- getGrid' m m
+
+  -- s 上の (i, j) に t を置いたとき、模様が一致するか判定する
+  let test i j = and [s @!? (i + dy, j + dx) == Just (t @! (dy, dx)) | dy <- [0 .. m - 1], dx <- [0 .. m - 1]]
+  -- すべての (i, j) を試す
+  let (!y, !x) = head [(y, x) | y <- [0 .. n - 1], x <- [0 .. n - 1], test y x]
+  printBSB (y + 1, x + 1)
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc391/tasks/abc391_c][C 問題]]
+
+配列の上を要素が移動するとき、要素のダブりがあるスロットの数を追跡せよ。
+
+可変配列が要求されて辛い問題でした。クエリは =mapMaybeM= で処理しました。
+
+** [[https://atcoder.jp/contests/abc391/tasks/abc391_d][D 問題]]
+
+テトリスのシミュレーション時に、 $t_i$ 秒後に 1x1 サイズの正方形 $A_i$ が消滅していないか答えよ。 $x$ 座標毎に $i$ 番目のブロックの位置を求め、 $i$ 番目の位置のブロックの max を計算します。 naoya さんの [[https://publish.obsidian.md/naoya/atcoder/ABC391+%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8A][=tranpose= による実装]] が綺麗でした。
+
+** [[https://atcoder.jp/contests/abc391/tasks/abc391_e][E 問題]]
+
+3 分木を再帰的に畳み込め。と読解できればボトムアップで解けました。
+
+まず =Vector= を 3 要素ずつに分解します:
+
+#+BEGIN_SRC haskell
+chunks3 :: (U.Unbox a) => U.Vector a -> V.Vector (U.Vector a)
+chunks3 xs = V.unfoldrExactN (G.length xs `div` 3) (G.splitAt 3) xs
+#+END_SRC
+
+ノードには =(多数決の結果, 結果反転の最小コスト)= を載せます:
+
+#+BEGIN_SRC haskell
+reduce :: U.Vector (Int, Int) -> U.Vector (Int, Int)
+reduce = V.convert . V.map eval . chunks3
+  where
+    eval xs = {- .. -}
+#+END_SRC
+
+=n= 回 =reduce= して解答します。
+
+** [[https://atcoder.jp/contests/abc391/tasks/abc391_f][F 問題]]
+
+ヒープで TLE, 検討中です。ヒープの実装が遅いってことも無いと思うのですが。
+
+* Misc
+
+** =INLINE= 以外の信じられるもの
+
+Haskell は 1 行の差で 10 倍遅くなることで有名な言語です。特にモジュールを跨ぐ場合には、低速になること必至！　しかし link/cut tree の関数は巨大で、すべてを =INLINE= 化するとコンパイルに失敗しました。 =INLINE= 無しだと C++ の 10 倍遅いので、対策が必須です。
+
+この件を [[https://github.com/toyboot4e/lct-bench][toyboot4e/lct-bench]] で質問したところ、 =INLINABLE= を付けて 10 倍高速化して頂きました。モジュールをまたぐ場合は、 =INLINABLE= を付けなければ関数の特殊化が行われず =PrimMonad= が辞書渡しになり、非常に低速となる模様です。
+
+(おそらく) これを機に [[https://zenn.dev/mod_poppo/articles/haskell-primmonad#%E3%83%A2%E3%83%8A%E3%83%89%E3%82%B9%E3%82%BF%E3%83%83%E3%82%AF%E3%81%8C%E7%A9%8D%E3%81%BE%E3%82%8C%E3%81%A6%E3%81%84%E3%82%8B%E5%A0%B4%E5%90%88%EF%BC%9Asttoprim-%E3%81%AE%E5%88%A9%E7%94%A8][HaskellのPrimMonadとうまく付き合う その1]] が執筆されました。自分でも色々試した感じ、 =INLINE= の方が =INLINEABLE= よりも高速な傾向にあります。
+
+| No | モナド    | pragma      | stToPrim | ST/IO   | モナドスタック | 判定       |
+|----+-----------+-------------+----------+----------+----------------+------------|
+|  1 | =PrimMonad= | -           | -        | 遅い     | 遅い           | 絶対ダメ！ |
+|  2 | =PrimMonad= | =INLINE=     | -        | 速い     | やや遅い       | 良し       |
+|  3 | =PrimMonad= | =INLINE=     | =stToPrim= | やや遅い | 速い           | 良し       |
+|  4 | =PrimMonad= | =INLINEABLE= | -        | やや遅い | 遅い           | 絶対ダメ！ |
+|  5 | =PrimMonad= | =INLINEABLE= | =stToPrim= | やや遅い | やや遅い       | 良し       |
+
+業務ならコンパイルの速い No 5 が良さそうです。 =PrimMonad= (型クラス) を特殊化しつつ、コンパイル時間も肥大しません。速度優先なら =INLINE= 指定の No 2 か No 3 が良さそうです。
+
+** =vector-algorithms= 高速化
+
+=vector-algorithms= の =nub=, =sort= 等が低速な件で [[https://github.com/erikd/vector-algorithms/pull/51][PR]] を出しました。 [[https://github.com/toyboot4e/va-bench][ベンチマーク]] を取りましたし、 Core もチラ見しています。要は =INLINE= の方が速いというだけの内容です。
+
+** Magit が動かない？
+
+=magit-file-icons= に [[https://github.com/gekoke/magit-file-icons/issues/17][Issue]] を立てました。 =git bisect run 'rg' 'magit-insert-files-1'= が便利！　修正はオーナーにお願いしたいです。たぶんフック先を変えるだけだと思うのですが。
+
+** 競プロ用の =flake.nix=
+
+=atcoder-cli= と =oj-verify= を Nix 経由で入れられるようになりました。 Source は [[https://github.com/berberman/nvfetcher][=nvfetcher=]] で取ったほうが更新が楽かも。
+
+#+BEGIN_DETAILS =flake.nix=
+#+BEGIN_SRC nix
+{
+  description = "A basic flake with a shell";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+
+  outputs =
+    { nixpkgs, flake-utils, ... }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+        # https://github.com/lmdexpr/contest/blob/d7d7e84034cf1ce6e54a59ffb0435e5edafa873e/flake.nix#L83C1-L95C11
+        atcoder-cli = pkgs.buildNpmPackage {
+          pname = "atcoder-cli";
+          version = "2.2.0";
+          src = pkgs.fetchFromGitHub {
+            owner = "Tatamo";
+            repo = "atcoder-cli";
+            rev = "f385e71ba270716f5a94e3ed9bd23a24f78799d0";
+            sha256 = "sha256-7pbCTgWt+khKVyMV03HanvuOX2uAC0PL9OLmqly7IWE=";
+          };
+          npmDepsHash = "sha256-ufG7Fq5D2SOzUp8KYRYUB5tYJYoADuhK+2zDfG0a3ks=";
+          npmPackFlags = [ "--ignore-scripts" ];
+          NODE_OPTIONS = "--openssl-legacy-provider";
+        };
+        oj-verify =
+          with pkgs.python3Packages;
+          pkgs.python3Packages.buildPythonApplication {
+            name = "verification-helper";
+            version = "5.6.0";
+            pyproject = true;
+            src = pkgs.fetchFromGitHub {
+              owner = "online-judge-tools";
+              repo = "verification-helper";
+              rev = "adbff121b1f96de5f34e9f1483eb47d661c54075";
+              fetchSubmodules = false;
+              sha256 = "sha256-f7Ge8kLRQv9uxdNGtgNsypGVY0XAnKPCg8HYQ5nT6mI=";
+            };
+            build-system = [ setuptools ];
+            dependencies = [
+              colorlog
+              importlab
+              online-judge-tools
+              pyyaml
+              setuptools
+              toml
+            ];
+            propagatedBuildInputs = [ setuptools ];
+          };
+      in
+      {
+        devShells.default =
+          with pkgs;
+          mkShell {
+            packages = [
+              atcoder-cli
+              online-judge-tools
+              oj-verify
+            ];
+          };
+        shellHook = ''
+          acc config oj-path $(which oj)
+        '';
+      }
+    );
+}
+#+END_SRC
+#+END_DETAILS
+
+参考:
+
+- [[https://github.com/gawakawa/atcoder-haskell][gawakawa/atcoder-haskell]]
+- [[https://github.com/lmdexpr/contest][lmdexpr/contest]]
+
+** キーボード
+
+[[https://github.com/Bastardkb/Dilemma][Dilemma]] キーボードが格好いい。自分でパーツを集めなくても Kit の販売があるので、発注してみました。発送待ちです。
+
+** 音楽
+
+[[https://www.behemoth.pl/][Behemoth]] の新盤が 5 月に出ます。やった！
+
+[[https://publibjp.com/books/isbn978-4-908468-81-0][メロディック・ブラックメタル・ガイドブック]] をぺらぺらと見ています。 [[https://swornnorway.bandcamp.com/album/a-journey-told-through-fire][Sworn]] が載っていて嬉しい。 [[https://blissofflesh.bandcamp.com/album/tyrant-3][Bliss of Flesh]] も一瞬出てきましたが、本当に一言しかコメントが無くて無常を感じます。もう少し予算があれば紙面を割けそうです。
+
+音楽は消化が難しく、 1 月あたり 1 バンド未満のペースで聴いています。最近は [[https://inannametal.bandcamp.com/album/void-of-unending-depths][INANNA]] が良い感じです。
+
