@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Diellma V2 キーボード - toybeam</title>
+    <meta name="description" content="devlog of toyboot4e" />
+    <link rel="stylesheet" href="/style/simple.min.css" />
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/prism.css" />
+    <script type="text/javascript" src="/style/style.js"></script>
+    <script type="text/javascript" async="" src="/style/prism.js"></script>
+    <!-- MathJax -->
+    <script
+      type="text/javascript"
+      async=""
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <header role="banner">
+      <h1>Diellma V2 キーボード</h1>
+      <p>Mar 23, 2025</p>
+      <nav role="navigation">
+        <a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a>
+      </nav>
+    </header>
+    <main role="main">
+      <h2 id="背景"><a href="#背景">背景</a></h2>
+      <p>
+        僕は <a href="https://shirogane-lab.net/items/64b7a006eb6dbe00346cd0c5">Keyball 44</a> を 34
+        キーで運用しています。 10
+        個もキーが余っているので、より小さなキーボードへの移行を検討しました。問題は Keyball
+        の造りが良過ぎる点で、他のキーボードに移行すると、トラックボールの手触りが見劣りしそうでした。<br />
+      </p>
+
+      <figure>
+        <img src="./img/2023-08-keyball44.jpg" alt="2023-08-keyball44.jpg" /><br />
+
+        <figcaption><span class="figure-number">Figure 1: </span>Keyball 44</figcaption>
+      </figure>
+
+      <p>
+        そこで
+        <a href="https://kbd.news/">kbd.news</a> から以下の要件でキーボードを探してみました。<br />
+      </p>
+
+      <ul>
+        <li>キー数 34<br /></li>
+        <li><strong>トラックボール以外</strong> のポインティング・デバイスを内蔵<br /></li>
+        <li>その他、面白い機能<br /></li>
+      </ul>
+
+      <p>
+        結果、 <a href="https://kbd.news/Dilemma-v2-1968.html">Dilmma V2</a> が
+        <strong>トラックパッド</strong>
+        を組み込んでいて完璧でした。感圧機能やジェスチャー機能は無いのですが、何も無いよりは断然マシです。さらにロータリーエンコーダーが付いていて格好良い！　君に決めた！<br />
+      </p>
+      <h2 id="Dilemma V2"><a href="#Dilemma V2">Dilemma V2</a></h2>
+      <h3 id="発注・組み立て"><a href="#発注・組み立て">発注・組み立て</a></h3>
+      <p>
+        幸いなことに、 <a href="https://github.com/Bastardkb/Dilemma">Dilemma</a> の作者 (<a
+          href="https://bastardkb.com/"
+          >Bastard Keyboards</a
+        >) が
+        <a href="https://bastardkb.com/product/dilemma/">Dilemma Kit</a>
+        を販売しており、安価で簡単に部品が揃いました。配送に一ヶ月かかったり、一部の部品が欠けたりしていましたが、無事に組み立てできました。<br />
+      </p>
+
+      <p>
+        電源に繋ぐと七色に光りました。ゲーミングキーボードだ？！　キーキャップも 🌈
+        にしました。とてつもないダサさにニヤニヤしています。<br />
+      </p>
+
+      <figure>
+        <img src="./img/2025-03-23-dilemma-v2.jpg" alt="2025-03-23-dilemma-v2.jpg" /><br />
+
+        <figcaption><span class="figure-number">Figure 2: </span>Dilemma V2</figcaption>
+      </figure>
+
+      <p>
+        キースイッチは 2023 年の
+        <a
+          href="https://publish.obsidian.md/naoya/%E6%9C%80%E8%BF%91%E3%81%AE%E3%82%AD%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89%E4%BA%8B%E6%83%85+2023.9.15"
+          >naoya さんおすすめ</a
+        >
+        の NuPhy Night Breeze です。正直、キースイッチの違いが分かっていません。<br />
+      </p>
+      <h3 id="設定"><a href="#設定">設定</a></h3>
+      <p>
+        キーマップは <a href="https://www.usevia.app/">Via (※ Chromium 系ブラウザが必要)</a> から
+        GUI で設定できます。 Special &gt; Any から
+        <a href="https://github.com/qmk/qmk_firmware/blob/master/docs/keycodes.md"
+          >QMK のキーコード</a
+        >
+        を直に入力するのが簡単でした。<br />
+      </p>
+
+      <p>よく使うキー設定:<br /></p>
+
+      <ul>
+        <li><code>LT(layer, kc)</code>: 長押しでレイヤー切り替え<br /></li>
+        <li><code>MT(mod, kc)</code>: Mod-Tap (長押しで modifier)<br /></li>
+      </ul>
+      <h3 id="Home-row mods"><a href="#Home-row mods">Home-row mods</a></h3>
+      <p>
+        中央列のキー (ASDF, JKL+) 長押しを修飾キーにする
+        <a href="https://precondition.github.io/home-row-mods#using-home-row-mods-with-qmk"
+          >home-row mods</a
+        >
+        ですが、導入に失敗しました。 QMK の <a href="https://docs.qmk.fm/mod_tap">Mod-Tap</a> は
+        <a href="https://docs.qmk.fm/keycodes_basic">basic keycode set</a>
+        に限定されており、たとえばマウスキー兼 ALT
+        キーを作ることができません。今まで通り、親指キーと端のキーを修飾キーにします。<br />
+      </p>
+      <h3 id="使用感"><a href="#使用感">使用感</a></h3>
+      <p>
+        元々マウスをほぼ使わないので、トラックパッドで全く問題ありませんでした。 Windows
+        ラップトップのトラックパッドより操作し辛いレベルですが、とにかくマウスが不要で満足です。<br />
+      </p>
+
+      <p>
+        ロータリーエンコーダーは飾りになっています。スクロールしたいなら
+        <code>d</code>
+        で半ページ動かした方が良いです。ジリジリっという音を出すためだけに回します。<br />
+      </p>
+      <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
+      <p>
+        トラックパッド、ロータリーエンコーダー付きの 34 キー Dilemma キーボードを組み立てました。
+        Keyball とほぼ同じ使い方をしており、 drop-in replacement となりました。<br />
+      </p>
+
+      <p>
+        さらにキーを減らす方向性としては、コンボ、 steno,
+        タップによるレイヤー切り替え、フリック入力等があります。今は特に steno
+        方面に興味があります。<br />
+      </p>
+    </main>
+    <footer role="contentinfo">
+      <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
+      <div><a href="/index.html">Home</a><a href="https://github.com/toyboot4e">GitHub</a></div>
+    </footer>
+  </body>
+</html>
