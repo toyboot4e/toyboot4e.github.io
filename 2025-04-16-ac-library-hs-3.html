@@ -28,7 +28,8 @@
     <main role="main">
       <h2 id="背景"><a href="#背景">背景</a></h2>
       <p>
-        <a href="https://atcoder.jp/">AtCoder</a> は隔年でジャッジ環境を更新します。なんと
+        <a href="https://atcoder.jp/">AtCoder</a>
+        は隔年でジャッジ環境を更新しています。なんと更新時は
         <strong>ユーザの提案を丸ごと受け入れています</strong> から、使いたい言語やライブラリがあれば
         (節度を持った範囲で) 入れ放題です。いつもありがとうございます！<br />
       </p>
@@ -45,9 +46,9 @@
       </h2>
       <p>
         <code>Extra</code> に収録したモジュールは、概ね
-        <a href="https://maspypy.github.io/library/">maspy さんのライブラリ</a> の Haskell
+        <a href="https://maspypy.github.io/library/">maspy さんのライブラリ</a> の一部の Haskell
         移植版です。金冠プレイヤー (上位 100 名の 1 人)
-        のプログラムを移植したわけですから、はっきり言って出来が良いです。軽く紹介して行くので、なんだか面白そうだと感じてもらえると幸いです。<br />
+        のコードを移植したわけですから、かなり強力なモジュールもあります。かいつまんで紹介して行くので、なんだか面白そうだと感じてもらえると幸いです。<br />
       </p>
       <h3 id="Bisect">
         <a href="#Bisect"><code>Bisect</code></a>
@@ -161,7 +162,12 @@
         (!?) 強力です。<br />
       </p>
       <h3 id="Graph">
-        <a href="#Graph"><code>Graph</code></a>
+        <a href="#Graph"
+          ><a
+            href="https://hackage-content.haskell.org/package/ac-library-hs/docs/AtCoder-Extra-Graph.html"
+            ><code>Graph</code></a
+          ></a
+        >
       </h3>
       <table>
         <colgroup>
@@ -498,7 +504,7 @@
 
       <p>
         区間クエリの平方分割モジュールです。クエリを上手くソートした上で、左右に伸び縮みする尺取り法のような仕組みで走査すると、
-        \((n + q) \sqrt n\) でクエリ処理できる魔術的アルゴリズムです。<br />
+        \(O((n + q) \sqrt n)\) でクエリ処理できる魔術的アルゴリズムです。<br />
       </p>
       <h3 id="ModInt64">
         <a href="#ModInt64"
@@ -593,7 +599,8 @@
         <code>HashMap</code> をラップした multiset です。 <code>inc</code> / <code>dec</code> が
         \(O(1)\) で高速ですが、代わりに
         <a href="https://judge.yosupo.jp/problem/predecessor_problem">Predecessor Problem</a> (1
-        次元の nearest neighbor problem) が解けません。ほぼ出番は無さそうです。<br />
+        次元の nearest neighbor problem)
+        が解けません。思いつきで作りましたが、出番は無さそうです。<br />
       </p>
       <h3 id="Pdsu">
         <a href="#Pdsu"
@@ -695,8 +702,8 @@
       </p>
 
       <p>
-        区間作用は実施できませんが、モノイド積の取得は \(O(\log^2 n)\) (のはず) なので lazy \(k\)-d
-        tree
+        区間作用は実施できませんが、モノイド積の取得は \(O(\log h \log w)\) (のはず) なので lazy
+        \(k\)-d tree
         よりも高速です。静的であり、木の作成後に点の追加はできませんが、クエリを先読みして単位元を重みとした点を木の中に入れておくことはできます。<br />
       </p>
       <h3 id="Seq">
@@ -798,7 +805,7 @@
       </table>
 
       <p>
-        僕が作った区間の平方分割のモジュールです。平方分割は、長さ \(n\) の区間を長さ \(\sqrt n\)
+        自分で考えた区間の平方分割のモジュールです。平方分割は、長さ \(n\) の区間を長さ \(\sqrt n\)
         程度ののブロックに分割し、ブロックごとに集約情報を持つことで \(O(q \sqrt n)\)
         程度で区間クエリを処理するアルゴリズムです。<br />
       </p>
@@ -839,8 +846,9 @@
       </table>
 
       <p>
-        木のモジュールです。木の直径、畳み込み、全方位木 DP を収録しています。全方位木 DP
-        で解ける問題は結構出ていて、そろそろ緑 diff になる気がしてます。<br />
+        木のモジュールです。木の直径、畳み込み、全方位木 DP (<code>foldReroot</code>)
+        を収録しています。全方位木 DP で解ける問題は結構出ていて、そろそろ緑 diff
+        になる気がしてます。<br />
       </p>
       <h3 id="Tree.Hld, Tree.TreeMonoid">
         <a href="#Tree.Hld, Tree.TreeMonoid"
@@ -874,12 +882,14 @@
       </table>
 
       <p>
-        Heavy-light decomposition と、その上にセグメント木を載せたモジュールです。 LCA,
-        パスの畳み込み、部分木の畳み込みができて強力です。<br />
+        Heavy-light decomposition
+        と、その上にセグメント木を載せたモジュールです。木をブロックに分け、頂点番号を振り直すと、頂点
+        (または辺) がセグメント木に載り、経路のモノイド積を \(O(\log^2 n)\) で取得できます。 LCA
+        の取得や部分木の畳み込みも可能です。<br />
       </p>
 
       <p>
-        セグメント木と比べて Fenwick Tree (binary index tree)
+        セグメント木と比べて Fenwick Tree (binary indexed tree)
         がかなり速いので、そちらにも対応すべきかもしれません (maspy
         さんのライブラリでは対応しています) 。<br />
       </p>
@@ -945,7 +955,11 @@
 
       <p>
         僕が作った wavelet matrix です。 maspy さんの wavelet matrix は 1
-        次元版でもモノイド積が解けるので、写経しておけば良かった痛恨のモジュールです。ただ早めに至らなさを実感できたおかげで、他のモジュールでは写経に徹することができました。完全に理解するためには、また半年かかるかもしれません。<br />
+        次元版でもモノイド積を取れるので、写経しておけば良かった痛恨のモジュールです。しかし早めに至らなさを実感できたおかげで、他のモジュールでは写経に徹することができました。<br />
+      </p>
+
+      <p>
+        以上、主に写経で作ったモジュール達ですが、完全に理解するためには追加で半年必要かもしれません。人生が、人生が終わってしまう……<br />
       </p>
       <h2 id="まとめ"><a href="#まとめ">まとめ</a></h2>
       <p>
@@ -957,8 +971,8 @@
       <p>
         この半年はひたすら
         <code>ac-library-hs</code>
-        を作っていました。正直ユーザは僕だけになる可能性が高いですが、一応誰でも使えるライブラリを用意できて役得でした。早くオンラインジャッジで
-        <code>import AtCoder.XXX</code> を書いてみたいです。<br />
+        を作っていました。正直ユーザは僕だけになる可能性が高いですが、一応誰でも使えるライブラリを用意できたのは役得でした。早くオンラインジャッジで
+        <code>import AtCoder.XXX</code> を書いてみたいです。とにかく楽しみです。<br />
       </p>
     </main>
     <footer role="contentinfo">
