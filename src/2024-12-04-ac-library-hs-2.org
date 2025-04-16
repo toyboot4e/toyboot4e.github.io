@@ -15,8 +15,8 @@
 
 以下でソース・ドキュメントを確認できます。
 
-- [[https://github.com/toyboot4e/ac-library-hs][toyboot4e/ac-library-hs]]
-- [[https://toyboot4e.github.io/ac-library-hs/][API ドキュメント]]
+- [[https://github.com/toyboot4e/ac-library-hs][toyboot4e/ac-library-hs (GitHub)]]
+- [[https://hackage.haskell.org/package/ac-library-hs][API ドキュメント (Hackage)]]
 
 * =ac-library-hs=
 
@@ -24,7 +24,7 @@
 
 ** 何が変わるか
 
-たとえば [[https://toyboot4e.github.io/ac-library-hs/AtCoder-Dsu.html][AtCoder.DSU]] や [[https://toyboot4e.github.io/ac-library-hs/AtCoder-SegTree.html][AtCoder.SegTree]] が利用できます。これらは頻出のデータ型ですが、自作する場合はそれなりに時間がかかります。 =ac-library-hs= があれば、これらの実装を後回しにして、どんどん問題を解いていくことができます。
+たとえば [[https://hackage.haskell.org/package/ac-library-hs/docs/AtCoder-Dsu.html][AtCoder.DSU]] や [[https://hackage.haskell.org/package/ac-library-hs/docs/AtCoder-SegTree.html][AtCoder.SegTree]] が利用できます。これらは頻出のデータ型ですが、自作する場合はそれなりに時間がかかります。 =ac-library-hs= があれば、これらの実装を後回しにして、どんどん問題を解いていくことができます。
 
 ** Haskell 事情
 
