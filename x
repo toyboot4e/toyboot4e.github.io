@@ -1,4 +1,4 @@
-#!/usr/bin/env -S bash -euE
+#!/usr/bin/env -S bash
 
 set -o pipefail
 
@@ -72,10 +72,10 @@ _watch() {
     if [[ "${1:-}" == "-d" || "${1:-}" == "--draft" ]] ; then
         echo "draft build"
         # watchexec -e org -w draft --ignore "index.org" "./x build --draft && ./x format"
-        watchexec -e org -w draft --ignore "index.org" "./x build --draft"
+        watchexec -e org,css -w draft --ignore "index.org" "./x build --draft"
     elif [[ -z "${1:-}" || "${1:-}" == "-r" || "${1:-}" == "--release" ]] ; then
         echo "release build"
-        watchexec -e org -w src --ignore "index.org" "./x build --release && ./x format"
+        watchexec -e org,css -w src --ignore "index.org" "./x build --release && ./x format"
     else
         echo "invalid option"
     fi

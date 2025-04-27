@@ -157,3 +157,17 @@ span.code-highlighted {
   background: hsla(60, 30%, 50%, 0.5);
 }
 
+/* aahub_light: https://qiita.com/scrpgil/items/b8bde1257a135d173585 */
+/* TODO: delay loading */
+@font-face {
+  font-family: "aahub_light";
+  src: url(/style/aahub_light.woff2) format("woff2");
+  font-display: swap;
+}
+
+.YARUO p {
+  font-family: "aahub_light";
+  font-size: 16px;
+  line-height: 18px;
+  text-indent: 0;
+}
