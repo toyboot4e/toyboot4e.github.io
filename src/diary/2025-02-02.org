@@ -93,7 +93,7 @@ reduce = V.convert . V.map eval . chunks3
 
 ** =INLINE= 以外の信じられるもの
 
-Haskell は 1 行の差で 10 倍遅くなることで有名な言語です。特にモジュールを跨ぐ場合には、低速になること必至！　しかし link/cut tree の関数は巨大で、すべてを =INLINE= 化するとコンパイルに失敗しました。 =INLINE= 無しだと C++ の 10 倍遅いので、対策が必須です。
+Haskell は 1 行の差で 10 倍遅くなることで有名な言語です。特にモジュールを跨ぐ場合には、 pragma 無しだと低速になること必至！　しかし link/cut tree の関数は巨大で、すべてを =INLINE= 化するとコンパイルに失敗しました。 =INLINE= 無しだと C++ の 10 倍遅いので、対策が必須です。
 
 この件を [[https://github.com/toyboot4e/lct-bench][toyboot4e/lct-bench]] で質問したところ、 =INLINABLE= を付けて 10 倍高速化して頂きました。モジュールをまたぐ場合は、 =INLINABLE= を付けなければ関数の特殊化が行われず =PrimMonad= が辞書渡しになり、非常に低速となる模様です。
 
@@ -115,7 +115,7 @@ Haskell は 1 行の差で 10 倍遅くなることで有名な言語です。�
 
 ** Magit が動かない？
 
-=magit-file-icons= に [[https://github.com/gekoke/magit-file-icons/issues/17][Issue]] を立てました。 =git bisect run 'rg' 'magit-insert-files-1'= が便利！　修正はオーナーにお願いしたいです。たぶんフック先を変えるだけだと思うのですが。
+=magit-file-icons= に [[https://github.com/gekoke/magit-file-icons/issues/17][Issue]] を立てました。 =git bisect= が便利で、 =git bisect run 'rg' 'magit-insert-files-1'= が全てやってくれました。修正はオーナーにお願いしたいです。たぶんフック先を変えるだけだと思うのですが。
 
 ** 競プロ用の =flake.nix=
 

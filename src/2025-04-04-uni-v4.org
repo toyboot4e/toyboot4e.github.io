@@ -1,0 +1,53 @@
+#+TITLE: Uni V4 購入
+#+DATE: <2025-04-04 Fri>
+
+* 背景
+
+僕はアクションゲームとして分割キーボードを楽しんでいます。この Dilemma V2 などは 34 個しかキーが無く、その分特殊な操作が要求されるため、ちょっとした上達を積み重ねる楽しみがあります。
+
+#+CAPTION: Dilemma V2
+[[./img/2025-03-23-dilemma-v2.jpg]]
+
+現在主力の Keyball 44, Dilmma V2 はマスターしたため、新しい操作体系を求めて [[https://stenokeyboards.com/products/the-uni-v4][Uni V4]] を購入しました。
+
+* Uni V4
+
+[[https://stenokeyboards.com/products/the-uni-v4][Uni V4]] は _steno_ キーボードの一種で、 _chording_ による速記をウリにしています。 Chording とは複数キーの同時押しを他の入力に変換する機能で、一度のストロークで一単語、あるいは複数文字などを入力できます。
+
+Uni V4 は在庫切れの状態でしたが、 Discord で売ってくれる人がいて助かりました。
+
+#+CAPTION: Uni V4
+[[./img/2024-04-04-uni-v4.jpg]]
+
+** Steno 関連のコンテンツ
+
+Steno の習得にあたり、やはり [[https://aerick.ca/][Aerick 氏]] の発信を頼りにしたいと思います。そもそも steno でプログラミングができるし、何でも打てると Aerick 氏が発信してくれたおかげで、少しずつ steno に興味を持った面があります。
+
+- [[https://www.youtube.com/@AerickSteno][Youtube]]
+- [[https://lapwing.aerick.ca/][Lapwing for Beginners]]
+
+Steno ができる日本人プログラマは、インターネットですら聞いたことがありません。希少性という意味でも面白いんじゃないかと思います。ただ最近だと、 [[https://note.com/search?q=steno&context=note&mode=search][Note で steno を検索]] すると [[https://note.com/jeebis_keyboard][急速に多数のキー配列や steno を習得している人物]] が見つかり、非常に刺激を受けました。かなり天才だと思います……！
+
+** Plover
+
+[[https://www.openstenoproject.org/plover/][Plover]] は _stenography_ の実装で、特定のキーボードを steno キーボードとして扱えるようになります。 Uni V4 を steno としつつ、 Dilemma V2 は従来通りに入力できる環境が作れました。
+
+#+BEGIN_QUOTE
+Uni 本体に steno 機能を埋め込むこともできるようです。
+#+END_QUOTE
+
+** 学習過程 (予定)
+
+上手く順番を分けて学びたいと思います。
+
+1. アルファベット入力
+2. 英語の chording (英語版の寿司打をやる)
+3. 数値
+4. 記号
+5. 修飾キー ([[https://github.com/openstenoproject/awesome-plover][awesome-plover]] の辞書を見る？)
+6. 日本語 ([[https://note.com/jeebis_keyboard/n/n82bb135b8f71][めじろ式]] など？)
+
+* まとめ
+
+新しい操作体系を求めて Uni V4 を購入しました。まだ買っただけで、挫折する可能性の方が高いですが、色々遊べたら嬉しいです。 Steno を習得できた暁には、 M-x 界最強の男を名乗りたいと思います。
+

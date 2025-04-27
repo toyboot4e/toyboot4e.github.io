@@ -1,0 +1,56 @@
+#+TITLE: Dilemma V2 キーボード
+#+DATE: <2025-03-23 Sun>
+
+* 背景
+
+僕は [[https://shirogane-lab.net/items/64b7a006eb6dbe00346cd0c5][Keyball 44]] を 34 キーで運用しています。 10 個もキーが余っているので、より小さなキーボードへの移行を検討しました。問題は Keyball の造りが良過ぎる点で、他のキーボードに移行すると、トラックボールの手触りが見劣りしそうでした。
+
+#+CAPTION: Keyball 44
+[[./img/2023-08-keyball44.jpg]]
+
+そこで [[https://kbd.news/][kbd.news]] から以下の要件でキーボードを探してみました。
+
+- キー数 34
+- *トラックボール以外* のポインティング・デバイスを内蔵
+- その他、面白い機能
+
+結果、 [[https://kbd.news/Dilemma-v2-1968.html][Dilmma V2]] が *トラックパッド* を組み込んでいて完璧でした。感圧機能やジェスチャー機能は無いのですが、何も無いよりは断然マシです。さらにロータリーエンコーダーが付いていて格好良い！　君に決めた！
+
+* Dilemma V2
+
+** 発注・組み立て
+
+幸いなことに、 [[https://github.com/Bastardkb/Dilemma][Dilemma]] の作者 ([[https://bastardkb.com/][Bastard Keyboards]]) が [[https://bastardkb.com/product/dilemma/][Dilemma Kit]] を販売しており、安価で簡単に部品が揃いました。配送に一ヶ月かかったり、一部の部品が欠けたりしていましたが、無事に組み立てできました。
+
+電源に繋ぐと七色に光りました。ゲーミングキーボードだ？！　キーキャップも 🌈 にしました。とてつもないダサさにニヤニヤしています。
+
+#+CAPTION: Dilemma V2
+[[./img/2025-03-23-dilemma-v2.jpg]]
+
+キースイッチは 2023 年の [[https://publish.obsidian.md/naoya/%E6%9C%80%E8%BF%91%E3%81%AE%E3%82%AD%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89%E4%BA%8B%E6%83%85+2023.9.15][naoya さんおすすめ]] の NuPhy Night Breeze です。正直、キースイッチの違いが分かっていません。
+
+** 設定
+
+キーマップは [[https://www.usevia.app/][Via (※ Chromium 系ブラウザが必要)]] から GUI で設定できます。 Special > Any から [[https://github.com/qmk/qmk_firmware/blob/master/docs/keycodes.md][QMK のキーコード]] を直に入力するのが簡単でした。
+
+よく使うキー設定:
+
+- =LT(layer, kc)=: 長押しでレイヤー切り替え
+- =MT(mod, kc)=: Mod-Tap (長押しで modifier)
+
+** Home-row mods
+
+中央列のキー (ASDF, JKL+) 長押しを修飾キーにする [[https://precondition.github.io/home-row-mods#using-home-row-mods-with-qmk][home-row mods]] ですが、導入に失敗しました。 QMK の [[https://docs.qmk.fm/mod_tap][Mod-Tap]] は [[https://docs.qmk.fm/keycodes_basic][basic keycode set]] に限定されており、たとえばマウスキー兼 ALT キーを作ることができません。今まで通り、親指キーと端のキーを修飾キーにします。
+
+** 使用感
+
+元々マウスをほぼ使わないので、トラックパッドで全く問題ありませんでした。 Windows ラップトップのトラックパッドより操作し辛いレベルですが、とにかくマウスが不要で満足です。
+
+ロータリーエンコーダーは飾りになっています。スクロールしたいなら =d= で半ページ動かした方が良いです。ジリジリっという音を出すためだけに回します。
+
+* まとめ
+
+トラックパッド、ロータリーエンコーダー付きの 34 キー Dilemma キーボードを組み立てました。 Keyball とほぼ同じ使い方をしており、 drop-in replacement となりました。
+
+さらにキーを減らす方向性としては、コンボ、 steno, タップによるレイヤー切り替え、フリック入力等があります。今は特に steno 方面に興味があります。
+
