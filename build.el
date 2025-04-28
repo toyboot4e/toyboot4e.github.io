@@ -361,18 +361,37 @@ wrapped in code elements."
 %s
 </details>" title contents)))
 
+;; ;; TODO: define it as special block
+;; ;; `#+BEGIN_EXPORT yaruo'
+;; (defun my-org-html-export-block (export-block contents info)
+;;     "Transcode a EXPORT-BLOCK element from Org to HTML.
+;; CONTENTS is nil.  INFO is a plist holding contextual information."
+;;     (cond (;; yaruo
+;;            (or (string= (org-element-property :type export-block) "YARUO")
+;;                (string= (org-element-property :type export-block) "yaruo"))
+;;            ;; <pre> is for avoiding mathjax
+;;            (concat "<div class=\"YARUO\"><pre class=\"YARUO\">"
+;;                    ;; (org-html-encode-plain-text (org-remove-indentation (org-element-property :value export-block)))
+;;                    (xml-escape-string (org-remove-indentation (org-element-property :value export-block)))
+;;                    "</pre></div>"))
+;;           (t (ox-slimhtml-export-block export-block contents info))))
+
 ;; `#+BEGIN_YARUO' special block
 (defun my-org-html-yaruo-block (yaruo-block contents info)
-    (format "<div class=\"yaruo\">
+    ;; TODO: should not add <br> and should respect white spaces
+    (let* ((beg (org-element-property :contents-begin yaruo-block))
+           (end (org-element-property :contents-end yaruo-block))
+           (raw-content (buffer-substring-no-properties beg end)))
+        (format "<pre class=\"yaruo\">
 %s
-</div>" contents))
+</pre>" raw-content)))
 
 ;; Special block (custom block) handler dispatcher
 (defun my-org-html-special-block (special-block contents info)
     (let* ((block-type (org-element-property :type special-block)))
         (cond ((or (string= block-type "details") (string= block-type "DETAILS"))
                (my-org-html-details-block special-block contents info))
-              ((or (string= block-type "yaruo") (string= block-type "yaruo"))
+              ((or (string= block-type "yaruo") (string= block-type "YARUO"))
                (my-org-html-yaruo-block special-block contents info))
               (t ;; fallback
                (org-html-special-block special-block contents info)))))
@@ -652,6 +671,7 @@ INFO is a plist holding contextual information.  See
  :translate-alist
  '((template . my-org-html-template)
    (link . my-org-html-link)
+   ;; (export-block . my-org-html-export-block)
    (src-block . roygbyte/org-html-src-block)
    (center-block . my-org-html-center-block)
    (special-block . my-org-html-special-block)))
