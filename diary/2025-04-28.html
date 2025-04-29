@@ -316,7 +316,7 @@ solve = do
       >
 
       <div class="org-src-container">
-        <pre><code class="src language-haskell">match :: String -&gt; String -&gt; Int -&gt; Int -&gt; Bool
+        <pre><code class="src language-haskell">match :: String -&gt; String -&gt; Int -&gt; Bool
 match s t offset = inner (drop offset s) t
   where
     inner _ [] = True
@@ -390,7 +390,7 @@ solve' = do
 　　 　 　 ／　（ー） 　（ー）＼　　　　　　閲覧権限が剥奪されることは無いお
 　　　　／　　 ⌒（__人__）⌒ ＼
 　　　　|　　 　　　|r┬-|　　　　|　　　　 全コンテスト閲覧権と各コンテスト閲覧権を
-　　　　 ＼　　　　 `ー'´　　 ／　　　　　別々に持てば、どのクエリも O(1) で処理できるお
+　　　　 ＼　　　　 `ー'´　　 ／　　　　　別々に持てば、どのクエリも O(1) か O(log N) で処理できるお
 　　　　ノ　　　　　　　　　　 　＼
 　 ／´　　　　　　　　　　　　 　　ヽ
 　|　　　　ｌ　　　　　　　　　　　　　　＼
