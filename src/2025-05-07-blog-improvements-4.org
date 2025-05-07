@@ -1,0 +1,147 @@
+#+TITLE: =org-mode= 製ブログの改良 (4): yaruo block
+#+DATE: <2025-05-07 Wed>
+
+* 機能
+
+org-mode 製ブログに新機能を追加しました。アスキーアートを綺麗に表示できます。
+
+** デモ
+
+#+BEGIN_YARUO
+　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .|　　　　　 　 　 /
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 !　　　　　　　 /
+　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .l　　　　＿＿/_
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 !　　 ／　　/　＼
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 !　／. 　　/ _ノ　 ＼
+　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .l │. 　　/（● ）（●）　　　　俺が見えるか！
+　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .| │　　/　　（__人__）
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 ! │.　/ 　 　｀ ⌒´ﾉ
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 ! │ /　　 　 　 　 }
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 | ノ./ヾ.ﾍ　　　　　}
+　　　　　　　　　　　　　　　　　　　　 　 　 ..=ｨﾞﾆ|　/､;i;i;ヾヘ　　_ノ
+　　　　　　　　　　　　　　　.　　　　 　 : :イ/{ ／￣ヾ}l!;i;i;iLc､＞
+　　　　　　　　　　　　　　　.　　　　 　 / '/,ﾑ{　∧　 }ｰ-,-､《;i〈
+　　　　　　　　　　　　　　　.　　　　 　 !:.,'〃´ﾊ｛/　 ﾊ::〃,=ヾﾐ;i
+　　　　　　　　　　　　　　　.　　　　 　 :.:{/' 〃ﾞヽ__ノヽi/´　　 }＼
+　　　　　　　　　　　　　　　.　　　　 　 :.:|!､/　　ヽ::Y::/{　　r､/ﾑ .＼
+　　　　　　　　　　　　　　　.　　　　 　 !:.!ﾑ　　　 ヽj::ノ{ 　 | ,';i;iﾑ 　 ヽ.
+　　　　　　　　　　　　　　　.　　　　 　 Ⅵﾏ＼　　_ ヽ';i乂__.ｿ;i;i;i;i| 　 　 丶
+　　　　　　　　　　　　　　　.　　　　 　 ﾄj0l|Y´＼{ }　 Y;i;i;i;i;i;i;i;i;i;iﾄ，　　 　 ＼
+　　　　　　　　　　　　　　　.　　　　 　 `!0j;iﾄ､　 ヾ__.人;i;i;i;i;i;i;i;i;i;i;{ 　 　 　 　 ＼
+　　　　　　　　　　　　　　　.　　　　 　 〈ｿ,∧　＼　 「 ! Y;i;i;i;i;i;i;i;i;iﾑ
+　　　　　　　　　　　　　　　.　　　　　 　 j､;i;i;､　　＼___丿;i;i;i;i;i;i;i;i;i;iﾑ
+　　　　　　　　　　　　　　　.　　　　 　 /.:::∨;i;i`i.､___ﾉ;i＼;i;i;i;i;i;i;i;i;i;i;ｉﾑ
+　　　　　　　　　　　　　　　.　　　　 　 ::::::::.∨;i;i|:;i;i;i;i;i;i;i;ｉ;＼;i;i;i;i;i;i;i;i;i;ﾑ
+　　　　　　　　　　　　　　　.　　　　 　 ､_:::::::∨;i|:;i;i;i;i;i;i;i;i;i;i;i;丶:;i;i;i;i;i;i;i;ﾑ
+　　　　　　　　　　　　　　　.　　　　 　 ::ｰﾆ=ｲ};i:!:;i;i;i;i;i;i;i;i;i;i;i;i;i;i＼:;i;i;i;i;i;i;i〉
+　　　　　　　　　　　　　　　.　　　　 　 ヽ:::::::::ﾉ;i:!:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i＼:;i;i;/
+　　　　　　　　　　　　　　　.　　　　　 　 ヽ／;ｉ;i:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i＼:〉
+　　　　　　　　　　　　　　　.　　　　 　 ..／;i;i;i;i;i:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;ｉ;ｉ;ｉ;＼
+　　　　　　　　　　　　　　　.　　　　 　 ,ゝ;i;i;i;i;i;ｉ:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i/　 丶
+　　　　　　　　　　　　　　　.　　　　 　 i;i;i;i;i;i;i;i;ｉ:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;/　　　　＼
+　　　　　　　　　　　　　　　.　　　　 　 i;i;i;i;i;i;i;ｉ;ｉ:!:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i∧
+　　　　　　　　　　　　　　　.　　　　 　 i;i;i;i;i;i;i;ｉ;ｉ:!:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i/. ﾑ
+　　　　　　　　　　　　　　　.　　　　 　 i;i;i;i;i;i;i;i;ｉ:ｌ:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i/／ﾏ___
+　　　　　　　　　　　　　　　.　　　　 　 ､i;i;i;i;i;i;i;i:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;}/イ;;;;;;;;;`!
+　　　　　　　　　　　　　　　.　　　　 　 ';i;i;i;i;i;i;i;ｉ:ｌ:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;iﾑ.;;;;;;;;;;;;;;;;;〉
+#+END_YARUO
+
+#+BEGIN_QUOTE
+AA のフォントは [[https://fonts.aahub.org/font/2][aahub\under{}light]] をお借りしました。
+#+END_QUOTE
+
+** =#+BEGIN_YARUO= 構文
+
+ソースファイル中では、以下のように =#+BEGIN_YARUO=, =#+END_YARUO= で AA を囲みます:
+
+#+BEGIN_SRC org
+,#+BEGIN_YARUO
+等幅フォントで表示されるテキスト
+,#+END_YARUO
+#+END_SRC
+
+HTML 変換時は、以下のように元のテキストが [[https://developer.mozilla.org/ja/docs/Web/HTML/Reference/Elements/pre][=<pre>=]] タグ (preformatted text) で囲まれます:
+
+#+BEGIN_SRC html
+<pre class="yaruo">等幅フォントで表示されるテキスト
+</pre>
+#+END_SRC
+
+* 実装
+
+HTML 変換時には、 AA のテキスト内容を保持します。改行を =<br>= タグに変換したり、記号をエスケープしないように気をつける必要があります。
+
+** ELisp
+
+Emacs Lisp のコーナーです。 [[https://orgmode.org/org.html][org-mode]] では、標準外の =#+BEGIN_***= 構文を speical block と呼びます (たぶん) 。 Backend 定義の際に special block の _translator_ を指定できるので、その中から =#+BEGIN_YARUO= の処理関数へ繋ぎます:
+
+#+BEGIN_SRC diff-elisp
+;; Backend 定義
+(org-export-define-derived-backend
+ ;; ~~ 一部省略
+ :translate-alist
+ '((template . my-org-html-template)
+   ;; ~~ 一部省略
+   ;; Special block (#+BEGIN_***) の処理関数を割り当てる
+   (special-block . my-org-html-special-block)))
+
+;; Special block (#+BEGIN_***) の処理関数
+(defun my-org-html-special-block (special-block contents info)
+  (let* ((block-type (org-element-property :type special-block)))
+    (cond ( ;; #+BEGIN_DETAILS の処理関数を割り当てる
+           (or (string= block-type "details") (string= block-type "DETAILS"))
+           (my-org-html-details-block special-block contents info))
++          ( ;; #+BEGIN_YARUO の処理関数を割り当てる
++           (or (string= block-type "yaruo") (string= block-type "YARUO"))
++           (my-org-html-yaruo-block special-block contents info))
+          (t ;; fallback する
+           (org-html-special-block special-block contents info)))))
+#+END_SRC
+
+=#+BEGIN_YARUO= の処理関数では、元のテキストを取得して =<pre>= で囲みます:
+
+#+BEGIN_SRC elisp
+(defun my-org-html-yaruo-block (yaruo-block contents info)
+    (let* ((beg (org-element-property :contents-begin yaruo-block))
+           (end (org-element-property :contents-end yaruo-block))
+           (raw-content (buffer-substring-no-properties beg end)))
+        (format "<pre class=\"yaruo\">
+%s
+</pre>" raw-content)))
+#+END_SRC
+
+#+BEGIN_QUOTE
+=yaruo-block= 変数からは、 =(org-element-property :value yaruo-block)= を使って =#+BEGIN_YARUO= ~ =#+END_YARUO= までのテキストを取得できます。しかしこの =:value= は既に HTML へ変換されており、 =<br>= タグや HTML へのエスケープを含むため AA には使用できません。
+
+HTML への変換を避けるため、むしろ export block (=#+BEGIN_EXPORT yaruo=) とするのが素直な実装ですが、今回は =#+BEGIN_YARUO= と書きたかったため、あくまで special block として実装しました。
+#+END_QUOTE
+
+** CSS
+
+=<pre>= タグのフォント設定をします:
+
+#+BEGIN_SRC css
+/* aahub_light: https://qiita.com/scrpgil/items/b8bde1257a135d173585 */
+@font-face {
+  /* TODO: 40KB とはいえ遅延ロードにしたい */
+  font-family: "aahub_light";
+  src: url(/style/aahub_light.woff2) format("woff2");
+  font-display: swap;
+}
+
+.yaruo {
+  font-family: "aahub_light";
+  font-size: 16px;
+  line-height: 18px;
+  text-indent: 0;
+  /* これは外さない方が良いかも: */
+  /* white-space: pre; */
+}
+#+END_SRC
+
+なお MathJax はデフォルトで =<pre>= タグを無視するため、 AA の中で記号を使っても数式になることはありません。
+
+* 振り返って
+
+=org-mode= の =:contents-begin= や HTML の =<pre>= タグを知らず、回り道しました。異常に軽量な [[https://fonts.aahub.org/font/2][aahub\under{}light]] (43.9 KB) のおかげで、気兼ねなくポータブルに AA を表示できました。
+
