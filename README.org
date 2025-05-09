@@ -4,8 +4,7 @@ This is [[https://toyboot4e.github.io/][my devlog (link)]] written in =.org= fil
 
 ** Commands
 
-- =./x watch=
-- =./x serve=
+See the [[./Justfile][./Justfile]].
 
 ** Thanks
 
