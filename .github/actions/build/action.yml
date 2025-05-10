@@ -7,5 +7,6 @@ runs:
     - uses: cachix/install-nix-action@v31
     # TODO: cachix
     - name: Build the devlog
+      shell: "bash"
       run: |
         nix build .#devlog
