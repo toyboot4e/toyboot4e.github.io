@@ -175,7 +175,7 @@ bin/  boot/  d/  dev/  etc/  home/  lib/  lib64/  lost+found/  media/  nix/  opt
 
 - [[(1)]]: ビルドに必要な依存を書きます。
 - [[(2)]]: 隔離環境では =HOME= 変数が存在しないディレクトリ (=/homeless-shelter=) を指すため、 Emacs がファイル生成できるように一時ディレクトリを設定しました。
-- [[(3)]]: すでにあるビルドスクリプトを呼び出すだけです。
+- [[(3)]]: HTML の生成方法は、ビルドスクリプトを呼び出すだけです。
 
 ** =nix build= の使い道
 
@@ -233,7 +233,7 @@ jobs:
 
 - [[(1)]]: [[https://github.com/actions/upload-pages-artifact][=actions/upload-pages-artifact=]] で GitHub Pages 専用の _artifact_ を作成します
 - [[(2)]]: =nix build= の出力 (への symlink) を指定しています
-- [[(3)]]: [[https://github.com/actions/deploy-pages][=actions/deploy-paegs=]] が deploy してくれます
+- [[(3)]]: [[https://github.com/actions/deploy-pages][=actions/deploy-pages=]] が deploy してくれます
 
 * まとめ
 
