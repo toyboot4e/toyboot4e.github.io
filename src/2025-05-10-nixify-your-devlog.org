@@ -1,0 +1,245 @@
+#+TITLE: Nixify your devlog
+#+DATE: <2025-05-10 Sat>
+
+* 背景
+
+Nix Flakes 入門 =nix build= 編です。このブログはシェルスクリプトでビルドしていますが、 =nix build= コマンドでビルドできるように、簡単な =flake.nix= を作成しました。これで reproducible なブログ (html) になったかと思います。
+
+* 実装
+
+以下では Nix Flakes の環境構築を前提に、 =flake.nix= を作って行きます。
+
+** Nix Flakes の書き方
+
+Nix Flakes を使って純粋な環境でビルドするためには、 [[https://nixos-and-flakes.thiscute.world/other-usage-of-flakes/outputs][=Flake Outputs=]] の =packages= を定義します。 [[https://github.com/numtide/flake-utils][=flake-utils=]] のおかげで、 system 名 (x86\under{}64\under{}linux 等) に惑わされず、簡潔に =flake.nix= を作成できます:
+
+#+BEGIN_SRC nix
+{
+  description = "A basic flake for my devlog";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+
+  outputs =
+    { nixpkgs, flake-utils, ... }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in
+      {
+        # nix build の対象一覧
+        packages = {
+          # nix build .#devlog でビルドできる:
+          devlog = pkgs.stdenvNoCC.mkDerivation {
+            # 後述
+          };
+        };
+      }
+    );
+}
+#+END_SRC
+
+#+BEGIN_QUOTE
+参考:
+
+- [[https://zenn.dev/asa1984/books/nix-hands-on][Nix入門: ハンズオン編]]
+- [[https://nixos-and-flakes.thiscute.world/nixos-with-flakes/introduction-to-flakes][NixOS & Flakes Book]]
+#+END_QUOTE
+
+** Hello, =nix build=!
+
+=packages= 中に =devlog= パッケージを記載してみます:
+
+#+CAPTION: =packages= の中に追記
+#+BEGIN_SRC nix
+          # nix build .#devlog でビルドできる:
+          devlog = pkgs.stdenvNoCC.mkDerivation {
+            name = "devlog";
+            src = ./.; # (ref:1)
+            nativeBuildInputs = []; # (ref:2)
+            buildPhase = '' # (ref:3)
+              ls > ls.txt
+              pwd > pwd.txt
+            '';
+            installPhase = '' # (ref:4)
+              mkdir -p $out
+              mv ls.txt $out/
+              mv pwd.txt $out/
+            '';
+          };
+        };
+#+END_SRC
+
+#+BEGIN_DETAILS =flake.nix= 全文
+#+BEGIN_SRC nix
+{
+  description = "A basic flake for my devlog";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+
+  outputs =
+    { nixpkgs, flake-utils, ... }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in
+      {
+        # nix build の対象一覧
+        packages = {
+          # nix build .#devlog でビルドできる:
+          devlog = pkgs.stdenvNoCC.mkDerivation {
+            name = "devlog";
+            src = ./.;
+            nativeBuildInputs = [];
+            buildPhase = ''
+              ls > ls.txt
+              pwd > pwd.txt
+            '';
+            installPhase = ''
+              mkdir -p $out
+              mv ls.txt $out/
+              mv pwd.txt $out/
+            '';
+          };
+        };
+      }
+    );
+}
+#+END_SRC
+#+END_DETAILS
+
+=nix build= は隔離された環境で実行されます。
+
+- [[(1)]] =src= で隔離環境に持っていく (コピーする) ファイルを指定します。 Git 管理外のファイルはコピーされないため、手元のキャッシュファイル等は無視されます。
+- [[(2)]] 隔離環境で必要なパッケージがあれば =nativeBuildInputs= か =buildInputs= で指定します。
+- [[(3)]] Build phase では必要なファイルを生成します。今はダミーファイルを作っています。
+- [[(4)]] Install phase で build phase の成果物を =/nix/store= 下に移動します。 =$out= 変数は Nix 側が注入してくれます。
+
+=devlog= package を =nix build <path>#<package>= の形でビルドできます:
+
+#+BEGIN_SRC sh
+$ git add flake.nix
+$ nix build .#devlog
+#+END_SRC
+
+現ディレクトリ下に install phase の =$out= ディレクトリへの symlink (=result=) が生成されており、 install phase で保存したファイルを確認できます:
+
+#+BEGIN_SRC sh
+$ ls -lA result
+lrwxrwxrwx 1 tbm 50 May 10 06:33 result -> /nix/store/71c50cjbmairbhv20mar337i1jrg4iyg-devlog/
+$ ls result/
+ls.txt  pwd.txt
+$ cat result/ls.txt # Git 管理化のファイルのみが見える
+~~省略~~
+$ cat result/pwd.txt
+/build/2mxrczxdffffd75aj2wgz7mml9mzww8g-source
+#+END_SRC
+
+なお =/build= ディレクトリは存在せず、実際は =/tmp= の一時ディレクトリで build phase が実行されるようです。この辺りの sandbox 環境は、今はブラックボックスとしておきます:
+
+#+BEGIN_SRC sh
+$ bin/
+bin/  boot/  d/  dev/  etc/  home/  lib/  lib64/  lost+found/  media/  nix/  opt/  proc/  root/  run/  srv/  sys/  tmp/  usr/  var/
+#+END_SRC
+
+** Devlog をビルドする
+
+仮置きの =buildPhase= と =installPhase= を書き換えて、実際に devlog をビルドします:
+
+#+BEGIN_SRC nix
+          devlog = pkgs.stdenvNoCC.mkDerivation {
+            name = "devlog";
+            src = ./.;
+            nativeBuildInputs = with pkgs; [ # (ref:1)
+              (emacs.pkgs.withPackages (epkgs: with epkgs; [ seq esxml ]))
+              nodePackages.prettier
+            ];
+            buildPhase = ''
+              export HOME="$(mktemp -d)" # (ref:2)
+              emacs -Q --script "./build.el" -- "--release" # (ref:3)
+              prettier --print-width 100 --write out/*.html out/diary/*.html
+            '';
+            installPhase = ''
+              mkdir -p $out
+              mv out $out/site
+            '';
+          };
+#+END_SRC
+
+- [[(1)]]: ビルドに必要な依存を書きます。
+- [[(2)]]: 隔離環境では =HOME= 変数が存在しないディレクトリ (=/homeless-shelter=) を指すため、 Emacs がファイル生成できるように一時ディレクトリを設定しました。
+- [[(3)]]: すでにあるビルドスクリプトを呼び出すだけです。
+
+** =nix build= の使い道
+
+=nix build= ではキャッシュが活かせないため、開発環境ではすべての記事をビルドすることになって無駄です。開発中は devShell を使ったり、ビルド用コマンドを =flake.nix= で定義して、ユーザ環境のファイルを直接読み書きしたほうが良いかもしれません。
+
+** GitHub Actions のセットアップ
+
+手元で =nix build= を使う意味が無かったので、 GitHub Actions で使うことにします。参考:
+
+- [[https://qiita.com/junjihashimoto@github/items/2d310d9d488a2e9b71b3][Nix、Cachix、GitHub Actionsによるワークフローの紹介]]
+- [[https://github.com/takeokunn/blog][takeokunn/blog]]
+
+#+CAPTION: =github/actions/main.yml=
+#+BEGIN_SRC yaml
+name: "Main"
+
+# main branch への push 時に実行
+on:
+  push:
+    branches: 'main'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: cachix/install-nix-action@v31
+    - name: Build the devlog
+      run: nix build .#devlog
+    - name: Upload devlog artifact # (ref:1)
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: result # (ref:2)
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 # (ref:3)
+#+END_SRC
+
+- [[(1)]]: [[https://github.com/actions/upload-pages-artifact][=actions/upload-pages-artifact=]] で GitHub Pages 専用の _artifact_ を作成します
+- [[(2)]]: =nix build= の出力 (への symlink) を指定しています
+- [[(3)]]: [[https://github.com/actions/deploy-pages][=actions/deploy-paegs=]] が deploy してくれます
+
+* まとめ
+
+=nix build= を使い、隔離された環境で devlog をビルドできるようになりました。 =nix build= は、 PATH はもちろん、ファイルシステムとしても隔離された環境で実行されることが認識できました。
+
+ローカルでは =nix build= の使い道が無かったため、 GitHub Actions に利用してみました。 html の diff はローカルで見ちゃえば良いかと思います。 [[https://github.com/cachix/cachix-action][=cachix-action=]] を使えば高速化できそうですが、今は導入していません。
+
+この記事は GitHub Actions によってデプロイされる予定です。
+
