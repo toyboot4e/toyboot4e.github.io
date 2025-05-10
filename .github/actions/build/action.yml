@@ -1,0 +1,11 @@
+name: "Build"
+description: Set up Nix environment for GitHub Actions
+
+runs:
+  using: composite
+  steps:
+    - uses: cachix/install-nix-action@v31
+    # TODO: cachix
+    - name: Build the devlog
+      run: |
+        nix build .#devlog
