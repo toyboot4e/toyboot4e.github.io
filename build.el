@@ -165,7 +165,7 @@
       ;; NOTE: `org-export-data' returns HTML, so we'll remove HTML tags
       (title (*RAW-STRING* ,(concat (my-strip-html (org-export-data (plist-get info :title) info)) " - toybeam")))
       (meta (@ (name "description")
-               (content "devlog of toyboot4e")))
+               (content "devlog by toyboot4e")))
       ;; (link (@ (rel "stylesheet")
       ;;          (href "https://cdn.simplecss.org/simple.min.css")))
       (link (@ (rel "stylesheet")
