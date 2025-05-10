@@ -55,11 +55,9 @@ format:
     #!/usr/bin/env bash
     echo "formatting all the htmls.."
     cd out
-    pwd
-    ls
-    npx prettier --print-width 100 --write *.html
+    prettier --print-width 100 --write *.html
     cd diary
-    npx prettier --print-width 100 --write *.html
+    prettier --print-width 100 --write *.html
     cd ../../
 
 [private]
