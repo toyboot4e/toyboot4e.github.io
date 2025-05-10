@@ -1,0 +1,212 @@
+#+TITLE: ABC 405
+
+* ABC 405
+
+[[https://atcoder.jp/contests/abc405][ABC 405]] に参加しました。
+
+#+BEGIN_YARUO
+　　　　　　　 ＿＿＿_
+　　　　　　／ ─　 ─＼
+　　　 　／　（●）　（●）＼　　　　　　来なさい、 DP
+　　　／　　　 （__人__）　 　 ＼　　　
+　 　 |　　　　　｀ ⌒´　　　　　|
+　　　＼　　　　　 　　 　 　 ／
+　　　ノ　　　　　　　　　　 　＼
+.　／´　　　　　　 　 　 　 　 　 ヽ
+　|　　　　ｌ　　　　　　　　　　　　　＼
+　ヽ　　　 -一''''''"~~｀`'ー--､　　　-一'''''''ー-､.
+　　ヽ ＿＿＿＿(⌒)(⌒)⌒)　)　　(⌒＿(⌒)⌒)⌒))
+#+END_YARUO
+
+** [[https://atcoder.jp/contests/abc405/tasks/abc405_a][A 問題]]
+
+問題文は省略します:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!r, !x) <- ints2'
+  let rng = if x == 1 then (1600, 2999) else (1200, 2399)
+  printYn $ inRange rng r
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc405/tasks/abc405_b][B 問題]]
+
+集合としてのサイズを $M$ 未満にするため、数列の末尾から値を pop する最小の操作回数を求めよ。先頭何個まで $M$ 未満であるか数えて、 $N$ から引きました:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !m) <- ints2'
+  !xs <- intsU'
+  let xs' = V.postscanl' (flip S.insert) S.empty $ U.convert xs
+  let len = G.length $ G.takeWhile ((< m) . S.size) xs'
+  printBSB $ n - len
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc405/tasks/abc405_c][C 問題]]
+
+gksato さんの [[https://atcoder.jp/contests/abc405/submissions/65638250][完璧な提出]] をご覧ください。 $\sum\limits_{i\in[0, n)} \sum\limits_{j\in(i, n)} A_i A_j = \sum\limits_{i\in[0,n)} \sum\limits_{j\in[0,i)} A_i A_j := \sum\limits_{i\in[0, n)} A_i S_i$ で、上手いこと計算できます。 =prescanl'= で =as= と長さを合わせているのも素敵でした:
+
+#+BEGIN_SRC haskell
+main :: IO ()
+main = do
+  n <- readLn
+  !as <- getVecULn n rInt
+  print $ VU.sum $ VU.zipWith (*) as $ VU.prescanl' (+) 0 as
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc405/tasks/abc405_d][D 問題]]
+
+グリッドが与えられたとき、すべての床マスが (任意の) 終点マスに到着できるように、床マスに矢印を書き込め。
+
+終点から BFS or DFS します。多重始点 BFS としつつ、グラフに方向を書き込んで行くのが簡単だと思います。グリッド用テンプレートを活かして解きました。癖は強いです:
+
+#+BEGIN_DETAILS 解答
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!h, !w) <- ints2'
+  !gr <- getGrid' h w
+
+  -- Data.Ix と相性の良い bounds: ((0, 0), (h - 1, w - 1)) を作成する
+  let bnd0 = zero2 h w
+
+  -- グラフ関数: 周囲 4 マスを見て移動可能なセルを返す (※ 探索済みでも返す)
+  let grF (!y, !x) = U.filter p nexts
+        where
+          dir4 = U.fromListN 4 [(0, 1, '<'), (0, -1, '>'), (1, 0, '^'), (-1, 0, 'v')]
+          nexts = U.map (\(!dy, !dx, !c) -> (y + dy, x + dx, c)) dir4
+          p (!y, !x, !_) = inRange bnd0 (y, x) && gr @! (y, x) == '.'
+
+  -- 始点 (y, x) を集める
+  let sources = findIndicesIV (== 'E') gr
+
+  -- 多重始点 BFS
+  let !res = createIV $ do
+        -- Mutable なグリッドを作成
+        grVec <- thawIV gr
+
+        -- pushBack, popFront ができる MVector
+        queue <- newBuffer (h * w)
+
+        -- 始点を queue にいれる
+        U.forM_ sources $ \yx -> do
+          pushBack queue yx
+
+        -- Queue が空になるまでループ
+        fix $ \loop -> do
+          whenJustM (popFront queue) $ \v1 -> do
+            U.forM_ (grF v1) $ \(!y, !x, !dirC) -> do
+              c <- readIV grVec (y, x)
+              when (c == '.') $ do
+                -- 未探索の床マスには距離を書き込む
+                writeIV grVec (y, x) dirC
+                pushBack queue (y, x)
+            loop
+
+        pure grVec
+
+  printBSB $ showGridBSB res
+#+END_SRC
+#+END_DETAILS
+
+** [[https://atcoder.jp/contests/abc405/tasks/abc405_e][E 問題]]
+
+Upsolve しなければ……
+
+#+BEGIN_YARUO
+　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .|　　　　　 　 　 /
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 !　　　　　　　 /
+　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .l　　　　＿＿/_
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 !　　 ／　　/　＼
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 !　／. 　　/ _ノ　 ＼
+　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .l │. 　　/（● ）（●）
+　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .| │　　/　　（__人__）　　　やれ！
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 ! │.　/ 　 　｀ ⌒´ﾉ
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 ! │ /　　 　 　 　 }
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 | ノ./ヾ.ﾍ　　　　　}
+　　　　　　　　　　　　　　　　　　　　 　 　 ..=ｨﾞﾆ|　/､;i;i;ヾヘ　　_ノ
+　　　　　　　　　　　　　　　.　　　　 　 : :イ/{ ／￣ヾ}l!;i;i;iLc､＞
+　　　　　　　　　　　　　　　.　　　　 　 / '/,ﾑ{　∧　 }ｰ-,-､《;i〈
+　　　　　　　　　　　　　　　.　　　　 　 !:.,'〃´ﾊ｛/　 ﾊ::〃,=ヾﾐ;i
+　　　　　　　　　　　　　　　.　　　　 　 :.:{/' 〃ﾞヽ__ノヽi/´　　 }＼
+　　　　　　　　　　　　　　　.　　　　 　 :.:|!､/　　ヽ::Y::/{　　r､/ﾑ .＼
+　　　　　　　　　　　　　　　.　　　　 　 !:.!ﾑ　　　 ヽj::ノ{ 　 | ,';i;iﾑ 　 ヽ.
+　　　　　　　　　　　　　　　.　　　　 　 Ⅵﾏ＼　　_ ヽ';i乂__.ｿ;i;i;i;i| 　 　 丶
+　　　　　　　　　　　　　　　.　　　　 　 ﾄj0l|Y´＼{ }　 Y;i;i;i;i;i;i;i;i;i;iﾄ，　　 　 ＼
+　　　　　　　　　　　　　　　.　　　　 　 `!0j;iﾄ､　 ヾ__.人;i;i;i;i;i;i;i;i;i;i;{ 　 　 　 　 ＼
+　　　　　　　　　　　　　　　.　　　　 　 〈ｿ,∧　＼　 「 ! Y;i;i;i;i;i;i;i;i;iﾑ
+　　　　　　　　　　　　　　　.　　　　　 　 j､;i;i;､　　＼___丿;i;i;i;i;i;i;i;i;i;iﾑ
+　　　　　　　　　　　　　　　.　　　　 　 /.:::∨;i;i`i.､___ﾉ;i＼;i;i;i;i;i;i;i;i;i;i;ｉﾑ
+　　　　　　　　　　　　　　　.　　　　 　 ::::::::.∨;i;i|:;i;i;i;i;i;i;i;ｉ;＼;i;i;i;i;i;i;i;i;i;ﾑ
+　　　　　　　　　　　　　　　.　　　　 　 ､_:::::::∨;i|:;i;i;i;i;i;i;i;i;i;i;i;丶:;i;i;i;i;i;i;i;ﾑ
+　　　　　　　　　　　　　　　.　　　　 　 ::ｰﾆ=ｲ};i:!:;i;i;i;i;i;i;i;i;i;i;i;i;i;i＼:;i;i;i;i;i;i;i〉
+　　　　　　　　　　　　　　　.　　　　 　 ヽ:::::::::ﾉ;i:!:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i＼:;i;i;/
+　　　　　　　　　　　　　　　.　　　　　 　 ヽ／;ｉ;i:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i＼:〉
+　　　　　　　　　　　　　　　.　　　　 　 ..／;i;i;i;i;i:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;ｉ;ｉ;ｉ;＼
+　　　　　　　　　　　　　　　.　　　　 　 ,ゝ;i;i;i;i;i;ｉ:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i/　 丶
+　　　　　　　　　　　　　　　.　　　　 　 i;i;i;i;i;i;i;i;ｉ:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;/　　　　＼
+　　　　　　　　　　　　　　　.　　　　 　 i;i;i;i;i;i;i;ｉ;ｉ:!:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i∧
+　　　　　　　　　　　　　　　.　　　　 　 i;i;i;i;i;i;i;ｉ;ｉ:!:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i/. ﾑ
+　　　　　　　　　　　　　　　.　　　　 　 i;i;i;i;i;i;i;i;ｉ:ｌ:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i/／ﾏ___
+はい……　　　　　　　　　　　　.　　　　 　 ､i;i;i;i;i;i;i;i:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;}/イ;;;;;;;;;`!
+　　　　　　　　　　　　　　　.　　　　 　 ';i;i;i;i;i;i;i;ｉ:ｌ:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;iﾑ.;;;;;;;;;;;;;;;;;〉
+#+END_YARUO
+
+** [[https://atcoder.jp/contests/abc405/tasks/abc405_f][F 問題]]
+
+ひとまず Wavelet Matrix で upsolve しました。正攻法で解きたいですね。
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !m) <- ints2'
+  !abs <- U.replicateM m ints11'
+  q <- int'
+  qs <- U.replicateM q ints11'
+
+  wm <- buildWMST abs
+  U.forM_ abs $ \(!a, !b) -> do
+    modifyWMST wm (const (Sum (1 :: Int))) (a, b)
+
+  res <- U.forM qs $ \(!a, !b) -> do
+    x1 <- getSum . fromMaybe 0 <$> foldMayWMST wm a b b (2 * n)
+    x2 <- getSum . fromMaybe 0 <$> foldMayWMST wm 0 a a b
+    pure $ x1 + x2
+
+  printBSB $ unlinesBSB res
+#+END_SRC
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">F 問題は 4 年前の典型 90 問にかなり似た設定の問題が出題されています (共有点なし特有の解法があるなど細かい差はあります)。<br><br>その時の予想難易度が 1,880 (投票者数 24)，今回の F 問題の予想難易度が 1,580 程度であるため，参加者の実力が 4 年間で 200～300 程度向上したものとみられます。 <a href="https://t.co/yp1jvZLlas">pic.twitter.com/yp1jvZLlas</a></p>&mdash; E869120 (@e869120) <a href="https://twitter.com/e869120/status/1921200637569642780?ref_src=twsrc%5Etfw">May 10, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+** [[https://atcoder.jp/contests/abc405/tasks/abc405_g][G 問題]]
+
+同じアルゴリズムを使う難し目の問題が Library Checker にあって、そちちも見ておきたい気がしました。解法は全く違うかもしれません。
+
+* Misc
+
+** Nix, GitHub Actions
+
+この devlog が =nix build= でビルドしてデプロイされるようになりました。あまり意味は無いですが、 Nix Flakes が使えるようになって来て嬉しいです。 [[../2025-05-10-nixify-your-devlog.html][Nixify your devlog]]
+
+** Haskell の CI
+
+[[https://github.com/toyboot4e/ac-library-hs][=ac-library-hs=]] の CI をセットアップしています。テスト実行や =oj-verify= の並列実行ができました。 GHC のダウンロードがキャッシュされるように修正中です。
+
+** 小説執筆用の Typora
+
+小説投稿サイト用の構文では、次のように振り仮名を書ける場合が多いです:
+
+#+BEGIN_SRC txt
+|漢字(かんじ)
+#+END_SRC
+
+これをインラインスタイルを表示してくれる Typora のようなものが欲しく、 Electron, React, Slate.js で試行錯誤しています。
+
+** 音楽
+
+[[https://behemoth.bandcamp.com/album/the-shit-ov-god][The Shit Ov God | Behemoth]] が出ました。 TBDM 化、インスタントラーメン化が続いています。これはこれで面白いのですが、もっとトレモロを増やすか、ブルータルにして欲しい気がします。
+
