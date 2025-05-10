@@ -29,7 +29,7 @@
             '';
             installPhase = ''
               mkdir -p $out
-              mv out $out/site
+              mv out $out/
             '';
           };
         };
