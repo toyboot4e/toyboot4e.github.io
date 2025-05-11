@@ -1,6 +1,11 @@
 name: "Build"
 description: Set up Nix environment for GitHub Actions
 
+# Stop other CI in the same branch on new run:
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 runs:
   using: composite
   steps:
