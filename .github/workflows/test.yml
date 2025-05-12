@@ -1,5 +1,10 @@
 name: "Test"
 
+# Stop other CI in the same branch on new run:
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   pull_request:
 
