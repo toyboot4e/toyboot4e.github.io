@@ -8,7 +8,7 @@ GitHub Actions 入門編です。 [[https://github.com/toyboot4e/ac-library-hs][
 今回作成した workflow は、 GitHub 上では次のように表示します:
 
 #+CAPTION: =build= 後に =test=, =doctest=, =verify= job を並列実行します
-[[./img/2025-05-11-ci.png]]
+[[./img/2025-05-12-ci.png]]
 
 この設定の作り方を大まかに記載します。
 
