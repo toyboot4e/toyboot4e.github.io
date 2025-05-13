@@ -179,7 +179,89 @@ bin/  boot/  d/  dev/  etc/  home/  lib/  lib64/  lost+found/  media/  nix/  opt
 
 ** =nix build= の使い道
 
-=nix build= ではキャッシュが活かせないため、開発環境ではすべての記事をビルドすることになって無駄です。開発中は devShell を使ったり、ビルド用コマンドを =flake.nix= で定義して、ユーザ環境のファイルを直接読み書きしたほうが良いかもしれません。
+=nix build= ではキャッシュが活かせないため、開発環境ではすべての記事をビルドすることになって無駄です。開発中は devShell を使ったり、ビルド用コマンドを =flake.nix= で定義して、 =nix run= でユーザ環境のファイルを直接読み書きしたほうが良いかもしれません。
+
+追記: =nix run= 用の定義を作成しました。 =packages= の隣に置くと、 =nix run .#build= で実行できます:
+
+#+BEGIN_SRC nix
+        apps.build = flake-utils.lib.mkApp {
+          drv = pkgs.writeShellApplication {
+            name = "build";
+            runtimeInputs = with pkgs; [
+              (emacs.pkgs.withPackages (epkgs: with epkgs; [ seq esxml ]))
+              nodePackages.prettier
+            ];
+            text = ''
+              emacs -Q --script "./build.el" -- "--release"
+              prettier --print-width 100 --write out/*.html out/diary/*.html
+            '';
+          };
+        };
+#+END_SRC
+
+ビルドコマンドを =apps.build= と =packages.devlog= の間でDRY すると、 =flake.nix= 全体はこうなります:
+
+#+BEGIN_DETAILS =flake.nix=
+#+BEGIN_SRC nix
+{
+  description = "A basic flake for my devlog";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+
+  outputs =
+    { nixpkgs, flake-utils, ... }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+        buildCommand = pkgs.writeShellApplication { # (ref:1)
+          name = "buildCommand"; # (ref:2)
+          runtimeInputs = with pkgs; [
+            (emacs.pkgs.withPackages (epkgs: with epkgs; [ seq esxml ]))
+            nodePackages.prettier
+          ];
+          text = ''
+            emacs -Q --script "./build.el" -- "--release"
+            prettier --print-width 100 --write out/*.html out/diary/*.html
+          '';
+        };
+      in
+      {
+        apps.build = flake-utils.lib.mkApp {
+          drv = buildCommand; # (ref:3)
+        };
+        packages = {
+          devlog = pkgs.stdenvNoCC.mkDerivation {
+            name = "devlog";
+            src = ./.;
+            nativeBuildInputs = with pkgs; [
+              buildCommand # (ref:4)
+            ];
+            buildPhase = ''
+              export HOME="$(mktemp -d)"
+              buildCommand # (ref:5)
+            '';
+            installPhase = ''
+              mkdir -p $out
+              mv out $out/out
+            '';
+          };
+        };
+      }
+    );
+}
+#+END_SRC
+
+- [[(1)]]: ビルドコマンドの共通定義です。
+- [[(2)]]: 実行コマンドは
+- [[(3)]]: =apps= で =buildCommand= を使っています。
+- [[(4)]]: =packages= で =buildCommand= を使っています。
+- [[(5)]]: 実行ファイルの方の =buildCommand= を使っています。
+
+#+END_DETAILS
 
 ** GitHub Actions のセットアップ
 
