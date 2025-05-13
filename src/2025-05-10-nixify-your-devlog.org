@@ -3,7 +3,7 @@
 
 * 背景
 
-Nix Flakes 入門 =nix build= 編です。このブログはシェルスクリプトでビルドしていますが、 =nix build= コマンドでビルドできるように、簡単な =flake.nix= を作成しました。これで reproducible なブログ (html) になったかと思います。
+Nix Flakes 入門 =nix build= & =nix run= 編です。このブログはシェルスクリプトでビルドしていますが、 =nix build= コマンドでビルドできるように、簡単な =flake.nix= を作成しました。これで reproducible なブログ (html) になったかと思います。
 
 * 実装
 
