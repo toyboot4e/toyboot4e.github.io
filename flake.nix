@@ -14,6 +14,19 @@
         pkgs = import nixpkgs { inherit system; };
       in
       {
+        apps.build = flake-utils.lib.mkApp {
+          drv = pkgs.writeShellApplication {
+            name = "build";
+            runtimeInputs = with pkgs; [
+              (emacs.pkgs.withPackages (epkgs: with epkgs; [ seq esxml ]))
+              nodePackages.prettier
+            ];
+            text = ''
+              emacs -Q --script "./build.el" -- "--release"
+              prettier --print-width 100 --write out/*.html out/diary/*.html
+            '';
+          };
+        };
         packages = {
           devlog = pkgs.stdenvNoCC.mkDerivation {
             name = "devlog";
