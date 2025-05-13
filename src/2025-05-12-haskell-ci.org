@@ -126,7 +126,7 @@ jobs:
 
 *** Runner image
 
-GitHub Actions の実行環境 ([[https://github.com/actions/runner-images][=runner-images=]] 参照) の preinstall tool を確認します。今日の [[https://github.com/actions/runner-images/blob/25b33392eaa1122a494597b09ecfddd8c3cd1fa1/images/ubuntu/scripts/build/install-haskell.sh][=install-haskell.sh=]] では、次のように GHCup をインストールしています:
+GitHub Actions の実行環境 ([[https://github.com/actions/runner-images][=runner-images=]] 参照) の preinstalled tool を確認します。今日の [[https://github.com/actions/runner-images/blob/25b33392eaa1122a494597b09ecfddd8c3cd1fa1/images/ubuntu/scripts/build/install-haskell.sh][=install-haskell.sh=]] では、次のように GHCup をインストールしています:
 
 #+BEGIN_SRC sh
 # ~~
@@ -135,7 +135,7 @@ export GHCUP_INSTALL_BASE_PREFIX=/usr/local
 url --proto '=https' --tlsv1.2 -fsSL https://get-ghcup.haskell.org | sh > /dev/null 2>&1 || true
 #+END_SRC
 
-[[https://github.com/haskell/ghcup-hs][=haskell/ghcup-hs=]] を見れば、 [[https://github.com/haskell/ghcup-hs/blob/87ff2a99dea1bdf4d8efb8b4a7cbbd58e30c3819/scripts/bootstrap/bootstrap-haskell#L91][該当行]] にて =GHCUP_INSTALL_BASE_PREFIX= が使われていることが分かります。そのため =/usr/local/.ghcup/bin/ghcup= がインストールされている他、一部バージョンの GHC や Cabal も preinstall されています。
+[[https://github.com/haskell/ghcup-hs][=haskell/ghcup-hs=]] を見れば、 [[https://github.com/haskell/ghcup-hs/blob/87ff2a99dea1bdf4d8efb8b4a7cbbd58e30c3819/scripts/bootstrap/bootstrap-haskell#L91][該当行]] で =GHCUP_INSTALL_BASE_PREFIX= が使われています。よって =/usr/local/.ghcup/bin/ghcup= がインストールされている他、一部バージョンの GHC や Cabal も preinstall されています。
 
 また由来は不明ですが、 GitHub Actions の実行環境には =~/.ghcup -> /usr/local/.ghcup= の symlink があります。そのため =/usr/local/.ghcup/bin/ghcup install *= すると =/usr/local/.ghcup/bin= にツールがインストールされ、 =~/.ghcup/bin= としても見えるようになります。んな〜〜
 
@@ -145,7 +145,7 @@ url --proto '=https' --tlsv1.2 -fsSL https://get-ghcup.haskell.org | sh > /dev/n
 
 - Cabal や GHC のバージョンが変わるとキャッシュが無効になるため、確実にバージョンを揃える必要があります。
 - =haskell-actions/setup@v2= には Cabal をインストールしないオプションがありません。そのため実行後は =~/.ghcup/bin/cabal= が上書きされ、 preinstall 済みの =cabal= を指さなくなります。
-- =haskell-actions/setup@v2= は起動時に [[https://github.com/haskell-actions/setup/issues/108#issuecomment-2574825536][Cabal の XDG path を強制的に無効化します]] 。したがって =haskell-actions/setup@v2= を使う場合、使わない場合で cabal store の path が変わります。
+- =haskell-actions/setup@v2= は起動時に [[https://github.com/haskell-actions/setup/issues/108#issuecomment-2574825536][Cabal の XDG path mode を強制的に無効化します]] 。したがって =haskell-actions/setup@v2= を使う場合、使わない場合で cabal store の path が変わります。
 
 この辺の理解が大変でした。自分で GHCup を呼び出した方が簡単だったかもしれません。いっそ Nix を使っても良い気がします。 Nix による CI は僕の [[http://localhost:8080/2025-05-10-nixify-your-devlog.html][Nixify your devlog]] や [[https://www.takeokunn.org/posts/fleeting/20250510192642-use_cachix_in_github_actions/][GitHub ActionsでCachixを導入する]] などに載っています。
 
