@@ -12,33 +12,32 @@
       system:
       let
         pkgs = import nixpkgs { inherit system; };
+        buildCommand = pkgs.writeShellApplication {
+          name = "buildCommand";
+          runtimeInputs = with pkgs; [
+            (emacs.pkgs.withPackages (epkgs: with epkgs; [ seq esxml ]))
+            nodePackages.prettier
+          ];
+          text = ''
+            emacs -Q --script "./build.el" -- "--release"
+            prettier --print-width 100 --write out/*.html out/diary/*.html
+          '';
+        };
       in
       {
         apps.build = flake-utils.lib.mkApp {
-          drv = pkgs.writeShellApplication {
-            name = "build";
-            runtimeInputs = with pkgs; [
-              (emacs.pkgs.withPackages (epkgs: with epkgs; [ seq esxml ]))
-              nodePackages.prettier
-            ];
-            text = ''
-              emacs -Q --script "./build.el" -- "--release"
-              prettier --print-width 100 --write out/*.html out/diary/*.html
-            '';
-          };
+          drv = buildCommand;
         };
         packages = {
           devlog = pkgs.stdenvNoCC.mkDerivation {
             name = "devlog";
             src = ./.;
             nativeBuildInputs = with pkgs; [
-              (emacs.pkgs.withPackages (epkgs: with epkgs; [ seq esxml ]))
-              nodePackages.prettier
+              buildCommand
             ];
             buildPhase = ''
               export HOME="$(mktemp -d)"
-              emacs -Q --script "./build.el" -- "--release"
-              prettier --print-width 100 --write out/*.html out/diary/*.html
+              buildCommand
             '';
             installPhase = ''
               mkdir -p $out
