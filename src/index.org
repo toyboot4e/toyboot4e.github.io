@@ -47,6 +47,7 @@
 
 * diary
 #+ATTR_HTML: :class sitemap
+- @@html:<date>2025-05-18</date>@@ [[file:/diary/2025-05-18.org][ABC 406]]
 - @@html:<date>2025-05-11</date>@@ [[file:/diary/2025-05-11.org][ABC 405]]
 - @@html:<date>2025-04-28</date>@@ [[file:/diary/2025-04-28.org][ABC 403 (やる夫仕様)]]
 - @@html:<date>2025-02-02</date>@@ [[file:/diary/2025-02-02.org][ABC 391, 関数の特殊化]]

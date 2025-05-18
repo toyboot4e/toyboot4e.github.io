@@ -1,0 +1,203 @@
+#+TITLE: ABC 406
+#+DATE: <2025-05-18 Sun>
+
+* ABC 406
+
+[[https://atcoder.jp/contests/abc406][ABC 406]] に参加しました。
+
+** [[https://atcoder.jp/contests/abc406/tasks/abc406_a][A 問題]]
+
+A 時 B 分 < C 時 D 分なら =Yes=, それ以外なら =No= を出力せよ。分に直しちゃったんですが、確かにタプルで比較すれば良いですね:
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">A はタプルで比較できる言語なら<br><br>printYn $ (a, b) &gt;= (c, d)<br><br>でいいので。みなさん Haskell をですね</p>&mdash; naoya (@naoya_ito) <a href="https://twitter.com/naoya_ito/status/1923744329312633343?ref_src=twsrc%5Etfw">May 17, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+** [[https://atcoder.jp/contests/abc406/tasks/abc406_b][B 問題]]
+
+指定桁数以上になったら =1= に戻す掛け算に関して $\Pi_i A_i$ を求めよ。式変形すると $a b \ge U \Leftrightarrow a \ge \frac U b \Leftrightarrow a \ge \lceil \frac U a \rceil$ なので、オーバーフローを避けつつ計算できるようです:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !k) <- ints2'
+  !xs <- intsU'
+
+  let !upper = 10 ^ k :: Int
+  -- a * b >= U, a >= U/b
+  let mul a b
+        | a >= (upper + (b  -1)) `div` b = 1
+        | otherwise = a * b
+  let !res = U.foldl1' mul xs
+  printBSB res
+#+END_SRC
+
+本番は多倍長整数でチートしました。 Rust の [[https://doc.rust-lang.org/std/intrinsics/fn.wrapping_mul.html][=wrapping_mul=]] は unstable のようです。
+
+** [[https://atcoder.jp/contests/abc406/tasks/abc406_c][C 問題]]
+
+順列 $A_i$ の *連続* 部分列の内、単調増加、単調減少、単調増加の 3 つの部分から成るものの数を数えよ。部分列だと思ってセグ木を 4 本用意してしまいました。
+
+隣接する二項を比較し、連長圧縮して見ると良いようですね。結構難しい:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !xs <- U.map pred <$> intsU'
+  let !xs' = U.zipWith (<) xs (U.tail xs)
+  let !rle = U.fromList . map (\vec -> (U.head vec, U.length vec)) $ U.group xs'
+  let !res
+        | U.length rle < 3 = 0
+        | otherwise = U.sum $ U.zipWith3 f rle (U.tail rle) (U.tail (U.tail rle))
+        where
+          f (True, !l1) (False, !_) (True, !l3) = l1 * l3
+          f _ _ _ = 0
+  printBSB res
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc406/tasks/abc406_d][D 問題]]
+
+2 次元グリッドにゴミが配置されているとき、行 or 列のゴミ削除クエリに応答せよ。それぞれのゴミは高々 1 回しか削除されないことを考えると、 $O(n \log n)$ で解けます。
+
+問題文は y 座標を =x= と書いていてややこしいですが、惑わされず整理します:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!h, !w, !n) <- ints3'
+  yxs <- U.replicateM n ints2'
+  q <- int'
+  qs <- U.replicateM q ints2'
+
+  -- 行ごと、列ごとにゴミを持つ
+  let !rows0 = M.fromListWith S.union . map (\(!y, !x) -> (y, S.singleton x)) $ U.toList yxs
+  let !cols0 = M.fromListWith S.union . map (\(!y, !x) -> (x, S.singleton y)) $ U.toList yxs
+
+  let deleteRow y rows cols = (dn, rows', cols')
+        where
+          -- 削除したゴミの数
+          !dn = maybe 0 S.size $ M.lookup y rows
+          -- 行ごとに持ったゴミを削除する:
+          !rows' = M.delete y rows
+          -- 列ごとに持ったゴミも削除する:
+          !cols' = case M.lookup y rows of
+            Nothing -> cols
+            Just xs -> foldl' (flip (M.adjust (S.delete y))) cols $ S.toList xs
+
+  let resF = U.foldM'_ f s0 qs
+        where
+          s0 = (rows0, cols0)
+          f (!rows, !cols) (1, !y) = do
+            let (!dn, !rows', !cols') = deleteRow y rows cols
+            printBSB dn
+            pure (rows', cols')
+          f (!rows, !cols) (2, !x) = do
+            -- 行削除の関数を列削除に流用する:
+            let (!dn, !cols', !rows') = deleteRow x cols rows
+            printBSB dn
+            pure (rows', cols')
+
+  resF
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc406/tasks/abc406_e][E 問題]]
+
+$\mathrm{sum} \ [x \ | \ \mathrm{popCount}(x) = k, x \le N] \bmod 998244353$ を求めよ。僕の実力が落ちているのもありますが、かなり考察が難しい問題だと思いました。基本方針は:
+
+- 桁 DP で解く
+- 配列の各スロットで個数と総和のペアを持てば、実は総和が普通に求まる
+
+また $\mathrm{popCount}(N) = k$ の場合は答えに $N$ を加算します:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !k) <- ints2'
+
+  let !msb = msbOf n
+  let !nBits = msb + 1
+
+  let !res = done . U.foldl' step s0 $ U.generate nBits $ \i -> msb - i
+        where
+          !dn = modInt $ bool 0 n (popCount n == k)
+          done :: ((Int, MyModInt), U.Vector (Int, MyModInt)) -> MyModInt
+          done (!_, !res) = (dn +) . snd . U.last $ res
+          s0 :: ((Int, MyModInt), U.Vector (Int, MyModInt))
+          s0 = ((0 :: Int, modInt 0), U.replicate (k + 1) (0 :: Int, modInt 0))
+          step :: ((Int, MyModInt), U.Vector (Int, MyModInt)) -> Int -> ((Int, MyModInt), U.Vector (Int, MyModInt))
+          step ((!highPopCount, !highSum), !sofar) iBit = ((highPopCount', highSum'), sofar')
+            where
+              !highPopCount' = highPopCount + bool 0 1 (testBit n iBit)
+              !highSum' = highSum + bool 0 (modInt (bit iBit)) (testBit n iBit)
+              !sofar' = U.imap f sofar
+              f iPopCount (!nAcc, !sumAcc) =
+                let (!nFrom, !sumFrom)
+                      | iPopCount == 0 = (0, modInt 0)
+                      | otherwise = sofar G.! (iPopCount - 1)
+                    -- choose `0` bit and come down from the largest number
+                    !cntHigh
+                      | highPopCount <= k && testBit n iBit && iPopCount == highPopCount = 1
+                      | otherwise = 0
+                 in (nFrom + nAcc + cntHigh, sumAcc + sumFrom + modInt nFrom * modInt (bit iBit) + modInt cntHigh * highSum)
+
+  printBSB res
+
+-- verification-helper: PROBLEM https://atcoder.jp/contests/abc406/tasks/abc406_e
+main :: IO ()
+main = runIO $ do
+  t <- int'
+  replicateM_ t solve
+#+END_SRC
+
+うーん汚い……。桁 DP を DFA で解くやつを導入したら綺麗になるかもしれません。
+
+** [[https://atcoder.jp/contests/abc406/tasks/abc406_f][F 問題]]
+
+[[https://judge.yosupo.jp/problem/dynamic_tree_vertex_add_subtree_sum][Dynamic Tree Vertex Add Subtree Sum]] の簡単なやつ……と思いきや link/cut tree で TLE しました。ショックなんですが、 C++ の link/cut tree だと普通に通るようです。 ac-library-hs も C++ ほどは速くないので、 TLE しそうで辛いです。
+
+[[https://atcoder.jp/contests/abc406/submissions/65889766][kemuniku 氏の提出]] が HLD を使っていたので真似しました。片側の部分木の和が求まれば、全体の和からそれを引くことで、もう一方の部分木の和が求まります。確かにーー
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !uvs <- U.replicateM (n - 1) ints11'
+  q <- int'
+  qs <- U.replicateM q $ do
+    int' >>= \case
+      1 -> (1 :: Int,,) <$> int1' <*> int'
+      2 -> (2 :: Int,,-1) <$> int1'
+      _ -> error "unreachable"
+
+  let !tree = buildSG_ n $ swapDupeU uvs
+  let !hld@HLD {..} = hldOf tree
+  tm <- buildVertTM hld True $ U.replicate n (Sum (1 :: Int))
+
+  res <- (`U.mapMaybeM` qs) $ \case
+    (1, !v, !dw) -> do
+      modifyTM tm (+ Sum dw) v
+      pure Nothing
+    (2, !iEdge, !_) -> do
+      let (!u, !v) = uvs G.! iEdge
+      let !child = if parentHLD G.! u == v then u else v
+      xWhole <- foldAllSTree (streeFTM tm)
+      x1 <- foldSubtreeVertsTM tm child
+      let !x2 = xWhole - x1
+      pure . Just . getSum . abs $ x1 - x2
+
+  printBSB $ unlinesBSB res
+#+END_SRC
+
+HLD と組み合わせてモノイド積を取る tree monoid については、 maspy さんの [[https://maspypy.github.io/library/graph/ds/tree_monoid.hpp][=tree_monoid.hpp=]] を参照のこと。つまりこれなんですが、 pull ではなく push ベースなのと、非可換なモノイドに対応するために 2 本のセグ木を用意します:
+
+#+BEGIN_EXPORT html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">HLDやWavelet Matrixは内部でSegtreeは持たず、rangeの列を返すようにしたら使い勝手が良くなった<br>外で累積和・Fenwick Tree・Segtree・Lazy Segtreeなどから好きなものを選んで使う</p>&mdash; 37kt (@37kt_kyopro) <a href="https://twitter.com/37kt_kyopro/status/1923979647286641043?ref_src=twsrc%5Etfw">May 18, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+#+END_EXPORT
+
+* Misc
+
+** [[https://github.com/ppdx999/atcoder-cli][=atcli=]]
+
+Haskell 製の CLI で、 oj/acc のように使えるツールが登場しました。凄い。 [[https://zenn.dev/ppdx999/books/65e882010be891][Haskellで競プロ鉄則本を解いていく]] も拝見しています。
+
