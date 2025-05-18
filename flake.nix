@@ -15,7 +15,12 @@
         buildCommand = pkgs.writeShellApplication {
           name = "buildCommand";
           runtimeInputs = with pkgs; [
-            (emacs.pkgs.withPackages (epkgs: with epkgs; [ seq esxml ]))
+            (emacs.pkgs.withPackages (
+              epkgs: with epkgs; [
+                seq
+                esxml
+              ]
+            ))
             nodePackages.prettier
           ];
           text = ''
@@ -28,6 +33,13 @@
         apps.build = flake-utils.lib.mkApp {
           drv = buildCommand;
         };
+        devShells.default =
+          with pkgs;
+          mkShell {
+            packages = [
+              nodePackages.prettier
+            ];
+          };
         packages = {
           devlog = pkgs.stdenvNoCC.mkDerivation {
             name = "devlog";
