@@ -44,6 +44,7 @@ alias c := clean
 
 # starts HTTP server
 serve:
+    #!/usr/bin/env bash
     cd out
     python3 -m http.server 8080
 
