@@ -12,8 +12,8 @@
       system:
       let
         pkgs = import nixpkgs { inherit system; };
-        buildCommand = pkgs.writeShellApplication {
-          name = "buildCommand";
+        build-command = pkgs.writeShellApplication {
+          name = "build-command";
           runtimeInputs = with pkgs; [
             (emacs.pkgs.withPackages (
               epkgs: with epkgs; [
@@ -31,7 +31,7 @@
       in
       {
         apps.build = flake-utils.lib.mkApp {
-          drv = buildCommand;
+          drv = build-command;
         };
         devShells.default =
           with pkgs;
@@ -45,11 +45,11 @@
             name = "devlog";
             src = ./.;
             nativeBuildInputs = with pkgs; [
-              buildCommand
+              build-command
             ];
             buildPhase = ''
               export HOME="$(mktemp -d)"
-              buildCommand
+              build-command
             '';
             installPhase = ''
               mkdir -p $out
