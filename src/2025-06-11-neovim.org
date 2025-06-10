@@ -232,7 +232,7 @@ Emacs から見るとこうで、 =#+STARTUP: nofold= が反映されていま�
 
 *** 畳み込みの初期値
 
-README に沿っての最低限の設定をしてみます:
+README に沿って最低限の設定をしてみます:
 
 #+BEGIN_SRC lua
 {
@@ -328,9 +328,9 @@ Re-sourcing your config is not supported with lazy.nvim
 
 久しぶりに Neovim に入門しました。 [[https://github.com/toyboot4e/dotfiles/blob/nixos/editor/nvim/init.org][=init.org=]] で Neovim の設定を書くのは結構アリだと感じています。 Org は Emacs 以外のエディタでガンガン使っても良いですし、 =emacs= を CLI ツールとして使うのもポピュラーになったら良いなと思います。
 
-Neovim は [[https://github.com/nvim-telescope/telescope.nvim][Telescope]] を始め各種プラグインの完成度が素晴らしく、また Lua が設定ファイルの記述に驚くほど適していると感じました。もっと変な Lua を読み書きしたいととすら思いました。 5 年遅れぐらいで熱が伝わってきたのかもしれません。イケています。
+Neovim は [[https://github.com/nvim-telescope/telescope.nvim][Telescope]] を始め各種プラグインの完成度が素晴らしく、また Lua が設定ファイルの記述に驚くほど適していると感じました。もっと変な Lua を読み書きしたいとすら思いました。 5 年遅れぐらいで熱が伝わってきたのかもしれません。イケています。
 
-そんなわけで、入門記事にお付き合い頂きありがとうございました！
+そんなわけで、 Neovim の入門記事にお付き合い頂きありがとうございました！
 
 #+BEGIN_YARUO
 　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .|　　　　　 　 　 /
