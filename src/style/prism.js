@@ -309,3 +309,92 @@ Prism.languages.yang={comment:/\/\*[\s\S]*?\*\/|\/\/.*/,string:{pattern:/"(?:[^\
 !function(){if("undefined"!=typeof Prism&&"undefined"!=typeof document){var e=[],t={},n=function(){};Prism.plugins.toolbar={};var a=Prism.plugins.toolbar.registerButton=function(n,a){var r;r="function"==typeof a?a:function(e){var t;return"function"==typeof a.onClick?((t=document.createElement("button")).type="button",t.addEventListener("click",(function(){a.onClick.call(this,e)}))):"string"==typeof a.url?(t=document.createElement("a")).href=a.url:t=document.createElement("span"),a.className&&t.classList.add(a.className),t.textContent=a.text,t},n in t?console.warn('There is a button with the key "'+n+'" registered already.'):e.push(t[n]=r)},r=Prism.plugins.toolbar.hook=function(a){var r=a.element.parentNode;if(r&&/pre/i.test(r.nodeName)&&!r.parentNode.classList.contains("code-toolbar")){var o=document.createElement("div");o.classList.add("code-toolbar"),r.parentNode.insertBefore(o,r),o.appendChild(r);var i=document.createElement("div");i.classList.add("toolbar");var l=e,d=function(e){for(;e;){var t=e.getAttribute("data-toolbar-order");if(null!=t)return(t=t.trim()).length?t.split(/\s*,\s*/g):[];e=e.parentElement}}(a.element);d&&(l=d.map((function(e){return t[e]||n}))),l.forEach((function(e){var t=e(a);if(t){var n=document.createElement("div");n.classList.add("toolbar-item"),n.appendChild(t),i.appendChild(n)}})),o.appendChild(i)}};a("label",(function(e){var t=e.element.parentNode;if(t&&/pre/i.test(t.nodeName)&&t.hasAttribute("data-label")){var n,a,r=t.getAttribute("data-label");try{a=document.querySelector("template#"+r)}catch(e){}return a?n=a.content:(t.hasAttribute("data-url")?(n=document.createElement("a")).href=t.getAttribute("data-url"):n=document.createElement("span"),n.textContent=r),n}})),Prism.hooks.add("complete",r)}}();
 !function(){function t(t){var e=document.createElement("textarea");e.value=t.getText(),e.style.top="0",e.style.left="0",e.style.position="fixed",document.body.appendChild(e),e.focus(),e.select();try{var o=document.execCommand("copy");setTimeout((function(){o?t.success():t.error()}),1)}catch(e){setTimeout((function(){t.error(e)}),1)}document.body.removeChild(e)}"undefined"!=typeof Prism&&"undefined"!=typeof document&&(Prism.plugins.toolbar?Prism.plugins.toolbar.registerButton("copy-to-clipboard",(function(e){var o=e.element,n=function(t){var e={copy:"Copy","copy-error":"Press Ctrl+C to copy","copy-success":"Copied!","copy-timeout":5e3};for(var o in e){for(var n="data-prismjs-"+o,c=t;c&&!c.hasAttribute(n);)c=c.parentElement;c&&(e[o]=c.getAttribute(n))}return e}(o),c=document.createElement("button");c.className="copy-to-clipboard-button",c.setAttribute("type","button");var r=document.createElement("span");return c.appendChild(r),u("copy"),function(e,o){e.addEventListener("click",(function(){!function(e){navigator.clipboard?navigator.clipboard.writeText(e.getText()).then(e.success,(function(){t(e)})):t(e)}(o)}))}(c,{getText:function(){return o.textContent},success:function(){u("copy-success"),i()},error:function(){u("copy-error"),setTimeout((function(){!function(t){window.getSelection().selectAllChildren(t)}(o)}),1),i()}}),c;function i(){setTimeout((function(){u("copy")}),n["copy-timeout"])}function u(t){r.textContent=n[t],c.setAttribute("data-copy-state",t)}})):console.warn("Copy to Clipboard plugin loaded before Toolbar plugin."))}();
 !function(){if("undefined"!=typeof Prism){var e=/^diff-([\w-]+)/i,i=/<\/?(?!\d)[^\s>\/=$<%]+(?:\s(?:\s*[^\s>\/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/g,a=RegExp("(?:__|[^\r\n<])*(?:\r\n?|\n|(?:__|[^\r\n<])(?![^\r\n]))".replace(/__/g,(function(){return i.source})),"gi"),s=!1;Prism.hooks.add("before-sanity-check",(function(i){var a=i.language;e.test(a)&&!i.grammar&&(i.grammar=Prism.languages[a]=Prism.languages.diff)})),Prism.hooks.add("before-tokenize",(function(i){s||Prism.languages.diff||Prism.plugins.autoloader||(s=!0,console.warn("Prism's Diff Highlight plugin requires the Diff language definition (prism-diff.js).Make sure the language definition is loaded or use Prism's Autoloader plugin."));var a=i.language;e.test(a)&&!Prism.languages[a]&&(Prism.languages[a]=Prism.languages.diff)})),Prism.hooks.add("wrap",(function(s){var r,n;if("diff"!==s.language){var g=e.exec(s.language);if(!g)return;r=g[1],n=Prism.languages[r]}var f=Prism.languages.diff&&Prism.languages.diff.PREFIXES;if(f&&s.type in f){var u,l=s.content.replace(i,"").replace(/&lt;/g,"<").replace(/&amp;/g,"&"),t=l.replace(/(^|[\r\n])./g,"$1");u=n?Prism.highlight(t,n,r):Prism.util.encode(t);var o,m=new Prism.Token("prefix",f[s.type],[/\w+/.exec(s.type)[0]]),d=Prism.Token.stringify(m,s.language),c=[];for(a.lastIndex=0;o=a.exec(u);)c.push(d+o[0]);/(?:^|[\r\n]).$/.test(l)&&c.push(d),s.content=c.join(""),n&&s.classes.push("language-"+r)}}))}}();
+
+// FIXME: AI wrote the following. It should be loaded properly.
+Prism.languages['org'] = {
+  'comment': {
+    pattern: /^ *#.*$/m,
+    greedy: true
+  },
+  // TODO keywords/states tags: :tag:
+  'headline': {
+    pattern: /^(\*+)( +)(.*)$/m,
+    inside: {
+      'stars': {
+        pattern: /^\*+/,
+        alias: 'punctuation'
+      },
+      'priority': {
+        pattern: /\[\#[A-Z]\]/,
+        alias: 'symbol'
+      },
+      'todo': {
+        pattern: /\b(TODO|DONE|CANCELLED)\b/,
+        alias: 'important'
+      },
+      'text': {
+        pattern: /.+/,
+        alias: 'title'
+      }
+    },
+    alias: 'important'
+  },
+  'bold': {
+    pattern: /\*(\S(.*?\S)?)\*/,
+    lookbehind: false,
+    greedy: true,
+    inside: {
+      'punctuation': /\*/
+    }
+  },
+  'italic': {
+    pattern: /\/(\S(.*?\S)?)\//,
+    lookbehind: false,
+    greedy: true,
+    inside: {
+      'punctuation': /\//
+    }
+  },
+  'underline': {
+    pattern: /_(\S(.*?\S)?)_/,
+    greedy: true,
+    inside: {
+      'punctuation': /_/
+    }
+  },
+  'code': {
+    pattern: /~[^~\n]+~|=([^=\n])+[=]/,
+    greedy: true,
+    alias: 'symbol'
+  },
+  'block': [ // For src blocks, quotes, etc.
+    {
+      pattern: /^(\s*)#\+BEGIN_\w+[\s\S]*?^(\s*)#\+END_\w+/gmi,
+      inside: {
+        'property': /^#\+\w+/m,
+        'punctuation': /[\+\-]/
+      },
+      alias: 'block'
+    }
+  ],
+  'blockquote': {
+    pattern: /^ *\s*#\+BEGIN_QUOTE[\s\S]+?^ *\s*#\+END_QUOTE$/gmi,
+    alias: 'quote'
+  },
+  'property-drawer': {
+    pattern: /^ *:PROPERTIES:[\s\S]*?:END:/gmi,
+    alias: 'attr-name'
+  },
+  'list': {
+    pattern: /^[ \t]*([-+*]|[0-9]+\.) /m,
+    alias: 'punctuation'
+  },
+  'checkbox': {
+    pattern: /\[([ X-])\]/,
+    alias: 'constant'
+  },
+  'link': {
+    pattern: /\[\[([^\]]+)\](?:\[([^\]]+)\])?\]/,
+    alias: 'url'
+  }
+};
