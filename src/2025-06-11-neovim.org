@@ -8,7 +8,7 @@
 久しぶりに [[https://neovim.io/][Neovim]] に入門しています。今回は設定ファイルを Org ファイルにしてみようと思います。
 
 - 設定ファイル: [[https://github.com/toyboot4e/dotfiles/blob/nixos/editor/nvim/init.org][=init.org=]]
-  README のような雰囲気のみ覧ください。
+  README のような雰囲気のみご覧ください。
 
 #+BEGIN_QUOTE
 注意: =lazy.nvim= の設定に失敗しました。
@@ -228,7 +228,7 @@ Emacs から見るとこうで、 =#+STARTUP: nofold= が反映されていま�
 #+ATTR_HTML: :width 500px
 [[./img/2025-06-11-org-mode-headers.png]]
 
-いきなり未実装機能 ([[https://github.com/nvim-orgmode/orgmode/issues/394][nvim-orgmode/orgmode#394]]) を引いてしまいました。どうしても欲しい機能はコントリビュートする必要がありそうです。
+いきなり未実装機能 ([[https://github.com/nvim-orgmode/orgmode/issues/394][nvim-orgmode/orgmode#394]]) を引いてしまいました。どうしても欲しい機能にはコントリビュートする必要がありそうです。
 
 *** 畳み込みの初期値
 
