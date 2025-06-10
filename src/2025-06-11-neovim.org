@@ -1,0 +1,373 @@
+#+TITLE: =org-mode= で Neovim に入門してみました
+#+DATE: <2025-06-11 Wed>
+
+[[https://vim-jp.org/ekiden/][Vim 駅伝]] 2025/06/11 の投稿です。前回の記事は、あべべさんの [[https://zenn.dev/abebe123000/articles/f5fd75017c3e08][vim マクロで楽する！実践例あり]] でした。
+
+* 背景
+
+久しぶりに [[https://neovim.io/][Neovim]] に入門しています。今回は設定ファイルを Org ファイルにしてみようと思います。
+
+- 設定ファイル: [[https://github.com/toyboot4e/dotfiles/blob/nixos/editor/nvim/init.org][=init.org=]]
+  README のような雰囲気のみ覧ください。
+
+#+BEGIN_QUOTE
+注意: =lazy.nvim= の設定に失敗しました。
+
+Neovim の設定としては致命的な失敗があることをご了承お願いします。
+#+END_QUOTE
+
+** Org とは
+
+[[https://orgmode.org/worg/org-syntax.html][Org]] は主に Emacs で活躍するマークアップ言語です。 Org の処理系は文芸的プログラミングの機能を備えている場合があります。 [[https://neovim.io/][Neovim]] の [[https://github.com/nvim-orgmode/orgmode][=nvim-orgmode/orgmode=]] にも /tangle/ が実装されており、これを使えば =init.lua= を =init.org= の中に埋め込むことができます。
+
+** Tangle とは
+
+具体的には、以下の =init.org= に対し =org-babel-tangle= コマンドを実行すると、全ての Lua ブロックを連結した =init.lua= が生成されます:
+
+#+CAPTION: =init.org=
+#+BEGIN_SRC org
+,#+TITLE Neovim Configuration
+,#+STARTUP: nofold
+,#+PROPERTY: header-args:lua :tangle ./init.lua
+
+,* Bootstrapping
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
+
+,#+BEGIN_SRC lua
+print("Hello, A!") -- (ref:1)
+,#+END_SRC
+
+,* Packages
+
+,#+BEGIN_SRC lua
+print("Hello, B!") -- (ref:2)
+,#+END_SRC
+#+END_SRC
+
+- [[(1)]] Lua ブロック 1
+- [[(2)]] Lua ブロック 2
+
+生成結果は以下です:
+
+#+CAPTION: =init.lua=
+#+BEGIN_SRC lua
+print("Hello, A!")
+
+print("Hello, B!")
+
+#+END_SRC
+
+このように =init.lua= 全体を =init.org= に埋め込むことで、構造化ドキュメントとしての利便性を享受して設定ファイルを編集できます。
+
+** Cons
+
+=org-mode= のコードブロック中では、補間や言語サーバ等が動作しないかもしれません。この欠点は文芸的プログラミングに付き物だと思います。
+
+#+BEGIN_QUOTE
+- Neovim の場合
+  - [[https://github.com/nvim-orgmode/orgmode][=nvim-orgmode/orgmode=]] は言語サーバをサポートしていません。
+- Emacs の場合
+  - [[https://github.com/manateelazycat/lsp-bridge][=lsp-bridge=]] だと簡単に動くかもしれません。
+  - =lsp-mode= では [[https://emacs-lsp.github.io/lsp-mode/manual-language-docs/lsp-org/][=lsp-org=]] が動くはずですが、僕の環境では失敗しました。
+#+END_QUOTE
+
+どうしても言語サーバが必要な時は、 =init.lua= の方を見に行くことにします。
+
+* 環境構築
+
+** =init.org= 事始め
+
+始めから =init.org= を書きたいので、 Emacs で tangle する環境を作ります。 Emacs に不慣れな人も、コマンドラインツールとしての Emacs には抵抗が少ないのではないでしょうか。
+
+Emacs の [[https://www.gnu.org/s/emacs/manual/html_node/elisp/Batch-Mode.html][バッチモード]] (=--batch=) で =org-bable-tangle-file= を実行できます:
+
+#+BEGIN_SRC sh
+$ emacs --batch --eval "(require 'org)" --eval '(org-babel-tangle-file "init.org")'
+Loading /nix/store/52b391v99j92cx9dka8py47cr8hx167b-emacs-unstable-30.1.90/share/emacs/site-lisp/site-start...
+Tangled 1 code block from init.org
+$ ls # init.lua が生成されました:
+init.lua  init.org
+#+END_SRC
+
+これを =tangle= コマンドにしておけば、 =emacs= の使い方を忘れても安心です:
+
+#+BEGIN_SRC sh
+#!/usr/bin/env bash
+
+cd "$(dirname "$0")"
+emacs --batch --eval "(require 'org)" --eval '(org-babel-tangle-file "init.org")'
+#+END_SRC
+
+(Nix ユーザ向け) 上記の =tangle= コマンドを =nix run .#tangle= から実行できるようにします:
+
+#+BEGIN_DETAILS =flake.nix=
+一応動きます:
+
+#+BEGIN_SRC nix
+{
+  description = "A basic flake for generating `init.lua`";
+
+  inputs = {
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+
+  outputs =
+    { nixpkgs, flake-utils, ... }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+        tangleCommand = pkgs.writeShellApplication {
+          name = "run-tangle";
+          runtimeInputs = with pkgs; [emacs];
+          text = ''
+            ./tangle;
+          '';
+        };
+      in
+      {
+        apps.tangle = flake-utils.lib.mkApp {
+          drv = tangleCommand;
+        };
+      }
+    );
+}
+#+END_SRC
+
+#+BEGIN_SRC sh
+$ nix run .#tangle
+Tangled 2 code blocks from init.
+#+END_SRC
+#+END_DETAILS
+
+これで =init.org= から =init.lua= を生成できるようになったので、 Neovim の設定が始められます。
+
+** Package Manager
+
+[[https://github.com/wbthomason/packer.nvim][=packer.nvim=]] が流行ったのも今は昔、現在は [[https://lazy.folke.io/installation][=lazy.nvim=]] と [[https://github.com/Shougo/dpp.vim][=dpp.vim=]] の二強の時代のようです。今回は観光目的なので、簡単な =lazy.nvim= の方を使います。
+
+- [[https://lazy.folke.io/installation][🛠️ Installation | lazy.nvim]]
+- [[https://vineeth.io/posts/neovim-setup][Yet Another Neovim Setup Guide — 2024 Edition]]
+
+** Not Structuring Your Plugins
+
+[[https://lazy.folke.io/installation][=lazy.nvim=]] のドキュメントでは、以下のファイル構成が [[https://lazy.folke.io/usage/structuring][勧められています]]:
+
+#+BEGIN_SRC sh
+~/.config/nvim
+├── lua
+│   ├── config
+│   │   └── lazy.lua
+│   └── plugins
+│       ├── spec1.lua
+│       ├── **
+│       └── spec2.lua
+└── init.lua
+#+END_SRC
+
+これに沿って =tangle= の出力先ファイルを切り替えても良いのですが、今回はファイル分割しない簡単な構成とします。これはこれでハマり所がありそうですが……:
+
+#+BEGIN_SRC sh
+~/.config/nvim
+├── init.lua
+└── init.org
+#+END_SRC
+
+* Neovim 入門 + Tangle の設定
+
+** [[https://github.com/mattn/vim-tanakh][mattn/vim-tanakh]]
+
+まずは =lazy.nvim= の動作確認を兼ねて、 =vim-tanakh= をゲットします:
+
+#+BEGIN_SRC org
+,#+BEGIN_SRC lua
+{
+  "mattn/vim-tanakh"
+},
+,#+END_SRC
+#+END_SRC
+
+=tangle= してから Neovim を起動すると、ダッシュボードが起動し、プラグインをインストールできました:
+
+#+CAPTION: =lazy.nvim= のダッシュボード (格好いい！)
+[[./img/2025-06-11-lazy-nvim.png]]
+
+=config= を設定すると、カーソル移動に応じてステータスバーが更新されるようになりました:
+
+#+BEGIN_SRC lua
+{
+   "mattn/vim-tanakh",
+   config = function()
+      vim.opt.statusline = vim.fn["tanakh#face"]()
+      vim.api.nvim_create_autocmd({"CursorMoved", "CursorMovedI"}, {
+            callback = function()
+               vim.opt.statusline = vim.fn["tanakh#face"]()
+            end
+      })
+   end,
+},
+#+END_SRC
+
+[[./img/2025-06-11-tanakh.gif]]
+
+普段は =lazy = true= を設定して封印します。
+
+** [[https://github.com/nvim-orgmode/orgmode][nvim-orgmode/orgmode]]
+
+=lazy.nvim= の使い方が分かったところで、 Neovim から tangle できるように [[https://github.com/nvim-orgmode/orgmode][nvim-orgmode/orgmode]] をインストールしてみました。起動時にドキュメントが折り畳まれています:
+
+#+CAPTION: Neovim から見た =init.org=
+#+ATTR_HTML: :width 500px
+[[./img/2025-06-11-nvim-orgmode-headers.png]]
+
+Emacs から見るとこうで、 =#+STARTUP: nofold= が反映されています。この動きが正しいです:
+
+#+CAPTION: Emacs から見た =init.org=
+#+ATTR_HTML: :width 500px
+[[./img/2025-06-11-org-mode-headers.png]]
+
+いきなり未実装機能 ([[https://github.com/nvim-orgmode/orgmode/issues/394][nvim-orgmode/orgmode#394]]) を引いてしまいました。どうしても欲しい機能はコントリビュートする必要がありそうです。
+
+*** 畳み込みの初期値
+
+README に沿っての最低限の設定をしてみます:
+
+#+BEGIN_SRC lua
+{
+  'nvim-orgmode/orgmode',
+  event = 'VeryLazy',
+  ft = { 'org' },
+  config = function()
+    require('orgmode').setup({
+      org_startup_folded = 'showeverything', -- (ref:1)
+      -- org_startup_indented = true,
+      org_agenda_files = '~/org/**/*',
+      org_default_notes_file = '~/org/refile.org',
+    })
+  end,
+}
+#+END_SRC
+
+- [[(1)]] 起動時に全ての畳み込みを開く設定にしました。
+
+*** =org-babel-tangle=
+
+=nvim-orgmode/orgmode= を使って =init.lua= を生成できるのか試してみます。一直線に [[https://deepwiki.com/nvim-orgmode/orgmode][DeepWiki]] に聞いてみると =<Leader>obt= に =org-babel-tangle= がマップされています。これを実行すると:
+
+#+BEGIN_SRC txt
+[orgmode] Tangled 0 blocks from init.org
+#+END_SRC
+
+何も起こらない！　ファイル全体の [[https://orgmode.org/guide/Properties.html][=#+PROPERTY=]] が実装されていません。
+
+現状の対策としては、見出しの =header-args= を設定するか:
+
+#+BEGIN_SRC org
+,* 見出し
+:PROPERTIES:
+:header-args:lua :tangle ./init.lua
+:END:
+#+END_SRC
+
+コードブロック毎に =:tangle= を書く必要があります:
+
+#+BEGIN_SRC org
+,#+BEGIN_SRC lua :tangle ./init.lua
+print('hello')
+,#+END_SRC
+#+END_SRC
+
+今回は =tangle= コマンドを使い続けることにしました。
+
+*** Neovim から =tangle= コマンドを実行する
+
+=SourceConfig= で =tangle= を実行できるようにして、
+
+#+BEGIN_SRC lua
+vim.api.nvim_create_user_command("SourceConfig", function()
+  -- Run the `tangle` command
+  local config = vim.fn.stdpath("config")
+  local tangle = vim.fs.joinpath(config, "tangle")
+  vim.fn.system(tangle, config)
+  -- Reload the buffer in case it's `init.lua`
+  vim.cmd("edit!")
+end, {})
+#+END_SRC
+
+また =:s= が =:SourceConfig= に展開されるようにしました。 Vimscript で恐縮ですが:
+
+#+BEGIN_SRC lua
+-- Abbreviate function:
+-- https://stackoverflow.com/a/3879737
+vim.cmd([[
+function! Abbreviate(from, to)
+  exec 'cnoreabbrev <expr> '.a:from
+        \ .' ((getcmdtype() ==# ":" && getcmdline() ==# "'.a:from.'")'
+        \ .'? ("'.a:to.'") : ("'.a:from.'"))'
+endfunction
+
+call Abbreviate('s', 'SourceConfig')
+call Abbreviate('ed', 'edit ~/.config/nvim/init.org')
+
+call Abbreviate('h', 'tab help')
+call Abbreviate('hs', 'split')
+]])
+#+END_SRC
+
+本来は =:SourceConfig= 実行時に =init.lua= を読み込む予定でしたが、 =lazy.nvim= では =init.lua= の再読み込みが禁止されていました:
+
+#+BEGIN_SRC txt
+Re-sourcing your config is not supported with lazy.nvim
+#+END_SRC
+
+派手に失敗していて申し訳ないですが、設定ファイルの変更内容をエディタに反映する方法は未検討です。
+
+* まとめ
+
+久しぶりに Neovim に入門しました。 [[https://github.com/toyboot4e/dotfiles/blob/nixos/editor/nvim/init.org][=init.org=]] で Neovim の設定を書くのは結構アリだという手応えを感じています。 Org は Emacs 以外のエディタでガンガン使っても良いですし、 =emacs= を CLI ツールとして使うのもポピュラーになったら良いなと思います。
+
+Neovim は [[https://github.com/nvim-telescope/telescope.nvim][Telescope]] を始め各種プラグインの完成度が素晴らしく、また Lua が設定ファイルの記述に驚くほど適していると感じました。イケています。もっと変な Lua を読み書きしたいととすら思いました。 5 年遅れぐらいで熱が伝わってきたのかもしれません。
+
+そんなわけで、入門記事にお付き合い頂きありがとうございました！
+
+#+BEGIN_YARUO
+　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .|　　　　　 　 　 /
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 !　　　　　　　 /
+　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .l　　　　＿＿/_
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 !　　 ／　　/　＼
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 !　／. 　　/ _ノ　 ＼
+　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .l │. 　　/（● ）（●）　　　　ありがとう！
+　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .| │　　/　　（__人__）
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 ! │.　/ 　 　｀ ⌒´ﾉ
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 ! │ /　　 　 　 　 }
+　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 | ノ./ヾ.ﾍ　　　　　}
+　　　　　　　　　　　　　　　　　　　　 　 　 ..=ｨﾞﾆ|　/､;i;i;ヾヘ　　_ノ
+　　　　　　　　　　　　　　　.　　　　 　 : :イ/{ ／￣ヾ}l!;i;i;iLc､＞
+　　　　　　　　　　　　　　　.　　　　 　 / '/,ﾑ{　∧　 }ｰ-,-､《;i〈
+　　　　　　　　　　　　　　　.　　　　 　 !:.,'〃´ﾊ｛/　 ﾊ::〃,=ヾﾐ;i
+　　　　　　　　　　　　　　　.　　　　 　 :.:{/' 〃ﾞヽ__ノヽi/´　　 }＼
+　　　　　　　　　　　　　　　.　　　　 　 :.:|!､/　　ヽ::Y::/{　　r､/ﾑ .＼
+　　　　　　　　　　　　　　　.　　　　 　 !:.!ﾑ　　　 ヽj::ノ{ 　 | ,';i;iﾑ 　 ヽ.
+　　　　　　　　　　　　　　　.　　　　 　 Ⅵﾏ＼　　_ ヽ';i乂__.ｿ;i;i;i;i| 　 　 丶
+　　　　　　　　　　　　　　　.　　　　 　 ﾄj0l|Y´＼{ }　 Y;i;i;i;i;i;i;i;i;i;iﾄ，　　 　 ＼
+　　　　　　　　　　　　　　　.　　　　 　 `!0j;iﾄ､　 ヾ__.人;i;i;i;i;i;i;i;i;i;i;{ 　 　 　 　 ＼
+　　　　　　　　　　　　　　　.　　　　 　 〈ｿ,∧　＼　 「 ! Y;i;i;i;i;i;i;i;i;iﾑ
+　　　　　　　　　　　　　　　.　　　　　 　 j､;i;i;､　　＼___丿;i;i;i;i;i;i;i;i;i;iﾑ
+　　　　　　　　　　　　　　　.　　　　 　 /.:::∨;i;i`i.､___ﾉ;i＼;i;i;i;i;i;i;i;i;i;i;ｉﾑ
+　　　　　　　　　　　　　　　.　　　　 　 ::::::::.∨;i;i|:;i;i;i;i;i;i;i;ｉ;＼;i;i;i;i;i;i;i;i;i;ﾑ
+　　　　　　　　　　　　　　　.　　　　 　 ､_:::::::∨;i|:;i;i;i;i;i;i;i;i;i;i;i;丶:;i;i;i;i;i;i;i;ﾑ
+　　　　　　　　　　　　　　　.　　　　 　 ::ｰﾆ=ｲ};i:!:;i;i;i;i;i;i;i;i;i;i;i;i;i;i＼:;i;i;i;i;i;i;i〉
+　　　　　　　　　　　　　　　.　　　　 　 ヽ:::::::::ﾉ;i:!:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i＼:;i;i;/
+　　　　　　　　　　　　　　　.　　　　　 　 ヽ／;ｉ;i:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i＼:〉
+　　　　　　　　　　　　　　　.　　　　 　 ..／;i;i;i;i;i:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;ｉ;ｉ;ｉ;＼
+　　　　　　　　　　　　　　　.　　　　 　 ,ゝ;i;i;i;i;i;ｉ:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i/　 丶
+　　　　　　　　　　　　　　　.　　　　 　 i;i;i;i;i;i;i;i;ｉ:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;/　　　　＼
+　　　　　　　　　　　　　　　.　　　　 　 i;i;i;i;i;i;i;ｉ;ｉ:!:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i∧
+　　　　　　　　　　　　　　　.　　　　 　 i;i;i;i;i;i;i;ｉ;ｉ:!:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i/. ﾑ
+　　　　　　　　　　　　　　　.　　　　 　 i;i;i;i;i;i;i;i;ｉ:ｌ:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i/／ﾏ___
+　　　　　　　　　　　　　　　.　　　　 　 ､i;i;i;i;i;i;i;i:|:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;}/イ;;;;;;;;;`!
+　　　　　　　　　　　　　　　.　　　　 　 ';i;i;i;i;i;i;i;ｉ:ｌ:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;iﾑ.;;;;;;;;;;;;;;;;;〉
+#+END_YARUO
+
