@@ -279,7 +279,7 @@ print('hello')
 ,#+END_SRC
 #+END_SRC
 
-今回は =tangle= コマンドを使い続けることにしました。
+僕は =#+PROPERTY= で =:tangle= の設定がしたかったので、 Emacs 依存の =tangle= コマンドを使い続けることにしました。
 
 *** Neovim から =tangle= コマンドを実行する
 
