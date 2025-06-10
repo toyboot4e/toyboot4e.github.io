@@ -283,7 +283,7 @@ print('hello')
 
 *** Neovim から =tangle= コマンドを実行する
 
-=SourceConfig= で =tangle= を実行できるようにして、
+=SourceConfig= で =tangle= を実行できるようにします:
 
 #+BEGIN_SRC lua
 vim.api.nvim_create_user_command("SourceConfig", function()
