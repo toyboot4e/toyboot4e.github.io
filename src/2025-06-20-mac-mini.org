@@ -1,0 +1,47 @@
+#+TITLE: Mac Mini 購入
+#+DATE: <2025-06-20 Fri>
+
+* 背景
+
+2015 年の MacBook Pro が更新できなくなって久しいです。もちろん開発はできませんし、 [[https://github.com/nix-darwin/nix-darwin][=nix-darwin=]] で遊ぶこともできません。ただ [[https://github.com/openstenoproject/plover-flake][=plover-flake=]] に PR を出したり、 macOS をサポートするアプリが作りたいので、 [[https://www.apple.com/jp/shop/buy-mac/mac-mini][Mac Mini]] を発注しました。
+
+* Mac Mini 購入にあたって
+
+** 自宅 PC 一覧
+
+自宅は 3 台の PC があります。新たに M4 の Mac Mini を発注しました (表の 4 行目):
+
+| OS         | 筐体       | CPU           | GPU      | メモリ | ストレージ |
+|------------+------------+---------------+----------+-------+-----------|
+| NixOS      | ATX        | Intel Core i7 | -        | 64 GB | 1TB + 1TB |
+| Windows 11 | ATX        | Intel Core i7 | RTX 3070 | 64 GB | 4TB       |
+| macOS      | ラップトップ | Intel ?       | ?        | 16 GB | 512 GB    |
+| macOS      | Mac Mini   | M4           | ?        | 64GB  | 512 GB    |
+
+** ラップトップ vs デスクトップ
+
+PC を持ち歩くことが無いため、デスクトップ機にしました。また費用の問題で Mac Mini にしました。
+
+** スペックの検討
+
+20 万円以下に抑えるため、メモリ 32 GB, ストレージ 512 GB としました。やや心もとないスペックです。特に Mac のユニファイドメモリは GPU メモリとしても使えますから、 LLM 時代の PC としては弱いです。
+
+** 付属品
+
+Mac の付属品は買いませんでした。憧れはあるのですが、実利を取ってしまいます。
+
+- Magic Keyboard
+  憧れのキーボードですが、 [[./2025-03-23-dilemma-v2.html][Dillema V2]] の方が良さそうです。
+
+- Magic Mouse
+  憧れのマウスですが、充電するのが嫌になると思いました。
+
+- Logic, Final Cut Pros
+  クリエイティブ作業用に Windows があるため、購入しませんでした。
+
+お家を Apple Store にしたくなったら購入します。
+
+* 終わりに
+
+来週末に Mac Mini が到着予定です。 Apple Store に通い詰めたのも今は昔、二度目の Mac は淡白な気持ちでの購入となりました。ひとまず =nix-darwin= でモダンな環境に追いつきたいです。
+
