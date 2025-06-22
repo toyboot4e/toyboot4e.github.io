@@ -1,0 +1,115 @@
+#+TITLE: ステノ入門のための yak shaving
+#+DATE: <2025-06-22 Sun>
+
+* 背景
+
+先日購入した [[https://stenokeyboards.com/products/the-uni-v4][Uni V4]] で、英語ステノの練習をしています。
+
+#+CAPTION: Uni V4. 28 キー
+#+ATTR_HTML: :width 75%
+[[./img/2024-04-04-uni-v4.jpg]]
+
+ステノ (stenography) とは速記のことで、複数キーの同時押し (ストローク) を活かして多数の文字を瞬時に入力できるシステムです。元々は数百万円台の専用機に実装されていたようですが、 [[http://openstenoproject.org/][Open Steno Project]] のおかげで庶民の手にも届くようになりました。
+
+ステノユーザはインターネットにもほぼいないので、これを習得すれば突出できると思います。あわよくば技術同人誌なども書けると嬉しいです。
+
+今回はステノの練習に先立って、周辺環境の構築に関する取り組みを紹介します。
+
+* Yak shaving
+
+** ブログ上のキーボード表示
+
+Uni のストロークを html のカスタム要素して表示できるようにしました。たとえば KAT (cat) というストロークは、次のように表示されます:
+
+#+BEGIN_STENO
+kat
+#+END_STENO
+
+これは =steno-outline= 要素として実装されており、 html grid として描画されます:
+
+#+BEGIN_SRC html
+<steno-outline>KAT</steno-outline>
+#+END_SRC
+
+** 練習用ツールの作成
+
+ステノは [[https://didoesdigital.com/typey-type/][Typey Type]] というサイトで練習できます。毎回レッスンデータを入力するのが面倒だったため、コマンドラインで練習するためのツールを作成中です ([[https://github.com/toyboot4e/plover-drills][=plover-drills=]]) 。
+
+[[./img/2025-06-22-drill.gif]]
+
+画面は Python の [[https://textual.textualize.io/][Textual]] ライブラリで表示しています。キーボード部分も Textual での表示に移行したいと思います。
+
+** =plover-flake= の導入
+
+ステノの実装は Plover というソフトウェアです:
+
+- [[https://www.openstenoproject.org/plover/][Plover (公式サイト)]]
+- [[https://plover.readthedocs.io/en/latest/][Plover (開発者用ドキュメント)]]
+
+Nix 環境では、 nixpkgs 上の =plover= の実行に失敗しました。 [[https://github.com/dnaq/plover-flake][plover-flake]] の方からインストールすると導入に成功しました。
+
+=plover-flake= にいくつか修正すべき点があったため、取り組んでいます。
+
+*** =plover.cfg= の生成
+
+=plover-flake= の home-manager module は、 Plover の設定ファイル (=plover.cfg=) を生成し、 symlink を配置してくれます。 =plover.cfg= は次のような ini ファイルです:
+
+#+CAPTION: =plover.cfg=
+#+BEGIN_SRC ini
+[Gemini PR]
+baudrate = 9600
+bytesize = 8
+parity = N
+port = /dev/serial/by-id/usb-StenoKeyboards_The_Uni-if02
+stopbits = 1
+timeout = 2.0
+
+[Logging Configuration]
+log_file = strokes.log
+
+[Machine Configuration]
+auto_start = True
+machine_type = Gemini PR
+
+[Output Configuration]
+undo_levels = 100
+
+[Plugins]
+enabled_extensions = ["plover_lapwing_aio","plover_auto_reconnect_machine","plover_console_ui"]
+
+[Startup]
+
+[System]
+name = Lapwing
+
+[System: Lapwing]
+dictionaries = [{"enabled": false, "path": "user.json"}, {"enabled": true, "path": "jeff-phrasing.py"}, {"enabled": true, "path": "abby-left-hand-modifiers.py"}, {"enabled": true, "path": "emily-modifiers.py"}, {"enabled": true, "path": "emily-symbols.py"}, {"enabled": true, "path": "lapwing-movement.modal"}, {"enabled": true, "path": "lapwing-commands.json"}, {"enabled": true, "path": "lapwing-numbers.json"}, {"enabled": true, "path": "lapwing-uk-additions.json"}, {"enabled": true, "path": "lapwing-proper-nouns.json"}, {"enabled": true, "path": "lapwing-base.json"}]
+
+[Translation Frame]
+opacity = 100
+#+END_SRC
+
+通常の ini ファイルとは異なり、値部分が JSON となっているキーがあります。これへの対応の [[https://github.com/openstenoproject/plover-flake/pull/239][PR]] を作成しました。
+
+*** macOS のサポート確認 (未)
+
+=plover.cfg= の生成パスが =~/.config/plover/plover.cfg= になっており、 macOS が考慮されていません。修正用 PR の動作確認のため、 [[./2025-06-20-mac-mini.html][Mac Mini を購入しました]] 。到着次第、動作確認して RP を作成します。
+
+*** =/nix/store= 中の辞書データを参照する (未)
+
+ステノ辞書データのダウンロードや、設定ファイル (=plover.cfg=) への取り込みまで =plover-flake= で実行可能にしたいと思います。
+
+*** Wayland サポート (未)
+
+Wayland でのみ =psutil= パッケージが必要になりそうです。
+
+* まとめ
+
+英語ステノを快適に練習し、ブログで紹介できるようになりました。このキーボード表示は結構お気に入りです:
+
+#+BEGIN_STENO
+KAT
+#+END_STENO
+
+=plover-flake= には引き続き PR を出して行きたいと思います。
+

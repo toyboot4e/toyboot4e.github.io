@@ -2,6 +2,7 @@
 
 * devlog
 #+ATTR_HTML: :class sitemap
+- @@html:<date>2025-06-22</date>@@ [[file:/2025-06-22-steno-1.org][ステノ入門のための yak shaving]]
 - @@html:<date>2025-06-20</date>@@ [[file:/2025-06-20-mac-mini.org][Mac Mini 購入]]
 - @@html:<date>2025-06-11</date>@@ [[file:/2025-06-11-neovim.org][=org-mode= で Neovim に入門してみました]]
 - @@html:<date>2025-05-12</date>@@ [[file:/2025-05-12-haskell-ci.org][=ac-library-hs= の CI を設定しました]]
