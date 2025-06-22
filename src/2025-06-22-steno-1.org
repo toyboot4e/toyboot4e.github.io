@@ -93,7 +93,7 @@ opacity = 100
 
 *** macOS のサポート確認 (未)
 
-=plover.cfg= の生成パスが =~/.config/plover/plover.cfg= になっており、 macOS が考慮されていません。修正用 PR の動作確認のため、 [[./2025-06-20-mac-mini.html][Mac Mini を購入しました]] 。到着次第、動作確認して RP を作成します。
+=plover.cfg= の生成パスが =~/.config/plover/plover.cfg= になっており、 macOS が考慮されていません。修正用 PR の動作確認のため、 [[./2025-06-20-mac-mini.html][Mac Mini を購入しました]] 。到着待ちです。
 
 *** =/nix/store= 中の辞書データを参照する (未)
 
@@ -101,7 +101,7 @@ opacity = 100
 
 *** Wayland サポート (未)
 
-Wayland でのみ =psutil= パッケージが必要になりそうです。
+Wayland でのみ =psutil= パッケージが必要になりそうです。謎のエラーが出ている人もいて、 QT6 のインストールが必要だったりする……？　これは綺麗に解決するのが難しそうです。
 
 * まとめ
 
