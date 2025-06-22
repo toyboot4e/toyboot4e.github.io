@@ -47,8 +47,8 @@ class StenoViz extends HTMLElement {
   static collectKeyPress(chars, stroke) {
     const ret = [
       Array(chars[0].length).fill(false),
-      Array(chars[0].length).fill(false),
-      Array(chars[0].length).fill(false),
+      Array(chars[1].length).fill(false),
+      Array(chars[2].length).fill(false),
     ];
 
     if (stroke === undefined || stroke === null || stroke === '') {
@@ -93,10 +93,8 @@ class StenoViz extends HTMLElement {
     const isPressed = StenoViz.collectKeyPress(chars, this.textContent.toUpperCase());
 
     // render
-    const columnDef = [2, 2, 2, 3, -1, -1, 3, 3, 2, 2, 2, 2]
     for (let row = 0; row < 3; row++) {
-      for (let col = 0; col < columnDef.length; col++) {
-        const def = columnDef[col];
+      for (let col = 0; col < chars[row].length; col++) {
         const isLeft = col <= 4;
         const c = chars[row][col];
 
