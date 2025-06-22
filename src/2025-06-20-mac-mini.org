@@ -9,14 +9,14 @@
 
 ** 自宅 PC 一覧
 
-自宅は 3 台の PC があります。新たに M4 の Mac Mini を発注しました (表の 4 行目):
+自宅には 3 台の PC があります。新たに M4 の Mac Mini を発注しました:
 
-| OS         | 筐体       | CPU           | GPU      | メモリ | ストレージ |
-|------------+------------+---------------+----------+-------+-----------|
-| NixOS      | ATX        | Intel Core i7 | -        | 64 GB | 1TB + 1TB |
-| Windows 11 | ATX        | Intel Core i7 | RTX 3070 | 64 GB | 4TB       |
-| macOS      | ラップトップ | Intel ?       | ?        | 16 GB | 512 GB    |
-| macOS      | Mac Mini   | M4           | ?        | 64GB  | 512 GB    |
+| OS         | 筐体            | CPU           | GPU      | メモリ | ストレージ |
+|------------+-----------------+---------------+----------+-------+-----------|
+| NixOS      | ATX             | Intel Core i7 | -        | 64 GB | 1TB + 1TB |
+| Windows 11 | ATX             | Intel Core i7 | RTX 3070 | 64 GB | 4TB       |
+| macOS      | ラップトップ      | Intel ?       | ?        | 16 GB | 512 GB    |
+| macOS      | Mac Mini ← New! | M4            | ?        | 32 GB | 512 GB    |
 
 ** ラップトップ vs デスクトップ
 
