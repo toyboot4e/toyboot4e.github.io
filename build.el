@@ -131,7 +131,7 @@
 
         ("static"
          :base-directory "./src"
-         :base-extension "js\\|css\\|png\\|jpg\\|gif\\|mp4\\|woff2"
+         :base-extension "js\\|css\\|png\\|jpg\\|gif\\|svg\\|mp4\\|mov\\|woff2"
          ;; `/ltximg/' is for previewing. MathJax is used at runtime.
          :exclude ,(rx-to-string (rx "ltximg/"))
          ;; :exclude ,(rx-to-string (rx line-start "ltximg"))
@@ -183,6 +183,11 @@
                (async "")
                (src "/style/prism.js"))
             ;; NOTE: empty body is required for self-closing tag
+            "")
+    ;; TODO: lazy loading
+    (script (@ (type "text/javascript")
+               (async "")
+               (src "/style/steno-viz.js"))
             "")
     (*RAW-STRING* "<!-- MathJax -->")
     (script (@ (type "text/javascript")
@@ -386,15 +391,25 @@ wrapped in code elements."
 %s
 </pre>" raw-content)))
 
+;; `#+BEGIN_STENO' special block
+;; TODO: enable captions
+(defun my-org-html-steno-block (steno-block contents info)
+  (let* ((beg (org-element-property :contents-begin steno-block))
+         (end (org-element-property :contents-end steno-block))
+         (raw-content (buffer-substring-no-properties beg end)))
+    (format "<steno-outline>%s</steno-outline>" (string-trim raw-content))))
+
 ;; Special block (custom block) handler dispatcher
-(defun my-org-html-special-block (special-block contents info)
-  (let* ((block-type (org-element-property :type special-block)))
-    (cond ((or (string= block-type "details") (string= block-type "DETAILS"))
-           (my-org-html-details-block special-block contents info))
-          ((or (string= block-type "yaruo") (string= block-type "YARUO"))
-           (my-org-html-yaruo-block special-block contents info))
-          (t ;; fallback
-           (org-html-special-block special-block contents info)))))
+  (defun my-org-html-special-block (special-block contents info)
+    (let* ((block-type (org-element-property :type special-block)))
+      (cond ((or (string= block-type "details") (string= block-type "DETAILS"))
+             (my-org-html-details-block special-block contents info))
+            ((or (string= block-type "yaruo") (string= block-type "YARUO") (string= block-type "aa") (string= block-type "AA"))
+             (my-org-html-yaruo-block special-block contents info))
+            ((or (string= block-type "steno") (string= block-type "STENO"))
+             (my-org-html-steno-block special-block contents info))
+            (t ;; fallback
+             (org-html-special-block special-block contents info)))))
 
 ;; Do not convert `/index.html' into `file:///index.html', really
 (defun my-org-html-link (link desc info)
