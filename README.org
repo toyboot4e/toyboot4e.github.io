@@ -24,3 +24,7 @@ See the [[./Justfile][./Justfile]].
 - [[https://prismjs.com/][Prism.js]]
 - [[https://www.mathjax.org/][MathJax]]
 
+*** Fonts
+
+- [[https://fonts.aahub.org/font/2][aahub_light]]
+
