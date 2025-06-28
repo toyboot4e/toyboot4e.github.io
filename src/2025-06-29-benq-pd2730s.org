@@ -1,0 +1,32 @@
+#+TITLE: BenQ 2730S (5K モニタ) の購入
+#+DATE: <2025-06-29 Sun>
+
+* 背景
+
+そういえば、二ヶ月前に 5K モニタ ([[https://www.benq.com/en-us/monitor/professional/pd2730s.html][BenQ 2730S]]) を購入しました。簡単にメモします。
+
+* 感想
+
+** BenQ 2730S
+
+- 5K の嬉しさが分かりませんでした
+- KVM 機能を使用していません
+  - 端子の多い [[https://www.amazon.co.jp/dp/B0DMF7PTYJ?ref=ppx_yo2ov_dt_b_fed_asin_title][UGreen の KVM スイッチ]] を購入しました
+- 無線操作機器を使用していません
+  - 乾電池を使いたくないです
+
+** 他製品との比較
+
+- Dell の 4K モニタとの比較
+ 直前に使っていた 4K モニタと比べて、発色が良くなったと思います。
+
+- EIZO との比較
+  EIZO のモニタの『紙のよう』と言われる質感を理解できず、候補から外れました。
+
+- [[https://www.apple.com/studio-display/][Studio Display]]
+  Studio Display を買っても良かったです。 BenQ の方がベゼルは目立たないと思います。
+
+* 終わりに
+
+僕は 5K モニタを買う意味が無かったですが、 5 年以上メインモニタとして活躍してくれればと思います。
+
