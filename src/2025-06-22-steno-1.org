@@ -25,7 +25,7 @@ Uni のストロークを html のカスタム要素して表示できるよう�
 kat
 #+END_STENO
 
-これは =steno-outline= 要素として実装されており、 html grid として描画されます:
+これは =steno-outline= 要素として実装しており、 html grid として描画されます:
 
 #+BEGIN_SRC html
 <steno-outline>KAT</steno-outline>
@@ -97,7 +97,7 @@ opacity = 100
 
 *** =/nix/store= 中の辞書データを参照する (未)
 
-ステノ辞書データのダウンロードや、設定ファイル (=plover.cfg=) への取り込みまで =plover-flake= で実行可能にしたいと思います。
+ステノ辞書データのダウンロードや、設定ファイル (=plover.cfg=) への取り込みまで =plover-flake= で実行可能にしたいと思います。 =plover-flake= の中の人は特に希望していないかも。
 
 *** Wayland サポート (未)
 

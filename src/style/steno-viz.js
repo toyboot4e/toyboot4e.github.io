@@ -86,7 +86,7 @@ class StenoViz extends HTMLElement {
 
     const leftCol = 4;
     const chars = [
-      ['#', 'T', 'R', 'H', '*', '', '*', 'F', 'P', 'L', 'T', 'D'],
+      ['#', 'T', 'P', 'H', '*', '', '*', 'F', 'P', 'L', 'T', 'D'],
       ['S', 'K', 'W', 'R', '', '', '', 'R', 'B', 'G', 'S', 'Z'],
       ['', '',  '#', 'A', 'O', '', 'E', 'U', '#', '', '', ''],
     ];
