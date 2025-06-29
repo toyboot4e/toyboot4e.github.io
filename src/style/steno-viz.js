@@ -7,9 +7,11 @@ class StenoViz extends HTMLElement {
     const style = document.createElement('style');
     style.textContent = `
       :host {
-        display: block;
+        display: flex;
         width: 100%;
-        text-align: center;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
       }
       .steno-viz-container {
         display: inline-grid;
@@ -57,15 +59,25 @@ class StenoViz extends HTMLElement {
 
     // steno order: #STKPWHRAO*EUFRPBLGTSDZ
     const stenoOrder = [
+      // #0    1       2       3       4       5       6       7
       [0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2], [0, 3], [1, 3],
+      // 8
       [0, 4],
-      [2, 3], [2, 4], [2, 6], [2, 7],
+      // #9    10      11      12      13      #14
+      [2, 2], [2, 3], [2, 4], [2, 6], [2, 7], [2, 8],
+      // *15
       [0, 7], [1, 7], [0, 8], [1, 8], [0, 9], [1, 9], [0, 10], [1, 10], [0, 11], [1, 11],
     ];
+
+    const iAster = 15
 
     let iOrder = 0
     for (let c of stroke) {
       if (iOrder >= stenoOrder.length) break;
+      if (c == '-') {
+          if (iOrder < iAster) iOrder = iAster;
+          continue;
+      }
       while (iOrder < stenoOrder.length) {
         const [row, col] = stenoOrder[iOrder++];
         if (c == chars[row][col]) {
@@ -77,22 +89,32 @@ class StenoViz extends HTMLElement {
 
     // '*'
     ret[0][6] = ret[0][4];
+
+    // '#'
+      ret[2][2] = ret[0][0];
+      ret[2][8] = ret[0][0];
+
     return ret;
   }
 
   connectedCallback() {
-    const container = document.createElement('div');
-    container.className = 'steno-viz-container';
-
-    const leftCol = 4;
     const chars = [
       ['#', 'T', 'P', 'H', '*', '', '*', 'F', 'P', 'L', 'T', 'D'],
       ['S', 'K', 'W', 'R', '', '', '', 'R', 'B', 'G', 'S', 'Z'],
       ['', '',  '#', 'A', 'O', '', 'E', 'U', '#', '', '', ''],
     ];
-    const isPressed = StenoViz.collectKeyPress(chars, this.textContent.toUpperCase());
 
-    // render
+    const strokes = this.textContent.toUpperCase().split('/');
+    console.log(strokes);
+    for (let stroke of strokes) {
+      this.shadowRoot.appendChild(this.renderStroke(chars, stroke));
+    }
+  }
+
+  renderStroke(chars, stroke) {
+    const container = document.createElement('div');
+    container.className = 'steno-viz-container';
+    const isPressed = StenoViz.collectKeyPress(chars, stroke);
     for (let row = 0; row < 3; row++) {
       for (let col = 0; col < chars[row].length; col++) {
         const isLeft = col <= 4;
@@ -111,8 +133,7 @@ class StenoViz extends HTMLElement {
         container.appendChild(rect);
       }
     }
-
-    this.shadowRoot.appendChild(container);
+    return container;
   }
 }
 
