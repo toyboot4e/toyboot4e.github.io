@@ -1,0 +1,319 @@
+#+TITLE: 速記キーボードで Neovim がしたい？！
+#+DATE: <2025-06-30 Mon>
+
+* 背景
+
+#+BEGIN_QUOTE
+この記事は [[https://vim-jp.org/ekiden/][Vim 駅伝]] 2025/06/30 の投稿です。前回の投稿は [[https://zenn.dev/vim_jp/articles/175ba80cd3cbaa][kawarimidoll]] さんの [[https://zenn.dev/vim_jp/articles/175ba80cd3cbaa][Vim script / Neovim luaで現在のファイルのパスと行数をコピーするコマンド]] でした。
+#+END_QUOTE
+
+速記キーボードの紹介と、 Neovim 観光・速記編の記事です。 *9 割は速記入門の覚え書きです* が、ご了承ください。
+
+** キーボード操作のアクション性
+
+この記事の読者の多くが分割キーボードをお持ちだと思います。
+
+#+CAPTION: [[https://bastardkb.com/dilemma/][Dilemma]] V2. キーキャップがダサいのは許してください
+[[./img/2025-03-23-dilemma-v2.jpg]]
+
+分割キーボードは『レイヤ』切り替えの機能を持つことが多いです。親指キーをホールドしている間は、キーマップが『レイヤ 0』から『レイヤ 1』に切り替わるといった具合です。
+
+#+CAPTION: レイヤ 1 ([[https://www.usevia.app/][Via]] による設定画面)
+[[./img/2025-06-30-via-layer-1.png]]
+
+#+CAPTION: レイヤ 2 ([[https://www.usevia.app/][Via]] による設定画面)
+[[./img/2025-06-30-via-layer-2.png]]
+
+このレイヤ切り替えを駆使して文字入力するのが面白くて、少しずつキーボードに興味を持ちました。
+
+** 速記 (ステノグラフィー) の存在
+
+半年も経てばキーボード操作をマスターし、刺激不足に陥ります。もっと野心的なキー入力システムが無いか [[https://scrapbox.io/Stenotype-Japan/%E3%82%B9%E3%83%86%E3%83%8E%E4%BB%A5%E5%A4%96%E3%81%AE_30%25_%E6%9C%AA%E6%BA%80%E3%82%AD%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89][調べてみた]] ところ、やはり *速記 (ステノグラフィー、ステノ) が面白い* と思いました。
+
+Vim は構造的なテキスト編集を勧めるエディタで、パソコン生活を変えてくれました。テキスト入力においても、 1 文字ではなく 1 単語ずつ入力できたら、 PC との向き合い方が一転する可能性があります。
+
+早速、速記用のキーボード ([[https://stenokeyboards.com/products/the-uni-v4][Uni V4]]) を購入しました:
+
+#+CAPTION: [[https://stenokeyboards.com/products/the-uni-v4][Uni V4]]. 読み方は『ユニ』です (ウニではない)
+[[./img/2024-04-04-uni-v4.jpg]]
+
+たとえば [[https://www.youtube.com/@AerickSteno][Aerick]] 氏の英語速記システム ([[https://lapwing.aerick.ca/Home.html][Lapwing Theory]]) では、以下のキーストロークにより beginner と入力できます:
+
+#+BEGIN_STENO
+TKPWEURPB
+#+END_STENO
+
+このような『速記』をやって行こうという記事です。
+
+* 速記の可能性について
+
+現時点でのステノへの期待と、コーディングに導入できるかをぼんやりと考えます。
+
+#+BEGIN_QUOTE
+あまり速記の練習が進んでいないので、裏取りはありません。
+#+END_QUOTE
+
+** 英語速記の入力方法
+
+英語速記の Lapwing Theory の入力方法を紹介します。 [[https://lapwing.aerick.ca/Home.html][Lapwing for Beginners]] の稀釈版と思ってください。
+
+*** キー配列
+
+英語ステノの標準的なキー配列は以下です。 =S=, =P=, =R= は左右対称の位置にあって覚えやすいと思います:
+
+#+BEGIN_STENO
+SPRRPS
+#+END_STENO
+
+*** 音節の入力
+
+速記キーボードは、キーストロークの翻訳エンジンを活用します。たとえば =K= キーを押すと =can= になります:
+
+#+BEGIN_STENO
+k
+#+END_STENO
+
+基本的には 1 ストロークで 1 音節 (子音 + 母音 + 子音) を入力します。たとえば cat は =KAT= として入力します。キーボードの左、下、右の部分が、子音、母音、子音に対応します:
+
+#+BEGIN_STENO
+kat
+#+END_STENO
+
+同時押しで多彩な音が打てます。 job を入力してみます:
+
+#+BEGIN_STENO
+SKWROB
+#+END_STENO
+
+左の =SKWR= が j に対応します。下の =O= が o, 右の =B= は b で、合わせて job という音を打っています。キー数は多いですが、これも単なる一音節です。
+
+*** 繰り返し入力
+
+=#= キーで直前の入力を繰り返します。 Uni には 3 つ =#= キーがありますが、どれか 1 つを押せば良いです:
+
+#+BEGIN_STENO
+#
+#+END_STENO
+
+*** [[https://lapwing.aerick.ca/Chapter-04.html#the-backspace-key][Backspace]]
+
+文字の削除は基本的にストローク単位です。削除キー =*= を押すと、 =cat= が 1 発で削除されます:
+
+#+BEGIN_STENO
+*
+#+END_STENO
+
+1 文字だけ消すには、バックスペースキーに翻訳されるストロークを使います:
+
+#+BEGIN_STENO
+SKWHEFG
+#+END_STENO
+
+上記のストロークは記号入力の辞書 (後述) で定義されているのが良い点ですが、より短いストロークも用意されています:
+
+#+BEGIN_STENO
+SPW/PW-FP
+#+END_STENO
+
+どれを使えばいいのか、僕も分かりません……。
+
+*** [[https://lapwing.aerick.ca/Chapter-13.html][二音節以上の単語入力]]
+
+二音節以上の単語は、複数回のストロークに分けて入力する場合があります。たとえば =reexport= は =RE/EBGS/PORT= です:
+
+#+BEGIN_STENO
+RE/EBGS/PORT
+#+END_STENO
+
+*** [[https://lapwing.aerick.ca/Chapter-24.html][フレーズの入力]]
+
+辞書データを作成すれば、一音節以上のフレーズを一気に入力することもできます。 [[https://github.com/jthlim/jeff-phrasing][Jeff's phrasing dictionary]] が有名で、たとえば =SWR-BD= で =I was= が打てます:
+
+#+BEGIN_STENO
+SWR-BD
+#+END_STENO
+
+暗記が大変なため、これの習得は最後で良いと思います。
+
+*** 空白モード、記法モード
+
+速記の出力は、基本スペース区切りです。 =k= キーを 2 回押すと =can= が 2 回出て、いずれも先頭に空白文字が付きます。 [[https://plover.readthedocs.io/en/latest/translation_language.html#spacing-modes][空白モード]] を切り替えると、単語間に空白を挿入しないよう切り替えできます。
+
+[[https://plover.readthedocs.io/en/latest/translation_language.html#casing-modes][記法モード]] を切り替えれば、 =snake_case= や =CamelCase= 等も入力できます。なお [[https://github.com/minad/corfu][corfu]] のような補完システムを使うと、空白区切りの単語列を関数名などに補完できるため、案外ケース変更は必要無いことも多そうです。
+
+この辺りはプログラミングで非常に重要であるため、よくよく調べて行きたいと思います。普及したキーマップも無さそうです。
+
+*** [[https://lapwing.aerick.ca/Chapter-18.html][Fingerspelling]]
+
+=k= 1 文字を打つためには、 =K= と =*= を同時押しします:
+
+#+BEGIN_STENO
+k*
+#+END_STENO
+
+=j= なども同様に打てます:
+
+#+BEGIN_STENO
+skwr*
+#+END_STENO
+
+大文字の =J= を打つためには、右手の =p= も押さえます:
+
+#+BEGIN_STENO
+skwr*p
+#+END_STENO
+
+*** [[https://lapwing.aerick.ca/Chapter-25.html][修飾キー]]
+
+[[https://github.com/EPLHREU/emily-modifiers][Emily's modifier dictionary]] を使用します。 Lapwing には [[https://lapwing.aerick.ca/Chapter-25.html][改変版]] が同封されており、 =-LGTS= を /ender/ とします:
+
+#+BEGIN_STENO
+-LGTS
+#+END_STENO
+
+右手の =FRPB= が、それぞれ ctrl, shift, meta, alt に相当します:
+
+#+BEGIN_STENO
+-FRPB
+#+END_STENO
+
+最後に、左手と親指で任意のアルファベットを入力できます。たとえば、 =TKPW-FLGTS=  で Ctrl + G が打てます (ターミナルで [[https://github.com/decors/fish-ghq][=fish-ghq=]] を起動):
+
+#+BEGIN_STENO
+TKPW-FLGTS
+#+END_STENO
+
+=KR-FLGTS= で Ctrl + C を打って =fish-ghq= を終了できます:
+
+#+BEGIN_STENO
+KR-FLGTS
+#+END_STENO
+
+左手で数字や記号も打つことができ、 =RAO-PLGTS= で Meta + 1 が打てます。詳細は省略しますが、このキー配置は納得行きません。 Lapwing には [[https://github.com/Abkwreu/plover-left-hand-modifiers][Abby's Left Hand Modifiers Dictionary]] も同封されているので、そちらも参照した方が良さそうです:
+
+#+BEGIN_STENO
+RAO-PLGTS
+#+END_STENO
+
+*** [[https://lapwing.aerick.ca/Chapter-25.html][記号入力]]
+
+[[https://github.com/EPLHREU/emily-symbols][Emily's Symbol Dictionary]] を使用します。これは =SKWH= + 他のキーで記号入力ができる辞書データです:
+
+#+BEGIN_STENO
+SKWH
+#+END_STENO
+
+前述のバックスペースを始め、様々なキーや記号を入力できます:
+
+#+BEGIN_STENO
+SKWHEFG
+#+END_STENO
+
+*** [[https://lapwing.aerick.ca/Chapter-18.html#numbers][数値入力]]
+
+Lapwing の初期設定では、 =#= キーを押すと右手の =FRPBLG= がテンキーになります:
+
+#+BEGIN_STENO
+FRPBLG
+#+END_STENO
+
+物理キーは 2x3 ですが、上下二段の同時押しが中段になるという寸法です。 =1=, =2=, =3=, =4= と打ってみます:
+
+#+BEGIN_STENO
+#-R/#-B/#-G/#-FR
+#+END_STENO
+
+[[https://github.com/StenoHarri/Harri_numbers][StenoHarri/Harri\under{}numbers]] を導入すると、右手の =FRPB= がテンキーになります:
+
+#+BEGIN_STENO
+FRPB
+#+END_STENO
+
+物理キーは 2x2 ですが、同様に同時押しによって 3x3 になります。 =1=, =2=, =3=, =4= と打ってみます:
+
+#+BEGIN_STENO
+#-R/#-RB/#-B/#-FR
+#+END_STENO
+
+そして =LTGS= もテンキーになります。テンキーが 2 つあるので、 2 つの数字を同時に入力できます。 =42= を打ってみます:
+
+#+BEGIN_STENO
+#-FRGS
+#+END_STENO
+
+速記の方が QWERTY よりも速く快適に数値入力できるという人もおり、数値入力は安心できそうです。
+
+*** [[https://lapwing.aerick.ca/Chapter-26.html][十字キー]]
+
+=#TPH= を /starter/ とします。右手の =RPBG= が十字キーになります:
+
+#+BEGIN_STENO
+#TPH-RPBG
+#+END_STENO
+
+Page up, page down 等も打てます:
+
+#+BEGIN_STENO
+#TPH-RPG/#TPH-FBL
+#+END_STENO
+
+*** 1 つでもキーを離した瞬間に翻訳をする (first-up chord send)
+
+[[https://github.com/openstenoproject/plover][Plover]] (ステノエンジン、速記の実装) では、デフォルトでは全てのキーを離した時に翻訳が発動します。 1 つでもキーを離した時に翻訳が起きるように設定変更すると、上記の Emily's dictionary 等が使いやすくなりそうです。
+
+この機能 (first-up chord send) は [[https://github.com/openstenoproject/plover/pull/1611][plover#1611]] で実装されていますが、通常の Keyboard に対する実装ですので、 GeminiPR プロトコル越しにアクセスする Uni V4 では使えません。 [[https://github.com/JoshuaGrams/steno-firmware][JoshuaGrams/steno-firmware]] を焼けば Uni でも使えるかもしれません。
+
+*** 以上
+
+歯抜け知識での紹介ですが、概ね全てのキーが打てることを確認できたと思います。修飾キー + 数字、修飾キー + 記号は検討中のため、持ち帰らせてください……。
+
+** Neovim 観光
+
+Vim 駅伝の投稿ですから、速記関連の Vim プラグインを見ていきましょう。
+
+*** [[https://github.com/derekthecool/plover-tapey-tape.nvim][derekthecool/plover-tapey-tape.nvim]]
+
+実質、これが唯一の Vim プラグインです。以下の手順で動かしてみました:
+
+1. Plover の [[https://github.com/rabbitgrowth/plover-tapey-tape][rabbitgrowth/plover-tapey-tape]] をインストールし有効化します。
+2. Neovim の [[https://github.com/derekthecool/plover-tapey-tape.nvim][derekthecool/plover-tapey-tape.nvim]] をインストールし、実行します。
+3. ウィンドウの配置を調整します (調整が必要になるのはバグ……？)
+
+#+CAPTION: 右上にストローク表示、右下にキー入力履歴を表示
+[[./img/2025-06-30-plover-tapey-tape-nvim.png]]
+
+これにより、 Vim で速記をしつつ、自分のストロークを確認できます。バグの最小再現構成の提供などに便利かも……？
+
+*** [[https://github.com/Josiah-tan/plover-vim][Josiah-tan/plover-vim]], [[https://github.com/Josiah-tan/plover-vim-tutor][Josiah-tan/plover-vim-tutor]]
+
+速記側に Vim 用のストロークを追加するプロジェクトです。 Vim プラグインというよりは、 Plover の辞書のリポジトリとなります:
+
+- [[https://github.com/Josiah-tan/plover-vim][Josiah-tan/plover-vim]]
+  Vim 用の辞書を定義しています。
+- [[https://github.com/Josiah-tan/plover-vim-tutor][Josiah-tan/plover-vim-tutor]]
+  =plover-vim= 関連のドキュメントを Vim の中で表示できるプラグイン (help エントリ) です。
+
+=LTZ= を Vim 関連の主なストロークに使用します:
+
+#+BEGIN_STENO
+LTZ
+#+END_STENO
+
+また =LTSZ= をコマンドオブジェクトに使用します:
+
+#+BEGIN_STENO
+LSTZ
+#+END_STENO
+
+汎用辞書というよりは、 Vim 専用のホットキーを量産するようなアイデアですが、どうでしょうか。まだ試せていません。
+
+*** 以上
+
+なんと、他に速記関連のプラグインは見つかりませんでした。 [[https://github.com/Josiah-tan/plover-vim][Josiah-tan/plover-vim]] が実質的に唯一のプラグインです。
+
+* 終わりに
+
+速記でタイピングが変わるのは間違いありません。結構期待していますが、想定より難しくなりそうです。コーディングのベストプラクティスなどは見つからず、 Vim プラグインも全然ありませんでした。今後は先人の跡を辿るだけではなく、自分で試行錯誤する必要がありそうです。
+
+英語速記をやりたい人は [[https://stenokeyboards.com/products/the-uni-v4][Uni V4]] を買って [[https://lapwing.aerick.ca/Home.html][Lapwing for Beginners]] を読みましょう。日本語速記をやりたい人は、 Note 等を検索して頑張ってください！
+
