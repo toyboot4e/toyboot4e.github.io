@@ -137,11 +137,11 @@ SWR-BD
 
 *** 空白モード、記法モード
 
-速記の出力は、基本スペース区切りです。 =k= キーを 2 回押すと =can= が 2 回出て、いずれも先頭に空白文字が付きます。 [[https://plover.readthedocs.io/en/latest/translation_language.html#spacing-modes][空白モード]] を切り替えると、単語間に空白を挿入しないよう切り替えできます。
+速記の出力は、基本スペース区切りです。 =k= キーを 2 回押すと =can= が 2 回出て、いずれも先頭に空白文字が付きます。 [[https://plover.readthedocs.io/en/latest/translation_language.html#spacing-modes][空白モード]] を切り替えると、単語間に空白を挿入しないようにできます。
 
 [[https://plover.readthedocs.io/en/latest/translation_language.html#casing-modes][記法モード]] を切り替えれば、 =snake_case= や =CamelCase= 等も入力できます。なお [[https://github.com/minad/corfu][corfu]] のような補完システムを使うと、空白区切りの単語列を関数名などに補完できるため、案外ケース変更は必要無いことも多そうです。
 
-この辺りはプログラミングで非常に重要であるため、よくよく調べて行きたいと思います。普及したキーマップも無さそうです。
+この辺りはプログラミングで非常に重要であるため、よくよく調べて行きたいと思います。普及した辞書も無さそうです。
 
 *** [[https://lapwing.aerick.ca/Chapter-18.html][Fingerspelling]]
 
@@ -197,7 +197,7 @@ RAO-PLGTS
 
 *** [[https://lapwing.aerick.ca/Chapter-25.html][記号入力]]
 
-[[https://github.com/EPLHREU/emily-symbols][Emily's Symbol Dictionary]] を使用します。これは =SKWH= + 他のキーで記号入力ができる辞書データです:
+[[https://github.com/EPLHREU/emily-symbols][Emily's Symbol Dictionary]] を使用します。これは =SKWH= + 他のキーで記号入力ができる辞書です:
 
 #+BEGIN_STENO
 SKWH
@@ -241,7 +241,7 @@ FRPB
 #-FRGS
 #+END_STENO
 
-速記の方が QWERTY よりも速く快適に数値入力できるという人もおり、数値入力は安心できそうです。
+速記の方が QWERTY よりも速く快適に数値入力できるという声もあり、数値入力は安心できそうです。
 
 *** [[https://lapwing.aerick.ca/Chapter-26.html][十字キー]]
 
@@ -302,14 +302,14 @@ LTZ
 また =LTSZ= をコマンドオブジェクトに使用します:
 
 #+BEGIN_STENO
-LSTZ
+LTSZ
 #+END_STENO
 
 汎用辞書というよりは、 Vim 専用のホットキーを量産するようなアイデアですが、どうでしょうか。まだ試せていません。
 
 *** 以上
 
-なんと、他に速記関連のプラグインは見つかりませんでした。 [[https://github.com/Josiah-tan/plover-vim][Josiah-tan/plover-vim]] が実質的に唯一のプラグインです。
+なんと、他に速記関連のプラグインは見つかりませんでした。 [[https://github.com/derekthecool/plover-tapey-tape.nvim][derekthecool/plover-tapey-tape.nvim]] が実質的に唯一のプラグインです。
 
 * 終わりに
 
