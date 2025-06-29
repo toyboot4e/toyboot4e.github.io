@@ -257,7 +257,7 @@ Page up, page down 等も打てます:
 #TPH-RPG/#TPH-FBL
 #+END_STENO
 
-*** 1 つでもキーを離した瞬間に翻訳をする (first-up chord send)
+*** 1 つでもキーを離した瞬間に翻訳する (first-up chord send)
 
 [[https://github.com/openstenoproject/plover][Plover]] (ステノエンジン、速記の実装) では、デフォルトでは全てのキーを離した時に翻訳が発動します。 1 つでもキーを離した時に翻訳が起きるように設定変更すると、上記の Emily's dictionary 等が使いやすくなりそうです。
 
@@ -289,7 +289,7 @@ Vim 駅伝の投稿ですから、速記関連の Vim プラグインを見て�
 速記側に Vim 用のストロークを追加するプロジェクトです。 Vim プラグインというよりは、 Plover の辞書のリポジトリとなります:
 
 - [[https://github.com/Josiah-tan/plover-vim][Josiah-tan/plover-vim]]
-  Vim 用の辞書を定義しています。
+  Vim 用の Plover 辞書を定義しています。
 - [[https://github.com/Josiah-tan/plover-vim-tutor][Josiah-tan/plover-vim-tutor]]
   =plover-vim= 関連のドキュメントを Vim の中で表示できるプラグイン (help エントリ) です。
 
@@ -313,7 +313,7 @@ LTSZ
 
 * 終わりに
 
-速記でタイピングが変わるのは間違いありません。結構期待していますが、想定より難しくなりそうです。コーディングのベストプラクティスなどは見つからず、 Vim プラグインも全然ありませんでした。今後は先人の跡を辿るだけではなく、自分で試行錯誤する必要がありそうです。
+速記でタイピングが変わるのは間違いありません。結構期待していますが、想定より難しくなりそうです。コーディング用途の速記のベストプラクティスなどは見つからず、 Vim プラグインも全然ありませんでした。今後は先人の跡を辿るだけではなく、自分で試行錯誤する必要がありそうです。
 
 英語速記をやりたい人は [[https://stenokeyboards.com/products/the-uni-v4][Uni V4]] を買って [[https://lapwing.aerick.ca/Home.html][Lapwing for Beginners]] を読みましょう。日本語速記をやりたい人は、 Note 等を検索して頑張ってください！
 
