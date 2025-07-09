@@ -397,7 +397,8 @@ wrapped in code elements."
   (let* ((beg (org-element-property :contents-begin steno-block))
          (end (org-element-property :contents-end steno-block))
          (raw-content (buffer-substring-no-properties beg end)))
-    (format "<steno-outline>%s</steno-outline>" (string-trim raw-content))))
+    ;; TODO: Remove mathjax_ignore, set it in other way
+    (format "<steno-outline class=\"mathjax_ignore\">%s</steno-outline>" (string-trim raw-content))))
 
 ;; Special block (custom block) handler dispatcher
   (defun my-org-html-special-block (special-block contents info)
