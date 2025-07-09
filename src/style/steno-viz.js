@@ -105,7 +105,6 @@ class StenoViz extends HTMLElement {
     ];
 
     const strokes = this.textContent.toUpperCase().split('/');
-    console.log(strokes);
     for (let stroke of strokes) {
       this.shadowRoot.appendChild(this.renderStroke(chars, stroke));
     }
