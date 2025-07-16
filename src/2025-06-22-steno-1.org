@@ -1,19 +1,19 @@
-#+TITLE: ステノ入門のための yak shaving
+#+TITLE: 速記入門のための yak shaving
 #+DATE: <2025-06-22 Sun>
 
 * 背景
 
-先日購入した [[https://stenokeyboards.com/products/the-uni-v4][Uni V4]] で、英語ステノの練習をしています。
+先日購入した [[https://stenokeyboards.com/products/the-uni-v4][Uni V4]] で、英語速記の練習をしています。
 
 #+CAPTION: Uni V4. 28 キー
 #+ATTR_HTML: :width 75%
 [[./img/2024-04-04-uni-v4.jpg]]
 
-ステノ (stenography) とは速記のことで、複数キーの同時押し (ストローク) を活かして多数の文字を瞬時に入力できるシステムです。元々は数百万円台の専用機に実装されていたようですが、 [[http://openstenoproject.org/][Open Steno Project]] のおかげで庶民の手にも届くようになりました。
+速記 (stenography) とは、複数キーの同時押し (ストローク) を活かして多数の文字を瞬時に入力できるシステムです。元々は数百万円台の専用機に実装されていたようですが、 [[http://openstenoproject.org/][Open Steno Project]] のおかげで庶民の手にも届くようになりました。
 
-ステノユーザはインターネットにもほぼいないので、これを習得すれば突出できると思います。あわよくば技術同人誌なども書けると嬉しいです。
+速記ユーザはインターネットにもほぼいないので、これを習得すれば突出できると思います。あわよくば技術同人誌なども書けると嬉しいです。
 
-今回はステノの練習に先立って、周辺環境の構築に関する取り組みを紹介します。
+今回は速記の練習に先立って、周辺環境の構築に関する取り組みを紹介します。
 
 * Yak shaving
 
@@ -33,7 +33,7 @@ kat
 
 ** 練習用ツールの作成
 
-ステノは [[https://didoesdigital.com/typey-type/][Typey Type]] というサイトで練習できます。毎回レッスンデータを入力するのが面倒だったため、コマンドラインで練習するためのツールを作成中です ([[https://github.com/toyboot4e/plover-drills][=plover-drills=]]) 。
+速記は [[https://didoesdigital.com/typey-type/][Typey Type]] というサイトで練習できます。毎回レッスンデータを入力するのが面倒だったため、コマンドラインで練習するためのツールを作成中です ([[https://github.com/toyboot4e/plover-drills][=plover-drills=]]) 。
 
 [[./img/2025-06-22-drill.gif]]
 
@@ -41,7 +41,7 @@ kat
 
 ** =plover-flake= の導入
 
-ステノの実装は Plover というソフトウェアです:
+速記の実装は Plover というソフトウェアです:
 
 - [[https://www.openstenoproject.org/plover/][Plover (公式サイト)]]
 - [[https://plover.readthedocs.io/en/latest/][Plover (開発者用ドキュメント)]]
@@ -97,7 +97,7 @@ opacity = 100
 
 *** =/nix/store= 中の辞書データを参照する (未)
 
-ステノ辞書データのダウンロードや、設定ファイル (=plover.cfg=) への取り込みまで =plover-flake= で実行可能にしたいと思います。 =plover-flake= の中の人は特に希望していないかも。
+速記辞書データのダウンロードや、設定ファイル (=plover.cfg=) への取り込みまで =plover-flake= で実行可能にしたいと思います。 =plover-flake= の中の人は特に希望していないかも。
 
 *** Wayland サポート (未)
 
@@ -105,7 +105,7 @@ Wayland でのみ =psutil= パッケージが必要になりそうです。謎�
 
 * まとめ
 
-英語ステノを快適に練習し、ブログで紹介できるようになりました。このキーボード表示は結構お気に入りです:
+英語速記を快適に練習し、ブログで紹介できるようになりました。このキーボード表示は結構お気に入りです:
 
 #+BEGIN_STENO
 KAT

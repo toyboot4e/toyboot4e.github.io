@@ -47,7 +47,7 @@ TKPWEURPB
 
 * 速記の可能性について
 
-現時点でのステノへの期待と、コーディングに導入できるかをぼんやりと考えます。
+現時点での速記への期待と、コーディングに導入できるかをぼんやりと考えます。
 
 #+BEGIN_QUOTE
 あまり速記の練習が進んでいないので、裏取りはありません。
@@ -59,7 +59,7 @@ TKPWEURPB
 
 *** キー配列
 
-英語ステノの標準的なキー配列は以下です。 =S=, =P=, =R= は左右対称の位置にあって覚えやすいと思います:
+英語速記の標準的なキー配列は以下です。 =S=, =P=, =R= は左右対称の位置にあって覚えやすいと思います:
 
 #+BEGIN_STENO
 SPRRPS
@@ -259,7 +259,7 @@ Page up, page down 等も打てます:
 
 *** 1 つでもキーを離した瞬間に翻訳する (first-up chord send)
 
-[[https://github.com/openstenoproject/plover][Plover]] (ステノエンジン、速記の実装) では、デフォルトでは全てのキーを離した時に翻訳が発動します。 1 つでもキーを離した時に翻訳が起きるように設定変更すると、上記の Emily's dictionary 等が使いやすくなりそうです。
+[[https://github.com/openstenoproject/plover][Plover]] (速記、速記の実装) では、デフォルトでは全てのキーを離した時に翻訳が発動します。 1 つでもキーを離した時に翻訳が起きるように設定変更すると、上記の Emily's dictionary 等が使いやすくなりそうです。
 
 この機能 (first-up chord send) は [[https://github.com/openstenoproject/plover/pull/1611][plover#1611]] で実装されていますが、通常の Keyboard に対する実装ですので、 GeminiPR プロトコル越しにアクセスする Uni V4 では使えません。 [[https://github.com/JoshuaGrams/steno-firmware][JoshuaGrams/steno-firmware]] を焼けば Uni でも使えるかもしれません。
 
