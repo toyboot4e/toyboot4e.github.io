@@ -12,7 +12,7 @@
 - @@html:<date>2025-05-10</date>@@ [[file:./2025-05-10-nixify-your-devlog.org][Nixify your devlog]] [@@html:<a href="./tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
 - @@html:<date>2025-05-07</date>@@ [[file:./2025-05-07-blog-improvements-4.org][=org-mode= 製ブログの改良 (4): yaruo block]] [@@html:<a href="./tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
 - @@html:<date>2025-04-16</date>@@ [[file:./2025-04-16-ac-library-hs-3.org][=ac-library-hs= の =Extra= モジュールを作成しました]] [@@html:<a href="./tags/atcoder.html" class="org-tag"><code>#atcoder</code></a>|<a href="./tags/haskell.html" class="org-tag"><code>#haskell</code></a>@@]
-- @@html:<date>2025-04-04</date>@@ [[file:./2025-04-04-uni-v4.org][Uni V4 購入]] [@@html:<a href="./tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@]
+- @@html:<date>2025-04-04</date>@@ [[file:./2025-04-04-uni-v4.org][Uni V4 購入]] [@@html:<a href="./tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>|<a href="./tags/steno.html" class="org-tag"><code>#steno</code></a>@@]
 - @@html:<date>2025-03-23</date>@@ [[file:./2025-03-23-dilemma-v2.org][Dilemma V2 キーボード]] [@@html:<a href="./tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@]
 - @@html:<date>2025-01-18</date>@@ [[file:./2025-01-18-task-runners.org][お試しタスクランナー (make, just, shake, ..)]] [@@html:<a href="./tags/tools.html" class="org-tag"><code>#tools</code></a>@@]
 - @@html:<date>2024-12-19</date>@@ [[file:./2024-12-19-fortran.org][Fortran, 難し過ぎる]] [@@html:<a href="./tags/misc.html" class="org-tag"><code>#misc</code></a>@@]

@@ -1,6 +1,6 @@
 #+TITLE: Uni V4 購入
 #+DATE: <2025-04-04 Fri>
-#+FILETAGS: :keyboard:
+#+FILETAGS: :keyboard:steno
 
 * 背景
 
