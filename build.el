@@ -716,7 +716,7 @@ INFO is a plist holding contextual information.  See
          (tags-string
           (mapconcat
            (lambda (tag)
-             (format "[[%s][#%s]]" (concat "/tags/" tag ".org") tag))
+             (format "[[%s][=#%s=]]" (concat "/tags/" tag ".org") tag))
              all-tags " | ")))
     (concat "#+TITLE: " page-title "\n"
             "\n"
@@ -755,7 +755,7 @@ INFO is a plist holding contextual information.  See
          (tags-string
            (mapconcat
             (lambda (tag)
-              (format "[[%s][#%s]]" (concat "/tags/" tag ".org") tag))
+              (format "[[%s][=#%s=]]" (concat "/tags/" tag ".org") tag))
               all-tags " | ")))
     (concat "#+TITLE: #" tag "\n"
             "\n"

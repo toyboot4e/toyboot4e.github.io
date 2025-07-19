@@ -2,7 +2,7 @@
 
 * Tags
 
-[[/tags/atcoder.org][#atcoder]] | [[/tags/blender.org][#blender]] | [[/tags/blog.org][#blog]] | [[/tags/buy.org][#buy]] | [[/tags/gamedev.org][#gamedev]] | [[/tags/haskell.org][#haskell]] | [[/tags/keyboard.org][#keyboard]] | [[/tags/misc.org][#misc]] | [[/tags/nix.org][#nix]] | [[/tags/react.org][#react]] | [[/tags/steno.org][#steno]] | [[/tags/tools.org][#tools]] | [[/tags/vim.org][#vim]]
+[[/tags/atcoder.org][=#atcoder=]] | [[/tags/blender.org][=#blender=]] | [[/tags/blog.org][=#blog=]] | [[/tags/buy.org][=#buy=]] | [[/tags/gamedev.org][=#gamedev=]] | [[/tags/haskell.org][=#haskell=]] | [[/tags/keyboard.org][=#keyboard=]] | [[/tags/misc.org][=#misc=]] | [[/tags/nix.org][=#nix=]] | [[/tags/react.org][=#react=]] | [[/tags/steno.org][=#steno=]] | [[/tags/tools.org][=#tools=]] | [[/tags/vim.org][=#vim=]]
 
 * Devlog (#react)
 #+ATTR_HTML: :class sitemap
