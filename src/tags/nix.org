@@ -1,6 +1,10 @@
 #+TITLE: #nix
 
-* Articles (#nix)
+* Tags
+
+[[/tags/atcoder.org][#atcoder]] | [[/tags/blender.org][#blender]] | [[/tags/blog.org][#blog]] | [[/tags/buy.org][#buy]] | [[/tags/gamedev.org][#gamedev]] | [[/tags/haskell.org][#haskell]] | [[/tags/keyboard.org][#keyboard]] | [[/tags/misc.org][#misc]] | [[/tags/nix.org][#nix]] | [[/tags/react.org][#react]] | [[/tags/steno.org][#steno]] | [[/tags/tools.org][#tools]] | [[/tags/vim.org][#vim]]
+
+* Devlog (#nix)
 #+ATTR_HTML: :class sitemap
 - @@html:<date>2025-05-10</date>@@ [[file:/2025-05-10-nixify-your-devlog.org][Nixify your devlog]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
 - @@html:<date>2024-09-14</date>@@ [[file:/2024-09-08-nixify-emacs.org][Nixify your Emacs]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]

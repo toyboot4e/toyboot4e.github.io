@@ -1,5 +1,9 @@
 #+TITLE: #tools
 
-* Articles (#tools)
+* Tags
+
+[[/tags/atcoder.org][#atcoder]] | [[/tags/blender.org][#blender]] | [[/tags/blog.org][#blog]] | [[/tags/buy.org][#buy]] | [[/tags/gamedev.org][#gamedev]] | [[/tags/haskell.org][#haskell]] | [[/tags/keyboard.org][#keyboard]] | [[/tags/misc.org][#misc]] | [[/tags/nix.org][#nix]] | [[/tags/react.org][#react]] | [[/tags/steno.org][#steno]] | [[/tags/tools.org][#tools]] | [[/tags/vim.org][#vim]]
+
+* Devlog (#tools)
 #+ATTR_HTML: :class sitemap
 - @@html:<date>2025-01-18</date>@@ [[file:/2025-01-18-task-runners.org][お試しタスクランナー (make, just, shake, ..)]] [@@html:<a href="/tags/tools.html" class="org-tag"><code>#tools</code></a>@@]

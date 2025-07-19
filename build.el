@@ -673,7 +673,7 @@ INFO is a plist holding contextual information.  See
                  ":" " "
                  (string-trim filetags " "))))
          (tag-delimiter ;; "&nbsp;"
-          "|")
+          " |")
          (tags-string
           (if (not tags) ""
             (format " [@@html:%s@@]"
@@ -716,8 +716,8 @@ INFO is a plist holding contextual information.  See
          (tags-string
           (mapconcat
            (lambda (tag)
-             (format "[[%s][%s]]" (concat "/tags/" tag ".org") tag))
-             all-tags "|")))
+             (format "[[%s][#%s]]" (concat "/tags/" tag ".org") tag))
+             all-tags " | ")))
     (concat "#+TITLE: " page-title "\n"
             "\n"
 
@@ -726,7 +726,7 @@ INFO is a plist holding contextual information.  See
             tags-string
             "\n" "\n"
 
-            "* Devlog" "\n"
+            "* Devlog (timeline)" "\n"
             "#+ATTR_HTML: :class sitemap" "\n"
             (join-with-newline devlog-bullets) "\n"
             "\n"
@@ -749,15 +749,26 @@ INFO is a plist holding contextual information.  See
                           (link-path (car url-tags)))
                       (format "- %s" (my-show-article-bullet org-file link-path))))
                   url-tags-list))
+
          ;; Stringify
-         (articles (join-with-newline bullets)))
+         (articles (join-with-newline bullets))
+         (tags-string
+           (mapconcat
+            (lambda (tag)
+              (format "[[%s][#%s]]" (concat "/tags/" tag ".org") tag))
+              all-tags " | ")))
     (concat "#+TITLE: #" tag "\n"
             "\n"
+
+            "* Tags" "\n"
+            "\n"
+            tags-string
+            "\n" "\n"
 
             ;; "#+BEGIN_CENTER" "\n"
             ;; "[[/index.html][devlog]] | [[/diary/index.org][diary]]" "\n"
             ;; "#+END_CENTER" "\n"
-            "* Articles (#" tag ")" "\n"
+            "* Devlog (#" tag ")" "\n"
             "#+ATTR_HTML: :class sitemap" "\n"
             articles"\n"
             )))

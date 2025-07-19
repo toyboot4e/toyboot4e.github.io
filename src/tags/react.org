@@ -1,5 +1,9 @@
 #+TITLE: #react
 
-* Articles (#react)
+* Tags
+
+[[/tags/atcoder.org][#atcoder]] | [[/tags/blender.org][#blender]] | [[/tags/blog.org][#blog]] | [[/tags/buy.org][#buy]] | [[/tags/gamedev.org][#gamedev]] | [[/tags/haskell.org][#haskell]] | [[/tags/keyboard.org][#keyboard]] | [[/tags/misc.org][#misc]] | [[/tags/nix.org][#nix]] | [[/tags/react.org][#react]] | [[/tags/steno.org][#steno]] | [[/tags/tools.org][#tools]] | [[/tags/vim.org][#vim]]
+
+* Devlog (#react)
 #+ATTR_HTML: :class sitemap
 - @@html:<date>2024-02-03</date>@@ [[file:/2024-02-03-react-1.org][React 入門 - 1: 三目並べ]] [@@html:<a href="/tags/react.html" class="org-tag"><code>#react</code></a>@@]

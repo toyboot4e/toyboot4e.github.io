@@ -1,6 +1,10 @@
 #+TITLE: #blog
 
-* Articles (#blog)
+* Tags
+
+[[/tags/atcoder.org][#atcoder]] | [[/tags/blender.org][#blender]] | [[/tags/blog.org][#blog]] | [[/tags/buy.org][#buy]] | [[/tags/gamedev.org][#gamedev]] | [[/tags/haskell.org][#haskell]] | [[/tags/keyboard.org][#keyboard]] | [[/tags/misc.org][#misc]] | [[/tags/nix.org][#nix]] | [[/tags/react.org][#react]] | [[/tags/steno.org][#steno]] | [[/tags/tools.org][#tools]] | [[/tags/vim.org][#vim]]
+
+* Devlog (#blog)
 #+ATTR_HTML: :class sitemap
 - @@html:<date>2025-05-07</date>@@ [[file:/2025-05-07-blog-improvements-4.org][=org-mode= 製ブログの改良 (4): yaruo block]] [@@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
 - @@html:<date>2024-09-15</date>@@ [[file:/2024-09-15-blog-improvements-3.org][=org-mode= 製ブログの改良 (3): callouts]] [@@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
