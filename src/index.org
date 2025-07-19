@@ -1,6 +1,10 @@
 #+TITLE: toybeam
 
-* devlog
+* Tags
+
+[[/tags/atcoder.org][atcoder]]|[[/tags/blender.org][blender]]|[[/tags/blog.org][blog]]|[[/tags/buy.org][buy]]|[[/tags/gamedev.org][gamedev]]|[[/tags/haskell.org][haskell]]|[[/tags/keyboard.org][keyboard]]|[[/tags/misc.org][misc]]|[[/tags/nix.org][nix]]|[[/tags/react.org][react]]|[[/tags/steno.org][steno]]|[[/tags/tools.org][tools]]|[[/tags/vim.org][vim]]
+
+* Devlog
 #+ATTR_HTML: :class sitemap
 - @@html:<date>2025-06-30</date>@@ [[file:/2025-06-30-steno-with-neovim.org][速記キーボードで Neovim がしたい？！]] [@@html:<a href="/tags/vim.html" class="org-tag"><code>#vim</code></a>|<a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@]
 - @@html:<date>2025-06-29</date>@@ [[file:/2025-06-29-benq-pd2730s.org][BenQ 2730S (5K モニタ) の購入]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
@@ -51,7 +55,7 @@
 - @@html:<date>2022-12-09</date>@@ [[file:/2022-12-09-kindle-scribe.org][Kindle Scribe の購入を正当化する]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
 - @@html:<date>2022-10-09</date>@@ [[file:/2022-10-09-org-mode-blog.org][=org-mode= で簡易ブログ生成]] [@@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
 
-* diary
+* Diary
 #+ATTR_HTML: :class sitemap
 - @@html:<date>2025-05-18</date>@@ [[file:/diary/2025-05-18.org][ABC 406]]
 - @@html:<date>2025-05-11</date>@@ [[file:/diary/2025-05-11.org][ABC 405]]

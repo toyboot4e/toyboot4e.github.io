@@ -166,7 +166,7 @@
     ;; NOTE: `org-export-data' returns HTML, so we'll remove HTML tags
     (title (*RAW-STRING* ,(concat (my-strip-html (org-export-data (plist-get info :title) info)) " - toybeam")))
     (meta (@ (name "description")
-             (content "devlog by toyboot4e")))
+             (content "Devlog by toyboot4e")))
     ;; (link (@ (rel "stylesheet")
     ;;          (href "https://cdn.simplecss.org/simple.min.css")))
     (link (@ (rel "stylesheet")
@@ -697,7 +697,7 @@ INFO is a plist holding contextual information.  See
   (mapconcat #'identity xs "\n"))
 
 ;; Generates `index.org'
-(defun my-generate-sitemap (base-dir page-title)
+(defun my-generate-sitemap (base-dir page-title all-tags)
   (let* ((devlog-bullets
           (my-show-article-bullets
            "src" (collect-org-files
@@ -711,19 +711,27 @@ INFO is a plist holding contextual information.  See
            "src" (collect-org-files
                   base-dir (lambda (url-tags)
                              (let ((url (car url-tags)))
-                               (string-match "diary/" url)))))))
+                               (string-match "diary/" url))))))
+
+         (tags-string
+          (mapconcat
+           (lambda (tag)
+             (format "[[%s][%s]]" (concat "/tags/" tag ".org") tag))
+             all-tags "|")))
     (concat "#+TITLE: " page-title "\n"
             "\n"
 
-            ;; "#+BEGIN_CENTER" "\n"
-            ;; "[[/index.html][devlog]] | [[/diary/index.org][diary]]" "\n"
-            ;; "#+END_CENTER" "\n"
-            "* devlog" "\n"
+            "* Tags" "\n"
+            "\n"
+            tags-string
+            "\n" "\n"
+
+            "* Devlog" "\n"
             "#+ATTR_HTML: :class sitemap" "\n"
             (join-with-newline devlog-bullets) "\n"
             "\n"
 
-            "* diary" "\n"
+            "* Diary" "\n"
             "#+ATTR_HTML: :class sitemap" "\n"
             (join-with-newline diary-bullets)"\n"
             )))
@@ -794,11 +802,27 @@ INFO is a plist holding contextual information.  See
 (message (concat "Target: " build-target " force flag: " (symbol-name force-flag)))
 (message "--------------------------------------------------------------------------------")
 
+;; TODO: Needed?
 (org-publish-remove-all-timestamps)
+
+(setq all-tags
+      '("atcoder"
+        "blender"
+        "blog"
+        "buy"
+        "gamedev"
+        "haskell"
+        "keyboard"
+        "misc"
+        "nix"
+        "react"
+        "steno"
+        "tools"
+        "vim"))
 
 (message "Generating `index.org`..")
 (let* ((base-dir "src")
-      (index-org-string (my-generate-sitemap base-dir "toybeam"))
+      (index-org-string (my-generate-sitemap base-dir "toybeam" all-tags))
       (index-org-path (concat base-dir "/index.org")))
    (with-temp-file index-org-path (insert index-org-string)))
 
@@ -807,19 +831,10 @@ INFO is a plist holding contextual information.  See
 
 ;; FIXME: It takes too long, probably due to multiple file opens. I should cache file reads.
 (message "Generating `tags/*.org`..")
-(my-create-tag-page-org-file "src" "atcoder")
-(my-create-tag-page-org-file "src" "blender")
-(my-create-tag-page-org-file "src" "blog")
-(my-create-tag-page-org-file "src" "buy")
-(my-create-tag-page-org-file "src" "gamedev")
-(my-create-tag-page-org-file "src" "haskell")
-(my-create-tag-page-org-file "src" "keyboard")
-(my-create-tag-page-org-file "src" "misc")
-(my-create-tag-page-org-file "src" "nix")
-(my-create-tag-page-org-file "src" "react")
-(my-create-tag-page-org-file "src" "steno")
-(my-create-tag-page-org-file "src" "tools")
-(my-create-tag-page-org-file "src" "vim")
+(mapcar
+ (lambda (tag)
+   (my-create-tag-page-org-file "src" tag))
+ all-tags)
 
 (if force-flag
     (org-publish build-target t)
