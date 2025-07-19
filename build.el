@@ -6,6 +6,7 @@
 ;; - `https://www.roygbyte.com/add_syntax_highlighting_to_an_org_publish_project.html'
 ;; - `https://github.com/balddotcat/ox-slimhtml'
 
+;; Note that this source file is a mess.
 
 ;; TODO: Custom admonition filter
 
@@ -678,7 +679,7 @@ INFO is a plist holding contextual information.  See
             (format " [@@html:%s@@]"
                     (mapconcat
                      (lambda (tag)
-                       (let ((link (format "./tags/%s.html" tag)))
+                       (let ((link (format "/tags/%s.html" tag)))
                          (format "<a href=\"%s\" class=\"org-tag\"><code>#%s</code></a>" link tag)))
                      tags tag-delimiter)))))
     (format "@@html:<date>%s</date>@@ [[file:%s][%s]]%s" date-string link-path title tags-string)))
@@ -687,7 +688,7 @@ INFO is a plist holding contextual information.  See
 (defun my-show-article-bullets (base-dir url-tags-list)
   (mapcar (lambda (url-tags)
             (let ((org-file (concat base-dir (car url-tags)))
-                  (link-path (concat "." (car url-tags))))
+                  (link-path (car url-tags)))
               (format "- %s" (my-show-article-bullet org-file link-path))))
           url-tags-list))
 
@@ -803,6 +804,8 @@ INFO is a plist holding contextual information.  See
 
 ;; TODO: draft/release
 ;; TODO: Collect tags first
+
+(message "Generating `tags/*.org`..")
 (my-create-tag-page-org-file "src" "atcoder")
 (my-create-tag-page-org-file "src" "blender")
 (my-create-tag-page-org-file "src" "blog")

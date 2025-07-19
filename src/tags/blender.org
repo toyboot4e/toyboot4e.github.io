@@ -2,4 +2,4 @@
 
 * Articles (#blender)
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2023-10-15</date>@@ [[file:./2023-10-22-blender-vse.org][Blender VSE + Whisper + VOICEVOX]] [@@html:<a href="./tags/blender.html" class="org-tag"><code>#blender</code></a>@@]
+- @@html:<date>2023-10-15</date>@@ [[file:./2023-10-22-blender-vse.org][Blender VSE + Whisper + VOICEVOX]] [@@html:<a href="/tags/blender.html" class="org-tag"><code>#blender</code></a>@@]

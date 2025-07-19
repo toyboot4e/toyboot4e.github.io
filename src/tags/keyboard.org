@@ -2,10 +2,10 @@
 
 * Articles (#keyboard)
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2025-06-22</date>@@ [[file:./2025-06-22-steno-1.org][速記入門のための yak shaving]] [@@html:<a href="./tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>|<a href="./tags/steno.html" class="org-tag"><code>#steno</code></a>@@]
-- @@html:<date>2025-04-04</date>@@ [[file:./2025-04-04-uni-v4.org][Uni V4 購入]] [@@html:<a href="./tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>|<a href="./tags/steno.html" class="org-tag"><code>#steno</code></a>@@]
-- @@html:<date>2025-03-23</date>@@ [[file:./2025-03-23-dilemma-v2.org][Dilemma V2 キーボード]] [@@html:<a href="./tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@]
-- @@html:<date>2024-11-17</date>@@ [[file:./2024-11-17-atcoder-1500.org][Haskell / AtCoder レーティング 1,500 到達]] [@@html:<a href="./tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@]
-- @@html:<date>2024-11-11</date>@@ [[file:./2024-11-11-keyball-44-with-34-keys.org][現在の Keyball 44 の運用 (34 キー操作)]] [@@html:<a href="./tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@]
-- @@html:<date>2023-08-19</date>@@ [[file:./2023-08-19-keyball44-build.org][Keyball 44 組み立て]] [@@html:<a href="./tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@]
-- @@html:<date>2023-07-30</date>@@ [[file:./2023-07-31-keyball44-prepare.org][Keyball 44 下準備]] [@@html:<a href="./tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@]
+- @@html:<date>2025-06-22</date>@@ [[file:./2025-06-22-steno-1.org][速記入門のための yak shaving]] [@@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>|<a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@]
+- @@html:<date>2025-04-04</date>@@ [[file:./2025-04-04-uni-v4.org][Uni V4 購入]] [@@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>|<a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@]
+- @@html:<date>2025-03-23</date>@@ [[file:./2025-03-23-dilemma-v2.org][Dilemma V2 キーボード]] [@@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@]
+- @@html:<date>2024-11-17</date>@@ [[file:./2024-11-17-atcoder-1500.org][Haskell / AtCoder レーティング 1,500 到達]] [@@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@]
+- @@html:<date>2024-11-11</date>@@ [[file:./2024-11-11-keyball-44-with-34-keys.org][現在の Keyball 44 の運用 (34 キー操作)]] [@@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@]
+- @@html:<date>2023-08-19</date>@@ [[file:./2023-08-19-keyball44-build.org][Keyball 44 組み立て]] [@@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@]
+- @@html:<date>2023-07-30</date>@@ [[file:./2023-07-31-keyball44-prepare.org][Keyball 44 下準備]] [@@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@]

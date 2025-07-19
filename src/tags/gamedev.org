@@ -2,6 +2,6 @@
 
 * Articles (#gamedev)
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2024-11-22</date>@@ [[file:./2024-11-19-wfc.org][Wave Function Collapse の解説]] [@@html:<a href="./tags/gamedev.html" class="org-tag"><code>#gamedev</code></a>@@]
-- @@html:<date>2022-12-11</date>@@ [[file:./2022-12-11-inkfs.org][開発中の 2D フレームワークについて]] [@@html:<a href="./tags/gamedev.html" class="org-tag"><code>#gamedev</code></a>@@]
-- @@html:<date>2022-12-11</date>@@ [[file:./2022-12-11-ecs-storages.org][Entity-Component-System の 3種類のストレージ]] [@@html:<a href="./tags/gamedev.html" class="org-tag"><code>#gamedev</code></a>@@]
+- @@html:<date>2024-11-22</date>@@ [[file:./2024-11-19-wfc.org][Wave Function Collapse の解説]] [@@html:<a href="/tags/gamedev.html" class="org-tag"><code>#gamedev</code></a>@@]
+- @@html:<date>2022-12-11</date>@@ [[file:./2022-12-11-inkfs.org][開発中の 2D フレームワークについて]] [@@html:<a href="/tags/gamedev.html" class="org-tag"><code>#gamedev</code></a>@@]
+- @@html:<date>2022-12-11</date>@@ [[file:./2022-12-11-ecs-storages.org][Entity-Component-System の 3種類のストレージ]] [@@html:<a href="/tags/gamedev.html" class="org-tag"><code>#gamedev</code></a>@@]

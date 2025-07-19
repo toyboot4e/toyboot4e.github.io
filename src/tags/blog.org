@@ -2,8 +2,8 @@
 
 * Articles (#blog)
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2025-05-07</date>@@ [[file:./2025-05-07-blog-improvements-4.org][=org-mode= 製ブログの改良 (4): yaruo block]] [@@html:<a href="./tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
-- @@html:<date>2024-09-15</date>@@ [[file:./2024-09-15-blog-improvements-3.org][=org-mode= 製ブログの改良 (3): callouts]] [@@html:<a href="./tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
-- @@html:<date>2023-09-23</date>@@ [[file:./2023-09-23-blog-improvements-2.org][=org-mode= 製ブログの改良 (2): =<details>=]] [@@html:<a href="./tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
-- @@html:<date>2023-03-18</date>@@ [[file:./2023-03-18-blog-improvements.org][=org-mode= 製ブログの改良 (1): =ox-slimhtml=]] [@@html:<a href="./tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
-- @@html:<date>2022-10-09</date>@@ [[file:./2022-10-09-org-mode-blog.org][=org-mode= で簡易ブログ生成]] [@@html:<a href="./tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
+- @@html:<date>2025-05-07</date>@@ [[file:./2025-05-07-blog-improvements-4.org][=org-mode= 製ブログの改良 (4): yaruo block]] [@@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
+- @@html:<date>2024-09-15</date>@@ [[file:./2024-09-15-blog-improvements-3.org][=org-mode= 製ブログの改良 (3): callouts]] [@@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
+- @@html:<date>2023-09-23</date>@@ [[file:./2023-09-23-blog-improvements-2.org][=org-mode= 製ブログの改良 (2): =<details>=]] [@@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
+- @@html:<date>2023-03-18</date>@@ [[file:./2023-03-18-blog-improvements.org][=org-mode= 製ブログの改良 (1): =ox-slimhtml=]] [@@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
+- @@html:<date>2022-10-09</date>@@ [[file:./2022-10-09-org-mode-blog.org][=org-mode= で簡易ブログ生成]] [@@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@]
