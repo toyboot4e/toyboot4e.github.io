@@ -2,12 +2,12 @@
 
 * Articles (#buy)
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2025-06-29</date>@@ [[file:./2025-06-29-benq-pd2730s.org][BenQ 2730S (5K モニタ) の購入]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
-- @@html:<date>2025-06-29</date>@@ [[file:./2025-06-29-audio.org][音響機器の購入]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
-- @@html:<date>2025-06-20</date>@@ [[file:./2025-06-20-mac-mini.org][Mac Mini 購入]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
-- @@html:<date>2024-12-06</date>@@ [[file:./2024-12-06-ayur-chair.org][アーユル・チェア購入]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
-- @@html:<date>2024-02-04</date>@@ [[file:./2024-02-04-boox-palma.org][BOOX Palma を購入しました]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
-- @@html:<date>2023-05-06</date>@@ [[file:./2023-05-06-exercise-bike.org][エアロバイクを買ってみた]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
-- @@html:<date>2023-02-14</date>@@ [[file:./2023-02-14-setup-new-machine.org][25 万円の PC 組み立て]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
-- @@html:<date>2023-01-14</date>@@ [[file:./2023-01-14-buy-new-machine.org][25 万円で PC パーツ購入]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
-- @@html:<date>2022-12-09</date>@@ [[file:./2022-12-09-kindle-scribe.org][Kindle Scribe の購入を正当化する]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
+- @@html:<date>2025-06-29</date>@@ [[file:/2025-06-29-benq-pd2730s.org][BenQ 2730S (5K モニタ) の購入]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
+- @@html:<date>2025-06-29</date>@@ [[file:/2025-06-29-audio.org][音響機器の購入]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
+- @@html:<date>2025-06-20</date>@@ [[file:/2025-06-20-mac-mini.org][Mac Mini 購入]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
+- @@html:<date>2024-12-06</date>@@ [[file:/2024-12-06-ayur-chair.org][アーユル・チェア購入]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
+- @@html:<date>2024-02-04</date>@@ [[file:/2024-02-04-boox-palma.org][BOOX Palma を購入しました]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
+- @@html:<date>2023-05-06</date>@@ [[file:/2023-05-06-exercise-bike.org][エアロバイクを買ってみた]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
+- @@html:<date>2023-02-14</date>@@ [[file:/2023-02-14-setup-new-machine.org][25 万円の PC 組み立て]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
+- @@html:<date>2023-01-14</date>@@ [[file:/2023-01-14-buy-new-machine.org][25 万円で PC パーツ購入]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]
+- @@html:<date>2022-12-09</date>@@ [[file:/2022-12-09-kindle-scribe.org][Kindle Scribe の購入を正当化する]] [@@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@]

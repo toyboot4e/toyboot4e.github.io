@@ -2,9 +2,9 @@
 
 * Articles (#nix)
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2025-05-10</date>@@ [[file:./2025-05-10-nixify-your-devlog.org][Nixify your devlog]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
-- @@html:<date>2024-09-14</date>@@ [[file:./2024-09-08-nixify-emacs.org][Nixify your Emacs]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
-- @@html:<date>2024-07-07</date>@@ [[file:./2024-07-07-nix-flakes.org][Nix Flakes 入門]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
-- @@html:<date>2023-03-12</date>@@ [[file:./2023-03-12-nixos-desktop.org][NixOS でデスクトップ環境構築 (X + i3)]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
-- @@html:<date>2023-02-24</date>@@ [[file:./2023-02-24-nixos-configuration-files.org][NixOS の設定ファイルとプロファイル]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
-- @@html:<date>2023-02-23</date>@@ [[file:./2023-02-23-nixos-and-other-distros.org][Linux distribution の選択について]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
+- @@html:<date>2025-05-10</date>@@ [[file:/2025-05-10-nixify-your-devlog.org][Nixify your devlog]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
+- @@html:<date>2024-09-14</date>@@ [[file:/2024-09-08-nixify-emacs.org][Nixify your Emacs]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
+- @@html:<date>2024-07-07</date>@@ [[file:/2024-07-07-nix-flakes.org][Nix Flakes 入門]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
+- @@html:<date>2023-03-12</date>@@ [[file:/2023-03-12-nixos-desktop.org][NixOS でデスクトップ環境構築 (X + i3)]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
+- @@html:<date>2023-02-24</date>@@ [[file:/2023-02-24-nixos-configuration-files.org][NixOS の設定ファイルとプロファイル]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
+- @@html:<date>2023-02-23</date>@@ [[file:/2023-02-23-nixos-and-other-distros.org][Linux distribution の選択について]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]

@@ -2,4 +2,4 @@
 
 * Articles (#tools)
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2025-01-18</date>@@ [[file:./2025-01-18-task-runners.org][お試しタスクランナー (make, just, shake, ..)]] [@@html:<a href="/tags/tools.html" class="org-tag"><code>#tools</code></a>@@]
+- @@html:<date>2025-01-18</date>@@ [[file:/2025-01-18-task-runners.org][お試しタスクランナー (make, just, shake, ..)]] [@@html:<a href="/tags/tools.html" class="org-tag"><code>#tools</code></a>@@]

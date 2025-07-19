@@ -2,5 +2,5 @@
 
 * Articles (#misc)
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2024-12-19</date>@@ [[file:./2024-12-19-fortran.org][Fortran, 難し過ぎる]] [@@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@]
-- @@html:<date>2024-11-05</date>@@ [[file:./2024-11-05-php.org][PHP 速習 (ナップサック問題)]] [@@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@]
+- @@html:<date>2024-12-19</date>@@ [[file:/2024-12-19-fortran.org][Fortran, 難し過ぎる]] [@@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@]
+- @@html:<date>2024-11-05</date>@@ [[file:/2024-11-05-php.org][PHP 速習 (ナップサック問題)]] [@@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@]

@@ -738,7 +738,7 @@ INFO is a plist holding contextual information.  See
          (bullets
           (mapcar (lambda (url-tags)
                     (let ((org-file (concat base-dir (car url-tags)))
-                          (link-path (concat "." (car url-tags))))
+                          (link-path (car url-tags)))
                       (format "- %s" (my-show-article-bullet org-file link-path))))
                   url-tags-list))
          ;; Stringify
@@ -805,6 +805,7 @@ INFO is a plist holding contextual information.  See
 ;; TODO: draft/release
 ;; TODO: Collect tags first
 
+;; FIXME: It takes too long, probably due to multiple file opens. I should cache file reads.
 (message "Generating `tags/*.org`..")
 (my-create-tag-page-org-file "src" "atcoder")
 (my-create-tag-page-org-file "src" "blender")

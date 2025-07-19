@@ -2,4 +2,4 @@
 
 * Articles (#react)
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2024-02-03</date>@@ [[file:./2024-02-03-react-1.org][React 入門 - 1: 三目並べ]] [@@html:<a href="/tags/react.html" class="org-tag"><code>#react</code></a>@@]
+- @@html:<date>2024-02-03</date>@@ [[file:/2024-02-03-react-1.org][React 入門 - 1: 三目並べ]] [@@html:<a href="/tags/react.html" class="org-tag"><code>#react</code></a>@@]
