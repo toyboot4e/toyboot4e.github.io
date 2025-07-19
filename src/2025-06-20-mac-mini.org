@@ -1,5 +1,6 @@
 #+TITLE: Mac Mini 購入
 #+DATE: <2025-06-20 Fri>
+#+FILETAGS: :buy:
 
 * 背景
 

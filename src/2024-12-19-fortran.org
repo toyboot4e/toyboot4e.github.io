@@ -1,5 +1,6 @@
 #+TITLE: Fortran, 難し過ぎる
 #+DATE: <2024-12-19 Thu>
+#+FILETAGS: :misc:
 
 [[https://qiita.com/advent-calendar/2024/fortran][Fortran Advent Calendar 2024]] の 19 日目の記事です。 Fortran 入門の三歩手前ぐらいの内容です。
 

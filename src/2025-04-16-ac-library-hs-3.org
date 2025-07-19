@@ -1,5 +1,6 @@
 #+TITLE: =ac-library-hs= の =Extra= モジュールを作成しました
 #+DATE: <2025-04-16 Wed>
+#+FILETAGS: :atcoder:haskell:
 
 * 背景
 

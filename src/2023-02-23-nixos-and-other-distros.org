@@ -1,5 +1,6 @@
 #+TITLE: Linux distribution の選択について
 #+DATE: <2023-02-23 Thu>
+#+FILETAGS: :nix:
 #+LINK: nixos https://nixos.org/
 #+LINK: flakes https://nixos.wiki/wiki/Flakes
 #+LINK: arch https://archlinux.org/

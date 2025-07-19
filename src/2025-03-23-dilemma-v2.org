@@ -1,5 +1,6 @@
 #+TITLE: Dilemma V2 キーボード
 #+DATE: <2025-03-23 Sun>
+#+FILETAGS: :keyboard:
 
 * 背景
 

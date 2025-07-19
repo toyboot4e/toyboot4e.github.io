@@ -1,5 +1,6 @@
 #+TITLE: =org-mode= 製ブログの改良 (1): =ox-slimhtml=
 #+DATE: <2023-03-18 Sat>
+#+FILETAGS: :blog:
 
 * 背景
 

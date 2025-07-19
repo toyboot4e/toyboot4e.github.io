@@ -1,5 +1,6 @@
 #+TITLE: BOOX Palma を購入しました
 #+DATE: <2024-02-04 Sun>
+#+FILETAGS: :buy:
 
 * 背景
 

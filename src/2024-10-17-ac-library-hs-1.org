@@ -1,5 +1,6 @@
 #+TITLE: =ac-library-hs= を作ります
 #+DATE: <2024-10-17 Thu>
+#+FILETAGS: :atcoder:haskell:
 
 * 始めに
 

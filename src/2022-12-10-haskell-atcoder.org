@@ -1,5 +1,6 @@
 #+TITLE: Haskell / AtCoder 入門中
 #+DATE: <2022-12-10 Sat>
+#+FILETAGS: :atcoder:haskell:
 #+OPTIONS: broken-links:t
 #+LINK: haskell https://www.haskell.org/
 #+LINK: monad  https://twitter.com/search?q=from%3Atanakh%20%E3%83%A2%E3%83%8A%E3%83%89%20%E3%82%BC%E3%83%8E%E3%83%96%E3%83%AC%E3%82%A4%E3%83%89&src=typed_query&f=top

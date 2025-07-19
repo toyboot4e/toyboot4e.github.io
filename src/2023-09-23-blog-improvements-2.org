@@ -1,5 +1,6 @@
 #+TITLE: =org-mode= 製ブログの改良 (2): =<details>=
 #+DATE: <2023-09-23 Sat>
+#+FILETAGS: :blog:
 
 * 背景
 

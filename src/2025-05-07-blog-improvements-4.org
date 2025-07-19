@@ -1,5 +1,6 @@
 #+TITLE: =org-mode= 製ブログの改良 (4): yaruo block
 #+DATE: <2025-05-07 Wed>
+#+FILETAGS: :blog:
 
 * 機能
 
@@ -144,4 +145,6 @@ HTML への変換を避けるため、むしろ export block (=#+BEGIN_EXPORT ya
 * 振り返って
 
 =org-mode= の =:contents-begin= や HTML の =<pre>= タグを知らず、回り道しました。異常に軽量な [[https://fonts.aahub.org/font/2][aahub\under{}light]] (43.9 KB) のおかげで、気兼ねなくポータブルに AA を表示できました。
+
+~#+BEGIN_YARUO~ ではなく ~#+BEGIN_AA~ (ascii art) でも良かったかもしれません。
 

@@ -1,5 +1,6 @@
 #+TITLE: Nixify your devlog
 #+DATE: <2025-05-10 Sat>
+#+FILETAGS: :nix:
 
 * 背景
 

@@ -1,5 +1,6 @@
 #+TITLE: 開発中の 2D フレームワークについて
 #+DATE: <2022-12-11 Sun>
+#+FILETAGS: :gamedev:
 
 [[https://qiita.com/advent-calendar/2022/mygameengine][GameEngineDev Advent Calendar 2022]] 11 日目の記事です。
 

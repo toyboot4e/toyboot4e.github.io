@@ -1,5 +1,6 @@
 #+TITLE: 現在の Keyball 44 の運用 (34 キー操作)
 #+DATE: <2024-11-11 Mon>
+#+FILETAGS: :keyboard:
 
 * 背景
 

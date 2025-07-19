@@ -1,5 +1,6 @@
 #+TITLE: Entity-Component-System の 3種類のストレージ
 #+DATE: <2022-12-11 Sat>
+#+FILETAGS: :gamedev:
 
 #+LINK: bevy https://bevyengine.org/
 #+LINK: entt https://github.com/skypjack/entt

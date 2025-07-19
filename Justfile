@@ -7,29 +7,10 @@ set positional-arguments
 help:
     @just -l
 
-# build the devlog (TODO: with nix)
+# build the devlog
 build *args:
     #!/usr/bin/env bash
-    # TODO: Allowing multiple flags in one word: `./x b -rf` for force release rebuild
-    if isForceFlag "${1:-}" || isForceFlag "${2:-}" ; then
-        echo "cleaning up the output directory"
-        if [ -d out ] ; then
-            rm -rf out/*
-        else
-            mkdir out
-        fi
-    fi
-
-    # FIXME: Passing `"${1:-}" "${2:-}"` causes error after run
-    if [ $# -eq 0 ] ; then
-        emacs -Q --script "./build.el"
-    elif [ $# -eq 1 ] ; then
-        emacs -Q --script "./build.el" -- "$1"
-    elif [ $# -eq 2 ] ; then
-        emacs -Q --script "./build.el" -- "$1" "$2"
-    else
-        echo "given too many arguments" 1>&2
-    fi
+    emacs -Q --script "./build.el"
 
 [private]
 alias b := build

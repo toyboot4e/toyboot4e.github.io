@@ -1,5 +1,6 @@
 #+TITLE: 音響機器の購入
 #+DATE: <2025-06-29 Sun>
+#+FILETAGS: :buy:
 
 * 背景
 

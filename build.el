@@ -633,34 +633,84 @@ INFO is a plist holding contextual information.  See
   (org-element-property :value (car (my-org-global-props key))))
 
 (defun my-org-read-prop (org-file key)
+  "Reads an org file's propery using temporary buffer."
   (with-temp-buffer
     (insert-file-contents org-file)
     (my-org-global-prop-value key)))
 
+;; Returns a list of '(url tag-list)
+(defun collect-org-files (base-dir filter-p)
+  (let* ((files (seq-filter
+                 (lambda (s)
+                   (not (string-match "index.org" s)))
+                 (directory-files-recursively base-dir "\.org$")))
+         (entries (mapcar
+                   (lambda (s)
+                     ;; NOTE: here `base-dir' is treated as a regex (unfortunately)
+                     (let* ((relative-path (string-trim-left s base-dir))
+                            (filetags (or (my-org-read-prop s "FILETAGS") ""))
+                            (tags (split-string
+                                   (replace-regexp-in-string
+                                    ":" " "
+                                    (string-trim filetags " ")))))
+                       `(,relative-path ,tags)))
+                   files)))
+
+    (sort
+     (seq-filter filter-p entries)
+     (lambda (l r)
+       (string> (car l) (car r))))))
+
 ;; Parses an `org-file' headline and returns an org line as a link.
-(defun my-parse-headlines (org-file link-path)
+(defun my-show-article-bullet (org-file link-path)
   (let* ((title (or (my-org-read-prop org-file "TITLE") "<none>"))
          ;; `<2023-01-01 Sat>' => `2023-01-01'
-         (date-string (substring (or (my-org-read-prop org-file "DATE") (concat "<" (format-time-string "%F") ">")) 1 11)))
-    (format "@@html:<date>%s</date>@@ [[file:%s][%s]]" date-string link-path title)))
+         (date-string (substring (or (my-org-read-prop org-file "DATE") (concat "<" (format-time-string "%F") ">")) 1 11))
+         (filetags (or (my-org-read-prop org-file "FILETAGS") ""))
+         (tags (split-string
+                (replace-regexp-in-string
+                 ":" " "
+                 (string-trim filetags " "))))
+         (tag-delimiter ;; "&nbsp;"
+          "|")
+         (tags-string
+          (if (not tags) ""
+            (format " [@@html:%s@@]"
+                    (mapconcat
+                     (lambda (tag)
+                       (let ((link (format "./tags/%s.html" tag)))
+                         (format "<a href=\"%s\" class=\"org-tag\"><code>#%s</code></a>" link tag)))
+                     tags tag-delimiter)))))
+    (format "@@html:<date>%s</date>@@ [[file:%s][%s]]%s" date-string link-path title tags-string)))
+
+;; Creates a list of `- [[..][..]]'.
+(defun my-show-article-bullets (base-dir url-tags-list)
+  (mapcar (lambda (url-tags)
+            (let ((org-file (concat base-dir (car url-tags)))
+                  (link-path (concat "." (car url-tags))))
+              (format "- %s" (my-show-article-bullet org-file link-path))))
+          url-tags-list))
+
+;; Concatenates strings with `\n' as the delimiter.
+(defun join-with-newline (xs)
+  (mapconcat #'identity xs "\n"))
 
 ;; Generates `index.org'
 (defun my-generate-sitemap (base-dir page-title)
-  (let* ((files (seq-filter (lambda (s) (not (string-match "index.org" s)))
-                            (directory-files-recursively base-dir "\.org$")))
-         ;; NOTE: here `base-dir' is treated as a regex (unfortunately)
-         (files2 (mapcar (lambda (s) (string-trim-left s base-dir)) files))
+  (let* ((devlog-bullets
+          (my-show-article-bullets
+           "src" (collect-org-files
+                  base-dir (lambda (url-tags)
+                             (let ((url (car url-tags)))
+                               (and (not (string-match "diary/" url))
+                                    (not (string-match "tags/" url))))))))
 
-         ;; Org-mode file links:
-         (list (mapcar (lambda (link-path)
-                         (format "- %s" (my-parse-headlines (concat base-dir link-path) link-path))) files2))
-         ;; Reverse alphabetically sorted:
-         (list2 (sort list #'string>))
-
-         ;; Filter & stringify
-         (to-lines (lambda (xs) (mapconcat #'identity xs "\n")))
-         (devlog (funcall to-lines (seq-filter (lambda (s) (not (string-match "diary/" s))) list2)))
-         (diary (funcall to-lines (seq-filter (lambda (s) (string-match "diary/" s)) list2))))
+         (diary-bullets
+          (my-show-article-bullets
+           "src" (collect-org-files
+                  base-dir (lambda (url-tags)
+                             (let ((url (car url-tags)))
+                               (string-match "diary/" url)))))))
     (concat "#+TITLE: " page-title "\n"
             "\n"
 
@@ -669,13 +719,45 @@ INFO is a plist holding contextual information.  See
             ;; "#+END_CENTER" "\n"
             "* devlog" "\n"
             "#+ATTR_HTML: :class sitemap" "\n"
-            devlog "\n"
+            (join-with-newline devlog-bullets) "\n"
             "\n"
 
             "* diary" "\n"
             "#+ATTR_HTML: :class sitemap" "\n"
-            diary "\n"
+            (join-with-newline diary-bullets)"\n"
             )))
+
+;; Generates string content of `tags/<tag>.org'
+(defun my-generate-tag-page-org (base-dir tag)
+  (let* ((url-tags-list
+          (collect-org-files
+           base-dir
+           (lambda (url-tags) (member tag (car (cdr url-tags))))))
+         ;; Org-mode file bullets:
+         (bullets
+          (mapcar (lambda (url-tags)
+                    (let ((org-file (concat base-dir (car url-tags)))
+                          (link-path (concat "." (car url-tags))))
+                      (format "- %s" (my-show-article-bullet org-file link-path))))
+                  url-tags-list))
+         ;; Stringify
+         (articles (join-with-newline bullets)))
+    (concat "#+TITLE: #" tag "\n"
+            "\n"
+
+            ;; "#+BEGIN_CENTER" "\n"
+            ;; "[[/index.html][devlog]] | [[/diary/index.org][diary]]" "\n"
+            ;; "#+END_CENTER" "\n"
+            "* Articles (#" tag ")" "\n"
+            "#+ATTR_HTML: :class sitemap" "\n"
+            articles"\n"
+            )))
+
+;; Creates `tags/<tag>.org'.
+(defun my-create-tag-page-org-file (base-dir tag)
+  (let ((index-org-string (my-generate-tag-page-org base-dir tag))
+        (index-org-path (concat base-dir "/tags/" tag ".org")))
+    (with-temp-file index-org-path (insert index-org-string))))
 
 ;;; Backend (setup)
 
@@ -708,37 +790,30 @@ INFO is a plist holding contextual information.  See
 (setq build-target "release")
 (setq force-flag nil)
 
-;; FIXME: don't repeat twice
-(when-let ((arg (elt argv 1)))
-  (cond ((or (string= arg "-r") (string= arg "--release"))
-         (setq build-target "release"))
-        ((or (string= arg "-d") (string= arg "--draft"))
-         (setq build-target "draft"))
-        ((or (string= arg "-f") (string= arg "--force"))
-         (setq force-flag t))))
-
-(when-let ((arg (elt argv 2)))
-  (cond ((or (string= arg "-r") (string= arg "--release"))
-         (setq build-target "release"))
-        ((or (string= arg "-d") (string= arg "--draft"))
-         (setq build-target "draft"))
-        ((or (string= arg "-f") (string= arg "--force"))
-         (setq force-flag t))))
-
 (message (concat "Target: " build-target " force flag: " (symbol-name force-flag)))
 (message "--------------------------------------------------------------------------------")
 
 (org-publish-remove-all-timestamps)
 
 (message "Generating `index.org`..")
-(pcase build-target
-  ("draft" (let ((index-org-string (my-generate-sitemap "draft" "toybeam"))
-                 (index-org-path "draft/index.org"))
-             (with-temp-file index-org-path (insert index-org-string))))
-  ("release" (let ((index-org-string (my-generate-sitemap "src" "toybeam"))
-                   (index-org-path "src/index.org"))
-               (with-temp-file index-org-path (insert index-org-string))))
-  (_ (error "build target wrong?")))
+(let* ((base-dir "src")
+      (index-org-string (my-generate-sitemap base-dir "toybeam"))
+      (index-org-path (concat base-dir "/index.org")))
+   (with-temp-file index-org-path (insert index-org-string)))
+
+;; TODO: draft/release
+;; TODO: Collect tags first
+(my-create-tag-page-org-file "src" "atcoder")
+(my-create-tag-page-org-file "src" "blender")
+(my-create-tag-page-org-file "src" "blog")
+(my-create-tag-page-org-file "src" "gamedev")
+(my-create-tag-page-org-file "src" "haskell")
+(my-create-tag-page-org-file "src" "keyboard")
+(my-create-tag-page-org-file "src" "misc")
+(my-create-tag-page-org-file "src" "react")
+(my-create-tag-page-org-file "src" "steno")
+(my-create-tag-page-org-file "src" "tools")
+(my-create-tag-page-org-file "src" "vim")
 
 (if force-flag
     (org-publish build-target t)

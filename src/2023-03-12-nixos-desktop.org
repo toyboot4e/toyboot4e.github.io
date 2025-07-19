@@ -1,5 +1,6 @@
 #+TITLE: NixOS でデスクトップ環境構築 (X + i3)
 #+DATE: <2023-03-12 Sun>
+#+FILETAGS: :nix:
 #+LINK: arch https://archlinux.org/
 #+LINK: arch-wiki https://wiki.archlinux.org/
 #+LINK: direnv https://direnv.net/

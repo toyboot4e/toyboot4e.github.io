@@ -1,6 +1,6 @@
 #+TITLE: =org-mode= で簡易ブログ生成
 #+DATE: <2022-10-09 Sun>
-#+FILETAGS: :blog:emacs:org_mode:
+#+FILETAGS: :blog:
 
 * =org-publish= ベースの SSG
 

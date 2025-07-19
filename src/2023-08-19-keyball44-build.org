@@ -1,5 +1,6 @@
 #+TITLE: Keyball 44 組み立て
 #+DATE: <2023-08-19 Sat>
+#+FILETAGS: :keyboard:
 
 * 背景
 

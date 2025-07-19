@@ -1,5 +1,6 @@
 #+TITLE: =ac-library-hs= を作成しました
 #+DATE: <2024-12-04 Wed>
+#+FILETAGS: :atcoder:haskell:
 
 [[https://qiita.com/advent-calendar/2024/haskell][Haskell アドベントカレンダー 2024]] の 4 日目の投稿です。
 

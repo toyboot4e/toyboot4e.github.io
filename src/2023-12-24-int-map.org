@@ -1,5 +1,6 @@
-#+TITLE: Haskell の IntMap は平衡されない
+#+TITLE: Haskell の IntMap における平衡
 #+DATE: <2023-12-24 Sun>
+#+FILETAGS: :haskell:
 
 [[https://adventar.org/calendars/9821][木 Advent Calendar 2023]] の 24 日目の記事です。
 
@@ -111,7 +112,7 @@ ghci> debug $ (0 :) $ map (2^) [0 .. 16]
 そんな =IntMap= はマージ処理もそこそこ速く、性能のバランスが取れているようです。今日でも優れた選択なのかは分かりませんが、平衡しないんだ〜と面白かったので共有しました。お使いの言語でも patricia tree は使われているのでしょうか。
 
 #+BEGIN_QUOTE
-追記: 平衡されますが、特殊なやり方だっただけでした。
+追記: 平衡されますが、特殊なやり方だっただけでした。記事タイトルを変更しました。
 #+END_QUOTE
 
 以上です。昨日投稿の [[https://zenn.dev/toyboot4e/books/seriously-haskell][AtCoder ガチ言語 Haskell 🔥]] もよろしくお願いします！

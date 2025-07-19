@@ -1,5 +1,6 @@
 #+TITLE: Kindle Scribe の購入を正当化する
 #+DATE: <2022-12-09 Sat>
+#+FILETAGS: :buy:
 #+LINK: apecs https://hackage.haskell.org/package/apecs
 
 * 背景

@@ -1,5 +1,6 @@
 #+TITLE: Nix Flakes 入門
 #+DATE: <2024-07-07 Sun>
+#+FILETAGS: :nix:
 
 * Flakes 事始め
 

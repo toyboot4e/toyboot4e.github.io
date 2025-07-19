@@ -1,5 +1,6 @@
 #+TITLE: BenQ 2730S (5K モニタ) の購入
 #+DATE: <2025-06-29 Sun>
+#+FILETAGS: :buy:
 
 * 背景
 

@@ -1,5 +1,6 @@
 #+TITLE: お試しタスクランナー (make, just, shake, ..)
 #+DATE: <2025-01-18 Sat>
+#+FILETAGS: :tools:
 
 * 背景
 

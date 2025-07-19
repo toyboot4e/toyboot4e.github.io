@@ -1,5 +1,6 @@
 #+TITLE: エアロバイクを買ってみた
 #+DATE: <2023-05-06 Sat>
+#+FILETAGS: :buy:
 
 * 背景
 

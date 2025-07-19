@@ -1,5 +1,6 @@
 #+TITLE: 速記キーボードで Neovim がしたい？！
 #+DATE: <2025-06-30 Mon>
+#+FILETAGS: :vim:steno:
 
 * 背景
 

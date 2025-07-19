@@ -1,5 +1,6 @@
 #+TITLE: Keyball 44 下準備
 #+DATE: <2023-07-30 Mon>
+#+FILETAGS: :keyboard:
 
 * 背景
 

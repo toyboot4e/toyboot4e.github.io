@@ -1,5 +1,6 @@
 #+TITLE: =ac-library-hs= の CI を設定しました
 #+DATE: <2025-05-12 Mon>
+#+FILETAGS: :haskell:
 
 * 背景
 

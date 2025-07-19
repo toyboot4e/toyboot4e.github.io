@@ -1,5 +1,6 @@
 #+TITLE: =org-mode= 製ブログの改良 (3): callouts
 #+DATE: <2024-09-15 Sun>
+#+FILETAGS: :blog:
 
 * 機能追加
 

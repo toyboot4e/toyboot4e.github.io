@@ -1,5 +1,6 @@
 #+title: Wave Function Collapse の解説
 #+DATE: <2024-11-22 Fri>
+#+FILETAGS: :gamedev:
 
 * 背景
 

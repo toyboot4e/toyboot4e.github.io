@@ -1,5 +1,6 @@
 #+TITLE: 速記入門のための yak shaving
 #+DATE: <2025-06-22 Sun>
+#+FILETAGS: :keyboard:steno:
 
 * 背景
 

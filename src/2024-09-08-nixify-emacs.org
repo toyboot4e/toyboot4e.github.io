@@ -1,5 +1,6 @@
 #+TITLE: Nixify your Emacs
 #+DATE: <2024-09-14 Sat>
+#+FILETAGS: :nix:
 
 * Nix + Emacs
 

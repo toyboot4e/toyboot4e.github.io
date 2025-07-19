@@ -1,5 +1,6 @@
 #+TITLE: =org-mode= で Neovim に入門してみました
 #+DATE: <2025-06-11 Wed>
+#+FILETAGS: :vim:
 
 [[https://vim-jp.org/ekiden/][Vim 駅伝]] 2025/06/11 の投稿です。前回の記事は、あべべさんの [[https://zenn.dev/abebe123000/articles/f5fd75017c3e08][vim マクロで楽する！実践例あり]] でした。
 
