@@ -1,4 +1,4 @@
-#+TITLE: toybeam
+#+TITLE: Toybeam
 
 * Tags
 

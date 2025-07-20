@@ -164,7 +164,7 @@
     (meta (@ (name "viewport")
              (content "width=device-width, initial-scale=1")))
     ;; NOTE: `org-export-data' returns HTML, so we'll remove HTML tags
-    (title (*RAW-STRING* ,(concat (my-strip-html (org-export-data (plist-get info :title) info)) " - toybeam")))
+    (title (*RAW-STRING* ,(concat (my-strip-html (org-export-data (plist-get info :title) info)) " - Toybeam")))
     (meta (@ (name "description")
              (content "Devlog by toyboot4e")))
     ;; (link (@ (rel "stylesheet")
@@ -833,7 +833,7 @@ INFO is a plist holding contextual information.  See
 
 (message "Generating `index.org`..")
 (let* ((base-dir "src")
-      (index-org-string (my-generate-sitemap base-dir "toybeam" all-tags))
+      (index-org-string (my-generate-sitemap base-dir "Toybeam" all-tags))
       (index-org-path (concat base-dir "/index.org")))
    (with-temp-file index-org-path (insert index-org-string)))
 
