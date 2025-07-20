@@ -673,7 +673,7 @@ INFO is a plist holding contextual information.  See
                  ":" " "
                  (string-trim filetags " "))))
          (tag-delimiter ;; "&nbsp;"
-          " |")
+          " | ")
          (tags-string
           (if (not tags) ""
             (format " [@@html:%s@@]"
