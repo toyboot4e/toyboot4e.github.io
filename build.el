@@ -192,8 +192,9 @@
             "")
     (*RAW-STRING* "<!-- MathJax -->")
     (script (@ (type "text/javascript")
+               (id "MathJax-script")
                (async "")
-               (src "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"))
+               (src "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"))
             "")))
 
 ;; Returns `<header>' SXML
