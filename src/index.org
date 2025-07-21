@@ -6,6 +6,7 @@
 
 * Devlog (timeline)
 #+ATTR_HTML: :class sitemap
+- @@html:<date>2025-07-21</date>@@ [[file:/2025-07-21-blog-improvements-5.org][=org-mode= 製ブログの改良 (5): タグとヘッダ]] @@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@
 - @@html:<date>2025-06-30</date>@@ [[file:/2025-06-30-steno-with-neovim.org][速記キーボードで Neovim がしたい？！]] @@html:<a href="/tags/vim.html" class="org-tag"><code>#vim</code></a> <a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@
 - @@html:<date>2025-06-29</date>@@ [[file:/2025-06-29-benq-pd2730s.org][BenQ 2730S (5K モニタ) の購入]] @@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@
 - @@html:<date>2025-06-29</date>@@ [[file:/2025-06-29-audio.org][音響機器の購入]] @@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@
