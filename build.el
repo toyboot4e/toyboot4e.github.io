@@ -774,7 +774,7 @@ INFO is a plist holding contextual information.  See
             ;; "#+BEGIN_CENTER" "\n"
             ;; "[[/index.html][devlog]] | [[/diary/index.org][diary]]" "\n"
             ;; "#+END_CENTER" "\n"
-            "* Devlog (#" tag ")" "\n"
+            "* Devlog (=#" tag "=)" "\n"
             "#+ATTR_HTML: :class sitemap" "\n"
             articles"\n"
             )))
