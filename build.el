@@ -205,7 +205,10 @@
            (p ,(org-export-data (org-export-get-date info "%b %e, %Y") info))
            (nav (@ (role "navigation"))
                 (a (@ (href "/index.html")) "Home")
-                (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
+                (a (@ (href "https://atcoder.jp/users/toyboot4e")) "AtCoder")
+                (a (@ (href "https://github.com/toyboot4e")) "GitHub")
+                (a (@ (href "https://qiita.com/toyboot4e")) "Qiita")
+                (a (@ (href "https://zenn.dev/toyboot4e")) "Zenn"))))
 
 ;; Returns `<footer>' SXML
 (defun my-html-footer (info)
@@ -840,16 +843,17 @@ INFO is a plist holding contextual information.  See
 ;; TODO: draft/release
 ;; TODO: Collect tags first
 
+(message "Building articles..")
+(if force-flag
+    (org-publish build-target t)
+  (org-publish build-target))
+
 ;; FIXME: It takes too long, probably due to multiple file opens. I should cache file reads.
 (message "Generating `tags/*.org`..")
 (mapcar
  (lambda (tag)
    (my-create-tag-page-org-file "src" tag))
  all-tags)
-
-(if force-flag
-    (org-publish build-target t)
-  (org-publish build-target))
 
 (message "--------------------------------------------------------------------------------")
 (message "Build complete!")

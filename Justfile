@@ -9,7 +9,6 @@ help:
 
 # build the devlog
 build *args:
-    #!/usr/bin/env bash
     emacs -Q --script "./build.el"
 
 [private]
@@ -23,14 +22,8 @@ clean:
 [private]
 alias c := clean
 
-# starts HTTP server
-serve:
-    #!/usr/bin/env bash
-    cd out
-    python3 -m http.server 8080
 
 [private]
-alias s := serve
 
 # formats the output HTML files in-place
 format:
@@ -40,13 +33,21 @@ format:
     prettier --print-width 100 --write *.html
     cd diary
     prettier --print-width 100 --write *.html
-    cd ../../
+    cd ../tags
+    prettier --print-width 100 --write *.html
 
 [private]
 alias fmt := format
 
 [private]
 alias f := format
+
+# starts HTTP server
+serve:
+    cd out && python3 -m http.server 8080
+
+[private]
+alias s := serve
 
 # start watching source files and runs `build` on chane
 watch *args:

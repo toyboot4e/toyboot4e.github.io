@@ -42,11 +42,7 @@ header > p {
 }
 
 h1 {
-  text-decoration: underline;
-  text-underline-position: under;
-  text-decoration-color: rgb(79, 123, 84);
-  text-decoration-thickness: 2px;
-  line-height: 1.2;
+  text-shadow: 2px 1px black;
 }
 
 h2 {

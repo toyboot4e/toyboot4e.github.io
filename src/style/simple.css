@@ -1,6 +1,5 @@
 /*
 Changes
-- Do not set source code colors (prefering `Prism.js` styling)
 - Use dark theme by default
 */
 
@@ -11,22 +10,41 @@ Changes
     "Nimbus Sans L", Roboto, "Noto Sans", "Segoe UI", Arial, Helvetica,
     "Helvetica Neue", sans-serif;
   --mono-font: Consolas, Menlo, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+  --standard-border-radius: 5px;
+  --border-width: 1px;
 
   /* Default (light) theme */
-  /* --bg: #fff; */
-  /* --accent-bg: #f5f7ff; */
-  /* --text: #212121; */
-  /* --text-light: #585858; */
-  /* --border: #898EA4; */
-  /* --accent: #0d47a1; */
-  /* --code: #d81b60; */
-  /* --preformatted: #444; */
-  /* --marked: #ffdd33; */
-  /* --disabled: #efefef; */
+  --bg: #fff;
+  --accent-bg: #f5f7ff;
+  --text: #212121;
+  --text-light: #585858;
+  --border: #898EA4;
+  --accent: #0d47a1;
+  --accent-hover: #1266e2;
+  --accent-text: var(--bg);
+  --code: #d81b60;
+  --preformatted: #444;
+  --marked: #ffdd33;
+  --disabled: #efefef;
+}
+
+/* [EDIT] Force dark theme */
+:root {
+  color-scheme: dark;
+  --bg: #212121;
+  --accent-bg: #2b2b2b;
+  --text: #dcdcdc;
+  --text-light: #ababab;
+  --accent: #ffb300;
+  --accent-hover: #ffe099;
+  --accent-text: var(--bg);
+  --code: #f06292;
+  --preformatted: #ccc;
+  --disabled: #111;
 }
 
 /* Dark theme */
-/* @media (prefers-color-scheme: dark) { */
+@media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
     --bg: #212121;
@@ -34,6 +52,8 @@ Changes
     --text: #dcdcdc;
     --text-light: #ababab;
     --accent: #ffb300;
+    --accent-hover: #ffe099;
+    --accent-text: var(--bg);
     --code: #f06292;
     --preformatted: #ccc;
     --disabled: #111;
@@ -43,7 +63,7 @@ Changes
   video {
     opacity: 0.8;
   }
-/* } */
+}
 
 /* Reset box-sizing */
 *, *::before, *::after {
@@ -83,10 +103,14 @@ body > * {
 /* Make the header bg full width, but the content inline with body */
 body > header {
   background-color: var(--accent-bg);
-  border-bottom: 1px solid var(--border);
+  border-bottom: var(--border-width) solid var(--border);
   text-align: center;
   padding: 0 0.5rem 2rem 0.5rem;
   grid-column: 1 / -1;
+}
+
+body > header > *:only-child {
+  margin-block-start: 2rem;
 }
 
 body > header h1 {
@@ -99,7 +123,7 @@ body > header p {
   margin: 1rem auto;
 }
 
-/* Add a little padding to ensure spacing is correct between content and header > nav */
+/* Add a little padding to ensure spacing is correct between content and header nav */
 main {
   padding-top: 1.5rem;
 }
@@ -110,7 +134,7 @@ body > footer {
   color: var(--text-light);
   font-size: 0.9rem;
   text-align: center;
-  border-top: 1px solid var(--border);
+  border-top: var(--border-width) solid var(--border);
 }
 
 /* Format headers */
@@ -138,6 +162,10 @@ h5 {
 
 h6 {
   font-size: 0.96rem;
+}
+
+p {
+  margin: 1.5rem 0;
 }
 
 /* Prevent long strings from overflowing container */
@@ -182,37 +210,28 @@ a:hover {
 }
 
 button,
-[role="button"],
+.button,
+a.button, /* extra specificity to override a */
 input[type="submit"],
 input[type="reset"],
-input[type="button"],
-label[type="button"] {
-  border: none;
-  border-radius: 5px;
+input[type="button"] {
+  border: var(--border-width) solid var(--accent);
   background-color: var(--accent);
-  font-size: 1rem;
-  color: var(--bg);
-  padding: 0.7rem 0.9rem;
-  margin: 0.5rem 0;
+  color: var(--accent-text);
+  padding: 0.5rem 0.9rem;
+  text-decoration: none;
+  line-height: normal;
 }
 
-button[disabled],
-[role="button"][aria-disabled="true"],
-input[type="submit"][disabled],
-input[type="reset"][disabled],
-input[type="button"][disabled],
-input[type="checkbox"][disabled],
-input[type="radio"][disabled],
-select[disabled] {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
+.button[aria-disabled="true"], 
 input:disabled,
 textarea:disabled,
-select:disabled {
+select:disabled,
+button[disabled] {
   cursor: not-allowed;
   background-color: var(--disabled);
+  border-color: var(--disabled);
+  color: var(--text-light);
 }
 
 input[type="range"] {
@@ -226,32 +245,37 @@ abbr[title] {
   text-decoration-style: dotted;
 }
 
-button:focus,
 button:enabled:hover,
-[role="button"]:focus,
-[role="button"]:not([aria-disabled="true"]):hover,
-input[type="submit"]:focus,
+.button:not([aria-disabled="true"]):hover,
 input[type="submit"]:enabled:hover,
-input[type="reset"]:focus,
 input[type="reset"]:enabled:hover,
-input[type="button"]:focus,
-input[type="button"]:enabled:hover,
-label[type="button"]:focus,
-label[type="button"]:hover {
-  filter: brightness(1.4);
+input[type="button"]:enabled:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
   cursor: pointer;
 }
 
+.button:focus-visible,
+button:focus-visible:where(:enabled),
+input:enabled:focus-visible:where(
+  [type="submit"],
+  [type="reset"],
+  [type="button"]
+) {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 /* Format navigation */
-header > nav {
+header nav {
   font-size: 1rem;
   line-height: 2;
   padding: 1rem 0 0 0;
 }
 
 /* Use flexbox to allow items to wrap, as needed */
-header > nav ul,
-header > nav ol {
+header nav ul,
+header nav ol {
   align-content: space-around;
   align-items: center;
   display: flex;
@@ -264,23 +288,27 @@ header > nav ol {
 }
 
 /* List items are inline elements, make them behave more like blocks */
-header > nav ul li,
-header > nav ol li {
+header nav ul li,
+header nav ol li {
   display: inline-block;
 }
 
-header > nav a,
-header > nav a:visited {
+header nav a,
+header nav a:visited {
   margin: 0 0.5rem 1rem 0.5rem;
-  border: 1px solid var(--border);
-  border-radius: 5px;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--standard-border-radius);
   color: var(--text);
   display: inline-block;
   padding: 0.1rem 1rem;
   text-decoration: none;
 }
 
-header > nav a:hover {
+header nav a:hover,
+header nav a.current,
+header nav a[aria-current="page"],
+header nav a[aria-current="true"] {
+  background: var(--bg);
   border-color: var(--accent);
   color: var(--accent);
   cursor: pointer;
@@ -288,19 +316,23 @@ header > nav a:hover {
 
 /* Reduce nav side on mobile */
 @media only screen and (max-width: 720px) {
-  header > nav a {
+  header nav a {
     border: none;
     padding: 0;
     text-decoration: underline;
     line-height: 1;
+  }
+
+  header nav a.current {
+    background: none;
   }
 }
 
 /* Consolidate box styling */
 aside, details, pre, progress {
   background-color: var(--accent-bg);
-  border: 1px solid var(--border);
-  border-radius: 5px;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--standard-border-radius);
   margin-bottom: 1rem;
 }
 
@@ -308,8 +340,11 @@ aside {
   font-size: 1rem;
   width: 30%;
   padding: 0 15px;
-  margin-left: 15px;
+  margin-inline-start: 15px;
   float: right;
+}
+*[dir="rtl"] aside {
+  float: left;
 }
 
 /* Make aside full-width on mobile */
@@ -317,25 +352,27 @@ aside {
   aside {
     width: 100%;
     float: none;
-    margin-left: 0;
+    margin-inline-start: 0;
   }
 }
 
-article, fieldset {
-  border: 1px solid var(--border);
+article, fieldset, dialog {
+  border: var(--border-width) solid var(--border);
   padding: 1rem;
-  border-radius: 5px;
+  border-radius: var(--standard-border-radius);
   margin-bottom: 1rem;
 }
 
 article h2:first-child,
-section h2:first-child {
+section h2:first-child,
+article h3:first-child,
+section h3:first-child {
   margin-top: 1rem;
 }
 
 section {
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  border-top: var(--border-width) solid var(--border);
+  border-bottom: var(--border-width) solid var(--border);
   padding: 2rem 1rem;
   margin: 3rem 0;
 }
@@ -345,6 +382,10 @@ section + section,
 section:first-child {
   border-top: 0;
   padding-top: 0;
+}
+
+section + section {
+  margin-top: 0;
 }
 
 section:last-child {
@@ -379,16 +420,18 @@ details[open] > :last-child {
 /* Format tables */
 table {
   border-collapse: collapse;
-  display: block;
   margin: 1.5rem 0;
-  overflow: auto;
-  width: 100%;
+}
+
+figure > table {
+  width: max-content;
+  margin: 0;
 }
 
 td,
 th {
-  border: 1px solid var(--border);
-  text-align: left;
+  border: var(--border-width) solid var(--border);
+  text-align: start;
   padding: 0.5rem;
 }
 
@@ -410,18 +453,24 @@ table caption {
 /* Format forms */
 textarea,
 select,
-input {
+input,
+button,
+.button {
   font-size: inherit;
   font-family: inherit;
-  padding: 0.5rem;
+  padding: 0.5em;
   margin-bottom: 0.5rem;
-  color: var(--text);
-  background-color: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: var(--standard-border-radius);
   box-shadow: none;
   max-width: 100%;
   display: inline-block;
+}
+textarea,
+select,
+input {
+  color: var(--text);
+  background-color: var(--bg);
+  border: var(--border-width) solid var(--border);
 }
 label {
   display: block;
@@ -437,7 +486,10 @@ select:not([multiple]) {
   background-position: calc(100% - 15px), calc(100% - 10px);
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
-  padding-right: 25px;
+  padding-inline-end: 25px;
+}
+*[dir="rtl"] select:not([multiple]) {
+  background-position: 10px, 15px;
 }
 
 /* checkbox and radio button style */
@@ -465,12 +517,12 @@ input[type="radio"]:checked {
 input[type="checkbox"]:checked::after {
   /* Creates a rectangle with colored right and bottom borders which is rotated to look like a check mark */
   content: " ";
-  width: 0.18em;
-  height: 0.32em;
+  width: 0.2em;
+  height: 0.4em;
   border-radius: 0;
   position: absolute;
-  top: 0.05em;
-  left: 0.17em;
+  top: 0.04em;
+  left: 0.18em;
   background-color: transparent;
   border-right: solid var(--bg) 0.08em;
   border-bottom: solid var(--bg) 0.08em;
@@ -480,14 +532,14 @@ input[type="checkbox"]:checked::after {
 input[type="radio"]:checked::after {
   /* creates a colored circle for the checked radio button  */
   content: " ";
-  width: 0.25em;
-  height: 0.25em;
+  width: 0.3em;
+  height: 0.3em;
   border-radius: 100%;
   position: absolute;
   top: 0.125em;
   background-color: var(--bg);
   left: 0.125em;
-  font-size: 32px;
+  font-size: 1.8em;
 }
 
 /* Makes input fields wider on smaller screens */
@@ -513,39 +565,56 @@ input[type="file"] {
 /* Misc body elements */
 hr {
   border: none;
-  height: 1px;
+  height: var(--border-width);
   background: var(--border);
   margin: 1rem auto;
 }
 
 mark {
   padding: 2px 5px;
-  border-radius: 4px;
+  border-radius: var(--standard-border-radius);
   background-color: var(--marked);
+  color: black;
+}
+
+mark a {
+  color: #0d47a1;
 }
 
 img,
 video {
   max-width: 100%;
   height: auto;
-  border-radius: 5px;
+  border-radius: var(--standard-border-radius);
 }
 
 figure {
   margin: 0;
-  text-align: center;
+  display: block;
+  overflow-x: auto;
+}
+
+figure > img,
+figure > picture > img {
+  display: block;
+  margin-inline: auto;
 }
 
 figcaption {
+  position: sticky;
+  left: 0;
+  text-align: center;
   font-size: 0.9rem;
   color: var(--text-light);
-  margin-bottom: 1rem;
+  margin-block: 1rem;
 }
 
 blockquote {
-  margin: 2rem 0 2rem 2rem;
+  margin-inline-start: 2rem;
+  margin-inline-end: 0;
+  margin-block: 2rem;
   padding: 0.4rem 0.8rem;
-  border-left: 0.35rem solid var(--accent);
+  border-inline-start: 0.35rem solid var(--accent);
   color: var(--text-light);
   font-style: italic;
 }
@@ -561,10 +630,9 @@ dt {
 }
 
 /* Use mono font for code elements */
-/* EDIT: EXCLUDE Prism.js code block */
-code:not(org-src-container),
-/* pre, */
-/* pre span, */
+code,
+pre,
+pre span,
 kbd,
 samp {
   font-family: var(--mono-font);
@@ -573,13 +641,13 @@ samp {
 
 kbd {
   color: var(--preformatted);
-  border: 1px solid var(--preformatted);
+  border: var(--border-width) solid var(--preformatted);
   border-bottom: 3px solid var(--preformatted);
-  border-radius: 5px;
+  border-radius: var(--standard-border-radius);
   padding: 0.1rem 0.4rem;
 }
 
-pre:not(org-src-container) {
+pre {
   padding: 1rem 1.4rem;
   max-width: 100%;
   overflow: auto;
@@ -587,7 +655,7 @@ pre:not(org-src-container) {
 }
 
 /* Fix embedded code within pre */
-pre code:not(org-src-container) {
+pre code {
   color: var(--preformatted);
   background: none;
   margin: 0;
@@ -606,17 +674,17 @@ progress:indeterminate {
 }
 
 progress::-webkit-progress-bar {
-  border-radius: 5px;
+  border-radius: var(--standard-border-radius);
   background-color: var(--accent-bg);
 }
 
 progress::-webkit-progress-value {
-  border-radius: 5px;
+  border-radius: var(--standard-border-radius);
   background-color: var(--accent);
 }
 
 progress::-moz-progress-bar {
-  border-radius: 5px;
+  border-radius: var(--standard-border-radius);
   background-color: var(--accent);
   transition-property: width;
   transition-duration: 0.3s;
@@ -624,4 +692,91 @@ progress::-moz-progress-bar {
 
 progress:indeterminate::-moz-progress-bar {
   background-color: var(--accent-bg);
+}
+
+dialog {
+  background-color: var(--bg);
+  max-width: 40rem;
+  margin: auto;
+}
+
+dialog::backdrop {
+  background-color: var(--bg);
+  opacity: 0.8;
+}
+
+@media only screen and (max-width: 720px) {
+  dialog {
+    max-width: calc(100vw - 2rem);
+  }
+}
+
+/* Superscript & Subscript */
+/* Prevent scripts from affecting line-height. */
+sup, sub {
+  vertical-align: baseline;
+  position: relative;
+}
+
+sup {
+  top: -0.4em;
+}
+
+sub { 
+  top: 0.3em; 
+}
+
+/* Classes for notices */
+.notice {
+  background: var(--accent-bg);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--standard-border-radius);
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+/* Print */
+@media print {
+  @page {
+    margin: 1cm;
+  }
+  body {
+    display: block;
+  }
+  body > header {
+    background-color: unset;
+  }
+  body > header nav,
+  body > footer {
+    display: none;
+  }
+  article {
+    border: none;
+    padding: 0;
+  }
+  a[href^="http"]::after {
+    content: " <" attr(href) ">";
+  }
+  abbr[title]:after {
+    content: " (" attr(title) ")";
+  }
+  a {
+    text-decoration: none;
+  }
+  p {
+    widows: 3;
+    orphans: 3;
+  }
+  hr {
+    border-top: var(--border-width) solid var(--border);
+  }
+  mark {
+    border: var(--border-width) solid var(--border);
+  }
+  pre, table, figure, img, svg {
+    break-inside: avoid;
+  }
+  pre code {
+    white-space: pre-wrap;
+  }
 }
