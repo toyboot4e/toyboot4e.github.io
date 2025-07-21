@@ -677,10 +677,10 @@ INFO is a plist holding contextual information.  See
                  ":" " "
                  (string-trim filetags " "))))
          (tag-delimiter ;; "&nbsp;"
-          " | ")
+          " ")
          (tags-string
           (if (not tags) ""
-            (format " [@@html:%s@@]"
+            (format " @@html:%s@@"
                     (mapconcat
                      (lambda (tag)
                        (let ((link (format "/tags/%s.html" tag)))
@@ -720,8 +720,9 @@ INFO is a plist holding contextual information.  See
          (tags-string
           (mapconcat
            (lambda (tag)
-             (format "[[%s][=#%s=]]" (concat "/tags/" tag ".org") tag))
-             all-tags " | ")))
+             (format "@@html:<a href=\"%s\" class=\"org-tag\"><code>#%s</code></a>@@"
+                     (concat "/tags/" tag ".html") tag))
+           all-tags " ")))
     (concat "#+TITLE: " page-title "\n"
             "\n"
 
@@ -757,11 +758,12 @@ INFO is a plist holding contextual information.  See
          ;; Stringify
          (articles (join-with-newline bullets))
          (tags-string
-           (mapconcat
-            (lambda (tag)
-              (format "[[%s][=#%s=]]" (concat "/tags/" tag ".org") tag))
-              all-tags " | ")))
-    (concat "#+TITLE: #" tag "\n"
+          (mapconcat
+           (lambda (tag)
+             (format "@@html:<a href=\"%s\" class=\"org-tag\"><code>#%s</code></a>@@"
+                     (concat "/tags/" tag ".html") tag))
+           all-tags " ")))
+    (concat "#+TITLE: =#" tag "=\n"
             "\n"
 
             "* Tags" "\n"
@@ -814,8 +816,8 @@ INFO is a plist holding contextual information.  See
 (setq build-target "release")
 (setq force-flag nil)
 
-(message (concat "Target: " build-target " force flag: " (symbol-name force-flag)))
 (message "--------------------------------------------------------------------------------")
+(message "Building project!")
 
 ;; TODO: Needed?
 (org-publish-remove-all-timestamps)
@@ -837,9 +839,9 @@ INFO is a plist holding contextual information.  See
 
 (message "Generating `index.org`..")
 (let* ((base-dir "src")
-      (index-org-string (my-generate-sitemap base-dir "Toybeam" all-tags))
-      (index-org-path (concat base-dir "/index.org")))
-   (with-temp-file index-org-path (insert index-org-string)))
+       (index-org-string (my-generate-sitemap base-dir "Toybeam" all-tags))
+       (index-org-path (concat base-dir "/index.org")))
+  (with-temp-file index-org-path (insert index-org-string)))
 
 ;; TODO: draft/release
 ;; TODO: Collect tags first
@@ -849,7 +851,7 @@ INFO is a plist holding contextual information.  See
     (org-publish build-target t)
   (org-publish build-target))
 
-;; FIXME: It takes too long, probably due to multiple file opens. I should cache file reads.
+;; FIXME: Too slow
 (message "Generating `tags/*.org`..")
 (mapcar
  (lambda (tag)

@@ -630,9 +630,13 @@ dt {
 }
 
 /* Use mono font for code elements */
-code,
-pre,
-pre span,
+/* [EDIT] Use Prism.js theme */
+/* code, */
+/* pre, */
+/* pre span, */
+/* kbd, */
+/* samp { */
+code:not(org-src-container),
 kbd,
 samp {
   font-family: var(--mono-font);
@@ -654,13 +658,14 @@ pre {
   color: var(--preformatted);
 }
 
+/* [EDIT] Use Prism.js */
 /* Fix embedded code within pre */
-pre code {
-  color: var(--preformatted);
-  background: none;
-  margin: 0;
-  padding: 0;
-}
+/* pre code { */
+/*   color: var(--preformatted); */
+/*   background: none; */
+/*   margin: 0; */
+/*   padding: 0; */
+/* } */
 
 /* Progress bars */
 /* Declarations are repeated because you */

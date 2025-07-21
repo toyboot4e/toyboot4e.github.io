@@ -1,11 +1,11 @@
-#+TITLE: #steno
+#+TITLE: =#steno=
 
 * Tags
 
-[[/tags/atcoder.org][=#atcoder=]] | [[/tags/blender.org][=#blender=]] | [[/tags/blog.org][=#blog=]] | [[/tags/buy.org][=#buy=]] | [[/tags/gamedev.org][=#gamedev=]] | [[/tags/haskell.org][=#haskell=]] | [[/tags/keyboard.org][=#keyboard=]] | [[/tags/misc.org][=#misc=]] | [[/tags/nix.org][=#nix=]] | [[/tags/react.org][=#react=]] | [[/tags/steno.org][=#steno=]] | [[/tags/tools.org][=#tools=]] | [[/tags/vim.org][=#vim=]]
+@@html:<a href="/tags/atcoder.html" class="org-tag"><code>#atcoder</code></a>@@ @@html:<a href="/tags/blender.html" class="org-tag"><code>#blender</code></a>@@ @@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@ @@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@ @@html:<a href="/tags/gamedev.html" class="org-tag"><code>#gamedev</code></a>@@ @@html:<a href="/tags/haskell.html" class="org-tag"><code>#haskell</code></a>@@ @@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@ @@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@ @@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@ @@html:<a href="/tags/react.html" class="org-tag"><code>#react</code></a>@@ @@html:<a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@ @@html:<a href="/tags/tools.html" class="org-tag"><code>#tools</code></a>@@ @@html:<a href="/tags/vim.html" class="org-tag"><code>#vim</code></a>@@
 
 * Devlog (#steno)
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2025-06-30</date>@@ [[file:/2025-06-30-steno-with-neovim.org][速記キーボードで Neovim がしたい？！]] [@@html:<a href="/tags/vim.html" class="org-tag"><code>#vim</code></a> | <a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@]
-- @@html:<date>2025-06-22</date>@@ [[file:/2025-06-22-steno-1.org][速記入門のための yak shaving]] [@@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a> | <a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@]
-- @@html:<date>2025-04-04</date>@@ [[file:/2025-04-04-uni-v4.org][Uni V4 購入]] [@@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a> | <a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@]
+- @@html:<date>2025-06-30</date>@@ [[file:/2025-06-30-steno-with-neovim.org][速記キーボードで Neovim がしたい？！]] @@html:<a href="/tags/vim.html" class="org-tag"><code>#vim</code></a> <a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@
+- @@html:<date>2025-06-22</date>@@ [[file:/2025-06-22-steno-1.org][速記入門のための yak shaving]] @@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a> <a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@
+- @@html:<date>2025-04-04</date>@@ [[file:/2025-04-04-uni-v4.org][Uni V4 購入]] @@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a> <a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@

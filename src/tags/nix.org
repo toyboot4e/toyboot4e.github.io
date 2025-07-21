@@ -1,14 +1,14 @@
-#+TITLE: #nix
+#+TITLE: =#nix=
 
 * Tags
 
-[[/tags/atcoder.org][=#atcoder=]] | [[/tags/blender.org][=#blender=]] | [[/tags/blog.org][=#blog=]] | [[/tags/buy.org][=#buy=]] | [[/tags/gamedev.org][=#gamedev=]] | [[/tags/haskell.org][=#haskell=]] | [[/tags/keyboard.org][=#keyboard=]] | [[/tags/misc.org][=#misc=]] | [[/tags/nix.org][=#nix=]] | [[/tags/react.org][=#react=]] | [[/tags/steno.org][=#steno=]] | [[/tags/tools.org][=#tools=]] | [[/tags/vim.org][=#vim=]]
+@@html:<a href="/tags/atcoder.html" class="org-tag"><code>#atcoder</code></a>@@ @@html:<a href="/tags/blender.html" class="org-tag"><code>#blender</code></a>@@ @@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@ @@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@ @@html:<a href="/tags/gamedev.html" class="org-tag"><code>#gamedev</code></a>@@ @@html:<a href="/tags/haskell.html" class="org-tag"><code>#haskell</code></a>@@ @@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@ @@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@ @@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@ @@html:<a href="/tags/react.html" class="org-tag"><code>#react</code></a>@@ @@html:<a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@ @@html:<a href="/tags/tools.html" class="org-tag"><code>#tools</code></a>@@ @@html:<a href="/tags/vim.html" class="org-tag"><code>#vim</code></a>@@
 
 * Devlog (#nix)
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2025-05-10</date>@@ [[file:/2025-05-10-nixify-your-devlog.org][Nixify your devlog]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
-- @@html:<date>2024-09-14</date>@@ [[file:/2024-09-08-nixify-emacs.org][Nixify your Emacs]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
-- @@html:<date>2024-07-07</date>@@ [[file:/2024-07-07-nix-flakes.org][Nix Flakes 入門]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
-- @@html:<date>2023-03-12</date>@@ [[file:/2023-03-12-nixos-desktop.org][NixOS でデスクトップ環境構築 (X + i3)]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
-- @@html:<date>2023-02-24</date>@@ [[file:/2023-02-24-nixos-configuration-files.org][NixOS の設定ファイルとプロファイル]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
-- @@html:<date>2023-02-23</date>@@ [[file:/2023-02-23-nixos-and-other-distros.org][Linux distribution の選択について]] [@@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@]
+- @@html:<date>2025-05-10</date>@@ [[file:/2025-05-10-nixify-your-devlog.org][Nixify your devlog]] @@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@
+- @@html:<date>2024-09-14</date>@@ [[file:/2024-09-08-nixify-emacs.org][Nixify your Emacs]] @@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@
+- @@html:<date>2024-07-07</date>@@ [[file:/2024-07-07-nix-flakes.org][Nix Flakes 入門]] @@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@
+- @@html:<date>2023-03-12</date>@@ [[file:/2023-03-12-nixos-desktop.org][NixOS でデスクトップ環境構築 (X + i3)]] @@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@
+- @@html:<date>2023-02-24</date>@@ [[file:/2023-02-24-nixos-configuration-files.org][NixOS の設定ファイルとプロファイル]] @@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@
+- @@html:<date>2023-02-23</date>@@ [[file:/2023-02-23-nixos-and-other-distros.org][Linux distribution の選択について]] @@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@

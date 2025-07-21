@@ -169,5 +169,12 @@ span.code-highlighted {
 }
 
 .org-tag {
+  text-indent: 0;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--standard-border-radius);
+  color: var(--text);
+  display: inline-block;
+  padding: 0px 6px;
+  text-decoration: none;
 }
 
