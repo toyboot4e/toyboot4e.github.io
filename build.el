@@ -822,11 +822,13 @@ INFO is a plist holding contextual information.  See
 ;; TODO: Needed?
 (org-publish-remove-all-timestamps)
 
+;; TODO: Collect from source files, cache source file reads
 (setq all-tags
       '("atcoder"
         "blender"
         "blog"
         "buy"
+        "emacs"
         "gamedev"
         "haskell"
         "keyboard"

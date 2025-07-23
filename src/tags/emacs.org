@@ -1,10 +1,10 @@
-#+TITLE: =#misc=
+#+TITLE: =#emacs=
 
 * Tags
 
 @@html:<a href="/tags/atcoder.html" class="org-tag"><code>#atcoder</code></a>@@ @@html:<a href="/tags/blender.html" class="org-tag"><code>#blender</code></a>@@ @@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@ @@html:<a href="/tags/buy.html" class="org-tag"><code>#buy</code></a>@@ @@html:<a href="/tags/emacs.html" class="org-tag"><code>#emacs</code></a>@@ @@html:<a href="/tags/gamedev.html" class="org-tag"><code>#gamedev</code></a>@@ @@html:<a href="/tags/haskell.html" class="org-tag"><code>#haskell</code></a>@@ @@html:<a href="/tags/keyboard.html" class="org-tag"><code>#keyboard</code></a>@@ @@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@ @@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@ @@html:<a href="/tags/react.html" class="org-tag"><code>#react</code></a>@@ @@html:<a href="/tags/steno.html" class="org-tag"><code>#steno</code></a>@@ @@html:<a href="/tags/tools.html" class="org-tag"><code>#tools</code></a>@@ @@html:<a href="/tags/vim.html" class="org-tag"><code>#vim</code></a>@@
 
-* Devlog (=#misc=)
+* Devlog (=#emacs=)
 #+ATTR_HTML: :class sitemap
-- @@html:<date>2024-12-19</date>@@ [[file:/2024-12-19-fortran.org][Fortran, 難し過ぎる]] @@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@
-- @@html:<date>2024-11-05</date>@@ [[file:/2024-11-05-php.org][PHP 速習 (ナップサック問題)]] @@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@
+- @@html:<date>2024-10-27</date>@@ [[file:/2024-10-27-emacs-fes.org][東京 Emacs 勉強会 2024/10 発表資料]] @@html:<a href="/tags/emacs.html" class="org-tag"><code>#emacs</code></a>@@
+- @@html:<date>2023-03-12</date>@@ [[file:/2023-03-12-why-evil-emacs.org][Evil Emacs における多重化]] @@html:<a href="/tags/emacs.html" class="org-tag"><code>#emacs</code></a>@@
