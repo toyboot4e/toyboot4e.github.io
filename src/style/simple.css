@@ -315,17 +315,18 @@ header nav a[aria-current="true"] {
 }
 
 /* Reduce nav side on mobile */
+/* [Edit] Just change padding, keeping button-like style */
 @media only screen and (max-width: 720px) {
   header nav a {
-    border: none;
-    padding: 0;
-    text-decoration: underline;
-    line-height: 1;
+    /* border: none; */
+    padding: 0 0.5rem 0 0.5rem;
+    /* text-decoration: underline; */
+    /* line-height: 1; */
   }
 
-  header nav a.current {
-    background: none;
-  }
+  /* header nav a.current { */
+  /*   background: none; */
+  /* } */
 }
 
 /* Consolidate box styling */
