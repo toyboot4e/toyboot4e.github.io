@@ -23,8 +23,6 @@ clean:
 alias c := clean
 
 
-[private]
-
 # formats the output HTML files in-place
 format:
     #!/usr/bin/env bash
