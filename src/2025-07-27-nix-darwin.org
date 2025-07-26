@@ -1,0 +1,92 @@
+#+TITLE: Nixify your Mac
+#+DATE: <2025-07-27 Sun>
+#+FILETAGS: :nix:
+
+* 背景
+
+Nix Flakes 入門 [[https://github.com/nix-darwin/nix-darwin][=nix-darwin=]] 編です。先日購入した Mac Mini を期待通りに操作できるよう、 Nix 等で環境構築しました。
+
+* 設定
+
+** System Settings
+
+macOS の設定も [[https://github.com/nix-darwin/nix-darwin][=nix-darwin=]] から実施できますが、今回は手動で設定しました。
+
+*** 英語設定 + JIS キーボード
+
+macOS の言語設定を英語、キーボード設定を JIS にしました。バグなのか、一度言語設定を日本語にしなければ JIS キーボードになりませんでした。
+
+*** Mission Control
+
+Mission Control のショートカットを有効化しました。これは yabai (後述) よりも高速でデスクトップの切り替えができるため、おすすめです:
+
+[[./img/2025-07-27-mission-control.png]]
+
+** Nix
+
+*** =nix-darwin= の導入
+
+NixOS 用の =flake.nix= があったので、 Mac 用のユーザを登録します。 [[https://github.com/nix-darwin/nix-darwin][=nix-darwin=]] の導入後、以下のコマンドで設定を反映できました:
+
+#+CAPTION:  =nix-darwin= の更新
+#+BEGIN_SRC sh
+sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#mac switch
+#+END_SRC
+
+*** ファイル分割
+
+Nix のファイル構成に関しては、 [[https://github.com/takeokunn/nixos-configuration][takeokunn/nixos-configuration]] を読んでおけば OK です。
+
+*** Fish をログインシェルにする
+
+[[https://github.com/nix-darwin/nix-darwin/issues/1237][nix-darwin#1237]] の通りです:
+
+#+CAPTION: =nix-darwin/default.nix=
+#+BEGIN_SRC nix
+  environment.shells = [ pkgs.fish ];
+  programs.fish.enable = true;
+  users.knownUsers = [ "mac" ]; # ユーザ名は人によります
+  users.users.mac.shell = pkgs.fish;
+  users.users.mac.uid = 501;
+#+END_SRC
+
+*** Bash を non-interactive shell にする
+
+少なくとも [[https://github.com/koekeishiya/skhd][=skhd=]] に関しては、 system-side なシェルを設定することで =bash= が使われるようになります:
+
+#+BEGIN_SRC nix
+  environment.variables.SHELL = "/bin/bash";
+#+END_SRC
+
+*** Homebrew 関連の設定
+
+=nix-darwin= 経由で Homebrew のパッケージも宣言的にインストールできます。インストール時のオプションは、 [[https://github.com/nix-darwin/nix-darwin/issues/314][nix-darwin#314]] の通り設定できます。
+
+** Emacs
+
+現在の Emacs は macOS (Sequoia) でのビルドに問題があり、各所で問題が出ていました。現在は nixpkgs の unstable ブランチに修正が入っている ([[https://nixpk.gs/pr-tracker.html?pr=423403][nixpkgs#423403]]) ため、 Nix では特に追加設定無しでインストールできます。
+
+** Karabiner Elements
+
+我らが [[https://karabiner-elements.pqrs.org/][Karabiner Elements]] ですが、 IME の切り替えのみ設定しました。
+
+#+CAPTION: Karabiner Elements の設定
+[[./img/2025-07-27-karabiner.png]]
+
+** yabai / skhd
+
+[[https://github.com/koekeishiya/yabai][yabai]] の導入には [[https://github.com/koekeishiya/yabai/wiki/Disabling-System-Integrity-Protection][SIP の無効化]] と [[https://github.com/koekeishiya/yabai/wiki/Installing-yabai-(from-HEAD)#configure-scripting-addition][script addition の有効化]] が必要です。 Script addition の有効化コマンドは、 yabai のサービス起動後に毎回設定が必要です:
+
+#+CAPTION: =nix-darwin= の更新 + script addition の有効化
+#+BEGIN_SRC diff-sh
+sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#mac switch
++yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
++sudo yabai --load-sa
+#+END_SRC
+
+若干レスポンスが悪いので、主に Mission Control のショートカットを使っています。
+
+* まとめ
+
+最低限の macOS の設定を実施しました。 Nix の macOS サポートは人手が足りておらず、特に GUI アプリは Homebrew が必須の場合が多いです。
+
