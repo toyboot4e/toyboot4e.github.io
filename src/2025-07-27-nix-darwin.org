@@ -10,7 +10,7 @@ Nix Flakes 入門 [[https://github.com/nix-darwin/nix-darwin][=nix-darwin=]] 編
 
 ** System Settings
 
-macOS の設定も [[https://github.com/nix-darwin/nix-darwin][=nix-darwin=]] から実施できますが、今回は手動で設定しました。
+macOS の設定も [[https://github.com/nix-darwin/nix-darwin][=nix-darwin=]] から実施できますが、今回は手動で設定しました (出オチ？) 。
 
 *** 英語設定 + JIS キーボード
 
@@ -45,7 +45,7 @@ Nix のファイル構成に関しては、 [[https://github.com/takeokunn/nixos
 #+BEGIN_SRC nix
   environment.shells = [ pkgs.fish ];
   programs.fish.enable = true;
-  users.knownUsers = [ "mac" ]; # ユーザ名は人によります
+  users.knownUsers = [ "mac" ]; # ユーザ名が mac の場合
   users.users.mac.shell = pkgs.fish;
   users.users.mac.uid = 501;
 #+END_SRC
@@ -64,7 +64,7 @@ Nix のファイル構成に関しては、 [[https://github.com/takeokunn/nixos
 
 ** Emacs
 
-現在の Emacs は macOS (Sequoia) でのビルドに問題があり、各所で問題が出ていました。現在は nixpkgs の unstable ブランチに修正が入っている ([[https://nixpk.gs/pr-tracker.html?pr=423403][nixpkgs#423403]]) ため、 Nix では特に追加設定無しでインストールできます。
+現在の Emacs は macOS (Sequoia) でのビルドに問題があり、各所で issue が立っていました。現在は nixpkgs の unstable ブランチに修正が入っている ([[https://nixpk.gs/pr-tracker.html?pr=423403][nixpkgs#423403]]) ため、 Nix では特に追加設定無しでインストールできます。
 
 ** Karabiner Elements
 
@@ -84,7 +84,7 @@ sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- sw
 +sudo yabai --load-sa
 #+END_SRC
 
-若干レスポンスが悪いので、主に Mission Control のショートカットを使っています。
+若干 yabai のレスポンスが悪いので、デスクトップの切り替えでは Mission Control のショートカットを使っています。
 
 * まとめ
 
