@@ -1,0 +1,132 @@
+#+TITLE: Nixify your packages
+#+DATE: <2025-07-28 Mon>
+#+FILETAGS: :nix:
+
+* 背景
+
+Nix 入門コントリビュート編です。 nixpkgs に送った簡単な PR がマージされた ([[https://github.com/NixOS/nixpkgs/pull/420544][nixpkgs#420544]]) ので、経験談を書きます。
+
+* PR がマージされるまで
+
+今回追加したのは、競技プログラミングで引っ張りだこの [[https://github.com/online-judge-tools/verification-helper][=oj-verify=]] です。 Python モジュールおよび実行ファイルとして nixpkgs に追加します。
+
+** 全体像
+
+最終的に、以下のファイルを提出しました:
+
+#+BEGIN_SRC txt
+.
+├── maitainers
+├── pkgs
+│   ├── by-name
+│   │   └── on
+│   │       └── online-judge-verify-helper
+│   │           └── package.nix # (ref:1)
+│   └── development
+│       └── python-modules
+│           └── online-judge-verify-helper
+│               └── default.nix # (ref:2)
+└── top-level
+    └── python-packages.nix # (ref:3)
+#+END_SRC
+
+- [[(1)]] 実行ファイル相当
+- [[(2)]] Python モジュール相当
+- [[(3)]] Python モジュールの re-export?
+
+本体は 2. の Python モジュールで、これさえ書ければ PR は出せます。
+
+** ローカルでビルドする
+
+まず Python パッケージとしてビルドします。やや古い Python プロジェクト (=setup.py=, =setup.cfg=, =setuptools= など) について調べることになり、 Nix 以前の知識が問われました:
+
+#+BEGIN_SRC sh
+$ nix-build -A python3Packages.online-judge-tools
+#+END_SRC
+
+実行ファイルの方は動かしてみれば OK です:
+
+#+BEGIN_SRC sh
+$ nix-build -A online-judge-verify-helper
+$ eza result/bin
+oj-bundle*  oj-verify*
+$ ./result/bin/oj-verify
+INFO:onlinejudge_verify.config:no config file
+usage: oj-verify [-h] [--config-file CONFIG_FILE] {all,run,docs,stats} ...
+#+END_SRC
+
+一応、自環境の nixpkgs を一時的に fork に切り替えて動作確認しました。より簡単な方法があれば知りたいです。
+
+** コントリビューションガイドを読む
+
+Markdown を 2,000 行ほど読みます。長い！　初回の PR ではメンテナの追加などもあり、全体像を把握するのが大変です。
+
+大半のドキュメントは [[https://nixos.org/manual/nixpkgs/stable/][Nixpkgs Reference Manual]] になるため、気になるトピックはこのページで検索しました。
+
+** PR を送信する
+
+PR に関連するドキュメントは一通り読んだので、僕の PR が悪い時はドキュメントが悪いとも言えます。免罪符をゲットし、 PR を送信します。
+
+** レビューを受ける
+
+レビューして頂きました。僕が頂いた指摘は以下です:
+
+- =rev= よりも =tag= を使うべし
+  =tag= の方が安全で分かりやすいですね:
+  #+BEGIN_SRC diff-nix
+src = fetchFromGitHub {
+  owner = "online-judge-tools";
+  repo = "verification-helper";
+-  rev = "refs/tags/v${version}";
++  tag = "v${version}";
+  hash = "sha256-sBR9/rf8vpDRbRD8HO2VNmxVckXPmPjUih7ogLRFaW8=";
+};
+  #+END_SRC
+
+- =checkPhase= を書くならば hook を呼ぶべし
+  これは自分で気付きたかった点です:
+  #+BEGIN_SRC diff-sh
+checkPhase = ''
++    runHook preCheck
+  export PATH=$out/bin:$PATH
+  oj-verify --help > /dev/null
+  oj-bundle --help > /dev/null
++    runHook postCheck
+'';
+  #+END_SRC
+
+- =checkPhase= を書いたせいで、 =pytest= が実行されなくなっている
+  致命的なエラー！　上の =checkPhase= ほぼ意味が無かったので、消しました。
+
+- Python モジュールが不要ならば =pkgs/by-name= 以下のみで良い
+  今回は Python モジュールも必要だったため、修正無しとしました。
+
+** レビュワーを呼ぶ
+
+どのレビュワーも、来なかったり居なくなったりするので、バンバン ping しましょう。僕にはあなたが必要なんです！ 応えてください！！
+
+* まとめ
+
+nixpkgs にパッケージを追加しました。 [[https://nixpk.gs/pr-tracker.html?pr=420544][PR tracker]] で unstable ブランチへのマージを確認次第、手元の boilerplate は削除して行こうと思います。
+
+今後は [[https://github.com/Tatamo/atcoder-cli][atcoder-cli]], [[https://github.com/competitive-verifier/competitive-verifier][competitive-verifier]], [[https://github.com/ronaldoussoren/pyobjc][pyobjc-framework-Quartz]] など、自分が必要なパッケージを nixpkgs へ追加して行こうと思います。
+
+#+CAPTION: ありがとうございます！
+[[./img/2025-07-28-welcome.png]]
+
+** おまけ: RSS
+
+追加パッケージのメンテナになったため、 Release の RSS を取得することにしました。 Emacs の [[https://github.com/skeeto/elfeed][=elfeed=]] (または [[https://github.com/remyhonig/elfeed-org][=elfeed-org=]]) を使う予定です:
+
+#+BEGIN_SRC elisp
+(leaf elfeed
+  :url "https://github.com/skeeto/elfeed"
+  :hook (emacs-startup-hook . (lambda () (run-at-time 5 5 'elfeed-update)))
+  :custom
+  (elfeed-feeds .
+    '(("https://matklad.github.io/feed.xml" fun)
+      ("https://github.com/online-judge-tools/verification-helper/releases.atom" maintain))))
+#+END_SRC
+
+Emacs 以外では、やはり [[https://github.com/ymgyt/syndicationd][=ymgyt/syndicationd=]] が格好良くて素敵です。
+

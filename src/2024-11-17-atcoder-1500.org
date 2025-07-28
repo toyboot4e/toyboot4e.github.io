@@ -1,6 +1,6 @@
 #+TITLE: Haskell / AtCoder レーティング 1,500 到達
 #+DATE: <2024-11-17 Sun>
-#+FILETAGS: :atcoder::
+#+FILETAGS: :atcoder:
 
 * 始めに
 
