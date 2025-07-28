@@ -8,7 +8,7 @@ Nix 入門コントリビュート編です。 nixpkgs に送った簡単な PR 
 
 * PR がマージされるまで
 
-今回追加したのは、競技プログラミングで引っ張りだこの [[https://github.com/online-judge-tools/verification-helper][=oj-verify=]] です。 Python モジュールおよび実行ファイルとして nixpkgs に追加します。
+今回追加したのは、競技プログラミングで引っ張りだこの [[https://github.com/online-judge-tools/verification-helper][=oj-verify=]] です。 Python モジュールおよび実行ファイルとして nixpkgs に追加しました。
 
 ** 全体像
 
@@ -84,7 +84,7 @@ src = fetchFromGitHub {
   #+END_SRC
 
 - =checkPhase= を書くならば hook を呼ぶべし
-  これは自分で気付きたかった点です:
+  ああー、すみません:
   #+BEGIN_SRC diff-sh
 checkPhase = ''
 +    runHook preCheck
@@ -95,19 +95,48 @@ checkPhase = ''
 '';
   #+END_SRC
 
-- =checkPhase= を書いたせいで、 =pytest= が実行されなくなっている
-  致命的なエラー！　上の =checkPhase= ほぼ意味が無かったので、消しました。
+- そもそも =checkPhase= を書いたせいで、 =pytest= が実行されなくなっている
+  致命的なエラーです。上の =checkPhase= ほぼ意味が無かったので、消しました。
 
 - Python モジュールが不要ならば =pkgs/by-name= 以下のみで良い
   今回は Python モジュールも必要だったため、修正無しとしました。
 
 ** レビュワーを呼ぶ
 
-どのレビュワーも、来なかったり居なくなったりするので、バンバン ping しましょう。僕にはあなたが必要なんです！ 応えてください！！
+どのレビュワーも、来なかったり居なくなったりするので、バンバン ping しましょう。僕にはあなたが必要なんです！　ということで、応えてくれる可能性は高めです。
 
 * まとめ
 
 nixpkgs にパッケージを追加しました。 [[https://nixpk.gs/pr-tracker.html?pr=420544][PR tracker]] で unstable ブランチへのマージを確認次第、手元の boilerplate は削除して行こうと思います。
+
+#+BEGIN_DETAILS Boilerplate
+#+BEGIN_SRC nix
+oj-verify =
+  with pkgs.python3Packages;
+  pkgs.python3Packages.buildPythonApplication {
+    name = "verification-helper";
+    version = "5.6.0";
+    pyproject = true;
+    src = pkgs.fetchFromGitHub {
+      owner = "online-judge-tools";
+      repo = "verification-helper";
+      rev = "adbff121b1f96de5f34e9f1483eb47d661c54075";
+      fetchSubmodules = false;
+      sha256 = "sha256-f7Ge8kLRQv9uxdNGtgNsypGVY0XAnKPCg8HYQ5nT6mI=";
+    };
+    build-system = [ setuptools ];
+    dependencies = [
+      colorlog
+      importlab
+      online-judge-tools
+      pyyaml
+      setuptools
+      toml
+    ];
+    propagatedBuildInputs = [ setuptools ];
+  };
+#+END_SRC
+#+END_DETAILS
 
 今後は [[https://github.com/Tatamo/atcoder-cli][atcoder-cli]], [[https://github.com/competitive-verifier/competitive-verifier][competitive-verifier]], [[https://github.com/ronaldoussoren/pyobjc][pyobjc-framework-Quartz]] など、自分が必要なパッケージを nixpkgs へ追加して行こうと思います。
 
