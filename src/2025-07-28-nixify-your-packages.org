@@ -87,16 +87,16 @@ src = fetchFromGitHub {
   ああー、すみません:
   #+BEGIN_SRC diff-sh
 checkPhase = ''
-+    runHook preCheck
++  runHook preCheck
   export PATH=$out/bin:$PATH
   oj-verify --help > /dev/null
   oj-bundle --help > /dev/null
-+    runHook postCheck
++  runHook postCheck
 '';
   #+END_SRC
 
 - そもそも =checkPhase= を書いたせいで、 =pytest= が実行されなくなっている
-  致命的なエラーです。上の =checkPhase= ほぼ意味が無かったので、消しました。
+  致命的なエラーです。上の =checkPhase= は、ほぼ意味が無かっため消しました。
 
 - Python モジュールが不要ならば =pkgs/by-name= 以下のみで良い
   今回は Python モジュールも必要だったため、修正無しとしました。
@@ -138,14 +138,14 @@ oj-verify =
 #+END_SRC
 #+END_DETAILS
 
-今後は [[https://github.com/Tatamo/atcoder-cli][atcoder-cli]], [[https://github.com/competitive-verifier/competitive-verifier][competitive-verifier]], [[https://github.com/ronaldoussoren/pyobjc][pyobjc-framework-Quartz]] など、自分が必要なパッケージを nixpkgs へ追加して行こうと思います。
+今後は [[https://github.com/Tatamo/atcoder-cli][atcoder-cli]], [[https://github.com/competitive-verifier/competitive-verifier][competitive-verifier]], [[https://github.com/ronaldoussoren/pyobjc][pyobjc-framework-Quartz]] など、自分が必要なパッケージを nixpkgs へ追加して行く予定です。
 
 #+CAPTION: ありがとうございます！
 [[./img/2025-07-28-welcome.png]]
 
 ** おまけ: RSS
 
-追加パッケージのメンテナになったため、 Release の RSS を取得することにしました。 Emacs の [[https://github.com/skeeto/elfeed][=elfeed=]] (または [[https://github.com/remyhonig/elfeed-org][=elfeed-org=]]) を使う予定です:
+追加したパッケージのメンテナになったため、 Release の RSS を購読することにしました。 Emacs の [[https://github.com/skeeto/elfeed][=elfeed=]] (または [[https://github.com/remyhonig/elfeed-org][=elfeed-org=]]) を使うつもりです:
 
 #+BEGIN_SRC elisp
 (leaf elfeed
