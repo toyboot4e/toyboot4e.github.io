@@ -60,6 +60,7 @@
 
 * Diary
 #+ATTR_HTML: :class sitemap
+- @@html:<date>2025-08-03</date>@@ [[file:/diary/2025-08-03.org][ABC 417]]
 - @@html:<date>2025-05-18</date>@@ [[file:/diary/2025-05-18.org][ABC 406]]
 - @@html:<date>2025-05-11</date>@@ [[file:/diary/2025-05-11.org][ABC 405]]
 - @@html:<date>2025-04-28</date>@@ [[file:/diary/2025-04-28.org][ABC 403 (やる夫仕様)]]

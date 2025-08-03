@@ -1,0 +1,115 @@
+#+TITLE: ABC 417
+#+DATE: <2025-08-03 Sun>
+
+* ABC 417
+
+[[https://atcoder.jp/contests/abc417][ABC 417]] に参加しました。
+
+** [[https://atcoder.jp/contests/abc417/tasks/abc417_a][A 問題]]
+
+文字列 $S$ の先頭 $A$ 文字、末尾 $B$ 文字を削除せよ。 =dropEnd= 関数を知っていると楽できますね。
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !a, !b) <- ints3'
+  !s <- line'
+  printBSB . BS.dropEnd b $ BS.drop a s
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc417/tasks/abc417_b][B 問題]]
+
+数列 $A$ から数列 $B$ の要素を 1 つずつ削除せよ。 [[https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:-92--92-+][(\\\\)]] 一発で解ける模様です:
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !m) <- ints2'
+  !xs <- U.toList <$> intsU'
+  !ys <- U.toList <$> intsU'
+  printBSB . unwordsBSB . U.fromList $ xs \\ ys
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc417/tasks/abc417_c][C 問題]]
+
+数列 $A$ に対し条件 $j - i = A_i + A_j$ を満たす $i, j$ の数を求めよ。
+
+*** 本番で考えた方法
+
+下の図で $i = 1$ かつ $A_1 = 1$ のとき、 $j > 1$ に対しては \(A_j = -1, 0, 1, ..\) である場合に条件を満たします:
+
+#+BEGIN_SRC txt
+   o----o----o----o----o
+ A_1  A_2  A_3  A_4  A_5
+       -1    0    1    2
+#+END_SRC
+
+ここで頻度列 ($[..]$) を持って、読み出し位置のオフセット ($|$) をズラして行くと、 $j$ に対して条件を満たす $i$ の数が $O(1)$ で求められます:
+
+#+BEGIN_SRC txt
+[-    1    -    -    -]
+          |0    1    2   j = 1
+     |0    1    2    3   j = 2
+|0    1    2    3    4   j = 3
+#+END_SRC
+
+という形で頑張りました。伝わらないかも……
+
+*** シンプルな解放
+
+$A_i + i = j - A_j$ の形に変数分離 ($f(i) = g(j)$) すると、各項の値が独立するため簡単になります。 $j \in [0, N)$ の範囲で走査して $O(N)$ で解けます。頭がいいですね:
+
+#+BEGIN_SRC hs
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !xs <- intsU'
+
+  let lhs, rhs :: Int -> Int -> Int
+      lhs i xi = i + xi
+      rhs j xj = j - xj
+
+  let !res = runST $ do
+        freq <- UM.replicate (1 + n + 2 * 10 ^ 5) (0 :: Int)
+        U.ifoldM'
+          ( \acc j xj -> do
+              dn <- fromMaybe 0 <$> (GM.readMaybe freq $! rhs j xj)
+              GM.modify freq (+ 1) $! lhs j xj
+              pure $! acc + dn
+          )
+          (0 :: Int)
+          xs
+
+  printBSB res
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc417/tasks/abc417_d][D 問題]]
+
+$N$ 個の関数を連結するとき、様々な入力に対する出力を求めよ。それぞれの関数は $1 \le a_i, b_i, p_i \le 500$ の範囲で以下の通り定義する:
+
+$$
+f_i(t) := \begin{cases}
+  t + a_i & (x \le p_i) \\
+  \max (0, t - b_i) & (x \gt p_i)
+\end{cases}
+$$
+
+$t \gt 500$ の間は、常に $t - b_i$ が選択されることが分かります。各点の入出力は $t \in [0, 500]$ の範囲で持つことにすると、 $t \gt 500$ の範囲は一括計算できそうです。
+
+各点で $t \in [0, 500]$ の範囲で入出力表を持つことにして、最後の関数から順に (入力 → 最終出力) を計算していくと解けます。
+
+** [[https://atcoder.jp/contests/abc417/tasks/abc417_e][E 問題]]
+
+単純無向連結グラフにおいて、 $X$ から $Y$ への辞書順最小パスを $O(N^2 \log N)$ で求め、経路復元せよ。
+
+Dijkstra 法において、コストを =ByteString= 型の経路にすると WA になりました。 =Text= 型の経路にすると AC しました。 =ByteString= の比較はバイト列の比較ですから、文字コードが 255 を超えると正しく判定できなくなるようです。
+
+* Misc
+
+- Grenadier の [[https://www.youtube.com/watch?v=4W28NxSFBv8][新曲]] が出ました。今秋にアルバム発売予定ということで、今年一番の楽しみとなっています。年間ベストかも。
+- Pixiv Fanbox で [[https://ncode.syosetu.com/n4006r/][ラピスの心臓]] 最新話の [[https://op-sum.fanbox.cc/][先行配信]] が始まりました。 𝒫𝓊𝓇ℯ 𝒥ℴ𝓎..
+- 速記は相当難しいです。地道に練習します。
+- ROM 気味だった vim-JP Slack を退会しました。
+  - 非常に有益で面白く、どんな話も打ち返してもらえる、万人におすすめのコミュニティです。レベルアップしたい人におすすめ！
+  - 僕は自力で情報収集しなくなる傾向があったため、退会してみました。違った方向に進化してみたいです。
+
