@@ -132,7 +132,7 @@
 
         ("static"
          :base-directory "./src"
-         :base-extension "js\\|css\\|png\\|jpg\\|gif\\|svg\\|mp4\\|mov\\|woff2"
+         :base-extension "js\\|css\\|png\\|jpg\\|gif\\|svg\\|mp4\\|mov\\|woff2\\|pdf"
          ;; `/ltximg/' is for previewing. MathJax is used at runtime.
          :exclude ,(rx-to-string (rx "ltximg/"))
          ;; :exclude ,(rx-to-string (rx line-start "ltximg"))

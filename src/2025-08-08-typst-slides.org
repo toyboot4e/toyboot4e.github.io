@@ -1,0 +1,147 @@
+#+TITLE: Typst によるスライド生成
+#+DATE: <2025-08-08 Fri>
+#+FILETAGS: :tools:
+
+* 背景
+
+自由なツールを使って発表・プレゼンをする機会が増えるかもしれません (ぬか喜びの可能性もあります) 。発表資料作成のため、スライドの生成方法を更新したいです。
+
+** 既知の方法
+
+軽量マークアップ言語でスライドを作る方法がありました。特に [[https://revealjs.com/][Reveal.js]] + [[https://asciidoc.org/][AsciiDoc]] にお世話になっていた他、 [[https://marp.app/][Marp]] や [[https://qiita.com/takaxp/items/8dfb5d34dfcd79f9fa5c][org-tree-slide]] なども選択肢にあります。
+
+** Typst の台頭
+
+直近 2 年のトレンドは [[https://typst.app/][Typst]] によるスライド生成です。今も一番面白い [[https://www.takeokunn.org][takeokunn's blog]] の [[https://www.takeokunn.org/tags/typst/][Typst タグの記事]] でも、 Typst でスライド作成・組版を実施しています。やってみましょう。
+
+* Typst の導入
+
+環境構築とスライド生成をやります。
+
+** TreeSitter, LS
+
+最低限、 =.typ= ファイルのハイライトを有効化します:
+
+- [[https://github.com/Myriad-Dreamin/tinymist][tinymist]]
+  Typst の言語サーバです。
+
+- [[https://codeberg.org/meow_king/typst-ts-mode][typst-ts-mode]]
+  Typst の Tree Sitter 文法です。
+
+Emacs の設定は以下の通りとなりました:
+
+#+BEGIN_SRC elisp
+(leaf typst-ts-mode
+  :after lsp-mode
+  :vc (:url "meow_king/typst-ts-mode")
+  :custom
+  (typst-ts-mode-watch-options . "--open")
+  :hook
+  (typst-ts-mode-hook . lsp-deferred)
+  :config
+  (add-to-list 'lsp-language-id-configuration '(typst-ts-mode . "typst"))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection "tinymist")
+                    :activation-fn (lsp-activate-on "typst")
+                    :server-id 'tinymist)))
+#+END_SRC
+
+** Live preview
+
+=tinymist preview <file>= でプレビューが見れます。 [[https://github.com/havarddj/typst-preview.el][typst-preview.el]] が動くならそれでも良さそうです。
+
+** スライド用パッケージ
+
+=tinymist preview= を使ってスライド用パッケージを試してみました。
+
+- [[https://typst.app/universe/package/minimal-presentation/][minimal-presentation]]
+  シンプルです。あまり合いませんでした。サンプルに画像が含まれており、コピペで動かなかった点が印象が悪いです。
+- [[https://typst.app/universe/package/typslides/][typslides]]
+  シンプルです。このまま使ってもいいかも。サンプルに画像が含まれており、コピペで動かなかった点が印象が悪いです。
+- [[https://typst.app/universe/package/polylux][polylux]]
+  takeokunn さんも使っているパッケージです。 Template を切り替えできます。いい感じです。
+- [[https://typst.app/universe/package/touying/][touying]]
+  polylux と似ています。これも良い感じです。
+
+** Demo
+
+Touying の方を使って、最も簡素な類のスライドを作ってみました。リンクから確認できます:
+
+[[./pdf/2025-08-08-typst-example.pdf]]
+
+#+BEGIN_DETAILS ソース
+余計なコードが多そうですが、ソース内容は以下の通りです:
+
+#+BEGIN_SRC txt
+#import "@preview/touying:0.6.1": *
+#import themes.university: *
+#import "@preview/cetz:0.3.2"
+#import "@preview/fletcher:0.5.4" as fletcher: node, edge
+#import "@preview/numbly:0.1.0": numbly
+#import "@preview/theorion:0.3.2": *
+#import cosmos.clouds: *
+#show: show-theorion
+
+// cetz and fletcher bindings for touying
+#let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))
+#let fletcher-diagram = touying-reducer.with(reduce: fletcher.diagram, cover: fletcher.hide)
+
+#show: university-theme.with(
+  aspect-ratio: "16-9",
+  // align: horizon,
+  // config-common(handout: true),
+  config-common(frozen-counters: (theorem-counter,)),  // freeze theorem counter for animation
+  config-info(
+    title: [My interests],
+    subtitle: [Or Typst test with Touying package],
+    author: [toyboot4e],
+    date: datetime.today(),
+    institution: [toybeam],
+    logo: emoji.school,
+  ),
+)
+
+#set heading(numbering: numbly("{1}.", default: "1.1"))
+
+#title-slide()
+
+== Outline <touying:hidden>
+
+#components.adaptive-columns(outline(title: none, indent: 1em))
+
+= Haskell
+
+The hard cliff.
+
+== Haskell + AtCoder
+
+It was a genius idea to get started with Haskell and AtCoder at the same time. Initially it went well pretty well, just like I assumed. It turned out, however, I couldn't do with neither of them after six months of practice. I was highly depressed, and started serious battles..
+
+= Nix
+
+The best world.
+
+== Pure, isolated environment
+
+Nix used to be so hard that it made me a copy-paste programmer of `shell.nix`. It got better when NixOS & Flakes book came out. I started configuraing NixOS with `flake.nix`, wrote some packages and even contributed to nixpkgs. Not only it's reproducible, it's also nice that we can bundle many features of a package on installation, e.g., all of the tree-sitter grammers.
+
+= Emacs
+
+The best text editor multiplexer.
+
+== The best packages.
+
+Emacs has tons of killer features. One of them is centaur-tabs; it shows buffers, but in groups. If you open another project's file, the buffer bar switches to the project's buffers. You'll hit many of these goodies if you use Emacs.
+
+== Stenograpy with Emacs
+
+Today I'm interested in stenography. I wonder if it works well with coding and Emacs. Let's try out and see how it works (or not works)!
+#+END_SRC
+#+END_DETAILS
+
+* まとめ
+
+Typst で基本的なスライドを生成できるようになりました。まだ高度な機能は使っていませんが、微調整が必要になった時に Typst の表現力が真価を発揮するかと思います。
+
+まー真価を発揮する機会に恵まれると良いのですが……。どう転ぶでしょうか。
+

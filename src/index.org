@@ -6,6 +6,7 @@
 
 * Devlog (timeline)
 #+ATTR_HTML: :class sitemap
+- @@html:<date>2025-08-08</date>@@ [[file:/2025-08-08-typst-slides.org][Typst によるスライド生成]] @@html:<a href="/tags/tools.html" class="org-tag"><code>#tools</code></a>@@
 - @@html:<date>2025-07-28</date>@@ [[file:/2025-07-28-nixify-your-packages.org][Nixify your packages]] @@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@
 - @@html:<date>2025-07-27</date>@@ [[file:/2025-07-27-nix-darwin.org][Nixify your Mac]] @@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@
 - @@html:<date>2025-07-21</date>@@ [[file:/2025-07-21-blog-improvements-5.org][=org-mode= 製ブログの改良 (5): タグとヘッダ]] @@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@
