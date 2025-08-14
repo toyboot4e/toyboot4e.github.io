@@ -1,0 +1,80 @@
+#+TITLE: 『ゼロから学ぶGit/GitHub』感想
+#+DATE: <2025-08-14 Thu>
+#+FILETAGS: :books:
+
+* 背景
+
+幸いなことに、継続的にチーム開発に参加する機会を得ました。ボトムアップなアプローチとして、まずは [[https://www.kodansha.co.jp/book/products/0000387516][ゼロから学ぶＧｉｔ／ＧｉｔＨｕｂ]] を読み、 Git の基本を学び直しました。
+
+* 本の感想
+
+序盤から話が上手く、流石大学の先生だと思いながら読んでいました。 1 ページ目からパンチラインが凄いです。僕自身の文脈としては、一件目の読書記事にふさわしいかもしれません:
+
+#+BEGIN_QUOTE
+もし何かの間違いで、コードを開発しているのにバージョン管理システムを使っていない会社に入社してしまったら、すぐに逃げてほしい。その会社は効率の悪さを開発時間でカバーしており、あなたの時間を搾取している可能性が高い。
+#+END_QUOTE
+
+贅沢な解説も嬉しいです:
+
+#+BEGIN_QUOTE
+このように、サーバに必要なファイルを準備、および配置する一連の作業をデプロイ (deploy) と呼ぶ。
+#+END_QUOTE
+
+序盤から =git rebase= や =git bisect= を全面に出していた点が良かったです。デバッグの短いプログラマを良いプログラマとするのも金言。また最終章で blob, branch, commit, tree といった Git オブジェクトの概要を復習できて良かったです。
+
+** その他、興味・関心
+
+技術習得という意味では、以下の項目に興味があります。適宜調べてみようと思います。
+
+#+BEGIN_DETAILS 知りたいこと
+- [ ] Git の内部的なオブジェクトモデルの把握
+  - [ ] スナップショット形式における容量削減について
+  - [ ] 差分保存形式との比較、メリットとデメリットについて
+  - [ ] =reflog= と =reset= で復旧できること、できないことについて
+
+- [ ] Rebase 時の conflict の解消について知る
+  - [ ] なぜ同じ conflict を繰り返し解消しなくてはならないのか
+    - [ ] スナップショット方式であるため？
+    - [ ] [[https://jj-vcs.github.io/jj/latest/][Jujutsu]] であれば発生しないのか
+  - [ ] =git rerere= の使い方と信頼性について
+
+- [X] モダンな Git コマンドに慣れる
+  - [X] Unstaging (=git reset= -> =git restore -S=)
+  - [X] Detached HEAD (=git checkout= -> =git switch -d=)
+
+- [-] Git の設定関係
+  - [ ] Git Hooks の仕組みと [[https://github.com/awslabs/git-secrets][git-secrets]] の導入
+  - [ ] =git push --force-with-lease= をデフォルトにする (または alias にする)
+    - [ ] [[https://git-scm.com/docs/git-push#Documentation/git-push.txt---no-force-if-includes][=--no-force-if-includes=]] の方が安全なんですね
+  - [X] =git push= を非同期実行にする ([[https://github.com/magit/magit][Magit]] における [[https://github.com/magit/magit/blob/649bc9dc328b8cb7519292be4f5c9cac13cf3466/lisp/magit-process.el#L588][実装]] を調べる)
+    - まあ =git push &= で十分か？
+  - [ ] =git clone= 時に URL スキームを =https://= から =git@github.com:= に変更する
+
+- [ ] チーム開発
+  - [ ] GitHub Actions 以外の CI 導入 (Circle CI など)
+  - [ ] Circle CI から GitHub Actions への移行検討
+  - [ ] ある PR に依存した別の PR の作成について
+  - [ ] Git LFS およびアセット管理について
+
+- [ ] サーバ関係
+  - [ ] Force push 後など、サーバ上に dangling (?) commit が発生した場合の削除方法
+  - [ ] Git のローカルサーバの運用方法
+  - [ ] GitHub の複数アカウント所持の是非や運用方法
+  - [ ] GitHub 上とローカルマシンと連携した CI の導入
+
+- [ ] Emacs の環境改善
+  - [ ] [[https://magit.vc/][Magit]] の未使用の機能を使い込む
+  - [ ] =ediff= の使い方を把握する
+    - 3-way diff, マージ処理
+  - [ ] =smerge-mode= 以外に良いキーバインドがあれば習得する
+
+- [ ] その他
+  - =origin/main= と =origin main= の違いを整理する
+  - =@=, =HEAD{3}= のような表記法を整理する
+  - =:/= がリポジトリのルートを指すのはどのような場合か整理する
+#+END_DETAILS
+
+* まとめ
+
+モダンな Git 入門書を読みました。本書が扱うトピックを元に、次に何を知るべきか明確になったと思います。また入門書とはいえ概ね既知の内容であったため、基礎知識が十分にあると思えて嬉しかったです。
+

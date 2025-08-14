@@ -827,6 +827,7 @@ INFO is a plist holding contextual information.  See
       '("atcoder"
         "blender"
         "blog"
+        "books"
         "buy"
         "emacs"
         "gamedev"
