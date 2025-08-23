@@ -1,0 +1,163 @@
+#+TITLE: 『新くりかえしモナドドリル』感想
+#+DATE: <2025-08-23 Sat>
+#+FILETAGS: :books:
+
+* 背景
+
+[[https://doujin.kakkun61.com/monad-drill][新くりかえしモナドドリル]] を解いてみました。これは Haskell のモナドと =do= 記法に関する小さな問題集です。
+
+#+ATTR_HTML: :width 50%
+[[./img/2025-08-23-monad-drill.jpg]]
+
+* =do= 記法を理解する
+
+本書では、主に =do= 記法の desugaring の知識が問われているように思いました。以下の背景知識があれば、バッチリ解けると思います。
+
+** =let= の展開
+
+=do= 記法の中では =let= 式を文のように書くことができます:
+
+#+CAPTION: =do= 記法
+#+BEGIN_SRC haskell
+let x = do
+      let y = 10
+      let z = 20
+      y + z
+#+END_SRC
+
+これは =let .. in ..= 式に展開されます:
+
+#+CAPTION: Desugaring の結果 (予想)
+#+BEGIN_SRC haskell
+let x =
+      let y = 10
+       in let z = 20
+           in y + z
+#+END_SRC
+
+#+BEGIN_QUOTE
+なお例の通り、式全体がモナドではない場合にも =do= 記法を使うことができます。
+#+END_QUOTE
+
+** 操作の連結 (=>>=)
+
+=do= 記法の中でモナド値 (monadic action) を連結した場合、 [[https://hackage.haskell.org/package/base-4.21.0.0/docs/Control-Monad.html#v:-62--62-][~(>>)~]] 演算子によって接続されます:
+
+#+BEGIN_SRC haskell
+let x = do
+      Just 2
+      Just 3
+      Just 4
+#+END_SRC
+
+#+CAPTION: Desugaring の結果 (予想)
+#+BEGIN_SRC haskell
+let x = ((Just 2 >> Just 3) >> Just 4)
+#+END_SRC
+
+[[https://hackage.haskell.org/package/base-4.21.0.0/docs/Control-Monad.html#v:-62--62-][~(>>)~]] は [[https://hackage.haskell.org/package/base-4.21.0.0/docs/Control-Monad.html#v:-62--62--61-][~(>>=)~]] を使って定義されており、左辺の出力を捨てて右辺を評価します:
+
+#+BEGIN_SRC haskell
+(>>)        :: forall a b. m a -> m b -> m b
+m >> k = m >>= \_ -> k
+#+END_SRC
+
+*** 右辺の評価について
+
+モナドの値に応じて、 ~(>>=)~ 内で右辺の値が捨てられる場合もあります:
+
+#+BEGIN_SRC haskell
+-- | @since base-4.4.0.0
+instance Monad (Either e) where
+    Left  l >>= _ = Left l
+    Right r >>= k = k r
+#+END_SRC
+
+したがって =Left= や =Nothing= が見つかった時点で、 =do= 記法内の後の式は評価されないことが確定します。
+
+*** 両辺の型について
+
+[[https://hackage.haskell.org/package/base-4.21.0.0/docs/Control-Monad.html#v:-62--62-][~(>>)~]] や [[https://hackage.haskell.org/package/base-4.21.0.0/docs/Control-Monad.html#v:-62--62--61-][~(>>=)~]] の両辺の間は、あくまで文脈 (モナド) の型が合っていれば良く、異なる型の値を引数に取ることができます。たとえば次の式はコンパイル可能です:
+
+#+CAPTION: コンパイル可能
+#+BEGIN_SRC haskell
+Right "42" >> Right (42 :: Int)
+#+END_SRC
+
+ただ [[https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-Either.html][=Either=]] に関しては、 =Either e= に対して =Monad= が実装されており、失敗にあたる部分まで型が一致しなければ =>>=, ~>>=~ を適用できません。だから =Either a b= は =Left a= の方が失敗を表すのですね。
+
+#+CAPTION: コンパイル不可能
+#+BEGIN_SRC haskell
+Left "42" >> Left (42 :: Int)
+#+END_SRC
+
+** Bind (=<-=) の展開
+
+最後はお馴染みの bind (=<-=) を使った =do= 記法です:
+
+#+BEGIN_SRC haskell
+let x = do
+      y <- Just (1 :: Int)
+      z <- Just (2 :: Int)
+      pure $ y + z
+#+END_SRC
+
+これはもちろん、ネストした ~(>>=)~ に展開されます:
+
+#+CAPTION: Desugaring の結果 (予想)
+#+BEGIN_SRC haskell
+let x =
+      Just (1 :: Int)
+        >>= ( \y ->
+                Just (2 :: Int)
+                  >>= ( \z ->
+                          pure $ y + z
+                      )
+            )
+#+END_SRC
+
+#+BEGIN_QUOTE
+~(>>)~ は単純な展開でしたが、 ~(>>=)~ はネストした式になる点は要注意です。
+#+END_QUOTE
+
+~(>>=)~ の中では、短絡評価を実施したり、引数を状態とみなしたり、 =concatMap= するなど、モナド毎に様々なトリックが実装されます。
+
+** =MonadFail=
+
+Bind の左辺でパタンマッチに失敗した場合は [[https://hackage.haskell.org/package/base-4.21.0.0/docs/Control-Monad-Fail.html#v:fail][=fail= 関数]] の値に fallback します:
+
+#+BEGIN_SRC haskell
+let x = do
+      Just y <- Nothing
+      pure 42
+-- x == Nothing になる
+#+END_SRC
+
+これも =do= 記法においては desugaring されます:
+
+#+CAPTION: Desugaring の結果 (※ 予想、おそらく正しくないです)
+#+BEGIN_SRC haskell
+let x =
+      let f (Just y) = pure y
+          f _ = fail "<compiler-generated message>"
+       in f Nothing
+#+END_SRC
+
+#+BEGIN_QUOTE
+=Maybe= においては ~fail _ = Nothing~ です:
+
+#+BEGIN_SRC haskell
+instance MonadFail Maybe where
+    fail _ = Nothing
+#+END_SRC
+#+END_QUOTE
+
+* まとめ
+
+モナドドリルを通し、 Haskell の =do= 記法がどのように解釈されるか再確認できました。操作の連結 (~a; b; c~) と bind (~<-~) の展開において、異なる desugaring が実施されることが明確に認識できました。また =Monad= が =Either e= に対して実装されている点が面白かったです。
+
+** 参考
+
+- [[https://en.wikibooks.org/wiki/Haskell/do_notation][Haskell/do notation - Wikibooks, open books for an open world]]
+- [[https://qiita.com/kerupani129/items/1dcfd80e209355e683d3][[Haskell] do 記法の使い方と型 #Haskell - Qiita]]
+
