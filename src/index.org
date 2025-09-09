@@ -6,7 +6,9 @@
 
 * Devlog (timeline)
 #+ATTR_HTML: :class sitemap
+- @@html:<date>2025-09-10</date>@@ [[file:/2025-09-10-rent.org][ドタバタ賃貸契約]] @@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@
 - @@html:<date>2025-08-23</date>@@ [[file:/2025-08-23-monad-drill.org][『新くりかえしモナドドリル』感想]] @@html:<a href="/tags/books.html" class="org-tag"><code>#books</code></a>@@
+- @@html:<date>2025-08-08</date>@@ [[file:/2025-08-16-pbt.org][『実践プロパティベーステスト』感想]] @@html:<a href="/tags/read.html" class="org-tag"><code>#read</code></a>@@
 - @@html:<date>2025-08-14</date>@@ [[file:/2025-08-14-git-from-zero.org][『ゼロから学ぶGit/GitHub』感想]] @@html:<a href="/tags/books.html" class="org-tag"><code>#books</code></a>@@
 - @@html:<date>2025-08-08</date>@@ [[file:/2025-08-08-typst-slides.org][Typst によるスライド生成]] @@html:<a href="/tags/tools.html" class="org-tag"><code>#tools</code></a>@@
 - @@html:<date>2025-07-28</date>@@ [[file:/2025-07-28-nixify-your-packages.org][Nixify your packages]] @@html:<a href="/tags/nix.html" class="org-tag"><code>#nix</code></a>@@
