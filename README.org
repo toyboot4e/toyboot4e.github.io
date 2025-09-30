@@ -1,10 +1,15 @@
 * Devlog
 
-This is [[https://toyboot4e.github.io/][my devlog (link)]] written in =.org= files and converted into HTML.
+This is [[https://toyboot4e.github.io/][my devlog (link)]] written in =.org= files that converted into HTML.
 
 ** Commands
 
 See the [[./Justfile][./Justfile]].
+
+#+BEGIN_SRC sh
+$ just watch # in one tab
+$ just serve # in another tab
+#+END_SRC
 
 ** Thanks
 
