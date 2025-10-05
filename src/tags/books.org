@@ -6,6 +6,7 @@
 
 * Devlog (=#books=)
 #+ATTR_HTML: :class sitemap
+- @@html:<date>2025-10-05</date>@@ [[file:/2025-10-05-tdd.org][『テスト駆動開発』感想]] @@html:<a href="/tags/books.html" class="org-tag"><code>#books</code></a>@@
 - @@html:<date>2025-09-30</date>@@ [[file:/2025-09-30-the-way-of-the-web-tester.org][『初めての自動テスト』感想]] @@html:<a href="/tags/books.html" class="org-tag"><code>#books</code></a>@@
 - @@html:<date>2025-08-23</date>@@ [[file:/2025-08-23-monad-drill.org][『新くりかえしモナドドリル』感想]] @@html:<a href="/tags/books.html" class="org-tag"><code>#books</code></a>@@
 - @@html:<date>2025-08-14</date>@@ [[file:/2025-08-14-git-from-zero.org][『ゼロから学ぶGit/GitHub』感想]] @@html:<a href="/tags/books.html" class="org-tag"><code>#books</code></a>@@
