@@ -1,0 +1,153 @@
+#+TITLE: ABC 430
+#+DATE: <2025-11-02 Sun>
+
+* ABC 430
+
+[[https://atcoder.jp/contests/abc430][ABC 430]] に参加しました。
+
+今回から AtCoder のジャッジ環境が更新され、 [[https://hackage.haskell.org/package/ac-library-hs][ac-library-hs]] が使えるようになったのが嬉しいです。この日記では、なるべく ac-library-hs を使って問題を解きます。
+
+#+BEGIN_QUOTE
+自作テンプレート ([[https://github.com/toyboot4e/toy-lib][toy-lib]]) のコードは省略します。
+#+END_QUOTE
+
+** [[https://atcoder.jp/contests/abc430/tasks/abc430_a][A 問題]]
+
+4 つの数値に関して、条件式を整理せよ。違反していれば =True= ということで、ややこしいです:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!a, !b, !c, !d) <- ints4'
+  printYn $ c >= a && d < b
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc430/tasks/abc430_b][B 問題]]
+
+$N \times N$ のグリッド中に $M \times M$ のユニークなパタンが何通りあるか調べよ。 $w := n + 1 - m$ として、 $w^2$ 個のパタンを全探索します:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !m) <- ints2'
+  !gr <- getGrid' n n
+
+  let w = n + 1 - m
+  let patterns = V.generate (w * w) $ \di ->
+        let (!dy, !dx) = di `divMod` w
+         in U.generate (m * m) $ \i ->
+              let (!y0, !x0) = i `divMod` m
+               in gr @! (y0 + dy, x0 + dx)
+
+  printBSB $ G.length . G.uniq $ G.modify VAI.sort patterns
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc430/tasks/abc430_c][C 問題]]
+
+文字列 $S$ に対して $n_a(s[l, r]) \ge A$ かつ $n_b(s[l, r]) \lt B$ である $[l, r]$ の数を求めよ。すべての $[l, r]$ を探索すると $O(n^2)$ の計算量となりますから、一括計算の方針を考えます。
+
+$s[l, r]$ の $l$ を特定の値に固定します。 $r$ を大きくするほど $n_a, n_b$ は多くなります。そこで $n_a(s[l, r]) \ge a$ となる最小の $r$ を $r_1$ とし、 $n_b(s[l, r]) \ge b$ となる最小の $r (r \ge r_1)$ を $r_2$ とすると、 $r_2 - r_1$ が条件を満たす $[l, r]$ 区間の数となります。
+
+#+BEGIN_SRC haskell
+import qualified AtCoder.Extra.Bisect as B
+
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !a, !b) <- ints3'
+  !s <- U.fromList . BS.unpack <$> line'
+
+  let na = csum1D $ U.map (bool 0 1 . (== 'a')) s
+  let nb = csum1D $ U.map (bool 0 1 . (== 'b')) s
+
+  let res = U.sum $ U.generate n $ \i -> do
+          -- maxRight は [l, r) 区間の二分探索です
+          -- +! は [l, r] 区間の累積和を返します
+          let l = B.maxRight i n $ \x -> na +! (i, x) < a
+              r = B.maxRight l n $ \x -> nb +! (i, x) < b
+           in r - l
+
+  printBSB res
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc430/tasks/abc430_d][D 問題]]
+
+人 $1 .. n$ を位置 $x_1 .. x_n$ へ挿入していくとき、最近傍距離の和を追跡せよ。気合です。
+
+普通に [[https://hackage-content.haskell.org/package/containers-0.8/docs/Data-IntMap.html][containers の =IntMap=]] を使うのが良い問題ですが、あえて密な可変データ構造である [[https://hackage-content.haskell.org/package/ac-library-hs/docs/AtCoder-Extra-IntMap.html][=AtCoder.Extra.IntMap=]] を使うと以下のようになりました。座標圧縮が必要なため、煩雑になります:
+
+#+BEGIN_SRC haskell
+import AtCoder.Extra.Vector qualified as EV
+import qualified AtCoder.Extra.IntMap as EIM
+
+updateNeighborDist :: (HasCallStack, PrimMonad m) => EIM.IntMap (PrimState m) Int -> (Int, Int) -> Int -> m Int
+updateNeighborDist im (!ix, !d) d'
+  | d == 0 || d' < d = stToPrim $ do
+      EIM.insert im ix d'
+      pure $ d - d'
+  | otherwise = do
+      pure 0
+
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !n <- int'
+  !xs <- intsU'
+
+  -- compress xs
+  let dict = {- U.uniq $ -} U.modify VAI.sort $ U.cons 0 xs
+  let ixs = U.map (B.lowerBound dict) xs
+
+  let res = runST $ do
+        -- position -> distance between itself and the shortest neighbor
+        im <- EIM.new @_ @Int (n + 1)
+        EIM.insert im 0 (0 :: Int)
+
+        EV.postscanlM'
+          ( \acc (!ix, !x) -> do
+              let f acc' (Just (!ik, !v)) = do
+                    let !k = dict G.! ik
+                    let !d = abs $ k - x
+                    delta <- updateNeighborDist im (ik, v) d
+                    pure (acc' - delta, d)
+                  f acc' Nothing = do
+                    pure (acc', maxBound)
+
+              (!acc', !dl) <- f acc =<< EIM.lookupLT im ix
+              (!acc'', !dr) <- f acc' =<< EIM.lookupGT im ix
+              let !d = min dl dr
+              EIM.insert im ix d
+              pure $ acc'' + d
+          )
+          (0 :: Int)
+          $ U.zip ixs xs
+
+  printBSB $ unlinesBSB res
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc430/tasks/abc430_e][E 問題]]
+
+[[https://hackage-content.haskell.org/package/ac-library-hs/docs/AtCoder-Extra-Monoid-RollingHash.html][=RollingHash=]] の練習問題です。
+
+#+BEGIN_SRC haskell
+newRH :: BS.ByteString -> U.Vector (RH.RollingHash 100 998244353)
+newRH = U.map (RH.new . ord) . U.fromList . BS.unpack
+
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !b <- newRH <$> line'
+  !a <- newRH <$> line'
+
+  let !len = U.length a
+  let !ha = U.foldl' (<>) mempty a
+
+  seg <- Seg.build $ b U.++ b
+  res <- fmap (fromMaybe (-1) . U.find (>= 0)) $ U.generateM len $ \i -> do
+    hb <- Seg.prod seg i (i + len)
+    pure . bool (-1) i $ ha == hb
+
+  printBSB res
+#+END_SRC
+
+** 感想
+
+ac-library-hs は半開区間 $[l, r)$ を主とするため、以前よりも端的なコードを書ける機会が増えそうで楽しみです。
+
