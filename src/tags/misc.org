@@ -6,6 +6,7 @@
 
 * Devlog (=#misc=)
 #+ATTR_HTML: :class sitemap
+- @@html:<date>2025-11-10</date>@@ [[file:/2025-11-10-rent-house.org][メキメキ新居環境構築]] @@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@
 - @@html:<date>2025-09-10</date>@@ [[file:/2025-09-10-rent.org][ドタバタ賃貸契約]] @@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@
 - @@html:<date>2024-12-19</date>@@ [[file:/2024-12-19-fortran.org][Fortran, 難し過ぎる]] @@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@
 - @@html:<date>2024-11-05</date>@@ [[file:/2024-11-05-php.org][PHP 速習 (ナップサック問題)]] @@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@
