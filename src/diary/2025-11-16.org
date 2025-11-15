@@ -1,0 +1,168 @@
+#+TITLE: ABC 432
+#+DATE: <2025-11-16 Sun>
+
+* ABC 432
+
+[[https://atcoder.jp/contests/abc432][ABC 432]] に参加しました。 D 問題で [[https://hackage.haskell.org/package/ac-library-hs][ac-library-hs]] を使用しました。
+
+** [[https://atcoder.jp/contests/abc432/tasks/abc432_a][A 問題]]
+
+数列を並び替え、最も大きな値を作成せよ。数列を降順ソートした後、連結して出力します:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !xs <- U.toList <$> intsU'
+  printBSB . concatMap show $ sortBy (comparing Down) xs
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc432/tasks/abc432_b][B 問題]]
+
+数列を並び替え、 =0= 以外から始まる最も小さな値を作成せよ。全探索が楽なようです:
+
+#+BEGIN_SRC haskell
+solve :: StateT BS.ByteString IO ()
+solve = do
+  !xs <- U.toList <$> intsU'
+  printBSB . concatMap show $ sortBy (comparing Down) xs
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc432/tasks/abc432_c][C 問題]]
+
+難しめの問題です。問題文を省略します。
+
+$X$ または $Y$ ($X < Y$) を合計 $n_i$ 個取るとき、和 $s$ が取り得る値の集合は、 $[n_iX, n_iY]$ の区間を $d := Y - X$ で移動した点の集まりです。この集合を $S_i$ とすると、 $\{S_i\}_{i \in [1, N]}$ の共通集合の最大の値が必要です。
+
+$\{S_i\}$ が空集合でないためには $n_iY \equiv n_jY \pmod d$ が必須です。この条件下では、積集合を $S_i \cap S_j = [\max(n_iX, n_jX), \min(n_iY, n_jY)]$ により計算できます。
+
+#+BEGIN_SRC haskell
+feat :: Int -> Int -> Int -> (Int, Int, Int)
+feat a b n = (modX, minX, maxX)
+  where
+    d = b - a
+    maxX = b * n
+    minX = a * n
+    modX = maxX `mod` d
+
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !a, !b)<- ints3'
+  !xs <- intsU'
+
+  let (mods, mins, maxes) = U.unzip3 $ U.map (feat a b) xs
+  let b1 = U.all (== U.head mods) mods
+  let l = U.maximum mins
+  let r = U.minimum maxes
+  let b2 = l <= r
+
+  if b1 && b2
+    then do
+      let d = b - a
+      printBSB . U.sum $ U.map ((`div` d) . (r -)) mins
+    else do
+      printBSB "-1"
+#+END_SRC
+
+** [[https://atcoder.jp/contests/abc432/tasks/abc432_d][D 問題]]
+
+長方形が配置された空間にねじれを加えていく問題です。千切れた長方形もまとめてねじって行き、最終的な連結成分のサイズを回答します。
+
+長方形毎に位置とサイズを追跡し、千切れた部分は後から連結判定することで、 $O(4^N)$ で解けそうです。
+
+長方形の隣接判定がこちら:
+
+#+BEGIN_SRC haskell
+isAdj :: (Int, Int, Int, Int) -> (Int, Int, Int, Int) -> Bool
+isAdj r1@(!y, !x, !h, !w) r2@(!y', !x', !h', !w')
+  | x + w == x' || x' + w' == x =
+      let yMin = max y y'
+          yMax = min (y + h - 1) (y' + h' - 1)
+       in yMin <= yMax
+  | y + h == y' || y' + h' == y =
+      let xMin = max x x'
+          xMax = min (x + w - 1) (x' + w' - 1)
+       in xMin <= xMax
+  | otherwise = False
+#+END_SRC
+
+長方形の追跡と、連結成分の個数確認が以下です。上下と左右のねじれでコードがダブっているとは、重いです:
+
+#+BEGIN_SRC haskell
+-- (2^n)^2 < 10^9. Neraly safe.
+solve :: StateT BS.ByteString IO ()
+solve = do
+  (!n, !w0, !h0) <- ints3'
+  !cds <- U.replicateM n ((,,) <$> char' <*> int' <*> int')
+
+  -- track rects
+  let res1 = U.foldl' step s0 cds
+        where
+          s0 = U.singleton (0, 0, h0, w0)
+          step rects ('X', !atX, !dy) = U.concatMap f rects
+            where
+              !_ = dbg rects
+              f (!y, !x, !h, !w)
+                | x + w <= atX = U.singleton (y - dy, x, h, w)
+                | x >= atX = U.singleton (y + dy, x, h, w)
+                | otherwise = U.fromListN 2 [b1, b2]
+                where
+                  b1 = (y - dy, x, h, atX - x)
+                  b2 = (y + dy, atX, h, x + w - atX)
+          step rects ('Y', !atY, !dx) = U.concatMap g rects
+            where
+              !_ = dbg rects
+              g (!y, !x, !h, !w)
+                | y + h <= atY = U.singleton (y, x - dx, h, w)
+                | y >= atY = U.singleton (y, x + dx, h, w)
+                | otherwise = U.fromListN 2 [b1, b2]
+                where
+                  b1 = (y, x - dx, atY - y, w)
+                  b2 = (atY, x + dx, y + h - atY, w)
+          step _ _ = error "unreachable"
+
+  -- merge and return counts
+  let !_ = dbg res1
+  let res = U.filter (/= 0) $ U.create $ do
+        let len = G.length res1
+        groups <- Dsu.new len
+        counts <- U.unsafeThaw $ U.map (\(!_, !_, !h, !w) -> h * w) res1
+
+        U.iforM_ res1 $ \i r -> do
+          let rects = U.take i res1
+          U.iforM_ rects $ \i' r' -> do
+            when (isAdj r r') $ do
+              -- change the belonging group
+              r1 <- Dsu.leader groups i
+              r2 <- Dsu.leader groups i'
+              r <- Dsu.merge groups i i'
+              -- move the count to the group
+              a1 <- GM.exchange counts r1 0
+              a2 <- GM.exchange counts r2 0
+              GM.write counts r $ a1 + a2
+
+        pure counts
+
+  printBSB $ U.length res
+  printBSB . unwordsBSB $ U.modify VAI.sort res
+#+END_SRC
+
+なお [[https://atcoder.jp/contests/abc432/editorial/14576][解説]] によると、長方形の区間は $N = 14$ のとき $471$ であるそうです。 $4^N$ にならないのですね……。安易な計算量解析で結論を出してはいけないことが分かります。形上せよ！
+
+** [[https://atcoder.jp/contests/abc432/tasks/abc432_e][E 問題]]
+
+Clamped range sum 的な問題です。僕は本番で解けませんでしたが、頻度分布を持てば解けるようです。確かに……。
+
+- エッジケースとして、 clamp のクエリが $l > r$ である場合があります。
+
+** 感想
+
+D のような PAST 的、実務的な問題が好きです。
+
+* Misc
+
+** 音楽
+
+Bliss of Flesh の [[https://www.youtube.com/watch?v=5pakP7qbhYU][新盤]] が出ました。最高の出来とは言えないのですが、やはり曲調が僕の中では No. 1 です。
+
+これが最後のアルバムとなるのでしょうか。誰も歳には勝てませんね。
+
