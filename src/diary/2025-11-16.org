@@ -21,10 +21,9 @@ solve = do
 数列を並び替え、 =0= 以外から始まる最も小さな値を作成せよ。全探索が楽なようです:
 
 #+BEGIN_SRC haskell
-solve :: StateT BS.ByteString IO ()
 solve = do
-  !xs <- U.toList <$> intsU'
-  printBSB . concatMap show $ sortBy (comparing Down) xs
+  !xs <- sort . BS.unpack <$> line'
+  printBSB . fromJust . find ((/= '0') . head) $ permutations xs
 #+END_SRC
 
 ** [[https://atcoder.jp/contests/abc432/tasks/abc432_c][C 問題]]
@@ -85,7 +84,7 @@ isAdj r1@(!y, !x, !h, !w) r2@(!y', !x', !h', !w')
   | otherwise = False
 #+END_SRC
 
-長方形の追跡と、連結成分の個数確認が以下です。上下と左右のねじれでコードがダブっているとは、重いです:
+長方形の追跡と、連結成分の個数確認が以下です。上下と左右のねじれでコードがダブっているとはいえ、重いです:
 
 #+BEGIN_SRC haskell
 -- (2^n)^2 < 10^9. Neraly safe.
@@ -100,7 +99,6 @@ solve = do
           s0 = U.singleton (0, 0, h0, w0)
           step rects ('X', !atX, !dy) = U.concatMap f rects
             where
-              !_ = dbg rects
               f (!y, !x, !h, !w)
                 | x + w <= atX = U.singleton (y - dy, x, h, w)
                 | x >= atX = U.singleton (y + dy, x, h, w)
@@ -110,7 +108,6 @@ solve = do
                   b2 = (y + dy, atX, h, x + w - atX)
           step rects ('Y', !atY, !dx) = U.concatMap g rects
             where
-              !_ = dbg rects
               g (!y, !x, !h, !w)
                 | y + h <= atY = U.singleton (y, x - dx, h, w)
                 | y >= atY = U.singleton (y, x + dx, h, w)
@@ -121,7 +118,6 @@ solve = do
           step _ _ = error "unreachable"
 
   -- merge and return counts
-  let !_ = dbg res1
   let res = U.filter (/= 0) $ U.create $ do
         let len = G.length res1
         groups <- Dsu.new len
@@ -146,7 +142,7 @@ solve = do
   printBSB . unwordsBSB $ U.modify VAI.sort res
 #+END_SRC
 
-なお [[https://atcoder.jp/contests/abc432/editorial/14576][解説]] によると、長方形の区間は $N = 14$ のとき $471$ であるそうです。 $4^N$ にならないのですね……。安易な計算量解析で結論を出してはいけないことが分かります。形上せよ！
+なお [[https://atcoder.jp/contests/abc432/editorial/14576][解説]] によると、長方形の区間は $N = 14$ のとき最大で $471$ になるそうです。 $4^N$ ではないのですね……。安易な計算量解析で結論を出してはいけないことが分かります。形上せよ！
 
 ** [[https://atcoder.jp/contests/abc432/tasks/abc432_e][E 問題]]
 
@@ -156,7 +152,7 @@ Clamped range sum 的な問題です。僕は本番で解けませんでした�
 
 ** 感想
 
-D のような PAST 的、実務的な問題が好きです。
+D のような PAST 的、実務的な泥臭い問題が好きです。
 
 * Misc
 
