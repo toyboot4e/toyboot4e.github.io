@@ -81,13 +81,13 @@ csum1D = U.scanl' (+) 0
 
 ** =index'=
 
-[[https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-Ix.html#v:index][=Data.Ix.index=]] には [[https://hackage.haskell.org/package/base-4.21.0.0/docs/GHC-Stack.html#t:HasCallStack][=HasCallStack=]] 制約が無いため、エラー時にどこでエラーが起きたか分かりません。エラー表示は以下のようになります:
+[[https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-Ix.html#v:index][=Data.Ix.index=]] には [[https://hackage.haskell.org/package/base-4.21.0.0/docs/GHC-Stack.html#t:HasCallStack][=HasCallStack=]] 制約が無いため、エラー時の情報に乏しいです。エラー表示は以下のようになります:
 
 #+BEGIN_SRC txt
 a-exe: Error in array index
 #+END_SRC
 
-より詳細なエラー表示をしてくれる =index= 関数が以下です:
+より詳細なエラー表示をしてくれる =index= 関数は以下となります:
 
 #+BEGIN_SRC hs
 import Data.Ix
@@ -100,7 +100,7 @@ index' !bnd !i
   | otherwise = error $ "index out ouf bounds: " ++ show i ++ " in " ++ show bnd
 #+END_SRC
 
-次のような表示になります:
+次のように表示してくれて助かります:
 
 #+BEGIN_SRC txt
 a-exe: index out ouf bounds: (-1,-1) in ((0,0),(4,4))
