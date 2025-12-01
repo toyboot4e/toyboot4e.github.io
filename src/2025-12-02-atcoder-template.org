@@ -111,7 +111,7 @@ CallStack (from HasCallStack):
 
 ** 2 次元 or 3 次元 vector
 
-[[https://hackage.haskell.org/package/vector][=vector=]] パッケージは 1 次元配列を提供します。 =vector= をラップすると、 =array= 似の多次元配列の API を提供できます。
+[[https://hackage.haskell.org/package/vector][=vector=]] パッケージは 1 次元配列を提供します。 =vector= をラップすると、 [[https://zenn.dev/naoya_ito/articles/87a8a21d52c302][=array=]] 似の多次元配列の API を提供できます。
 
 #+BEGIN_SRC hs
 import Control.Monad.Primitive
