@@ -6,6 +6,7 @@
 
 * Devlog (timeline)
 #+ATTR_HTML: :class sitemap
+- @@html:<date>2025-12-02</date>@@ [[file:/2025-12-02-atcoder-template.org][AtCoder 用テンプレートの紹介 (Haskell)]] @@html:<a href="/tags/atcoder.html" class="org-tag"><code>#atcoder</code></a> <a href="/tags/haskell.html" class="org-tag"><code>#haskell</code></a>@@
 - @@html:<date>2025-11-10</date>@@ [[file:/2025-11-10-rent-house.org][メキメキ新居環境構築]] @@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@
 - @@html:<date>2025-10-05</date>@@ [[file:/2025-10-05-tdd.org][『テスト駆動開発』感想]] @@html:<a href="/tags/books.html" class="org-tag"><code>#books</code></a>@@
 - @@html:<date>2025-09-30</date>@@ [[file:/2025-09-30-the-way-of-the-web-tester.org][『初めての自動テスト』感想]] @@html:<a href="/tags/books.html" class="org-tag"><code>#books</code></a>@@
