@@ -6,6 +6,7 @@
 
 * Devlog (=#blog=)
 #+ATTR_HTML: :class sitemap
+- @@html:<date>2025-12-20</date>@@ [[file:/2025-12-20-toc.org][=org-mode= 製ブログの改良 (5): Tocbot]] @@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@
 - @@html:<date>2025-07-21</date>@@ [[file:/2025-07-21-blog-improvements-5.org][=org-mode= 製ブログの改良 (5): タグとヘッダ]] @@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@
 - @@html:<date>2025-05-07</date>@@ [[file:/2025-05-07-blog-improvements-4.org][=org-mode= 製ブログの改良 (4): yaruo block]] @@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@
 - @@html:<date>2024-09-15</date>@@ [[file:/2024-09-15-blog-improvements-3.org][=org-mode= 製ブログの改良 (3): callouts]] @@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@

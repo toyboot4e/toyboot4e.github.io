@@ -1,0 +1,26 @@
+#+TITLE: =org-mode= 製ブログの改良 (5): Tocbot
+#+DATE: <2025-12-20 Sat>
+#+FILETAGS: :blog:
+
+* 背景
+
+[[https://atree4728.github.io/posts/introduction_to_equational_reasoning][Equational Reasoning 入門]] を読みました。内容もさながら、ブログのスタイルが良かったです。本ブログにおいても、やはり記事の隣に nav bar が欲しいと思い、 ToC (table of contents, 目次) を導入してみました。
+
+* 結果
+
+Zenn で使われていることでも有名な [[https://tscanlin.github.io/tocbot/][Tocbot]] を導入し、スタイリングしてみました:
+
+[[./img/2025-12-20-tocbot.png]]
+
+スタイルは [[https://lapwing.aerick.ca/][Lapwing for Beginners]] ([[https://github.com/badboy/mdbook-toc][=mdbook-toc=]]) を参考にしました。 (記事 + 目次) を中央寄せにしたため、やや目次の存在感があり過ぎる気はします。
+
+目次要素はクライアント側で動的に生成しています。 Prism.js を含め、事前処理に移行したい気はしています。
+
+** デモ (レベル 2 の目次)
+
+ToC から見出しをクリックしてジャンプできます。ジャンプ時に keyframe でアニメーションが出ます。超大作記事を出した時に活躍しそうです。
+
+* まとめ
+
+簡易的な目次を導入してみました。前から欲しかった機能でしたが、やはり記事の構造が明示されて良いと思います。 Zenn Book を含め、基本すべてのページに欲しい機能です。
+
