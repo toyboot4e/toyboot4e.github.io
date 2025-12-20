@@ -14,7 +14,7 @@ Zenn で使われていることでも有名な [[https://tscanlin.github.io/toc
 
 スタイルは [[https://lapwing.aerick.ca/][Lapwing for Beginners]] ([[https://github.com/badboy/mdbook-toc][=mdbook-toc=]]) を参考にしました。 (記事 + 目次) を中央寄せにしたため、やや目次の存在感があり過ぎる気はします。
 
-目次要素はクライアント側で動的に生成しています。 Prism.js を含め、事前処理に移行したい気はしています。
+目次要素はクライアント側で動的に生成しています。 Prism.js を含め、いずれ事前処理に移行したいです。
 
 ** デモ (レベル 2 の目次)
 
