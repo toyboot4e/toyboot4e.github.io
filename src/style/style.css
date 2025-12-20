@@ -1,9 +1,26 @@
-body {
-  /* wider */
-  grid-template-columns: 1fr min(50rem, 90%) 1fr;
+main {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
 }
 
-main p {
+#content {
+  margin-top: 1.5rem;
+  width: min(50rem, 90vw);
+}
+
+#toc-wrapper {
+  position: sticky;
+  top: 1.5rem;
+  margin-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  width: 250px;
+  margin-left: 2rem;
+  padding-left: 2rem;
+  border-left: var(--border-width) solid var(--border);
+}
+
+#content p {
   text-indent: 1em;
 }
 
@@ -29,7 +46,6 @@ header > nav {
 
 header > nav a {
   text-align: center;
-  max-width: 1200px;
 }
 
 /* timestamp */
@@ -178,3 +194,82 @@ span.code-highlighted {
   text-decoration: none;
 }
 
+/* ToC (sticky, right side) */
+
+@media (max-width: 1100px) {
+  #toc-wrapper {
+    display: none;
+  }
+}
+
+a.toc-link {
+  display: block;
+}
+
+a.is-active-link {
+  background-color: hsla(24, 20%, 50%, 0.25);
+}
+
+#toc-wrapper a:hover {
+  background-color: hsla(24, 20%, 50%, 0.25);
+}
+
+.toc-list {
+  margin: 0;
+}
+
+ul.toc-list {
+  list-style: none;
+}
+
+#toc > ul {
+  padding-left: 0;
+}
+
+#toc ul ul {
+  padding-left: 16px;
+}
+
+/* highlight on jump */
+@keyframes fadeHighlight {
+  0% { background-color: hsla(60, 30%, 50%, 0.5); }
+  100% { background-color: transparent; }
+}
+
+h1:target,
+h2:target,
+h3:target,
+h4:target,
+h5:target,
+h6:target {
+  animation: fadeHighlight 2s ease-out forwards;
+}
+
+/* Modifies Tocbot CSS */
+
+.toc {
+  overflow-y: auto;
+}
+
+.toc > .toc-list {
+  overflow: hidden;
+  position: relative;
+}
+
+a.toc-link {
+  height: 100%;
+}
+
+.is-collapsible {
+  max-height: 1000px;
+  overflow: hidden;
+  transition: all 300ms ease-in-out;
+}
+
+.is-collapsed {
+  max-height: 0;
+}
+
+.is-active-link {
+  font-weight: 700;
+}
