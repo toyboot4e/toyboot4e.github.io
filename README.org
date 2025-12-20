@@ -28,6 +28,7 @@ $ just serve # in another tab
 - [[https://github.com/kevquirk/simple.css/][Simple.css]]
 - [[https://prismjs.com/][Prism.js]]
 - [[https://www.mathjax.org/][MathJax]]
+- [[https://tscanlin.github.io/tocbot/][Tocbot]]
 
 *** Fonts
 
