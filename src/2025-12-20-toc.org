@@ -1,4 +1,4 @@
-#+TITLE: =org-mode= 製ブログの改良 (5): Tocbot
+#+TITLE: =org-mode= 製ブログの改良 (6): Tocbot
 #+DATE: <2025-12-20 Sat>
 #+FILETAGS: :blog:
 
