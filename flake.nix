@@ -34,17 +34,17 @@
           drv = buildCommand;
         };
         devShells.default =
-          with pkgs;
-          mkShell {
-            packages = [
+          pkgs.mkShell {
+            packages = with pkgs; [
               nodePackages.prettier
+              watchexec
             ];
           };
         packages = {
           devlog = pkgs.stdenvNoCC.mkDerivation {
             name = "devlog";
             src = ./.;
-            nativeBuildInputs = with pkgs; [
+            nativeBuildInputs = [
               buildCommand
             ];
             buildPhase = ''
@@ -52,8 +52,8 @@
               build-command
             '';
             installPhase = ''
-              mkdir -p $out
-              mv out $out/out
+              mkdir -p "$out"
+              mv out "$out/out"
             '';
           };
         };
