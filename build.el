@@ -1,11 +1,5 @@
 ;; Build script
 ;;
-;; Thanks:
-;; - `https://systemcrafters.net/publishing-websites-with-org-mode/building-the-site/'
-;; - `https://taingram.org/blog/org-mode-blog.html'
-;; - `https://www.roygbyte.com/add_syntax_highlighting_to_an_org_publish_project.html'
-;; - `https://github.com/balddotcat/ox-slimhtml'
-
 ;; Note that this source file is a mess.
 
 ;; TODO: Custom admonition filter
