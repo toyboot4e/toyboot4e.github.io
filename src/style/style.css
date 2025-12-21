@@ -258,6 +258,7 @@ h6:target {
 
 a.toc-link {
   height: 100%;
+  padding: 2px 0 2px 0;
 }
 
 .is-collapsible {
