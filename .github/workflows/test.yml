@@ -8,6 +8,7 @@ concurrency:
 on:
   pull_request:
 
+# Run build only
 jobs:
   build:
     name: Build test

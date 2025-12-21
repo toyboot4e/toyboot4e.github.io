@@ -5,10 +5,15 @@ concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
 
+# Run on source file or build script change only
 on:
   push:
     branches: 'main'
+    paths:
+      - src/**
+      - build.el
 
+# Build and deploy
 jobs:
   build:
     name: Build
