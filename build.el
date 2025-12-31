@@ -238,7 +238,7 @@
                        (src "https://unpkg.com/tocbot@4/dist/tocbot.min.js"))
                     "")
             (script (*RAW-STRING*
-                     "tocbot.init({ tocSelector: '#toc', contentSelector: '#content', headingSelector: 'h1, h2, h3', collapseDepth: 6, scrollSmooth: false, orderedList: false });")
+                     "tocbot.init({ tocSelector: '#toc', contentSelector: '#content', headingSelector: 'h1, h2, h3, h4', collapseDepth: 6, scrollSmooth: false, orderedList: false });")
                     ))))))
 
 ;;; Backend (filters)
