@@ -6,6 +6,7 @@
 
 * Devlog (timeline)
 #+ATTR_HTML: :class sitemap
+- @@html:<date>2026-01-01</date>@@ [[file:/2026-01-01-automaton-for-dp-1.org][桁 DP をオートマトンで解く (1): 準備編]] @@html:<a href="/tags/atcoder.html" class="org-tag"><code>#atcoder</code></a> <a href="/tags/haskell.html" class="org-tag"><code>#haskell</code></a>@@
 - @@html:<date>2025-12-20</date>@@ [[file:/2025-12-20-toc.org][=org-mode= 製ブログの改良 (6): Tocbot]] @@html:<a href="/tags/blog.html" class="org-tag"><code>#blog</code></a>@@
 - @@html:<date>2025-12-02</date>@@ [[file:/2025-12-02-atcoder-template.org][AtCoder 用テンプレートの紹介 (Haskell)]] @@html:<a href="/tags/atcoder.html" class="org-tag"><code>#atcoder</code></a> <a href="/tags/haskell.html" class="org-tag"><code>#haskell</code></a>@@
 - @@html:<date>2025-11-10</date>@@ [[file:/2025-11-10-rent-house.org][メキメキ新居環境構築]] @@html:<a href="/tags/misc.html" class="org-tag"><code>#misc</code></a>@@

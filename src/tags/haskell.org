@@ -6,6 +6,7 @@
 
 * Devlog (=#haskell=)
 #+ATTR_HTML: :class sitemap
+- @@html:<date>2026-01-01</date>@@ [[file:/2026-01-01-automaton-for-dp-1.org][配る桁 DP をオートマトンで解く！]] @@html:<a href="/tags/atcoder.html" class="org-tag"><code>#atcoder</code></a> <a href="/tags/haskell.html" class="org-tag"><code>#haskell</code></a>@@
 - @@html:<date>2025-12-02</date>@@ [[file:/2025-12-02-atcoder-template.org][AtCoder 用テンプレートの紹介 (Haskell)]] @@html:<a href="/tags/atcoder.html" class="org-tag"><code>#atcoder</code></a> <a href="/tags/haskell.html" class="org-tag"><code>#haskell</code></a>@@
 - @@html:<date>2025-05-12</date>@@ [[file:/2025-05-12-haskell-ci.org][=ac-library-hs= の CI を設定しました]] @@html:<a href="/tags/haskell.html" class="org-tag"><code>#haskell</code></a>@@
 - @@html:<date>2025-04-16</date>@@ [[file:/2025-04-16-ac-library-hs-3.org][=ac-library-hs= の =Extra= モジュールを作成しました]] @@html:<a href="/tags/atcoder.html" class="org-tag"><code>#atcoder</code></a> <a href="/tags/haskell.html" class="org-tag"><code>#haskell</code></a>@@

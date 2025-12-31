@@ -1,0 +1,275 @@
+#+TITLE: 配る桁 DP をオートマトンで解く！
+#+DATE: <2026-01-01 Thu>
+#+FILETAGS: :atcoder:haskell:
+
+* 背景
+
+AtCoder では、動的計画法の一種として『桁 DP』と呼ばれるジャンルの問題があります。桁 DP には明確な攻略法が存在し、オートマトンを使えば良いとされています:
+
+[[https://shino16.github.io/blog/post/algo/%E3%82%AA%E3%83%BC%E3%83%88%E3%83%9E%E3%83%88%E3%83%B3/][オートマトン（DFA）での桁DPを理解する - shino16]]
+
+上の記事が最も平易に書かれていると思います。この投稿では、該当記事の手法を Haskell で再現してみます。
+
+* 演習
+
+[[https://atcoder-tags.herokuapp.com/tags/Dynamic-Programming/Digit-DP][AtCoder Tag の桁 DP のページ]] から易しめの問題を選んで解いてみます。
+
+** 1. [[https://atcoder.jp/contests/agc021/tasks/agc021_a][AGC 021 A - Digit Sum 2]]
+
+#+BEGIN_QUOTE
+$N$ 以下の正の整数の $10$ 進法での各桁の和の最大値を求めてください。
+
+- $1 \le N \le 10^{16}$
+#+END_QUOTE
+
+*** 配る桁 DP ($O(1)$)
+
+$N$ が巨大であるため、解き方に工夫が必要です。飛び道具気味ですが、配る桁 DP を使ってみます。 $N$ の各桁を畳み込みの対象に、『現在の値が $N$ 未満であるか』を基準に =State= を取りました:
+
+#+BEGIN_SRC hs
+import Data.ByteString.Char8 qualified as BS
+import Data.Char (digitToInt)
+import Data.Foldable (Foldable (foldl'))
+import Data.HashMap.Strict qualified as HM
+import Data.Hashable (Hashable (hashWithSalt))
+import Data.Vector.Unboxed qualified as U
+
+data LtEq = LessThan | Equal
+  deriving (Eq, Show, Enum)
+
+instance Hashable LtEq where
+  hashWithSalt i s = hashWithSalt i (fromEnum s)
+
+solve :: String -> Int
+solve = maximum . foldl' step s0 . map digitToInt
+  where
+    s0 :: HM.HashMap LtEq Int
+    s0 = HM.singleton Equal (0 :: Int)
+    -- 1 桁読む
+    step :: HM.HashMap LtEq Int -> Int -> HM.HashMap LtEq Int
+    step sofar d = HM.fromListWith max . concatMap f $ HM.toList sofar
+      where
+        f :: (LtEq, Int) -> [(LtEq, Int)]
+        f (Equal, !digitSum)
+          | d == 0 = [(Equal, digitSum + d)]
+          | otherwise = [(Equal, digitSum + d), (LessThan, digitSum + (d - 1))]
+        f (LessThan, !digitSum) =
+          -- 明らかに 9 を選ぶのが効率が良い
+          [(LessThan, digitSum + 9)]
+
+main :: IO ()
+main = do
+  print . solve . BS.unpack =<< BS.getLine
+#+END_SRC
+
+桁数を無視すると $O(1)$ で解けました。
+
+*** あえて DFA 的に書き直す
+
+上記の =step= を書き換えて、遷移 =f= のシグネチャを以下に変えます:
+
+#+BEGIN_SRC hs
+f :: (LtEq, Int) -> Int -> Maybe (LtEq, Int)
+#+END_SRC
+
+つまり、入力を受けて状態遷移する、というモデルに書き直します:
+
+#+BEGIN_SRC hs
+solve :: String -> Int
+solve = maximum . foldl' step s0 . map digitToInt
+  where
+    s0 :: HM.HashMap LtEq Int
+    s0 = HM.singleton Equal (0 :: Int)
+    step :: HM.HashMap LtEq Int -> Int -> HM.HashMap LtEq Int
+    step sofar d =
+      HM.fromListWith max
+        . concatMap (\kv -> mapMaybe (f kv) [0 .. 9]) -- (ref:1)
+        $ HM.toList sofar
+      where
+        f :: (LtEq, Int) -> Int -> Maybe (LtEq, Int)
+        f (Equal, !digitSum) i = case compare i d of
+          EQ -> Just (Equal, digitSum + i) -- (ref:2)
+          LT -> Just (LessThan, digitSum + i)
+          GT -> Nothing
+        f (LessThan, !digitSum) i =
+          Just (LessThan, digitSum + i)
+#+END_SRC
+
+- [[(1)]] で任意の入力値 (=[0 .. 9]=) を取って、全ての状態遷移を辿っています。やや非効率的ですが、今回は枝刈りを考えず置いておきましょう。
+- [[(2)]] 以降、値の箇所は全て =digitSum + i= (値 + 入力値) ですね
+
+*** =Dfa= を型クラスにする
+
+桁 DP 専用の DFA を作ってみます:
+
+#+BEGIN_SRC haskell 
+class DigitDfa context s d where
+  onNextDigit ::
+    -- context: DFA 相当のデータ型
+    context ->
+    -- s: 状態
+    s ->
+    -- d: 入力値 (この桁の値)
+    d ->
+    -- 遷移先 (あれば)
+    Maybe s
+#+END_SRC
+
+巧妙にも、 =HashMap= の *値の部分 (桁和の部分) の計算を =DigitDfa= の外に* 出してしまいました。 =DigitDfa= の定義は遷移に専念させつつ、状態に関連付ける値を桁和や合計値などに差し替え可能にする、極めて冴えた設計だと思います。
+
+状態の =LtEq= は続投します:
+
+#+BEGIN_SRC hs
+data LtEq = LessThan | Equal
+  deriving (Eq, Show, Enum)
+
+instance Hashable LtEq where
+  hashWithSalt i s = hashWithSalt i (fromEnum s)
+#+END_SRC
+
+=LtEq= に関連した状態遷移を定義します:
+
+#+BEGIN_SRC hs
+newtype LtEqDfa = LtEqDfa Int
+  deriving (Eq, Show)
+
+instance DigitDfa LtEqDfa LtEq Int where
+  onNextDigit (LtEqDfa d) Equal i =
+    case compare i d of
+      EQ -> Just Equal
+      LT -> Just LessThan
+      GT -> Nothing
+  onNextDigit (LtEqDfa _) LessThan _ =
+    Just LessThan
+#+END_SRC
+
+最後に、これらを元に問題を解きます:
+
+#+BEGIN_SRC hs
+solve :: String -> Int
+solve s = maximum $ U.foldl' step s0 digits
+  where
+    digits :: U.Vector Int
+    digits = U.map digitToInt $ U.fromList s
+    s0 :: HM.HashMap LtEq Int
+    s0 = HM.singleton Equal (0 :: Int)
+    step :: HM.HashMap LtEq Int -> Int -> HM.HashMap LtEq Int
+    step sofar dGuard =
+      HM.fromListWith max
+        . concatMap
+          ( \(!state, !digitSum) ->
+              mapMaybe
+                ( \d -> do
+                    state' <- onNextDigit (LtEqDfa dGuard) state d -- (ref:1)
+                    pure (state', digitSum + d) -- (ref:2)
+                )
+                [0 .. 9] -- (ref:3)
+          )
+        $ HM.toList sofar
+#+END_SRC
+
+- [[(1)]] $N$ のこの桁の値を =LtEqDfa dGuard= の形で使用しています
+- [[(2)]] 桁和を =digitSum + d= の形で計算しています
+- [[(3)]] 入力値の範囲はガバガバで、 =[0 .. 9]= まで全ての遷移を考えています
+
+かなり再利用できそうな形に整理できました。
+
+** [[https://atcoder.jp/contests/abc154/tasks/abc154_e][ABC 154 - E Almost Everywhere Zero]]
+
+#+BEGIN_QUOTE
+$1$ 以上 $N$ 以下の整数であって、 $10$ 進法で表したときに、$0$ でない数字がちょうど $K$ 個あるようなものの個数を求めてください。
+
+- $1 \le N \lt 10^{100}$
+- $1 \le K \le 3$
+#+END_QUOTE
+
+*** オートマトンの合成
+
+状態が増えました。オートマトンの組み合わせを考えると、 *複数の独立した状態を追跡できます*:
+
+#+BEGIN_SRC hs
+newtype AndDfa a = AndDfa a
+  deriving (Eq, Show)
+
+instance
+  (DigitDfa context1 s1 d, DigitDfa context2 s2 d) =>
+  DigitDfa (AndDfa (context1, context2)) (s1, s2) d
+  where
+  onNextDigit (AndDfa (context1, context2)) (!s1, !s2) d = do
+    s1' <- onNextDigit context1 s1 d
+    s2' <- onNextDigit context2 s2 d
+    pure (s1', s2')
+#+END_SRC
+
+したがって今回の問題に置いては、 =AndDfa (LtEqDfa, CountNonZeroDfa)=  のようなものを定義すれば、 *ほぼ解けたも同然です* 。楽勝ですね。
+
+*** =CountNonZero=, =CountNonZeroDfa=
+
+各桁の内、 =0= でない数字の数を追跡するための状態を作成します:
+
+#+BEGIN_SRC hs
+newtype CountNonZero = CountNonZero Int
+  deriving (Eq, Show)
+
+instance Hashable CountNonZero where
+  hashWithSalt :: Int -> CountNonZero -> Int
+  hashWithSalt i (CountNonZero k) = hashWithSalt i k
+#+END_SRC
+
+これを追跡するための DFA を定義します:
+
+#+BEGIN_SRC hs
+newtype CountNonZeroDfa = CountNonZeroDfa Int
+  deriving (Eq, Show)
+
+instance DigitDfa CountNonZeroDfa CountNonZero Int where
+  onNextDigit _ s 0 = Just s
+  onNextDigit (CountNonZeroDfa k) (CountNonZero n) _
+    | n >= k = Nothing
+    | otherwise = Just $ CountNonZero (n + 1)
+#+END_SRC
+
+*** =solve= 関数
+
+後は 2 つの DFA を組み合わて解きます:
+
+#+BEGIN_SRC hs
+solve :: String -> Int -> Int
+solve s k =
+  sum
+    . map snd
+    . filter ((== CountNonZero k) . snd . fst)
+    . traceShowId
+    . HM.toList
+    $ U.foldl' step s0 digits
+  where
+    digits :: U.Vector Int
+    digits = U.map digitToInt $ U.fromList s
+    s0 :: HM.HashMap (LtEq, CountNonZero) Int
+    s0 = HM.singleton (Equal, CountNonZero 0) (1 :: Int) -- (ref:1)
+    step :: HM.HashMap (LtEq, CountNonZero) Int -> Int -> HM.HashMap (LtEq, CountNonZero) Int
+    step sofar dGuard =
+      HM.fromListWith (+)
+        . concatMap
+          ( \(!state, !count) ->
+              mapMaybe
+                ( \d -> do
+                    state' <- onNextDigit (AndDfa (LtEqDfa dGuard, CountNonZeroDfa k)) state d -- (ref:2)
+                    pure (state', count)
+                )
+                [0 :: Int .. 9]
+          )
+        $ HM.toList sofar
+#+END_SRC
+
+- [[(1)]] 今回は状態の数を値とするため、初期値は =1= です
+- [[(2)]] =AndDfa= を使います
+
+半自動的に解けました。この手の =solve= 関数を丸ごと抽象化できそうですが、今回はアイデアが掴めたということで良しとします。
+
+* まとめ
+
+桁 DP において、入力値を受け取って状態遷移するという DFA のアイデアを導入しました。 DFA の定義から関連付ける値を分離したことで、 DFA が多くの問題で再利用可能になりました。さらに、 DFA の組み合わせ (合成？) を考えることができるようになりました。
+
+かなり多くの典型問題が同じ仕組みで解けるようになったのではないかと思います。この方法で解けない問題もありそうですが ([[https://atcoder.jp/contests/typical90/tasks/typical90_e][典型90 005]] など) 、まずはここまでの内容でライブラリを作ってみたいと思います。
+
