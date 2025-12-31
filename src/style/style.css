@@ -247,8 +247,9 @@ h6:target {
 
 /* Modifies Tocbot CSS */
 
-.toc {
+#toc-wrapper {
   overflow-y: auto;
+  height: 100vh;
 }
 
 .toc > .toc-list {
