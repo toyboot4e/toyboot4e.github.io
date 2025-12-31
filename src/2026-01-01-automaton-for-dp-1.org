@@ -143,7 +143,7 @@ instance DigitDfa LtEqDfa LtEq Int where
     Just LessThan
 #+END_SRC
 
-最後に、これらを元に問題を解きます:
+これらを元に問題を解き直します:
 
 #+BEGIN_SRC hs
 solve :: String -> Int
