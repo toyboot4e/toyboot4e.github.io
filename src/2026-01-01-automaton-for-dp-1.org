@@ -201,7 +201,7 @@ instance
     pure (s1', s2')
 #+END_SRC
 
-したがって今回の問題に置いては、 =AndDfa (LtEqDfa, CountNonZeroDfa)=  のようなものを定義すれば、 *ほぼ解けたも同然です* 。楽勝ですね。
+したがって今回の問題においては、 =AndDfa (LtEqDfa, CountNonZeroDfa)=  のようなものを定義すれば、 *ほぼ解けたも同然です* 。楽勝ですね。
 
 *** =CountNonZero=, =CountNonZeroDfa=
 
@@ -216,7 +216,7 @@ instance Hashable CountNonZero where
   hashWithSalt i (CountNonZero k) = hashWithSalt i k
 #+END_SRC
 
-これを追跡するための DFA を定義します:
+この状態に関する DFA を定義します:
 
 #+BEGIN_SRC hs
 newtype CountNonZeroDfa = CountNonZeroDfa Int
@@ -231,7 +231,7 @@ instance DigitDfa CountNonZeroDfa CountNonZero Int where
 
 *** =solve= 関数
 
-後は 2 つの DFA を組み合わて解きます:
+後は 2 つの DFA を組み合われば解けます:
 
 #+BEGIN_SRC hs
 solve :: String -> Int -> Int
