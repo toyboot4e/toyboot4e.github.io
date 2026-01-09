@@ -17,7 +17,7 @@ main {
   width: 250px;
   margin-left: 2rem;
   padding-left: 2rem;
-  border-left: var(--border-width) solid var(--border);
+  border-left: var(--border-width) solid rgb(96, 96, 114);
 }
 
 #content p {
