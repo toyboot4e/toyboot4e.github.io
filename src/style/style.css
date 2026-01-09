@@ -41,17 +41,18 @@ body > header {
 }
 
 header > nav {
-  padding: 0;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
-header > nav a {
-  text-align: center;
+header > h1 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 /* timestamp */
 header > p {
-  margin: 0;
-
+  margin: .5rem auto .5rem auto !important;
   color: var(--text-light);
   font-size: 0.9rem;
   text-align: center;

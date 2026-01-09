@@ -194,16 +194,17 @@
 ;; Returns `<header>' SXML
 (defun my-html-header (info)
   `(header (@ (role "banner"))
-           ;; `org-export-data' returns raw HTML
-           (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
-           ;; timestamp
-           (p ,(org-export-data (org-export-get-date info "%b %e, %Y") info))
            (nav (@ (role "navigation"))
                 (a (@ (href "/index.html")) "Home")
                 (a (@ (href "https://atcoder.jp/users/toyboot4e")) "AtCoder")
                 (a (@ (href "https://github.com/toyboot4e")) "GitHub")
                 (a (@ (href "https://qiita.com/toyboot4e")) "Qiita")
-                (a (@ (href "https://zenn.dev/toyboot4e")) "Zenn"))))
+                (a (@ (href "https://zenn.dev/toyboot4e")) "Zenn"))
+           ;; `org-export-data' returns raw HTML
+           (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
+           ;; timestamp
+           (p ,(org-export-data (org-export-get-date info "%b %e, %Y") info))
+           ))
 
 ;; Returns `<footer>' SXML
 (defun my-html-footer (info)
