@@ -228,10 +228,7 @@
                   ;; TODO: <article> without style
                   (div (@ (id "content"))
                        (*RAW-STRING* ,contents))
-                  (div (@ (id "toc-wrapper"))
-                       (p "目次")
-                       (nav (@ (id "toc"))
-                            )))
+                  (nav (@ (id "toc"))))
             ,(my-html-footer info)
 
             (script (@ (type "text/javascript")

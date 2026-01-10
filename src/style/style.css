@@ -10,18 +10,17 @@ main {
   width: min(50rem, 90vw);
 }
 
-#toc-wrapper {
+#toc {
   grid-column: 3;
   align-self: start;
   position: sticky;
   top: 1.5rem;
   margin-top: 1.5rem;
-  padding-bottom: 1.5rem;
   width: 250px;
   max-height: 100vh;
   overflow-y: auto;
   margin-left: 2rem;
-  padding-left: 2rem;
+  padding-left: 0rem;
   border-left: var(--border-width) solid rgb(96, 96, 114);
 }
 
@@ -224,8 +223,9 @@ a.is-active-link {
   background-color: hsla(24, 20%, 50%, 0.25);
 }
 
-#toc-wrapper a:hover {
+#toc a:hover {
   background-color: hsla(24, 20%, 50%, 0.25);
+  text-decoration: underline;
 }
 
 .toc-list {
@@ -234,14 +234,6 @@ a.is-active-link {
 
 ul.toc-list {
   list-style: none;
-}
-
-#toc > ul {
-  padding-left: 0;
-}
-
-#toc ul ul {
-  padding-left: 16px;
 }
 
 /* highlight on jump */
@@ -261,14 +253,41 @@ h6:target {
 
 /* Modifies Tocbot CSS */
 
-.toc > .toc-list {
+#toc ul {
+  padding-left: 0;
+}
+
+#toc > .toc-list {
   overflow: hidden;
   position: relative;
 }
 
 a.toc-link {
   height: 100%;
-  padding: 2px 0 2px 0;
+  text-decoration: none;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-right: 4px;
+}
+
+.node-name--H2 {
+  padding-left: 16px;
+}
+
+.node-name--H3 {
+  padding-left: 32px;
+}
+
+.node-name--H4 {
+  padding-left: 48px;
+}
+
+.node-name--H5 {
+  padding-left: 64px;
+}
+
+.node-name--H6 {
+  padding-left: 80px;
 }
 
 .is-collapsible {
