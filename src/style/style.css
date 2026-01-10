@@ -12,6 +12,7 @@ main {
 
 #toc-wrapper {
   grid-column: 3;
+  align-self: start;
   position: sticky;
   top: 1.5rem;
   margin-top: 1.5rem;
@@ -257,11 +258,6 @@ h6:target {
 }
 
 /* Modifies Tocbot CSS */
-
-#toc-wrapper {
-  overflow-y: auto;
-  height: 100vh;
-}
 
 .toc > .toc-list {
   overflow: hidden;
