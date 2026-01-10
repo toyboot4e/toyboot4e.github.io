@@ -201,7 +201,7 @@ span.code-highlighted {
 
 /* ToC (sticky, right side) */
 
-@media (max-width: 1150px) {
+@media (max-width: 1250px) {
   /* single-column mode */
   main {
     display: grid;
