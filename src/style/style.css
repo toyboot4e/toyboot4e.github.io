@@ -19,7 +19,7 @@ main {
   width: 250px;
   max-height: 100vh;
   overflow-y: auto;
-  margin-left: 17px; /* 16px + --border-width */
+  margin-left: 33px; /* 32px + --border-width */
   padding-left: 0rem;
   border-left: var(--border-width) solid rgb(96, 96, 114);
 }
