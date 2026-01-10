@@ -54,10 +54,10 @@ watch *args:
     if [[ "${1:-}" == "-d" || "${1:-}" == "--draft" ]] ; then
         echo "draft build"
         # watchexec -e org -w draft --ignore "index.org" "just build --draft && just format"
-        watchexec -e org,css -w draft --ignore "index.org" "just build --draft"
+        watchexec -e el,org,css -w draft --ignore "index.org" "just build --draft"
     elif [[ -z "${1:-}" || "${1:-}" == "-r" || "${1:-}" == "--release" ]] ; then
         echo "release build"
-        watchexec -e org,css -w src --ignore "index.org" "just build --release && just format"
+        watchexec -e el,org,css -w src --ignore "index.org" "just build --release && just format"
     else
         echo "invalid option"
     fi
