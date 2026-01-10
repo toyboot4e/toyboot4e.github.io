@@ -6,7 +6,7 @@ main {
 
 #content {
   grid-column: 2;
-  margin-top: 1.5rem;
+  margin: 1.5rem auto 0 auto;
   width: min(50rem, 90vw);
 }
 
