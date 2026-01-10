@@ -203,8 +203,7 @@
            ;; `org-export-data' returns raw HTML
            (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
            ;; timestamp
-           (p ,(org-export-data (org-export-get-date info "%b %e, %Y") info))
-           ))
+           (p ,(org-export-data (org-export-get-date info "%b %e, %Y") info))))
 
 ;; Returns `<footer>' SXML
 (defun my-html-footer (info)

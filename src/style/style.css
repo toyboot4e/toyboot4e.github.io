@@ -1,15 +1,17 @@
+/* three-column mode */
 main {
-  display: flex;
-  flex-direction: row;
-  align-items: start;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, min(50rem, 90vw)) 1fr;
 }
 
 #content {
+  grid-column: 2;
   margin-top: 1.5rem;
   width: min(50rem, 90vw);
 }
 
 #toc-wrapper {
+  grid-column: 3;
   position: sticky;
   top: 1.5rem;
   margin-top: 1.5rem;
@@ -197,7 +199,15 @@ span.code-highlighted {
 
 /* ToC (sticky, right side) */
 
-@media (max-width: 1100px) {
+@media (max-width: 1150px) {
+  /* single-column mode */
+  main {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  #content {
+    grid-column: 1;
+  }
   #toc-wrapper {
     display: none;
   }
