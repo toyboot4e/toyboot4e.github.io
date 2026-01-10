@@ -18,6 +18,8 @@ main {
   margin-top: 1.5rem;
   padding-bottom: 1.5rem;
   width: 250px;
+  max-height: 100vh;
+  overflow-y: auto;
   margin-left: 2rem;
   padding-left: 2rem;
   border-left: var(--border-width) solid rgb(96, 96, 114);
