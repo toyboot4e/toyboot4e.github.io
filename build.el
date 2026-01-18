@@ -849,20 +849,16 @@ INFO is a plist holding contextual information.  See
        (index-org-path (concat base-dir "/index.org")))
   (with-temp-file index-org-path (insert index-org-string)))
 
-;; TODO: draft/release
-;; TODO: Collect tags first
-
-(message "Building articles..")
-(if force-flag
-    (org-publish build-target t)
-  (org-publish build-target))
-
-;; FIXME: Too slow
 (message "Generating `tags/*.org`..")
 (mapcar
  (lambda (tag)
    (my-create-tag-page-org-file "src" tag))
  all-tags)
+
+(message "Building articles..")
+(if force-flag
+    (org-publish build-target t)
+  (org-publish build-target))
 
 (message "--------------------------------------------------------------------------------")
 (message "Build complete!")
