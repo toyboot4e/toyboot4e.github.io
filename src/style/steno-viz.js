@@ -16,7 +16,7 @@ class StenoViz extends HTMLElement {
       .steno-viz-container {
         display: inline-grid;
         grid-template-rows: repeat(3, 32px);
-        grid-template-columns: repeat(10, 32px);
+        grid-template-columns: repeat(12, 32px);
         gap: 4px;
         position: relative;
       }
