@@ -59,24 +59,41 @@ class StenoViz extends HTMLElement {
 
     // steno order: #STKPWHRAO*EUFRPBLGTSDZ
     const stenoOrder = [
-      // #0    1       2       3       4       5       6       7
-      [0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2], [0, 3], [1, 3],
-      // *8
-      [0, 4],
-      // #9    A10     O11     E12     U13      #14
-      [2, 2], [2, 3], [2, 4], [2, 6], [2, 7], [2, 8],
-      // *15
-      [0, 6], [0, 7], [1, 7], [0, 8], [1, 8], [0, 9], [1, 9], [0, 10], [1, 10], [0, 11], [1, 11],
+      [0, 0], //   0 #
+      [1, 0], //   1 S
+      [0, 1], //   2 T
+      [1, 1], //   3 K
+      [0, 2], //   4 P
+      [1, 2], //   5 W
+      [0, 3], //   6 H
+      [1, 3], //   7 R
+      [2, 2], //   8 # <--
+      [2, 3], //   9 A
+      [2, 4], //  10 O
+      [0, 4], //  11 *
+      [2, 6], //  12 E <--
+      [2, 7], //  13 U
+      [2, 8], //  14 #
+      [0, 7], //  15 F
+      [1, 7], //  16 R
+      [0, 8], //  17 P
+      [1, 8], //  18 B
+      [0, 9], //  19 L
+      [1, 9], //  20 G
+      [0, 10], // 21 T
+      [1, 10], // 22 S
+      [0, 11], // 23 D
+      [1, 11], // 24 Z
     ];
 
-    const iRhs = 12
+    const iRhs = 12;
 
-    let iOrder = 0
+    let iOrder = 0;
     for (let c of stroke) {
       if (iOrder >= stenoOrder.length) break;
       if (c == '-') {
-          if (iOrder < iRhs) iOrder = iRhs;
-          continue;
+        if (iOrder < iRhs) iOrder = iRhs;
+        continue;
       }
       while (iOrder < stenoOrder.length) {
         const [row, col] = stenoOrder[iOrder++];
@@ -103,7 +120,7 @@ class StenoViz extends HTMLElement {
     const chars = [
       ['#', 'T', 'P', 'H', '*', '', '*', 'F', 'P', 'L', 'T', 'D'],
       ['S', 'K', 'W', 'R', '', '', '', 'R', 'B', 'G', 'S', 'Z'],
-      ['', '',  '#', 'A', 'O', '', 'E', 'U', '#', '', '', ''],
+      ['', '', '#', 'A', 'O', '', 'E', 'U', '#', '', '', ''],
     ];
 
     const strokes = this.textContent.toUpperCase().split('/');
@@ -122,7 +139,7 @@ class StenoViz extends HTMLElement {
         const c = chars[row][col];
 
         let ty = 'steno-viz-empty';
-        if (c == '*') ty = 'steno-viz-rect steno-viz-fat'
+        if (c == '*') ty = 'steno-viz-rect steno-viz-fat';
         if (c != '' && c != '*') ty = 'steno-viz-rect';
         if (isPressed[row][col]) ty += ' steno-viz-rect-pressed';
 
