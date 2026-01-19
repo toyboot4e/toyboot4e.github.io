@@ -1,0 +1,196 @@
+#+TITLE: React 入門 - 2: Plover Drills
+#+DATE: <2026-01-20 Tue>
+#+FILETAGS: :react:keyboard:steno:
+
+* 背景
+
+[[https://lapwing.aerick.ca/][Lapwing for Beginners]] の練習ツールを作ってみました。速記キーボードに入門する人にご活用頂けると嬉しいです。
+
+** Web アプリ
+
+[[https://toyboot4e.github.io/plover-drills][Plover Drills for Lapwing Theory]] ← のリンクをクリックしてご覧ください。
+
+** デモ (GIF アニメーション)
+
+実画面は以下です:
+
+[[./img/2026-01-20-lapwing-tools-demo.gif]]
+
+* 開発
+
+** 環境構築 (Vite + Biome)
+
+[[https://vite.dev/][Vite]] (viːt/) で TypeScript + React の環境構築をしました。 ESLint と Prettier はアンインストールし、 [[https://biomejs.dev/][Biome]] に置き換えました。
+
+あの煩雑なフロントエンドが、ほぼ 2 つのツールで完結するようになったのは嬉しいです。わがままな環境構築オタクも快適に入門できるでしょう！
+
+** Base UI
+
+コンポーネントとしては、 [[https://base-ui.com/][Base UI]] から以下を拝借しました:
+
+- [[https://base-ui.com/react/components/checkbox][Checkbox]]
+- [[https://base-ui.com/react/components/combobox][Combobox]]
+
+Tree shaking を意識しているそうなので、未使用のコンポーネントはバンドルされないと思います。実際、 =dist= 以下のバンドルされた JS ファイルは 517 kB と小さめでした。
+
+** React
+
+React を使ってみて面白かった点をノートします。
+
+*** CSS Modules
+
+CSS Module をスコープ付きの CSS/SCSS として使うことができました。
+
+例えば以下の CSS ファイルがあったとします:
+
+#+TITLE:=Appl.module.css=
+#+BEGIN_SRC css
+.selector {
+  width: 800px;
+}
+#+END_SRC
+
+React 側からは以下のようにオブジェクトとして使用でき、 (おそらく) ランタイムコストゼロで使用できます:
+
+#+BEGIN_SRC tsx
+import styles from './App.module.scss';
+
+export const Selector = (): React.JSX.Element => {
+  return (<div className={styles.selector}>Choose your drill!</div>);
+};
+#+END_SRC
+
+注意点としては、この =styles= 変数は型付けされておらず、実行時エラーになる場合があります。型ファイルを自動生成するツールなどもありそうです。
+
+#+BEGIN_QUOTE
+静的に名前解決していないのに、ランタイムコストはゼロになる……？
+#+END_QUOTE
+
+*** =useState=
+
+React (hooks) で状態を持たせるには [[https://react.dev/reference/react/useState][=useState=]] を使います。この値はコンポーネントの初期後、 props が変化しても永続されます。
+
+入力値が変化した時に状態を初期化したいとします。この場合は、入力値を元にコンポーネントの =key= を設定すると、 =key= の変更時に新たなコンポーネントが作成されます:
+
+#+BEGIN_SRC diff-ts
+<Drill
+  drillData={drillProps.drillData}
+  drillDataIndex={drillProps.drillDataIndex}
++  /* key change = new component (reset state) */
++  key={drillProps.filename}
+/>
+#+END_SRC
+
+#+BEGIN_QUOTE
+[[https://react.dev/learn/you-might-not-need-an-effect#resetting-all-state-when-a-prop-changes][You Might Not Need an Effect - React]]
+#+END_QUOTE
+
+状態は値を保持することにも使用でき、子コンポーネントのデフォルト値を =useState= で持つことにしました:
+
+#+BEGIN_SRC ts
+const [shuffle, setShuffle] = useState(false);
+const [defaultShuffle] = useState(() => shuffle);
+#+END_SRC
+
+*** =useEffect=, =useLocalStorage=
+
+React においては状態を最小化し、状態を元に他の値を計算すべきとされています。これはシリアライズするデータを最小限にし、デシリアライズのコードを書くのと似ています。
+
+したがって、状態とは =localStorage= に保存する値であると考えると良い近似になるかもしれません。デシリアライズは重い処理も多いので、適宜 =useMemo= でラップします。
+
+=localStorage= のような仮想 DOM の外の世界と連携する時は、 [[https://react.dev/reference/react/useEffect][useEffect]] を使えば良いようです:
+
+#+BEGIN_SRC ts
+export const useLocalStorage = <T>(
+  key: string,
+  fromLocalStorage: (s: string | null) => T,
+  toLocalStorage: (v: T) => string | null,
+): [T, (newState: T | ((prevState: T) => T)) => void] => {
+  const [v, setV] = useState(() => {
+    return fromLocalStorage(localStorage.getItem(key));
+  });
+
+  useEffect(() => {
+    const s = toLocalStorage(v);
+    if (s === null) {
+      localStorage.removeItem(key);
+    } else {
+      localStorage.setItem(key, s);
+    }
+  }, [v, key, toLocalStorage]);
+
+  return [v, setV];
+};
+#+END_SRC
+
+以下のように使用しました:
+
+#+BEGIN_SRC ts
+const [shuffle, setShuffle] = useLocalStorage<boolean>('my-app/shuffle', (v) => v === 'true', String);
+#+END_SRC
+
+*** =useReducer=
+
+[[https://react.dev/reference/react/useReducer][=useReducer=]] は複数の状態をまとめ、共通のインターフェース越しに更新できるようにしてくれます。プリミティブな操作から解放されて、比較的宣言的にプログラミングできました。
+
+*** =useDebouncedCallback=
+
+速記キーボードは短時間に多数の文字を入力するため、入力文字の正誤判定は、キー入力イベントが納まったタイミングで実施したいです。
+
+このように、多数のイベントが発生した場合に一度だけイベントハンドラを呼び出すことを /debouncing/ と言うようです。
+
+型はボロボロなんですが、 AI が書いてくれた =useDebouncedCallback= がこちらです:
+
+#+BEGIN_SRC ts
+// biome-ignore lint/suspicious/noExplicitAny: ignore
+export const useDebouncedCallback = <T extends (...args: any[]) => void>(callback: T, delay: number) => {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  return (...args: Parameters<T>) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  };
+};
+#+END_SRC
+
+使い手は以下のようになります:
+
+#+BEGIN_SRC ts
+// 正誤判定を実施する
+const onChangeDebounced = useDebouncedCallback((text: string) => {
+  if (text.trim() === expected) {
+    dispatchState({ type: 'NEXT', length: drillData.length });
+  } else if (!matchWord(expected, text.trim())) {
+    dispatchState({ type: 'FAIL' });
+  }
+}, 100); // 100ms delay
+
+const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // テキストは即更新
+  const text = e.target.value;
+  dispatchState({ type: 'SET_TEXT', text });
+  // 正誤判定は debouncing する
+  onChangeDebounced(text);
+};
+#+END_SRC
+
+*** =use=, =Suspense=
+
+誤入力があった場合には、発音記号を表示します。発音記号は、現在は [[https://dictionaryapi.dev/][Free Dictionary API]] から =fetch= しています。
+
+この非同期処理の待機中に fallback 要素を表示するため、 [[https://react.dev/reference/react/use][=use=]] と [[https://react.dev/reference/react/Suspense][=Suspense=]] を使っています。
+
+* まとめ
+
+盤石な開発環境でした。特に Biome のリントが強かった点と、 React のドキュメントが良かったです。ほぼ『正解』が用意されていて安心感がありました。
+
+快適なツールができたので、どんどん速記の練習をして行こうと思います。
+
+Thank you! の速記で終わります:
+
+#+BEGIN_STENO
+THAUBG
+#+END_STENO
+
