@@ -43,7 +43,6 @@ CSS Module をスコープ付きの CSS/SCSS として使うことができま�
 
 例えば以下の CSS ファイルがあったとします:
 
-#+TITLE:=Appl.module.css=
 #+BEGIN_SRC css
 .selector {
   width: 800px;
