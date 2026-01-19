@@ -69,7 +69,7 @@ export const Selector = (): React.JSX.Element => {
 
 React (hooks) で状態を持たせるには [[https://react.dev/reference/react/useState][=useState=]] を使います。この値はコンポーネントの初期後、 props が変化しても永続されます。
 
-入力値が変化した時に状態を初期化したいとします。この場合は、入力値を元にコンポーネントの =key= を設定すると、 =key= の変更時に新たなコンポーネントが作成されます:
+Props が変化した時に状態を初期化したいとします。この場合は、 props を元にコンポーネントの =key= を設定すると、 =key= の変更時に新たなコンポーネントが作成されます:
 
 #+BEGIN_SRC diff-ts
 <Drill
@@ -154,7 +154,7 @@ export const useDebouncedCallback = <T extends (...args: any[]) => void>(callbac
 };
 #+END_SRC
 
-使い手は以下のようになります:
+使い方は以下のようになります:
 
 #+BEGIN_SRC ts
 // 正誤判定を実施する
