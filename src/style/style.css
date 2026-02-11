@@ -196,6 +196,7 @@ span.code-highlighted {
   color: var(--text);
   display: inline-block;
   padding: 0px 6px;
+  font-size: 1rem;
   text-decoration: none;
 }
 
