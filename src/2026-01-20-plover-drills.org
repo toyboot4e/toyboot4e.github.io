@@ -8,7 +8,7 @@
 
 ** Web アプリ
 
-[[https://toyboot4e.github.io/plover-drills][Plover Drills for Lapwing Theory]] ← のリンクをクリックしてご覧ください。
+[[https://toyboot4e.github.io/plover-drills][Plover Drills]] ← のリンクをクリックしてご覧ください。
 
 ** デモ (GIF アニメーション)
 
@@ -71,7 +71,7 @@ React (hooks) で状態を持たせるには [[https://react.dev/reference/react
 
 Props が変化した時に状態を初期化したいとします。この場合は、 props を元にコンポーネントの =key= を設定すると、 =key= の変更時に新たなコンポーネントが作成されます:
 
-#+BEGIN_SRC diff-ts
+#+BEGIN_SRC diff-tsx
 <Drill
   drillData={drillProps.drillData}
   drillDataIndex={drillProps.drillDataIndex}
