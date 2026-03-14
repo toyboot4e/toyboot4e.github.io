@@ -8,7 +8,7 @@
 #+CAPTION: リスト表示
 [[./img/2026-03-14-article-cards-old.png]]
 
-[[https://technicalsuwako.moe/][人のブログ]] を見て、やはりカード風の表示が良いと思い、実装してみました。
+[[https://technicalsuwako.moe/][人のブログ]] を見ると、やはりカード風の表示が良いですね。
 
 * 結果
 
