@@ -151,45 +151,67 @@
 (defun my-html-head (info)
   ;; Reset `my-codeblock-counter' on new file. TODO: move it to more appropriate place
   (setq my-codeblock-counter 0)
-  ;; NOTE: `esxml-html' is not on MELPA
-  `(head
-    (meta (@ (charset "utf-8")))
-    ;; (meta (@ (author "toyboot4e")))
-    (meta (@ (name "viewport")
-             (content "width=device-width, initial-scale=1")))
-    ;; NOTE: `org-export-data' returns HTML, so we'll remove HTML tags
-    (title (*RAW-STRING* ,(concat (my-strip-html (org-export-data (plist-get info :title) info)) " - Toybeam")))
-    (meta (@ (name "description")
-             (content "Devlog by toyboot4e")))
-    ;; (link (@ (rel "stylesheet")
-    ;;          (href "https://cdn.simplecss.org/simple.min.css")))
-    (link (@ (rel "stylesheet")
-             (href "/style/simple.min.css")))
-    (link (@ (rel "stylesheet")
-             (href "/style/style.css")))
-    (link (@ (rel "stylesheet")
-             (href "/style/prism.css")))
-    (script (@ (type "text/javascript")
-               (src "/style/style.js"))
-            ;; NOTE: empty body is required for self-closing tag
-            "")
-    (script (@ (type "text/javascript")
-               ;; NOTE: It creates `async=""`. I prefer `async` only, but the value is required for XHTML.
-               (async "")
-               (src "/style/prism.js"))
-            ;; NOTE: empty body is required for self-closing tag
-            "")
-    ;; TODO: lazy loading
-    (script (@ (type "text/javascript")
-               (async "")
-               (src "/style/steno-viz.js"))
-            "")
-    (*RAW-STRING* "<!-- MathJax -->")
-    (script (@ (type "text/javascript")
-               (id "MathJax-script")
-               (async "")
-               (src "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"))
-            "")))
+  (let (;; NOTE: `org-export-data' returns HTML, so we'll remove HTML tags
+        ;; TODO: (substring-no-properties (or (plist-get info :title) "")) may make more sense, but org-mode inline syntax must be removed
+        (title (or (my-strip-html (org-export-data (plist-get info :title) info)) ""))
+        (relative-path
+         (replace-regexp-in-string "\\.org\\'" ".html"
+                                   (file-relative-name
+                                    (plist-get info :input-file)
+                                    default-directory))))
+    ;; NOTE: `esxml-html' is not on MELPA
+    `(head
+      (meta (@ (charset "utf-8")))
+      ;; (meta (@ (author "toyboot4e")))
+      (meta (@ (name "viewport")
+               (content "width=device-width, initial-scale=1")))
+      (title (*RAW-STRING* ,(concat title " - Toybeam")))
+      (meta (@ (name "description")
+               (content "Devlog by toyboot4e")))
+      ;; (link (@ (rel "stylesheet")
+      ;;          (href "https://cdn.simplecss.org/simple.min.css")))
+      (link (@ (rel "stylesheet")
+               (href "/style/simple.min.css")))
+      (link (@ (rel "stylesheet")
+               (href "/style/style.css")))
+      (link (@ (rel "stylesheet")
+               (href "/style/prism.css")))
+      (script (@ (type "text/javascript")
+                 (src "/style/style.js"))
+              ;; NOTE: empty body is required for self-closing tag
+              "")
+      (script (@ (type "text/javascript")
+                 ;; NOTE: It creates `async=""`. I prefer `async` only, but the value is required for XHTML.
+                 (async "")
+                 (src "/style/prism.js"))
+              ;; NOTE: empty body is required for self-closing tag
+              "")
+      ;; TODO: lazy loading
+      (script (@ (type "text/javascript")
+                 (async "")
+                 (src "/style/steno-viz.js"))
+              "")
+      (script (@ (type "text/javascript")
+                 (id "MathJax-script")
+                 (async "")
+                 (src "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"))
+              "")
+      (meta (@ (property "og:title")
+               (content ,title)))
+      ;; (meta (@ (property "og:description")))
+      ;; (meta (@ (property "og:type")))
+      (meta (@ (property "og:url")
+               (content ,(concat "https://toyboot4e.github.io/" relative-path))))
+      (meta (@ (property "og:site_name")
+               (content "Toybeam")))
+      ;; (meta (@ (property "og:image)))
+      ;; (meta (@ (property "og:site_name")))
+      ;; (meta (@ (property "twitter:card")))
+      (meta (@ (property "twitter:site")
+               (content "@toyboot4e")))
+      ;; (meta (@ (property "description")))
+      ;; (meta (@ (property "generator")))
+      )))
 
 (defun create-tag-list-in-header (tags)
   `(p (@ (class "org-tag-list"))
