@@ -191,19 +191,28 @@
                (src "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"))
             "")))
 
+(defun create-tag-list-in-header (tags)
+  `(p (@ (class "org-tag-list"))
+    ,@(mapcar #'create-tag-sxml tags)))
+
 ;; Returns `<header>' SXML
 (defun my-html-header (info)
-  `(header (@ (role "banner"))
-           (nav (@ (role "navigation"))
-                (a (@ (href "/index.html")) "Home")
-                (a (@ (href "https://atcoder.jp/users/toyboot4e")) "AtCoder")
-                (a (@ (href "https://github.com/toyboot4e")) "GitHub")
-                (a (@ (href "https://qiita.com/toyboot4e")) "Qiita")
-                (a (@ (href "https://zenn.dev/toyboot4e")) "Zenn"))
-           ;; `org-export-data' returns raw HTML
-           (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
-           ;; timestamp
-           (p ,(org-export-data (org-export-get-date info "%b %e, %Y") info))))
+  (let ((tags (or (plist-get info :filetags) '())))
+    (pp tags)
+    `(header (@ (role "banner"))
+             (nav (@ (role "navigation"))
+                  (a (@ (href "/index.html")) "Home")
+                  (a (@ (href "https://atcoder.jp/users/toyboot4e")) "AtCoder")
+                  (a (@ (href "https://github.com/toyboot4e")) "GitHub")
+                  (a (@ (href "https://qiita.com/toyboot4e")) "Qiita")
+                  (a (@ (href "https://zenn.dev/toyboot4e")) "Zenn"))
+             ;; `org-export-data' returns raw HTML
+             (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
+             ;; tags
+             ,(unless (null tags)
+               (create-tag-list-in-header tags))
+             ;; timestamp
+             (p ,(org-export-data (org-export-get-date info "%b %e, %Y") info)))))
 
 ;; Returns `<footer>' SXML
 (defun my-html-footer (info)
@@ -719,7 +728,7 @@ INFO is a plist holding contextual information.  See
              ,@(mapcar (lambda (entry) (create-article-card entry)) entries)))
      "#+END_EXPORT")))
 
-;; Generates `index.org'
+;; Generates `index.org'.
 (defun my-generate-sitemap (page-title devlog-entries diary-entries all-tags)
   (let* ((tag-list (show-tag-list all-tags))
          (devlog-cards (show-article-cards devlog-entries))
@@ -729,7 +738,7 @@ INFO is a plist holding contextual information.  See
             "* Devlog (timeline)" "\n" "\n" devlog-cards "\n" "\n"
             "* Diary" "\n" "\n" diary-cards)))
 
-;; Generates string content of `tags/<tag>.org'
+;; Generates `tags/<tag>.org'.
 (defun my-generate-tag-page-org (base-dir title devlog-entries all-tags tag)
   (let* ((tag-list (show-tag-list all-tags))
          (entries
