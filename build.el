@@ -708,22 +708,9 @@ INFO is a plist holding contextual information.  See
   (mapconcat #'identity xs "\n"))
 
 ;; Generates `index.org'
-(defun my-generate-sitemap (base-dir page-title all-tags)
-  (let* ((devlog-bullets
-          (my-show-article-bullets
-           "src" (collect-org-files
-                  base-dir (lambda (entry)
-                             (let ((url (plist-get entry :filepath)))
-                               (and (not (string-match "diary/" url))
-                                    (not (string-match "tags/" url))))))))
-
-         (diary-bullets
-          (my-show-article-bullets
-           "src" (collect-org-files
-                  base-dir (lambda (entry)
-                             (let ((url (plist-get entry :filepath)))
-                               (string-match "diary/" url))))))
-
+(defun my-generate-sitemap (devlog-entries diary-entries page-title all-tags)
+  (let* ((devlog-bullets (my-show-article-bullets "src" devlog-entries))
+         (diary-bullets (my-show-article-bullets "src" diary-entries))
          (tags-string
           (mapconcat
            (lambda (tag)
@@ -749,11 +736,11 @@ INFO is a plist holding contextual information.  See
             )))
 
 ;; Generates string content of `tags/<tag>.org'
-(defun my-generate-tag-page-org (base-dir tag)
+(defun my-generate-tag-page-org (base-dir devlog-entries tag)
   (let* ((entries
-          (collect-org-files
-           base-dir
-           (lambda (entry) (member tag (plist-get entry :tags)))))
+          (seq-filter
+           (lambda (entry) (member tag (plist-get entry :tags)))
+           devlog-entries))
          ;; Org-mode file bullets:
          (bullets
           (mapcar (lambda (entry)
@@ -785,8 +772,8 @@ INFO is a plist holding contextual information.  See
             )))
 
 ;; Creates `tags/<tag>.org'.
-(defun my-create-tag-page-org-file (base-dir tag)
-  (let ((index-org-string (my-generate-tag-page-org base-dir tag))
+(defun my-create-tag-page-org-file (base-dir devlog-entries tag)
+  (let ((index-org-string (my-generate-tag-page-org base-dir devlog-entries tag))
         (index-org-path (concat base-dir "/tags/" tag ".org")))
     (with-temp-file index-org-path (insert index-org-string))))
 
@@ -845,22 +832,36 @@ INFO is a plist holding contextual information.  See
         "tools"
         "vim"))
 
-(message "Generating `index.org`..")
 (let* ((base-dir "src")
-       (index-org-string (my-generate-sitemap base-dir "Toybeam" all-tags))
-       (index-org-path (concat base-dir "/index.org")))
-  (with-temp-file index-org-path (insert index-org-string)))
+       ;; "src/*.org"
+       (devlog-entries
+        (collect-org-files
+         base-dir (lambda (entry)
+                    (let ((url (plist-get entry :filepath)))
+                      (and (not (string-match "diary/" url))
+                           (not (string-match "tags/" url)))))))
+       ;;"src/diary/*.org"
+       (diary-entries
+        (collect-org-files
+         base-dir (lambda (entry)
+                    (let ((url (plist-get entry :filepath)))
+                      (string-match "diary/" url))))))
+  (message "Generating `index.org`..")
+  (let* ((index-org-string
+          (my-generate-sitemap devlog-entries diary-entries "Toybeam" all-tags))
+         (index-org-path (concat base-dir "/index.org")))
+    (with-temp-file index-org-path (insert index-org-string)))
 
-(message "Generating `tags/*.org`..")
-(mapcar
- (lambda (tag)
-   (my-create-tag-page-org-file "src" tag))
- all-tags)
+  (message "Generating `tags/*.org`..")
+  (mapcar
+   (lambda (tag)
+     (my-create-tag-page-org-file "src" devlog-entries tag))
+   all-tags)
 
-(message "Building articles..")
-(if force-flag
-    (org-publish build-target t)
-  (org-publish build-target))
+  (message "Building articles..")
+  (if force-flag
+      (org-publish build-target t)
+    (org-publish build-target)))
 
 (message "--------------------------------------------------------------------------------")
 (message "Build complete!")
