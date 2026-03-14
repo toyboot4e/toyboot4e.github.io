@@ -22,13 +22,13 @@
 
 * まとめ
 
-このブログは苦手な Emacs Lisp でビルドしているため、着手が遅れてしましました。今回から記事の情報を [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Property-Lists.html][=plist=]] として持つようにしたため、改造が楽になりました。
+ブログのビルドスクリプトを更新しました。 Emacs Lisp の修正に乗り気になれなかったのですが、今回から記事の情報を [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Property-Lists.html][=plist=]] として持つようにしたため、気軽に改造できるようになりました。
 
 #+BEGIN_SRC elisp
 ;; ある種オブジェクトのように扱えます
 (plist-get article :title)
 (plist-get article :date)
 
-;; 今までタプルで頑張っていたのが、ある意味凄くないですか……？
+;; 今までは、何とタプルで頑張っていました (酷い！)
 #+END_SRC
 
