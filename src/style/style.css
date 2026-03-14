@@ -181,6 +181,10 @@ span.code-highlighted {
   text-indent: 0;
 }
 
+.org-tag-list {
+  font-size: 1rem;
+}
+
 .article-list {
   display: flex;
   flex-direction: column;

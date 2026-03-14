@@ -691,7 +691,9 @@ INFO is a plist holding contextual information.  See
 (defun show-tag-list (all-tags)
   (join-with-newline
    `("#+BEGIN_EXPORT html"
-     ,@(mapcar (lambda (tag) (my-sxml-to-xml (create-tag-sxml tag))) all-tags)
+     ,(my-sxml-to-xml
+       `(div (@ (class "org-tag-list"))
+          ,@(mapcar #'create-tag-sxml all-tags)))
      "#+END_EXPORT")))
 
 (defun create-article-card (entry)
