@@ -695,17 +695,19 @@ INFO is a plist holding contextual information.  See
      "#+END_EXPORT")))
 
 (defun create-article-card (entry)
-  (let ((title (plist-get entry :title))
-        (date (plist-get entry :date))
-        (link (plist-get entry :href))
-        (tags (plist-get entry :tags)))
+  (let* ((title (plist-get entry :title))
+        ;; Convert =code= etc. in title into html. Remove the surrounding <p>
+         (title-html (replace-regexp-in-string "^<p>\\|</p>$" "" (org-export-string-as title 'html t '(:body-only t))))
+         (date (plist-get entry :date))
+         (link (plist-get entry :href))
+         (tags (plist-get entry :tags)))
     `(div (@ (class "article-card"))
           (div (@ (class "article-card-meta"))
                (date ,date)
                ,@(mapcar #'create-tag-sxml tags))
           (div (a (@ (href ,link)
                      (class "article-card-link"))
-                  ,title)))))
+                  (*RAW-STRING* ,title-html))))))
 
 (defun show-article-cards (entries)
   (join-with-newline
