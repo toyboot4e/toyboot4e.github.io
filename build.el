@@ -730,21 +730,21 @@ INFO is a plist holding contextual information.  See
             "* Diary" "\n" "\n" diary-cards)))
 
 ;; Generates string content of `tags/<tag>.org'
-(defun my-generate-tag-page-org (base-dir devlog-entries all-tags tag)
+(defun my-generate-tag-page-org (base-dir title devlog-entries all-tags tag)
   (let* ((tag-list (show-tag-list all-tags))
          (entries
           (seq-filter
            (lambda (entry) (member tag (plist-get entry :tags)))
            devlog-entries))
          (article-cards (show-article-cards entries)))
-    (concat "#+TITLE: =#" tag "=\n" "\n"
+    (concat "#+TITLE: " title " (=#" tag "=)\n" "\n"
             "* Tags" "\n" "\n" tag-list "\n" "\n"
             "* Devlog (=#" tag "=)" "\n"
             "#+ATTR_HTML: :class sitemap" "\n" article-cards)))
 
 ;; Creates `tags/<tag>.org'.
 (defun my-create-tag-page-org-file (base-dir devlog-entries all-tags tag)
-  (let ((index-org-string (my-generate-tag-page-org base-dir devlog-entries all-tags tag))
+  (let ((index-org-string (my-generate-tag-page-org base-dir "Toybeam" devlog-entries all-tags tag))
         (index-org-path (concat base-dir "/tags/" tag ".org")))
     (with-temp-file index-org-path (insert index-org-string))))
 
