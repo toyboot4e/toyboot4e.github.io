@@ -811,10 +811,6 @@ INFO is a plist holding contextual information.  See
 (message "--------------------------------------------------------------------------------")
 (message "Building project!")
 
-;; TODO: Needed?
-(org-publish-remove-all-timestamps)
-
-;; TODO: Collect from source files, cache source file reads
 (let* ((base-dir "src")
        ;; "src/*.org"
        (devlog-entries
