@@ -683,10 +683,16 @@ INFO is a plist holding contextual information.  See
   (mapconcat #'identity xs "\n"))
 
 (defun create-tag-sxml (tag)
-  `(a (@ (href ,(concat "/tags/" tag))
+  `(a (@ (href ,(concat "/tags/" tag ".html"))
          (class "org-tag"))
       (code
        ,tag)))
+
+(defun show-tag-list (all-tags)
+  (join-with-newline
+   `("#+BEGIN_EXPORT html"
+     ,@(mapcar (lambda (tag) (my-sxml-to-xml (create-tag-sxml tag))) all-tags)
+     "#+END_EXPORT")))
 
 (defun create-article-card (entry)
   (let ((title (plist-get entry :title))
@@ -703,74 +709,38 @@ INFO is a plist holding contextual information.  See
 
 (defun show-article-cards (entries)
   (join-with-newline
-   `(
-     "#+BEGIN_EXPORT html"
+   `("#+BEGIN_EXPORT html"
      ,(my-sxml-to-xml
        `(div (@ (class "article-list"))
              ,@(mapcar (lambda (entry) (create-article-card entry)) entries)))
-     "#+END_EXPORT"
-     )))
+     "#+END_EXPORT")))
 
 ;; Generates `index.org'
-(defun my-generate-sitemap (devlog-entries diary-entries page-title all-tags)
-  (let* ((devlog-cards (show-article-cards devlog-entries))
-         (diary-cards (show-article-cards diary-entries))
-         (tags-string
-          (mapconcat
-           (lambda (tag)
-             (format "@@html:<a href=\"%s\" class=\"org-tag\"><code>#%s</code></a>@@"
-                     (concat "/tags/" tag ".html") tag))
-           all-tags " ")))
-    (concat "#+TITLE: " page-title "\n"
-            "\n"
-
-            "* Tags" "\n"
-            "\n"
-            tags-string
-            "\n" "\n"
-
-            "* Devlog (timeline)" "\n"
-            "\n"
-            devlog-cards "\n"
-            "\n"
-
-            "* Diary" "\n"
-            "\n"
-            diary-cards"\n")))
+(defun my-generate-sitemap (page-title devlog-entries diary-entries all-tags)
+  (let* ((tag-list (show-tag-list all-tags))
+         (devlog-cards (show-article-cards devlog-entries))
+         (diary-cards (show-article-cards diary-entries)))
+    (concat "#+TITLE: " page-title "\n" "\n"
+            "* Tags" "\n" "\n" tag-list "\n" "\n"
+            "* Devlog (timeline)" "\n" "\n" devlog-cards "\n" "\n"
+            "* Diary" "\n" "\n" diary-cards)))
 
 ;; Generates string content of `tags/<tag>.org'
-(defun my-generate-tag-page-org (base-dir devlog-entries tag)
-  (let* ((entries
+(defun my-generate-tag-page-org (base-dir devlog-entries all-tags tag)
+  (let* ((tag-list (show-tag-list all-tags))
+         (entries
           (seq-filter
            (lambda (entry) (member tag (plist-get entry :tags)))
            devlog-entries))
-         ;; Stringify
-         (articles (show-article-cards devlog-entries))
-         (tags-string
-          (mapconcat
-           (lambda (tag)
-             (format "@@html:<a href=\"%s\" class=\"org-tag\"><code>#%s</code></a>@@"
-                     (concat "/tags/" tag ".html") tag))
-           all-tags " ")))
-    (concat "#+TITLE: =#" tag "=\n"
-            "\n"
-
-            "* Tags" "\n"
-            "\n"
-            tags-string
-            "\n" "\n"
-
-            ;; "#+BEGIN_CENTER" "\n"
-            ;; "[[/index.html][devlog]] | [[/diary/index.org][diary]]" "\n"
-            ;; "#+END_CENTER" "\n"
+         (article-cards (show-article-cards entries)))
+    (concat "#+TITLE: =#" tag "=\n" "\n"
+            "* Tags" "\n" "\n" tag-list "\n" "\n"
             "* Devlog (=#" tag "=)" "\n"
-            "#+ATTR_HTML: :class sitemap" "\n"
-            articles"\n"
-            )))
+            "#+ATTR_HTML: :class sitemap" "\n" article-cards)))
 
 ;; Creates `tags/<tag>.org'.
-(defun my-create-tag-page-org-file (base-dir devlog-entries tag)
-  (let ((index-org-string (my-generate-tag-page-org base-dir devlog-entries tag))
+(defun my-create-tag-page-org-file (base-dir devlog-entries all-tags tag)
+  (let ((index-org-string (my-generate-tag-page-org base-dir devlog-entries all-tags tag))
         (index-org-path (concat base-dir "/tags/" tag ".org")))
     (with-temp-file index-org-path (insert index-org-string))))
 
@@ -829,14 +799,14 @@ INFO is a plist holding contextual information.  See
          #'string<)))
   (message "Generating `index.org`..")
   (let* ((index-org-string
-          (my-generate-sitemap devlog-entries diary-entries "Toybeam" all-tags))
+          (my-generate-sitemap "Toybeam" devlog-entries diary-entries all-tags))
          (index-org-path (concat base-dir "/index.org")))
     (with-temp-file index-org-path (insert index-org-string)))
 
   (message "Generating `tags/*.org`..")
   (mapcar
    (lambda (tag)
-     (my-create-tag-page-org-file "src" devlog-entries tag))
+     (my-create-tag-page-org-file "src" devlog-entries all-tags tag))
    all-tags)
 
   (message "Building articles..")
