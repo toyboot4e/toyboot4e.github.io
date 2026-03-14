@@ -181,7 +181,13 @@ span.code-highlighted {
   text-indent: 0;
 }
 
-.org-tag {
+.article-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.org-tag, .article-card {
   text-indent: 0;
   border: var(--border-width) solid var(--border);
   border-radius: var(--standard-border-radius);
@@ -190,29 +196,27 @@ span.code-highlighted {
   padding: 0px 6px;
   font-size: 1rem;
   text-decoration: none;
-}
-
-/* index.html and tags/*.html */
-.article-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.article-card {
-  text-indent: 0;
-  border: var(--border-width) solid var(--border);
-  border-radius: var(--standard-border-radius);
-  color: var(--text);
-  padding: 0px 6px;
-  text-decoration: none;
-  /* TODO: needed? */
-  position: relative;
   /* transition: background-color 0.15s; */
+}
+
+.org-tag:hover {
+  background-color: color-mix(in srgb, var(--accent-hover) 10%, transparent);
 }
 
 .article-card:hover {
   background-color: color-mix(in srgb, var(--accent-hover) 5%, transparent);
+}
+
+.article-card {
+  /* TODO: needed? */
+  position: relative;
+}
+
+.article-card-meta date {
+  font-size: 0.9em;
+  color: var(text-light);
+  padding-right: 0.5em;
+  font-family: monospace, monospace;
 }
 
 .article-card-meta {
@@ -234,13 +238,6 @@ span.code-highlighted {
   /* clickable on the stretched link */
   position: relative;
   z-index: 1;
-}
-
-.article-card date {
-  font-size: 0.9em;
-  color: var(text-light);
-  padding-right: 0.5em;
-  font-family: monospace, monospace;
 }
 
 /* ToC (sticky, right side) */
