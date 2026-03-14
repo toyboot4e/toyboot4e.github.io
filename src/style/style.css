@@ -264,11 +264,11 @@ a.toc-link {
 }
 
 a.is-active-link {
-  background-color: hsla(24, 20%, 50%, 0.25);
+  background-color: color-mix(in srgb, var(--accent-hover) 10%, transparent);
 }
 
 #toc a:hover {
-  background-color: hsla(24, 20%, 50%, 0.25);
+  background-color: color-mix(in srgb, var(--accent-hover) 5%, transparent);
   text-decoration: underline;
 }
 
@@ -282,7 +282,7 @@ ul.toc-list {
 
 /* highlight on jump */
 @keyframes fadeHighlight {
-  0% { background-color: hsla(60, 30%, 50%, 0.5); }
+  0% { background-color: color-mix(in srgb, var(--accent-hover) 10%, transparent); }
   100% { background-color: transparent; }
 }
 
