@@ -677,40 +677,41 @@ INFO is a plist holding contextual information.  See
      (lambda (l r)
        (string> (plist-get l :filepath) (plist-get r :filepath))))))
 
-;; Parses an `org-file' headline and returns an org line as a link.
-(defun my-show-article-bullet (entry)
-  (let* ((date (plist-get entry :date))
-         ;; /src/file.org
-         (link (plist-get entry :filepath))
-         (title (plist-get entry :title))
-         (tags (plist-get entry :tags))
-         (tag-delimiter ;; "&nbsp;"
-          " ")
-         (tags-string
-          (if (not tags) ""
-            (format " @@html:%s@@"
-                    (mapconcat
-                     (lambda (tag)
-                       (let ((link (format "/tags/%s.html" tag)))
-                         (format "<a href=\"%s\" class=\"org-tag\"><code>#%s</code></a>" link tag)))
-                     tags tag-delimiter)))))
-    (format "@@html:<date>%s</date>@@ [[file:%s][%s]]%s" date link title tags-string)))
-
-;; Creates a list of `- [[..][..]]'.
-(defun my-show-article-bullets (base-dir entries)
-  (mapcar
-   (lambda (entry)
-     (format "- %s" (my-show-article-bullet entry)))
-   entries))
-
 ;; Concatenates strings with `\n' as the delimiter.
 (defun join-with-newline (xs)
   (mapconcat #'identity xs "\n"))
 
+(defun create-tag-sxml (tag)
+  `(a (@ (href ,(concat "/tags/" tag))
+         (class "org-tag"))
+      (code
+       ,tag)))
+
+(defun create-article-card (entry)
+  (let ((title (plist-get entry :title))
+        (date (plist-get entry :date))
+        (link (plist-get entry :link))
+        (tags (plist-get entry :tags)))
+    `(div (@ (class "article-card"))
+          (div (@ (class "article-meta-card"))
+               (date ,date)
+               ,@(mapcar #'create-tag-sxml tags))
+          (div (@ (class "article-card-link"))
+               (a (@ (href ,link))
+                  ,title)))))
+
+(defun show-article-cards (entries)
+  (join-with-newline
+   `(
+     "#+BEGIN_EXPORT html"
+     ,@(mapcar (lambda (entry) (my-sxml-to-xml (create-article-card entry))) entries)
+     "#+END_EXPORT"
+     )))
+
 ;; Generates `index.org'
 (defun my-generate-sitemap (devlog-entries diary-entries page-title all-tags)
-  (let* ((devlog-bullets (my-show-article-bullets "src" devlog-entries))
-         (diary-bullets (my-show-article-bullets "src" diary-entries))
+  (let* ((devlog-cards (show-article-cards devlog-entries))
+         (diary-cards (show-article-cards diary-entries))
          (tags-string
           (mapconcat
            (lambda (tag)
@@ -726,14 +727,13 @@ INFO is a plist holding contextual information.  See
             "\n" "\n"
 
             "* Devlog (timeline)" "\n"
-            "#+ATTR_HTML: :class sitemap" "\n"
-            (join-with-newline devlog-bullets) "\n"
+            "\n"
+            devlog-cards "\n"
             "\n"
 
             "* Diary" "\n"
-            "#+ATTR_HTML: :class sitemap" "\n"
-            (join-with-newline diary-bullets)"\n"
-            )))
+            "\n"
+            diary-cards"\n")))
 
 ;; Generates string content of `tags/<tag>.org'
 (defun my-generate-tag-page-org (base-dir devlog-entries tag)
@@ -741,14 +741,8 @@ INFO is a plist holding contextual information.  See
           (seq-filter
            (lambda (entry) (member tag (plist-get entry :tags)))
            devlog-entries))
-         ;; Org-mode file bullets:
-         (bullets
-          (mapcar (lambda (entry)
-                    (format "- %s" (my-show-article-bullet entry)))
-                  entries))
-
          ;; Stringify
-         (articles (join-with-newline bullets))
+         (articles (show-article-cards devlog-entries))
          (tags-string
           (mapconcat
            (lambda (tag)
@@ -806,7 +800,7 @@ INFO is a plist holding contextual information.  See
 
 ;; release build by default, ignoring drafts
 (setq build-target "release")
-(setq force-flag nil)
+(setq force-flag nil) ;; TODO: set from CLI
 
 (message "--------------------------------------------------------------------------------")
 (message "Building project!")
