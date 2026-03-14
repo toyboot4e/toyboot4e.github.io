@@ -815,23 +815,6 @@ INFO is a plist holding contextual information.  See
 (org-publish-remove-all-timestamps)
 
 ;; TODO: Collect from source files, cache source file reads
-(setq all-tags
-      '("atcoder"
-        "blender"
-        "blog"
-        "books"
-        "buy"
-        "emacs"
-        "gamedev"
-        "haskell"
-        "keyboard"
-        "misc"
-        "nix"
-        "react"
-        "steno"
-        "tools"
-        "vim"))
-
 (let* ((base-dir "src")
        ;; "src/*.org"
        (devlog-entries
@@ -845,7 +828,12 @@ INFO is a plist holding contextual information.  See
         (collect-org-files
          base-dir (lambda (entry)
                     (let ((url (plist-get entry :filepath)))
-                      (string-match "diary/" url))))))
+                      (string-match "diary/" url)))))
+       (all-tags
+        (sort
+         (seq-uniq (apply #'append
+                          (mapcar (lambda (entry) (plist-get entry :tags)) devlog-entries)))
+         #'string<)))
   (message "Generating `index.org`..")
   (let* ((index-org-string
           (my-generate-sitemap devlog-entries diary-entries "Toybeam" all-tags))
