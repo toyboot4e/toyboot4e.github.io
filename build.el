@@ -675,7 +675,7 @@ INFO is a plist holding contextual information.  See
     (sort
      (seq-filter filter-p entries)
      (lambda (l r)
-       (string> (plist-get :filepath l) (plist-get :filepath r))))))
+       (string> (plist-get l :filepath) (plist-get r :filepath))))))
 
 ;; Parses an `org-file' headline and returns an org line as a link.
 (defun my-show-article-bullet (entry)
