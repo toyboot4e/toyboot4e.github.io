@@ -167,7 +167,7 @@
                (content "width=device-width, initial-scale=1")))
       (title (*RAW-STRING* ,(concat title " - Toybeam")))
       (meta (@ (name "description")
-               (content "Devlog by toyboot4e")))
+               (content "Devlog of toyboot4e")))
       ;; (link (@ (rel "stylesheet")
       ;;          (href "https://cdn.simplecss.org/simple.min.css")))
       (link (@ (rel "stylesheet")
