@@ -1,7 +1,4 @@
-/*
-Changes
-- Use dark theme by default
-*/
+/* Edits */
 
 /* Global variables. */
 :root {
@@ -26,21 +23,6 @@ Changes
   --preformatted: #444;
   --marked: #ffdd33;
   --disabled: #efefef;
-}
-
-/* [EDIT] Force dark theme */
-:root {
-  color-scheme: dark;
-  --bg: #212121;
-  --accent-bg: #2b2b2b;
-  --text: #dcdcdc;
-  --text-light: #ababab;
-  --accent: #ffb300;
-  --accent-hover: #ffe099;
-  --accent-text: var(--bg);
-  --code: #f06292;
-  --preformatted: #ccc;
-  --disabled: #111;
 }
 
 /* Dark theme */

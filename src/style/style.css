@@ -55,7 +55,8 @@ header > p {
 }
 
 h1 {
-  text-shadow: 2px 1px black;
+  /* Not looks good on light theme */
+  /* text-shadow: 2px 1px black; */
 }
 
 h2 {
