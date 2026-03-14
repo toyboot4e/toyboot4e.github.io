@@ -646,7 +646,7 @@ INFO is a plist holding contextual information.  See
     (insert-file-contents org-file)
     (my-org-global-prop-value key)))
 
-;; Returns a plist of `url', `title', `date' and `tags'.
+;; Returns a plist of `filepath', 'href', `title', `date' and `tags'.
 (defun collect-org-files (base-dir filter-p)
   (let* ((files (seq-filter
                  (lambda (s)
@@ -655,8 +655,9 @@ INFO is a plist holding contextual information.  See
          (entries (mapcar
                    (lambda (s)
                      ;; NOTE: here `base-dir' is treated as a regex (unfortunately)
-                     (let* (;; `src/file.org' -> `/file.org'
+                     (let* (;; `src/file.org' -> `/file.org'.
                             (filepath (string-trim-left s base-dir))
+                            (href (replace-regexp-in-string "\\.org\\'" ".html" filepath))
                             ;; TODO: read them on-the-fly
                             (title (or (my-org-read-prop s "TITLE") ""))
                             ;; `<2023-01-01 Sat>' => `2023-01-01'
@@ -669,13 +670,13 @@ INFO is a plist holding contextual information.  See
                                    (replace-regexp-in-string
                                     ":" " "
                                     (string-trim filetags " ")))))
-                       (list :filepath filepath :title title :date date :tags tags)))
+                       (list :filepath filepath :href href :title title :date date :tags tags)))
                    files)))
 
     (sort
      (seq-filter filter-p entries)
      (lambda (l r)
-       (string> (plist-get l :filepath) (plist-get r :filepath))))))
+       (string> (plist-get l :href) (plist-get r :href))))))
 
 ;; Concatenates strings with `\n' as the delimiter.
 (defun join-with-newline (xs)
@@ -690,21 +691,23 @@ INFO is a plist holding contextual information.  See
 (defun create-article-card (entry)
   (let ((title (plist-get entry :title))
         (date (plist-get entry :date))
-        (link (plist-get entry :link))
+        (link (plist-get entry :href))
         (tags (plist-get entry :tags)))
     `(div (@ (class "article-card"))
-          (div (@ (class "article-meta-card"))
+          (div (@ (class "article-card-meta"))
                (date ,date)
                ,@(mapcar #'create-tag-sxml tags))
-          (div (@ (class "article-card-link"))
-               (a (@ (href ,link))
+          (div (a (@ (href ,link)
+                     (class "article-card-link"))
                   ,title)))))
 
 (defun show-article-cards (entries)
   (join-with-newline
    `(
      "#+BEGIN_EXPORT html"
-     ,@(mapcar (lambda (entry) (my-sxml-to-xml (create-article-card entry))) entries)
+     ,(my-sxml-to-xml
+       `(div (@ (class "article-list"))
+             ,@(mapcar (lambda (entry) (create-article-card entry)) entries)))
      "#+END_EXPORT"
      )))
 
