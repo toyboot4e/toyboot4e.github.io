@@ -646,7 +646,7 @@ INFO is a plist holding contextual information.  See
     (insert-file-contents org-file)
     (my-org-global-prop-value key)))
 
-;; Returns a list of '(url tag-list)
+;; Returns a plist of `url', `title', `date' and `tags'.
 (defun collect-org-files (base-dir filter-p)
   (let* ((files (seq-filter
                  (lambda (s)
@@ -655,30 +655,35 @@ INFO is a plist holding contextual information.  See
          (entries (mapcar
                    (lambda (s)
                      ;; NOTE: here `base-dir' is treated as a regex (unfortunately)
-                     (let* ((relative-path (string-trim-left s base-dir))
+                     (let* (;; `src/file.org' -> `/file.org'
+                            (filepath (string-trim-left s base-dir))
+                            ;; TODO: read them on-the-fly
+                            (title (or (my-org-read-prop s "TITLE") ""))
+                            ;; `<2023-01-01 Sat>' => `2023-01-01'
+                            (date (substring
+                                   (or (my-org-read-prop s "DATE")
+                                       (concat "<" (format-time-string "%F") ">"))
+                                   1 11))
                             (filetags (or (my-org-read-prop s "FILETAGS") ""))
                             (tags (split-string
                                    (replace-regexp-in-string
                                     ":" " "
                                     (string-trim filetags " ")))))
-                       `(,relative-path ,tags)))
+                       (list :filepath filepath :title title :date date :tags tags)))
                    files)))
 
     (sort
      (seq-filter filter-p entries)
      (lambda (l r)
-       (string> (car l) (car r))))))
+       (string> (plist-get :filepath l) (plist-get :filepath r))))))
 
 ;; Parses an `org-file' headline and returns an org line as a link.
-(defun my-show-article-bullet (org-file link-path)
-  (let* ((title (or (my-org-read-prop org-file "TITLE") "<none>"))
-         ;; `<2023-01-01 Sat>' => `2023-01-01'
-         (date-string (substring (or (my-org-read-prop org-file "DATE") (concat "<" (format-time-string "%F") ">")) 1 11))
-         (filetags (or (my-org-read-prop org-file "FILETAGS") ""))
-         (tags (split-string
-                (replace-regexp-in-string
-                 ":" " "
-                 (string-trim filetags " "))))
+(defun my-show-article-bullet (entry)
+  (let* ((date (plist-get entry :date))
+         ;; /src/file.org
+         (link (plist-get entry :filepath))
+         (title (plist-get entry :title))
+         (tags (plist-get entry :tags))
          (tag-delimiter ;; "&nbsp;"
           " ")
          (tags-string
@@ -689,15 +694,14 @@ INFO is a plist holding contextual information.  See
                        (let ((link (format "/tags/%s.html" tag)))
                          (format "<a href=\"%s\" class=\"org-tag\"><code>#%s</code></a>" link tag)))
                      tags tag-delimiter)))))
-    (format "@@html:<date>%s</date>@@ [[file:%s][%s]]%s" date-string link-path title tags-string)))
+    (format "@@html:<date>%s</date>@@ [[file:%s][%s]]%s" date link title tags-string)))
 
 ;; Creates a list of `- [[..][..]]'.
-(defun my-show-article-bullets (base-dir url-tags-list)
-  (mapcar (lambda (url-tags)
-            (let ((org-file (concat base-dir (car url-tags)))
-                  (link-path (car url-tags)))
-              (format "- %s" (my-show-article-bullet org-file link-path))))
-          url-tags-list))
+(defun my-show-article-bullets (base-dir entries)
+  (mapcar
+   (lambda (entry)
+     (format "- %s" (my-show-article-bullet entry)))
+   entries))
 
 ;; Concatenates strings with `\n' as the delimiter.
 (defun join-with-newline (xs)
@@ -708,16 +712,16 @@ INFO is a plist holding contextual information.  See
   (let* ((devlog-bullets
           (my-show-article-bullets
            "src" (collect-org-files
-                  base-dir (lambda (url-tags)
-                             (let ((url (car url-tags)))
+                  base-dir (lambda (entry)
+                             (let ((url (plist-get entry :filepath)))
                                (and (not (string-match "diary/" url))
                                     (not (string-match "tags/" url))))))))
 
          (diary-bullets
           (my-show-article-bullets
            "src" (collect-org-files
-                  base-dir (lambda (url-tags)
-                             (let ((url (car url-tags)))
+                  base-dir (lambda (entry)
+                             (let ((url (plist-get entry :filepath)))
                                (string-match "diary/" url))))))
 
          (tags-string
@@ -746,17 +750,15 @@ INFO is a plist holding contextual information.  See
 
 ;; Generates string content of `tags/<tag>.org'
 (defun my-generate-tag-page-org (base-dir tag)
-  (let* ((url-tags-list
+  (let* ((entries
           (collect-org-files
            base-dir
-           (lambda (url-tags) (member tag (car (cdr url-tags))))))
+           (lambda (entry) (member tag (plist-get entry :tags)))))
          ;; Org-mode file bullets:
          (bullets
-          (mapcar (lambda (url-tags)
-                    (let ((org-file (concat base-dir (car url-tags)))
-                          (link-path (car url-tags)))
-                      (format "- %s" (my-show-article-bullet org-file link-path))))
-                  url-tags-list))
+          (mapcar (lambda (entry)
+                    (format "- %s" (my-show-article-bullet entry)))
+                  entries))
 
          ;; Stringify
          (articles (join-with-newline bullets))
