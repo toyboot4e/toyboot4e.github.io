@@ -1,0 +1,33 @@
+#+TITLE: =org-mode= 製ブログの改良 (7): 記事カード
+#+DATE: <2026-03-14 Sat>
+
+* 背景
+
+このブログのトップページは、記事一覧が格好悪いと思っていました:
+
+#+CAPTION: リスト表示
+[[./img/2026-03-14-article-cards-old.png]]
+
+[[https://technicalsuwako.moe/][人のブログ]] を見て、やはりカード風の表示が良いと思い、実装してみました。
+
+* 結果
+
+記事のカード表示を実装してみました。記事のタイトルが左寄せになったため、視認性が改善したと思います:
+
+#+CAPTION: カード表示
+[[./img/2026-03-14-article-cards-new.png]]
+
+タグがスペースを取り過ぎているため、まだ調整が必要かとは思います。
+
+* まとめ
+
+このブログは苦手な Emacs Lisp でビルドしているため、着手が遅れてしましました。今回から記事の情報を [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Property-Lists.html][=plist=]] として持つようにしたため、改造が楽になりました。
+
+#+BEGIN_SRC elisp
+;; ある種オブジェクトのように扱えます
+(plist-get article :title)
+(plist-get article :date)
+
+;; 今までタプルで頑張っていたのが、ある意味凄くないですか……？
+#+END_SRC
+
