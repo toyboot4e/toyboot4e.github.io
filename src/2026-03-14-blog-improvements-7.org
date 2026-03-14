@@ -1,5 +1,6 @@
 #+TITLE: =org-mode= 製ブログの改良 (7): 記事カード
 #+DATE: <2026-03-14 Sat>
+#+FILETAGS: :blog:
 
 * 背景
 
