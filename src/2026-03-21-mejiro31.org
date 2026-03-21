@@ -56,7 +56,7 @@ Mejiro31 は、二段分しかキーが無いにも関わらず、 QWERTY 配列
 #+CAPTION: 購入！ かわいい！
 [[./img/2026-03-21-yusha-2.jpeg]]
 
-実際、オンライン販売の開始直後に売り切れたようです。オンライン販売開始までの時差があるため、現地で買った方が安心ですね ♡
+実際、オンライン販売の開始直後に売り切れたようです。オンライン販売開始までに時間差があるため、現地で買った方が安心ですね ♡
 
 #+BEGIN_EXPORT html
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">ぎゃ〜！完売！15分くらいで完売しました！<br>追加の在庫を用意するため、製造準備を開始いたします！</p>&mdash; じーびす/ʐiːbɪs/ (@jeebis_iox) <a href="https://twitter.com/jeebis_iox/status/2028721852508680583?ref_src=twsrc%5Etfw">March 3, 2026</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
