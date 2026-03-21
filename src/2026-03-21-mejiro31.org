@@ -108,7 +108,7 @@ Mejiro31 のおかげで QMK にも入門できて最高です。僕の設定内
 
 [[./img/2026-03-21-mejiro-3.jpeg]]
 
-Mejiro31 作者のじーびすさんは、 [[https://costory.jp/cf-published-sku-groups/1254312814][Nape Pro]] を検討されているそうです。
+Mejiro31 作者のじーびすさんは、 [[https://costory.jp/cf-published-sku-groups/1254312814][Nape Pro]] を検討されているそうです。やはり、何から何まで僕の先を行かれている方ですね……！
 
 * まとめ
 
