@@ -17,7 +17,7 @@
 
 ** 英語速記
 
-Dilemma の次は速記キーボードの [[https://stenokeyboards.com/products/the-uni-v4][Uni V4]] を買って速記を練習していました。当時は Uni が在庫切れだったため、 Discord 経由で異国の誰かに譲って頂いた思い出があります:
+Dilemma の次は [[https://stenokeyboards.com/products/the-uni-v4][Uni V4]] を買って『速記』を練習していました。当時は Uni が在庫切れだったため、 Discord 経由で異国の誰かに譲って頂いた思い出があります:
 
 #+CAPTION: Uni V4
 [[./img/2024-04-04-uni-v4.jpg]]
