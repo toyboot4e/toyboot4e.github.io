@@ -4,7 +4,7 @@
 
 * 背景
 
-[[https://shop.yushakobo.jp/products/11895][Mejiro31 キーボード]] を購入しました。かなり特殊なキーボードですが、なぜこれが嬉しかったのか、背景から記載します。
+[[https://shop.yushakobo.jp/products/11895][Mejiro31 キーボード]] を購入しました。かなり特殊なキーボードですが、なぜこれが嬉しかったか、背景から記載します。
 
 ** 34 キー QWERTY
 
@@ -13,7 +13,7 @@
 #+CAPTION: [[https://bastardkb.com/product/dilemma-built-v3/][Dilemma]] V2 キーボード (右手部分)
 [[./img/2025-03-23-dilemma-v2.jpg]]
 
-このキーボード自体は、なぜか光っていてお気に入りですが、操作方法が普通過ぎました。ここから先は、指の動かし方を変えなければ満足できません。
+このキーボードは (なぜか光っていて) お気に入りですが、操作方法が普通過ぎました。ここから先は、指の動かし方を変えなければ満足できません。
 
 ** 英語速記
 
@@ -22,7 +22,7 @@ Dilemma の次は速記キーボードの [[https://stenokeyboards.com/products/
 #+CAPTION: Uni V4
 [[./img/2024-04-04-uni-v4.jpg]]
 
-英語速記の [[https://lapwing.aerick.ca/][Lapwing]] では、以下のストロークで =git= を入力します。かなり特殊な指の動かし方を経験でき、キーボード操作の面白さは満たされました:
+英語速記の [[https://lapwing.aerick.ca/][Lapwing]] では、以下のストロークで =git= を入力します。かなり特殊な指の動かし方を経験でき、キーボード操作に満足できました:
 
 #+BEGIN_STENO
 TKPW-EUT
