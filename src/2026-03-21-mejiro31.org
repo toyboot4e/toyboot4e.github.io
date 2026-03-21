@@ -32,7 +32,7 @@ TKPW-EUT
 
 ** 24 キー QWERTY
 
-以上の背景を踏まえると、 Mejiro31 の登場がいかに嬉しいものであったかご理解頂けると思います。
+以上の背景を踏まえると、 Mejiro31 の登場がいかに嬉しいものであったかご理解頂けると思います！
 
 Mejiro31 は、二段分しかキーが無いにも関わらず、 QWERTY 配列を表現できるキーボードです。このために [[https://note.com/jeebis_keyboard/n/ncbc327906050][二段圧縮]] と命名されたアイデアを採用しており、しかも Uni と同様に速記キーボードとして使うこともできます。
 
@@ -48,12 +48,12 @@ Mejiro31 は、二段分しかキーが無いにも関わらず、 QWERTY 配列
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Mejiro31はなんと&quot;明日&quot;販売開始予定です！！！<br><br>遊舎工房さん（<a href="https://twitter.com/yushakobo_shop?ref_src=twsrc%5Etfw">@yushakobo_shop</a> ）の委託キーボードとして配売されます。<br>初回なので<br>・白5個<br>・黒5個<br>だけの在庫となっています。<a href="https://t.co/xoFuT3JKbA">https://t.co/xoFuT3JKbA</a><a href="https://twitter.com/hashtag/Mejiro31?src=hash&amp;ref_src=twsrc%5Etfw">#Mejiro31</a> <a href="https://twitter.com/hashtag/%E8%87%AA%E4%BD%9C%E3%82%AD%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89?src=hash&amp;ref_src=twsrc%5Etfw">#自作キーボード</a></p>&mdash; じーびす/ʐiːbɪs/ (@jeebis_iox) <a href="https://twitter.com/jeebis_iox/status/2028409114901291090?ref_src=twsrc%5Etfw">March 2, 2026</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 #+END_EXPORT
 
-在庫 10 に対して like の数が 10 を超えており、ステルス勢もいます。争奪戦になることが予想されたため、直接店舗に赴きました:
+在庫 10 に対して like の数が 10 を超えており、ステルス勢も必ずいます。争奪戦が予期されたため、直接店舗に赴きました:
 
 #+CAPTION: Mejiro31 を発見！
 [[./img/2026-03-21-yusha-1.jpeg]]
 
-#+CAPTION: 購入！
+#+CAPTION: 購入！ かわいい！
 [[./img/2026-03-21-yusha-2.jpeg]]
 
 実際、オンライン販売の開始直後に売り切れたようです。オンライン販売開始までの時差があるため、現地で買った方が安心ですね ♡
