@@ -8,7 +8,7 @@
 
 ** 34 キー QWERTY
 
-[[https://bastardkb.com/product/dilemma-built-v3/][Dilemma]] をメインのキーボードにしています。 34 キーの QWERTY 配列で、操作性の良さは極値にあります。しかし一年間使っていると、飽きを感じて来ました:
+[[https://bastardkb.com/product/dilemma-built-v3/][Dilemma]] をメインのキーボードにしています。 34 キーの QWERTY 配列で、操作性の良さは極値と言えます。しかし一年も使っていると飽きて来ました:
 
 #+CAPTION: [[https://bastardkb.com/product/dilemma-built-v3/][Dilemma]] V2 キーボード (右手部分)
 [[./img/2025-03-23-dilemma-v2.jpg]]
@@ -17,12 +17,12 @@
 
 ** 英語速記
 
-Dilemma の次は [[https://stenokeyboards.com/products/the-uni-v4][Uni V4]] を買って『速記』を練習していました。当時は Uni が在庫切れだったため、 Discord 経由で異国の誰かに譲って頂いた思い出があります:
+次は [[https://stenokeyboards.com/products/the-uni-v4][Uni V4]] を買って『速記』を練習しました。当時は Uni が在庫切れだったため、 Discord 経由で異国の誰かに譲って頂いた思い出があります:
 
 #+CAPTION: Uni V4
 [[./img/2024-04-04-uni-v4.jpg]]
 
-英語速記の [[https://lapwing.aerick.ca/][Lapwing]] では、以下のストロークで =git= を入力します。かなり特殊な指の動かし方を経験でき、キーボード操作に満足できました:
+英語速記の [[https://lapwing.aerick.ca/][Lapwing]] では、たとえば以下のストロークで =git= を入力します。かなり特殊な指の動かし方を経験でき、キーボード操作に満足できました:
 
 #+BEGIN_STENO
 TKPW-EUT
@@ -34,7 +34,7 @@ TKPW-EUT
 
 以上の背景を踏まえると、 Mejiro31 の登場がいかに嬉しいものであったかご理解頂けると思います！
 
-Mejiro31 は、二段分しかキーが無いにも関わらず、 QWERTY 配列を表現できるキーボードです。このために [[https://note.com/jeebis_keyboard/n/ncbc327906050][二段圧縮]] と命名されたアイデアを採用しており、しかも Uni と同様に速記キーボードとして使うこともできます。
+Mejiro31 は、二段分しかキーが無いにも関わらず、 QWERTY 配列を表現できるキーボードです。このために [[https://note.com/jeebis_keyboard/n/ncbc327906050][二段圧縮]] のアイデアを採用し、しかも Uni と同様に速記キーボードとして使うこともできます。
 
 つまり *QWERTY のメンタルモデルを保ったまま新しいキーボードの操作性を提供* し、かつ *いつでも速記ができる* 夢のキーボードだったのです。 𝑃𝑒𝑟𝑓𝑒𝑐𝑡𝑖𝑜𝑛..!
 
