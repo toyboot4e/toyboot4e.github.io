@@ -8,7 +8,7 @@
 
 ** 34 キー QWERTY
 
-[[https://bastardkb.com/product/dilemma-built-v3/][Dilemma]] をメインのキーボードにしています。 34 キーの QWERTY 配列で、操作性の良さは極値と言えます。しかし一年も使っていると飽きて来ました:
+[[https://bastardkb.com/product/dilemma-built-v3/][Dilemma]] をメインのキーボードにしていました。 34 キーの QWERTY 配列で、操作性の良さは極値と言えます。しかし一年も使っていると飽きて来ました:
 
 #+CAPTION: [[https://bastardkb.com/product/dilemma-built-v3/][Dilemma]] V2 キーボード (右手部分)
 [[./img/2025-03-23-dilemma-v2.jpg]]
