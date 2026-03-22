@@ -726,12 +726,12 @@ INFO is a plist holding contextual information.  See
    `("#+BEGIN_EXPORT html"
      ,(my-sxml-to-xml
        `(div (@ (class "org-tag-list"))
-          ,@(mapcar #'create-tag-sxml all-tags)))
+             ,@(mapcar #'create-tag-sxml all-tags)))
      "#+END_EXPORT")))
 
 (defun create-article-card (entry)
   (let* ((title (plist-get entry :title))
-        ;; Convert =code= etc. in title into html. Remove the surrounding <p>
+         ;; Convert =code= etc. in title into html. Remove the surrounding <p>
          (title-html (replace-regexp-in-string "^<p>\\|</p>$" "" (org-export-string-as title 'html t '(:body-only t))))
          (date (plist-get entry :date))
          (link (plist-get entry :href))
@@ -739,7 +739,8 @@ INFO is a plist holding contextual information.  See
     `(div (@ (class "article-card"))
           (div (@ (class "article-card-meta"))
                (date ,date)
-               ,@(mapcar #'create-tag-sxml tags))
+               (span (@ (class "org-tag-list"))
+                     ,@(mapcar #'create-tag-sxml tags)))
           (div (a (@ (href ,link)
                      (class "article-card-link"))
                   (*RAW-STRING* ,title-html))))))

@@ -184,6 +184,9 @@ span.code-highlighted {
 
 .org-tag-list {
   font-size: 1rem;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .article-list {
