@@ -158,6 +158,12 @@ div.WARNING {
   background: hsla(24, 20%, 50%, 0.25);
 }
 
+/* Disable font style by simple.css */
+.code-highlighted a,
+.coderef-off a {
+  color: inherit;
+}
+
 span.code-highlighted {
   display: inline-block;
   min-width: 100%;
