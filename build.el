@@ -366,11 +366,11 @@ wrapped in code elements."
          ;; REMARK(toyboot): added a wrapper `span' with `href', adding mouseover/click to `jump-href-*'.
          (let* ((coderef (format "coderef-%d-%s" my-codeblock-counter ref))
                 (in (format "onmouseover=\"CodeHighlightOn(this,'jump-%s');\"" coderef))
-  (out (format "onmouseout=\"CodeHighlightOff(this,'jump-%s');\"" coderef))
-  (content (format "<a href=\"#%s\">%s</a>" coderef loc)))
-               (format "<span id=\"%s\" %s %s class=\"coderef-off\">%s</span>"
-                       coderef in out content))))
-  num-start refs)))
+                (out (format "onmouseout=\"CodeHighlightOff(this,'jump-%s');\"" coderef))
+                (content (format "<a href=\"#%s\">%s</a>" coderef loc)))
+           (format "<span id=\"%s\" %s %s class=\"coderef-off\">%s</span>"
+                   coderef in out content))))
+     num-start refs)))
 
 ;; Ovewrite the wrap image function
 ;; - remove `id' attribute for the `<figure>' tag:
@@ -789,16 +789,16 @@ INFO is a plist holding contextual information.  See
 
 ;; Set up `my-site-html' backend:
 (org-export-define-derived-backend
- 'my-site-html
- my-base-backend
+    'my-site-html
+    my-base-backend
 
- :translate-alist
- '((template . my-org-html-template)
-   (link . my-org-html-link)
-   ;; (export-block . my-org-html-export-block)
-   (src-block . roygbyte/org-html-src-block)
-   (center-block . my-org-html-center-block)
-   (special-block . my-org-html-special-block)))
+  :translate-alist
+  '((template . my-org-html-template)
+    (link . my-org-html-link)
+    ;; (export-block . my-org-html-export-block)
+    (src-block . roygbyte/org-html-src-block)
+    (center-block . my-org-html-center-block)
+    (special-block . my-org-html-special-block)))
 
 (defun my-org-html-publish-to-html (plist filename pub-dir)
   "Publish an org file to HTML, using the FILENAME as the output directory."
