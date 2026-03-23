@@ -372,17 +372,20 @@ wrapped in code elements."
                        coderef in out content))))
   num-start refs)))
 
-;; Ovewrite the wrap image function and remove `id' attribute for the `<figure>' tag:
+;; Ovewrite the wrap image function
+;; - remove `id' attribute for the `<figure>' tag:
+;; - remove <br> between <img> and <figcaption>
 (defun org-html--wrap-image (contents info &optional caption label)
-  (let ((html5-fancy (org-html--html5-fancy-p info)))
+  (let* ((html5-fancy (org-html--html5-fancy-p info))
+         ;; HACK: remove literal <br> between <img> and <caption>
+         (contents (replace-regexp-in-string "<br ?/?>" "" contents)))
     (format (if html5-fancy "\n<figure>\n%s%s\n</figure>"
               "\n<div class=\"figure\">\n%s%s\n</div>")
-            ;; NOTE: `id' attribute for `<figure>' is removed
             (if html5-fancy contents (format "<p>%s</p>" contents))
             (if (not (org-string-nw-p caption)) ""
               (format (if html5-fancy "\n<figcaption>%s</figcaption>"
                         "\n<p>%s</p>")
-                      caption)))))
+                      (org-trim caption))))))
 
 ;; `#+BEGIN_CENTER' block
 (defun my-org-html-center-block (center-block contents info)
