@@ -30,43 +30,15 @@
       }
     }
 
-    updateToggleButton(theme);
-  }
-
-  function getEffectiveTheme(theme) {
-    if (theme) return theme;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }
-
-  function updateToggleButton(theme) {
-    var btns = document.querySelectorAll("#theme-toggle");
-    var effective = getEffectiveTheme(theme);
-    var icon = effective === "dark" ? "\u263D" : "\u2600";
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].textContent = icon;
-    }
   }
 
   // Apply saved theme immediately (before body renders) to prevent FOUC
-  var saved = getPreferredTheme();
-  applyTheme(saved);
-
-  // Update button once DOM is ready
-  document.addEventListener("DOMContentLoaded", function() {
-    updateToggleButton(saved);
-  });
-
-  // Listen for OS theme changes
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function() {
-    if (!getPreferredTheme()) {
-      updateToggleButton(null);
-    }
-  });
+  applyTheme(getPreferredTheme());
 
   // Global toggle function called by button onclick
   window.toggleTheme = function() {
     var current = getPreferredTheme();
-    var effective = getEffectiveTheme(current);
+    var effective = current || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     var next = effective === "dark" ? "light" : "dark";
     try { localStorage.setItem(STORAGE_KEY, next); } catch(e) {}
     if (document.startViewTransition) {

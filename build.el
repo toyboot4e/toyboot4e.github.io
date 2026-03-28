@@ -862,7 +862,7 @@ INFO is a plist holding contextual information.  See
    all-tags)
 
   (message "Building articles..")
-  (if t
+  (if force-flag
       (org-publish build-target t)
     (org-publish build-target)))
 

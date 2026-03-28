@@ -59,6 +59,22 @@ header > nav {
   line-height: 2;
 }
 
+/* Show correct icon via CSS (no JS needed) */
+#theme-toggle::before {
+  content: "\2600"; /* sun — light theme default */
+}
+@media (prefers-color-scheme: dark) {
+  #theme-toggle::before {
+    content: "\263D"; /* moon */
+  }
+}
+:root[data-theme="dark"] #theme-toggle::before {
+  content: "\263D";
+}
+:root[data-theme="light"] #theme-toggle::before {
+  content: "\2600";
+}
+
 #theme-toggle:hover {
   background: var(--bg);
   border-color: var(--accent);
