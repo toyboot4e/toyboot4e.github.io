@@ -1,15 +1,15 @@
 /* org-mode code ref feature supoprt */
 
 function CodeHighlightOn(elem, id)
- {
-   var target = document.getElementById(id);
-   if(null != target) {
-     elem.cacheClassElem = elem.className;
-     elem.cacheClassTarget = target.className;
-     target.className = "code-highlighted";
-     elem.className   = "code-highlighted";
-   }
- }
+{
+  var target = document.getElementById(id);
+  if(null != target) {
+    elem.cacheClassElem = elem.className;
+    elem.cacheClassTarget = target.className;
+    target.className = "code-highlighted";
+    elem.className   = "code-highlighted";
+  }
+}
 
 function CodeHighlightOff(elem, id)
 {
