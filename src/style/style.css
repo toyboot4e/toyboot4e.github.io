@@ -10,6 +10,12 @@ main {
   width: min(50rem, 90vw);
 }
 
+/* Smooth theme switch */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.1s;
+}
+
 #toc {
   grid-column: 3;
   align-self: start;

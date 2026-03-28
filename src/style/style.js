@@ -69,7 +69,13 @@
     var effective = getEffectiveTheme(current);
     var next = effective === "dark" ? "light" : "dark";
     try { localStorage.setItem(STORAGE_KEY, next); } catch(e) {}
-    applyTheme(next);
+    if (document.startViewTransition) {
+      document.startViewTransition(function() {
+        applyTheme(next);
+      });
+    } else {
+      applyTheme(next);
+    }
   };
 })();
 
