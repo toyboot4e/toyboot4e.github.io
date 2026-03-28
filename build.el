@@ -175,7 +175,11 @@
       (link (@ (rel "stylesheet")
                (href "/style/style.css")))
       (link (@ (rel "stylesheet")
-               (href "/style/prism.css")))
+               (href "/style/prism-dark.css")
+               (media "(prefers-color-scheme: dark)")))
+      (link (@ (rel "stylesheet")
+               (href "/style/prism-light.css")
+               (media "(prefers-color-scheme: light)")))
       (script (@ (type "text/javascript")
                  (src "/style/style.js"))
               ;; NOTE: empty body is required for self-closing tag

@@ -27,7 +27,7 @@ class StenoViz extends HTMLElement {
       }
       .steno-viz-rect {
         text-align: center;
-        border: 1px solid var(--accent);
+        border: 1px solid var(--text);
         border-radius: 3px;
       }
       .steno-viz-rect-pressed {

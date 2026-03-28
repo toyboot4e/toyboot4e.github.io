@@ -155,7 +155,7 @@ div.WARNING {
 .coderef-off {
   display: inline-block;
   min-width: 100%;
-  background: hsla(24, 20%, 50%, 0.25);
+  background-color: color-mix(in srgb, var(--accent-hover) 10%, transparent);
 }
 
 /* Disable font style by simple.css */
@@ -170,7 +170,7 @@ span.code-highlighted {
 }
 
 .code-highlighted {
-  background: hsla(60, 30%, 50%, 0.5);
+  background-color: color-mix(in srgb, var(--accent-hover) 20%, transparent);
 }
 
 /* aahub_light: https://qiita.com/scrpgil/items/b8bde1257a135d173585 */
