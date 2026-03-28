@@ -175,9 +175,11 @@
       (link (@ (rel "stylesheet")
                (href "/style/style.css")))
       (link (@ (rel "stylesheet")
+               (id "prism-dark")
                (href "/style/prism-dark.css")
                (media "(prefers-color-scheme: dark)")))
       (link (@ (rel "stylesheet")
+               (id "prism-light")
                (href "/style/prism-light.css")
                (media "(prefers-color-scheme: light)")))
       (script (@ (type "text/javascript")
@@ -233,7 +235,12 @@
                   (a (@ (href "https://atcoder.jp/users/toyboot4e")) "AtCoder")
                   (a (@ (href "https://github.com/toyboot4e")) "GitHub")
                   (a (@ (href "https://qiita.com/toyboot4e")) "Qiita")
-                  (a (@ (href "https://zenn.dev/toyboot4e")) "Zenn"))
+                  (a (@ (href "https://zenn.dev/toyboot4e")) "Zenn")
+                  (button (@ (id "theme-toggle")
+                             (onclick "toggleTheme()")
+                             (title "\u30c6\u30fc\u30de\u5207\u66ff")
+                             (aria-label "Toggle theme"))
+                          ""))
              ;; `org-export-data' returns raw HTML
              (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
              ;; tags
@@ -855,7 +862,7 @@ INFO is a plist holding contextual information.  See
    all-tags)
 
   (message "Building articles..")
-  (if force-flag
+  (if t
       (org-publish build-target t)
     (org-publish build-target)))
 

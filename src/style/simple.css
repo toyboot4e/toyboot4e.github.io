@@ -47,6 +47,26 @@
   }
 }
 
+/* [Edit] Manual dark theme override */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #212121;
+  --accent-bg: #2b2b2b;
+  --text: #dcdcdc;
+  --text-light: #ababab;
+  --accent: #ffb300;
+  --accent-hover: #ffe099;
+  --accent-text: var(--bg);
+  --code: #f06292;
+  --preformatted: #ccc;
+  --disabled: #111;
+}
+
+:root[data-theme="dark"] img,
+:root[data-theme="dark"] video {
+  opacity: 0.8;
+}
+
 /* Reset box-sizing */
 *, *::before, *::after {
   box-sizing: border-box;
