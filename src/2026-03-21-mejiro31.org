@@ -8,7 +8,7 @@
 
 ** 34 キー QWERTY
 
-[[https://bastardkb.com/product/dilemma-built-v3/][Dilemma]] をメインのキーボードにしていました。 34 キーの QWERTY 配列で、操作性の良さは極値と言えます。しかし一年も使っていると飽きて来ました:
+[[https://bastardkb.com/product/dilemma-built-v3/][Dilemma]] がメインのキーボードでした。 34 キーの QWERTY 配列で、操作性の良さは極値と言えます。しかし一年も使っていると飽きて来ました:
 
 #+CAPTION: [[https://bastardkb.com/product/dilemma-built-v3/][Dilemma]] V2 キーボード (右手部分)
 [[./img/2025-03-23-dilemma-v2.jpg]]
@@ -30,7 +30,7 @@ TKPW-EUT
 
 しかし今度は習得難度があまりにも高く、半年以上経った現在においても、入力できない単語の方が多いほどです。結果、 34 キー QWERTY 配列を使っている時間が圧倒的に長く、僅かな練習時間のみ速記を使っていました。
 
-** 24 キー QWERTY
+** 24 キー QWERTY (+ 速記)
 
 以上の背景を踏まえると、 Mejiro31 の登場がいかに嬉しいものであったかご理解頂けると思います！
 
