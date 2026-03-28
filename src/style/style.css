@@ -131,6 +131,9 @@ div.WARNING {
 }
 
 .coderef-anchor {
+  /* Assuming it's inside a comment span, adjust the Y position: */
+  position: relative;
+  top: -0.15em;
   display: inline-block;
   color: #fff !important;
   background: rgba(175, 134, 90, 0.8);
