@@ -29,6 +29,13 @@
 #+CAPTION: カード表示 (ライトテーマ)
 [[./img/2026-03-14-blog-light-theme.png]]
 
+Prism.js によるコードスタイルも、 light/dark 両対応にしました:
+
+#+BEGIN_SRC html
+<link rel="stylesheet" href="/style/prism-light.css" media="(prefers-color-scheme: light)">
+<link rel="stylesheet" href="/style/prism-dark.css" media="(prefers-color-scheme: dark)">
+#+END_SRC
+
 * まとめ
 
 ブログのビルドスクリプトを更新しました。 Emacs Lisp の修正に乗り気になれなかったのですが、今回から記事の情報を [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Property-Lists.html][=plist=]] として持つようにしたため、気軽に改造できるようになりました。
