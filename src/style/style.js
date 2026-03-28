@@ -1,5 +1,4 @@
 /* Theme switcher */
-
 (function() {
   var STORAGE_KEY = "toybeam-theme";
 
@@ -29,7 +28,6 @@
         light.media = "(prefers-color-scheme: light)";
       }
     }
-
   }
 
   // Apply saved theme immediately (before body renders) to prevent FOUC
@@ -53,10 +51,9 @@
 
 /* org-mode code ref feature supoprt */
 
-function CodeHighlightOn(elem, id)
-{
+function CodeHighlightOn(elem, id) {
   var target = document.getElementById(id);
-  if(null != target) {
+  if(target !== null) {
     elem.cacheClassElem = elem.className;
     elem.cacheClassTarget = target.className;
     target.className = "code-highlighted";
@@ -64,12 +61,12 @@ function CodeHighlightOn(elem, id)
   }
 }
 
-function CodeHighlightOff(elem, id)
-{
+function CodeHighlightOff(elem, id) {
   var target = document.getElementById(id);
-  if(elem.cacheClassElem)
+  if(elem.cacheClassElem) {
     elem.className = elem.cacheClassElem;
-  if(elem.cacheClassTarget)
+  } if(elem.cacheClassTarget) {
     target.className = elem.cacheClassTarget;
+  }
 }
 
