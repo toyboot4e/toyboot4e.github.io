@@ -23,7 +23,7 @@ jobs:
     - name: Build devlog
       uses: ./.github/actions/build
     - name: Upload devlog artifact
-      uses: actions/upload-pages-artifact@v4
+      uses: actions/upload-pages-artifact@v5
       with:
         path: result/out
 
