@@ -34,6 +34,10 @@ main {
   text-indent: 1em;
 }
 
+#content p > * {
+  text-indent: 0;
+}
+
 li p {
   text-indent: 0em;
 }
