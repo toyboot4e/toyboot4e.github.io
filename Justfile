@@ -65,3 +65,6 @@ watch *args:
 [private]
 alias w := watch
 
+ci *args:
+    pinact run -update
+    zizmor .

@@ -37,7 +37,9 @@
           pkgs.mkShell {
             packages = with pkgs; [
               nodePackages.prettier
+              pinact
               watchexec
+              zizmor
             ];
           };
         packages = {
