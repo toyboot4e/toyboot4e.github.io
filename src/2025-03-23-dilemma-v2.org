@@ -1,7 +1,7 @@
 #+TITLE: Dilemma V2 キーボード
 #+DATE: <2025-03-23 Sun>
 #+FILETAGS: :keyboard:
-#+THUMBNAIL: img/2023-08-keyball44.jpg
+#+THUMBNAIL: img/2025-03-23-dilemma-v2.jpg
 
 * 背景
 
