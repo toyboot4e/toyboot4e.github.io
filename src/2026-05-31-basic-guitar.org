@@ -1,6 +1,6 @@
 #+TITLE: ギターの基礎練を試してみました
 #+DATE: <2026-05-31 Sun>
-#+FILETAGS: :play:
+#+FILETAGS: :music:
 
 * 背景
 
