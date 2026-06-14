@@ -1,7 +1,7 @@
 #+TITLE: 速記入門のための yak shaving
 #+DATE: <2025-06-22 Sun>
 #+FILETAGS: :keyboard:steno:
-#+THUMBNAIL: img/2024-04-04-uni-v4.jpg
+#+THUMBNAIL: img/2025-06-22-drill.gif
 
 * 背景
 

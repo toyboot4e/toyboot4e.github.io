@@ -1,7 +1,7 @@
 #+TITLE: =org-mode= 製ブログの改良 (5): タグとヘッダ
 #+DATE: <2025-07-21 Mon>
 #+FILETAGS: :blog:
-#+THUMBNAIL: img/2025-07-21-header-before.png
+#+THUMBNAIL: img/2025-07-21-header-after.png
 
 * 背景
 
