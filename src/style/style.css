@@ -46,6 +46,10 @@ body > header {
   padding: 0;
 }
 
+body > header h1 {
+  max-width: 100% !important; /* overwrite simple.css's default */
+}
+
 header > nav {
   overflow-x: auto;
   white-space: nowrap;
