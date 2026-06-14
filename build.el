@@ -862,14 +862,22 @@ INFO is a plist holding contextual information.  See
     (center-block . my-org-html-center-block)
     (special-block . my-org-html-special-block)))
 
+;; Single source of truth: `#+DRAFT:' articles are published only in `--draft'.
+(defun my-publish-drafts-p ()
+  (string= build-target "draft"))
+
 (defun my-org-html-publish-to-html (plist filename pub-dir)
-  "Publish an org file to HTML, using the FILENAME as the output directory."
-  (org-publish-org-to 'my-site-html filename
-                      (concat (when (> (length org-html-extension) 0) ".")
-                              (or (plist-get plist :html-extension)
-                                  org-html-extension
-                                  "html"))
-                      plist pub-dir))
+  "Publish an org file to HTML, using the FILENAME as the output directory.
+Skips `#+DRAFT:'-flagged files unless this is a `--draft' build."
+  (if (and (not (my-publish-drafts-p))
+           (org-string-nw-p (my-org-read-prop filename "DRAFT")))
+      (message "Skipping draft: %s" filename)
+    (org-publish-org-to 'my-site-html filename
+                        (concat (when (> (length org-html-extension) 0) ".")
+                                (or (plist-get plist :html-extension)
+                                    org-html-extension
+                                    "html"))
+                        plist pub-dir)))
 
 
 ;;; Build
@@ -885,22 +893,22 @@ INFO is a plist holding contextual information.  See
 (message "Building project!")
 
 (let* ((base-dir "src")
-       ;; TODO: drop draft-flagged articles in release builds:
-       ;; (is-draft (string= build-target "draft"))
-       ;; (keep-p (lambda (entry) (or is-draft (not (plist-get entry :draft)))))
+       ;; Keep drafts in output:
+       (keep-p (lambda (entry) (or (my-publish-drafts-p) (not (plist-get entry :draft)))))
        ;; "src/*.org"
        (devlog-entries
         (collect-org-files
          base-dir (lambda (entry)
                     (let ((url (plist-get entry :filepath)))
                       (and (not (string-match "diary/" url))
-                           (not (string-match "tags/" url)))))))
+                           (not (string-match "tags/" url))
+                           (funcall keep-p entry))))))
        ;;"src/diary/*.org"
        (diary-entries
         (collect-org-files
          base-dir (lambda (entry)
-                    (let ((url (plist-get entry :filepath)))
-                      (string-match "diary/" url)))))
+                    (and (string-match "diary/" (plist-get entry :filepath))
+                         (funcall keep-p entry)))))
        (all-tags
         (sort
          (seq-uniq (apply #'append
