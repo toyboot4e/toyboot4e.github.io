@@ -1,7 +1,7 @@
 #+TITLE: Haskell / AtCoder 緑到達
 #+DATE: <2023-04-30 Sun>
 #+FILETAGS: :atcoder:haskell:
-#+THUMBNAIL: img/2023-04-haskell-is-second-the-fastest.png
+#+THUMBNAIL: ./img/2023-04-atcoder-green-rating.png
 
 Haskell で AtCoder を始めて 11 ヶ月、レーティング 800 を超えました！
 
