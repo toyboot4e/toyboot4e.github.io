@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OGP card preview - Toybeam</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, sans-serif; margin: 2rem auto; max-width: 640px; padding: 0 1rem; }
+  h1 { font-size: 1.4rem; }
+  p.hint { opacity: .7; font-size: .9rem; }
+  .card { display: block; border: 1px solid #cfd9de; border-radius: 16px; overflow: hidden;
+          margin: 1rem 0; text-decoration: none; color: inherit; background: Canvas; }
+  .card:hover { border-color: #8899a6; }
+  .card .thumb { display: none; background: #f0f3f4; }
+  .card .thumb img { display: block; width: 100%; aspect-ratio: 1.91 / 1; object-fit: cover; }
+  .card.large .thumb { display: block; }
+  .card .body { padding: .75rem 1rem; }
+  .card .host { font-size: .8rem; opacity: .6; }
+  .card .title { font-weight: 600; margin: .15rem 0; }
+  .card .desc { font-size: .9rem; opacity: .8;
+                display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card.failed { border-style: dashed; opacity: .5; }
+</style>
+</head>
+<body>
+<h1>OGP card preview</h1>
+<p class="hint">How each article looks when shared on X/Twitter. The article list comes from <code>/index.html</code>; each card is rendered from the live <code>&lt;meta&gt;</code> tags of the built page.</p>
+<div id="cards"></div>
+<script>
+const root = document.getElementById('cards');
+const esc = s => (s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function renderCard(url) {
+  const card = document.createElement('a');
+  card.className = 'card';
+  card.href = url;
+  card.textContent = url;
+  root.appendChild(card);
+  fetch(url).then(r => r.text()).then(text => {
+    const doc = new DOMParser().parseFromString(text, 'text/html');
+    const meta = p => {
+      const el = doc.querySelector(`meta[property='${p}'], meta[name='${p}']`);
+      return el ? el.getAttribute('content') : '';
+    };
+    const title = meta('og:title'), desc = meta('og:description');
+    const img = meta('og:image'), ogurl = meta('og:url') || url;
+    const cardType = meta('twitter:card');
+    let host = ''; try { host = new URL(ogurl).host; } catch (e) {}
+    // og:image is an absolute production URL; serve its path from the current
+    // origin so thumbnails resolve against this server during local preview.
+    let localImg = img;
+    if (img) { try { localImg = new URL(img).pathname; } catch (e) {} }
+    card.classList.toggle('large', cardType === 'summary_large_image' && !!img);
+    card.innerHTML =
+      (img ? `<div class="thumb"><img src="${esc(localImg)}" alt=""></div>` : '') +
+      `<div class="body"><div class="host">${esc(host)}</div>` +
+      `<div class="title">${esc(title)}</div><div class="desc">${esc(desc)}</div></div>`;
+  }).catch(() => {
+    card.classList.add('failed');
+    card.textContent = 'failed to load: ' + url;
+  });
+}
+
+// Discover every article from the generated sitemap, then render its card.
+fetch('/index.html').then(r => r.text()).then(text => {
+  const doc = new DOMParser().parseFromString(text, 'text/html');
+  const urls = [...doc.querySelectorAll('a.article-card-link')].map(a => a.getAttribute('href'));
+  if (!urls.length) { root.textContent = 'No articles found in /index.html.'; return; }
+  urls.forEach(renderCard);
+}).catch(() => { root.textContent = 'Failed to load /index.html.'; });
+</script>
+</body>
+</html>

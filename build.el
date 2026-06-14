@@ -129,7 +129,7 @@
 
         ("static"
          :base-directory "./src"
-         :base-extension "js\\|css\\|png\\|jpg\\|jpeg\\|gif\\|svg\\|mp4\\|mov\\|woff2\\|pdf"
+         :base-extension "html\\|js\\|css\\|png\\|jpg\\|jpeg\\|gif\\|svg\\|mp4\\|mov\\|woff2\\|pdf"
          ;; `/ltximg/' is for previewing. MathJax is used at runtime.
          :exclude ,(rx-to-string (rx "ltximg/"))
          ;; :exclude ,(rx-to-string (rx line-start "ltximg"))
@@ -150,18 +150,53 @@
 (defvar my-codeblock-counter 0
   "Identifies coderefs in different code blocks.")
 
+(defconst my-site-url "https://toyboot4e.github.io/"
+  "Canonical site root, used to build absolute URLs for OGP tags.")
+
+(defconst my-default-description "Devlog of toyboot4e"
+  "Fallback `og:description' when an article has none.")
+
+;; Turn a possibly-relative path into an absolute URL under `my-site-url'.
+;; `http(s)' URLs are returned as-is; `nil' stays `nil'.
+(defun my-absolute-url (path)
+  (cond
+   ((or (null path) (string-empty-p (string-trim path))) nil)
+   ((string-match-p "\\`https?://" path) path)
+   (t (concat my-site-url (string-trim-left (string-trim path) "/")))))
+
+;; Best-effort `og:description': explicit `#+DESCRIPTION:', else the opening
+;; text of the article body, else the site default.
+(defun my-og-description (info contents)
+  (let ((desc (plist-get info :description)))
+    (if (org-string-nw-p (and desc (org-export-data desc info)))
+        (string-trim (my-strip-html (org-export-data desc info)))
+      (let* ((text (string-trim
+                    (replace-regexp-in-string
+                     "[ \t\n\r]+" " " (my-strip-html (or contents "")))))
+             (max-len 140))
+        (cond
+         ((string-empty-p text) my-default-description)
+         ((> (length text) max-len) (concat (substring text 0 max-len) "…"))
+         (t text))))))
+
 ;; Returns `<head>' SXML
-(defun my-html-head (info)
+(defun my-html-head (info contents)
   ;; Reset `my-codeblock-counter' on new file. TODO: move it to more appropriate place
   (setq my-codeblock-counter 0)
-  (let (;; NOTE: `org-export-data' returns HTML, so we'll remove HTML tags
+  (let* (;; NOTE: `org-export-data' returns HTML, so we'll remove HTML tags
         ;; TODO: (substring-no-properties (or (plist-get info :title) "")) may make more sense, but org-mode inline syntax must be removed
         (title (or (my-strip-html (org-export-data (plist-get info :title) info)) ""))
         (relative-path
          (replace-regexp-in-string "\\.org\\'" ".html"
                                    (file-relative-name
                                     (plist-get info :input-file)
-                                    default-directory))))
+                                    default-directory)))
+        ;; OGP / Twitter card metadata, shared by `<meta>' tags below.
+        (description (my-og-description info contents))
+        (page-url (concat my-site-url relative-path))
+        (image (my-absolute-url (plist-get info :thumbnail)))
+        ;; Big image preview when a thumbnail exists, plain summary otherwise.
+        (twitter-card (if image "summary_large_image" "summary")))
     ;; NOTE: `esxml-html' is not on MELPA
     `(head
       (meta (@ (charset "utf-8")))
@@ -170,7 +205,7 @@
                (content "width=device-width, initial-scale=1")))
       (title (*RAW-STRING* ,(concat title " - Toybeam")))
       (meta (@ (name "description")
-               (content "Devlog of toyboot4e")))
+               (content ,description)))
       ;; (link (@ (rel "stylesheet")
       ;;          (href "https://cdn.simplecss.org/simple.min.css")))
       (link (@ (rel "stylesheet")
@@ -205,23 +240,33 @@
                  (async "")
                  (src "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"))
               "")
+      ;; Open Graph protocol: <https://ogp.me/>
+      (meta (@ (property "og:type")
+               (content "article")))
       (meta (@ (property "og:title")
                (content ,title)))
-      ;; (meta (@ (property "og:description")))
-      ;; (meta (@ (property "og:type")))
+      (meta (@ (property "og:description")
+               (content ,description)))
       (meta (@ (property "og:url")
-               (content ,(concat "https://toyboot4e.github.io/" relative-path))))
+               (content ,page-url)))
       (meta (@ (property "og:site_name")
                (content "Toybeam")))
-      ;; (meta (@ (property "og:image)))
-      ;; (meta (@ (property "og:site_name")))
-      ;; (meta (@ (property "twitter:card")))
-      (meta (@ (property "twitter:creator")
+      (meta (@ (property "og:locale")
+               (content "ja_JP")))
+      ;; `og:image' is only present when the article sets `#+THUMBNAIL:'.
+      ,@(when image
+          `((meta (@ (property "og:image")
+                     (content ,image)))))
+      ;; Twitter / X card. Falls back to `og:*' for title/description/image.
+      (meta (@ (name "twitter:card")
+               (content ,twitter-card)))
+      (meta (@ (name "twitter:creator")
                (content "@toyboot4e")))
-      (meta (@ (property "twitter:site")
-               (content "Toybeam")))
-      ;; (meta (@ (property "description")))
-      ;; (meta (@ (property "generator")))
+      (meta (@ (name "twitter:site")
+               (content "@toyboot4e")))
+      ,@(when image
+          `((meta (@ (name "twitter:image")
+                     (content ,image)))))
       )))
 
 (defun create-tag-list-in-header (tags)
@@ -266,7 +311,7 @@
    "<!DOCTYPE html>\n"
    (my-sxml-to-xml
     `(html (@ (lang "ja"))
-           ,(my-html-head info)
+           ,(my-html-head info contents)
 
            (body
             ,(my-html-header info)
@@ -805,6 +850,13 @@ INFO is a plist holding contextual information.  See
 (org-export-define-derived-backend
     'my-site-html
     my-base-backend
+
+  ;; OGP options for `my-html-head' in each article:
+  ;; - `#+DESCRIPTION:' overrides `og:description'.
+  ;; - `#+THUMBNAIL:' sets `og:image' (absolute URL, or a path under the site root).
+  :options-alist
+  '((:description "DESCRIPTION" nil nil newline)
+    (:thumbnail "THUMBNAIL" nil nil t))
 
   :translate-alist
   '((template . my-org-html-template)
