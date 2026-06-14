@@ -834,7 +834,8 @@ INFO is a plist holding contextual information.  See
   (let* ((tag-list (show-tag-list all-tags))
          (devlog-cards (show-article-cards devlog-entries))
          (diary-cards (show-article-cards diary-entries)))
-    (concat "#+TITLE: " page-title "\n" "\n"
+    (concat "#+TITLE: " page-title "\n"
+            "#+DESCRIPTION: " my-default-description "\n" "\n"
             "* Tags" "\n" "\n" tag-list "\n" "\n"
             "* Devlog (timeline)" "\n" "\n" devlog-cards "\n" "\n"
             "* Diary" "\n" "\n" diary-cards)))
