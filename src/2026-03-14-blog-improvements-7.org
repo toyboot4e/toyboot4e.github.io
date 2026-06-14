@@ -1,7 +1,7 @@
 #+TITLE: =org-mode= 製ブログの改良 (7): 記事カード、ライトテーマ
 #+DATE: <2026-03-14 Sat>
 #+FILETAGS: :blog:
-#+THUMBNAIL: img/2026-03-14-article-cards-new.png
+#+THUMBNAIL: img/2026-03-14-blog-light-theme.png
 * 背景
 
 このブログのトップページは、記事一覧が格好悪いと思っていました:
