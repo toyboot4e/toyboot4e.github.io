@@ -321,12 +321,14 @@ span.code-highlighted {
   content: "";
   position: absolute;
   inset: 0;
+  /* keep the thumbnail clickable even if it's in dark mode */
+  z-index: 1;
 }
 
 .article-card a:not(.article-card-link) {
-  /* clickable on the stretched link */
+  /* clickable above the stretched link */
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 /* ToC (sticky, right side) */
