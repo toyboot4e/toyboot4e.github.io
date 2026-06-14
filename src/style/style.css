@@ -248,7 +248,7 @@ span.code-highlighted {
   gap: 4px;
 }
 
-.org-tag, .article-card {
+.org-tag {
   text-indent: 0;
   border: var(--border-width) solid var(--border);
   border-radius: var(--standard-border-radius);
@@ -263,36 +263,43 @@ span.code-highlighted {
   background-color: color-mix(in srgb, var(--accent-hover) 10%, transparent);
 }
 
+/* Article card, styled like a Twitter/OGP card. */
+.article-card {
+  position: relative;
+  text-indent: 0;
+  border: var(--border-width) solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  color: var(--text);
+  background: var(--bg);
+}
+
 .article-card:hover {
+  border-color: var(--accent-hover);
   background-color: color-mix(in srgb, var(--accent-hover) 5%, transparent);
 }
 
-.article-card {
-  /* TODO: needed? */
-  position: relative;
+/* The text content is padded, while the thumbnail stays full-bleed. */
+.article-card-body {
+  padding: 0.35rem 0.75rem;
+  line-height: 1.3;
 }
 
-/* Only add bottom padding when there's a thumbnail, so the image isn't flush
-   with the border. */
-.article-card:has(.article-card-thumbnail) {
-  padding-bottom: 0.5rem;
-}
-
-/* Thumbnail at the bottom of the card. */
+/* Thumbnail at the bottom of the card, flush to its edges. */
 .article-card-thumbnail {
   display: block;
-  /* The visible gap above the image matches the gap below. */
-  margin-top: 0.25rem;
   width: 100%;
   /* Twitter OGP image aspect */
   aspect-ratio: 1.91 / 1;
   object-fit: cover;
-  border-radius: 6px;
+  /* Flush to the card border. */
+  border-radius: 0;
   background: color-mix(in srgb, var(--text) 6%, transparent);
 }
 
 .article-card-meta {
-  font-size: 0.9rem;
+  font-size: 1rem;
+  line-height: 1.4;
 }
 
 .article-card-meta date {

@@ -805,13 +805,15 @@ INFO is a plist holding contextual information.  See
          (tags (plist-get entry :tags))
          (thumbnail (plist-get entry :thumbnail)))
     `(div (@ (class "article-card"))
-          (div (@ (class "article-card-meta"))
-               (date ,date)
-               (span (@ (class "org-tag-list"))
-                     ,@(mapcar #'create-tag-sxml tags)))
-          (div (a (@ (href ,link)
-                     (class "article-card-link"))
-                  (*RAW-STRING* ,title-html)))
+          ;; Padded text content; the thumbnail below stays flush to the border.
+          (div (@ (class "article-card-body"))
+               (div (@ (class "article-card-meta"))
+                    (date ,date)
+                    (span (@ (class "org-tag-list"))
+                          ,@(mapcar #'create-tag-sxml tags)))
+               (div (a (@ (href ,link)
+                          (class "article-card-link"))
+                       (*RAW-STRING* ,title-html))))
           ;; Thumbnail with `loading=lazy', `decoding=async' and `fetchpriority=low'.
           ,@(when thumbnail
               `((img (@ (class "article-card-thumbnail")
