@@ -13,7 +13,8 @@
           margin: 1rem 0; text-decoration: none; color: inherit; background: Canvas; }
   .card:hover { border-color: #8899a6; }
   .card .thumb { display: none; background: #f0f3f4; }
-  .card .thumb img { display: block; width: 100%; aspect-ratio: 1.91 / 1; object-fit: cover; }
+  .card .thumb img,
+  .card .thumb canvas { display: block; width: 100%; aspect-ratio: 1.91 / 1; object-fit: cover; }
   .card.large .thumb { display: block; }
   .card .body { padding: .75rem 1rem; }
   .card .host { font-size: .8rem; opacity: .6; }
@@ -52,10 +53,27 @@ function renderCard(url) {
     let localImg = img;
     if (img) { try { localImg = new URL(img).pathname; } catch (e) {} }
     card.classList.toggle('large', cardType === 'summary_large_image' && !!img);
-    card.innerHTML =
-      (img ? `<div class="thumb"><img src="${esc(localImg)}" alt=""></div>` : '') +
+    // Mimic X/Twitter: animated GIFs render as a static first frame, not animated.
+    // We draw the loaded image once into a <canvas>, which freezes that frame.
+    const isGif = !!img && /\.gif(\?|$)/i.test(img);
+    const thumb = img
+      ? (isGif
+          ? `<div class="thumb"><canvas data-src="${esc(localImg)}"></canvas></div>`
+          : `<div class="thumb"><img src="${esc(localImg)}" alt=""></div>`)
+      : '';
+    card.innerHTML = thumb +
       `<div class="body"><div class="host">${esc(host)}</div>` +
       `<div class="title">${esc(title)}</div><div class="desc">${esc(desc)}</div></div>`;
+    if (isGif) {
+      const cnv = card.querySelector('canvas[data-src]');
+      const im = new Image();
+      im.onload = () => {
+        cnv.width = im.naturalWidth;
+        cnv.height = im.naturalHeight;
+        cnv.getContext('2d').drawImage(im, 0, 0);
+      };
+      im.src = cnv.dataset.src;
+    }
   }).catch(() => {
     card.classList.add('failed');
     card.textContent = 'failed to load: ' + url;
