@@ -42,7 +42,8 @@
               zizmor
             ];
           };
-        packages = {
+        packages = rec {
+          default = devlog;
           devlog = pkgs.stdenvNoCC.mkDerivation {
             name = "devlog";
             src = ./.;
