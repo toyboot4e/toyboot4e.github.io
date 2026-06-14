@@ -1,6 +1,7 @@
 #+TITLE: 東京 Emacs 勉強会 2024/10 発表資料
 #+DATE: <2024-10-27 Sun>
 #+FILETAGS: :emacs:
+#+THUMBNAIL: img/2024-10-27-dragon-leaf.png
 
 * 初めに
 

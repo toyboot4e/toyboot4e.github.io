@@ -1,6 +1,7 @@
 #+TITLE: Evil Emacs における多重化
 #+DATE: <2023-03-12 Sun>
 #+FILETAGS: :emacs:
+#+THUMBNAIL: img/2023-03-terminal.png
 
 * 背景
 

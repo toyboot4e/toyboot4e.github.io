@@ -1,6 +1,7 @@
 #+TITLE: ライトテーマの設定
 #+DATE: <2026-03-14 Sat>
 #+FILETAGS: :emacs:tools:
+#+THUMBNAIL: img/2026-03-14-light-theme-1.png
 
 * 背景
 

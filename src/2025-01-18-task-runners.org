@@ -1,6 +1,7 @@
 #+TITLE: お試しタスクランナー (make, just, shake, ..)
 #+DATE: <2025-01-18 Sat>
 #+FILETAGS: :tools:
+#+THUMBNAIL: img/2025-01-18-just.png
 
 * 背景
 

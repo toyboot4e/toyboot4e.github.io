@@ -1,6 +1,7 @@
 #+TITLE: Nixify your packages
 #+DATE: <2025-07-28 Mon>
 #+FILETAGS: :nix:
+#+THUMBNAIL: img/2025-07-28-welcome.png
 
 * 背景
 

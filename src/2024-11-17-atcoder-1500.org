@@ -1,6 +1,7 @@
 #+TITLE: Haskell / AtCoder レーティング 1,500 到達
 #+DATE: <2024-11-17 Sun>
 #+FILETAGS: :atcoder:
+#+THUMBNAIL: img/2024-11-17-rating-1500.png
 
 * 始めに
 

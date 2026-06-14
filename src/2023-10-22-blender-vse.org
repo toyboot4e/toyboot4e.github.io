@@ -1,6 +1,7 @@
 #+TITLE: Blender VSE + Whisper + VOICEVOX
 #+DATE: <2023-10-15 Sun>
 #+FILETAGS: :blender:
+#+THUMBNAIL: img/2023-10-blender-startup.png
 
 * 背景
 

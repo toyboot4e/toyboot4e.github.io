@@ -1,6 +1,7 @@
 #+TITLE: 『新くりかえしモナドドリル』感想
 #+DATE: <2025-08-23 Sat>
 #+FILETAGS: :books:
+#+THUMBNAIL: img/2025-08-23-monad-drill.jpg
 
 * 背景
 

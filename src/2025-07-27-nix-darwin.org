@@ -1,6 +1,7 @@
 #+TITLE: Nixify your Mac
 #+DATE: <2025-07-27 Sun>
 #+FILETAGS: :nix:
+#+THUMBNAIL: img/2025-07-27-mission-control.png
 
 * 背景
 

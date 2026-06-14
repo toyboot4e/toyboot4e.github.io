@@ -1,6 +1,7 @@
 #+TITLE: Mejiro31 キーボード
 #+DATE: <2026-03-21 Sat>
 #+FILETAGS: :keyboard:steno:
+#+THUMBNAIL: img/2025-03-23-dilemma-v2.jpg
 
 * 背景
 

@@ -1,6 +1,7 @@
 #+TITLE: AtCoder 用テンプレートの紹介 (Haskell)
 #+DATE: <2025-12-02 Tue>
 #+FILETAGS: :atcoder:haskell:
+#+THUMBNAIL: img/2025-12-02-graph.png
 
 この記事は [[https://qiita.com/advent-calendar/2025/haskell][Haskell Advent Calendar 2025]] の 2 日目の投稿です。
 

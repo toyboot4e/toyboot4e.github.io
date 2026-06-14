@@ -10,6 +10,7 @@
 #+LINK: nix-1p https://github.com/tazjin/nix-1p
 #+LINK: nix-direnv https://github.com/nix-community/nix-direnv
 #+LINK: nixos https://nixos.org/
+#+THUMBNAIL: img/2023-03-desktop.png
 
 NixOS をメイン機として使えるようになりました。主な設定を紹介します。
 

@@ -1,6 +1,7 @@
 #+TITLE: Entity-Component-System の 3種類のストレージ
 #+DATE: <2022-12-11 Sat>
 #+FILETAGS: :gamedev:
+#+THUMBNAIL: img/2023-12-toecs-big-array.png
 
 #+LINK: bevy https://bevyengine.org/
 #+LINK: entt https://github.com/skypjack/entt

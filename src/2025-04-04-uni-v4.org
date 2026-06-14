@@ -1,6 +1,7 @@
 #+TITLE: Uni V4 購入
 #+DATE: <2025-04-04 Fri>
 #+FILETAGS: :keyboard:steno
+#+THUMBNAIL: img/2025-03-23-dilemma-v2.jpg
 
 * 背景
 

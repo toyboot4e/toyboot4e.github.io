@@ -1,6 +1,7 @@
 #+TITLE: 現在の Keyball 44 の運用 (34 キー操作)
 #+DATE: <2024-11-11 Mon>
 #+FILETAGS: :keyboard:
+#+THUMBNAIL: img/2023-08-keyball44.jpg
 
 * 背景
 

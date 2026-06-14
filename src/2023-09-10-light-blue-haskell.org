@@ -1,6 +1,7 @@
 #+TITLE: Haskell / AtCoder 入水！
 #+DATE: <2023-09-10 Sat>
 #+FILETAGS: :atcoder:haskell:
+#+THUMBNAIL: img/2023-09-rating-1230.png
 
 AtCoder でレーティング 1,200 を超えました！　自慢します。
 

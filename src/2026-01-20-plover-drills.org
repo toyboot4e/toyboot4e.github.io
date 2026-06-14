@@ -1,6 +1,7 @@
 #+TITLE: React 入門 - 2: Plover Drills
 #+DATE: <2026-01-20 Tue>
 #+FILETAGS: :react:keyboard:steno:
+#+THUMBNAIL: img/2026-01-20-lapwing-tools-demo.gif
 
 * 背景
 
