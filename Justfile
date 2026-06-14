@@ -7,9 +7,9 @@ set positional-arguments
 help:
     @just -l
 
-# build the devlog
+# build the devlog (-d --draft, -f --force)
 build *args:
-    emacs -Q --script "./build.el"
+    emacs -Q --script "./build.el" -- {{args}}
 
 [private]
 alias b := build

@@ -113,18 +113,13 @@
       `(
         ;; build targets:
         ("release" :components ("static" "release-posts"))
-        ("draft" :components ("static" "release-posts" "draft-posts"))
+        ("draft" :components ("static" "release-posts"))
 
         ;; components:
         ("release-posts" ,@base-attrs
          :base-directory "./src/"
          :recursive t
          ;; :include ,(mapcar (lambda (x) (concat "./src/" x)) (directory-files "./src" nil "\\.org$"))
-         )
-
-        ("draft-posts" ,@base-attrs
-         :base-directory "./draft"
-         :recursive t
          )
 
         ("static"
@@ -741,7 +736,7 @@ INFO is a plist holding contextual information.  See
     (insert-file-contents org-file)
     (my-org-global-prop-value key)))
 
-;; Returns a plist of `filepath', 'href', `title', `date' and `tags'.
+;; Returns a plist of `filepath', 'href', `title', `date', `tags' and `draft'.
 (defun collect-org-files (base-dir filter-p)
   (let* ((files (seq-filter
                  (lambda (s)
@@ -764,8 +759,9 @@ INFO is a plist holding contextual information.  See
                             (tags (split-string
                                    (replace-regexp-in-string
                                     ":" " "
-                                    (string-trim filetags " ")))))
-                       (list :filepath filepath :href href :title title :date date :tags tags)))
+                                    (string-trim filetags " "))))
+                            (draft (org-string-nw-p (my-org-read-prop s "DRAFT"))))
+                       (list :filepath filepath :href href :title title :date date :tags tags :draft draft)))
                    files)))
 
     (sort
@@ -878,14 +874,20 @@ INFO is a plist holding contextual information.  See
 
 ;;; Build
 
-;; release build by default, ignoring drafts
-(setq build-target "release")
-(setq force-flag nil) ;; TODO: set from CLI
+;; Build options:
+;; - `-d' / `--draft': includes the `#+DRAFT' articles.
+;; - `-f' / `--force': rebuilds every file, ignoring the timestamp cache.
+(let ((args command-line-args-left))
+  (setq build-target (if (or (member "-d" args) (member "--draft" args)) "draft" "release"))
+  (setq force-flag (or (member "-f" args) (member "--force" args))))
 
 (message "--------------------------------------------------------------------------------")
 (message "Building project!")
 
 (let* ((base-dir "src")
+       ;; TODO: drop draft-flagged articles in release builds:
+       ;; (is-draft (string= build-target "draft"))
+       ;; (keep-p (lambda (entry) (or is-draft (not (plist-get entry :draft)))))
        ;; "src/*.org"
        (devlog-entries
         (collect-org-files
