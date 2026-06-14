@@ -159,6 +159,14 @@
    ((string-match-p "\\`https?://" path) path)
    (t (concat my-site-url (string-trim-left (string-trim path) "/")))))
 
+;; Like `my-absolute-url' but produces a root-relative URL (e.g. `/img/x.png'),
+;; suitable for inline `<img src>' in the top page.
+(defun my-thumbnail-src (path)
+  (cond
+   ((or (null path) (string-empty-p (string-trim path))) nil)
+   ((string-match-p "\\`https?://" path) path)
+   (t (concat "/" (string-trim-left (string-trim path) "/")))))
+
 ;; Best-effort `og:description': explicit `#+DESCRIPTION:', else the opening
 ;; text of the article body, else the site default.
 (defun my-og-description (info contents)
@@ -760,8 +768,9 @@ INFO is a plist holding contextual information.  See
                                    (replace-regexp-in-string
                                     ":" " "
                                     (string-trim filetags " "))))
-                            (draft (org-string-nw-p (my-org-read-prop s "DRAFT"))))
-                       (list :filepath filepath :href href :title title :date date :tags tags :draft draft)))
+                            (draft (org-string-nw-p (my-org-read-prop s "DRAFT")))
+                            (thumbnail (my-thumbnail-src (my-org-read-prop s "THUMBNAIL"))))
+                       (list :filepath filepath :href href :title title :date date :tags tags :draft draft :thumbnail thumbnail)))
                    files)))
 
     (sort
@@ -793,7 +802,8 @@ INFO is a plist holding contextual information.  See
          (title-html (replace-regexp-in-string "^<p>\\|</p>$" "" (org-export-string-as title 'html t '(:body-only t))))
          (date (plist-get entry :date))
          (link (plist-get entry :href))
-         (tags (plist-get entry :tags)))
+         (tags (plist-get entry :tags))
+         (thumbnail (plist-get entry :thumbnail)))
     `(div (@ (class "article-card"))
           (div (@ (class "article-card-meta"))
                (date ,date)
@@ -801,7 +811,15 @@ INFO is a plist holding contextual information.  See
                      ,@(mapcar #'create-tag-sxml tags)))
           (div (a (@ (href ,link)
                      (class "article-card-link"))
-                  (*RAW-STRING* ,title-html))))))
+                  (*RAW-STRING* ,title-html)))
+          ;; Thumbnail with `loading=lazy', `decoding=async' and `fetchpriority=low'.
+          ,@(when thumbnail
+              `((img (@ (class "article-card-thumbnail")
+                        (src ,thumbnail)
+                        (alt "")
+                        (loading "lazy")
+                        (decoding "async")
+                        (fetchpriority "low"))))))))
 
 (defun show-article-cards (entries)
   (join-with-newline

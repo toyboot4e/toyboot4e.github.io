@@ -272,6 +272,25 @@ span.code-highlighted {
   position: relative;
 }
 
+/* Only add bottom padding when there's a thumbnail, so the image isn't flush
+   with the border. */
+.article-card:has(.article-card-thumbnail) {
+  padding-bottom: 0.5rem;
+}
+
+/* Thumbnail at the bottom of the card. */
+.article-card-thumbnail {
+  display: block;
+  /* The visible gap above the image matches the gap below. */
+  margin-top: 0.25rem;
+  width: 100%;
+  /* Twitter OGP image aspect */
+  aspect-ratio: 1.91 / 1;
+  object-fit: cover;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
 .article-card-meta {
   font-size: 0.9rem;
 }
