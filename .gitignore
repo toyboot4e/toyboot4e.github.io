@@ -5,6 +5,7 @@
 ltximg
 /result
 /.direnv
+/.org-timestamps
 /src/index.org
 /src/tags
 

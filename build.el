@@ -53,7 +53,10 @@
   ;; Prefer `<figure>' tag to <div>', etc.
   (setq org-html-html5-fancy t)
 
-  (require 'ox-publish))
+  (require 'ox-publish)
+
+  ;; Store timestamps within this repository, not in global:
+  (setq org-publish-timestamp-directory "./.org-timestamps/"))
 
 ;;; Ingredients
 

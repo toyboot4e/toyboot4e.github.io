@@ -18,6 +18,8 @@ alias b := build
 clean:
     echo "cleaning up the \`out/\` directory.."
     rm -rf out/* > /dev/null 2>&1
+    # force rebuild in the next `just build`:
+    rm -rf .org-timestamps
 
 [private]
 alias c := clean
