@@ -49,6 +49,49 @@ serve:
 [private]
 alias s := serve
 
+# audit a built page with Lighthouse (needs `just serve` running)
+audit page="index.html":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Audits the running `just serve` (port 8080); start it first in another shell.
+    if ! curl -sf -o /dev/null "http://localhost:8080/{{page}}" ; then
+        echo "no server on :8080 — run \`just serve\` in another shell first" >&2
+        exit 1
+    fi
+    CHROME_PATH="$(command -v chromium)" npx --yes lighthouse@latest \
+        "http://localhost:8080/{{page}}" \
+        --quiet --output=html --output=json --output-path=/tmp/lh-report \
+        --chrome-flags="--headless=new --no-sandbox --disable-gpu" \
+        --only-categories=performance,accessibility,best-practices,seo
+    echo "report: /tmp/lh-report.report.html"
+
+[private]
+alias a := audit
+
+# audit, then open the HTML report in a browser
+audit-open page="index.html": (audit page)
+    xdg-open /tmp/lh-report.report.html
+
+# audit, then print a compact, agent-friendly summary from the report JSON
+audit-ai page="index.html": (audit page)
+    #!/usr/bin/env bash
+    set -euo pipefail
+    node -e '
+      const r = require("/tmp/lh-report.report.json");
+      const a = r.audits;
+      const sc = (o) => Math.round(o.score * 100);
+      console.log("# Lighthouse — " + (r.finalDisplayedUrl || r.finalUrl || r.requestedUrl));
+      console.log(Object.values(r.categories).map((c) => c.title + " " + sc(c)).join(" | "));
+      const m = ["first-contentful-paint","largest-contentful-paint","total-blocking-time","cumulative-layout-shift","speed-index"];
+      console.log("\nMetrics: " + m.filter((k) => a[k]).map((k) => a[k].title + " " + a[k].displayValue).join(" | "));
+      const fails = Object.values(a).filter((x) => x.score !== null && x.score < 0.9).sort((x, y) => x.score - y.score);
+      console.log("\nIssues (" + fails.length + "):");
+      for (const x of fails) {
+        const ms = x.details && x.details.overallSavingsMs ? " (~" + Math.round(x.details.overallSavingsMs) + "ms)" : "";
+        console.log("- [" + Math.round(x.score * 100) + "] " + x.title + ms);
+      }
+    '
+
 # start watching source files and runs `build` on chane
 watch *args:
     #!/usr/bin/env bash
