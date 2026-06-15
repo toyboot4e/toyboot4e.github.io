@@ -151,13 +151,17 @@
 (defconst my-default-description "Devlog of toyboot4e"
   "Fallback `og:description' when an article has none.")
 
+;; e.g. `./img/x' or `/img/x' -> `img/x'
+(defun my-clean-relative-path (path)
+  (replace-regexp-in-string "\\`\\(?:\\./\\|/\\)+" "" (string-trim path)))
+
 ;; Turn a possibly-relative path into an absolute URL under `my-site-url'.
 ;; `http(s)' URLs are returned as-is; `nil' stays `nil'.
 (defun my-absolute-url (path)
   (cond
    ((or (null path) (string-empty-p (string-trim path))) nil)
    ((string-match-p "\\`https?://" path) path)
-   (t (concat my-site-url (string-trim-left (string-trim path) "/")))))
+   (t (concat my-site-url (my-clean-relative-path path)))))
 
 ;; Like `my-absolute-url' but produces a root-relative URL (e.g. `/img/x.png'),
 ;; suitable for inline `<img src>' in the top page.
@@ -165,7 +169,7 @@
   (cond
    ((or (null path) (string-empty-p (string-trim path))) nil)
    ((string-match-p "\\`https?://" path) path)
-   (t (concat "/" (string-trim-left (string-trim path) "/")))))
+   (t (concat "/" (my-clean-relative-path path)))))
 
 ;; Best-effort `og:description': explicit `#+DESCRIPTION:', else the opening
 ;; text of the article body, else the site default.
