@@ -198,7 +198,7 @@ main = do
 Cabal プロジェクトの設定としては [[https://github.com/haskell/vector/tree/master/vector][vector]] が参考になった。 =tasty-bench= の方が軽くて良かったが、 =criterion= は結果の時間軸を対数にして表示できるのが良かった:
 
 #+CAPTION: [[https://atcoder.jp/contests/dp/tasks/dp_d][EDPC D - Knapsack 1]] のベンチマーク結果。
-[[./img/2023-11-05-criterion.png]]
+[[./img/2023-11-05-criterion.webp]]
 
 =vector= は =tasty-bench= を使用しているが、 =criterion= とほぼ共通の API のため乗り換えは簡単。
 

@@ -6,7 +6,7 @@
 [[https://atcoder.jp/contests/arc181][ARC 181]] に参加しました。なんと D 問題が解けました！　バイブスあげてこー！
 
 #+CAPTION: [[https://atcoder-replay.kakira.dev/][AtCoder Replay]]
-[[./img/2024-08-11-arc.png]]
+[[./img/2024-08-11-arc.webp]]
 
 ** [[https://atcoder.jp/contests/arc181/tasks/arc181_a][A 問題]]
 
@@ -72,13 +72,13 @@ Wavelet Matrix の頭文字は WM. ウィンドウマネージャと同じくら
 
 入力は座標圧縮済みの数列とします。上位 bit から順番に、その bit の 01 を基準に数列をソートしていきます。
 
-[[./img/2024-08-11-wavelet-matrix-1.png]]
+[[./img/2024-08-11-wavelet-matrix-1.webp]]
 
 *** =kthMin=
 
 各行の bit 列が wavelet matrix の本体です。たとえば $[l, r]$ 区間中の K 番目に小さい数を求めるためには、次のように上から下に降りていきます:
 
-[[./img/2024-08-11-wavelet-matrix-2.png]]
+[[./img/2024-08-11-wavelet-matrix-2.webp]]
 
 各行 (各 bit) で区間 <---> が 2 分されていきます。最下段まで降りるまでの bit 値は 0, 0, 1 の順番だったため、答えは =0b001 = 1= です。また区間が 2 分されるとき、左へ降りるか右へ降りるかを $O(1)$ で判定するために、事前に各 bit の累積和を作成します。
 
@@ -165,7 +165,7 @@ class SegmentTreeAction op a where
 
 [[https://github.com/rksm/org-ai][org-ai]] から gpt-4o を使い始めました。爆速ではないか……！
 
-[[./img/2024-08-11-org-ai.png]]
+[[./img/2024-08-11-org-ai.webp]]
 
 やはりブラウザよりも使い勝手が良いです。フロントエンド (コマンド) も充実していて応用が効きそうです。
 

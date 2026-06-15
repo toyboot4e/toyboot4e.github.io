@@ -69,7 +69,7 @@ solve (WAIT, !queue, !heap) = {- TODO -}
 X で流れてきた [[https://www.intel.com/content/www/us/en/company-overview/one-monospace-font.html][Intel One Mono]] フォントに変えてみた。 Adobe の [[https://fonts.adobe.com/fonts/source-code-pro#fonts-section][Source Code Pro]] も見やすがウリだったけれど、より大胆な見た目になっている。
 
 #+CAPTION: Intel One Mono フォント。 `{ }` のデザインがすごい。
-[[./img/2023-10-15-intel-one-mono.png]]
+[[./img/2023-10-15-intel-one-mono.webp]]
 
 日本語と混ぜると引き締まって良い。なお [[https://github.com/ryanoasis/nerd-fonts/issues/1238][5 月時点で NerdFonts にも収録済みだった]] 。
 

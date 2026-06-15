@@ -1,7 +1,7 @@
 #+TITLE: =org-mode= 製ブログの改良 (5): タグとヘッダ
 #+DATE: <2025-07-21 Mon>
 #+FILETAGS: :blog:
-#+THUMBNAIL: img/2025-07-21-header-after.png
+#+THUMBNAIL: img/2025-07-21-header-after.webp
 
 * 背景
 
@@ -14,7 +14,7 @@
 変更前のトップページは以下です。シンプルでした:
 
 #+BEGIN_QUOTE
-[[./img/2025-07-21-header-before.png]]
+[[./img/2025-07-21-header-before.webp]]
 #+END_QUOTE
 
 ** 変更後
@@ -22,7 +22,7 @@
 変更後のトップページは以下です。ごちゃごちゃしていますが、タグごとに記事を見れるようになりました:
 
 #+BEGIN_QUOTE
-[[./img/2025-07-21-header-after.png]]
+[[./img/2025-07-21-header-after.webp]]
 #+END_QUOTE
 
 ** =#+FILETAGS= について

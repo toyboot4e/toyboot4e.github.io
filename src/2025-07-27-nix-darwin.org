@@ -1,7 +1,7 @@
 #+TITLE: Nixify your Mac
 #+DATE: <2025-07-27 Sun>
 #+FILETAGS: :nix:
-#+THUMBNAIL: img/2025-07-27-mission-control.png
+#+THUMBNAIL: img/2025-07-27-mission-control.webp
 
 * 背景
 
@@ -21,7 +21,7 @@ macOS の言語設定を英語、キーボード設定を JIS にしました。
 
 Mission Control のショートカットを有効化しました。これは yabai (後述) よりも高速でデスクトップの切り替えができるため、おすすめです:
 
-[[./img/2025-07-27-mission-control.png]]
+[[./img/2025-07-27-mission-control.webp]]
 
 ** Nix
 
@@ -72,7 +72,7 @@ Nix のファイル構成に関しては、 [[https://github.com/takeokunn/nixos
 我らが [[https://karabiner-elements.pqrs.org/][Karabiner Elements]] ですが、 IME の切り替えのみ設定しました。
 
 #+CAPTION: Karabiner Elements の設定
-[[./img/2025-07-27-karabiner.png]]
+[[./img/2025-07-27-karabiner.webp]]
 
 ** yabai / skhd
 

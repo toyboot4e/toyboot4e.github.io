@@ -1,7 +1,7 @@
 #+TITLE: Entity-Component-System の 3種類のストレージ
 #+DATE: <2022-12-11 Sat>
 #+FILETAGS: :gamedev:
-#+THUMBNAIL: img/2023-12-toecs-big-array.png
+#+THUMBNAIL: img/2023-12-toecs-big-array.webp
 
 #+LINK: bevy https://bevyengine.org/
 #+LINK: entt https://github.com/skypjack/entt
@@ -32,7 +32,7 @@
 
 まずは ECS の概念図を説明します。コンポーネント配列 (横列) に対し、 =Entity= は添字に相当します:
 
-[[./img/2023-12-toecs-big-array.png]]
+[[./img/2023-12-toecs-big-array.webp]]
 
 それぞれのコンポーネントは optional ですから、 =Vec<Option<T>>= をコンポーネントストレージにするのが ECS の最も簡単な実装です。
 
@@ -40,7 +40,7 @@
 
 こちらは詳しくないため、図だけ載せます:
 
-[[./img/2023-12-toecs-archetype-storage.png]]
+[[./img/2023-12-toecs-archetype-storage.webp]]
 
 - Component セット毎に archetype ストレージを作成します
   - Archetype ストレージの内部実装は ={ Vec<A>, Vec<B>, .. }= のような形です (SoA: struct of arrays)
@@ -73,7 +73,7 @@ pub struct World {
 
 そこで =SparseSet<T>= においては、コンポーネント配列を連続した配列に入れます (=Vec<T>=) 。また =Entity= からコンポーネント配列への添字アクセスの間接層を追加します (=Vec<Option<DenseIndex>>=):
 
-[[./img/2023-12-toecs-sparse-set.png]]
+[[./img/2023-12-toecs-sparse-set.webp]]
 
 より詳しく実装を解説します。
 
@@ -101,13 +101,13 @@ pub struct Entity {
 
 =Entity= 経由のアクセスは添字のマッピングを経由するため、メモリ局所性が落ちてしまいます。最速でイテレーションするためには、『グループ』という仕組みを使います。グループ化された =Entity= のコンポーネントには、すべて共通の =DenseIndex= からアクセスできます:
 
-[[./img/2023-12-toecs-groups.png]]
+[[./img/2023-12-toecs-groups.webp]]
 
 これは =Entity= を削除したり、 =Entity= にコンポーネントを追加・削除する際のグループの更新処理で実現されます:
 
-[[./img/2023-12-toecs-group-sync.png]]
+[[./img/2023-12-toecs-group-sync.webp]]
 
-[[./img/2023-12-toecs-group-unsync.png]]
+[[./img/2023-12-toecs-group-unsync.webp]]
 
 *** =Entity= の挿入と削除について
 
@@ -115,15 +115,15 @@ pub struct Entity {
 
 例として以下の初期状態を考えます:
 
-[[./img/2023-12-toecs-free-slot.png]]
+[[./img/2023-12-toecs-free-slot.webp]]
 
 初期状態からデータを追加した後は:
 
-[[./img/2023-12-toecs-free-slot-insert.png]]
+[[./img/2023-12-toecs-free-slot-insert.webp]]
 
 初期状態からデータを削除した後は:
 
-[[./img/2023-12-toecs-free-slot-remove.png]]
+[[./img/2023-12-toecs-free-slot-remove.webp]]
 
 *** =Entity= の削除について
 

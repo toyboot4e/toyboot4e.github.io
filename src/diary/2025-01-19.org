@@ -128,7 +128,7 @@ solve = do
 [[https://toyboot4e.github.io/2025-01-18-task-runners.html][お試しタスクランナー]] の後、 =ac-library-hs= に =Justfile= を導入しました [[https://github.com/toyboot4e/ac-library-hs/commit/d74035fb2528c65a41833d1d8e7d61ec48558174][(該当のコミット)]] 。これが結構良い感じです。書き味良し、見た目良し！:
 
 #+CAPTION: =Justfile= のコマンド一覧
-[[./img/2025-01-19-just.png]]
+[[./img/2025-01-19-just.webp]]
 
 #+CAPTION: テスト実行の例
 #+BEGIN_SRC sh

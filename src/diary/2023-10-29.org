@@ -12,7 +12,7 @@
 青 diff DP を 3 問解いた。 TEE を見ると約 2 ヶ月の周期性があったので脱したい。
 
 #+CAPTION: 4 月初旬から 10 月下旬の TEE の推移
-[[./img/2023-10-29-tee.png]]
+[[./img/2023-10-29-tee.webp]]
 
 ** AHC 025
 
@@ -50,7 +50,7 @@ twoPointers len p = _ {-# 実装は汚いので省略…… #-}
 
 #+ATTR_HTML: :width 551px
 #+CAPTION: 期待値 DP の雰囲気
-[[./img/2023-10-29-ex-dp.png]]
+[[./img/2023-10-29-ex-dp.webp]]
 
 $dp[i] := E_i$ はトポロジカル順に求める (終点から順に求める) 。今回の問題における遷移を整理すると $E_i = \sum_j (E_j + \Delta x_{i, j}) \frac 1 N = (\sum_j E_j + \sum_j \Delta x_{i j}) \frac 1 N$ であり、それぞれの $\sum$ をセグメント木と累積和から計算できた。セグメント木も累積和にした方が賢い。
 
@@ -69,7 +69,7 @@ $dp[i] := E_i$ はトポロジカル順に求める (終点から順に求める
 1/2 の確率で表が出るコインがある。 3 回表を出すまでにコインを投げる回数の期待値は？
 
 #+ATTR_HTML: :width 880px
-[[./img/2023-10-29-coin-dp.png]]
+[[./img/2023-10-29-coin-dp.webp]]
 
 DP 的な式整理無しで解くのは無理な気がする。まず $E_2 = \sum\limits_i p_i x_i = \sum_\limits{n=1}^{\infty} \frac n {2^n} = 2$ 。 $E_1$ は……考えたくない。。
 

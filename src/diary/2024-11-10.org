@@ -57,7 +57,7 @@ solve = do
 奇妙な問題設定が話題になりました。
 
 #+CAPTION: "競プロ準拠の人体"
-[[./img/2024-11-10-chokudai.png]]
+[[./img/2024-11-10-chokudai.webp]]
 
 ** 感想
 

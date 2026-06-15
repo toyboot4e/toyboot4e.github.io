@@ -1,7 +1,7 @@
 #+TITLE: Fortran, 難し過ぎる
 #+DATE: <2024-12-19 Thu>
 #+FILETAGS: :misc:
-#+THUMBNAIL: img/2024-12-19-emacs.png
+#+THUMBNAIL: img/2024-12-19-emacs.webp
 
 [[https://qiita.com/advent-calendar/2024/fortran][Fortran Advent Calendar 2024]] の 19 日目の記事です。 Fortran 入門の三歩手前ぐらいの内容です。
 
@@ -19,7 +19,7 @@
 
 #+CAPTION: Emacs
 #+ATTR_HTML: :width 405dpx
-[[./img/2024-12-19-emacs.png]]
+[[./img/2024-12-19-emacs.webp]]
 
 [[https://atcoder.jp/contests/abs/tasks/abc086_a?lang=ja][AtCoder の一番簡単な問題]] を解いてみましたが、その後の進捗がありません。エアプで良いので、もう少し理解を進める手立ては無いものでしょうか？
 

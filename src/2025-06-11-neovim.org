@@ -1,7 +1,7 @@
 #+TITLE: =org-mode= で Neovim に入門してみました
 #+DATE: <2025-06-11 Wed>
 #+FILETAGS: :vim:
-#+THUMBNAIL: img/2025-06-11-lazy-nvim.png
+#+THUMBNAIL: img/2025-06-11-lazy-nvim.webp
 
 [[https://vim-jp.org/ekiden/][Vim 駅伝]] 2025/06/11 の投稿です。前回の記事は、あべべさんの [[https://zenn.dev/abebe123000/articles/f5fd75017c3e08][vim マクロで楽する！実践例あり]] でした。
 
@@ -194,7 +194,7 @@ Tangled 2 code blocks from init.
 =tangle= してから Neovim を起動すると、ダッシュボードが起動し、プラグインをインストールできました:
 
 #+CAPTION: =lazy.nvim= のダッシュボード (格好いい！)
-[[./img/2025-06-11-lazy-nvim.png]]
+[[./img/2025-06-11-lazy-nvim.webp]]
 
 =config= を設定すると、カーソル移動に応じてステータスバーが更新されるようになりました:
 
@@ -222,13 +222,13 @@ Tangled 2 code blocks from init.
 
 #+CAPTION: Neovim から見た =init.org=
 #+ATTR_HTML: :width 500px
-[[./img/2025-06-11-nvim-orgmode-headers.png]]
+[[./img/2025-06-11-nvim-orgmode-headers.webp]]
 
 Emacs から見るとこうで、 =#+STARTUP: nofold= が反映されています。この動きが正しいです:
 
 #+CAPTION: Emacs から見た =init.org=
 #+ATTR_HTML: :width 500px
-[[./img/2025-06-11-org-mode-headers.png]]
+[[./img/2025-06-11-org-mode-headers.webp]]
 
 いきなり未実装機能 ([[https://github.com/nvim-orgmode/orgmode/issues/394][nvim-orgmode/orgmode#394]]) を引いてしまいました。どうしても欲しい機能にはコントリビュートする必要がありそうです。
 

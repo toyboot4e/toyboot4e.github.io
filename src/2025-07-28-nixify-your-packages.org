@@ -1,7 +1,7 @@
 #+TITLE: Nixify your packages
 #+DATE: <2025-07-28 Mon>
 #+FILETAGS: :nix:
-#+THUMBNAIL: img/2025-07-28-welcome.png
+#+THUMBNAIL: img/2025-07-28-welcome.webp
 
 * 背景
 
@@ -142,7 +142,7 @@ oj-verify =
 今後は [[https://github.com/Tatamo/atcoder-cli][atcoder-cli]], [[https://github.com/competitive-verifier/competitive-verifier][competitive-verifier]], [[https://github.com/ronaldoussoren/pyobjc][pyobjc-framework-Quartz]] など、自分が必要なパッケージを nixpkgs へ追加して行く予定です。
 
 #+CAPTION: ありがとうございます！
-[[./img/2025-07-28-welcome.png]]
+[[./img/2025-07-28-welcome.webp]]
 
 ** おまけ: RSS
 

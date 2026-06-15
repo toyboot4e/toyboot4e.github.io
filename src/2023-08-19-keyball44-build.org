@@ -1,14 +1,14 @@
 #+TITLE: Keyball 44 組み立て
 #+DATE: <2023-08-19 Sat>
 #+FILETAGS: :keyboard:
-#+THUMBNAIL: img/2023-08-keyball44.jpg
+#+THUMBNAIL: img/2023-08-keyball44.webp
 
 * 背景
 
 [[./2023-07-31-keyball44-prepare.html][前回の投稿]] で [[https://shirogane-lab.net/items/64b7a006eb6dbe00346cd0c5][Keyball 44]] の注文に成功し、お洒落なキーボード画像を多数拝見しました。今回はその他の購買と組み立てをやっていきます。
 
 #+CAPTION: 完成品 (右手部分)
-[[./img/2023-08-keyball44.jpg]]
+[[./img/2023-08-keyball44.webp]]
 
 ** 情報収集
 

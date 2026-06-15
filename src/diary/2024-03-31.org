@@ -78,7 +78,7 @@ ghci> join (++) [1,2,3]
 
 Dijkstra を貼っただけで Fastest が取れてしまいました。
 
-[[./img/2024-03-31-fastest.png]]
+[[./img/2024-03-31-fastest.webp]]
 
 穴場だと思うので、 fastest が欲しければおすすめです。 [[https://atcoder.jp/contests/past202203-open/submissions?f.LanguageName=&f.Status=AC&f.Task=past202203_k&f.User=&orderBy=time_consumption][提出一覧]]
 

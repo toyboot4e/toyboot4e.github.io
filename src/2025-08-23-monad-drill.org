@@ -1,14 +1,14 @@
 #+TITLE: 『新くりかえしモナドドリル』感想
 #+DATE: <2025-08-23 Sat>
 #+FILETAGS: :books:
-#+THUMBNAIL: img/2025-08-23-monad-drill.jpg
+#+THUMBNAIL: img/2025-08-23-monad-drill.webp
 
 * 背景
 
 [[https://doujin.kakkun61.com/monad-drill][新くりかえしモナドドリル]] を解いてみました。これは Haskell のモナドと =do= 記法に関する小さな問題集です。タイトル通り、夏休みの宿題みたいな見た目をしています。
 
 #+ATTR_HTML: :width 50%
-[[./img/2025-08-23-monad-drill.jpg]]
+[[./img/2025-08-23-monad-drill.webp]]
 
 * =do= 記法を理解する
 

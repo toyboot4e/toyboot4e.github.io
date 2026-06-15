@@ -1,13 +1,13 @@
 #+TITLE: =org-mode= 製ブログの改良 (7): 記事カード、ライトテーマ
 #+DATE: <2026-03-14 Sat>
 #+FILETAGS: :blog:
-#+THUMBNAIL: img/2026-03-14-blog-light-theme.png
+#+THUMBNAIL: img/2026-03-14-blog-light-theme.webp
 * 背景
 
 このブログのトップページは、記事一覧が格好悪いと思っていました:
 
 #+CAPTION: リスト表示
-[[./img/2026-03-14-article-cards-old.png]]
+[[./img/2026-03-14-article-cards-old.webp]]
 
 [[https://technicalsuwako.moe/][人のブログ]] を見ると、やはりカード風の表示が良いですね。
 
@@ -18,7 +18,7 @@
 記事のカード表示を実装してみました。記事のタイトルが左寄せになったため、視認性が改善したと思います:
 
 #+CAPTION: カード表示
-[[./img/2026-03-14-article-cards-new.png]]
+[[./img/2026-03-14-article-cards-new.webp]]
 
 タグがスペースを取り過ぎているため、まだ調整が必要かとは思います。
 
@@ -27,7 +27,7 @@
 別件ですが、 OS の設定に応じて [[https://simplecss.org/][Simple.css]] のライトテーマが表示するように変更しました (ダークテーマの強制を解除しました):
 
 #+CAPTION: カード表示 (ライトテーマ)
-[[./img/2026-03-14-blog-light-theme.png]]
+[[./img/2026-03-14-blog-light-theme.webp]]
 
 Prism.js によるコードスタイルも、 light/dark 両対応にしました:
 

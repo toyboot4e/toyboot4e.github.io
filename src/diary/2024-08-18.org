@@ -137,11 +137,11 @@ One-shot なダブリングは [[https://hackage.haskell.org/package/base-4.20.0
 
 先週の図を前提として、 =rank= (=freq=, =count=) や =fold= は以下のように実装します:
 
-[[./img/2024-08-18-segment-tree-on-wavelet-matrix-1.png]]
+[[./img/2024-08-18-segment-tree-on-wavelet-matrix-1.webp]]
 
 たとえば 2 番目の =1= に注目すると、ちょうど 1 回だけ =fold= の対象になっていることが分かります:
 
-[[./img/2024-08-18-segment-tree-on-wavelet-matrix-2.png]]
+[[./img/2024-08-18-segment-tree-on-wavelet-matrix-2.webp]]
 
 したがって bit 毎に (各行に) セグメント木を持って畳み込めば、 =freq= と同じ要領で =fold= を実装できます。凄いなー……
 

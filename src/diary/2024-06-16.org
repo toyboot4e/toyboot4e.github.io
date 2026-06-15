@@ -99,7 +99,7 @@ zOfNaive bs = U.generate (BS.length bs) z
 $s$ と接尾辞 (\(s[1:], s[2:], \dots\)) のマッチの内、最も右端までマッチした範囲を /z-box/ と呼んで保持します。 z-box 内の $i$ に対する $z[i]$ の計算には $z[i'] (i' < i)$ の計算結果を利用できます:
 
 #+ATTR_HTML: :width 371px
-[[./img/2024-06-16-z-function.png]]
+[[./img/2024-06-16-z-function.webp]]
 
 実装中は z-box を状態に持って =constructN= したくなりました。しかし =constructN= が引数に取るのは純粋関数です。やはり [[https://github.com/cojna/iota/blob/d6b5d9cbb38de5dea2c151663776858a413abde5/src/Data/ByteString/ZAlgorithm.hs][cojna さんの実装]] と同様に可変配列を手動管理しました。 [[https://github.com/toyboot4e/toy-lib/blob/ef9b371ce11a2dc8dd0195c6bd0c615f345770da/src/Data/ByteString/ZFunction.hs][僕の実装 (ZFunction.hs)]]
 
@@ -279,7 +279,7 @@ saOfNaive bs =
 Emacs ではアイコンレスなターミナル人生を歩んで来ましたが、 [[https://github.com/rainstormstudio/nerd-icons.el][nerd-icons.el]] により華やかになりました。この 1 週間、何度見ても嬉しいです。
 
 #+CAPTION: my wife
-[[./img/2024-06-16-nerd-icons.png]]
+[[./img/2024-06-16-nerd-icons.webp]]
 
 =neotree= に関しては [[https://github.com/jaypei/emacs-neotree/pull/359][こちらの PR]] がマージされれば、ほぼ out-of-the-box でアイコン表示できるようになるはずです。黄金期！ Emacs の時代は何度来ても良いですからね。
 

@@ -1,7 +1,7 @@
 #+TITLE: ライトテーマの設定
 #+DATE: <2026-03-14 Sat>
 #+FILETAGS: :emacs:tools:
-#+THUMBNAIL: img/2026-03-14-light-theme-1.png
+#+THUMBNAIL: img/2026-03-14-light-theme-1.webp
 
 * 背景
 
@@ -14,12 +14,12 @@
 配色は 12 年前に定義された [[https://github.com/jwiegley/emacs-release/blob/master/etc/themes/dichromacy-theme.el][=dichromacy-theme=]] をベースに、 AI が調整してくれました:
 
 #+CAPTION: Code and Magit
-[[./img/2026-03-14-light-theme-1.png]]
+[[./img/2026-03-14-light-theme-1.webp]]
 
 古いテーマには新しい UI の色が設定されていませんが、 [[https://github.com/doomemacs/themes][doomemacs/themes]] に合わせて更新すると復刻できます。
 
 #+CAPTION: org-mode
-[[./img/2026-03-14-light-theme-2.png]]
+[[./img/2026-03-14-light-theme-2.webp]]
 
 * まとめ
 

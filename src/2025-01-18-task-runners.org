@@ -1,7 +1,7 @@
 #+TITLE: お試しタスクランナー (make, just, shake, ..)
 #+DATE: <2025-01-18 Sat>
 #+FILETAGS: :tools:
-#+THUMBNAIL: img/2025-01-18-just.png
+#+THUMBNAIL: img/2025-01-18-just.webp
 
 * 背景
 
@@ -147,7 +147,7 @@ target: prerequisites
 準備できました:
 
 #+CAPTION: タブ文字を可視化
-[[./img/2025-01-18-tabs.png]]
+[[./img/2025-01-18-tabs.webp]]
 
 *** リスト
 
@@ -280,7 +280,7 @@ alias t := test
 リスト表示が素敵です:
 
 #+CAPTION: =just=
-[[./img/2025-01-18-just.png]]
+[[./img/2025-01-18-just.webp]]
 
 実際のコマンド実行も良い感じに:
 

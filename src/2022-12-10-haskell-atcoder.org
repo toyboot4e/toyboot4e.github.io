@@ -5,7 +5,7 @@
 #+LINK: haskell https://www.haskell.org/
 #+LINK: monad  https://twitter.com/search?q=from%3Atanakh%20%E3%83%A2%E3%83%8A%E3%83%89%20%E3%82%BC%E3%83%8E%E3%83%96%E3%83%AC%E3%82%A4%E3%83%89&src=typed_query&f=top
 #+LINK: atcoder https://atcoder.jp/
-#+THUMBNAIL: img/2022-12-atcoder-brown.png
+#+THUMBNAIL: img/2022-12-atcoder-brown.webp
 
 [[https://qiita.com/advent-calendar/2022/haskell][Haskell Advent Calendar 2022]] 10 日目の記事です。
 
@@ -207,5 +207,5 @@ Haskell で AtCoder に参加した結果、世の中には面白い人がたく
 
 図らずも色変記事になりました。次は DP を学んで緑色を目指します。
 
-[[./img/2022-12-atcoder-brown.png]]
+[[./img/2022-12-atcoder-brown.webp]]
 

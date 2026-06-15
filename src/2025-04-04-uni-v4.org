@@ -1,14 +1,14 @@
 #+TITLE: Uni V4 購入
 #+DATE: <2025-04-04 Fri>
 #+FILETAGS: :keyboard:steno
-#+THUMBNAIL: ./img/2024-04-04-uni-v4.jpg
+#+THUMBNAIL: ./img/2024-04-04-uni-v4.webp
 
 * 背景
 
 僕はアクションゲームとして分割キーボードを楽しんでいます。この Dilemma V2 などは 34 個しかキーが無く、その分特殊な操作が要求されるため、ちょっとした上達を積み重ねる楽しみがあります。
 
 #+CAPTION: Dilemma V2
-[[./img/2025-03-23-dilemma-v2.jpg]]
+[[./img/2025-03-23-dilemma-v2.webp]]
 
 現在主力の Keyball 44, Dilmma V2 はマスターしたため、新しい操作体系を求めて [[https://stenokeyboards.com/products/the-uni-v4][Uni V4]] を購入しました。
 
@@ -19,7 +19,7 @@
 Uni V4 は在庫切れの状態でしたが、 Discord で売ってくれる人がいて助かりました。
 
 #+CAPTION: Uni V4
-[[./img/2024-04-04-uni-v4.jpg]]
+[[./img/2024-04-04-uni-v4.webp]]
 
 ** Steno 関連のコンテンツ
 

@@ -9,7 +9,7 @@
 
 #+CAPTION: Uni V4. 28 キー
 #+ATTR_HTML: :width 75%
-[[./img/2024-04-04-uni-v4.jpg]]
+[[./img/2024-04-04-uni-v4.webp]]
 
 速記 (stenography) とは、複数キーの同時押し (ストローク) を活かして多数の文字を瞬時に入力できるシステムです。元々は数百万円台の専用機に実装されていたようですが、 [[http://openstenoproject.org/][Open Steno Project]] のおかげで庶民の手にも届くようになりました。
 

@@ -107,7 +107,7 @@ hogeeee
 今回は列 (sequence) としての splay tree を作りました。 [[https://github.com/maspypy/library/blob/f05f893635f7855c3bb268435a0b7c3f9b84ae9c/ds/splaytree/splaytree.hpp][maspy さんの =splaytree.hpp=]] を写経します。列を木にすると、親が子の集約 (畳み込み) を持つことができます:
 
 #+ATTR_HTML: :width 600px
-[[./img/2024-08-25-sequence.png]]
+[[./img/2024-08-25-sequence.webp]]
 
 セグメント木との主な違いとしては、要素の挿入・削除ができ、区間反転ができます。出ないと思いますが、部分木の入れ替えなども可能です。
 

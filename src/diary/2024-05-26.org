@@ -13,10 +13,10 @@
 ゲーム開発で似た計算がありました。元ネタは [[https://skypjack.github.io/2019-11-19-ecs-baf-part-6/][ECS back and forth Part 6 - Nested groups and perfect SoA to the rescue]] で、以下の処理を実施しました (詳細略):
 
 #+CAPTION: =X= を =A= グループに移動する
-[[../img/2023-12-toecs-group-sync.png]]
+[[../img/2023-12-toecs-group-sync.webp]]
 
 #+CAPTION: =X= を A グループから削除する
-[[../img/2023-12-toecs-group-unsync.png]]
+[[../img/2023-12-toecs-group-unsync.webp]]
 #+END_DETAILS
 
 * ABC 355
@@ -56,7 +56,7 @@ solve = do
 
 2. ／ 上のセルであるかの判定
    左右反転すれば＼字と同じ条件で判定できます。左右反転は平行移動と Y 軸対象に分けて考えました。
-   [[./img/2024-05-26-diag.png]]
+   [[./img/2024-05-26-diag.webp]]
 
 ** [[https://atcoder.jp/contests/abc355/tasks/abc355_d][D 問題]]
 

@@ -1,7 +1,7 @@
 #+TITLE: =org-mode= 製ブログの改良 (6): Tocbot
 #+DATE: <2025-12-20 Sat>
 #+FILETAGS: :blog:
-#+THUMBNAIL: img/2025-12-20-tocbot.png
+#+THUMBNAIL: img/2025-12-20-tocbot.webp
 
 * 背景
 
@@ -11,7 +11,7 @@
 
 Zenn で使われていることでも有名な [[https://tscanlin.github.io/tocbot/][Tocbot]] を導入し、スタイリングしてみました:
 
-[[./img/2025-12-20-tocbot.png]]
+[[./img/2025-12-20-tocbot.webp]]
 
 スタイルは [[https://lapwing.aerick.ca/][Lapwing for Beginners]] ([[https://github.com/badboy/mdbook-toc][=mdbook-toc=]]) を参考にしました。 (記事 + 目次) を中央寄せにしたため、やや目次の存在感があり過ぎる気はします。
 

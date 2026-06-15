@@ -1,7 +1,7 @@
 #+TITLE: =org-mode= 製ブログの改良 (4): yaruo block
 #+DATE: <2025-05-07 Wed>
 #+FILETAGS: :blog:
-#+THUMBNAIL: img/2025-05-07-yaruo.png
+#+THUMBNAIL: img/2025-05-07-yaruo.webp
 
 * 機能
 

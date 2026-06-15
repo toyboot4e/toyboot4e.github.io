@@ -1,23 +1,23 @@
 #+TITLE: Haskell / AtCoder レーティング 1,400 到達
 #+DATE: <2024-10-21 Mon>
 #+FILETAGS: :atcoder:haskell:
-#+THUMBNAIL: ./diary/img/2024-10-20-rating.png
+#+THUMBNAIL: ./diary/img/2024-10-20-rating.webp
 
 * 始めに
 
 AtCoder でレーティング 1,400 に到達しました！
 
 #+CAPTION: 1,465!
-[[./diary/img/2024-10-20-rating.png]]
+[[./diary/img/2024-10-20-rating.webp]]
 
 [[https://kenkoooo.com/atcoder/#/table/][AtCoder Problems]] における進捗は以下です:
 
-[[./img/2024-10-21-problems.png]]
+[[./img/2024-10-21-problems.webp]]
 #+CAPTION: 1,248 AC
 
 人と比べると、 [[https://judge.yosupo.jp/][Library Checker]] をやった方だと思います。
 
-[[./img/2024-10-21-library-checker.png]]
+[[./img/2024-10-21-library-checker.webp]]
 #+CAPTION: 51 AC, 141 位
 
 * 振り返り
@@ -29,7 +29,7 @@ AtCoder でレーティング 1,400 に到達しました！
 現状は運でした。次のグラフで一発屋が一目瞭然です:
 
 #+CAPTION: [[https://atcoder-graphs.vercel.app/][AtCoder Graphs β より]] 。コンテストの成績とレーティングへの寄与が分かります。
-[[./img/2024-10-21-contrib.png]]
+[[./img/2024-10-21-contrib.webp]]
 
 ** この 1 年間やっていたこと
 
