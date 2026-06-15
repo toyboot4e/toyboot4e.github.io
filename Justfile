@@ -70,3 +70,7 @@ alias w := watch
 ci *args:
     pinact run -update
     zizmor .
+
+# converts image files into webp in-place
+to-webp:
+    bun scripts/to-webp.ts

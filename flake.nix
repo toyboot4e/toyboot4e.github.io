@@ -46,6 +46,9 @@
             pinact
             watchexec
             zizmor
+            # used by the image scripts in scripts/
+            bun
+            libwebp # gen-webp.ts (cwebp)
           ];
         };
       });
