@@ -3,16 +3,19 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs =
-    { nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-        buildCommand = pkgs.writeShellApplication {
+    { nixpkgs, ... }:
+    let
+      forAllSystems =
+        f:
+        nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
+          system: f (import nixpkgs { inherit system; })
+        );
+      buildCommandFor =
+        pkgs:
+        pkgs.writeShellApplication {
           name = "build-command";
           runtimeInputs = with pkgs; [
             (emacs.pkgs.withPackages (
@@ -28,38 +31,41 @@
             prettier --print-width 100 --write out/*.html out/diary/*.html
           '';
         };
-      in
-      {
-        apps.build = flake-utils.lib.mkApp {
-          drv = buildCommand;
+    in
+    {
+      apps = forAllSystems (pkgs: {
+        build = {
+          type = "app";
+          program = "${buildCommandFor pkgs}/bin/build-command";
         };
-        devShells.default =
-          pkgs.mkShell {
-            packages = with pkgs; [
-              nodePackages.prettier
-              pinact
-              watchexec
-              zizmor
-            ];
-          };
-        packages = rec {
-          default = devlog;
-          devlog = pkgs.stdenvNoCC.mkDerivation {
-            name = "devlog";
-            src = ./.;
-            nativeBuildInputs = [
-              buildCommand
-            ];
-            buildPhase = ''
-              export HOME="$(mktemp -d)"
-              build-command
-            '';
-            installPhase = ''
-              mkdir -p "$out"
-              mv out "$out/out"
-            '';
-          };
+      });
+      devShells = forAllSystems (pkgs: {
+        default = pkgs.mkShell {
+          packages = with pkgs; [
+            nodePackages.prettier
+            pinact
+            watchexec
+            zizmor
+          ];
         };
-      }
-    );
+      });
+      packages = forAllSystems (pkgs: rec {
+        default = devlog;
+        devlog = pkgs.stdenvNoCC.mkDerivation {
+          name = "devlog";
+          src = ./.;
+          nativeBuildInputs = [
+            (buildCommandFor pkgs)
+          ];
+          buildPhase = ''
+            export HOME="$(mktemp -d)"
+            build-command
+          '';
+          installPhase = ''
+            mkdir -p "$out"
+            mv out "$out/out"
+          '';
+        };
+      });
+    };
 }
