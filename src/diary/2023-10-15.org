@@ -91,7 +91,7 @@ Haskell で 2D 描画をやるならまず [[https://github.com/benl23x5/gloss][
 コンテスト開始時のセットアップ用スクリプトを書いた。僅か 10 秒の差を生む程度で、実用的な効果は無い。一応ソース: [[https://github.com/toyboot4e/abc-hs/blob/e0bae9927fb1025bb9024c639977560b6ed01731/go][=go= スクリプト (=bash=)]]
 
 #+CAPTION: =acc= 実行、 =tmux= の pane 分割、 =cd=, エディタの起動を 1 コマンドに
-[[./img/2023-10-15-go.gif]]
+[[./img/2023-10-15-go.webp]]
 
 AA は [[http://www.figlet.org/][figlet]] が表示してくれた。 =figlet= は映えるのに、エディタの起動画面で台無しだ。改良の余地がある。
 

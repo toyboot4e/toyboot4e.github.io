@@ -212,7 +212,7 @@ Tangled 2 code blocks from init.
 },
 #+END_SRC
 
-[[./img/2025-06-11-tanakh.gif]]
+[[./img/2025-06-11-tanakh.webp]]
 
 普段は =lazy = true= を設定して封印します。
 

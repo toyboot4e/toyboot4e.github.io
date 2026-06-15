@@ -48,7 +48,8 @@
             zizmor
             # used by the image scripts in scripts/
             bun
-            libwebp # gen-webp.ts (cwebp)
+            libwebp # to-webp.ts: cwebp / gif2webp / webpmux
+            imagemagick # to-webp.ts: identify (dimensions) + magick (gif resize)
           ];
         };
       });

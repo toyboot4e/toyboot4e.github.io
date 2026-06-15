@@ -52,7 +52,7 @@ Rust でゲームを作る際は、データの持ち方が重要です。たと
 =inkfs= 🦑 のシーングラフは ECS の上に作っています。
 
 #+ATTR_HTML: :width 292px
-[[./img/2022-12-gfx-ui-text.gif]]
+[[./img/2022-12-gfx-ui-text.webp]]
 
 *** Renderable の共通コンポーネント
 

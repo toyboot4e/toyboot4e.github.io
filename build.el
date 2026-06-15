@@ -325,9 +325,8 @@
                        (*RAW-STRING* ,contents))
                   (nav (@ (id "toc"))))
             ,(my-html-footer info)
-
             (script (@ (type "text/javascript")
-                       (src "https://unpkg.com/tocbot@4/dist/tocbot.min.js"))
+                       (src "/style/tocbot.min.js"))
                     "")
             (script (*RAW-STRING*
                      "tocbot.init({ tocSelector: '#toc', contentSelector: '#content', headingSelector: 'h1, h2, h3, h4', collapseDepth: 6, scrollSmooth: false, orderedList: false });")

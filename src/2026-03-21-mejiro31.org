@@ -1,7 +1,7 @@
 #+TITLE: Mejiro31 キーボード
 #+DATE: <2026-03-21 Sat>
 #+FILETAGS: :keyboard:steno:
-#+THUMBNAIL: ./img/2026-03-21-mejiro-3.jpeg
+#+THUMBNAIL: ./img/2026-03-21-mejiro-3.webp
 
 * 背景
 
@@ -52,7 +52,7 @@ Mejiro31 は、二段分しかキーが無いにも関わらず、 QWERTY 配列
 在庫 10 に対して like の数が 10 を超えており、ステルス勢も必ずいます。争奪戦が予期されたため、直接店舗に赴きました:
 
 #+CAPTION: Mejiro31 を発見！
-[[./img/2026-03-21-yusha-1.jpeg]]
+[[./img/2026-03-21-yusha-1.webp]]
 
 #+CAPTION: 購入！ かわいい！
 [[./img/2026-03-21-yusha-2.webp]]
@@ -76,7 +76,7 @@ Mejiro31 は、二段分しかキーが無いにも関わらず、 QWERTY 配列
 組み立て作業はハンダ付け無しで完了してしまいました。設計次第でそこまでユーザーフレンドリーになるものなのですね。
 
 #+CAPTION: 組み立て完了
-[[./img/2026-03-21-mejiro-3.jpeg]]
+[[./img/2026-03-21-mejiro-3.webp]]
 
 #+BEGIN_QUOTE
 親指の 2U (横広) キャップを付けておらず、未完です
@@ -107,7 +107,7 @@ Mejiro31 のおかげで QMK にも入門できて最高です。僕の設定内
 
 小さいトラックパッドを中央に置きたいのですが、該当する製品は未検討です:
 
-[[./img/2026-03-21-mejiro-3.jpeg]]
+[[./img/2026-03-21-mejiro-3.webp]]
 
 Mejiro31 作者のじーびすさんは、 [[https://costory.jp/cf-published-sku-groups/1254312814][Nape Pro]] を検討されているそうです。やはり、何から何まで僕の先を行かれている方ですね……！
 
