@@ -120,25 +120,26 @@
         };
       });
       packages = forAllSystems (pkgs: rec {
-        default = devlog;
+        # default = devlog;
         # Vendored node deps, exposed so `nix build .#node-deps` can surface the
         # real `npmDepsHash` after a dependency bump.
         node-deps = nodeModulesFor pkgs;
-        devlog = pkgs.stdenvNoCC.mkDerivation {
-          name = "devlog";
-          src = ./.;
-          nativeBuildInputs = [
-            (buildCommandFor pkgs)
-          ];
-          buildPhase = ''
-            export HOME="$(mktemp -d)"
-            build-command
-          '';
-          installPhase = ''
-            mkdir -p "$out"
-            mv out "$out/out"
-          '';
-        };
+        # TODO: commit link card cache JSON
+        # devlog = pkgs.stdenvNoCC.mkDerivation {
+        #   name = "devlog";
+        #   src = ./.;
+        #   nativeBuildInputs = [
+        #     (buildCommandFor pkgs)
+        #   ];
+        #   buildPhase = ''
+        #     export HOME="$(mktemp -d)"
+        #     build-command
+        #   '';
+        #   installPhase = ''
+        #     mkdir -p "$out"
+        #     mv out "$out/out"
+        #   '';
+        # };
       });
     };
 }
