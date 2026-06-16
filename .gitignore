@@ -9,3 +9,6 @@ ltximg
 /src/index.org
 /src/tags
 
+
+# build-time post-processing deps (scripts/postprocess.ts)
+/node_modules
