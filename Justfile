@@ -113,17 +113,18 @@ audit-ai page="index.html": (audit page)
       }
     '
 
-# start watching source files and runs `build` on chane
+# start watching source files and runs `build` on change
 watch *args:
     #!/usr/bin/env bash
     echo "start watching.."
+    exts="el,org,css,scss,js,webp,png,jpg,jpeg,gif,svg"
+    ig=(--ignore 'index.org' --ignore '**/tags/**' --ignore '**/ltximg/**' --ignore '**/*.min.css')
     if [[ "${1:-}" == "-d" || "${1:-}" == "--draft" ]] ; then
         echo "draft build"
-        # watchexec -e org -w draft --ignore "index.org" "just build --draft && just format"
-        watchexec -e el,org,css -w draft --ignore "index.org" "just build --draft"
+        watchexec -e "$exts" -w src "${ig[@]}" "just min-css && just build --draft"
     elif [[ -z "${1:-}" || "${1:-}" == "-r" || "${1:-}" == "--release" ]] ; then
         echo "release build"
-        watchexec -e el,org,css -w src --ignore "index.org" "just build --release && just format"
+        watchexec -e "$exts" -w src "${ig[@]}" "just min-css && just build --release"
     else
         echo "invalid option"
     fi
