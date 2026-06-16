@@ -125,7 +125,8 @@
         ("static"
          :base-directory "./src"
          :base-extension "html\\|js\\|css\\|png\\|jpg\\|jpeg\\|webp\\|gif\\|svg\\|mp4\\|mov\\|woff2\\|pdf"
-         ;; `/ltximg/' is for previewing. MathJax is used at runtime.
+         ;; `/ltximg/' holds local LaTeX previews; never published (math is
+         ;; pre-rendered to static KaTeX HTML by `scripts/postprocess.ts').
          :exclude ,(rx-to-string (rx "ltximg/"))
          ;; :exclude ,(rx-to-string (rx line-start "ltximg"))
          :publishing-directory  "./out"
@@ -231,6 +232,10 @@ from `my-eager-image-count' as cards render.")
       (title (*RAW-STRING* ,(concat title " - Toybeam")))
       (meta (@ (name "description")
                (content ,description)))
+      ;; Inline SVG favicon (\U0001F526). Avoids a `/favicon.ico' request (and
+      ;; its 404), and modern browsers skip the default request once this exists.
+      (link (@ (rel "icon")
+               (href "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>\U0001F526</text></svg>")))
       ;; (link (@ (rel "stylesheet")
       ;;          (href "https://cdn.simplecss.org/simple.min.css")))
       (link (@ (rel "stylesheet")
@@ -246,28 +251,23 @@ from `my-eager-image-count' as cards render.")
                      (id "prism-light")
                      (href "/style/prism-light.min.css")
                      (media "(prefers-color-scheme: light)")))))
+      ;; KaTeX CSS for build-time pre-rendered math (see `scripts/postprocess.ts').
+      ,@(when has-math
+          `((link (@ (rel "stylesheet")
+                     (href "/style/katex/katex.min.css")))))
       (script (@ (type "text/javascript")
                  (src "/style/style.js"))
               ;; NOTE: empty body is required for self-closing tag
               "")
-      ,@(when has-code
-          `((script (@ (type "text/javascript")
-                       ;; NOTE: It creates `defer=""`. The value is required for XHTML.
-                       (defer "")
-                       (src "/style/prism.js"))
-                    ;; NOTE: empty body is required for self-closing tag
-                    "")))
+      ;; NOTE: Prism highlighting is baked in at build time (`scripts/postprocess.ts'),
+      ;; so no runtime `prism.js' is shipped; only the Prism CSS above is needed.
       ;; TODO: lazy loading
       (script (@ (type "text/javascript")
                  (async "")
                  (src "/style/steno-viz.js"))
               "")
-      ,@(when has-math
-          `((script (@ (type "text/javascript")
-                       (id "MathJax-script")
-                       (defer "")
-                       (src "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"))
-                    "")))
+      ;; NOTE: math is pre-rendered to static KaTeX HTML at build time
+      ;; (`scripts/postprocess.ts'); only `katex.min.css' (linked above) is shipped.
       ;; Open Graph protocol: <https://ogp.me/>
       (meta (@ (property "og:type")
                (content "article")))
