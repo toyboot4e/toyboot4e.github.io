@@ -115,7 +115,7 @@ $ ./x t '-p /SegTree/'
 =make <target>= で定義されたコマンドを実行できます。参考: [[https://makefiletutorial.com/][Makefile Tutorial]]
 
 #+CAPTION: =Makefile= の主な文法
-#+BEGIN_SRC make
+#+BEGIN_SRC makefile
 target: prerequisites
 	command
 #+END_SRC
@@ -188,7 +188,7 @@ test:	Runs local test.
 エイリアス相当の target も作れます:
 
 #+CAPTION: =Makefile=
-#+BEGIN_SRC make
+#+BEGIN_SRC makefile
 .PHONY: t
 t: test
 #+END_SRC
@@ -201,7 +201,7 @@ $ make t
 
 Target に引数を渡すためには、 ~arg=value~ の形で変数定義します:
 
-#+BEGIN_SRC makefike
+#+BEGIN_SRC makefile
 .PHONY: test
 test:		## Runs local test
 	cabal test --enable-tests --test-options "$(p)"

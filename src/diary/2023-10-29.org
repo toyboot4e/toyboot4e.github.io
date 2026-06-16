@@ -71,7 +71,7 @@ $dp[i] := E_i$ はトポロジカル順に求める (終点から順に求める
 #+ATTR_HTML: :width 880px
 [[./img/2023-10-29-coin-dp.webp]]
 
-DP 的な式整理無しで解くのは無理な気がする。まず $E_2 = \sum\limits_i p_i x_i = \sum_\limits{n=1}^{\infty} \frac n {2^n} = 2$ 。 $E_1$ は……考えたくない。。
+DP 的な式整理無しで解くのは無理な気がする。まず $E_2 = \sum\limits_i p_i x_i = \sum\limits_{n=1}^{\infty} \frac n {2^n} = 2$ 。 $E_1$ は……考えたくない。。
 
 * 読書
 
