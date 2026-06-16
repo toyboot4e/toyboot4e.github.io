@@ -404,8 +404,10 @@ span.code-highlighted {
 .link-card-image {
   /* OG-standard aspect box (Twitter card 1.91:1) so the whole image shows
      instead of being cropped to the text height. `align-self: center` keeps the
-     box from stretching to the (possibly taller) text column. */
-  flex: 0 0 40%;
+     box from stretching to the (possibly taller) text column. ~35% + a cap keeps
+     it a supporting thumbnail (Zenn-like) rather than dominating wide cards. */
+  flex: 0 0 35%;
+  max-width: 220px;
   align-self: center;
   aspect-ratio: 1.91 / 1;
   overflow: hidden;
@@ -424,12 +426,6 @@ span.code-highlighted {
   display: inline;
 }
 
-@media (max-width: 600px) {
-  .link-card-image {
-    flex-basis: 35%;
-  }
-}
-
 /* GitHub source-line embed: `[[card:github.com/.../blob/<sha>/file#L10-L20]]`.
    The header links to GitHub; the `<pre>` is Prism-highlighted like any code. */
 .gh-embed {
@@ -437,6 +433,19 @@ span.code-highlighted {
   border: var(--border-width) solid var(--border);
   border-radius: 12px;
   overflow: hidden;
+}
+
+/* Signal the (otherwise code-block-looking) embed is a clickable external link. */
+.gh-embed:hover {
+  border-color: var(--accent-hover);
+}
+
+.gh-embed:hover .gh-embed-head {
+  background-color: color-mix(in srgb, var(--accent-hover) 8%, transparent);
+}
+
+.gh-embed:hover .gh-embed-path {
+  text-decoration: underline;
 }
 
 .gh-embed-head {
@@ -455,12 +464,26 @@ span.code-highlighted {
   display: flex;
   align-items: center;
   gap: 0.4em;
+  /* Match the line box to the icon height so align-items:center truly centers
+     the icon against the text (a tall line-height would push it below). */
+  line-height: 1;
   color: var(--text-light);
   text-decoration: none;
 }
 
 .gh-embed-head a:hover {
   color: var(--accent-hover);
+}
+
+/* GitHub mark + external-link arrow flanking the header text. */
+.gh-embed-icon {
+  flex: none;
+  opacity: 0.8;
+}
+
+.gh-embed-ext {
+  flex: none;
+  opacity: 0.7;
 }
 
 /* `filename:line`, leftmost. The path may ellipsize when space is tight; the
