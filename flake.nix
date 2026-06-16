@@ -63,21 +63,12 @@
             just
           ];
           text = ''
-            # Make the vendored deps resolvable by `bun` from the build cwd
-            # (skip when a real node_modules already exists, e.g. local runs).
             [ -e node_modules ] || ln -sfn ${nodeModules}/node_modules ./node_modules
-            # Reuse the Justfile build verbatim, so this never drifts from a local
-            # build. Run as an app (`nix run .#build`), not a sandboxed package, so
-            # the link-card fetch has network. CI=1 -> strict post-process.
+            # CI=1: catch error
             CI=1 just build --release
           '';
         };
 
-      # `nix run .#linkcard` -- fetch OGP/GitHub metadata into linkcard-cache.json
-      # using the vendored deps. Runs *outside* the sandbox (network is allowed),
-      # so CI can regenerate the cache from the committed tree before `nix build`,
-      # keeping the cache out of git (no unpublished-draft leak) yet present for
-      # the hermetic build. Passes args through (e.g. `nix run .#linkcard -- --force`).
       linkcardCmdFor =
         pkgs:
         let
@@ -111,35 +102,31 @@
             watchexec
             zizmor
             just
-            esbuild # `just min-css`
-            # used by the image scripts in scripts/ and scripts/postprocess.ts
+            # scripts
             bun
-            libwebp # to-webp.ts: cwebp / gif2webp / webpmux
-            imagemagick # to-webp.ts: identify (dimensions) + magick (gif resize)
+            esbuild # just min-css
+            imagemagick # to-webp.ts
+            libwebp # to-wep.ts
           ];
         };
       });
       packages = forAllSystems (pkgs: rec {
-        # default = devlog;
-        # Vendored node deps, exposed so `nix build .#node-deps` can surface the
-        # real `npmDepsHash` after a dependency bump.
-        node-deps = nodeModulesFor pkgs;
-        # TODO: commit link card cache JSON
-        # devlog = pkgs.stdenvNoCC.mkDerivation {
-        #   name = "devlog";
-        #   src = ./.;
-        #   nativeBuildInputs = [
-        #     (buildCommandFor pkgs)
-        #   ];
-        #   buildPhase = ''
-        #     export HOME="$(mktemp -d)"
-        #     build-command
-        #   '';
-        #   installPhase = ''
-        #     mkdir -p "$out"
-        #     mv out "$out/out"
-        #   '';
-        # };
+        default = devlog;
+        devlog = pkgs.stdenvNoCC.mkDerivation {
+          name = "devlog";
+          src = ./.;
+          nativeBuildInputs = [
+            (buildCommandFor pkgs)
+          ];
+          buildPhase = ''
+            export HOME="$(mktemp -d)"
+            build-command
+          '';
+          installPhase = ''
+            mkdir -p "$out"
+            mv out "$out/out"
+          '';
+        };
       });
     };
 }

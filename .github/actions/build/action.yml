@@ -9,7 +9,4 @@ runs:
     - name: Build the devlog
       shell: "bash"
       run: |
-        # Run the build as an app, not the sandboxed `nix build .#devlog`, so its
-        # link-card fetch (`just build` -> fetch-linkcards) has network and writes
-        # the gitignored cache itself. Output lands in ./out. Tools stay nix-pinned.
-        nix run .#build
+        nix build .#devlog
