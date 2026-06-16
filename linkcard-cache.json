@@ -1,1 +1,39 @@
-{}
+{
+  "https://github.com/toyboot4e/toyboot4e.github.io": {
+    "title": "GitHub - toyboot4e/toyboot4e.github.io: My devlog generated with `org-publish` and custom functions",
+    "description": "My devlog generated with `org-publish` and custom functions - toyboot4e/toyboot4e.github.io",
+    "image": "https://opengraph.githubassets.com/bde17ec1041c2ffea129a264715e2ab1a24e170fa4c23cd9deb4673d5cef9339/toyboot4e/toyboot4e.github.io",
+    "siteName": "GitHub",
+    "favicon": "https://github.githubassets.com/favicons/favicon.svg"
+  },
+  "https://github.com/toyboot4e/toyboot4e.github.io/blob/c0b6beaf6ec6a4123b82e0217db43cd98b4569db/build.el#L923-L925": {
+    "kind": "github-code",
+    "owner": "toyboot4e",
+    "repo": "toyboot4e.github.io",
+    "refLabel": "c0b6bea",
+    "path": "build.el",
+    "startLine": 923,
+    "endLine": 925,
+    "code": "(defun my-org-html-publish-to-html (plist filename pub-dir)\n  \"Publish an org file to HTML, using the FILENAME as the output directory.\nSkips `#+DRAFT:'-flagged files unless this is a `--draft' build.\"",
+    "lang": "emacs-lisp"
+  },
+  "https://toyboot4e.github.io": {
+    "title": "Toybeam",
+    "description": "Devlog of toyboot4e",
+    "siteName": "Toybeam",
+    "favicon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%94%A6</text></svg>"
+  },
+  "https://toyboot4e.github.io/2026-03-14-light-theme.html": {
+    "title": "ライトテーマの設定",
+    "description": "背景 ダークテーマを使い始めて n 年、目に良いとされるライトテーマも設定してみました。 設定内容テキストエディタ (Emacs + tmux) 配色は 12 年前に定義された dichromacy-theme をベースに、 AI が調整してくれました: Figure 1: Co…",
+    "image": "https://toyboot4e.github.io/img/2026-03-14-light-theme-1.webp",
+    "siteName": "Toybeam",
+    "favicon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%94%A6</text></svg>"
+  },
+  "https://zenn.dev/catnose99/articles/nani-translate": {
+    "title": "Nani翻訳の技術的な話",
+    "image": "https://res.cloudinary.com/zenn/image/upload/s--1T2JunzU--/c_fit%2Cg_north_west%2Cl_text:notosansjp-medium.otf_55:Nani%25E7%25BF%25BB%25E8%25A8%25B3%25E3%2581%25AE%25E6%258A%2580%25E8%25A1%2593%25E7%259A%2584%25E3%2581%25AA%25E8%25A9%25B1%2Cw_1010%2Cx_90%2Cy_100/g_south_west%2Cl_text:notosansjp-medium.otf_37:catnose%2Cx_203%2Cy_121/g_south_west%2Ch_90%2Cl_fetch:aHR0cHM6Ly9zdGF0aWMuemVubi5zdHVkaW8vdXNlci11cGxvYWQvYXZhdGFyLzc2YzYxNGExZmEuanBlZw==%2Cr_max%2Cw_90%2Cx_87%2Cy_95/v1627283836/default/og-base-w1200-v2.png?_a=BACMTiAE",
+    "siteName": "Zenn",
+    "favicon": "https://static.zenn.studio/images/logo-transparent.png"
+  }
+}
