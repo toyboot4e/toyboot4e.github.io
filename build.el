@@ -303,37 +303,82 @@ from `my-eager-image-count' as cards render.")
   `(p (@ (class "org-tag-list"))
     ,@(mapcar #'create-tag-sxml tags)))
 
-;; Returns `<header>' SXML
+;;; Header nav icons
+;; Inline SVG, baked into the page (the build is offline/hermetic and ships no
+;; icon font or runtime JS). All use `currentColor' so they inherit the link
+;; colour and the accent colour on hover, in both themes.
+;;
+;; Brand marks are Simple Icons (https://simpleicons.org, single filled path);
+;; Home / AtCoder are Lucide (https://lucide.dev, stroked paths).
+
+;; Simple Icons brand marks (inner <path>, filled)
+(defconst my-icon-github
+  "<path d=\"M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12\"/>")
+(defconst my-icon-qiita
+  "<path d=\"M12 0C5.3726 0 0 5.3726 0 12s5.3726 12 12 12c3.3984 0 6.4665-1.413 8.6498-3.6832-.383-.0574-.7746-.2062-1.1466-.4542-.7145-.4763-1.3486-.9263-1.6817-1.674-1.2945 1.3807-3.0532 1.835-5.1822 2.0503-4.311.4359-8.0456-1.4893-8.4979-6.2996-.1922-2.045.2628-3.989 1.1804-5.582l-.5342-2.1009c-.0862-.3652.2498-.7126.6057-.6262l1.8456.448c1.0974-.9012 2.4249-1.49 3.8892-1.638 1.2526-.1267 2.467.0834 3.571.5624l1.7348-1.0494c.3265-.1974.7399.0257.7711.4164l.1 2.4747v.0002c1.334 1.4084 2.2424 3.3319 2.4478 5.516.116 1.2339-.012 2.1776-.339 3.078-.1531.4215-.1992.7778.0776 1.1305.2674.3408.6915 1.0026 1.1644.8917.7107-.1666 1.4718-.1223 1.9422.1715C23.4925 15.9525 24 14.0358 24 12c0-6.6274-5.3726-12-12-12Zm-.0727 5.727a5.2731 5.2731 0 0 0-.6146.0273c-2.2084.2233-3.9572 1.8135-4.4937 3.8484l-1.3176-.1996-.014.2589 1.2972.1407c-.0352.1497-.0643.2384-.086.3923l-1.1319.0902.0103.2025 1.1032-.088c-.0194.1713-.031.2814-.0332.4565l-1.0078.412.0495.2499.9598-.4492c.002.1339.008.2053.0207.3407.2667 2.8371 2.6364 3.3981 5.4677 3.1118 2.8312-.2863 5.0517-1.3114 4.785-4.1486-.013-.1361-.0324-.2068-.0553-.3392l1.0397.2257.0242-.229-1.0906-.207c-.0342-.1687-.0765-.271-.1264-.4327l1.1208-.1374-.0158-.2019-1.1499.1409a5.1093 5.1093 0 0 0-.1665-.4259l1.2665-.4042-.0397-.2536-1.3471.4667c-.819-1.7168-2.5002-2.8224-4.4546-2.8482Z\"/>")
+(defconst my-icon-zenn
+  "<path d=\"M.264 23.771h4.984c.264 0 .498-.147.645-.352L19.614.874c.176-.293-.029-.645-.381-.645h-4.72c-.235 0-.44.117-.557.323L.03 23.361c-.088.176.029.41.234.41z\"/><path d=\"M17.445 23.419l6.479-10.408c.205-.323-.029-.733-.41-.733h-4.691c-.176 0-.352.088-.44.235l-6.655 10.643c-.176.264.029.616.352.616h4.779c.234-.001.468-.118.586-.353z\"/>")
+
+;; Lucide marks (inner <path>s, stroked)
+(defconst my-icon-home
+  "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/>")
+(defconst my-icon-atcoder
+  "<path d=\"M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978\"/><path d=\"M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978\"/><path d=\"M18 9h1.5a1 1 0 0 0 0-5H18\"/><path d=\"M4 22h16\"/><path d=\"M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z\"/><path d=\"M6 9H4.5a1 1 0 0 1 0-5H6\"/>")
+
+(defun my-brand-icon (paths)
+  "Wrap Simple-Icons PATHS in a filled inline <svg>."
+  (concat "<svg class=\"nav-icon\" viewBox=\"0 0 24 24\" width=\"1em\" height=\"1em\""
+          " fill=\"currentColor\" aria-hidden=\"true\">" paths "</svg>"))
+
+(defun my-line-icon (paths)
+  "Wrap Lucide PATHS in a stroked inline <svg>."
+  (concat "<svg class=\"nav-icon\" viewBox=\"0 0 24 24\" width=\"1em\" height=\"1em\""
+          " fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\""
+          " stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">"
+          paths "</svg>"))
+
+(defun my-nav-link (href svg label)
+  "A header nav link: inline SVG icon followed by a text LABEL."
+  `(a (@ (href ,href))
+      (*RAW-STRING* ,svg)
+      (span (@ (class "nav-label")) ,label)))
+
+;; Returns the sticky `<header>' SXML \u2014 only the navigation link icons.
 (defun my-html-header (info)
+  `(header (@ (role "banner"))
+           (nav (@ (role "navigation"))
+                ,(my-nav-link "/index.html" (my-line-icon my-icon-home) "Home")
+                ,(my-nav-link "https://atcoder.jp/users/toyboot4e" (my-line-icon my-icon-atcoder) "AtCoder")
+                ,(my-nav-link "https://github.com/toyboot4e" (my-brand-icon my-icon-github) "GitHub")
+                ,(my-nav-link "https://qiita.com/toyboot4e" (my-brand-icon my-icon-qiita) "Qiita")
+                ,(my-nav-link "https://zenn.dev/toyboot4e" (my-brand-icon my-icon-zenn) "Zenn")
+                (button (@ (id "theme-toggle")
+                           (onclick "toggleTheme()")
+                           (title "\u30c6\u30fc\u30de\u5207\u66ff")
+                           (aria-label "Toggle theme"))
+                        ""))))
+
+;; Returns the page title block, shown below the sticky header rather than
+;; inside it: a title, then a single meta row of date + tags.
+(defun my-html-title-block (info)
   (let ((tags (or (plist-get info :filetags) '())))
-    (pp tags)
-    `(header (@ (role "banner"))
-             (nav (@ (role "navigation"))
-                  (a (@ (href "/index.html")) "Home")
-                  (a (@ (href "https://atcoder.jp/users/toyboot4e")) "AtCoder")
-                  (a (@ (href "https://github.com/toyboot4e")) "GitHub")
-                  (a (@ (href "https://qiita.com/toyboot4e")) "Qiita")
-                  (a (@ (href "https://zenn.dev/toyboot4e")) "Zenn")
-                  (button (@ (id "theme-toggle")
-                             (onclick "toggleTheme()")
-                             (title "\u30c6\u30fc\u30de\u5207\u66ff")
-                             (aria-label "Toggle theme"))
-                          ""))
-             ;; `org-export-data' returns raw HTML
-             (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
-             ;; tags
-             ,(unless (null tags)
-               (create-tag-list-in-header tags))
-             ;; timestamp
-             (p ,(org-export-data (org-export-get-date info "%b %e, %Y") info)))))
+    `(div (@ (class "title-block"))
+          ;; `org-export-data' returns raw HTML
+          (h1 (*RAW-STRING* ,(org-export-data (plist-get info :title) info)))
+          ;; meta row: date then tags, on one line
+          (div (@ (class "title-meta"))
+               (span (@ (class "title-date"))
+                     ,(org-export-data (org-export-get-date info "%b %e, %Y") info))
+               ,(unless (null tags)
+                  (create-tag-list-in-header tags))))))
 
 ;; Returns `<footer>' SXML
 (defun my-html-footer (info)
   `(footer (@ (role "contentinfo"))
            (*RAW-STRING* "<p>Styled with <a href=\"https://simplecss.org/\">Simple.css</a></p>")
            (div
-            (a (@ (href "/index.html")) "Home")
-            (a (@ (href "https://github.com/toyboot4e")) "GitHub"))))
+            ,(my-nav-link "/index.html" (my-line-icon my-icon-home) "Home")
+            ,(my-nav-link "https://github.com/toyboot4e" (my-brand-icon my-icon-github) "GitHub"))))
 
 ;; Thanks: `https://github.com/SystemCrafters/systemcrafters.github.io/blob/master/publish.el'
 (defun my-org-html-template (contents info)
@@ -347,6 +392,7 @@ from `my-eager-image-count' as cards render.")
             ,(my-html-header info)
             (main (@ (role "main")
                      (id "main"))
+                  ,(my-html-title-block info)
                   ;; TODO: <article> without style
                   (div (@ (id "content"))
                        (*RAW-STRING* ,contents))
