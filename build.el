@@ -145,6 +145,14 @@
 (defvar my-codeblock-counter 0
   "Identifies coderefs in different code blocks.")
 
+(defconst my-eager-image-count 1
+  "How many leading thumbnails on a listing page to load eagerly (those above
+the fold). The first of them is the LCP image and also gets fetchpriority=high.")
+
+(defvar my-eager-image-budget 0
+  "Remaining eager thumbnails to emit on the current listing page; counts down
+from `my-eager-image-count' as cards render.")
+
 (defconst my-site-url "https://toyboot4e.github.io/"
   "Canonical site root, used to build absolute URLs for OGP tags.")
 
@@ -203,7 +211,13 @@
         (page-url (concat my-site-url relative-path))
         (image (my-absolute-url (plist-get info :thumbnail)))
         ;; Big image preview when a thumbnail exists, plain summary otherwise.
-        (twitter-card (if image "summary_large_image" "summary")))
+        (twitter-card (if image "summary_large_image" "summary"))
+        ;; Only pull in MathJax (~250 KiB) when the body actually contains math.
+        ;; Org exports inline/display math as `\(...\)' / `\[...\]' and keeps
+        ;; LaTeX environments as `\begin{...}'. A stray match in a code block just
+        ;; loads MathJax needlessly, so we err toward loading it.
+        (has-math (and contents
+                       (string-match-p (regexp-opt '("\\(" "\\[" "\\begin{")) contents))))
     ;; NOTE: `esxml-html' is not on MELPA
     `(head
       (meta (@ (charset "utf-8")))
@@ -242,11 +256,12 @@
                  (async "")
                  (src "/style/steno-viz.js"))
               "")
-      (script (@ (type "text/javascript")
-                 (id "MathJax-script")
-                 (async "")
-                 (src "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"))
-              "")
+      ,@(when has-math
+          `((script (@ (type "text/javascript")
+                       (id "MathJax-script")
+                       (async "")
+                       (src "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"))
+                    "")))
       ;; Open Graph protocol: <https://ogp.me/>
       (meta (@ (property "og:type")
                (content "article")))
@@ -817,25 +832,31 @@ INFO is a plist holding contextual information.  See
                (div (a (@ (href ,link)
                           (class "article-card-link"))
                        (*RAW-STRING* ,title-html))))
-          ;; Thumbnail with `loading=lazy', `decoding=async' and `fetchpriority=low'.
+          ;; Thumbnail: `decoding=async' always. The first `my-eager-image-count'
+          ;; thumbnails (above the fold) load eagerly; the very first is the LCP
+          ;; and gets fetchpriority=high, the rest stay lazy/low.
           ,@(when thumbnail
-              `((img (@ (class "article-card-thumbnail")
-                        (src ,thumbnail)
-                        (alt "")
-                        (loading "lazy")
-                        (decoding "async")
-                        (fetchpriority "low"))))))))
+              (let* ((eager (> my-eager-image-budget 0))
+                     (lcp (and eager (= my-eager-image-budget my-eager-image-count))))
+                (when eager (setq my-eager-image-budget (1- my-eager-image-budget)))
+                `((img (@ (class "article-card-thumbnail")
+                          (src ,thumbnail)
+                          (alt "")
+                          (loading ,(if eager "eager" "lazy"))
+                          (decoding "async")
+                          (fetchpriority ,(cond (lcp "high") (eager "auto") (t "low")))))))))))
 
 (defun show-article-cards (entries)
   (join-with-newline
    `("#+BEGIN_EXPORT html"
      ,(my-sxml-to-xml
        `(div (@ (class "article-list"))
-             ,@(mapcar (lambda (entry) (create-article-card entry)) entries)))
+             ,@(mapcar #'create-article-card entries)))
      "#+END_EXPORT")))
 
 ;; Generates `index.org'.
 (defun my-generate-sitemap (page-title devlog-entries diary-entries all-tags)
+  (setq my-eager-image-budget my-eager-image-count) ; leading Devlog thumbnails load eagerly
   (let* ((tag-list (show-tag-list all-tags))
          (devlog-cards (show-article-cards devlog-entries))
          (diary-cards (show-article-cards diary-entries)))
@@ -847,6 +868,7 @@ INFO is a plist holding contextual information.  See
 
 ;; Generates `tags/<tag>.org'.
 (defun my-generate-tag-page-org (base-dir title devlog-entries all-tags tag)
+  (setq my-eager-image-budget my-eager-image-count) ; leading thumbnails below load eagerly
   (let* ((tag-list (show-tag-list all-tags))
          (entries
           (seq-filter
