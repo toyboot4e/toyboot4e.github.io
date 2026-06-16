@@ -18,12 +18,18 @@ main {
 
 #toc {
   grid-column: 3;
+  /* span both grid rows (title + content) so the TOC can start at the top,
+     next to the header — otherwise auto-placement drops it into the content
+     row, below the title. Use `span 2`, not `1 / -1`: with no explicit
+     grid-template-rows, `-1` resolves to line 1, so a tall TOC would land
+     entirely in row 1 and inflate it, pushing the content far down. */
+  grid-row: 1 / span 2;
   align-self: start;
   position: sticky;
-  top: 2rem;
-  margin-top: 2rem;
+  top: 3.25rem; /* clear the thin sticky header */
+  margin-top: 2.5rem; /* align with the title block's top */
+  max-height: calc(100vh - 4rem);
   width: 250px;
-  max-height: 100vh;
   overflow-y: auto;
   margin-left: 33px; /* 32px + --border-width */
   padding-left: 0rem;
@@ -44,15 +50,51 @@ li p {
 
 body > header {
   padding: 0;
+  /* stick the navigation to the top of the viewport */
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-body > header h1 {
-  max-width: 100% !important; /* overwrite simple.css's default */
+/* nav is now the header's only child, so simple.css's
+   `body > header > *:only-child { margin-block-start: 2rem }` adds a gap above
+   the bar (the margin collapses through the padding-less header). Match its
+   selector exactly to win on specificity and cancel it. */
+body > header > *:only-child {
+  margin-block-start: 0;
 }
 
+/* thin header bar: tighten simple.css's roomy nav */
 header > nav {
   overflow-x: auto;
   white-space: nowrap;
+  /* override simple.css `padding: 1rem 0 0 0` and `line-height: 2` */
+  padding: 0.55rem 0.5rem;
+  line-height: 1.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+header > nav a,
+header > nav a:visited {
+  /* override simple.css's 1rem bottom margin that thickens the bar */
+  margin: 0;
+  padding: 0.05rem 0.7rem;
+}
+
+/* inline icon + label in the header nav (footer links set this themselves) */
+header > nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.nav-icon {
+  width: 1em;
+  height: 1em;
+  flex: none;
 }
 
 #theme-toggle {
@@ -61,10 +103,10 @@ header > nav {
   border-radius: var(--standard-border-radius);
   color: var(--text);
   cursor: pointer;
-  font-size: 1.2rem;
-  padding: 0 0.6rem;
-  margin: 0 0.5rem 1rem 0.5rem;
-  line-height: 2;
+  font-size: 1rem;
+  padding: 0 0.5rem;
+  margin: 0;
+  line-height: 1.6;
 }
 
 /* Show correct icon via CSS (no JS needed) */
@@ -89,17 +131,43 @@ header > nav {
   color: var(--accent);
 }
 
-header > h1 {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
+/* page title block (moved out of the sticky header): left-aligned title with
+   a date + tags meta row beneath it */
+.title-block {
+  grid-column: 2;
+  width: min(50rem, 90vw);
+  margin: 2.5rem auto 0 auto;
 }
 
-/* timestamp */
-header > p {
-  margin: .5rem auto .5rem auto !important;
+.title-block h1 {
+  max-width: 100% !important; /* overwrite simple.css's default */
+  margin-top: 0 !important;
+  margin-bottom: 0.3rem !important;
+}
+
+/* the title block supplies the spacing above the content; cancel the large
+   top margin simple.css puts on the first heading so the gap isn't doubled */
+#content > :first-child {
+  margin-top: 0.75rem;
+}
+
+/* date + tags on a single line */
+.title-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
   color: var(--text-light);
   font-size: 0.9rem;
-  text-align: center;
+}
+
+.title-meta .title-date {
+  white-space: nowrap;
+}
+
+/* the tag list lives inline in the meta row; drop its block margins */
+.title-meta .org-tag-list {
+  margin: 0;
 }
 
 h1 {
@@ -138,7 +206,10 @@ footer > div a:visited {
   border: 1px solid var(--border);
   border-radius: 5px;
   color: var(--text);
-  display: inline-block;
+  /* inline-flex (not inline-block) so the icon + label gap applies */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
   padding: 0.1rem 1rem;
   text-decoration: none;
 }
@@ -546,7 +617,8 @@ span.code-highlighted {
     display: grid;
     grid-template-columns: 1fr;
   }
-  #content {
+  #content,
+  .title-block {
     grid-column: 1;
   }
   #toc {
