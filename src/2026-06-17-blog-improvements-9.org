@@ -5,7 +5,7 @@
 
 * 背景
 
-前回の投稿でサムネイルの表示し、重くなったブログを高速化しました。概ね AI エージェントがやってくれました。
+前回の投稿でサムネイルを表示し、重くなったブログを高速化しました。概ね AI エージェントがやってくれました。
 
 #+CAPTION: [[https://developer.chrome.com/docs/lighthouse/overview][Lighthouse]] の結果
 [[./img/2026-06-17-lighthouse.png]]
@@ -22,7 +22,7 @@
 
 *** WebP 変換
 
-トップページのサムネイルが重かったようです。 webp に変換するだけで 50% 以下に容量を削減できました。
+画像を webp に変換しました。これだけで 50% 以下に容量を削減できました。
 
 サムネイルは最初の一枚のみを即座に読み込み、他の画像は遅延することにしました。このため LCP (Largest Contentful Paint) が素早くなります。 Lighthouse の評価をハックしている感はありますが、実際にユーザ体験も良くなれば幸いです。
 
@@ -51,7 +51,7 @@ const itIs = this; // (ref:1)
 
 *** Optional な JS/CSS の検出
 
-テンプレート処理中で、特定の要素に応じて =<link>= タグを設定するように変更しました。たとえば =$\LaTeX$= と書けば、 =org-mode= はまず以下の math fragment に展開します:
+テンプレート処理中で、特定の要素に応じて =<link>= タグを設定するように変更しました。たとえば =$\LaTeX$= と書けば、 =org-mode= は以下の math fragment に展開します:
 
 #+BEGIN_SRC html
 \(\LaTeX\)
