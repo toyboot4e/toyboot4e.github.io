@@ -1,25 +1,24 @@
 #!/usr/bin/env bun
 
-// Populate `linkcard-cache.json` for `[[card:URL]]` links.
+// Populate `linkcard-cache.json` for `[[card:URL]]` links by scraping OGP /
+// GitHub metadata from the live web; `scripts/postprocess.ts` only ever *reads*
+// it.
 //
-// The actual build (`scripts/postprocess.ts`) is offline & hermetic (nix/CI run
-// in a sandbox with no network), so OGP metadata can't be fetched there. This
-// script does the fetching *ahead of time* against the live web and writes a
-// committed cache the build reads. Run it after adding a card:
+// The cache is NOT committed -- it's derived from the working tree, which may
+// hold unpublished drafts. It's regenerated each build: `just build` runs this
+// best-effort locally, and CI runs the whole build as an app (`nix run .#build`,
+// which has network) so the fetch happens there too. Usage:
 //
 //   just linkcards            # fetch any new `[[card:URL]]`, keep existing
 //   just linkcards --force    # re-fetch everything (refresh stale metadata)
 //   just linkcards <url> ...  # fetch only the given URLs
-//
-// Then `just build` bakes the cards from the cache and you commit both the org
-// change and `linkcard-cache.json`.
 
 import { parseHTML } from "linkedom";
 import { readFile, writeFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 
 const CACHE_FILE = "linkcard-cache.json";
-const SRC_DIRS = ["src", "draft"];
+const SRC_DIR = "src";
 const CARD_RE = /\[\[card:([^\]]+)\]\]/g;
 const UA =
   "Mozilla/5.0 (compatible; toyboot4e-devlog-linkcard/1.0; +https://toyboot4e.github.io/)";
@@ -65,13 +64,7 @@ const urlArgs = args.filter((a) => !a.startsWith("--"));
 // --- collect card URLs from org sources ------------------------------------
 async function walkOrg(dir: string): Promise<string[]> {
   const out: string[] = [];
-  let entries;
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return out; // dir may not exist (e.g. no draft/)
-  }
-  for (const e of entries) {
+  for (const e of await readdir(dir, { withFileTypes: true })) {
     const p = join(dir, e.name);
     if (e.isDirectory()) out.push(...(await walkOrg(p)));
     else if (e.name.endsWith(".org")) out.push(p);
@@ -82,11 +75,9 @@ async function walkOrg(dir: string): Promise<string[]> {
 async function collectUrls(): Promise<string[]> {
   if (urlArgs.length) return [...new Set(urlArgs)];
   const urls = new Set<string>();
-  for (const dir of SRC_DIRS) {
-    for (const file of await walkOrg(dir)) {
-      const text = await readFile(file, "utf8");
-      for (const m of text.matchAll(CARD_RE)) urls.add(m[1].trim());
-    }
+  for (const file of await walkOrg(SRC_DIR)) {
+    const text = await readFile(file, "utf8");
+    for (const m of text.matchAll(CARD_RE)) urls.add(m[1].trim());
   }
   return [...urls];
 }

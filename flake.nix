@@ -63,12 +63,32 @@
             just
           ];
           text = ''
-            # Make the vendored deps resolvable by `bun` from the build cwd.
-            ln -sfn ${nodeModules}/node_modules ./node_modules
+            # Make the vendored deps resolvable by `bun` from the build cwd
+            # (skip when a real node_modules already exists, e.g. local runs).
+            [ -e node_modules ] || ln -sfn ${nodeModules}/node_modules ./node_modules
             # Reuse the Justfile build verbatim, so this never drifts from a local
-            # build. Offline-safe: the link-card fetch is `-`-dismissed and the
-            # committed linkcard-cache.json supplies metadata. CI=1 -> strict.
+            # build. Run as an app (`nix run .#build`), not a sandboxed package, so
+            # the link-card fetch has network. CI=1 -> strict post-process.
             CI=1 just build --release
+          '';
+        };
+
+      # `nix run .#linkcard` -- fetch OGP/GitHub metadata into linkcard-cache.json
+      # using the vendored deps. Runs *outside* the sandbox (network is allowed),
+      # so CI can regenerate the cache from the committed tree before `nix build`,
+      # keeping the cache out of git (no unpublished-draft leak) yet present for
+      # the hermetic build. Passes args through (e.g. `nix run .#linkcard -- --force`).
+      linkcardCmdFor =
+        pkgs:
+        let
+          nodeModules = nodeModulesFor pkgs;
+        in
+        pkgs.writeShellApplication {
+          name = "linkcard";
+          runtimeInputs = [ pkgs.bun ];
+          text = ''
+            [ -e node_modules ] || ln -sfn ${nodeModules}/node_modules ./node_modules
+            bun scripts/fetch-linkcards.ts "$@"
           '';
         };
     in
@@ -77,6 +97,10 @@
         build = {
           type = "app";
           program = "${buildCommandFor pkgs}/bin/build-command";
+        };
+        linkcard = {
+          type = "app";
+          program = "${linkcardCmdFor pkgs}/bin/linkcard";
         };
       });
       devShells = forAllSystems (pkgs: {
