@@ -272,7 +272,7 @@ span.code-highlighted {
   position: relative;
   text-indent: 0;
   border: var(--border-width) solid var(--border);
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
   color: var(--text);
   background: var(--bg);
