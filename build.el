@@ -125,8 +125,7 @@
         ("static"
          :base-directory "./src"
          :base-extension "html\\|js\\|css\\|png\\|jpg\\|jpeg\\|webp\\|gif\\|svg\\|mp4\\|mov\\|woff2\\|pdf"
-         ;; `/ltximg/' holds local LaTeX previews; never published (math is
-         ;; pre-rendered to static KaTeX HTML by `scripts/postprocess.ts').
+         ;; `/ltximg/' holds local LaTeX previews:
          :exclude ,(rx-to-string (rx "ltximg/"))
          ;; :exclude ,(rx-to-string (rx line-start "ltximg"))
          :publishing-directory  "./out"
