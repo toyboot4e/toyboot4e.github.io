@@ -3,12 +3,22 @@
 
 set positional-arguments
 
+# Use bash for recipe lines (for Nix sandbox)
+set shell := ["bash", "-cu"]
+
+port := "8080"
+lh_report := "/tmp/lh-report" # {{lh_report}}.report.{html,json}`
+
 # shows this help message
 help:
     @just -l
 
-# build the devlog (-d --draft, -f --force), then format and postprocess
+# build the devlog (-d --draft, -f --force): minify CSS, fetch link cards,
+# export with Emacs, then format and postprocess
 build *args:
+    @just min-css
+    # Generate `linkcard-cache.json`, dismissing errors:
+    -bun scripts/fetch-linkcards.ts
     emacs -Q --script "./build.el" -- {{args}}
     @just format
 
@@ -25,18 +35,10 @@ clean:
 [private]
 alias c := clean
 
-# format (Prettier) + bake in Prism/KaTeX (scripts/postprocess.ts) the freshly
-# built HTML. Both steps skip files already stamped with the `<!--pp-->`
-# sentinel.
+# format and run the post processing script, embedding `<!--pp-->` sentinel.
+# CI=1 makes the post-process strict.
 format:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    mapfile -t files < <(grep -rL --include='*.html' -- '<!--pp-->' out 2>/dev/null || true)
-    if [ "${#files[@]}" -eq 0 ]; then echo "post: nothing to bake"; exit 0; fi
-    echo "post: formatting + baking ${#files[@]} file(s).."
-    # Run prettier first
-    prettier --print-width 100 --write "${files[@]}" >/dev/null
-    bun scripts/postprocess.ts "${files[@]}"
+    bash scripts/format.sh
 
 [private]
 alias fmt := format
@@ -44,76 +46,65 @@ alias fmt := format
 [private]
 alias f := format
 
-# minify hand-written CSS in `src/style/` into `*.min.css` (re-run after editing CSS)
+# fetch OGP metadata for `[[card:URL]]` links into `linkcard-cache.json` (-f, URLs)
+linkcards *args:
+    bun scripts/fetch-linkcards.ts {{args}}
+
+[private]
+alias lc := linkcards
+
+# minify hand-written CSS in `src/style/` into `*.min.css` (also run by `build`)
 min-css:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    for f in style prism-dark prism-light ; do
-        npx --yes esbuild "src/style/$f.css" --minify --outfile="src/style/$f.min.css" --log-level=warning
-        echo "  $f.css -> $f.min.css ($(wc -c < "src/style/$f.css") -> $(wc -c < "src/style/$f.min.css") bytes)"
-    done
+    bash scripts/min-css.sh
 
 # starts HTTP server
 serve:
-    cd out && python3 -m http.server 8080
+    cd out && python3 -m http.server {{port}}
 
 [private]
 alias s := serve
 
-# audit a built page with Lighthouse (needs `just serve` running)
+# audit a built page with Lighthouse (requires local server at {{port}})
 audit page="index.html":
     #!/usr/bin/env bash
     set -euo pipefail
-    # Audits the running `just serve` (port 8080); start it first in another shell.
-    if ! curl -sf -o /dev/null "http://localhost:8080/{{page}}" ; then
-        echo "no server on :8080 — run \`just serve\` in another shell first" >&2
+    if ! curl -sf -o /dev/null "http://localhost:{{port}}/{{page}}" ; then
+        echo "no server on :{{port}} — run \`just serve\` in another shell first" >&2
         exit 1
     fi
     CHROME_PATH="$(command -v chromium)" npx --yes lighthouse@latest \
-        "http://localhost:8080/{{page}}" \
-        --quiet --output=html --output=json --output-path=/tmp/lh-report \
+        "http://localhost:{{port}}/{{page}}" \
+        --quiet --output=html --output=json --output-path={{lh_report}} \
         --chrome-flags="--headless=new --no-sandbox --disable-gpu" \
         --only-categories=performance,accessibility,best-practices,seo
-    echo "report: /tmp/lh-report.report.html"
+    echo "report: {{lh_report}}.report.html"
 
 [private]
 alias a := audit
 
 # audit, then open the HTML report in a browser
 audit-open page="index.html": (audit page)
-    xdg-open /tmp/lh-report.report.html
+    xdg-open {{lh_report}}.report.html
+
+[private]
+alias ao := audit-open
 
 # audit, then print a compact, agent-friendly summary from the report JSON
 audit-ai page="index.html": (audit page)
-    #!/usr/bin/env bash
-    set -euo pipefail
-    node -e '
-      const r = require("/tmp/lh-report.report.json");
-      const a = r.audits;
-      const sc = (o) => Math.round(o.score * 100);
-      console.log("# Lighthouse — " + (r.finalDisplayedUrl || r.finalUrl || r.requestedUrl));
-      console.log(Object.values(r.categories).map((c) => c.title + " " + sc(c)).join(" | "));
-      const m = ["first-contentful-paint","largest-contentful-paint","total-blocking-time","cumulative-layout-shift","speed-index"];
-      console.log("\nMetrics: " + m.filter((k) => a[k]).map((k) => a[k].title + " " + a[k].displayValue).join(" | "));
-      const fails = Object.values(a).filter((x) => x.score !== null && x.score < 0.9).sort((x, y) => x.score - y.score);
-      console.log("\nIssues (" + fails.length + "):");
-      for (const x of fails) {
-        const ms = x.details && x.details.overallSavingsMs ? " (~" + Math.round(x.details.overallSavingsMs) + "ms)" : "";
-        console.log("- [" + Math.round(x.score * 100) + "] " + x.title + ms);
-      }
-    '
+    bun scripts/audit-summary.ts {{lh_report}}.report.json
 
-# start watching source files and runs `build` on chane
+# start watching source files and runs `build` on change
 watch *args:
     #!/usr/bin/env bash
     echo "start watching.."
+    exts="el,org,css,scss,js,webp,png,jpg,jpeg,gif,svg"
+    ig=(--ignore 'index.org' --ignore '**/tags/**' --ignore '**/ltximg/**' --ignore '**/*.min.css')
     if [[ "${1:-}" == "-d" || "${1:-}" == "--draft" ]] ; then
         echo "draft build"
-        # watchexec -e org -w draft --ignore "index.org" "just build --draft && just format"
-        watchexec -e el,org,css -w draft --ignore "index.org" "just build --draft"
+        watchexec -e "$exts" -w src "${ig[@]}" "just build --draft"
     elif [[ -z "${1:-}" || "${1:-}" == "-r" || "${1:-}" == "--release" ]] ; then
         echo "release build"
-        watchexec -e el,org,css -w src --ignore "index.org" "just build --release && just format"
+        watchexec -e "$exts" -w src "${ig[@]}" "just build --release"
     else
         echo "invalid option"
     fi

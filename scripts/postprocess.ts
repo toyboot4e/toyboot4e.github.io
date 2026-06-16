@@ -36,6 +36,7 @@ import { dirname, join } from "node:path";
 const STRICT = process.argv.includes("--strict") || !!process.env.CI;
 const SENTINEL = "<!--pp-->";
 const OUT = "out";
+const CARD_CACHE = "linkcard-cache.json";
 
 // Rendered as-is, never highlighted, never an error: the plaintext aliases plus
 // languages that stock Prism has no grammar for and that we deliberately show
@@ -82,7 +83,9 @@ const hdoc = hw.document;
 let nFiles = 0, nSkippedFiles = 0;
 let nPlain = 0, nDom = 0, nUnknown = 0, nHlError = 0;
 let nMath = 0, nMathError = 0;
+let nCards = 0, nCardMiss = 0;
 const unknownLangs = new Set<string>();
+const missingCards = new Set<string>();
 const warn = (m: string) => console.warn(`  ! ${m}`);
 
 // --- code highlighting -----------------------------------------------------
@@ -176,6 +179,177 @@ function renderMath(document: any): void {
   }
 }
 
+// --- link cards ------------------------------------------------------------
+// Emacs turns `[[card:URL]]` into `<a class="link-card" href data-link-card>`;
+// here we fill it from the committed cache (populated offline by `just
+// linkcards` -> scripts/fetch-linkcards.ts). A URL missing from the cache
+// degrades to a plain link and, under --strict (CI/nix), fails the build -- so
+// the offline build always has the metadata it needs in source.
+type Card = {
+  kind?: "card" | "github-code";
+  // kind: card (OGP)
+  title?: string; description?: string; image?: string; siteName?: string; favicon?: string;
+  // kind: github-code
+  owner?: string; repo?: string; refLabel?: string; path?: string;
+  startLine?: number; endLine?: number; lang?: string; code?: string;
+};
+let cards: Record<string, Card> = {};
+try {
+  cards = JSON.parse(await readFile(CARD_CACHE, "utf8"));
+} catch {
+  /* no cache yet -- every card will degrade (and fail strict) */
+}
+
+const esc = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+function addClass(el: any, cls: string): void {
+  const cur = (el.getAttribute("class") || "").split(/\s+/).filter(Boolean);
+  if (!cur.includes(cls)) cur.push(cls);
+  el.setAttribute("class", cur.join(" "));
+}
+
+// Replace the placeholder anchor with a block element. If the anchor is the
+// sole content of its parent `<p>` (the usual case -- a card on its own line),
+// replace that `<p>`, so the block isn't nested inside a paragraph; otherwise
+// replace the anchor in place.
+function replaceWithBlock(a: any, html: string, document: any): void {
+  let p = a.parentNode;
+  while (p && p.nodeName !== "P") p = p.parentNode;
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html;
+  const node = tmp.firstElementChild;
+  if (!node) return;
+  const target = p && p.textContent.trim() === a.textContent.trim() ? p : a;
+  target.parentNode.replaceChild(node, target);
+}
+
+// GitHub code embeds are highlighted with Prism (same as the rest of the site),
+// with a line-number gutter starting at the real source line. The Prism
+// `line-numbers` plugin only emits its gutter for an *attached* <pre> (it reads
+// the `line-numbers` class + `data-start` off the parent), so -- unlike the
+// general highlightCode path which reuses a detached <code> -- we highlight a
+// full <pre> built in the happy-dom document, then splice its HTML into the card.
+// build.el only links the Prism stylesheets when the *exported* page already
+// contains `language-` (see `has-code`). A GitHub embed's code is injected here,
+// after export, so a page whose only code is an embed would ship unstyled
+// (no highlighting, no gutter). Add the links if missing, mirroring build.el's
+// markup exactly (ids + media) so style.js's theme toggle still controls them.
+function ensurePrismCss(document: any): void {
+  if (document.getElementById("prism-dark")) return;
+  const head = document.querySelector("head");
+  if (!head) return;
+  for (const [id, file, scheme] of [
+    ["prism-dark", "prism-dark.min.css", "dark"],
+    ["prism-light", "prism-light.min.css", "light"],
+  ]) {
+    const link = document.createElement("link");
+    link.setAttribute("rel", "stylesheet");
+    link.setAttribute("id", id);
+    link.setAttribute("href", `/style/${file}`);
+    link.setAttribute("media", `(prefers-color-scheme: ${scheme})`);
+    head.appendChild(link);
+  }
+}
+
+function renderGitHubCode(a: any, url: string, c: Card, document: any): void {
+  // Header leads with `filename:Lnn` (leftmost); repo + ref pushed to the right.
+  const lines =
+    c.startLine === c.endLine ? `L${c.startLine}` : `L${c.startLine}-L${c.endLine}`;
+  const repo = `${c.owner}/${c.repo}${c.refLabel ? ` @ ${c.refLabel}` : ""}`;
+  // GitHub mark (octicon, inlined so no external request) + a trailing ↗ mark
+  // the header as an external GitHub link, since the Prism-highlighted body
+  // otherwise reads as a plain code block.
+  const ghIcon =
+    '<svg class="gh-embed-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="currentColor" aria-hidden="true">' +
+    '<path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.27-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>';
+  const head =
+    ghIcon +
+    `<span class="gh-embed-loc">` +
+    `<span class="gh-embed-path">${esc(c.path || "")}</span>` +
+    `<span class="gh-embed-lines">:${esc(lines)}</span>` +
+    `</span>` +
+    `<span class="gh-embed-repo">${esc(repo)}</span>` +
+    `<span class="gh-embed-ext" aria-hidden="true">↗</span>`;
+
+  let codeBlock: string;
+  if (c.lang && Prism.languages[c.lang]) {
+    const pre = hdoc.createElement("pre");
+    pre.className = "gh-embed-code line-numbers";
+    pre.setAttribute("data-start", String(c.startLine || 1));
+    const code = hdoc.createElement("code");
+    code.className = `language-${c.lang}`;
+    code.textContent = c.code || "";
+    pre.appendChild(code);
+    hdoc.body.appendChild(pre); // line-numbers plugin needs the <pre> parent
+    try {
+      Prism.highlightElement(code);
+      codeBlock = pre.outerHTML;
+      ensurePrismCss(document); // page may have no other code block
+      nDom++;
+    } catch (e: any) {
+      nHlError++;
+      warn(`gh embed highlight failed (${c.lang}): ${e?.message ?? e}`);
+      codeBlock = `<pre class="gh-embed-code gh-embed-plain"><code>${esc(c.code || "")}</code></pre>`;
+    } finally {
+      hdoc.body.removeChild(pre);
+    }
+  } else {
+    codeBlock = `<pre class="gh-embed-code gh-embed-plain"><code>${esc(c.code || "")}</code></pre>`;
+  }
+
+  const html =
+    `<figure class="gh-embed">` +
+    `<figcaption class="gh-embed-head">` +
+    `<a href="${esc(url)}" target="_blank" rel="noopener">${head}</a>` +
+    `</figcaption>` +
+    codeBlock +
+    `</figure>`;
+  replaceWithBlock(a, html, document);
+  nCards++;
+}
+
+function renderLinkCards(document: any): void {
+  for (const a of document.querySelectorAll("a[data-link-card]")) {
+    a.removeAttribute("data-link-card");
+    const url = a.getAttribute("href") || "";
+    const card = cards[url];
+    if (!card) {
+      nCardMiss++;
+      missingCards.add(url);
+      addClass(a, "link-card--plain");
+      warn(`link card not in cache (run \`just linkcards\`): ${url}`);
+      continue;
+    }
+    if (card.kind === "github-code") {
+      renderGitHubCode(a, url, card, document);
+      continue;
+    }
+    a.setAttribute("target", "_blank");
+    a.setAttribute("rel", "noopener");
+    let host = "";
+    try { host = new URL(url).hostname; } catch { /* keep empty */ }
+    const site = esc(card.siteName || host);
+    const favicon = card.favicon
+      ? `<img class="link-card-favicon" src="${esc(card.favicon)}" alt="" loading="lazy" decoding="async" width="16" height="16">`
+      : "";
+    const desc = card.description
+      ? `<span class="link-card-desc">${esc(card.description)}</span>`
+      : "";
+    const image = card.image
+      ? `<span class="link-card-image"><img src="${esc(card.image)}" alt="" loading="lazy" decoding="async"></span>`
+      : "";
+    a.innerHTML =
+      `<span class="link-card-text">` +
+      `<span class="link-card-title">${esc(card.title || url)}</span>` +
+      desc +
+      `<span class="link-card-site">${favicon}${site}</span>` +
+      `</span>` +
+      image;
+    nCards++;
+  }
+}
+
 // --- KaTeX assets ----------------------------------------------------------
 // Copy katex.min.css + woff2 fonts into out/style/katex/ (woff2 only: modern
 // browsers never fetch the woff/ttf @font-face fallbacks). Single source of
@@ -208,6 +382,9 @@ async function processFile(file: string): Promise<void> {
   const { document } = parseHTML(html);
   highlightCode(document);
   renderMath(document);
+  // Last: renderGitHubCode highlights its own (attached) <pre>, so running after
+  // highlightCode keeps that pass from re-processing the embed's code.
+  renderLinkCards(document);
   // Stamp right after the doctype so the next run can skip via a string scan.
   let out = document.toString();
   out = /<!doctype html>/i.test(out)
@@ -225,13 +402,15 @@ await copyKatexAssets();
 console.log(
   `post: ${nFiles} processed, ${nSkippedFiles} already stamped | ` +
   `code: ${nPlain} fast + ${nDom} dom, ${nUnknown} unknown, ${nHlError} failed | ` +
-  `math: ${nMath} rendered, ${nMathError} errored`,
+  `math: ${nMath} rendered, ${nMathError} errored | ` +
+  `cards: ${nCards} baked, ${nCardMiss} missing`,
 );
 
-if (STRICT && (nMathError > 0 || nUnknown > 0)) {
+if (STRICT && (nMathError > 0 || nUnknown > 0 || nCardMiss > 0)) {
   console.error(
     `post: FAILED (strict) -- ${nMathError} math error(s), ` +
-    `${nUnknown} unknown language(s)${unknownLangs.size ? `: ${[...unknownLangs].join(", ")}` : ""}`,
+    `${nUnknown} unknown language(s)${unknownLangs.size ? `: ${[...unknownLangs].join(", ")}` : ""}` +
+    `, ${nCardMiss} uncached link card(s)${missingCards.size ? `: ${[...missingCards].join(", ")}` : ""}`,
   );
   process.exit(1);
 }

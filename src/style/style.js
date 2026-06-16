@@ -47,6 +47,16 @@
       applyTheme(next);
     }
   };
+
+  // Keep every tab in sync with the stored value. The `storage` event fires in
+  // *other* same-origin tabs whenever localStorage changes (toggling here, or an
+  // external edit), so the view never drifts from the stored theme. `e.key` is
+  // null on clear(); re-read and re-apply (a removed value falls back to the OS).
+  window.addEventListener("storage", function(e) {
+    if (e.key === STORAGE_KEY || e.key === null) {
+      applyTheme(getPreferredTheme());
+    }
+  });
 })();
 
 /* org-mode code ref feature supoprt */

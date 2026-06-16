@@ -59,15 +59,27 @@
             ))
             nodePackages.prettier
             bun
+            esbuild
+            just
           ];
           text = ''
-            emacs -Q --script "./build.el" -- "--release"
-            # Make the vendored deps resolvable by `bun` from the build cwd.
-            ln -sfn ${nodeModules}/node_modules ./node_modules
-            # Format first
-            find out -name '*.html' -print0 | xargs -0 prettier --print-width 100 --write
-            # Postprocess (CI=1 for strict check)
-            CI=1 bun scripts/postprocess.ts
+            [ -e node_modules ] || ln -sfn ${nodeModules}/node_modules ./node_modules
+            # CI=1: catch error
+            CI=1 just build --release
+          '';
+        };
+
+      linkcardCmdFor =
+        pkgs:
+        let
+          nodeModules = nodeModulesFor pkgs;
+        in
+        pkgs.writeShellApplication {
+          name = "linkcard";
+          runtimeInputs = [ pkgs.bun ];
+          text = ''
+            [ -e node_modules ] || ln -sfn ${nodeModules}/node_modules ./node_modules
+            bun scripts/fetch-linkcards.ts "$@"
           '';
         };
     in
@@ -77,6 +89,10 @@
           type = "app";
           program = "${buildCommandFor pkgs}/bin/build-command";
         };
+        linkcard = {
+          type = "app";
+          program = "${linkcardCmdFor pkgs}/bin/linkcard";
+        };
       });
       devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell {
@@ -85,18 +101,17 @@
             pinact
             watchexec
             zizmor
-            # used by the image scripts in scripts/ and scripts/postprocess.ts
+            just
+            # scripts
             bun
-            libwebp # to-webp.ts: cwebp / gif2webp / webpmux
-            imagemagick # to-webp.ts: identify (dimensions) + magick (gif resize)
+            esbuild # just min-css
+            imagemagick # to-webp.ts
+            libwebp # to-wep.ts
           ];
         };
       });
       packages = forAllSystems (pkgs: rec {
         default = devlog;
-        # Vendored node deps, exposed so `nix build .#node-deps` can surface the
-        # real `npmDepsHash` after a dependency bump.
-        node-deps = nodeModulesFor pkgs;
         devlog = pkgs.stdenvNoCC.mkDerivation {
           name = "devlog";
           src = ./.;

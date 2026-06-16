@@ -743,6 +743,21 @@ INFO is a plist holding contextual information.  See
      (t
       (format "<i>%s</i>" desc)))))
 
+;;; Link cards
+
+;; Register the `card:' link type so Org recognises `[[card:https://...]]' and emit placeholder
+;; anchors.
+;;
+;; The post processing script (`scripts/postprocess.ts') replaces it with a rich OGP card from the
+;; committed `linkcard-cache.json'.
+(org-link-set-parameters
+ "card"
+ :follow (lambda (path &optional _arg) (browse-url path))
+ :export (lambda (path _desc backend _info)
+           (when (org-export-derived-backend-p backend 'html)
+             (let ((url (org-html-encode-plain-text path)))
+               (format "<a class=\"link-card\" href=\"%s\" data-link-card>%s</a>" url url)))))
+
 ;;; Manual sitemap (`index.org') generation
 
 ;; Returns something like:
