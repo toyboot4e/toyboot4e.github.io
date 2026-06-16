@@ -402,9 +402,13 @@ span.code-highlighted {
 }
 
 .link-card-image {
-  flex: 0 0 30%;
-  max-width: 200px;
-  align-self: stretch;
+  /* OG-standard aspect box (Twitter card 1.91:1) so the whole image shows
+     instead of being cropped to the text height. `align-self: center` keeps the
+     box from stretching to the (possibly taller) text column. */
+  flex: 0 0 40%;
+  align-self: center;
+  aspect-ratio: 1.91 / 1;
+  overflow: hidden;
   background: color-mix(in srgb, var(--text) 6%, transparent);
 }
 
@@ -412,8 +416,6 @@ span.code-highlighted {
   display: block;
   width: 100%;
   height: 100%;
-  /* Twitter OGP image aspect */
-  aspect-ratio: 1.91 / 1;
   object-fit: cover;
 }
 
