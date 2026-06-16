@@ -7,9 +7,10 @@ set positional-arguments
 help:
     @just -l
 
-# build the devlog (-d --draft, -f --force)
+# build the devlog (-d --draft, -f --force), then format + bake (Prism/KaTeX SSR)
 build *args:
     emacs -Q --script "./build.el" -- {{args}}
+    @just format
 
 [private]
 alias b := build
@@ -25,16 +26,18 @@ clean:
 alias c := clean
 
 
-# formats the output HTML files in-place
+# format (Prettier) + bake in Prism/KaTeX (scripts/postprocess.ts) the freshly
+# built HTML. Both steps skip files already stamped with the `<!--pp-->`
+# sentinel, so warm rebuilds only touch what Emacs regenerated. Prettier must run
+# *before* the bake so it never reflows the whitespace-sensitive KaTeX markup.
 format:
     #!/usr/bin/env bash
-    echo "formatting all the htmls.."
-    cd out
-    prettier --print-width 100 --write *.html
-    cd diary
-    prettier --print-width 100 --write *.html
-    cd ../tags
-    prettier --print-width 100 --write *.html
+    set -euo pipefail
+    mapfile -t files < <(grep -rL --include='*.html' -- '<!--pp-->' out 2>/dev/null || true)
+    if [ "${#files[@]}" -eq 0 ]; then echo "post: nothing to bake"; exit 0; fi
+    echo "post: formatting + baking ${#files[@]} file(s).."
+    prettier --print-width 100 --write "${files[@]}" >/dev/null
+    bun scripts/postprocess.ts "${files[@]}"
 
 [private]
 alias fmt := format
@@ -111,7 +114,7 @@ watch *args:
         watchexec -e el,org,css -w draft --ignore "index.org" "just build --draft"
     elif [[ -z "${1:-}" || "${1:-}" == "-r" || "${1:-}" == "--release" ]] ; then
         echo "release build"
-        watchexec -e el,org,css -w src --ignore "index.org" "just build --release && just format"
+        watchexec -e el,org,css -w src --ignore "index.org" "just build --release"
     else
         echo "invalid option"
     fi
