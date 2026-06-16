@@ -199,29 +199,33 @@ from `my-eager-image-count' as cards render.")
   ;; Reset `my-codeblock-counter' on new file. TODO: move it to more appropriate place
   (setq my-codeblock-counter 0)
   (let* (;; NOTE: `org-export-data' returns HTML, so we'll remove HTML tags
-        ;; TODO: (substring-no-properties (or (plist-get info :title) "")) may make more sense, but org-mode inline syntax must be removed
-        (title (or (my-strip-html (org-export-data (plist-get info :title) info)) ""))
-        (relative-path
-         (replace-regexp-in-string "\\.org\\'" ".html"
-                                   (file-relative-name
-                                    (plist-get info :input-file)
-                                    default-directory)))
-        ;; OGP / Twitter card metadata, shared by `<meta>' tags below.
-        (description (my-og-description info contents))
-        (page-url (concat my-site-url relative-path))
-        (image (my-absolute-url (plist-get info :thumbnail)))
-        ;; Big image preview when a thumbnail exists, plain summary otherwise.
-        (twitter-card (if image "summary_large_image" "summary"))
-        ;; Only pull in MathJax (~250 KiB) when the body actually contains math.
-        ;; Org exports inline/display math as `\(...\)' / `\[...\]' and keeps
-        ;; LaTeX environments as `\begin{...}'. A stray match in a code block just
-        ;; loads MathJax needlessly, so we err toward loading it.
-        (has-math (and contents
-                       (string-match-p (regexp-opt '("\\(" "\\[" "\\begin{")) contents)))
-        ;; Only pull in Prism (~580 KiB JS + its CSS) on pages that actually
-        ;; contain a highlightable code block. Code exports as
-        ;; `<code class="... language-XXX">' (see `roygbyte/org-html-src-block').
-        (has-code (and contents (string-match-p "language-" contents))))
+         ;; TODO: (substring-no-properties (or (plist-get info :title) "")) may make more sense, but org-mode inline syntax must be removed
+         (title (or (my-strip-html (org-export-data (plist-get info :title) info)) ""))
+         (relative-path
+          (replace-regexp-in-string "\\.org\\'" ".html"
+                                    (file-relative-name
+                                     (plist-get info :input-file)
+                                     default-directory)))
+         ;; OGP / Twitter card metadata, shared by `<meta>' tags below.
+         (description (my-og-description info contents))
+         (page-url (concat my-site-url relative-path))
+         (image (my-absolute-url (plist-get info :thumbnail)))
+         ;; Big image preview when a thumbnail exists, plain summary otherwise.
+         (twitter-card (if image "summary_large_image" "summary"))
+         ;; Only pull in MathJax (~250 KiB) when the body actually contains math.
+         ;; Org exports inline/display math as `\(...\)' / `\[...\]' and keeps
+         ;; LaTeX environments as `\begin{...}'. A stray match in a code block just
+         ;; loads MathJax needlessly, so we err toward loading it.
+         (has-math (and contents
+                        (string-match-p (regexp-opt '("\\(" "\\[" "\\begin{")) contents)))
+         ;; Only pull in Prism (~580 KiB JS + its CSS) on pages that actually
+         ;; contain a highlightable code block. Code exports as
+         ;; `<code class="... language-XXX">' (see `roygbyte/org-html-src-block').
+         (has-code (and contents (string-match-p "language-" contents)))
+         ;; Only ship `steno-viz.js' on pages that actually embed a steno chord
+         ;; chart. `#+BEGIN_STENO' exports as `<steno-outline ...>' (see
+         ;; `my-org-html-steno-block'); the vast majority of pages have none.
+         (has-steno (and contents (string-match-p "<steno-outline" contents))))
     ;; NOTE: `esxml-html' is not on MELPA
     `(head
       (meta (@ (charset "utf-8")))
@@ -231,8 +235,7 @@ from `my-eager-image-count' as cards render.")
       (title (*RAW-STRING* ,(concat title " - Toybeam")))
       (meta (@ (name "description")
                (content ,description)))
-      ;; Inline SVG favicon (\U0001F526). Avoids a `/favicon.ico' request (and
-      ;; its 404), and modern browsers skip the default request once this exists.
+      ;; Inline SVG favicon (\U0001F526):
       (link (@ (rel "icon")
                (href "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>\U0001F526</text></svg>")))
       ;; (link (@ (rel "stylesheet")
@@ -258,13 +261,13 @@ from `my-eager-image-count' as cards render.")
                  (src "/style/style.js"))
               ;; NOTE: empty body is required for self-closing tag
               "")
-      ;; NOTE: Prism highlighting is baked in at build time (`scripts/postprocess.ts'),
-      ;; so no runtime `prism.js' is shipped; only the Prism CSS above is needed.
-      ;; TODO: lazy loading
-      (script (@ (type "text/javascript")
-                 (async "")
-                 (src "/style/steno-viz.js"))
-              "")
+      ;; NOTE: Prism highlighting is baked in at build time (`scripts/postprocess.ts').
+      ;; Only loaded on pages that actually embed a `<steno-outline>' chart.
+      ,@(when has-steno
+          `((script (@ (type "text/javascript")
+                       (async "")
+                       (src "/style/steno-viz.js"))
+                    "")))
       ;; NOTE: math is pre-rendered to static KaTeX HTML at build time
       ;; (`scripts/postprocess.ts'); only `katex.min.css' (linked above) is shipped.
       ;; Open Graph protocol: <https://ogp.me/>
