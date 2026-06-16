@@ -217,7 +217,11 @@ from `my-eager-image-count' as cards render.")
         ;; LaTeX environments as `\begin{...}'. A stray match in a code block just
         ;; loads MathJax needlessly, so we err toward loading it.
         (has-math (and contents
-                       (string-match-p (regexp-opt '("\\(" "\\[" "\\begin{")) contents))))
+                       (string-match-p (regexp-opt '("\\(" "\\[" "\\begin{")) contents)))
+        ;; Only pull in Prism (~580 KiB JS + its CSS) on pages that actually
+        ;; contain a highlightable code block. Code exports as
+        ;; `<code class="... language-XXX">' (see `roygbyte/org-html-src-block').
+        (has-code (and contents (string-match-p "language-" contents))))
     ;; NOTE: `esxml-html' is not on MELPA
     `(head
       (meta (@ (charset "utf-8")))
@@ -232,25 +236,27 @@ from `my-eager-image-count' as cards render.")
       (link (@ (rel "stylesheet")
                (href "/style/simple.min.css")))
       (link (@ (rel "stylesheet")
-               (href "/style/style.css")))
-      (link (@ (rel "stylesheet")
-               (id "prism-dark")
-               (href "/style/prism-dark.css")
-               (media "(prefers-color-scheme: dark)")))
-      (link (@ (rel "stylesheet")
-               (id "prism-light")
-               (href "/style/prism-light.css")
-               (media "(prefers-color-scheme: light)")))
+               (href "/style/style.min.css")))
+      ,@(when has-code
+          `((link (@ (rel "stylesheet")
+                     (id "prism-dark")
+                     (href "/style/prism-dark.min.css")
+                     (media "(prefers-color-scheme: dark)")))
+            (link (@ (rel "stylesheet")
+                     (id "prism-light")
+                     (href "/style/prism-light.min.css")
+                     (media "(prefers-color-scheme: light)")))))
       (script (@ (type "text/javascript")
                  (src "/style/style.js"))
               ;; NOTE: empty body is required for self-closing tag
               "")
-      (script (@ (type "text/javascript")
-                 ;; NOTE: It creates `async=""`. I prefer `async` only, but the value is required for XHTML.
-                 (async "")
-                 (src "/style/prism.js"))
-              ;; NOTE: empty body is required for self-closing tag
-              "")
+      ,@(when has-code
+          `((script (@ (type "text/javascript")
+                       ;; NOTE: It creates `defer=""`. The value is required for XHTML.
+                       (defer "")
+                       (src "/style/prism.js"))
+                    ;; NOTE: empty body is required for self-closing tag
+                    "")))
       ;; TODO: lazy loading
       (script (@ (type "text/javascript")
                  (async "")
@@ -259,7 +265,7 @@ from `my-eager-image-count' as cards render.")
       ,@(when has-math
           `((script (@ (type "text/javascript")
                        (id "MathJax-script")
-                       (async "")
+                       (defer "")
                        (src "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"))
                     "")))
       ;; Open Graph protocol: <https://ogp.me/>
