@@ -9,6 +9,9 @@ help:
 
 # build the devlog (-d --draft, -f --force), then format and postprocess
 build *args:
+    # Generate `linkcard-cache.json`, dismissing errors:
+    -bun scripts/fetch-linkcards.ts
+    # Populate `linkcard-cache.json` for `[[card:URL]]` syntax:
     emacs -Q --script "./build.el" -- {{args}}
     @just format
 
@@ -43,6 +46,13 @@ alias fmt := format
 
 [private]
 alias f := format
+
+# fetch OGP metadata for `[[card:URL]]` links into `linkcard-cache.json` (-f, URLs)
+linkcards *args:
+    bun scripts/fetch-linkcards.ts {{args}}
+
+[private]
+alias lc := linkcards
 
 # minify hand-written CSS in `src/style/` into `*.min.css` (re-run after editing CSS)
 min-css:

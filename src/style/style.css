@@ -331,6 +331,188 @@ span.code-highlighted {
   z-index: 2;
 }
 
+/* Link card: `[[card:URL]]`, an OGP preview baked in at build time
+   (scripts/postprocess.ts). Phrasing-only markup so it stays valid inside the
+   `<p>` Org wraps a lone link in. */
+.link-card {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 0;
+  /* Full article width (like .gh-embed); the thumbnail keeps a fixed ratio. */
+  margin: 1rem 0;
+  border: var(--border-width) solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  color: var(--text);
+  background: var(--bg);
+  text-decoration: none;
+}
+
+.link-card:hover {
+  border-color: var(--accent-hover);
+  background-color: color-mix(in srgb, var(--accent-hover) 5%, transparent);
+}
+
+.link-card-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.3em;
+  padding: 0.6rem 0.9rem;
+  min-width: 0; /* allow children to truncate */
+  flex: 1 1 auto;
+  line-height: 1.35;
+}
+
+.link-card-title {
+  font-weight: 600;
+  /* clamp to two lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.link-card-desc {
+  font-size: 0.85em;
+  color: var(--text-light);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.link-card-site {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  font-size: 0.8em;
+  color: var(--text-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.link-card-favicon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  border-radius: 3px;
+}
+
+.link-card-image {
+  flex: 0 0 30%;
+  max-width: 200px;
+  align-self: stretch;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.link-card-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Twitter OGP image aspect */
+  aspect-ratio: 1.91 / 1;
+  object-fit: cover;
+}
+
+/* A `[[card:URL]]` whose metadata wasn't in the cache: renders as a plain link. */
+.link-card--plain {
+  display: inline;
+}
+
+@media (max-width: 600px) {
+  .link-card-image {
+    flex-basis: 35%;
+  }
+}
+
+/* GitHub source-line embed: `[[card:github.com/.../blob/<sha>/file#L10-L20]]`.
+   The header links to GitHub; the `<pre>` is Prism-highlighted like any code. */
+.gh-embed {
+  margin: 1rem 0;
+  border: var(--border-width) solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.gh-embed-head {
+  /* Override simple.css's figcaption defaults (sticky, centered, 1rem margin)
+     so the header sits flush inside the figure border. */
+  margin: 0;
+  position: static;
+  text-align: left;
+  font-size: 0.8em;
+  padding: 0.4rem 0.7rem;
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+  border-bottom: var(--border-width) solid var(--border);
+}
+
+.gh-embed-head a {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  color: var(--text-light);
+  text-decoration: none;
+}
+
+.gh-embed-head a:hover {
+  color: var(--accent-hover);
+}
+
+/* `filename:line`, leftmost. The path may ellipsize when space is tight; the
+   line range never does. */
+.gh-embed-loc {
+  display: flex;
+  align-items: baseline;
+  min-width: 0; /* let the path ellipsize instead of pushing the line range out */
+  flex: 0 1 auto;
+  font-family: monospace, monospace;
+}
+
+.gh-embed-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gh-embed-lines {
+  flex: none; /* never cut the line range */
+  white-space: nowrap;
+}
+
+/* repo (+ ref), pushed to the right edge. */
+.gh-embed-repo {
+  margin-left: auto;
+  padding-left: 0.5em;
+  white-space: nowrap;
+  font-family: monospace, monospace;
+}
+
+/* Prism-highlighted code (same theme as the rest of the site). Prism's theme +
+   line-numbers CSS supply the background, padding, and gutter; `data-start` (set
+   in postprocess.ts) makes the gutter begin at the real source line.
+   The descendant selector (two classes) outranks Prism's `pre[class*=language-]`
+   (0,1,1), whose `margin:.5em 0` + `border-radius:.3em` would otherwise leave a
+   gap and rounded inner corners — so the code background fills flush to the
+   card border, header and code together filling the figure. */
+.gh-embed .gh-embed-code {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  max-height: 24rem;
+  overflow: auto;
+}
+
+/* Unhighlighted fallback (Prism lacked the grammar): keep it readable. */
+.gh-embed-plain {
+  padding: 0.7rem 0.9rem;
+  font-size: 0.85em;
+  white-space: pre;
+  overflow: auto;
+}
+
 /* ToC (sticky, right side) */
 
 @media (max-width: 1100px) {
