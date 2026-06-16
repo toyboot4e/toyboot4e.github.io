@@ -59,15 +59,16 @@
             ))
             nodePackages.prettier
             bun
+            esbuild
+            just
           ];
           text = ''
-            emacs -Q --script "./build.el" -- "--release"
             # Make the vendored deps resolvable by `bun` from the build cwd.
             ln -sfn ${nodeModules}/node_modules ./node_modules
-            # Format first
-            find out -name '*.html' -print0 | xargs -0 prettier --print-width 100 --write
-            # Postprocess (CI=1 for strict check)
-            CI=1 bun scripts/postprocess.ts
+            # Reuse the Justfile build verbatim, so this never drifts from a local
+            # build. Offline-safe: the link-card fetch is `-`-dismissed and the
+            # committed linkcard-cache.json supplies metadata. CI=1 -> strict.
+            CI=1 just build --release
           '';
         };
     in
@@ -85,6 +86,8 @@
             pinact
             watchexec
             zizmor
+            just
+            esbuild # `just min-css`
             # used by the image scripts in scripts/ and scripts/postprocess.ts
             bun
             libwebp # to-webp.ts: cwebp / gif2webp / webpmux

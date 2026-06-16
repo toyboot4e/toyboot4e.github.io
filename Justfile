@@ -2,16 +2,20 @@
 # <https://github.com/casey/just>
 
 set positional-arguments
+# Use bash for recipe lines (always present, incl. the nix build sandbox, where
+# `/usr/bin/env` for `#!`-shebang recipes is not).
+set shell := ["bash", "-cu"]
 
 # shows this help message
 help:
     @just -l
 
-# build the devlog (-d --draft, -f --force), then format and postprocess
+# build the devlog (-d --draft, -f --force): minify CSS, fetch link cards,
+# export with Emacs, then format and postprocess
 build *args:
+    @just min-css
     # Generate `linkcard-cache.json`, dismissing errors:
     -bun scripts/fetch-linkcards.ts
-    # Populate `linkcard-cache.json` for `[[card:URL]]` syntax:
     emacs -Q --script "./build.el" -- {{args}}
     @just format
 
@@ -30,16 +34,9 @@ alias c := clean
 
 # format (Prettier) + bake in Prism/KaTeX (scripts/postprocess.ts) the freshly
 # built HTML. Both steps skip files already stamped with the `<!--pp-->`
-# sentinel.
+# sentinel. CI=1 makes the post-process strict.
 format:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    mapfile -t files < <(grep -rL --include='*.html' -- '<!--pp-->' out 2>/dev/null || true)
-    if [ "${#files[@]}" -eq 0 ]; then echo "post: nothing to bake"; exit 0; fi
-    echo "post: formatting + baking ${#files[@]} file(s).."
-    # Run prettier first
-    prettier --print-width 100 --write "${files[@]}" >/dev/null
-    bun scripts/postprocess.ts "${files[@]}"
+    bash scripts/format.sh
 
 [private]
 alias fmt := format
@@ -54,14 +51,9 @@ linkcards *args:
 [private]
 alias lc := linkcards
 
-# minify hand-written CSS in `src/style/` into `*.min.css` (re-run after editing CSS)
+# minify hand-written CSS in `src/style/` into `*.min.css` (also run by `build`)
 min-css:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    for f in style prism-dark prism-light ; do
-        npx --yes esbuild "src/style/$f.css" --minify --outfile="src/style/$f.min.css" --log-level=warning
-        echo "  $f.css -> $f.min.css ($(wc -c < "src/style/$f.css") -> $(wc -c < "src/style/$f.min.css") bytes)"
-    done
+    bash scripts/min-css.sh
 
 # starts HTTP server
 serve:
@@ -121,10 +113,10 @@ watch *args:
     ig=(--ignore 'index.org' --ignore '**/tags/**' --ignore '**/ltximg/**' --ignore '**/*.min.css')
     if [[ "${1:-}" == "-d" || "${1:-}" == "--draft" ]] ; then
         echo "draft build"
-        watchexec -e "$exts" -w src "${ig[@]}" "just min-css && just build --draft"
+        watchexec -e "$exts" -w src "${ig[@]}" "just build --draft"
     elif [[ -z "${1:-}" || "${1:-}" == "-r" || "${1:-}" == "--release" ]] ; then
         echo "release build"
-        watchexec -e "$exts" -w src "${ig[@]}" "just min-css && just build --release"
+        watchexec -e "$exts" -w src "${ig[@]}" "just build --release"
     else
         echo "invalid option"
     fi
