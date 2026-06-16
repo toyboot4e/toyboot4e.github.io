@@ -1,0 +1,12 @@
+{
+  "name": "toyboot4e-devlog-build",
+  "private": true,
+  "type": "module",
+  "description": "Build-time post-processing for the devlog (Prism + KaTeX SSR).",
+  "dependencies": {
+    "happy-dom": "^15.0.0",
+    "katex": "^0.16.0",
+    "linkedom": "^0.18.0",
+    "prismjs": "^1.29.0"
+  }
+}

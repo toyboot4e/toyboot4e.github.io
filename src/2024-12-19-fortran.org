@@ -112,7 +112,7 @@ $ python src/libasr/asdl_cpp.py grammar/AST.asdl src/lfortran/ast.h
 
 まあでも =.asdl= の方が分かりやすそうです。 [[https://github.com/lfortran/lfortran/blob/5ebf07740600ccdbeeab8db143f1bb0f320a0f7a/grammar/AST.asdl][AST.asdl]] から一部抜粋すると、 read/write 文の文法が記載されています。
 
-#+BEGIN_SRC asdl
+#+BEGIN_SRC txt
 stmt
     = ..
     | Read(int label, expr? format, argstar* args,

@@ -12,6 +12,13 @@ on:
     paths:
       - src/**
       - build.el
+      - ox-slimhtml.el
+      # the build-time post-process pass and its offline deps (nix build .#devlog)
+      - scripts/**
+      - flake.nix
+      - flake.lock
+      - package.json
+      - package-lock.json
 
 # Deny all permissions by default; grant per job below
 permissions: {}

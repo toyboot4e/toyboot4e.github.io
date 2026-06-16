@@ -13,8 +13,41 @@
         nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
           system: f (import nixpkgs { inherit system; })
         );
+
+      # For `scripts/postprocess.ts`.
+      #
+      # After bumping deps: regenerate `package-lock.json`, set `npmDepsHash` to
+      # `lib.fakeHash`, run `nix build`, and copy the `got:` hash from the error.
+      nodeModulesFor =
+        pkgs:
+        pkgs.buildNpmPackage {
+          pname = "devlog-node-deps";
+          version = "0";
+          src = pkgs.lib.cleanSourceWith {
+            src = ./.;
+            filter =
+              path: _type:
+              let
+                b = baseNameOf path;
+              in
+              b == "package.json" || b == "package-lock.json";
+          };
+          npmDepsHash = "sha256-hEMkfI5hqRVOmAJiLM7LSKFNccjq599BjwiN8IQSvIU=";
+          dontNpmBuild = true;
+          # We only want node_modules, not a packaged/installed app.
+          installPhase = ''
+            runHook preInstall
+            mkdir -p "$out"
+            cp -r node_modules "$out/node_modules"
+            runHook postInstall
+          '';
+        };
+
       buildCommandFor =
         pkgs:
+        let
+          nodeModules = nodeModulesFor pkgs;
+        in
         pkgs.writeShellApplication {
           name = "build-command";
           runtimeInputs = with pkgs; [
@@ -25,10 +58,16 @@
               ]
             ))
             nodePackages.prettier
+            bun
           ];
           text = ''
             emacs -Q --script "./build.el" -- "--release"
-            prettier --print-width 100 --write out/*.html out/diary/*.html
+            # Make the vendored deps resolvable by `bun` from the build cwd.
+            ln -sfn ${nodeModules}/node_modules ./node_modules
+            # Format first
+            find out -name '*.html' -print0 | xargs -0 prettier --print-width 100 --write
+            # Postprocess (CI=1 for strict check)
+            CI=1 bun scripts/postprocess.ts
           '';
         };
     in
@@ -46,7 +85,7 @@
             pinact
             watchexec
             zizmor
-            # used by the image scripts in scripts/
+            # used by the image scripts in scripts/ and scripts/postprocess.ts
             bun
             libwebp # to-webp.ts: cwebp / gif2webp / webpmux
             imagemagick # to-webp.ts: identify (dimensions) + magick (gif resize)
@@ -55,6 +94,9 @@
       });
       packages = forAllSystems (pkgs: rec {
         default = devlog;
+        # Vendored node deps, exposed so `nix build .#node-deps` can surface the
+        # real `npmDepsHash` after a dependency bump.
+        node-deps = nodeModulesFor pkgs;
         devlog = pkgs.stdenvNoCC.mkDerivation {
           name = "devlog";
           src = ./.;

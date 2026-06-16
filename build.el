@@ -125,7 +125,7 @@
         ("static"
          :base-directory "./src"
          :base-extension "html\\|js\\|css\\|png\\|jpg\\|jpeg\\|webp\\|gif\\|svg\\|mp4\\|mov\\|woff2\\|pdf"
-         ;; `/ltximg/' is for previewing. MathJax is used at runtime.
+         ;; `/ltximg/' holds local LaTeX previews:
          :exclude ,(rx-to-string (rx "ltximg/"))
          ;; :exclude ,(rx-to-string (rx line-start "ltximg"))
          :publishing-directory  "./out"
@@ -199,29 +199,33 @@ from `my-eager-image-count' as cards render.")
   ;; Reset `my-codeblock-counter' on new file. TODO: move it to more appropriate place
   (setq my-codeblock-counter 0)
   (let* (;; NOTE: `org-export-data' returns HTML, so we'll remove HTML tags
-        ;; TODO: (substring-no-properties (or (plist-get info :title) "")) may make more sense, but org-mode inline syntax must be removed
-        (title (or (my-strip-html (org-export-data (plist-get info :title) info)) ""))
-        (relative-path
-         (replace-regexp-in-string "\\.org\\'" ".html"
-                                   (file-relative-name
-                                    (plist-get info :input-file)
-                                    default-directory)))
-        ;; OGP / Twitter card metadata, shared by `<meta>' tags below.
-        (description (my-og-description info contents))
-        (page-url (concat my-site-url relative-path))
-        (image (my-absolute-url (plist-get info :thumbnail)))
-        ;; Big image preview when a thumbnail exists, plain summary otherwise.
-        (twitter-card (if image "summary_large_image" "summary"))
-        ;; Only pull in MathJax (~250 KiB) when the body actually contains math.
-        ;; Org exports inline/display math as `\(...\)' / `\[...\]' and keeps
-        ;; LaTeX environments as `\begin{...}'. A stray match in a code block just
-        ;; loads MathJax needlessly, so we err toward loading it.
-        (has-math (and contents
-                       (string-match-p (regexp-opt '("\\(" "\\[" "\\begin{")) contents)))
-        ;; Only pull in Prism (~580 KiB JS + its CSS) on pages that actually
-        ;; contain a highlightable code block. Code exports as
-        ;; `<code class="... language-XXX">' (see `roygbyte/org-html-src-block').
-        (has-code (and contents (string-match-p "language-" contents))))
+         ;; TODO: (substring-no-properties (or (plist-get info :title) "")) may make more sense, but org-mode inline syntax must be removed
+         (title (or (my-strip-html (org-export-data (plist-get info :title) info)) ""))
+         (relative-path
+          (replace-regexp-in-string "\\.org\\'" ".html"
+                                    (file-relative-name
+                                     (plist-get info :input-file)
+                                     default-directory)))
+         ;; OGP / Twitter card metadata, shared by `<meta>' tags below.
+         (description (my-og-description info contents))
+         (page-url (concat my-site-url relative-path))
+         (image (my-absolute-url (plist-get info :thumbnail)))
+         ;; Big image preview when a thumbnail exists, plain summary otherwise.
+         (twitter-card (if image "summary_large_image" "summary"))
+         ;; Only pull in MathJax (~250 KiB) when the body actually contains math.
+         ;; Org exports inline/display math as `\(...\)' / `\[...\]' and keeps
+         ;; LaTeX environments as `\begin{...}'. A stray match in a code block just
+         ;; loads MathJax needlessly, so we err toward loading it.
+         (has-math (and contents
+                        (string-match-p (regexp-opt '("\\(" "\\[" "\\begin{")) contents)))
+         ;; Only pull in Prism (~580 KiB JS + its CSS) on pages that actually
+         ;; contain a highlightable code block. Code exports as
+         ;; `<code class="... language-XXX">' (see `roygbyte/org-html-src-block').
+         (has-code (and contents (string-match-p "language-" contents)))
+         ;; Only ship `steno-viz.js' on pages that actually embed a steno chord
+         ;; chart. `#+BEGIN_STENO' exports as `<steno-outline ...>' (see
+         ;; `my-org-html-steno-block'); the vast majority of pages have none.
+         (has-steno (and contents (string-match-p "<steno-outline" contents))))
     ;; NOTE: `esxml-html' is not on MELPA
     `(head
       (meta (@ (charset "utf-8")))
@@ -231,6 +235,9 @@ from `my-eager-image-count' as cards render.")
       (title (*RAW-STRING* ,(concat title " - Toybeam")))
       (meta (@ (name "description")
                (content ,description)))
+      ;; Inline SVG favicon (\U0001F526):
+      (link (@ (rel "icon")
+               (href "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>\U0001F526</text></svg>")))
       ;; (link (@ (rel "stylesheet")
       ;;          (href "https://cdn.simplecss.org/simple.min.css")))
       (link (@ (rel "stylesheet")
@@ -246,28 +253,23 @@ from `my-eager-image-count' as cards render.")
                      (id "prism-light")
                      (href "/style/prism-light.min.css")
                      (media "(prefers-color-scheme: light)")))))
+      ;; KaTeX CSS for build-time pre-rendered math (see `scripts/postprocess.ts').
+      ,@(when has-math
+          `((link (@ (rel "stylesheet")
+                     (href "/style/katex/katex.min.css")))))
       (script (@ (type "text/javascript")
                  (src "/style/style.js"))
               ;; NOTE: empty body is required for self-closing tag
               "")
-      ,@(when has-code
+      ;; NOTE: Prism highlighting is baked in at build time (`scripts/postprocess.ts').
+      ;; Only loaded on pages that actually embed a `<steno-outline>' chart.
+      ,@(when has-steno
           `((script (@ (type "text/javascript")
-                       ;; NOTE: It creates `defer=""`. The value is required for XHTML.
-                       (defer "")
-                       (src "/style/prism.js"))
-                    ;; NOTE: empty body is required for self-closing tag
+                       (async "")
+                       (src "/style/steno-viz.js"))
                     "")))
-      ;; TODO: lazy loading
-      (script (@ (type "text/javascript")
-                 (async "")
-                 (src "/style/steno-viz.js"))
-              "")
-      ,@(when has-math
-          `((script (@ (type "text/javascript")
-                       (id "MathJax-script")
-                       (defer "")
-                       (src "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"))
-                    "")))
+      ;; NOTE: math is pre-rendered to static KaTeX HTML at build time
+      ;; (`scripts/postprocess.ts'); only `katex.min.css' (linked above) is shipped.
       ;; Open Graph protocol: <https://ogp.me/>
       (meta (@ (property "og:type")
                (content "article")))

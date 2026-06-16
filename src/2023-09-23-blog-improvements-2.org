@@ -32,7 +32,7 @@
 今回 =#+BEGIN_DETAILS= という /special block/ (custom block) を追加しました。 =<details>= タグを簡単に記述できるようになりました。
 
 #+CAPTION: 変換前 (=org-mode=)
-#+BEGIN_SRC org-mode
+#+BEGIN_SRC org
 #+BEGIN_DETAILS ここにタイトル
 折りたたみ表示
 #+END_DETAILS
