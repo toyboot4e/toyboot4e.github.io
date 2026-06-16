@@ -42,6 +42,15 @@ alias fmt := format
 [private]
 alias f := format
 
+# minify hand-written CSS in `src/style/` into `*.min.css` (re-run after editing CSS)
+min-css:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for f in style prism-dark prism-light ; do
+        npx --yes esbuild "src/style/$f.css" --minify --outfile="src/style/$f.min.css" --log-level=warning
+        echo "  $f.css -> $f.min.css ($(wc -c < "src/style/$f.css") -> $(wc -c < "src/style/$f.min.css") bytes)"
+    done
+
 # starts HTTP server
 serve:
     cd out && python3 -m http.server 8080
