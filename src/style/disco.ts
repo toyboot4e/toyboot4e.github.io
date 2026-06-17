@@ -757,9 +757,14 @@ function start(): void {
     false,
   );
 
-  // Fade in on a fresh/external visit; same-site navigation appears instantly
-  // (and continues the animation from the shared clock — see discoEpoch).
-  if (!fromSameSite) animate();
+  // Always fade the effect in on first paint — including same-site navigation.
+  // The WebGL canvas can't draw until its context + shaders warm up (a frame or
+  // two after the page renders), so an instant reveal popped in abruptly after
+  // that gap, read as a flash when moving between pages. Fading 0 → onOpacity
+  // absorbs the warm-up into a smooth rise. (The animation still continues from
+  // the shared clock — see discoEpoch — so it doesn't restart, just fades up.)
+  void fromSameSite;
+  animate();
 
   sync();
 }
