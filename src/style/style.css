@@ -41,10 +41,12 @@ header > nav a:visited {
 }
 
 /* Footer: drop simple.css's padding (keep a little at the bottom); its 4rem top
-   margin is too much space. */
+   margin is too much space. `margin-top: auto` (with the body flex column below)
+   sinks the footer to the bottom of the viewport on short pages WITHOUT stretching
+   the content; the gap above it on long pages comes from `main`'s margin-bottom. */
 body > footer {
   padding: 0 0 0.6rem 0;
-  margin-top: 2rem;
+  margin-top: auto;
 }
 
 /* tighten the roomy "Styled with…" paragraph (simple.css gives p a 1.5rem
@@ -62,10 +64,23 @@ body > footer > p {
 
 /* ============================================================ */
 
+/* Flex column so the footer's `margin-top: auto` can sink it to the viewport
+   bottom on short pages — without stretching `main` (its content keeps its
+   natural height; the empty space lands above the footer, not inside the
+   content). The fixed disco canvas/bg-light are out of flow and unaffected. */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 /* three-column mode */
 main {
   display: grid;
   grid-template-columns: 1fr minmax(0, min(50rem, 90vw)) 1fr;
+  /* keeps the gap above the footer on long pages (the footer's auto top margin
+     collapses to 0 when content fills the viewport) */
+  margin-bottom: 2rem;
 }
 
 #content {
