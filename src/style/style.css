@@ -233,12 +233,15 @@ header > nav a {
   max-width: 100% !important; /* overwrite simple.css's default */
   /* smaller than simple.css's 3rem — matches the section h2 size */
   font-size: 2.6rem;
-  margin-top: 0 !important;
-  margin-bottom: 0.3rem !important;
+  /* Just reset the framework's heading margins — the title→meta gap is owned by
+     .title-meta's margin-top below, so the h1 box relies only on its (disco chip)
+     padding for its own spacing, like the section h2s. */
+  margin: 0 !important;
 }
 
 /* date + tags on a single line */
 .title-meta {
+  margin-top: 0.3rem; /* the gap under the title (formerly the h1's margin-bottom) */
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -261,10 +264,17 @@ h1 {
   /* text-shadow: 2px 1px black; */
 }
 
-h2 {
+/* Section-heading underline — one rule for both plain and disco mode. Drawn as a
+   block ::after (a line UNDER the text), not a border on the box: in disco the h2
+   is a padded chip, so a box border-bottom would sit at the pane's bottom edge
+   (curved by the radius), not under the text. The ::after spans the full content
+   width — matching the original line length — and in disco the chip padding
+   insets it slightly. */
+h2::after {
+  content: "";
+  display: block;
+  margin-top: 6px;
   border-bottom: 1px solid rgb(96, 96, 114);
-  /* border-bottom: 1px solid rgb(126, 131, 152); */
-  padding-bottom: 6px;
 }
 
 h2 a,
@@ -982,8 +992,16 @@ html.disco-on.disco-static .disco-bg-light {
    The reading column is already shader-dimmed, so ~62% bg keeps text readable
    while letting the glints bleed past. Light theme / article pages are
    untouched. Tune the mix percentage to taste. */
+/* Drop shadow that lifts every disco pane off the effect, lit from the
+   upper-left (offset down-right). Applied in both themes. One token, so every
+   pane just uses var(--disco-shadow). */
+html.disco-on {
+  --disco-shadow: 6px 6px 18px rgba(0, 0, 0, 0.2);
+}
+
 .disco-on .article-card {
   background-color: color-mix(in srgb, var(--bg) 70%, transparent);
+  box-shadow: var(--disco-shadow);
 }
 .disco-on .article-card:hover {
   background-color: color-mix(in srgb, var(--bg) 82%, transparent);
@@ -1005,6 +1023,27 @@ html.disco-on.disco-static .disco-bg-light {
 }
 .disco-on .org-tag:hover {
   background-color: color-mix(in srgb, var(--accent-hover) 22%, var(--bg));
+}
+
+/* Homepage headings (the title h1 and the section h2s) sit directly over the
+   ball — unlike article pages, the homepage has no #content backdrop (it shows
+   translucent cards instead). Give them a semi-solid panel spanning the content
+   column so they stay legible. The h1 (page title) carries the full article-card
+   border; the h2s keep their shared `::after` underline instead, so it reads the
+   same as in plain mode. */
+.disco-on.home .title-block h1,
+.disco-on.home #content h2 {
+  background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+  border-radius: 8px;
+  /* 0.9rem left/right matches the article reading pane's horizontal inset
+     (#content::before { inset: -0.6rem -0.9rem }); em-based padding scaled with
+     the big heading font and read wider than the article. */
+  padding: 0.3em 0.9rem;
+  width: 100%;
+  box-shadow: var(--disco-shadow);
+}
+.disco-on.home .title-block h1 {
+  border: var(--border-width) solid var(--border);
 }
 
 /* In disco mode, make the sticky header and the footer glassy so the effect shows
@@ -1046,37 +1085,40 @@ html.disco-on:not(.home) #content::before {
   inset: -0.6rem -0.9rem;
   z-index: -1;
   background-color: color-mix(in srgb, var(--bg) 70%, transparent);
+  border: var(--border-width) solid var(--border);
   border-radius: 10px;
+  box-shadow: var(--disco-shadow);
 }
 /* #toc has `overflow-y: auto`, which would clip a ::before backdrop (cutting off
    the rounded corners → a rect, and the upward extension → misaligned top). So
-   give the TOC its background DIRECTLY (border-radius clips fine with overflow),
-   drop its left border so it reads as a clean rounded panel like #content, and
-   lift its top by 0.6rem so its top aligns with the title's backdrop (which
-   extends 0.6rem above the title box). */
-html.disco-on:not(.home) #toc {
-  border-left: none;
+   give the TOC its background DIRECTLY (border-radius clips fine with overflow)
+   and swap its left border for a full border in the article-card colour so it
+   reads as a clean rounded panel that matches the cards. */
+html.disco-on #toc {
+  border: var(--border-width) solid var(--border);
   background-color: color-mix(in srgb, var(--bg) 80%, transparent);
   border-radius: 10px;
   padding: 0.5rem 0.7rem;
+  box-shadow: var(--disco-shadow);
+}
+/* Article/tag pages only: lift the toc 0.6rem to meet the title backdrop, which
+   ::before extends 0.6rem above the title box. The homepage title is a plain chip
+   (no upward ::before), so its toc keeps the base 2.5rem top and aligns there. */
+html.disco-on:not(.home) #toc {
   margin-top: calc(2.5rem - 0.6rem);
 }
 
-/* Light theme needs more opaque backdrops than the dark room for text to stay
-   readable over the bright effect (dark theme keeps the values above). Covers
-   explicit light and the OS-light default — but not when explicitly dark. */
+/* Homepage cards need a more opaque backdrop in light theme to stay readable
+   over the bright effect (dark theme keeps the value above). The article-page
+   reading panels (title/content/toc) DON'T get a light-theme bump: now that they
+   carry a card border, the base transparency reads fine in both themes, and the
+   heavier light backdrop was too strong a change. Covers explicit light and the
+   OS-light default — but not when explicitly dark. */
 :root[data-theme="light"].disco-on .article-card {
   background-color: color-mix(in srgb, var(--bg) 85%, transparent);
 }
 :root[data-theme="light"].disco-on .article-card:hover {
   background-color: color-mix(in srgb, var(--bg) 93%, transparent);
-}
-:root[data-theme="light"].disco-on:not(.home) .title-block::before,
-:root[data-theme="light"].disco-on:not(.home) #content::before {
-  background-color: color-mix(in srgb, var(--bg) 87%, transparent);
-}
-:root[data-theme="light"].disco-on:not(.home) #toc {
-  background-color: color-mix(in srgb, var(--bg) 91%, transparent);
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]).disco-on .article-card {
@@ -1084,12 +1126,5 @@ html.disco-on:not(.home) #toc {
   }
   :root:not([data-theme="dark"]).disco-on .article-card:hover {
     background-color: color-mix(in srgb, var(--bg) 93%, transparent);
-  }
-  :root:not([data-theme="dark"]).disco-on:not(.home) .title-block::before,
-  :root:not([data-theme="dark"]).disco-on:not(.home) #content::before {
-    background-color: color-mix(in srgb, var(--bg) 87%, transparent);
-  }
-  :root:not([data-theme="dark"]).disco-on:not(.home) #toc {
-    background-color: color-mix(in srgb, var(--bg) 91%, transparent);
   }
 }
