@@ -40,11 +40,12 @@ environment. The cost is authoring difficulty, which is a one-time price.
 
 Client TypeScript needs a transpile step (nothing compiled client JS before).
 `src/style/disco.ts` is bundled+minified to `src/style/disco.min.js` by
-`scripts/build-js.sh` via **esbuild**, mirroring how `scripts/min-css.sh`
-produces `*.min.css`. esbuild is already a vendored, offline build dependency, so
-this adds no new tooling and stays hermetic. The org-publish "static" component
-copies `disco.min.js` (matched by extension) into `out/`; the `.ts` source is not
-matched and does not ship. The generated `*.min.js` is committed, like `*.min.css`.
+`scripts/build-assets.ts`, the same Bun step that minifies the hand-written CSS
+into `*.min.css`. Bun is already a build dependency (it runs the post-process and
+link-card scripts) and bundles offline, so this adds no new tooling and stays
+hermetic. The org-publish "static" component copies `disco.min.js` (matched by
+extension) into `out/`; the `.ts` source is not matched and does not ship. The
+generated `*.min.{css,js}` are git-ignored — the build regenerates them.
 
 ## Consequences
 

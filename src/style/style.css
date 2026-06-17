@@ -441,7 +441,7 @@ span.code-highlighted {
 }
 
 .article-card-meta date {
-  color: var(text-light);
+  color: var(--text-light);
   padding-right: 0.5em;
   font-family: monospace, monospace;
 }

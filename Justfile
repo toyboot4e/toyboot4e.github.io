@@ -13,11 +13,10 @@ lh_report := "/tmp/lh-report" # {{lh_report}}.report.{html,json}`
 help:
     @just -l
 
-# build the devlog (-d --draft, -f --force): minify CSS, fetch link cards,
+# build the devlog (-d --draft, -f --force): build assets, fetch link cards,
 # export with Emacs, then format and postprocess
 build *args:
-    @just min-css
-    @just build-js
+    @just assets
     # Generate `linkcard-cache.json`, dismissing errors:
     -bun scripts/fetch-linkcards.ts
     emacs -Q --script "./build.el" -- {{args}}
@@ -54,13 +53,9 @@ linkcards *args:
 [private]
 alias lc := linkcards
 
-# minify hand-written CSS in `src/style/` into `*.min.css` (also run by `build`)
-min-css:
-    bash scripts/min-css.sh
-
-# bundle + minify hand-written TS in `src/style/` into `*.min.js` (also run by `build`)
-build-js:
-    bash scripts/build-js.sh
+# minify CSS + bundle/minify TS in `src/style/` into `*.min.{css,js}` (also run by `build`)
+assets:
+    bun scripts/build-assets.ts
 
 # starts HTTP server
 serve:

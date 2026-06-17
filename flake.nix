@@ -43,6 +43,25 @@
           '';
         };
 
+      # Everything `just build` shells out to. Single source of truth, shared by
+      # the hermetic package build (runtimeInputs) and the devShell, so the two
+      # can't drift. Asset minification (CSS + TS) goes through bun now, so no
+      # esbuild. (linkcard fetch is best-effort and skipped offline.)
+      buildToolsFor =
+        pkgs:
+        with pkgs;
+        [
+          (emacs.pkgs.withPackages (
+            epkgs: with epkgs; [
+              seq
+              esxml
+            ]
+          ))
+          nodePackages.prettier
+          bun
+          just
+        ];
+
       buildCommandFor =
         pkgs:
         let
@@ -50,18 +69,7 @@
         in
         pkgs.writeShellApplication {
           name = "build-command";
-          runtimeInputs = with pkgs; [
-            (emacs.pkgs.withPackages (
-              epkgs: with epkgs; [
-                seq
-                esxml
-              ]
-            ))
-            nodePackages.prettier
-            bun
-            esbuild
-            just
-          ];
+          runtimeInputs = buildToolsFor pkgs;
           text = ''
             [ -e node_modules ] || ln -sfn ${nodeModules}/node_modules ./node_modules
             # CI=1: catch error
@@ -96,18 +104,16 @@
       });
       devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell {
-          packages = with pkgs; [
-            nodePackages.prettier
-            pinact
-            watchexec
-            zizmor
-            just
-            # scripts
-            bun
-            esbuild # just min-css
-            imagemagick # to-webp.ts
-            libwebp # to-wep.ts
-          ];
+          packages =
+            buildToolsFor pkgs
+            ++ (with pkgs; [
+              # dev-only tooling (not needed by the hermetic build)
+              pinact
+              watchexec
+              zizmor
+              imagemagick # to-webp.ts
+              libwebp # to-webp.ts
+            ]);
         };
       });
       packages = forAllSystems (pkgs: rec {
