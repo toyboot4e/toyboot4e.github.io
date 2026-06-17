@@ -152,6 +152,8 @@ header > nav a {
 
 .title-block h1 {
   max-width: 100% !important; /* overwrite simple.css's default */
+  /* smaller than simple.css's 3rem — matches the section h2 size */
+  font-size: 2.6rem;
   margin-top: 0 !important;
   margin-bottom: 0.3rem !important;
 }
