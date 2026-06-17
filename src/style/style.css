@@ -40,10 +40,17 @@ header > nav a:visited {
   margin: 0;
 }
 
-/* Footer: drop simple.css's padding; its 4rem top margin is too much space. */
+/* Footer: drop simple.css's padding (keep a little at the bottom); its 4rem top
+   margin is too much space. */
 body > footer {
-  padding: 0;
+  padding: 0 0 0.6rem 0;
   margin-top: 2rem;
+}
+
+/* tighten the roomy "Styled with…" paragraph (simple.css gives p a 1.5rem
+   block margin) */
+body > footer > p {
+  margin: 0.6rem 0;
 }
 
 /* The title block supplies the spacing above the content; trim simple.css's
@@ -207,7 +214,16 @@ h6 a {
   text-decoration: none;
 }
 
+/* Footer button row: same shrink as the header nav — flex so the bar height
+   tracks the buttons instead of an inline line-box strut, and drop the button
+   margins (flex `gap` handles spacing). Keep line-height: 2 so the buttons stay
+   full size (a flex container adds no line-box strut of its own). */
 footer > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
   font-size: 1rem;
   line-height: 2;
   padding: 0;
@@ -215,7 +231,7 @@ footer > div {
 
 footer > div a,
 footer > div a:visited {
-  margin: 0 0.5rem 1rem 0.5rem;
+  margin: 0;
   border: 1px solid var(--border);
   border-radius: 5px;
   color: var(--text);
