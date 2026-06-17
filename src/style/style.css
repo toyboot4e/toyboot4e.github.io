@@ -20,14 +20,24 @@ body > header > *:only-child {
   margin-block-start: 0;
 }
 
-/* Shorten the bar a little without changing the button size: halve simple.css's
-   1rem nav top padding and 1rem button bottom margin. The roomy bordered-button
-   look (same as the footer) is simple.css's default, kept as-is. */
+/* Shorten the header bar without changing the button size: flex the nav so its
+   height tracks the buttons rather than simple.css's tall inline line box
+   (line-height: 2), and drop the button margins (flex `gap` handles spacing,
+   including the row gap when the buttons wrap on narrow screens). The roomy
+   bordered-button look is simple.css's default, kept as-is. */
 header > nav {
-  padding-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  /* 1rem keeps the airy spacing simple.css's 0.5rem-each-side button margins
+     gave (and is the row gap when buttons wrap) */
+  gap: 1rem;
+  padding: 0.3rem 0.5rem;
 }
-header > nav a {
-  margin-bottom: 0.5rem;
+header > nav a,
+header > nav a:visited {
+  margin: 0;
 }
 
 /* Footer: drop simple.css's padding; its 4rem top margin is too much space. */
@@ -116,7 +126,7 @@ header > nav a {
   cursor: pointer;
   font-size: 1.2rem;
   padding: 0 0.6rem;
-  margin: 0 0.5rem 0.5rem 0.5rem;
+  margin: 0; /* spacing handled by the nav's flex gap */
   line-height: 2;
 }
 
@@ -639,6 +649,7 @@ span.code-highlighted {
     display: none;
   }
 }
+
 
 a.toc-link {
   display: block;
