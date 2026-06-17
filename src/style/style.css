@@ -26,9 +26,9 @@ main {
   grid-row: 1 / span 2;
   align-self: start;
   position: sticky;
-  top: 3.25rem; /* clear the thin sticky header */
+  top: 3.75rem; /* clear the sticky header */
   margin-top: 2.5rem; /* align with the title block's top */
-  max-height: calc(100vh - 4rem);
+  max-height: calc(100vh - 4.5rem);
   width: 250px;
   overflow-y: auto;
   margin-left: 33px; /* 32px + --border-width */
@@ -64,24 +64,13 @@ body > header > *:only-child {
   margin-block-start: 0;
 }
 
-/* thin header bar: tighten simple.css's roomy nav */
+/* Roomy header nav: keep simple.css's default bordered-button links (the same
+   style as the footer); only the sticky positioning above is custom.
+   Trim a little vertical space around the buttons (half of simple.css's 1rem
+   top padding + 1rem button bottom margin) to shorten the bar, keeping the
+   button size. */
 header > nav {
-  overflow-x: auto;
-  white-space: nowrap;
-  /* override simple.css `padding: 1rem 0 0 0` and `line-height: 2` */
-  padding: 0.55rem 0.5rem;
-  line-height: 1.6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-}
-
-header > nav a,
-header > nav a:visited {
-  /* override simple.css's 1rem bottom margin that thickens the bar */
-  margin: 0;
-  padding: 0.05rem 0.7rem;
+  padding-top: 0.5rem;
 }
 
 /* inline icon + label in the header nav (footer links set this themselves) */
@@ -89,6 +78,7 @@ header > nav a {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
+  margin-bottom: 0.5rem;
 }
 
 .nav-icon {
@@ -103,10 +93,10 @@ header > nav a {
   border-radius: var(--standard-border-radius);
   color: var(--text);
   cursor: pointer;
-  font-size: 1rem;
-  padding: 0 0.5rem;
-  margin: 0;
-  line-height: 1.6;
+  font-size: 1.2rem;
+  padding: 0 0.6rem;
+  margin: 0 0.5rem 0.5rem 0.5rem;
+  line-height: 2;
 }
 
 /* Show correct icon via CSS (no JS needed) */
