@@ -125,7 +125,8 @@ header > nav a {
   flex: none;
 }
 
-#theme-toggle {
+#theme-toggle,
+#disco-toggle {
   background: none;
   border: var(--border-width) solid var(--border);
   border-radius: var(--standard-border-radius);
@@ -153,10 +154,23 @@ header > nav a {
   content: "\2600";
 }
 
-#theme-toggle:hover {
+#theme-toggle:hover,
+#disco-toggle:hover {
   background: var(--bg);
   border-color: var(--accent);
   color: var(--accent);
+}
+
+/* Disco-ball toggle: a mirror-ball glyph. Shown in both themes (the button only
+   exists on the homepage, and disco.ts removes it when there's no GPU). */
+#disco-toggle::before {
+  content: "\1FAA9"; /* 🪩 disco ball */
+}
+/* When off, desaturate the emoji to monochrome (like the SVG nav icons) and dim
+   it — keep the button's border/background solid. Colour returns when it's on. */
+#disco-toggle[aria-pressed="false"]::before {
+  opacity: 0.5;
+  filter: grayscale(1);
 }
 
 /* page title block (moved out of the sticky header): left-aligned title with
@@ -754,4 +768,180 @@ a.toc-link {
 
 .is-active-link {
   font-weight: 700;
+}
+
+/* ============================================================
+   Homepage disco ball (see docs/adr/0003, CONTEXT.md)
+   A fixed, full-viewport WebGL canvas behind all content. Emitted only on the
+   homepage (`has-disco` in build.el) and only rendered in dark theme (disco.ts
+   gates the render loop and fades the canvas in/out via `opacity`). `z-index:-1`
+   keeps it behind the content but above the page background; `pointer-events:
+   none` lets clicks/scroll pass through. */
+#disco-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  display: block;
+  pointer-events: none;
+  /* The script flips opacity to 1 once the first frame is drawn, and back to 0
+     when the theme is light or the tab is hidden — so it fades, never flashes. */
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+/* Cheap CSS drifting-light background, used only on the static-ball fallback
+   (real-but-weak GPU the governor froze, or reduced motion — disco.ts adds
+   `disco-static`). Sits behind the ball canvas. Animates ONLY transform/opacity
+   to stay on the compositor fast path; the gradients themselves are painted
+   once. (Software renderers are dropped entirely, so this never runs there.) */
+.disco-bg-light {
+  position: fixed;
+  inset: 0;
+  z-index: -2; /* behind the ball canvas (-1), behind content */
+  pointer-events: none;
+  overflow: hidden;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+html.disco-on.disco-static .disco-bg-light {
+  display: block;
+  opacity: 1;
+}
+.disco-bg-light::before,
+.disco-bg-light::after {
+  content: "";
+  position: absolute;
+  /* Oversized well beyond one tile + the layer rotation so the drift never
+     reveals an edge. */
+  inset: -560px;
+  background-repeat: repeat;
+  will-change: transform, opacity;
+}
+/* Defeating the grid: each layer is ROTATED (so the lattice isn't axis-aligned,
+   which is what the eye locks onto), uses a large, non-multiple tile period, and
+   packs many irregularly-scattered dots per tile. Two layers at different scales
+   and opposite small rotations read as a scattered field, not a grid. The drift
+   translates by exactly one tile *in the layer's own (rotated) axes*, so
+   `linear infinite` still loops seamlessly — heading roughly upper-left. */
+.disco-bg-light::before {
+  background-image:
+    radial-gradient(circle at 8% 14%, color-mix(in srgb, var(--accent) 78%, white) 0, transparent 2.2px),
+    radial-gradient(circle at 22% 63%, rgba(130, 175, 255, 0.85) 0, transparent 1.7px),
+    radial-gradient(circle at 41% 9%, color-mix(in srgb, var(--accent) 60%, white) 0, transparent 1.5px),
+    radial-gradient(circle at 57% 38%, rgba(225, 140, 210, 0.7) 0, transparent 1.9px),
+    radial-gradient(circle at 72% 77%, color-mix(in srgb, var(--accent) 70%, white) 0, transparent 1.6px),
+    radial-gradient(circle at 88% 22%, rgba(150, 185, 255, 0.7) 0, transparent 1.4px),
+    radial-gradient(circle at 15% 88%, color-mix(in srgb, var(--accent) 65%, white) 0, transparent 2px),
+    radial-gradient(circle at 63% 57%, rgba(210, 130, 205, 0.6) 0, transparent 1.5px),
+    radial-gradient(circle at 34% 44%, rgba(140, 180, 255, 0.6) 0, transparent 1.3px),
+    radial-gradient(circle at 92% 69%, color-mix(in srgb, var(--accent) 72%, white) 0, transparent 1.8px);
+  background-size: 310px 310px;
+  transform: rotate(-8deg);
+  animation:
+    disco-drift-a 30s linear infinite,
+    disco-twinkle-a 7s ease-in-out infinite alternate;
+}
+.disco-bg-light::after {
+  background-image:
+    radial-gradient(circle at 13% 27%, color-mix(in srgb, var(--accent) 66%, white) 0, transparent 1.7px),
+    radial-gradient(circle at 32% 71%, rgba(150, 185, 255, 0.7) 0, transparent 1.5px),
+    radial-gradient(circle at 49% 12%, rgba(225, 140, 210, 0.6) 0, transparent 1.6px),
+    radial-gradient(circle at 68% 49%, color-mix(in srgb, var(--accent) 60%, white) 0, transparent 1.4px),
+    radial-gradient(circle at 83% 83%, rgba(140, 180, 255, 0.6) 0, transparent 1.7px),
+    radial-gradient(circle at 24% 52%, color-mix(in srgb, var(--accent) 55%, white) 0, transparent 1.3px),
+    radial-gradient(circle at 58% 90%, rgba(210, 130, 200, 0.55) 0, transparent 1.5px),
+    radial-gradient(circle at 77% 18%, color-mix(in srgb, var(--accent) 62%, white) 0, transparent 1.5px);
+  background-size: 430px 430px;
+  opacity: 0.7;
+  transform: rotate(7deg);
+  animation:
+    disco-drift-b 44s linear infinite,
+    disco-twinkle-b 9s ease-in-out infinite alternate;
+}
+/* Drift one full tile along the layer's own (rotated) axes — roughly upper-left
+   (right-bottom → left-up). The rotate must stay in every keyframe so the
+   transform doesn't lose it mid-animation. */
+@keyframes disco-drift-a {
+  from {
+    transform: rotate(-8deg) translate3d(0, 0, 0);
+  }
+  to {
+    transform: rotate(-8deg) translate3d(-310px, -310px, 0);
+  }
+}
+@keyframes disco-drift-b {
+  from {
+    transform: rotate(7deg) translate3d(0, 0, 0);
+  }
+  to {
+    transform: rotate(7deg) translate3d(-430px, -430px, 0);
+  }
+}
+@keyframes disco-twinkle-a {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes disco-twinkle-b {
+  from {
+    opacity: 0.85;
+  }
+  to {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .disco-bg-light::before,
+  .disco-bg-light::after {
+    animation: none;
+  }
+}
+
+/* In disco mode (dark theme on the homepage — `disco-on` is toggled by
+   disco.ts), make the article cards translucent so the ball shows through them.
+   The reading column is already shader-dimmed, so ~62% bg keeps text readable
+   while letting the glints bleed past. Light theme / article pages are
+   untouched. Tune the mix percentage to taste. */
+.disco-on .article-card {
+  background-color: color-mix(in srgb, var(--bg) 58%, transparent);
+  transition: background-color 0.8s ease;
+}
+.disco-on .article-card:hover {
+  background-color: color-mix(in srgb, var(--bg) 73%, transparent);
+}
+/* Fade the (opaque) card thumbnails in disco mode so the effect shows through
+   them too; restore full opacity on hover so the image reads when focused. */
+.disco-on .article-card-thumbnail {
+  opacity: 0.75;
+  transition: opacity 0.8s ease;
+}
+.disco-on .article-card:hover .article-card-thumbnail {
+  opacity: 1;
+}
+
+/* In disco mode the tag chips (no background of their own) float unreadably over
+   the ball — give them a semi-solid backdrop so the labels stay legible while
+   still letting a little of the ball through. */
+.disco-on .org-tag {
+  background-color: color-mix(in srgb, var(--bg) 68%, transparent);
+  transition: background-color 0.8s ease;
+}
+.disco-on .org-tag:hover {
+  background-color: color-mix(in srgb, var(--accent-hover) 22%, var(--bg));
+}
+
+/* In disco mode, make the sticky header glassy so the ball shows behind the nav.
+   A light backdrop blur keeps the nav icons/labels legible over the moving ball.
+   Light theme / article pages keep the solid header. */
+.disco-on body > header {
+  background-color: color-mix(in srgb, var(--accent-bg) 38%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: background-color 0.8s ease;
 }

@@ -51,8 +51,13 @@
     try { localStorage.setItem(STORAGE_KEY, next); } catch(e) {}
     // Apply directly if the View Transitions API is missing or throws (older
     // WebKit), so the toggle always works even without the animation.
+    // Skip the View Transition on the disco page: it would snapshot the
+    // full-screen WebGL canvas + animated light layers, a very expensive capture
+    // that wrecks Interaction-to-Next-Paint. The disco's own opacity transitions
+    // (and the card/header fades) keep the switch smooth without it.
+    var hasDisco = document.getElementById("disco-canvas");
     try {
-      if (document.startViewTransition) {
+      if (document.startViewTransition && !hasDisco) {
         document.startViewTransition(function() { applyTheme(next); });
       } else {
         applyTheme(next);

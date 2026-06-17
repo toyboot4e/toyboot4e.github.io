@@ -17,6 +17,7 @@ help:
 # export with Emacs, then format and postprocess
 build *args:
     @just min-css
+    @just build-js
     # Generate `linkcard-cache.json`, dismissing errors:
     -bun scripts/fetch-linkcards.ts
     emacs -Q --script "./build.el" -- {{args}}
@@ -56,6 +57,10 @@ alias lc := linkcards
 # minify hand-written CSS in `src/style/` into `*.min.css` (also run by `build`)
 min-css:
     bash scripts/min-css.sh
+
+# bundle + minify hand-written TS in `src/style/` into `*.min.js` (also run by `build`)
+build-js:
+    bash scripts/build-js.sh
 
 # starts HTTP server
 serve:
@@ -97,8 +102,8 @@ audit-ai page="index.html": (audit page)
 watch *args:
     #!/usr/bin/env bash
     echo "start watching.."
-    exts="el,org,css,scss,js,webp,png,jpg,jpeg,gif,svg"
-    ig=(--ignore 'index.org' --ignore '**/tags/**' --ignore '**/ltximg/**' --ignore '**/*.min.css')
+    exts="el,org,css,scss,ts,js,webp,png,jpg,jpeg,gif,svg"
+    ig=(--ignore 'index.org' --ignore '**/tags/**' --ignore '**/ltximg/**' --ignore '**/*.min.css' --ignore '**/*.min.js')
     if [[ "${1:-}" == "-d" || "${1:-}" == "--draft" ]] ; then
         echo "draft build"
         watchexec -e "$exts" -w src "${ig[@]}" "just build --draft"
