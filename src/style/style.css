@@ -30,9 +30,10 @@ header > nav {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  /* 1rem keeps the airy spacing simple.css's 0.5rem-each-side button margins
-     gave (and is the row gap when buttons wrap) */
-  gap: 1rem;
+  /* Column gap 1rem keeps the airy horizontal spacing simple.css's
+     0.5rem-each-side button margins gave; row gap is tighter so wrapped rows on
+     narrow screens don't sit far apart. */
+  gap: 0.4rem 1rem;
   padding: 0.3rem 0.5rem;
 }
 header > nav a,
