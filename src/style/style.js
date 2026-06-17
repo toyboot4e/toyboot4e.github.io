@@ -3,7 +3,16 @@
   var STORAGE_KEY = "toybeam-theme";
 
   function getPreferredTheme() {
-    return localStorage.getItem(STORAGE_KEY);
+    // iOS Safari/Chrome throws on localStorage *access* (not just writes) when
+    // storage is blocked ("Block All Cookies", some private/lockdown contexts).
+    // An unguarded throw here would abort this IIFE before toggleTheme is
+    // defined, breaking the button entirely — so swallow it and fall back to
+    // the OS preference.
+    try {
+      return localStorage.getItem(STORAGE_KEY);
+    } catch (e) {
+      return null;
+    }
   }
 
   function applyTheme(theme) {
@@ -36,14 +45,19 @@
   // Global toggle function called by button onclick
   window.toggleTheme = function() {
     var current = getPreferredTheme();
-    var effective = current || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var effective = current || (prefersDark ? "dark" : "light");
     var next = effective === "dark" ? "light" : "dark";
     try { localStorage.setItem(STORAGE_KEY, next); } catch(e) {}
-    if (document.startViewTransition) {
-      document.startViewTransition(function() {
+    // Apply directly if the View Transitions API is missing or throws (older
+    // WebKit), so the toggle always works even without the animation.
+    try {
+      if (document.startViewTransition) {
+        document.startViewTransition(function() { applyTheme(next); });
+      } else {
         applyTheme(next);
-      });
-    } else {
+      }
+    } catch (e) {
       applyTheme(next);
     }
   };
