@@ -203,6 +203,13 @@ from `my-eager-image-count' as cards render.")
   (ignore info)
   t)
 
+(defun my-home-page-p (info)
+  "Non-nil when the page being exported is the homepage (`index.html')."
+  (let ((rel (replace-regexp-in-string
+              "\\.org\\'" ".html"
+              (file-relative-name (plist-get info :input-file) default-directory))))
+    (string= rel "index.html")))
+
 ;; Returns `<head>' SXML
 (defun my-html-head (info contents)
   ;; Reset `my-codeblock-counter' on new file. TODO: move it to more appropriate place
@@ -270,11 +277,15 @@ from `my-eager-image-count' as cards render.")
                  (src "/style/style.js"))
               ;; NOTE: empty body is required for self-closing tag
               "")
-      ;; Homepage-only disco ball (`<canvas>' is emitted in the body). `defer'
-      ;; so the canvas exists; dark-theme-only rendering is decided in the
-      ;; script. See `docs/adr/0003-homepage-disco-ball-webgl.md'.
+      ;; Disco ball (`<canvas>' is emitted in the body). An inline script adds
+      ;; `disco-on' before first paint (from the persisted preference) so the
+      ;; disco-mode content styling doesn't flash in when the deferred script runs
+      ;; on each navigation; `disco.min.js' (deferred, needs the canvas) then
+      ;; renders, dropping it on no-GPU. See `docs/adr/0003-homepage-disco-ball-webgl.md'.
       ,@(when (my-disco-page-p info)
-          `((script (@ (type "text/javascript")
+          `((script (*RAW-STRING*
+                     "try{if(localStorage.getItem('toybeam-disco')!=='off')document.documentElement.classList.add('disco-on')}catch(e){}"))
+            (script (@ (type "text/javascript")
                        (defer "")
                        (src "/style/disco.min.js"))
                     "")))
@@ -411,7 +422,10 @@ from `my-eager-image-count' as cards render.")
   (concat
    "<!DOCTYPE html>\n"
    (my-sxml-to-xml
-    `(html (@ (lang "ja"))
+    `(html (@ (lang "ja")
+              ;; `home' marks the homepage so disco-mode CSS can treat article/tag
+              ;; pages differently (e.g. a more solid content backdrop).
+              ,@(when (my-home-page-p info) '((class "home"))))
            ,(my-html-head info contents)
 
            (body

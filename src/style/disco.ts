@@ -720,10 +720,12 @@ function start(): void {
   });
   document.addEventListener("visibilitychange", sync);
   window.addEventListener("resize", () => {
-    if (running) resize();
-    // Static render (software GL / frozen / reduced motion): redraw at the new
-    // size so the still frame doesn't stretch.
-    else if (document.documentElement.classList.contains("disco-on")) drawStill();
+    // The animated loop already resizes itself each frame (resize + redraw in the
+    // same frame). Calling resize() here too reallocates+clears the canvas with
+    // the redraw deferred to the next frame → a blank flash, e.g. when a mobile
+    // URL/search bar shows and changes the viewport height. So only the static
+    // render needs a nudge to avoid stretching.
+    if (!running && document.documentElement.classList.contains("disco-on")) drawStill();
   });
 
   // WebGL context loss: stop cleanly, then rebuild on restore.

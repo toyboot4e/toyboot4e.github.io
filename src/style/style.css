@@ -800,7 +800,11 @@ a.toc-link {
 .disco-animating .article-card,
 .disco-animating .article-card-thumbnail,
 .disco-animating .org-tag,
-.disco-animating body > header {
+.disco-animating .title-block,
+.disco-animating #content,
+.disco-animating #toc,
+.disco-animating body > header,
+.disco-animating body > footer {
   transition:
     opacity 0.8s ease,
     background-color 0.8s ease,
@@ -924,10 +928,10 @@ html.disco-on.disco-static .disco-bg-light {
    while letting the glints bleed past. Light theme / article pages are
    untouched. Tune the mix percentage to taste. */
 .disco-on .article-card {
-  background-color: color-mix(in srgb, var(--bg) 58%, transparent);
+  background-color: color-mix(in srgb, var(--bg) 70%, transparent);
 }
 .disco-on .article-card:hover {
-  background-color: color-mix(in srgb, var(--bg) 73%, transparent);
+  background-color: color-mix(in srgb, var(--bg) 82%, transparent);
 }
 /* Fade the (opaque) card thumbnails in disco mode so the effect shows through
    them too; restore full opacity on hover so the image reads when focused. */
@@ -948,11 +952,89 @@ html.disco-on.disco-static .disco-bg-light {
   background-color: color-mix(in srgb, var(--accent-hover) 22%, var(--bg));
 }
 
-/* In disco mode, make the sticky header glassy so the ball shows behind the nav.
-   A light backdrop blur keeps the nav icons/labels legible over the moving ball.
-   Light theme / article pages keep the solid header. */
-.disco-on body > header {
-  background-color: color-mix(in srgb, var(--accent-bg) 38%, transparent);
+/* In disco mode, make the sticky header and the footer glassy so the effect shows
+   behind them while the nav/footer links stay legible (a light backdrop blur).
+   Dark values here; light theme overrides to more opaque below. */
+.disco-on body > header,
+.disco-on body > footer {
+  background-color: color-mix(in srgb, var(--accent-bg) 62%, transparent);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
+}
+:root[data-theme="light"].disco-on body > header,
+:root[data-theme="light"].disco-on body > footer {
+  background-color: color-mix(in srgb, var(--accent-bg) 82%, transparent);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]).disco-on body > header,
+  :root:not([data-theme="dark"]).disco-on body > footer {
+    background-color: color-mix(in srgb, var(--accent-bg) 82%, transparent);
+  }
+}
+
+/* On article/tag pages (not the homepage `home` class) in disco mode, give the
+   title, content column, and TOC a backdrop so long-form text stays readable over
+   the effect. The homepage keeps its translucent cards. The backdrop is drawn as
+   a ::before that extends OUTWARD, so it never changes the text box width (padding
+   would shrink characters-per-row vs non-disco mode). `isolation` makes a stacking
+   context so the ::before sits behind the text but above the canvas. Tune the mix
+   percentages for more/less transparency. */
+html.disco-on:not(.home) .title-block,
+html.disco-on:not(.home) #content {
+  position: relative;
+  isolation: isolate;
+}
+html.disco-on:not(.home) .title-block::before,
+html.disco-on:not(.home) #content::before {
+  content: "";
+  position: absolute;
+  inset: -0.6rem -0.9rem;
+  z-index: -1;
+  background-color: color-mix(in srgb, var(--bg) 70%, transparent);
+  border-radius: 10px;
+}
+/* #toc has `overflow-y: auto`, which would clip a ::before backdrop (cutting off
+   the rounded corners → a rect, and the upward extension → misaligned top). So
+   give the TOC its background DIRECTLY (border-radius clips fine with overflow),
+   drop its left border so it reads as a clean rounded panel like #content, and
+   lift its top by 0.6rem so its top aligns with the title's backdrop (which
+   extends 0.6rem above the title box). */
+html.disco-on:not(.home) #toc {
+  border-left: none;
+  background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+  border-radius: 10px;
+  padding: 0.5rem 0.7rem;
+  margin-top: calc(2.5rem - 0.6rem);
+}
+
+/* Light theme needs more opaque backdrops than the dark room for text to stay
+   readable over the bright effect (dark theme keeps the values above). Covers
+   explicit light and the OS-light default — but not when explicitly dark. */
+:root[data-theme="light"].disco-on .article-card {
+  background-color: color-mix(in srgb, var(--bg) 85%, transparent);
+}
+:root[data-theme="light"].disco-on .article-card:hover {
+  background-color: color-mix(in srgb, var(--bg) 93%, transparent);
+}
+:root[data-theme="light"].disco-on:not(.home) .title-block::before,
+:root[data-theme="light"].disco-on:not(.home) #content::before {
+  background-color: color-mix(in srgb, var(--bg) 87%, transparent);
+}
+:root[data-theme="light"].disco-on:not(.home) #toc {
+  background-color: color-mix(in srgb, var(--bg) 91%, transparent);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]).disco-on .article-card {
+    background-color: color-mix(in srgb, var(--bg) 85%, transparent);
+  }
+  :root:not([data-theme="dark"]).disco-on .article-card:hover {
+    background-color: color-mix(in srgb, var(--bg) 93%, transparent);
+  }
+  :root:not([data-theme="dark"]).disco-on:not(.home) .title-block::before,
+  :root:not([data-theme="dark"]).disco-on:not(.home) #content::before {
+    background-color: color-mix(in srgb, var(--bg) 87%, transparent);
+  }
+  :root:not([data-theme="dark"]).disco-on:not(.home) #toc {
+    background-color: color-mix(in srgb, var(--bg) 91%, transparent);
+  }
 }
