@@ -183,6 +183,8 @@ h6 a {
 
 body > footer {
   padding: 0;
+  /* simple.css's 4rem is too much space above the footer */
+  margin-top: 2rem;
 }
 
 footer > div {
