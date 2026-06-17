@@ -21,11 +21,14 @@ environment. The cost is authoring difficulty, which is a one-time price.
 - **Homepage only.** Emitted under a new `has-disco` gate (the `<canvas>` and
   `disco.min.js` appear only on `index.html`), consistent with `has-code` /
   `has-steno`. Article pages stay lean and battery-friendly.
-- **Dark theme only (v1).** A disco ball is only beautiful against darkness; on a
-  white reading page it looks cheap. The render loop runs only while the
-  *effective* theme is dark and starts/stops live on theme toggle. A light branch
-  is intentionally stubbed (palette in tunable GLSL consts, theme read in JS) so
-  adding light later is tuning, not a rewrite.
+- **Both themes, one shader.** The effective theme drives a `u_light` uniform that
+  selects the palette (dark/`*_L` light variants) and, on light, takes the
+  ball-only (alpha) path so the bright page shows behind the ball rather than a
+  dark room filling the viewport. The theme is re-applied live on toggle. Dark
+  shipped first (it's the easier "beautiful"); light reuses all the plumbing — a
+  chrome (dark-base, bright-glint) ball with a contact shadow, plus a tinted
+  translucent cast-light field (colour dapples composited premultiplied over the
+  page, not bright specks).
 - **Readability by composition.** The canvas is `position: fixed; z-index: -1`
   behind content; brightness is pushed into the margins and title while the
   centre reading column is kept dark by a shader mask — so no per-card backdrop

@@ -6,10 +6,13 @@ This glossary fixes the language for site features so design discussions stay pr
 ## Language
 
 **Disco Ball**:
-The signature animated background effect on the **homepage** only, shown only
-when the effective theme is dark (v1). A large, slowly auto-rotating **faceted**
-mirror sphere is the visual hero, throwing a **cast glint-field** behind the
-page. Decorative; sits behind content and never blocks reading.
+The signature animated background effect on the **homepage** only, shown in both
+themes (the effective theme selects the palette). A large, slowly auto-rotating
+**faceted** mirror sphere is the visual hero: on dark it glows against a black
+room and throws a **cast glint-field**; on light it reads as reflective chrome
+over the bright page, throwing a tinted, translucent cast-light field (colour
+dapples, not bright specks). Decorative; sits behind content and never blocks
+reading. Runs only with a real GPU.
 _Avoid_: "mirror ball", "chrome orb" (it is faceted, not smooth), "background
 animation" (too generic).
 

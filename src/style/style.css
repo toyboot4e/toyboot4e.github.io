@@ -161,25 +161,10 @@ header > nav a {
   color: var(--accent);
 }
 
-/* Disco-ball toggle: a mirror-ball glyph. The ball is dark-theme only, so the
-   button is shown only when the effective theme is dark (mirrors the
-   theme-toggle icon logic). Dimmed when the effect is switched off. */
-#disco-toggle {
-  display: none;
-}
+/* Disco-ball toggle: a mirror-ball glyph. Shown in both themes (the button only
+   exists on the homepage, and disco.ts removes it when there's no GPU). */
 #disco-toggle::before {
   content: "\1FAA9"; /* 🪩 disco ball */
-}
-@media (prefers-color-scheme: dark) {
-  #disco-toggle {
-    display: inline-block;
-  }
-}
-:root[data-theme="dark"] #disco-toggle {
-  display: inline-block;
-}
-:root[data-theme="light"] #disco-toggle {
-  display: none;
 }
 /* When off, desaturate the emoji to monochrome (like the SVG nav icons) and dim
    it — keep the button's border/background solid. Colour returns when it's on. */
@@ -929,6 +914,15 @@ html.disco-on.disco-static .disco-bg-light {
 }
 .disco-on .article-card:hover {
   background-color: color-mix(in srgb, var(--bg) 73%, transparent);
+}
+/* Fade the (opaque) card thumbnails in disco mode so the effect shows through
+   them too; restore full opacity on hover so the image reads when focused. */
+.disco-on .article-card-thumbnail {
+  opacity: 0.75;
+  transition: opacity 0.8s ease;
+}
+.disco-on .article-card:hover .article-card-thumbnail {
+  opacity: 1;
 }
 
 /* In disco mode the tag chips (no background of their own) float unreadably over

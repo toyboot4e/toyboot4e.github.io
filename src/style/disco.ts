@@ -41,18 +41,50 @@ uniform vec2  u_res;
 uniform float u_time;
 uniform float u_ballOnly; // 1.0 = draw only the ball (transparent elsewhere) so a
                           // cheap CSS layer can supply the drifting light instead.
+uniform float u_light;    // 0.0 = dark theme, 1.0 = light theme. Selects the palette
+                          // below; light also takes the ball-only (alpha) path so the
+                          // bright page shows behind a reflective-silver ball.
 
 varying vec2 v_uv;
 
 // ============================================================
 //  TUNABLE PALETTE  — re-grade the whole effect from here.
-//  (Author note: warm gold key + cool counter-light + a colour
-//   "pop"; bump POP / add lights for a more rainbow disco.)
+//  Two themes; *_L is the light-theme variant (mixed in by u_light).
+//  Dark = emissive glints on black. Light = reflective silver/chrome
+//  on a bright "showroom" (ROOM_L light-grey so facets aren't black).
 // ============================================================
 const vec3 KEY  = vec3(1.00, 0.72, 0.34);   // warm gold key light
 const vec3 COOL = vec3(0.28, 0.52, 0.95);   // cool steel-blue counter-light
 const vec3 POP  = vec3(0.92, 0.32, 0.70);   // magenta pop (the "bit more colour")
 const vec3 ROOM = vec3(0.020, 0.022, 0.038); // near-black room
+
+const vec3 KEY_L  = vec3(1.00, 0.82, 0.42);  // light: warm highlight
+const vec3 COOL_L = vec3(0.40, 0.62, 1.00);  // light: cool highlight
+const vec3 POP_L  = vec3(0.95, 0.42, 0.75);  // light: colour pop
+const vec3 ROOM_L = vec3(0.16, 0.18, 0.24);  // light: dark steel base — chrome reads
+                                             // as mostly-dark with bright glints, so it
+                                             // pops against the bright page (not pale grey)
+
+// Light-theme cast field: rainbow beams fanning from the top-left, plus a
+// self-rotating ring of rainbow lights whose centre circles the viewport but is
+// biased up-right so it mostly stays clear of the (lower-left) ball.
+const float LBEAM_ALPHA  = 0.55;              // spotlight intensity from the top-left
+const float LBEAM_WIDTH  = 0.34;              // angular half-width of the soft halo cone
+const float LBEAM_CORE   = 0.09;              // narrow bright beam core (the "light")
+const float LBEAM_SWEEP  = 0.30;              // how fast the spotlights sweep
+const float LBEAM_DARK   = 1.10;              // beam brightness added to the dark room
+const float LRING_RADIUS = 0.40;              // radius of the circle the lights ride
+const float LRING_DOT    = 0.14;              // soft glow size of each light
+const float LRING_ALPHA  = 0.50;              // ring light intensity over the page
+const float LRING_SPEED  = 0.5;               // lights' rotation around the ring
+const float LRING_PULSE       = 0.32;         // radius shrink/expand amount
+const float LRING_PULSE_SPEED = 0.8;          // breathing speed
+const float LRING_ORBIT       = 0.48;         // ellipse extent of the centre's travel
+const float LRING_ORBIT_SPEED = 0.25;         // ring centre orbit speed
+// Both rings share the same right-side orbit; ring 2 is half a turn (PI) out of
+// phase so the two ride opposite points and together fill the right side.
+const float LRING_BIAS_X      = 0.62;         // right-side orbit centre (clear of the ball)
+const float LRING_BIAS_Y      = 0.00;
 
 const float BALL_RADIUS = 0.95;
 const vec2  BALL_SCREEN = vec2(-0.98, -0.30);  // y-normalised; offset into the left margin
@@ -75,11 +107,15 @@ float hash21(vec2 p){
 // Procedural "room" the facets reflect: a dark space with a few bright,
 // coloured key lights. Returns radiance for a reflection direction.
 vec3 environment(vec3 d){
-  vec3 c = ROOM;
-  c += KEY  * pow(max(dot(d, normalize(vec3( 0.55, 0.55, 0.45))), 0.0), 48.0) * 3.2;
-  c += COOL * pow(max(dot(d, normalize(vec3(-0.70, 0.25, 0.55))), 0.0), 70.0) * 2.2;
-  c += POP  * pow(max(dot(d, normalize(vec3( 0.15,-0.55, 0.62))), 0.0), 80.0) * 1.7;
-  c += KEY  * 0.035 * (0.5 + 0.5 * d.y);   // faint warm ambient gradient
+  vec3 key  = mix(KEY,  KEY_L,  u_light);
+  vec3 cool = mix(COOL, COOL_L, u_light);
+  vec3 pop  = mix(POP,  POP_L,  u_light);
+  vec3 room = mix(ROOM, ROOM_L, u_light);
+  vec3 c = room;
+  c += key  * pow(max(dot(d, normalize(vec3( 0.55, 0.55, 0.45))), 0.0), 48.0) * 3.2;
+  c += cool * pow(max(dot(d, normalize(vec3(-0.70, 0.25, 0.55))), 0.0), 70.0) * 2.2;
+  c += pop  * pow(max(dot(d, normalize(vec3( 0.15,-0.55, 0.62))), 0.0), 80.0) * 1.7;
+  c += key  * 0.035 * (0.5 + 0.5 * d.y);   // faint warm ambient gradient
   return c;
 }
 
@@ -102,6 +138,63 @@ vec3 castDots(vec2 uv, float t){
     c += tint * spk * (0.35 + 0.65 * hash21(id + 3.0));
   }
   return c * 0.55;
+}
+
+// Hue (0..1) → saturated RGB (for the rainbow ring).
+vec3 hue(float h){
+  return clamp(abs(mod(h * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+}
+
+// Light-theme cast field: a self-rotating circle of rainbow lights at the
+// top-left. Twelve coloured lights ride a circle and orbit its centre. Returns a
+// PREMULTIPLIED-alpha colour so it composites cleanly over the page. p is the
+// y-normalised centre-origin coord (same space as main()).
+// Rainbow spotlights: a few wide soft cones sweeping out from the top-left (they
+// widen with distance like real spotlights). Composited in FRONT of the ball.
+vec4 castBeam(vec2 p, float t){
+  float aspect = u_res.x / u_res.y;
+  // Apex pushed off-screen beyond the top-left so the on-screen cones are wide
+  // (not pinched at the corner).
+  vec2  src  = vec2(-aspect * 1.35, 1.45);
+  vec2  d    = p - src;
+  float bang = atan(d.y, d.x);
+  float fall = smoothstep(4.0, 0.4, length(d)); // brightest near the source
+  vec4 acc = vec4(0.0);
+  for (int k = 0; k < 3; k++){
+    float fk   = float(k);
+    float base = -0.10 - 1.0 * (fk / 2.0);                 // spread across the down-right fan
+    float ca   = base + 0.30 * sin(t * LBEAM_SWEEP + fk * 2.1);
+    float dang = bang - ca;
+    float cone = exp(-dang * dang / (LBEAM_WIDTH * LBEAM_WIDTH)); // soft halo
+    float core = exp(-dang * dang / (LBEAM_CORE * LBEAM_CORE));   // bright defined beam
+    vec3  col  = hue(fract(fk / 3.0 + t * 0.03));
+    float a    = (cone * 0.30 + core) * fall * LBEAM_ALPHA;
+    acc += vec4(col * a, a);
+  }
+  return min(acc, vec4(0.9));
+}
+
+// A self-rotating rainbow ring on the shared right-side orbit. dir spins the
+// lights, huePhase shifts its colours, orbitPhase offsets where its centre sits on
+// the orbit (PI apart = opposite points, so two rings fill the space).
+vec4 ringAt(vec2 p, float t, float dir, float huePhase, float orbitPhase){
+  float aspect = u_res.x / u_res.y;
+  float radius = LRING_RADIUS * (1.0 + LRING_PULSE * sin(t * LRING_PULSE_SPEED + huePhase * 6.28));
+  float oa = t * LRING_ORBIT_SPEED + orbitPhase;
+  vec2  center = vec2(LRING_BIAS_X * aspect, LRING_BIAS_Y)
+               + LRING_ORBIT * vec2(cos(oa) * aspect, sin(oa));
+  vec4 acc = vec4(0.0);
+  for (int k = 0; k < 12; k++){
+    float fk  = float(k);
+    float ang = t * LRING_SPEED * dir + fk * (6.2831853 / 12.0);
+    vec2  lp  = center + radius * vec2(cos(ang), sin(ang));
+    float dd  = length(p - lp) / LRING_DOT;
+    float glow = exp(-dd * dd);                   // soft round light
+    vec3  col  = hue(fk / 12.0 + huePhase);       // each light a different rainbow hue
+    float a    = glow * LRING_ALPHA;
+    acc += vec4(col * a, a);
+  }
+  return acc;
 }
 
 void main(){
@@ -155,20 +248,48 @@ void main(){
                * smoothstep(0.0, 0.07, cell.y) * smoothstep(0.0, 0.07, 1.0 - cell.y);
     col *= mix(0.22, 1.0, edge);
 
-    // Cool fresnel rim + a floor so unlit facets aren't pure black.
-    col += COOL * pow(1.0 - max(n.z, 0.0), 3.0) * 0.35;
-    col += ROOM * 3.5;
+    // Cool fresnel rim + a floor so unlit facets aren't pure black (light grey
+    // on the light theme, so the ball reads as reflective silver).
+    col += mix(COOL, COOL_L, u_light) * pow(1.0 - max(n.z, 0.0), 3.0) * 0.35;
+    col += mix(ROOM, ROOM_L, u_light) * mix(3.5, 1.0, u_light);
 
     // Dim the ball where it crosses the reading column, full in the margins.
     ball = col * mix(0.42, 1.0, colMask);
   }
 
-  // Ball-only path (static fallback): output just the ball with straight alpha,
-  // transparent everywhere else, so the CSS light layer behind shows through.
-  if (u_ballOnly > 0.5) {
+  // Ball-only path: output just the ball with straight alpha, transparent
+  // everywhere else. Used for the dark static fallback (a CSS layer supplies the
+  // light behind) AND for the light theme (the bright page shows behind a
+  // reflective ball — a dark "room" filling the viewport would look wrong there).
+  // Dark static fallback (reduced-motion): plain ball-only; the CSS layer behind
+  // supplies the drifting light.
+  if (u_ballOnly > 0.5 && u_light < 0.5) {
     vec3 c = ball / (ball + vec3(1.0));
     c = pow(c, vec3(1.0 / 2.2));
     gl_FragColor = vec4(c, mask);
+    return;
+  }
+
+  // Light theme: composite (premultiplied, "over") the page-relative layers —
+  // a tinted cast-light field at the bottom, a soft contact shadow, then the ball
+  // on top — and emit straight alpha so it lays over the bright page.
+  if (u_light > 0.5) {
+    vec3 bc = pow(ball / (ball + vec3(1.0)), vec3(1.0 / 2.2));
+    vec4 ballP = vec4(bc * mask, mask);
+
+    vec2 sq = (p - (BALL_SCREEN + vec2(0.06, -0.13))) / BALL_SCALE;
+    float shA = smoothstep(R * 1.35, R * 0.7, length(sq)) * (1.0 - mask) * 0.30;
+    vec4 shadP = vec4(vec3(0.04, 0.05, 0.09) * shA, shA);
+
+    // Layer order: two counter-rotating rainbow rings behind the ball; ball +
+    // contact shadow; then the rainbow spotlights IN FRONT (light on the ball's face).
+    vec4 ringP = ringAt(p, u_time, 1.0, 0.0, 0.0)
+               + ringAt(p, u_time, -1.0, 0.5, 3.14159265); // 2nd ring half a turn out of phase
+    ringP = min(ringP, vec4(0.95));
+    vec4 beamP = castBeam(p, u_time);
+    vec4 o = ballP + (1.0 - ballP.a) * (shadP + (1.0 - shadP.a) * ringP);
+    o = beamP + (1.0 - beamP.a) * o;
+    gl_FragColor = vec4(o.a > 0.001 ? o.rgb / o.a : vec3(0.0), o.a);
     return;
   }
 
@@ -180,6 +301,10 @@ void main(){
   // Vignette → push brightness to the edges, darken the centre/bottom.
   float vig = smoothstep(1.7, 0.25, length(p * vec2(0.85, 1.0)));
   col *= mix(0.55, 1.0, vig);
+
+  // Rainbow spotlights from the top-left, added to the dark room as bright
+  // coloured beams (same source as the light theme).
+  col += castBeam(p, u_time).rgb * LBEAM_DARK;
 
   // Reinhard tonemap + gamma.
   col = col / (col + vec3(1.0));
@@ -326,6 +451,7 @@ function start(): void {
   const uRes = gl.getUniformLocation(prog, "u_res");
   const uTime = gl.getUniformLocation(prog, "u_time");
   const uBallOnly = gl.getUniformLocation(prog, "u_ballOnly");
+  const uLight = gl.getUniformLocation(prog, "u_light");
 
   // Quality tier: cheaper internal resolution, cheaper still on touch devices.
   const coarseMql = mm("(pointer: coarse)");
@@ -350,6 +476,8 @@ function start(): void {
   let t0 = 0;
   let started = false; // first frame drawn (for fade-in)
   let enabled = discoPref(); // user on/off preference (the disco-toggle button)
+  let light = false; // current effective theme is light (drives u_light); set in sync()
+  let fadeTimer = 0; // pending teardown during a graceful switch-off fade
 
   // Framerate cap. The spin is slow, so 30fps is indistinguishable from 60 but
   // halves continuous fill for everyone.
@@ -384,6 +512,7 @@ function start(): void {
     gl!.uniform2f(uRes, canvas!.width, canvas!.height);
     gl!.uniform1f(uTime, timeSeconds);
     gl!.uniform1f(uBallOnly, ballOnly ? 1 : 0);
+    gl!.uniform1f(uLight, light ? 1 : 0);
     gl!.drawArrays(gl!.TRIANGLES, 0, 3);
     if (!started) {
       started = true;
@@ -439,11 +568,12 @@ function start(): void {
 
   let stillPending = 0;
   function drawStill(): void {
-    // Add the class synchronously (cheap — paints the CSS light immediately), but
-    // DEFER the heavy ball fill to a later task so it never blocks the paint that
-    // responds to a click/tap. This keeps Interaction-to-Next-Paint (INP) low when
-    // the theme/disco toggles flip the effect. Coalesced so rapid calls draw once.
-    document.documentElement.classList.add("disco-static");
+    // Toggle the class synchronously (cheap — paints immediately), but DEFER the
+    // heavy ball fill to a later task so it never blocks the paint that responds
+    // to a click/tap (keeps Interaction-to-Next-Paint low). Coalesced. The CSS
+    // light layer is dark-theme only — on light, a reflective ball over the bright
+    // page is enough and the bright-speck layer would vanish.
+    document.documentElement.classList.toggle("disco-static", !light);
     if (stillPending) return;
     stillPending = window.setTimeout(() => {
       stillPending = 0;
@@ -474,20 +604,46 @@ function start(): void {
     raf = 0;
   }
 
-  // Render while the effective theme is dark AND the user hasn't switched it off;
-  // pause when the tab is hidden. The `disco-on` class marks "the ball is the
-  // active background" (independent of pause) so CSS can make content translucent
-  // to reveal it.
+  // Show whenever the user hasn't switched it off (both themes now); pause when
+  // the tab is hidden. The effective theme just selects the palette (`light` →
+  // u_light), re-applied live on theme toggle. The `disco-on` class marks "the
+  // ball is the active background" so CSS can make content translucent to reveal it.
   function sync(): void {
     if (dropped) return;
-    const active = effectiveDark() && enabled;
-    document.documentElement.classList.toggle("disco-on", active);
-    if (active && !document.hidden) {
-      run();
+    light = !effectiveDark();
+    if (enabled) {
+      document.documentElement.classList.add("disco-on");
+      // Cancel any in-flight switch-off fade and bring it back.
+      if (fadeTimer) {
+        clearTimeout(fadeTimer);
+        fadeTimer = 0;
+        canvas!.style.opacity = "1";
+      }
+      if (!document.hidden) {
+        run();
+      } else {
+        // Hidden tab: pause rendering but keep the mode (disco-on stays).
+        stop();
+        canvas!.style.opacity = "0";
+        started = false;
+      }
     } else {
-      stop();
+      // Switched off: if it's visible and animating, keep it SPINNING through the
+      // CSS opacity fade, then tear down — a graceful fade-out, not a freeze.
       canvas!.style.opacity = "0";
-      started = false;
+      const teardown = () => {
+        stop();
+        started = false;
+        document.documentElement.classList.remove("disco-on", "disco-static");
+        fadeTimer = 0;
+      };
+      if (!document.hidden && running) {
+        if (fadeTimer) clearTimeout(fadeTimer);
+        fadeTimer = window.setTimeout(teardown, 850);
+      } else {
+        if (fadeTimer) clearTimeout(fadeTimer);
+        teardown();
+      }
     }
   }
 
