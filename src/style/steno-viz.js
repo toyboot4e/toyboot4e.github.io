@@ -117,6 +117,22 @@ class StenoViz extends HTMLElement {
   }
 
   connectedCallback() {
+    // steno-viz.js is loaded async, so this element can be upgraded *before* its
+    // child text is parsed. In that case `this.textContent` is still empty, so
+    // no keys get marked pressed (the layout itself still draws) — the "shows
+    // keys but nothing pressed on first load" bug. If the text isn't there yet
+    // and the document is still parsing, wait until parsing finishes.
+    if (this.textContent.trim() === '' && document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.render(), { once: true });
+    } else {
+      this.render();
+    }
+  }
+
+  render() {
+    if (this._rendered) return; // connectedCallback can fire more than once
+    this._rendered = true;
+
     const chars = [
       ['#', 'T', 'P', 'H', '*', '', '*', 'F', 'P', 'L', 'T', 'D'],
       ['S', 'K', 'W', 'R', '', '', '', 'R', 'B', 'G', 'S', 'Z'],
