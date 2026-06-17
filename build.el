@@ -894,13 +894,13 @@ INFO is a plist holding contextual information.  See
     `(div (@ (class "article-card"))
           ;; Padded text content; the thumbnail below stays flush to the border.
           (div (@ (class "article-card-body"))
+               (div (a (@ (href ,link)
+                          (class "article-card-link"))
+                       (*RAW-STRING* ,title-html)))
                (div (@ (class "article-card-meta"))
                     (date ,date)
                     (span (@ (class "org-tag-list"))
-                          ,@(mapcar #'create-tag-sxml tags)))
-               (div (a (@ (href ,link)
-                          (class "article-card-link"))
-                       (*RAW-STRING* ,title-html))))
+                          ,@(mapcar #'create-tag-sxml tags))))
           ;; Thumbnail: `decoding=async' always. The first `my-eager-image-count'
           ;; thumbnails (above the fold) load eagerly; the very first is the LCP
           ;; and gets fetchpriority=high, the rest stay lazy/low.

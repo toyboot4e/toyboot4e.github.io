@@ -373,8 +373,13 @@ span.code-highlighted {
 }
 
 .article-card-meta {
-  font-size: 1rem;
+  font-size: 0.85rem;
   line-height: 1.4;
+}
+
+/* keep the date and its tags the same (smaller) size on one meta row */
+.article-card-meta .org-tag-list {
+  font-size: inherit;
 }
 
 .article-card-meta date {
@@ -384,6 +389,9 @@ span.code-highlighted {
 }
 
 .article-card-link {
+  /* title sits above the meta and should read bigger than the date */
+  font-size: 1.25rem;
+  font-weight: 600;
   text-decoration: none;
 }
 
