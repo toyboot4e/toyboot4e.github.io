@@ -546,14 +546,17 @@ span.code-highlighted {
   color: var(--accent-hover);
 }
 
-/* GitHub mark + external-link arrow flanking the header text. */
+/* GitHub mark, leftmost. Vertical centring is handled reliably by the flex
+   `align-items: center` on `.gh-embed-head a` (no magic offsets). */
 .gh-embed-icon {
   flex: none;
   opacity: 0.8;
 }
 
+/* external-link arrow, sitting just after the line range. */
 .gh-embed-ext {
   flex: none;
+  margin-left: 0.35em;
   opacity: 0.7;
 }
 
