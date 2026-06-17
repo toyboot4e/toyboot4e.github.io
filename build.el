@@ -194,6 +194,15 @@ from `my-eager-image-count' as cards render.")
          ((> (length text) max-len) (concat (substring text 0 max-len) "…"))
          (t text))))))
 
+;; The disco ball is a homepage-only effect (see CONTEXT.md / ADR 0003): the
+;; `<canvas>' + `disco.min.js' are emitted only for `index.html'.
+(defun my-disco-page-p (info)
+  "Non-nil when the page being exported is the homepage (`index.html')."
+  (let ((rel (replace-regexp-in-string
+              "\\.org\\'" ".html"
+              (file-relative-name (plist-get info :input-file) default-directory))))
+    (string= rel "index.html")))
+
 ;; Returns `<head>' SXML
 (defun my-html-head (info contents)
   ;; Reset `my-codeblock-counter' on new file. TODO: move it to more appropriate place
@@ -261,6 +270,14 @@ from `my-eager-image-count' as cards render.")
                  (src "/style/style.js"))
               ;; NOTE: empty body is required for self-closing tag
               "")
+      ;; Homepage-only disco ball (`<canvas>' is emitted in the body). `defer'
+      ;; so the canvas exists; dark-theme-only rendering is decided in the
+      ;; script. See `docs/adr/0003-homepage-disco-ball-webgl.md'.
+      ,@(when (my-disco-page-p info)
+          `((script (@ (type "text/javascript")
+                       (defer "")
+                       (src "/style/disco.min.js"))
+                    "")))
       ;; NOTE: Prism highlighting is baked in at build time (`scripts/postprocess.ts').
       ;; Only loaded on pages that actually embed a `<steno-outline>' chart.
       ,@(when has-steno
@@ -356,7 +373,16 @@ from `my-eager-image-count' as cards render.")
                            (onclick "toggleTheme()")
                            (title "\u30c6\u30fc\u30de\u5207\u66ff")
                            (aria-label "Toggle theme"))
-                        ""))))
+                        "")
+                ;; Disco-ball on/off, homepage only (the ball lives there). Shown
+                ;; only in dark theme via CSS; `toggleDisco' is defined in disco.ts.
+                ,@(when (my-disco-page-p info)
+                    `((button (@ (id "disco-toggle")
+                                 (onclick "window.toggleDisco && toggleDisco()")
+                                 (aria-pressed "true")
+                                 (title "\u30c7\u30a3\u30b9\u30b3\u30dc\u30fc\u30eb\u5207\u66ff")
+                                 (aria-label "Toggle disco ball"))
+                              ""))))))
 
 ;; Returns the page title block, shown below the sticky header rather than
 ;; inside it: a title, then a single meta row of date + tags.
@@ -389,6 +415,10 @@ from `my-eager-image-count' as cards render.")
            ,(my-html-head info contents)
 
            (body
+            ;; Homepage disco ball: a fixed full-viewport WebGL background,
+            ;; behind all content. Only rendered in dark theme (see disco.ts).
+            ,@(when (my-disco-page-p info)
+                `((canvas (@ (id "disco-canvas") (aria-hidden "true")) "")))
             ,(my-html-header info)
             (main (@ (role "main")
                      (id "main"))

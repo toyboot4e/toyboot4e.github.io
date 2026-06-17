@@ -125,7 +125,8 @@ header > nav a {
   flex: none;
 }
 
-#theme-toggle {
+#theme-toggle,
+#disco-toggle {
   background: none;
   border: var(--border-width) solid var(--border);
   border-radius: var(--standard-border-radius);
@@ -153,10 +154,38 @@ header > nav a {
   content: "\2600";
 }
 
-#theme-toggle:hover {
+#theme-toggle:hover,
+#disco-toggle:hover {
   background: var(--bg);
   border-color: var(--accent);
   color: var(--accent);
+}
+
+/* Disco-ball toggle: a mirror-ball glyph. The ball is dark-theme only, so the
+   button is shown only when the effective theme is dark (mirrors the
+   theme-toggle icon logic). Dimmed when the effect is switched off. */
+#disco-toggle {
+  display: none;
+}
+#disco-toggle::before {
+  content: "\1FAA9"; /* 🪩 disco ball */
+}
+@media (prefers-color-scheme: dark) {
+  #disco-toggle {
+    display: inline-block;
+  }
+}
+:root[data-theme="dark"] #disco-toggle {
+  display: inline-block;
+}
+:root[data-theme="light"] #disco-toggle {
+  display: none;
+}
+/* When off, desaturate the emoji to monochrome (like the SVG nav icons) and dim
+   it — keep the button's border/background solid. Colour returns when it's on. */
+#disco-toggle[aria-pressed="false"]::before {
+  opacity: 0.5;
+  filter: grayscale(1);
 }
 
 /* page title block (moved out of the sticky header): left-aligned title with
@@ -754,4 +783,59 @@ a.toc-link {
 
 .is-active-link {
   font-weight: 700;
+}
+
+/* ============================================================
+   Homepage disco ball (see docs/adr/0003, CONTEXT.md)
+   A fixed, full-viewport WebGL canvas behind all content. Emitted only on the
+   homepage (`has-disco` in build.el) and only rendered in dark theme (disco.ts
+   gates the render loop and fades the canvas in/out via `opacity`). `z-index:-1`
+   keeps it behind the content but above the page background; `pointer-events:
+   none` lets clicks/scroll pass through. */
+#disco-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  display: block;
+  pointer-events: none;
+  /* The script flips opacity to 1 once the first frame is drawn, and back to 0
+     when the theme is light or the tab is hidden — so it fades, never flashes. */
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+/* In disco mode (dark theme on the homepage — `disco-on` is toggled by
+   disco.ts), make the article cards translucent so the ball shows through them.
+   The reading column is already shader-dimmed, so ~62% bg keeps text readable
+   while letting the glints bleed past. Light theme / article pages are
+   untouched. Tune the mix percentage to taste. */
+.disco-on .article-card {
+  background-color: color-mix(in srgb, var(--bg) 58%, transparent);
+  transition: background-color 0.8s ease;
+}
+.disco-on .article-card:hover {
+  background-color: color-mix(in srgb, var(--bg) 73%, transparent);
+}
+
+/* In disco mode the tag chips (no background of their own) float unreadably over
+   the ball — give them a semi-solid backdrop so the labels stay legible while
+   still letting a little of the ball through. */
+.disco-on .org-tag {
+  background-color: color-mix(in srgb, var(--bg) 68%, transparent);
+  transition: background-color 0.8s ease;
+}
+.disco-on .org-tag:hover {
+  background-color: color-mix(in srgb, var(--accent-hover) 22%, var(--bg));
+}
+
+/* In disco mode, make the sticky header glassy so the ball shows behind the nav.
+   A light backdrop blur keeps the nav icons/labels legible over the moving ball.
+   Light theme / article pages keep the solid header. */
+.disco-on body > header {
+  background-color: color-mix(in srgb, var(--accent-bg) 38%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: background-color 0.8s ease;
 }
