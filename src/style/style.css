@@ -135,10 +135,11 @@ header > nav a {
   margin-bottom: 0.3rem !important;
 }
 
-/* the title block supplies the spacing above the content; cancel the large
-   top margin simple.css puts on the first heading so the gap isn't doubled */
+/* the title block supplies the spacing above the content; trim simple.css's
+   large first-heading top margin, but keep a bit more than before so the
+   title→first-h2 gap isn't tighter than the gap between later h2 sections */
 #content > :first-child {
-  margin-top: 0.75rem;
+  margin-top: 1.5rem;
 }
 
 /* date + tags on a single line */
