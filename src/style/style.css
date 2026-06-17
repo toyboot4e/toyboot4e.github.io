@@ -785,10 +785,26 @@ a.toc-link {
   z-index: -1;
   display: block;
   pointer-events: none;
-  /* The script flips opacity to 1 once the first frame is drawn, and back to 0
-     when the theme is light or the tab is hidden — so it fades, never flashes. */
+  /* The script flips opacity up once the first frame is drawn, and back to 0 when
+     off/hidden. Fading is OPT-IN via `disco-animating` below (instant otherwise). */
   opacity: 0;
-  transition: opacity 0.8s ease;
+}
+
+/* Disco transitions are OPT-IN: disco.ts adds `disco-animating` only while the
+   effect fades in or out (a fresh/external visit, or an on/off toggle), then
+   removes it. So appearing/disappearing animates in sync with the canvas, while
+   hover, theme changes, and same-site navigation stay instant — and the off-fade
+   ends cleanly on the real final value instead of snapping. */
+.disco-animating #disco-canvas,
+.disco-animating .disco-bg-light,
+.disco-animating .article-card,
+.disco-animating .article-card-thumbnail,
+.disco-animating .org-tag,
+.disco-animating body > header {
+  transition:
+    opacity 0.8s ease,
+    background-color 0.8s ease,
+    backdrop-filter 0.8s ease;
 }
 
 /* Cheap CSS drifting-light background, used only on the static-ball fallback
@@ -804,7 +820,6 @@ a.toc-link {
   overflow: hidden;
   display: none;
   opacity: 0;
-  transition: opacity 0.8s ease;
 }
 html.disco-on.disco-static .disco-bg-light {
   display: block;
@@ -910,7 +925,6 @@ html.disco-on.disco-static .disco-bg-light {
    untouched. Tune the mix percentage to taste. */
 .disco-on .article-card {
   background-color: color-mix(in srgb, var(--bg) 58%, transparent);
-  transition: background-color 0.8s ease;
 }
 .disco-on .article-card:hover {
   background-color: color-mix(in srgb, var(--bg) 73%, transparent);
@@ -919,7 +933,6 @@ html.disco-on.disco-static .disco-bg-light {
    them too; restore full opacity on hover so the image reads when focused. */
 .disco-on .article-card-thumbnail {
   opacity: 0.75;
-  transition: opacity 0.8s ease;
 }
 .disco-on .article-card:hover .article-card-thumbnail {
   opacity: 1;
@@ -930,7 +943,6 @@ html.disco-on.disco-static .disco-bg-light {
    still letting a little of the ball through. */
 .disco-on .org-tag {
   background-color: color-mix(in srgb, var(--bg) 68%, transparent);
-  transition: background-color 0.8s ease;
 }
 .disco-on .org-tag:hover {
   background-color: color-mix(in srgb, var(--accent-hover) 22%, var(--bg));
@@ -943,5 +955,4 @@ html.disco-on.disco-static .disco-bg-light {
   background-color: color-mix(in srgb, var(--accent-bg) 38%, transparent);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
-  transition: background-color 0.8s ease;
 }

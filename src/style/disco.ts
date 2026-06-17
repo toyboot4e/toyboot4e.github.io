@@ -385,6 +385,29 @@ function onMedia(mql: MediaQueryList | null, cb: () => void): void {
   mql.addEventListener ? mql.addEventListener("change", cb) : mql.addListener(cb);
 }
 
+function sameOrigin(url: string): boolean {
+  try {
+    return new URL(url).origin === location.origin;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Wall-clock epoch (ms) shared across same-tab navigations (sessionStorage), so
+// the shader time is continuous between pages — performance.now() resets per
+// page, so it can't carry the animation over. A fresh tab/visit starts over.
+function discoEpoch(): number {
+  try {
+    const s = sessionStorage.getItem("toybeam-disco-t0");
+    if (s) return parseFloat(s);
+    const e = Date.now();
+    sessionStorage.setItem("toybeam-disco-t0", String(e));
+    return e;
+  } catch (e) {
+    return Date.now();
+  }
+}
+
 function effectiveDark(): boolean {
   const attr = document.documentElement.getAttribute("data-theme");
   if (attr === "dark") return true;
@@ -408,6 +431,13 @@ function start(): void {
     const tgl = document.getElementById("disco-toggle");
     if (tgl) tgl.remove();
   }
+
+  // Dimmer behind long-form article/tag text; full strength on the homepage.
+  const home = location.pathname === "/" || /(^|\/)index\.html$/.test(location.pathname);
+  const onOpacity = home ? "1" : "0.55";
+  // Same-site navigation shows the disco instantly (no fade-in); a fresh/external
+  // visit (or toggling it on) fades via the `disco-animating` opt-in class.
+  const fromSameSite = !!document.referrer && sameOrigin(document.referrer);
 
   const opts: WebGLContextAttributes = {
     alpha: true,
@@ -471,13 +501,14 @@ function start(): void {
   }
 
   const reduce = mm("(prefers-reduced-motion: reduce)");
+  const epoch = discoEpoch(); // wall-clock base for the shader time (cross-page)
   let raf = 0;
   let running = false;
-  let t0 = 0;
   let started = false; // first frame drawn (for fade-in)
   let enabled = discoPref(); // user on/off preference (the disco-toggle button)
   let light = false; // current effective theme is light (drives u_light); set in sync()
   let fadeTimer = 0; // pending teardown during a graceful switch-off fade
+  let animTimer = 0; // window during which disco transitions are enabled
 
   // Framerate cap. The spin is slow, so 30fps is indistinguishable from 60 but
   // halves continuous fill for everyone.
@@ -516,13 +547,12 @@ function start(): void {
     gl!.drawArrays(gl!.TRIANGLES, 0, 3);
     if (!started) {
       started = true;
-      canvas!.style.opacity = "1";
+      canvas!.style.opacity = onOpacity;
     }
   }
 
   function frame(now: number): void {
     if (!running) return;
-    if (!t0) t0 = now;
     raf = window.requestAnimationFrame(frame);
 
     // Framerate cap: skip this callback if too little time has passed.
@@ -555,7 +585,7 @@ function start(): void {
       }
     }
 
-    paint((now - t0) / 1000, false);
+    paint((Date.now() - epoch) / 1000, false); // wall-clock → continuous across pages
   }
 
   // Static path (`prefers-reduced-motion` only): draw the ball ONCE, ball-only
@@ -591,7 +621,6 @@ function start(): void {
     }
     document.documentElement.classList.remove("disco-static");
     running = true;
-    t0 = 0;
     lastDraw = 0;
     warmup = 0;
     slow = 0;
@@ -602,6 +631,17 @@ function start(): void {
     running = false;
     if (raf) window.cancelAnimationFrame(raf);
     raf = 0;
+  }
+
+  // Briefly enable the disco transitions so this on/off (or first appearance)
+  // fades; removed after, so hover / theme / same-site nav stay instant.
+  function animate(): void {
+    document.documentElement.classList.add("disco-animating");
+    if (animTimer) clearTimeout(animTimer);
+    animTimer = window.setTimeout(() => {
+      document.documentElement.classList.remove("disco-animating");
+      animTimer = 0;
+    }, 900);
   }
 
   // Show whenever the user hasn't switched it off (both themes now); pause when
@@ -617,7 +657,7 @@ function start(): void {
       if (fadeTimer) {
         clearTimeout(fadeTimer);
         fadeTimer = 0;
-        canvas!.style.opacity = "1";
+        canvas!.style.opacity = onOpacity;
       }
       if (!document.hidden) {
         run();
@@ -628,21 +668,22 @@ function start(): void {
         started = false;
       }
     } else {
-      // Switched off: if it's visible and animating, keep it SPINNING through the
-      // CSS opacity fade, then tear down — a graceful fade-out, not a freeze.
+      // Switched off: revert the content styling immediately so it animates back
+      // (via disco-animating) IN SYNC with the canvas fade — no late snap — then
+      // keep the ball spinning through the fade before stopping.
+      document.documentElement.classList.remove("disco-on", "disco-static");
       canvas!.style.opacity = "0";
-      const teardown = () => {
+      const finish = () => {
         stop();
         started = false;
-        document.documentElement.classList.remove("disco-on", "disco-static");
         fadeTimer = 0;
       };
       if (!document.hidden && running) {
         if (fadeTimer) clearTimeout(fadeTimer);
-        fadeTimer = window.setTimeout(teardown, 850);
+        fadeTimer = window.setTimeout(finish, 850);
       } else {
         if (fadeTimer) clearTimeout(fadeTimer);
-        teardown();
+        finish();
       }
     }
   }
@@ -662,6 +703,7 @@ function start(): void {
       /* storage blocked — preference is session-only */
     }
     reflectBtn();
+    animate(); // fade this on/off in or out
     sync();
   };
 
@@ -703,6 +745,10 @@ function start(): void {
     },
     false,
   );
+
+  // Fade in on a fresh/external visit; same-site navigation appears instantly
+  // (and continues the animation from the shared clock — see discoEpoch).
+  if (!fromSameSite) animate();
 
   sync();
 }
