@@ -95,6 +95,38 @@ main {
   animation-duration: 0.1s;
 }
 
+/* Explicit light-theme override — the long-standing "light theme doesn't work
+   on iOS" bug. simple.css defines its light palette only on bare `:root`, but
+   its dark palette on BOTH `@media (prefers-color-scheme: dark) :root` AND
+   `:root[data-theme="dark"]`. With no `:root[data-theme="light"]`, toggling to
+   light while the OS is in dark mode left the dark media-query `:root` rule
+   (specificity 0,1,0) winning over the bare `:root` light values — so the page
+   stayed dark and the toggle appeared dead. Re-assert the light palette at
+   specificity (0,2,0) so an explicit light choice always wins, regardless of OS
+   preference. Values mirror simple.css's `:root` (kept in sync with the pinned
+   framework). `color-scheme: light` also fixes iOS form controls / scrollbars /
+   overscroll that the OS-dark `color-scheme` would otherwise tint. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #fff;
+  --accent-bg: #f5f7ff;
+  --text: #212121;
+  --text-light: #585858;
+  --border: #898ea4;
+  --accent: #0d47a1;
+  --accent-hover: #1266e2;
+  --accent-text: var(--bg);
+  --code: #d81b60;
+  --preformatted: #444;
+  --marked: #ffdd33;
+  --disabled: #efefef;
+}
+/* simple.css dims img/video to 0.8 under OS-dark; undo it for explicit light. */
+:root[data-theme="light"] img,
+:root[data-theme="light"] video {
+  opacity: 1;
+}
+
 #toc {
   grid-column: 3;
   /* span both grid rows (title + content) so the TOC can start at the top,

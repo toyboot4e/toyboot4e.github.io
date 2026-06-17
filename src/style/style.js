@@ -38,21 +38,6 @@
       }
     }
 
-    // iOS Safari can leave the page background — the body background propagated to
-    // the viewport, behind the fixed disco canvas's compositing layer —
-    // unrepainted when the theme changes only via CSS variables; the transparent
-    // light-theme canvas then shows the stale colour. Force a repaint by
-    // re-asserting body's background for a frame. (Nudge body, not html: an html
-    // background would stop the propagation and the opaque body box would paint
-    // over the canvas, hiding the ball.)
-    if (document.body) {
-      try {
-        document.body.style.backgroundColor = getComputedStyle(document.body).backgroundColor;
-        requestAnimationFrame(function () {
-          document.body.style.backgroundColor = "";
-        });
-      } catch (e) {}
-    }
   }
 
   // Apply saved theme immediately (before body renders) to prevent FOUC
