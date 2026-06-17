@@ -73,12 +73,12 @@ React (hooks) で状態を持たせるには [[https://react.dev/reference/react
 Props が変化した時に状態を初期化したいとします。この場合は、 props を元にコンポーネントの =key= を設定すると、 =key= の変更時に新たなコンポーネントが作成されます:
 
 #+BEGIN_SRC diff-tsx
-<Drill
-  drillData={drillProps.drillData}
-  drillDataIndex={drillProps.drillDataIndex}
+ <Drill
+   drillData={drillProps.drillData}
+   drillDataIndex={drillProps.drillDataIndex}
 +  /* key change = new component (reset state) */
 +  key={drillProps.filename}
-/>
+ />
 #+END_SRC
 
 #+BEGIN_QUOTE
