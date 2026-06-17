@@ -39,6 +39,8 @@ precision highp float;
 
 uniform vec2  u_res;
 uniform float u_time;
+uniform float u_ballOnly; // 1.0 = draw only the ball (transparent elsewhere) so a
+                          // cheap CSS layer can supply the drifting light instead.
 
 varying vec2 v_uv;
 
@@ -161,6 +163,15 @@ void main(){
     ball = col * mix(0.42, 1.0, colMask);
   }
 
+  // Ball-only path (static fallback): output just the ball with straight alpha,
+  // transparent everywhere else, so the CSS light layer behind shows through.
+  if (u_ballOnly > 0.5) {
+    vec3 c = ball / (ball + vec3(1.0));
+    c = pow(c, vec3(1.0 / 2.2));
+    gl_FragColor = vec4(c, mask);
+    return;
+  }
+
   // Soft warm halo bleeding off the ball into the background.
   bg += KEY * 0.10 * smoothstep(R * 1.9, R, sqrt(r2)) * colMask;
 
@@ -223,16 +234,55 @@ function discoPref(): boolean {
   }
 }
 
+// Software GL (SwiftShader / llvmpipe / Mesa software / Microsoft Basic Render)
+// fills every pixel on the CPU — a full-screen shader animates far too slowly.
+// Detect it so we can freeze to a single static frame instead of animating.
+// Returns false when the renderer string is unavailable (masked for privacy);
+// the runtime frame-time governor then catches the slow case anyway.
+function isSoftwareRenderer(g: WebGLRenderingContext): boolean {
+  try {
+    const ext = g.getExtension("WEBGL_debug_renderer_info");
+    if (!ext) return false;
+    const r = String(g.getParameter((ext as any).UNMASKED_RENDERER_WEBGL) || "").toLowerCase();
+    return /swiftshader|llvmpipe|softpipe|software|basic render|microsoft basic|mesa offscreen/.test(r);
+  } catch (e) {
+    return false;
+  }
+}
+
+// matchMedia helpers (guarded — matchMedia is absent in very old engines).
+function mm(query: string): MediaQueryList | null {
+  return window.matchMedia ? window.matchMedia(query) : null;
+}
+function onMedia(mql: MediaQueryList | null, cb: () => void): void {
+  if (!mql) return;
+  // addListener is the deprecated fallback for old WebKit.
+  mql.addEventListener ? mql.addEventListener("change", cb) : mql.addListener(cb);
+}
+
 function effectiveDark(): boolean {
   const attr = document.documentElement.getAttribute("data-theme");
   if (attr === "dark") return true;
   if (attr === "light") return false;
-  return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const m = mm("(prefers-color-scheme: dark)");
+  return !!(m && m.matches);
 }
 
 function start(): void {
   const canvas = document.getElementById("disco-canvas") as HTMLCanvasElement | null;
   if (!canvas) return;
+
+  // Tear down ALL disco UI — the effect can't/shouldn't run on this device. This
+  // includes the disco-toggle button: a control for an absent effect is just a
+  // dead button, so remove it rather than leave it unresponsive.
+  function disable(): void {
+    document.documentElement.classList.remove("disco-on", "disco-static");
+    canvas!.remove();
+    const bg = document.querySelector(".disco-bg-light");
+    if (bg) bg.remove();
+    const tgl = document.getElementById("disco-toggle");
+    if (tgl) tgl.remove();
+  }
 
   const opts: WebGLContextAttributes = {
     alpha: true,
@@ -245,14 +295,23 @@ function start(): void {
   let gl = (canvas.getContext("webgl", opts) ||
     canvas.getContext("experimental-webgl", opts)) as WebGLRenderingContext | null;
   if (!gl) {
-    // Graceful no-WebGL skip: drop the element, leave the plain dark homepage.
-    canvas.remove();
+    // Graceful no-WebGL skip: leave the plain dark homepage.
+    disable();
+    return;
+  }
+
+  // Drop the effect entirely on software renderers (no real GPU): a full-screen
+  // shader is far too heavy on the CPU, and even the static-ball + CSS-light
+  // fallback wrecks Interaction-to-Next-Paint when the compositor is software too.
+  // Plain dark homepage instead.
+  if (isSoftwareRenderer(gl)) {
+    disable();
     return;
   }
 
   let prog = link(gl);
   if (!prog) {
-    canvas.remove();
+    disable();
     return;
   }
 
@@ -266,14 +325,16 @@ function start(): void {
   gl.useProgram(prog);
   const uRes = gl.getUniformLocation(prog, "u_res");
   const uTime = gl.getUniformLocation(prog, "u_time");
+  const uBallOnly = gl.getUniformLocation(prog, "u_ballOnly");
 
   // Quality tier: cheaper internal resolution, cheaper still on touch devices.
-  const coarse = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+  const coarseMql = mm("(pointer: coarse)");
+  const coarse = !!(coarseMql && coarseMql.matches);
   const maxDpr = coarse ? 1.0 : 1.5;
   const resScale = coarse ? 0.7 : 1.0;
 
   function resize(): void {
-    const dpr = Math.min(window.devicePixelRatio || 1, maxDpr) * resScale;
+    const dpr = Math.min(window.devicePixelRatio || 1, maxDpr) * resScale * govScale;
     const w = Math.max(1, Math.round(canvas!.clientWidth * dpr));
     const h = Math.max(1, Math.round(canvas!.clientHeight * dpr));
     if (canvas!.width !== w || canvas!.height !== h) {
@@ -283,44 +344,127 @@ function start(): void {
     gl!.viewport(0, 0, w, h);
   }
 
-  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  const reduce = mm("(prefers-reduced-motion: reduce)");
   let raf = 0;
   let running = false;
   let t0 = 0;
   let started = false; // first frame drawn (for fade-in)
   let enabled = discoPref(); // user on/off preference (the disco-toggle button)
 
-  function frame(now: number): void {
-    if (!running) return;
-    if (!t0) t0 = now;
+  // Framerate cap. The spin is slow, so 30fps is indistinguishable from 60 but
+  // halves continuous fill for everyone.
+  const MIN_INTERVAL = 1000 / 30;
+  // Adaptive governor — the real-GPU gate. Renderer-string sniffing (above) can be
+  // defeated by privacy masking, so frame time is the ground truth: if frames are
+  // slow, lower the resolution; if they're catastrophic or stay slow at the floor,
+  // REMOVE the effect (no usable GPU). Only `prefers-reduced-motion` keeps a static
+  // ball; a struggling device gets the plain dark homepage.
+  let govScale = 1.0; // resolution multiplier, lowered under load
+  let dropped = false; // effect removed entirely (no GPU / too weak)
+  let lastDraw = 0; // timestamp of the last actual draw
+  let warmup = 0; // drawn-frame count (skip governor during startup jank)
+  let slow = 0; // consecutive sustained-slow frames (weak GPU → lower res)
+  let vslow = 0; // consecutive catastrophic frames (no GPU → drop fast)
+
+  function drop(): void {
+    dropped = true;
+    stop();
+    disable(); // also removes the disco-toggle button — no control for an absent effect
+  }
+
+  function degrade(): void {
+    if (govScale > 0.34) govScale *= 0.6; // shrink the buffer a notch, keep animating
+    else drop(); // can't hold even the floor → give up and remove it
+  }
+
+  // Resize, set uniforms, draw, and reveal on the first frame. Shared by the
+  // animated loop and the static (ball-only) render.
+  function paint(timeSeconds: number, ballOnly: boolean): void {
     resize();
     gl!.uniform2f(uRes, canvas!.width, canvas!.height);
-    gl!.uniform1f(uTime, (now - t0) / 1000);
+    gl!.uniform1f(uTime, timeSeconds);
+    gl!.uniform1f(uBallOnly, ballOnly ? 1 : 0);
     gl!.drawArrays(gl!.TRIANGLES, 0, 3);
     if (!started) {
       started = true;
       canvas!.style.opacity = "1";
     }
-    raf = window.requestAnimationFrame(frame);
   }
 
+  function frame(now: number): void {
+    if (!running) return;
+    if (!t0) t0 = now;
+    raf = window.requestAnimationFrame(frame);
+
+    // Framerate cap: skip this callback if too little time has passed.
+    if (lastDraw && now - lastDraw < MIN_INTERVAL - 1) return;
+    const dt = lastDraw ? now - lastDraw : MIN_INTERVAL;
+    lastDraw = now;
+
+    // After a short warmup (ignore startup/compile jank), police frame time.
+    if (++warmup > 5) {
+      // Catastrophically slow (<~7fps): no usable GPU. Drop fast so it never
+      // lingers as a laggy mess — a few such frames is well under a second.
+      if (dt > 150) {
+        if (++vslow >= 3) {
+          drop();
+          return;
+        }
+      } else {
+        vslow = 0;
+      }
+      // Sustained slow (can't hold the 30fps target): a weak GPU — lower the
+      // resolution, and if it still can't cope, degrade() drops it.
+      if (dt > MIN_INTERVAL * 2) {
+        if (++slow >= 10) {
+          slow = 0;
+          degrade();
+          return;
+        }
+      } else {
+        slow = 0;
+      }
+    }
+
+    paint((now - t0) / 1000, false);
+  }
+
+  // Static path (`prefers-reduced-motion` only): draw the ball ONCE, ball-only
+  // (transparent surround), and let the CSS `.disco-bg-light` layer supply the
+  // drifting light. `disco-static` on <html> reveals it. (Software / weak GPUs are
+  // dropped, not frozen — see drop().)
+  function staticMode(): boolean {
+    return !!(reduce && reduce.matches);
+  }
+
+  let stillPending = 0;
   function drawStill(): void {
-    // prefers-reduced-motion: a single, frozen (still gorgeous) frame.
-    resize();
-    gl!.uniform2f(uRes, canvas!.width, canvas!.height);
-    gl!.uniform1f(uTime, 9.0);
-    gl!.drawArrays(gl!.TRIANGLES, 0, 3);
-    canvas!.style.opacity = "1";
+    // Add the class synchronously (cheap — paints the CSS light immediately), but
+    // DEFER the heavy ball fill to a later task so it never blocks the paint that
+    // responds to a click/tap. This keeps Interaction-to-Next-Paint (INP) low when
+    // the theme/disco toggles flip the effect. Coalesced so rapid calls draw once.
+    document.documentElement.classList.add("disco-static");
+    if (stillPending) return;
+    stillPending = window.setTimeout(() => {
+      stillPending = 0;
+      paint(9.0, true);
+    }, 0);
   }
 
   function run(): void {
     if (running) return;
-    if (reduce && reduce.matches) {
+    // Reduced motion → the static ball + CSS light path. Capable GPUs animate the
+    // full shader; software / weak GPUs are dropped by the governor.
+    if (staticMode()) {
       drawStill();
       return;
     }
+    document.documentElement.classList.remove("disco-static");
     running = true;
     t0 = 0;
+    lastDraw = 0;
+    warmup = 0;
+    slow = 0;
     raf = window.requestAnimationFrame(frame);
   }
 
@@ -335,6 +479,7 @@ function start(): void {
   // active background" (independent of pause) so CSS can make content translucent
   // to reveal it.
   function sync(): void {
+    if (dropped) return;
     const active = effectiveDark() && enabled;
     document.documentElement.classList.toggle("disco-on", active);
     if (active && !document.hidden) {
@@ -370,21 +515,17 @@ function start(): void {
     attributes: true,
     attributeFilter: ["data-theme"],
   });
-  if (window.matchMedia) {
-    const mqDark = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => sync();
-    mqDark.addEventListener ? mqDark.addEventListener("change", onChange) : mqDark.addListener(onChange);
-    if (reduce) {
-      const onReduce = () => {
-        stop();
-        sync();
-      };
-      reduce.addEventListener ? reduce.addEventListener("change", onReduce) : reduce.addListener(onReduce);
-    }
-  }
+  onMedia(mm("(prefers-color-scheme: dark)"), sync);
+  onMedia(reduce, () => {
+    stop();
+    sync();
+  });
   document.addEventListener("visibilitychange", sync);
   window.addEventListener("resize", () => {
     if (running) resize();
+    // Static render (software GL / frozen / reduced motion): redraw at the new
+    // size so the still frame doesn't stretch.
+    else if (document.documentElement.classList.contains("disco-on")) drawStill();
   });
 
   // WebGL context loss: stop cleanly, then rebuild on restore.

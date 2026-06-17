@@ -417,8 +417,11 @@ from `my-eager-image-count' as cards render.")
            (body
             ;; Homepage disco ball: a fixed full-viewport WebGL background,
             ;; behind all content. Only rendered in dark theme (see disco.ts).
+            ;; `.disco-bg-light' is the cheap CSS drifting-light layer used on the
+            ;; static fallback (weak GPU / reduced motion); idle otherwise.
             ,@(when (my-disco-page-p info)
-                `((canvas (@ (id "disco-canvas") (aria-hidden "true")) "")))
+                `((div (@ (class "disco-bg-light") (aria-hidden "true")) "")
+                  (canvas (@ (id "disco-canvas") (aria-hidden "true")) "")))
             ,(my-html-header info)
             (main (@ (role "main")
                      (id "main"))

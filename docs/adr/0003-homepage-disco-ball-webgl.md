@@ -45,6 +45,18 @@ matched and does not ship. The generated `*.min.js` is committed, like `*.min.cs
 
 - The shader is art that needs visual tuning; palette and placement live in a
   clearly-marked `TUNABLE PALETTE` / constants block at the top of the shader.
-- Guards ship with it: pause when the tab is hidden, `prefers-reduced-motion` →
-  one static frame, reduced internal resolution (capped DPR; lower tier on
-  coarse-pointer devices), graceful no-WebGL skip, and context-loss handling.
+- Guards ship with it: a 30fps cap; pause when the tab is hidden; reduced internal
+  resolution (capped DPR; lower tier on coarse-pointer devices); graceful
+  no-WebGL skip; and context-loss handling.
+- **Only runs with a real GPU.** Software renderers (SwiftShader / llvmpipe /
+  Mesa software / Microsoft Basic Render, via `WEBGL_debug_renderer_info`) are
+  dropped outright — a full-screen shader on a CPU rasteriser is far too heavy and
+  tanks Interaction-to-Next-Paint when the page compositor is software too. Those
+  visitors get the plain dark homepage.
+- **Static fallback** for a real-but-weak GPU (an adaptive frame-time governor
+  steps the resolution down, then freezes) and for `prefers-reduced-motion`: the
+  ball is drawn once (ball-only, transparent surround) and a compositor-cheap CSS
+  layer (`.disco-bg-light`, transform/opacity only) supplies the drifting light.
+- INP care: the theme/disco toggles defer the heavy WebGL redraw off the click's
+  critical path, and the theme toggle skips its View Transition on the disco page
+  (it would snapshot the full-screen canvas).
