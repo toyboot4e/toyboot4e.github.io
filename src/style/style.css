@@ -606,6 +606,13 @@ span.code-highlighted {
   line-height: 1;
   color: var(--text-light);
   text-decoration: none;
+  /* On a too-narrow screen, scroll the header horizontally instead of letting the
+     right side (repo) overlap the left (file path). Items below keep full width. */
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox: hide the bar; swipe/shift-scroll still works */
+}
+.gh-embed-head a::-webkit-scrollbar {
+  display: none; /* WebKit/Blink */
 }
 
 .gh-embed-head a:hover {
@@ -626,19 +633,16 @@ span.code-highlighted {
   opacity: 0.7;
 }
 
-/* `filename:line`, leftmost. The path may ellipsize when space is tight; the
-   line range never does. */
+/* `filename:line`, leftmost. Keeps its full width (the header scrolls instead of
+   truncating). */
 .gh-embed-loc {
   display: flex;
   align-items: baseline;
-  min-width: 0; /* let the path ellipsize instead of pushing the line range out */
-  flex: 0 1 auto;
+  flex: none;
   font-family: monospace, monospace;
 }
 
 .gh-embed-path {
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -647,8 +651,11 @@ span.code-highlighted {
   white-space: nowrap;
 }
 
-/* repo (+ ref), pushed to the right edge. */
+/* repo (+ ref): pushed to the right edge when there's room (margin-left:auto); on
+   a narrow screen the auto margin collapses and it scrolls into view instead of
+   overlapping the path. `flex: none` so it keeps full width rather than clipping. */
 .gh-embed-repo {
+  flex: none;
   margin-left: auto;
   padding-left: 0.5em;
   white-space: nowrap;
