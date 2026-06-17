@@ -1,3 +1,50 @@
+/* ============================================================
+   Simple.css overrides
+   Rules whose sole job is to override a simple.css default.
+   Component-specific tweaks stay with their component below.
+   ============================================================ */
+
+/* Header: drop simple.css's bottom padding; pin the bar to the top. */
+body > header {
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* The nav is the header's only child, so simple.css's
+   `body > header > *:only-child { margin-block-start: 2rem }` adds a gap above
+   the bar (the margin collapses through the padding-less header). Match its
+   selector exactly to win on specificity and cancel it. */
+body > header > *:only-child {
+  margin-block-start: 0;
+}
+
+/* Shorten the bar a little without changing the button size: halve simple.css's
+   1rem nav top padding and 1rem button bottom margin. The roomy bordered-button
+   look (same as the footer) is simple.css's default, kept as-is. */
+header > nav {
+  padding-top: 0.5rem;
+}
+header > nav a {
+  margin-bottom: 0.5rem;
+}
+
+/* Footer: drop simple.css's padding; its 4rem top margin is too much space. */
+body > footer {
+  padding: 0;
+  margin-top: 2rem;
+}
+
+/* The title block supplies the spacing above the content; trim simple.css's
+   large first-heading top margin, keeping enough that the title→first-h2 gap
+   matches the gap between later h2 sections (1.5rem + 1.5rem = 3rem). */
+#content > :first-child {
+  margin-top: 1.5rem;
+}
+
+/* ============================================================ */
+
 /* three-column mode */
 main {
   display: grid;
@@ -48,37 +95,11 @@ li p {
   text-indent: 0em;
 }
 
-body > header {
-  padding: 0;
-  /* stick the navigation to the top of the viewport */
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-/* nav is now the header's only child, so simple.css's
-   `body > header > *:only-child { margin-block-start: 2rem }` adds a gap above
-   the bar (the margin collapses through the padding-less header). Match its
-   selector exactly to win on specificity and cancel it. */
-body > header > *:only-child {
-  margin-block-start: 0;
-}
-
-/* Roomy header nav: keep simple.css's default bordered-button links (the same
-   style as the footer); only the sticky positioning above is custom.
-   Trim a little vertical space around the buttons (half of simple.css's 1rem
-   top padding + 1rem button bottom margin) to shorten the bar, keeping the
-   button size. */
-header > nav {
-  padding-top: 0.5rem;
-}
-
 /* inline icon + label in the header nav (footer links set this themselves) */
 header > nav a {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
-  margin-bottom: 0.5rem;
 }
 
 .nav-icon {
@@ -135,13 +156,6 @@ header > nav a {
   margin-bottom: 0.3rem !important;
 }
 
-/* the title block supplies the spacing above the content; trim simple.css's
-   large first-heading top margin, but keep a bit more than before so the
-   title→first-h2 gap isn't tighter than the gap between later h2 sections */
-#content > :first-child {
-  margin-top: 1.5rem;
-}
-
 /* date + tags on a single line */
 .title-meta {
   display: flex;
@@ -179,12 +193,6 @@ h5 a,
 h6 a {
   /* remove underlines from self links */
   text-decoration: none;
-}
-
-body > footer {
-  padding: 0;
-  /* simple.css's 4rem is too much space above the footer */
-  margin-top: 2rem;
 }
 
 footer > div {
