@@ -432,9 +432,12 @@ function start(): void {
     if (tgl) tgl.remove();
   }
 
-  // Dimmer behind long-form article/tag text; full strength on the homepage.
+  // Canvas opacity (recomputed per theme in sync). Homepage: full. Article/tag
+  // pages: DARK dims to 0.55; LIGHT to 0.7 — the old 0.55 over the bright page
+  // was what washed the light-theme article background into fog, and the
+  // drop-shadowed reading panes (CSS) give the separation instead of heavy dim.
   const home = location.pathname === "/" || /(^|\/)index\.html$/.test(location.pathname);
-  const onOpacity = home ? "1" : "0.55";
+  let onOpacity = "1";
   // Same-site navigation shows the disco instantly (no fade-in); a fresh/external
   // visit (or toggling it on) fades via the `disco-animating` opt-in class.
   const fromSameSite = !!document.referrer && sameOrigin(document.referrer);
@@ -651,16 +654,22 @@ function start(): void {
   function sync(): void {
     if (dropped) return;
     light = !effectiveDark();
+    // Homepage: full. Article/tag pages dim — dark to 0.55, light to 0.7 (enough
+    // to settle the effect behind the drop-shadowed panes without the fog wash).
+    onOpacity = home ? "1" : light ? "0.7" : "0.55";
     if (enabled) {
       document.documentElement.classList.add("disco-on");
       // Cancel any in-flight switch-off fade and bring it back.
       if (fadeTimer) {
         clearTimeout(fadeTimer);
         fadeTimer = 0;
-        canvas!.style.opacity = onOpacity;
       }
       if (!document.hidden) {
         run();
+        // Reflect the theme/page opacity live on a theme toggle (paint only sets
+        // it on the first frame). Guard on `started` so we never reveal a blank
+        // canvas before its first draw.
+        if (started) canvas!.style.opacity = onOpacity;
       } else {
         // Hidden tab: pause rendering but keep the mode (disco-on stays).
         stop();
