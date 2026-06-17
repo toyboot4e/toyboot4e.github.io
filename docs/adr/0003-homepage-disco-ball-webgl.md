@@ -18,9 +18,11 @@ environment. The cost is authoring difficulty, which is a one-time price.
 
 ## Scope decisions
 
-- **Homepage only.** Emitted under a new `has-disco` gate (the `<canvas>` and
-  `disco.min.js` appear only on `index.html`), consistent with `has-code` /
-  `has-steno`. Article pages stay lean and battery-friendly.
+- **Site-wide.** Emitted on every page via `my-disco-page-p` (the `<canvas>`,
+  `disco.min.js`, and toggle button). It shipped homepage-only first (to keep
+  articles lean), then opened up site-wide once it was wanted everywhere; the
+  per-page cost is bounded by the GPU gate, the persisted off-toggle, and the
+  reduced-motion/visibility guards.
 - **Both themes, one shader.** The effective theme drives a `u_light` uniform that
   selects the palette (dark/`*_L` light variants) and, on light, takes the
   ball-only (alpha) path so the bright page shows behind the ball rather than a

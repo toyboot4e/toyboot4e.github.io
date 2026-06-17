@@ -194,14 +194,14 @@ from `my-eager-image-count' as cards render.")
          ((> (length text) max-len) (concat (substring text 0 max-len) "…"))
          (t text))))))
 
-;; The disco ball is a homepage-only effect (see CONTEXT.md / ADR 0003): the
-;; `<canvas>' + `disco.min.js' are emitted only for `index.html'.
+;; The disco ball ships site-wide (see CONTEXT.md / ADR 0003): the `<canvas>',
+;; `disco.min.js', and the toggle button are emitted on every page. It runs by
+;; default (the toggle persists an off preference across pages), is GPU-gated,
+;; and is dark/light aware.
 (defun my-disco-page-p (info)
-  "Non-nil when the page being exported is the homepage (`index.html')."
-  (let ((rel (replace-regexp-in-string
-              "\\.org\\'" ".html"
-              (file-relative-name (plist-get info :input-file) default-directory))))
-    (string= rel "index.html")))
+  "Non-nil when the page should carry the disco ball (every page)."
+  (ignore info)
+  t)
 
 ;; Returns `<head>' SXML
 (defun my-html-head (info contents)
