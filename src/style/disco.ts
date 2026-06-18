@@ -90,8 +90,9 @@ const float LFIRE_SPEED  = 2.8;               // rising speed (continuous)
 const float LFIRE_HEIGHT = 2.2;               // flame reach up the screen
 const float LFIRE_WIDTH  = 1.3;               // horizontal falloff (bigger = hugs the right edge)
 const float LFIRE_ALPHA  = 0.90;              // opacity
-const float LAURORA_ALPHA = 0.65;             // aurora brightness
+const float LAURORA_ALPHA = 0.45;             // aurora brightness (light theme, over white)
 const float LAURORA_RAYS  = 6.0;              // number of fanning rays (angular frequency)
+const float LAURORA_DARK  = 0.5;              // aurora gain added to the dark sky (it glows there)
 
 const float BALL_RADIUS = 0.95;
 const vec2  BALL_SCREEN = vec2(-0.98, -0.30);  // y-normalised; offset into the left margin
@@ -367,6 +368,11 @@ void main(){
 
   // Soft warm halo bleeding off the ball into the background.
   bg += KEY * 0.10 * smoothstep(R * 1.9, R, sqrt(r2)) * colMask;
+
+  // Aurora curtains glowing across the upper sky. Added to the BACKGROUND (before
+  // the ball is composited) so the ball occludes it — it sits behind the ball;
+  // additive on the dark room so it glows. Premultiplied → .rgb.
+  bg += aurora(p, u_time).rgb * LAURORA_DARK;
 
   vec3 col = mix(bg, ball, mask);
 
