@@ -93,24 +93,27 @@ inherits the link colour, the accent colour on hover, and works in both themes.
 
 The SVG **path data lives inline in `build.el`** as `defconst`s
 (`my-icon-github`, `my-icon-qiita`, `my-icon-zenn`, `my-icon-home`,
-`my-icon-atcoder`) — there are no separate asset files. Two wrappers emit the
-`<svg>`: `my-brand-icon` (filled) and `my-line-icon` (stroked); `my-nav-link`
-pairs an icon with a label. Alignment is CSS only (`.nav-icon`, the
-`header > nav a` / `footer > div a` flex rules in `style.css`).
+`my-icon-atcoder`) — there are no separate asset files. One wrapper emits the
+`<svg>`: `my-line-icon` (stroked); `my-nav-link` pairs an icon with a label.
+Alignment is CSS only (`.nav-icon`, the `header > nav a` / `footer > div a` flex
+rules in `style.css`).
 
-Sources (path data copied once; the build itself never fetches):
-- **Brand marks** (GitHub, Qiita, Zenn) — [Simple Icons](https://simpleicons.org),
-  license CC0. Single filled `<path>`, `viewBox="0 0 24 24"` → use `my-brand-icon`.
-- **UI marks** (Home = house, AtCoder = trophy) — [Lucide](https://lucide.dev),
-  license ISC. Stroked multi-`<path>` (`fill=none`, `stroke=currentColor`,
-  `stroke-width=2`, round caps) → use `my-line-icon`. AtCoder has no official
-  icon, so the trophy is a stand-in.
+All icons are [Lucide](https://lucide.dev) (license ISC), stroked multi-`<path>`
+(`viewBox="0 0 24 24"`, `fill=none`, `stroke=currentColor`, `stroke-width=2`,
+round caps) → use `my-line-icon`. We deliberately **do not** use the real
+GitHub/Qiita/Zenn brand logos: their brand guidelines forbid recolouring, and we
+tint every icon with `currentColor` + hover accent. So the external links use
+generic semantic stand-ins (the text label carries the brand name): GitHub =
+`git-branch` (code repo), Qiita = `newspaper` (articles), Zenn = `book-open`
+(books). Home = house, AtCoder = trophy (also a stand-in — AtCoder has no
+official icon). The same `git-branch` stand-in is reused for the GitHub
+code-embed link-card header (`gh-embed-icon` in `scripts/postprocess.ts`).
 
-To add/refresh one: `curl` the raw SVG (e.g.
-`raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/<name>.svg`
-or `.../lucide-icons/lucide/main/icons/<name>.svg`), copy the inner `<path>`(s)
-into a new `defconst`, and reference it via the matching wrapper in
-`my-html-header` / `my-html-footer`.
+To add/refresh one: `curl` the raw SVG
+(`raw.githubusercontent.com/lucide-icons/lucide/main/icons/<name>.svg`), copy the
+inner `<path>`(s) into a new `defconst`, and reference it via `my-line-icon` in
+`my-html-header` / `my-html-footer`. Keep external-site links to generic icons,
+not the destination's trademarked logo.
 
 ### Dependencies
 - **Emacs packages**: `seq`, `esxml` (for HTML S-expression generation)

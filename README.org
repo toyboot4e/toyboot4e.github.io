@@ -34,3 +34,7 @@ $ just serve # in another tab
 
 - [[https://fonts.aahub.org/font/2][aahub_light]]
 
+*** Icons
+
+- [[https://lucide.dev/][Lucide]]
+
