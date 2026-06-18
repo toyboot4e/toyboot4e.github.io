@@ -987,24 +987,48 @@ html.disco-on.disco-static .disco-bg-light {
   }
 }
 
-/* In disco mode (dark theme on the homepage — `disco-on` is toggled by
-   disco.ts), make the article cards translucent so the ball shows through them.
-   The reading column is already shader-dimmed, so ~62% bg keeps text readable
-   while letting the glints bleed past. Light theme / article pages are
-   untouched. Tune the mix percentage to taste. */
-/* Drop shadow that lifts every disco pane off the effect, lit from the
-   upper-left (offset down-right). Applied in both themes. One token, so every
-   pane just uses var(--disco-shadow). */
+/* ── Disco surface tokens ────────────────────────────────────────────────
+   All disco-mode pane/surface values in one place so every rule below just
+   references a token (and tuning happens here). Dark/base values; light theme
+   overrides only the few that must be denser over the brighter effect — so the
+   light/dark difference lives on these tokens, not duplicated across every rule.
+   The percentages are fixed; var(--bg)/var(--accent-bg) resolve per theme at use,
+   so a single token is already theme-correct unless the percentage itself differs. */
 html.disco-on {
+  /* drop shadow lifting every pane off the effect, lit from the upper-left */
   --disco-shadow: 6px 6px 18px rgba(0, 0, 0, 0.2);
+  --disco-card-bg: color-mix(in srgb, var(--bg) 70%, transparent);
+  --disco-card-bg-hover: color-mix(in srgb, var(--bg) 82%, transparent);
+  --disco-tag-bg: color-mix(in srgb, var(--bg) 68%, transparent);
+  --disco-tag-bg-hover: color-mix(in srgb, var(--accent-hover) 22%, var(--bg));
+  --disco-heading-bg: color-mix(in srgb, var(--bg) 80%, transparent);
+  --disco-backdrop-bg: color-mix(in srgb, var(--bg) 70%, transparent); /* article ::before */
+  --disco-toc-bg: color-mix(in srgb, var(--bg) 80%, transparent);
+  --disco-chrome-bg: color-mix(in srgb, var(--accent-bg) 62%, transparent); /* header/footer */
+}
+/* Light theme: cards and the glassy header/footer need a denser backdrop over
+   the brighter effect. Only these three tokens differ from the dark base — so
+   this is the ONLY light/dark duplication left (explicit light + the OS-light
+   default, which needs its own media query so it can't merge with explicit). */
+:root[data-theme="light"].disco-on {
+  --disco-card-bg: color-mix(in srgb, var(--bg) 85%, transparent);
+  --disco-card-bg-hover: color-mix(in srgb, var(--bg) 93%, transparent);
+  --disco-chrome-bg: color-mix(in srgb, var(--accent-bg) 82%, transparent);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]).disco-on {
+    --disco-card-bg: color-mix(in srgb, var(--bg) 85%, transparent);
+    --disco-card-bg-hover: color-mix(in srgb, var(--bg) 93%, transparent);
+    --disco-chrome-bg: color-mix(in srgb, var(--accent-bg) 82%, transparent);
+  }
 }
 
 .disco-on .article-card {
-  background-color: color-mix(in srgb, var(--bg) 70%, transparent);
+  background-color: var(--disco-card-bg);
   box-shadow: var(--disco-shadow);
 }
 .disco-on .article-card:hover {
-  background-color: color-mix(in srgb, var(--bg) 82%, transparent);
+  background-color: var(--disco-card-bg-hover);
 }
 /* Fade the (opaque) card thumbnails in disco mode so the effect shows through
    them too; restore full opacity on hover so the image reads when focused. */
@@ -1019,10 +1043,21 @@ html.disco-on {
    the ball — give them a semi-solid backdrop so the labels stay legible while
    still letting a little of the ball through. */
 .disco-on .org-tag {
-  background-color: color-mix(in srgb, var(--bg) 68%, transparent);
+  background-color: var(--disco-tag-bg);
 }
 .disco-on .org-tag:hover {
-  background-color: color-mix(in srgb, var(--accent-hover) 22%, var(--bg));
+  background-color: var(--disco-tag-bg-hover);
+}
+
+/* The "Tags" list on the homepage / tag pages gets its own pane, like the
+   heading chips — a full-width semi-solid panel (its tag chips stay more opaque
+   on top). `> .org-tag-list` targets only the section list, not card/meta tags. */
+.disco-on.home #content > .org-tag-list {
+  display: flex; /* full-width pane (vs the default inline-flex) */
+  background-color: var(--disco-heading-bg);
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  box-shadow: var(--disco-shadow);
 }
 
 /* Homepage headings (the title h1 and the section h2s) sit directly over the
@@ -1033,7 +1068,7 @@ html.disco-on {
    same as in plain mode. */
 .disco-on.home .title-block h1,
 .disco-on.home #content h2 {
-  background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+  background-color: var(--disco-heading-bg);
   border-radius: 8px;
   /* 0.9rem left/right matches the article reading pane's horizontal inset
      (#content::before { inset: -0.6rem -0.9rem }); em-based padding scaled with
@@ -1048,22 +1083,12 @@ html.disco-on {
 
 /* In disco mode, make the sticky header and the footer glassy so the effect shows
    behind them while the nav/footer links stay legible (a light backdrop blur).
-   Dark values here; light theme overrides to more opaque below. */
+   `--disco-chrome-bg` is denser in light theme (see the token block above). */
 .disco-on body > header,
 .disco-on body > footer {
-  background-color: color-mix(in srgb, var(--accent-bg) 62%, transparent);
+  background-color: var(--disco-chrome-bg);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
-}
-:root[data-theme="light"].disco-on body > header,
-:root[data-theme="light"].disco-on body > footer {
-  background-color: color-mix(in srgb, var(--accent-bg) 82%, transparent);
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]).disco-on body > header,
-  :root:not([data-theme="dark"]).disco-on body > footer {
-    background-color: color-mix(in srgb, var(--accent-bg) 82%, transparent);
-  }
 }
 
 /* On article/tag pages (not the homepage `home` class) in disco mode, give the
@@ -1084,7 +1109,7 @@ html.disco-on:not(.home) #content::before {
   position: absolute;
   inset: -0.6rem -0.9rem;
   z-index: -1;
-  background-color: color-mix(in srgb, var(--bg) 70%, transparent);
+  background-color: var(--disco-backdrop-bg);
   border: var(--border-width) solid var(--border);
   border-radius: 10px;
   box-shadow: var(--disco-shadow);
@@ -1096,7 +1121,7 @@ html.disco-on:not(.home) #content::before {
    reads as a clean rounded panel that matches the cards. */
 html.disco-on #toc {
   border: var(--border-width) solid var(--border);
-  background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+  background-color: var(--disco-toc-bg);
   border-radius: 10px;
   padding: 0.5rem 0.7rem;
   box-shadow: var(--disco-shadow);
@@ -1108,23 +1133,3 @@ html.disco-on:not(.home) #toc {
   margin-top: calc(2.5rem - 0.6rem);
 }
 
-/* Homepage cards need a more opaque backdrop in light theme to stay readable
-   over the bright effect (dark theme keeps the value above). The article-page
-   reading panels (title/content/toc) DON'T get a light-theme bump: now that they
-   carry a card border, the base transparency reads fine in both themes, and the
-   heavier light backdrop was too strong a change. Covers explicit light and the
-   OS-light default — but not when explicitly dark. */
-:root[data-theme="light"].disco-on .article-card {
-  background-color: color-mix(in srgb, var(--bg) 85%, transparent);
-}
-:root[data-theme="light"].disco-on .article-card:hover {
-  background-color: color-mix(in srgb, var(--bg) 93%, transparent);
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]).disco-on .article-card {
-    background-color: color-mix(in srgb, var(--bg) 85%, transparent);
-  }
-  :root:not([data-theme="dark"]).disco-on .article-card:hover {
-    background-color: color-mix(in srgb, var(--bg) 93%, transparent);
-  }
-}
