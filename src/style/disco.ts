@@ -1,20 +1,19 @@
 // Homepage disco ball — a fixed, full-viewport WebGL background effect.
 //
 // Authored in TypeScript and bundled+minified to `disco.min.js` by
-// `scripts/build-js.sh` (esbuild), mirroring how `*.min.css` is produced from
-// hand-written CSS. The `.ts` source is NOT copied into `out/` (the org-publish
-// "static" component only matches `.js`/`.css`/… by extension); only the
-// compiled `disco.min.js` ships.
+// `scripts/build-assets.ts` (bun), alongside the `*.min.css`. The `.ts` source is
+// NOT copied into `out/` (the org-publish "static" component only matches
+// `.js`/`.css`/… by extension); only the compiled `disco.min.js` ships.
 //
 // Design (see docs/adr/0003-homepage-disco-ball-webgl.md and CONTEXT.md):
 //   - Homepage only, gated by `has-disco` in build.el (a `<canvas id="disco-canvas">`
 //     and this script are emitted only on index.html).
-//   - Raw WebGL, one full-screen raymarched fragment shader — no framework.
-//   - DARK THEME ONLY for v1. The render loop runs only while the *effective*
-//     theme is dark, and starts/stops live as the user toggles the theme.
-//     A clearly-marked light branch is stubbed for later.
-//   - A faceted mirror sphere (the hero) plus a cast glint-field (the gorgeous
-//     background), composed to keep the centre reading column dark.
+//   - Raw WebGL, one full-screen fragment shader — no framework. Runs in both
+//     themes (u_light selects the palette/effect); starts/stops live as the user
+//     toggles the theme or the disco button.
+//   - A faceted mirror sphere (the hero) is shared. DARK adds a cast glint-field
+//     on a near-black room; LIGHT adds rainbow rings, blue fire (bottom-right) and
+//     an aurora (upper sky) over the bright page — see the light branch in main().
 //   - Guards: pause when hidden; `prefers-reduced-motion` → one static frame;
 //     reduced internal resolution (capped DPR, lower tier on coarse-pointer
 //     devices); graceful no-WebGL skip; WebGL context-loss handling.
@@ -85,6 +84,14 @@ const float LRING_ORBIT_SPEED = 0.25;         // ring centre orbit speed
 // phase so the two ride opposite points and together fill the right side.
 const float LRING_BIAS_X      = 0.62;         // right-side orbit centre (clear of the ball)
 const float LRING_BIAS_Y      = 0.00;
+// Light-blue fire rising from the bottom-right corner (light theme).
+const float LFIRE_SCALE  = 3.0;               // flame detail (bigger = finer tongues)
+const float LFIRE_SPEED  = 2.8;               // rising speed (continuous)
+const float LFIRE_HEIGHT = 2.2;               // flame reach up the screen
+const float LFIRE_WIDTH  = 1.3;               // horizontal falloff (bigger = hugs the right edge)
+const float LFIRE_ALPHA  = 0.90;              // opacity
+const float LAURORA_ALPHA = 0.65;             // aurora brightness
+const float LAURORA_RAYS  = 6.0;              // number of fanning rays (angular frequency)
 
 const float BALL_RADIUS = 0.95;
 const vec2  BALL_SCREEN = vec2(-0.98, -0.30);  // y-normalised; offset into the left margin
@@ -177,11 +184,11 @@ vec4 castBeam(vec2 p, float t){
 // A self-rotating rainbow ring on the shared right-side orbit. dir spins the
 // lights, huePhase shifts its colours, orbitPhase offsets where its centre sits on
 // the orbit (PI apart = opposite points, so two rings fill the space).
-vec4 ringAt(vec2 p, float t, float dir, float huePhase, float orbitPhase){
+vec4 ringAt(vec2 p, float t, float dir, float huePhase, float orbitPhase, vec2 bias){
   float aspect = u_res.x / u_res.y;
   float radius = LRING_RADIUS * (1.0 + LRING_PULSE * sin(t * LRING_PULSE_SPEED + huePhase * 6.28));
   float oa = t * LRING_ORBIT_SPEED + orbitPhase;
-  vec2  center = vec2(LRING_BIAS_X * aspect, LRING_BIAS_Y)
+  vec2  center = vec2(bias.x * aspect, bias.y)
                + LRING_ORBIT * vec2(cos(oa) * aspect, sin(oa));
   vec4 acc = vec4(0.0);
   for (int k = 0; k < 12; k++){
@@ -195,6 +202,64 @@ vec4 ringAt(vec2 p, float t, float dir, float huePhase, float orbitPhase){
     acc += vec4(col * a, a);
   }
   return acc;
+}
+
+// Smooth value noise (0..1), interpolated → no hard cell edges.
+float vnoise(vec2 p){
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float a = hash21(i);
+  float b = hash21(i + vec2(1.0, 0.0));
+  float c = hash21(i + vec2(0.0, 1.0));
+  float d = hash21(i + vec2(1.0, 1.0));
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+// Fractal Brownian motion (3 octaves) — soft cloudy texture for the smoke.
+float fbm(vec2 p){
+  float v = 0.0, a = 0.5;
+  for (int i = 0; i < 3; i++){ v += a * vnoise(p); p = p * 2.0; a = a * 0.5; }
+  return v;
+}
+
+// Light-blue fire rising from the bottom-right corner. Turbulent fBm scrolls
+// upward so the flames rise and flicker; the flame body is a height/width
+// potential eaten into tongues by the turbulence, coloured deep-blue at the cool
+// edges → white-blue at the hot core. Premultiplied-alpha.
+vec4 blueFire(vec2 p, float t){
+  float aspect = u_res.x / u_res.y;
+  float fx = aspect - p.x;                                  // distance left of the right edge (>= 0)
+  float fy = p.y + 1.0;                                     // height above the bottom (>= 0)
+  vec2  q  = vec2(fx * 1.4, fy) * LFIRE_SCALE - vec2(0.0, t * LFIRE_SPEED);
+  float n  = fbm(q + 0.8 * fbm(q));                         // turbulent, scrolling up (continuous)
+  float intensity = n * LFIRE_HEIGHT - fy - fx * LFIRE_WIDTH;
+  float f  = smoothstep(0.0, 0.35, intensity);             // flame body / tongues
+  vec3  col = mix(vec3(0.06, 0.25, 0.85), vec3(0.55, 0.85, 1.0), smoothstep(0.0, 0.6, f));
+  col = mix(col, vec3(0.92, 0.98, 1.0), smoothstep(0.6, 0.95, f)); // white-blue hot core
+  float a = f * LFIRE_ALPHA;
+  return vec4(col * a, a);
+}
+
+// Aurora: curtains of light fanning out across the sky dome — angular ray stripes
+// radiating from a vanishing point high above (the 3D perspective: rays converge
+// at the zenith, spread toward the horizon). Teal-green ↔ violet, brightest in a
+// mid-sky band, soft. Premultiplied-alpha.
+vec4 aurora(vec2 p, float t){
+  vec2  vp  = vec2(0.1, 2.3);                                // vanishing point above the screen
+  vec2  d   = p - vp;
+  float ang = atan(d.x, -d.y);                              // fan angle (0 = straight down from vp)
+  // angular ray stripes, irregular widths via a slow wobble, gentle drift
+  float rc  = ang * LAURORA_RAYS + 0.6 * sin(ang * 5.0 + t * 0.15) + t * 0.04;
+  float ray = smoothstep(0.5, 0.12, abs(fract(rc) - 0.5));  // soft curtain
+  // aurora hangs in the upper sky, brightest through a mid band, fading up + down
+  float vEnv = smoothstep(-0.15, 0.35, p.y) * smoothstep(1.25, 0.55, p.y) + 0.35 * smoothstep(0.1, 0.6, p.y);
+  vEnv = clamp(vEnv, 0.0, 1.0);
+  // colour: teal-green ↔ violet across the fan, lifting toward violet higher up
+  float mixA = 0.5 + 0.5 * sin(ang * 2.5 + t * 0.10);
+  vec3  col  = mix(vec3(0.30, 0.95, 0.72), vec3(0.55, 0.32, 0.95), mixA);
+  col = mix(col, vec3(0.52, 0.30, 0.95), smoothstep(0.35, 1.0, p.y));
+  float a = ray * vEnv * LAURORA_ALPHA;
+  return vec4(col, 1.0) * a;
 }
 
 void main(){
@@ -283,9 +348,16 @@ void main(){
 
     // Layer order: two counter-rotating rainbow rings behind the ball; ball +
     // contact shadow; then the rainbow spotlights IN FRONT (light on the ball's face).
-    vec4 ringP = ringAt(p, u_time, 1.0, 0.0, 0.0)
-               + ringAt(p, u_time, -1.0, 0.5, 3.14159265); // 2nd ring half a turn out of phase
-    ringP = min(ringP, vec4(0.95));
+    // Rainbow rings: two on the right orbit (half a turn apart), plus a third
+    // drifting upper-left to fill more of the screen — a richer light-theme field
+    // (the reading column is covered by the card/heading panes). Tune via LRING_*
+    // and each ring's bias. TODO #2 — eyeball the count/placement.
+    vec2 ringBias = vec2(LRING_BIAS_X, LRING_BIAS_Y);
+    vec4 ringP = ringAt(p, u_time, 1.0, 0.0, 0.0, ringBias)
+               + ringAt(p, u_time, -1.0, 0.5, 3.14159265, ringBias)
+               + ringAt(p, u_time, 1.0, 0.27, 1.7, vec2(-0.55, 0.42));
+    // Light-blue fire (bottom-right) + aurora ribbons (upper sky).
+    ringP = min(ringP + blueFire(p, u_time) + aurora(p, u_time), vec4(0.97));
     vec4 beamP = castBeam(p, u_time);
     vec4 o = ballP + (1.0 - ballP.a) * (shadP + (1.0 - shadP.a) * ringP);
     o = beamP + (1.0 - beamP.a) * o;
