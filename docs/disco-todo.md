@@ -1,37 +1,36 @@
 # Disco / theme follow-up TODO
 
-Working list for the three items requested (worked on while away). Each lands as
-its own commit(s) on `main`. Status updated as I go.
+Worked through while away. All four landed as their own commits on `main` (after
+the history was squashed into clean units). The two visual ones (2, 3) couldn't
+be previewed here, so they need an eyeball + tuning.
 
-## (1) CSS cleanup — disco / theme parts  — STATUS: in progress
+## (1) CSS cleanup — disco / theme parts  — DONE (`refactor(css): hoist disco surface colors into --disco-* tokens`)
 
-The "conscious" cleanup discussed earlier: collapse the light/dark **duplication**
-in the disco CSS using plain-CSS custom properties (no SCSS, no CSS Modules —
-those don't fit a static, global-class, Emacs-exported site).
+Collapsed the light/dark duplication: all disco pane/surface colors now live in
+`--disco-*` tokens defined once per theme; rules read `var(--disco-*)`. The only
+remaining duplication is the three tokens that must differ in light theme (card
+bg/hover, header/footer chrome) — explicit-light + the OS-light media query,
+which can't merge. Plain CSS, no SCSS/CSS-Modules (don't fit). simple.css
+untouched. Behaviour-preserving.
 
-The pain: every theme-varying disco value is written 2–3× — once for the dark
-base, once under `:root[data-theme="light"]`, and again under
-`@media (prefers-color-scheme: light) :root:not([data-theme="dark"])` (a verbatim
-copy with a different selector). Plan: hoist those values into `--disco-*` tokens
-defined once per theme (the dual light selector stays, but only on the *token
-block*, not on every consuming rule), so the many disco rules read `var(--disco-*)`
-once. simple.css stays untouched.
+## (2) Richer light-theme shader  — DONE, NEEDS EYEBALL (`feat(disco): richer light-theme field — a third rainbow ring`)
 
-## (2) Richer light-theme shader  — STATUS: todo
+Parametrized `ringAt`'s center bias and added a third rainbow ring drifting
+upper-left (the two existing rings stay on the right orbit), so more of the
+screen carries the light. Tunable via the `LRING_*` constants and each ring's
+bias in `src/style/disco.ts`. Couldn't preview — check the count/placement; add
+more rings or a cast-glint sprinkle if it still reads sparse.
 
-The light-theme WebGL effect (`src/style/disco.ts`, the `u_light` branch) reads
-sparser/less satisfying than dark. Add more on-screen items in the light path
-(more rings / spotlights / cast glints), tunable via the existing `L*` constants.
-Keep the centre reading column calm; richness belongs in the margins. Build-verify
-only — can't preview, so keep additions conservative and clearly tunable.
+## (3) Pane-per-h2 article display (experimental)  — TRIED, REVERTED
 
-## (3) Pane-oriented article display in disco mode (experimental)  — STATUS: todo
+Prototyped (JS section-wrapping into `.disco-sec` panes) but reverted — final
+decision is to keep the previous design: articles use the single content
+backdrop, and the homepage/tag pages use the header-based heading panes (chips)
+with their cards. No `.disco-sec`, no layout unification.
 
-Idea: in disco mode, each `h2` section becomes its own pane — a pane spans from
-one `h2` to the next. Today the whole `#content` shares one `::before` backdrop.
+## (4) Tag pages styled like index.html  — DONE (`feat: give tag pages the same (home) styling as index.html`)
 
-Feasibility note: Org export emits a *flat* heading+content stream (no per-section
-wrapper element), and CSS can't group "from one h2 to the next" on its own. So this
-needs either (a) a small client script that wraps each h2-run in a `<section>` /
-adds a backdrop, or (b) build.el emitting section wrappers. Prototype behind a
-class/flag so the default rendering is unaffected; treat as experimental.
+Tag pages now carry the `home` class (via `my-listing-page-p` in build.el) and
+disco.ts detects "home" from that class, so tag pages get the card/heading
+styling and full-opacity effect like the homepage instead of the article
+treatment.
