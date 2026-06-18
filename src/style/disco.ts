@@ -436,7 +436,11 @@ function start(): void {
   // pages: DARK dims to 0.55; LIGHT to 0.7 — the old 0.55 over the bright page
   // was what washed the light-theme article background into fog, and the
   // drop-shadowed reading panes (CSS) give the separation instead of heavy dim.
-  const home = location.pathname === "/" || /(^|\/)index\.html$/.test(location.pathname);
+  // "home" = a card-listing page (homepage or a tag page); build.el puts the
+  // `home` class on those. They run the effect at full opacity like the homepage;
+  // long-form article pages (no `home` class) dim (below). Keying off the class
+  // keeps this in sync with the CSS, which switches on the same `home` class.
+  const home = document.documentElement.classList.contains("home");
   let onOpacity = "1";
   // Same-site navigation shows the disco instantly (no fade-in); a fresh/external
   // visit (or toggling it on) fades via the `disco-animating` opt-in class.

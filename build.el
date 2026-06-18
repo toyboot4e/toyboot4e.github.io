@@ -210,6 +210,14 @@ from `my-eager-image-count' as cards render.")
               (file-relative-name (plist-get info :input-file) default-directory))))
     (string= rel "index.html")))
 
+(defun my-listing-page-p (info)
+  "Non-nil for card-listing pages: the homepage and the tag pages. They share the
+homepage's `home' styling (translucent cards, heading chips) rather than the
+long-form article backdrop, so both carry the `home' class."
+  (or (my-home-page-p info)
+      (let ((input (plist-get info :input-file)))
+        (and input (string-match-p "\\(^\\|/\\)tags/[^/]*\\.org\\'" input)))))
+
 ;; Returns `<head>' SXML
 (defun my-html-head (info contents)
   ;; Reset `my-codeblock-counter' on new file. TODO: move it to more appropriate place
@@ -423,9 +431,10 @@ from `my-eager-image-count' as cards render.")
    "<!DOCTYPE html>\n"
    (my-sxml-to-xml
     `(html (@ (lang "ja")
-              ;; `home' marks the homepage so disco-mode CSS can treat article/tag
-              ;; pages differently (e.g. a more solid content backdrop).
-              ,@(when (my-home-page-p info) '((class "home"))))
+              ;; `home' marks the card-listing pages (homepage + tag pages) so
+              ;; disco-mode CSS gives them the card/heading styling, while
+              ;; long-form article pages get the content backdrop instead.
+              ,@(when (my-listing-page-p info) '((class "home"))))
            ,(my-html-head info contents)
 
            (body
