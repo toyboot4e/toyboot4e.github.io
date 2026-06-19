@@ -35,8 +35,8 @@ clean:
 [private]
 alias c := clean
 
-# format and run the post processing script, embedding `<!--pp-->` sentinel.
-# CI=1 makes the post-process strict.
+# run the post-processing script (Prism/KaTeX/link-card bake + serialise),
+# embedding the `<!--pp-->` sentinel. CI=1 makes the post-process strict.
 format:
     bash scripts/format.sh
 

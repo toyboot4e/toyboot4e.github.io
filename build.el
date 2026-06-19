@@ -23,25 +23,26 @@
 ;;; Setup
 
 (progn
-  (require 'package)
-  (setq package-user-dir (expand-file-name "./.blog-build-packages"))
-  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                           ("elpa" . "https://elpa.gnu.org/packages/")))
-
-  (package-initialize)
-  (unless package-archive-contents
-    (package-refresh-contents)))
+  ;; The hermetic nix build provides `esxml'/`seq' on `load-path' via
+  ;; `emacs.pkgs.withPackages', so the whole package.el bootstrap — including the
+  ;; offline-fatal `package-refresh-contents' — is dead weight there (and runs in
+  ;; every worker subprocess). Only fall back to package.el + the local
+  ;; `.blog-build-packages' when `esxml' isn't already available (plain local
+  ;; dev without nix).
+  (unless (require 'esxml nil t)
+    (require 'package)
+    (setq package-user-dir (expand-file-name "./.blog-build-packages"))
+    (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                             ("elpa" . "https://elpa.gnu.org/packages/")))
+    (package-initialize)
+    (unless package-archive-contents
+      (package-refresh-contents))
+    (package-install 'esxml)
+    (require 'esxml)))
 
 (progn
-  ;; Needed when you need builtin code block highlight
-  ;; (package-install 'htmlize)
-
   ;; `seq-*' functions
   (require 'seq)
-
-  ;; Create HTML from S-expressions
-  (package-install 'esxml)
-  (require 'esxml)
 
   ;; Local package downloaded from: `https://github.com/balddotcat/ox-slimhtml'
   (add-to-list 'load-path (expand-file-name default-directory))
@@ -884,6 +885,23 @@ INFO is a plist holding contextual information.  See
     (insert-file-contents org-file)
     (my-org-global-prop-value key)))
 
+;; Read several `#+KEY:' keywords from ORG-FILE in a single pass. Returns an
+;; alist of (KEY . VALUE); missing keys are absent. Much cheaper than calling
+;; `my-org-read-prop' once per key, which re-parses the whole document each time
+;; (`collect-org-files' needs five keywords from every article, so the old
+;; approach did 5 full `org-element-parse-buffer' passes per file).
+(defun my-org-read-props (org-file keys)
+  "Reads KEYS (a list of keyword strings) from ORG-FILE in one pass.
+Uses Org's own `org-collect-keywords' rather than a hand-rolled regexp, so it
+handles keyword syntax exactly as the exporter does. `delay-mode-hooks' keeps
+the `org-mode' activation cheap and silences the non-Org-buffer warning that
+`org-collect-keywords' would otherwise emit in a `fundamental-mode' buffer."
+  (with-temp-buffer
+    (insert-file-contents org-file)
+    (delay-mode-hooks (org-mode))
+    (mapcar (lambda (kw) (cons (car kw) (cadr kw)))
+            (org-collect-keywords keys))))
+
 ;; Returns a plist of `filepath', 'href', `title', `date', `tags' and `draft'.
 (defun collect-org-files (base-dir filter-p)
   (let* ((files (seq-filter
@@ -893,23 +911,25 @@ INFO is a plist holding contextual information.  See
          (entries (mapcar
                    (lambda (s)
                      ;; NOTE: here `base-dir' is treated as a regex (unfortunately)
-                     (let* (;; `src/file.org' -> `/file.org'.
+                     (let* (;; All keywords in one pass (see `my-org-read-props').
+                            (props (my-org-read-props
+                                    s '("TITLE" "DATE" "FILETAGS" "DRAFT" "THUMBNAIL")))
+                            ;; `src/file.org' -> `/file.org'.
                             (filepath (string-trim-left s base-dir))
                             (href (replace-regexp-in-string "\\.org\\'" ".html" filepath))
-                            ;; TODO: read them on-the-fly
-                            (title (or (my-org-read-prop s "TITLE") ""))
+                            (title (or (cdr (assoc "TITLE" props)) ""))
                             ;; `<2023-01-01 Sat>' => `2023-01-01'
                             (date (substring
-                                   (or (my-org-read-prop s "DATE")
+                                   (or (cdr (assoc "DATE" props))
                                        (concat "<" (format-time-string "%F") ">"))
                                    1 11))
-                            (filetags (or (my-org-read-prop s "FILETAGS") ""))
+                            (filetags (or (cdr (assoc "FILETAGS" props)) ""))
                             (tags (split-string
                                    (replace-regexp-in-string
                                     ":" " "
                                     (string-trim filetags " "))))
-                            (draft (org-string-nw-p (my-org-read-prop s "DRAFT")))
-                            (thumbnail (my-thumbnail-src (my-org-read-prop s "THUMBNAIL"))))
+                            (draft (org-string-nw-p (cdr (assoc "DRAFT" props))))
+                            (thumbnail (my-thumbnail-src (cdr (assoc "THUMBNAIL" props)))))
                        (list :filepath filepath :href href :title title :date date :tags tags :draft draft :thumbnail thumbnail)))
                    files)))
 
@@ -1002,11 +1022,24 @@ INFO is a plist holding contextual information.  See
             "* Devlog (=#" tag "=)" "\n"
             "#+ATTR_HTML: :class sitemap" "\n" article-cards)))
 
+;; Writes STRING to PATH only when the content differs from what's already there.
+;; The generated `index.org' / `tags/*.org' are rebuilt every run, but if we
+;; rewrote them unconditionally their mtime would bump and `org-publish' would
+;; re-export all 18 pages on every build (even a body-only article edit). Leaving
+;; the file untouched when unchanged lets the timestamp cache skip them.
+(defun my-write-if-changed (path string)
+  (unless (and (file-exists-p path)
+               (string= string
+                        (with-temp-buffer
+                          (insert-file-contents path)
+                          (buffer-string))))
+    (with-temp-file path (insert string))))
+
 ;; Creates `tags/<tag>.org'.
 (defun my-create-tag-page-org-file (base-dir devlog-entries all-tags tag)
   (let ((index-org-string (my-generate-tag-page-org base-dir "Toybeam" devlog-entries all-tags tag))
         (index-org-path (concat base-dir "/tags/" tag ".org")))
-    (with-temp-file index-org-path (insert index-org-string))))
+    (my-write-if-changed index-org-path index-org-string)))
 
 ;;; Backend (setup)
 
@@ -1048,14 +1081,204 @@ Skips `#+DRAFT:'-flagged files unless this is a `--draft' build."
                         plist pub-dir)))
 
 
+;;; Parallel export fan-out
+;;
+;; The Org -> HTML export is the build's only real bottleneck and `org-publish'
+;; runs it sequentially in one process. So the article export is fanned out to
+;; worker Emacs subprocesses: this (coordinator) process generates `index.org' /
+;; `tags/*.org', computes the stale set, and owns the `org-publish' timestamp
+;; cache; the workers (re-invocations of this script with `--export-worker') are
+;; stateless and just force-export the file list handed to them. Only the
+;; coordinator reads/writes the cache, so there is no race, and it reuses Org's
+;; own cache functions so the result is interchangeable with a plain serial
+;; build. See `docs/adr/0004-parallel-export-fan-out.md'.
+
+;; Below this many stale files, fan-out's per-worker startup (~0.5s) costs more
+;; than it saves, so we export in-process instead. ~= worker-startup / per-file.
+(defconst my-parallel-export-threshold 10)
+
+;; Cap on the automatic worker count. Each worker re-loads Org from scratch
+;; (~0.5s, CPU-bound), and that startup — not the export — dominates the fan-out,
+;; so launching more workers than physical cores just makes the simultaneous
+;; boots contend (measured: throughput stops improving past ~8 even on a
+;; 20-logical-core box). `num-processors' only reports logical cores, so cap at a
+;; constant knee; an explicit `-j N' still overrides this.
+(defconst my-max-workers 8)
+
+(require 'cl-lib)                       ; `cl-position' for argument parsing
+
+(defvar my-jobs-arg nil
+  "Value of the `-j' / `--jobs' option, or nil for the automatic worker count.")
+
+(defvar my-worker-files nil
+  "Files this process must export in `--export-worker' mode, or nil (coordinator).")
+
+(defun my-cpu-count ()
+  "Cores to use: nix's allotment when in a sandbox, else the host count."
+  (let ((nbc (getenv "NIX_BUILD_CORES")))
+    (if (and nbc (> (string-to-number nbc) 0))
+        (string-to-number nbc)
+      (max 1 (num-processors)))))
+
+(defun my-export-jobs (n-stale jobs-arg)
+  "Worker count for N-STALE files.  JOBS-ARG is the -j value, or nil (auto)."
+  (cond ((and jobs-arg (<= jobs-arg 1)) 1)        ; -j 1: force serial
+        (jobs-arg (min jobs-arg n-stale))         ; -j N: force N
+        ((< n-stale my-parallel-export-threshold) 1) ; small build: in-process
+        (t (min n-stale (my-cpu-count) my-max-workers))))
+
+(defun my-chunk-list (xs n)
+  "Split XS into at most N contiguous chunks of near-equal size."
+  (let* ((len (length xs))
+         (n (max 1 (min n len)))
+         (base (/ len n))
+         (rem (% len n))
+         (rest xs)
+         chunks)
+    (dotimes (i n)
+      (let ((size (+ base (if (< i rem) 1 0))))
+        (push (seq-take rest size) chunks)
+        (setq rest (seq-drop rest size))))
+    (nreverse chunks)))
+
+(defun my-posts-context ()
+  "Static export context (plist) shared by the coordinator and workers."
+  (let* ((project (assoc "release-posts" org-publish-project-alist))
+         (plist (cdr project)))
+    (list :project project
+          :plist plist
+          :base-dir (file-name-as-directory (plist-get plist :base-directory))
+          :pub-base-dir (file-name-as-directory (plist-get plist :publishing-directory))
+          :pubfunc (plist-get plist :publishing-function))))
+
+(defun my-export-one (filename ctx)
+  "Export a single org FILENAME using export context CTX."
+  (let ((pub-dir (file-name-directory
+                  (expand-file-name
+                   (file-relative-name filename (plist-get ctx :base-dir))
+                   (plist-get ctx :pub-base-dir)))))
+    (funcall (plist-get ctx :pubfunc) (plist-get ctx :plist) filename pub-dir)))
+
+;; Worker entry point: force-export FILES, no cache. Any error aborts the
+;; subprocess with a non-zero exit, which the coordinator treats as a chunk
+;; failure.
+(defun my-run-worker (files)
+  "Export FILES (a chunk) in this worker subprocess."
+  (let ((ctx (my-posts-context)))
+    ;; `org-publish-org-to' reads/writes the in-memory publish cache, so the
+    ;; worker needs it initialised. The coordinator has already created the
+    ;; cache file before spawning us, so this only *loads* it — no disk write,
+    ;; no race; the worker never calls `org-publish-write-cache-file'.
+    (org-publish-initialize-cache "release-posts")
+    (dolist (filename files)
+      (my-export-one filename ctx))))
+
+;; Spawn one worker subprocess per chunk and wait for all of them. Returns
+;; (SUCCEEDED-FILES . FAILED-P): files from chunks whose worker exited 0, and
+;; whether any worker failed. The same Emacs binary and script re-run with
+;; `--export-worker' so workers are identical to the coordinator (hermetic).
+(defun my-fan-out-export (files njobs)
+  "Export FILES across NJOBS worker subprocesses."
+  (let* ((emacs (expand-file-name invocation-name invocation-directory))
+         (script (or load-file-name (expand-file-name "build.el")))
+         (target (if (my-publish-drafts-p) "--draft" "--release"))
+         (chunks (seq-filter #'identity (my-chunk-list files njobs)))
+         (ok nil)
+         (failed nil)
+         jobs)
+    (dolist (chunk chunks)
+      (when chunk
+        (let ((buf (generate-new-buffer " *export-worker*")))
+          (push (list (make-process
+                       :name "export-worker" :buffer buf :noquery t
+                       :connection-type 'pipe
+                       :command (append (list emacs "-Q" "--script" script "--"
+                                              target "--export-worker")
+                                        chunk))
+                      buf chunk)
+                jobs))))
+    ;; Wait for every worker; `accept-process-output' drains all pipes so a
+    ;; chatty worker can't deadlock on a full stderr buffer.
+    (let ((procs (mapcar #'car jobs)))
+      (while (seq-some #'process-live-p procs)
+        (accept-process-output nil 0.2)))
+    (dolist (job jobs)
+      (let ((proc (nth 0 job)) (buf (nth 1 job)) (chunk (nth 2 job)))
+        (if (eq (process-exit-status proc) 0)
+            (setq ok (append ok chunk))
+          (setq failed t)
+          (message "--- export worker failed (exit %s) ---\n%s"
+                   (process-exit-status proc)
+                   (with-current-buffer buf (buffer-string))))
+        (kill-buffer buf)))
+    (cons ok failed)))
+
+;; Coordinator: export all stale article/index/tag files, owning the cache.
+;; `my-write-if-changed' has already written index.org/tags/*.org to disk, so
+;; `org-publish-get-base-files' sees them as ordinary stale .org files.
+(defun my-run-posts-export ()
+  "Export the `release-posts' project, fanning out across workers when worth it."
+  (let* ((ctx (my-posts-context))
+         (project (plist-get ctx :project))
+         (pub-base-dir (plist-get ctx :pub-base-dir))
+         (base-dir (plist-get ctx :base-dir))
+         (pubfunc (plist-get ctx :pubfunc))
+         (failed nil))
+    (org-publish-initialize-cache "release-posts")
+    (let* ((all-files (org-publish-get-base-files project))
+           ;; Reuse Org's own staleness check so keys match a serial build.
+           (stale (if force-flag
+                      all-files
+                    (seq-filter
+                     (lambda (f)
+                       (org-publish-cache-file-needs-publishing
+                        f pub-base-dir pubfunc base-dir))
+                     all-files)))
+           (njobs (my-export-jobs (length stale) my-jobs-arg)))
+      (cond
+       ((null stale)
+        (message "Articles: nothing to rebuild"))
+       ((<= njobs 1)
+        (message "Articles: %d file(s), in-process" (length stale))
+        (dolist (f stale)
+          (my-export-one f ctx)
+          (org-publish-update-timestamp f pub-base-dir pubfunc base-dir)))
+       (t
+        (message "Articles: %d file(s) across %d worker(s)" (length stale) njobs)
+        (let ((res (my-fan-out-export stale njobs)))
+          ;; Stamp only files whose worker succeeded (never stamp un-exported
+          ;; output), then surface any failure as a non-zero build exit.
+          (dolist (f (car res))
+            (org-publish-update-timestamp f pub-base-dir pubfunc base-dir))
+          (setq failed (cdr res)))))
+      (org-publish-write-cache-file)
+      (when failed
+        (kill-emacs 1)))))
+
+
 ;;; Build
 
 ;; Build options:
 ;; - `-d' / `--draft': includes the `#+DRAFT' articles.
 ;; - `-f' / `--force': rebuilds every file, ignoring the timestamp cache.
-(let ((args command-line-args-left))
-  (setq build-target (if (or (member "-d" args) (member "--draft" args)) "draft" "release"))
-  (setq force-flag (or (member "-f" args) (member "--force" args))))
+;; - `-j' / `--jobs' N: worker count for the parallel export (default: auto).
+;; - `--export-worker FILES...': internal worker mode (force-exports FILES).
+(let* ((args command-line-args-left)
+       (wpos (cl-position "--export-worker" args :test #'string=))
+       ;; Everything after `--export-worker' is the worker's file list.
+       (head (if wpos (seq-take args wpos) args)))
+  (setq my-worker-files (and wpos (nthcdr (1+ wpos) args)))
+  (setq build-target (if (or (member "-d" head) (member "--draft" head)) "draft" "release"))
+  (setq force-flag (and (or (member "-f" head) (member "--force" head)) t))
+  (setq my-jobs-arg
+        (let ((v (or (cadr (member "-j" head)) (cadr (member "--jobs" head)))))
+          (and v (string-to-number v)))))
+
+;; Worker mode: just export the handed-off chunk and exit (a failing export
+;; aborts the subprocess with a non-zero status, which the coordinator detects).
+(when my-worker-files
+  (my-run-worker my-worker-files)
+  (kill-emacs 0))
 
 (message "--------------------------------------------------------------------------------")
 (message "Building project!")
@@ -1086,7 +1309,7 @@ Skips `#+DRAFT:'-flagged files unless this is a `--draft' build."
   (let* ((index-org-string
           (my-generate-sitemap "Toybeam" devlog-entries diary-entries all-tags))
          (index-org-path (concat base-dir "/index.org")))
-    (with-temp-file index-org-path (insert index-org-string)))
+    (my-write-if-changed index-org-path index-org-string))
 
   (message "Generating `tags/*.org`..")
   (mapcar
@@ -1094,10 +1317,13 @@ Skips `#+DRAFT:'-flagged files unless this is a `--draft' build."
      (my-create-tag-page-org-file "src" devlog-entries all-tags tag))
    all-tags)
 
+  (message "Copying static files..")
+  ;; Attachments (images/CSS/JS/fonts) are cheap file copies — keep them in the
+  ;; coordinator; only the CPU-bound article export is fanned out.
+  (org-publish "static" force-flag)
+
   (message "Building articles..")
-  (if force-flag
-      (org-publish build-target t)
-    (org-publish build-target)))
+  (my-run-posts-export))
 
 (message "--------------------------------------------------------------------------------")
 (message "Build complete!")

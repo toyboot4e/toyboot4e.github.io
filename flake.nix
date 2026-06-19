@@ -46,7 +46,8 @@
       # Everything `just build` shells out to. Single source of truth, shared by
       # the hermetic package build (runtimeInputs) and the devShell, so the two
       # can't drift. Asset minification (CSS + TS) goes through bun now, so no
-      # esbuild. (linkcard fetch is best-effort and skipped offline.)
+      # esbuild. HTML is serialised by scripts/postprocess.ts (linkedom), so no
+      # Prettier. (linkcard fetch is best-effort and skipped offline.)
       buildToolsFor =
         pkgs:
         with pkgs;
@@ -57,7 +58,6 @@
               esxml
             ]
           ))
-          nodePackages.prettier
           bun
           just
         ];
