@@ -12,8 +12,8 @@
 //     themes (u_light selects the palette/effect); starts/stops live as the user
 //     toggles the theme or the disco button.
 //   - A faceted mirror sphere (the hero) is shared. DARK adds a cast glint-field
-//     on a near-black room; LIGHT adds rainbow rings, blue fire (bottom-right) and
-//     an aurora (upper sky) over the bright page — see the light branch in main().
+//     on a near-black room; LIGHT adds rainbow rings and an aurora (upper sky)
+//     over the bright page — see the light branch in main().
 //   - Guards: pause when hidden; `prefers-reduced-motion` → one static frame;
 //     reduced internal resolution (capped DPR, lower tier on coarse-pointer
 //     devices); graceful no-WebGL skip; WebGL context-loss handling.
@@ -84,12 +84,6 @@ const float LRING_ORBIT_SPEED = 0.25;         // ring centre orbit speed
 // phase so the two ride opposite points and together fill the right side.
 const float LRING_BIAS_X      = 0.62;         // right-side orbit centre (clear of the ball)
 const float LRING_BIAS_Y      = 0.00;
-// Light-blue fire rising from the bottom-right corner (light theme).
-const float LFIRE_SCALE  = 3.0;               // flame detail (bigger = finer tongues)
-const float LFIRE_SPEED  = 2.8;               // rising speed (continuous)
-const float LFIRE_HEIGHT = 2.2;               // flame reach up the screen
-const float LFIRE_WIDTH  = 1.3;               // horizontal falloff (bigger = hugs the right edge)
-const float LFIRE_ALPHA  = 0.90;              // opacity
 const float LAURORA_ALPHA = 0.45;             // aurora brightness (light theme, over white)
 const float LAURORA_RAYS  = 6.0;              // number of fanning rays (angular frequency)
 const float LAURORA_DARK  = 0.5;              // aurora gain added to the dark sky (it glows there)
@@ -205,42 +199,6 @@ vec4 ringAt(vec2 p, float t, float dir, float huePhase, float orbitPhase, vec2 b
   return acc;
 }
 
-// Smooth value noise (0..1), interpolated → no hard cell edges.
-float vnoise(vec2 p){
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  float a = hash21(i);
-  float b = hash21(i + vec2(1.0, 0.0));
-  float c = hash21(i + vec2(0.0, 1.0));
-  float d = hash21(i + vec2(1.0, 1.0));
-  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-}
-// Fractal Brownian motion (3 octaves) — soft cloudy texture for the smoke.
-float fbm(vec2 p){
-  float v = 0.0, a = 0.5;
-  for (int i = 0; i < 3; i++){ v += a * vnoise(p); p = p * 2.0; a = a * 0.5; }
-  return v;
-}
-
-// Light-blue fire rising from the bottom-right corner. Turbulent fBm scrolls
-// upward so the flames rise and flicker; the flame body is a height/width
-// potential eaten into tongues by the turbulence, coloured deep-blue at the cool
-// edges → white-blue at the hot core. Premultiplied-alpha.
-vec4 blueFire(vec2 p, float t){
-  float aspect = u_res.x / u_res.y;
-  float fx = aspect - p.x;                                  // distance left of the right edge (>= 0)
-  float fy = p.y + 1.0;                                     // height above the bottom (>= 0)
-  vec2  q  = vec2(fx * 1.4, fy) * LFIRE_SCALE - vec2(0.0, t * LFIRE_SPEED);
-  float n  = fbm(q + 0.8 * fbm(q));                         // turbulent, scrolling up (continuous)
-  float intensity = n * LFIRE_HEIGHT - fy - fx * LFIRE_WIDTH;
-  float f  = smoothstep(0.0, 0.35, intensity);             // flame body / tongues
-  vec3  col = mix(vec3(0.06, 0.25, 0.85), vec3(0.55, 0.85, 1.0), smoothstep(0.0, 0.6, f));
-  col = mix(col, vec3(0.92, 0.98, 1.0), smoothstep(0.6, 0.95, f)); // white-blue hot core
-  float a = f * LFIRE_ALPHA;
-  return vec4(col * a, a);
-}
-
 // Aurora: curtains of light fanning out across the sky dome — angular ray stripes
 // radiating from a vanishing point high above (the 3D perspective: rays converge
 // at the zenith, spread toward the horizon). Teal-green ↔ violet, brightest in a
@@ -270,8 +228,11 @@ void main(){
   // Reading-column mask: 0 in the central column (kept dark), 1 in the margins.
   float colMask = smoothstep(0.16, 0.46, abs(v_uv.x - 0.5));
 
-  // --- background cast glint-field (margins only) ---
-  vec3 bg = castDots(v_uv, u_time) * colMask;
+  // --- background cast glint-field (margins only; DARK theme only — the light
+  // path composites its own layers and never reads bg, so skip the work. u_light
+  // is a uniform, so this branch is coherent across the draw and stays cheap) ---
+  vec3 bg = vec3(0.0);
+  if (u_light < 0.5) bg = castDots(v_uv, u_time) * colMask;
 
   // --- the faceted mirror ball ---
   vec2  q  = (p - BALL_SCREEN) / BALL_SCALE;
@@ -357,8 +318,8 @@ void main(){
     vec4 ringP = ringAt(p, u_time, 1.0, 0.0, 0.0, ringBias)
                + ringAt(p, u_time, -1.0, 0.5, 3.14159265, ringBias)
                + ringAt(p, u_time, 1.0, 0.27, 1.7, vec2(-0.55, 0.42));
-    // Light-blue fire (bottom-right) + aurora ribbons (upper sky).
-    ringP = min(ringP + blueFire(p, u_time) + aurora(p, u_time), vec4(0.97));
+    // Aurora ribbons (upper sky).
+    ringP = min(ringP + aurora(p, u_time), vec4(0.97));
     vec4 beamP = castBeam(p, u_time);
     vec4 o = ballP + (1.0 - ballP.a) * (shadP + (1.0 - shadP.a) * ringP);
     o = beamP + (1.0 - beamP.a) * o;
@@ -839,14 +800,13 @@ function start(): void {
     false,
   );
 
-  // Always fade the effect in on first paint — including same-site navigation.
-  // The WebGL canvas can't draw until its context + shaders warm up (a frame or
-  // two after the page renders), so an instant reveal popped in abruptly after
-  // that gap, read as a flash when moving between pages. Fading 0 → onOpacity
-  // absorbs the warm-up into a smooth rise. (The animation still continues from
-  // the shared clock — see discoEpoch — so it doesn't restart, just fades up.)
-  void fromSameSite;
-  animate();
+  // Fade in only on a COLD entry (fresh tab / external referrer); on same-site
+  // navigation reveal instantly. The previous page already showed the effect, so
+  // a fade adds nothing — and an animating full-screen canvas on every navigation
+  // is extra compositor work that can amplify display-level tearing. The shared
+  // clock (discoEpoch) keeps the animation continuous across pages either way;
+  // this only governs the opacity reveal.
+  if (!fromSameSite) animate();
 
   sync();
 }
