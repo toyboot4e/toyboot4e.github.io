@@ -8,5 +8,13 @@
     "katex": "^0.16.0",
     "linkedom": "^0.18.0",
     "prismjs": "^1.29.0"
+  },
+  "devDependencies": {
+    "hastscript": "^9.0.1",
+    "rehype-katex": "^7.0.1",
+    "rehype-stringify": "^10.0.1",
+    "unified": "^11.0.5",
+    "uniorg-parse": "^3.2.1",
+    "uniorg-rehype": "^2.2.0"
   }
 }

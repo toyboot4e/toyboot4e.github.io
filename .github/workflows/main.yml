@@ -11,10 +11,11 @@ on:
     branches: 'main'
     paths:
       - src/**
-      - build.el
-      - ox-slimhtml.el
-      # the build-time post-process pass and its offline deps (nix build .#devlog)
+      # the bun build (uniorg render + bake) shipped by `nix build .#devlog`
+      - build.ts
+      - build/**
       - scripts/**
+      - Justfile
       - flake.nix
       - flake.lock
       - package.json

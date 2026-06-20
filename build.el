@@ -99,7 +99,11 @@
       ;; backquote and splice operator ,@: `https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html'
       `(
         :base-extension "org"
-        :publishing-directory "./out"
+        ;; The default build is now uniorg/bun (`just build' -> `./out', what the
+        ;; deploy ships). This Emacs path is the reference renderer, run via `just
+        ;; build-emacs' which sets `$OUT_DIR' to `./out-emacs' so it never clobbers
+        ;; the deployed output. Default to `./out-emacs' for the same reason.
+        :publishing-directory ,(or (getenv "OUT_DIR") "./out-emacs")
         ;; :recursive t
         ;; Custom function defined below
         :publishing-function my-org-html-publish-to-html
@@ -129,7 +133,7 @@
          ;; `/ltximg/' holds local LaTeX previews:
          :exclude ,(rx-to-string (rx "ltximg/"))
          ;; :exclude ,(rx-to-string (rx line-start "ltximg"))
-         :publishing-directory  "./out"
+         :publishing-directory ,(or (getenv "OUT_DIR") "./out")
          :recursive t
          :publishing-function org-publish-attachment)))
 

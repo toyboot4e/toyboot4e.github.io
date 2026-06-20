@@ -13,23 +13,36 @@ lh_report := "/tmp/lh-report" # {{lh_report}}.report.{html,json}`
 help:
     @just -l
 
-# build the devlog (-d --draft, -f --force): build assets, fetch link cards,
-# export with Emacs, then format and postprocess
+# build the devlog (uniorg/bun, no Emacs) into out/ -- this is what nix/CI ship.
+# Builds assets, fetches link cards (best-effort), then renders AND bakes
+# (Prism/KaTeX/cards) across worker threads in one pass. BUILD_WORKERS=N caps the
+# worker count; BUILD_PROF=1 prints timings.
 build *args:
     @just assets
-    # Generate `linkcard-cache.json`, dismissing errors:
+    # Refresh `linkcard-cache.json`, dismissing errors (offline/CI just reads it):
     -bun scripts/fetch-linkcards.ts
-    emacs -Q --script "./build.el" -- {{args}}
-    @just format
+    bun build.ts {{args}}
+
+# Emacs reference build (build.el + ox-slimhtml) into out-emacs/, for
+# side-by-side comparison with the default bun build. Exports with Emacs, then
+# bakes via scripts/postprocess.ts (-d --draft, -f --force passed through).
+build-emacs *args:
+    @just assets
+    -bun scripts/fetch-linkcards.ts
+    OUT_DIR=out-emacs emacs -Q --script "./build.el" -- {{args}}
+    OUT_DIR=out-emacs just format
+
+[private]
+alias be := build-emacs
 
 [private]
 alias b := build
 
-# cleans up the output directory
+# cleans up the output directories
 clean:
-    echo "cleaning up the \`out/\` directory.."
-    rm -rf out/* > /dev/null 2>&1
-    # force rebuild in the next `just build`:
+    echo "cleaning up the \`out/\` and \`out-emacs/\` directories.."
+    rm -rf out/* out-emacs/* > /dev/null 2>&1
+    # force a full rebuild of the Emacs reference build next time:
     rm -rf .org-timestamps
 
 [private]
@@ -93,21 +106,14 @@ alias ao := audit-open
 audit-ai page="index.html": (audit page)
     bun scripts/audit-summary.ts {{lh_report}}.report.json
 
-# start watching source files and runs `build` on change
-watch *args:
+# watch source files and run the (fast bun) `build` on change. The bun build is
+# release-only (no draft/ support); use `just build-emacs --draft` for drafts.
+watch:
     #!/usr/bin/env bash
     echo "start watching.."
-    exts="el,org,css,scss,ts,js,webp,png,jpg,jpeg,gif,svg"
+    exts="org,css,scss,ts,js,webp,png,jpg,jpeg,gif,svg"
     ig=(--ignore 'index.org' --ignore '**/tags/**' --ignore '**/ltximg/**' --ignore '**/*.min.css' --ignore '**/*.min.js')
-    if [[ "${1:-}" == "-d" || "${1:-}" == "--draft" ]] ; then
-        echo "draft build"
-        watchexec -e "$exts" -w src "${ig[@]}" "just build --draft"
-    elif [[ -z "${1:-}" || "${1:-}" == "-r" || "${1:-}" == "--release" ]] ; then
-        echo "release build"
-        watchexec -e "$exts" -w src "${ig[@]}" "just build --release"
-    else
-        echo "invalid option"
-    fi
+    watchexec -e "$exts" -w src "${ig[@]}" "just build"
 
 [private]
 alias w := watch

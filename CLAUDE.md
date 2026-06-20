@@ -9,20 +9,25 @@ This is a static site generator for a Japanese technical devlog built with Org M
 ## Core Commands
 
 ### Building and Development
-- `just build` - Build the devlog using Emacs script (`build.el`)
-- `just build --draft` - Build including draft articles from `draft/` directory  
-- `just build --release` - Build production version (default)
-- `just clean` - Clean the `out/` directory
-- `just watch` or `just watch --release` - Watch `src/` and rebuild on changes
-- `just watch --draft` - Watch `draft/` and rebuild with drafts
-- `just serve` - Start HTTP server on port 8080 to preview site
+- `just build` - Build the devlog (default): **uniorg + bun, no Emacs**, into
+  `out/`. Renders `.org` → HTML and bakes Prism/KaTeX/link-cards in one parallel
+  pass (`build.ts` + `scripts/render*.ts` + `scripts/bake*.ts`). This is what
+  nix/CI ship. `BUILD_WORKERS=N` caps worker threads; `BUILD_PROF=1` prints
+  phase/worker timings.
+- `just build-emacs` - The original Emacs reference build (`build.el` +
+  `ox-slimhtml`) into `out-emacs/`, for side-by-side comparison. Supports
+  `--draft` (include `draft/`) / `--release` / `--force`. Slower; byte-for-byte
+  reference renderer the bun build mirrors.
+- `just clean` - Clean `out/` and `out-emacs/`
+- `just watch` - Watch `src/` and run the fast bun `build` on change (release
+  only; use `just build-emacs --draft` for drafts)
+- `just serve` - Start HTTP server on port 8080 to preview `out/`
 
 ### Formatting and Processing
-- `just build` runs the full pipeline itself: Emacs, then `just format`
-- `just format` - Prettier-format **and** bake Prism/KaTeX/link-cards into the
-  freshly built HTML (`scripts/postprocess.ts`), skipping files already stamped
-  with the `<!--pp-->` sentinel. Prettier runs before the bake so it never
-  reflows KaTeX markup.
+- The default `just build` bakes in-process (no separate format step).
+- `just format` - bake Prism/KaTeX/link-cards into freshly built HTML
+  (`scripts/postprocess.ts`), skipping files already stamped with the `<!--pp-->`
+  sentinel. Used by `just build-emacs` (the bun build doesn't need it).
 - `just linkcards` - Fetch OGP metadata for `[[card:URL]]` links into
   `linkcard-cache.json` (committed). `--force` refreshes all (use to pick up
   changed remote metadata); pass URLs to fetch only those. `just build` already
@@ -30,30 +35,39 @@ This is a static site generator for a Japanese technical devlog built with Org M
   initial fetch when offline-building still need it. The hermetic nix/CI build
   only *reads* the cache (no network), so the cache must be committed.
 
-### Nix Build (Alternative)
-- `nix build` - Build the entire site using Nix flakes
-- `nix develop` - Enter development shell with all dependencies
+### Nix Build
+- `nix build` - Build the shipped site (the bun path) using Nix flakes
+- `nix develop` - Dev shell with all deps (incl. Emacs for `just build-emacs`)
 
 ## Architecture
 
-### Build Flow
+### Build Flow (default: uniorg + bun)
 1. **Content**: Articles written in Org Mode format in `src/`
-2. **Build**: `build.el` (865-line Emacs Lisp script) processes `.org` files
-3. **Export**: Custom `ox-slimhtml` backend generates minimal HTML
-4. **Format**: Prettier formats the HTML output
-5. **Post-process**: `scripts/postprocess.ts` (Bun) bakes Prism syntax
-   highlighting, KaTeX math, and `[[card:URL]]` link cards (from
-   `linkcard-cache.json`) into the HTML, so pages ship no highlighting/math
-   JavaScript. Idempotent via a `<!--pp-->` sentinel; degrades + warns on bad
-   macros / unknown languages / uncached cards, and fails the build under
-   `--strict` (CI). See `docs/adr/0001-build-time-prism-katex-ssr.md` and
-   `docs/adr/0002-link-cards.md` for the design.
-6. **Output**: Static files in `out/` directory
+2. **Orchestrate**: `build.ts` lists sources, shards them round-robin across
+   worker threads, and assembles the index + tag pages from returned metadata.
+3. **Render**: each worker parses `.org` with uniorg and renders the page HTML
+   (`scripts/render.ts`: uniorg2rehype + custom handlers + rehype-katex).
+4. **Bake**: the same worker bakes Prism highlighting + KaTeX + `[[card:URL]]`
+   cards in-process (`scripts/bake.ts`, shared with the Emacs path so the two
+   never drift), stamping a `<!--pp-->` sentinel. No separate format step.
+5. **Static**: `html/js/css/png/...` (excluding `ltximg/`) copied from `src/`,
+   concurrently with the workers. Output: static files in `out/`.
+
+Strict mode (`CI=1` / `--strict`) fails on unknown languages / KaTeX errors /
+uncached cards. See `docs/adr/0001-build-time-prism-katex-ssr.md` and
+`docs/adr/0002-link-cards.md`.
+
+The **Emacs reference build** (`just build-emacs` → `out-emacs/`) instead
+exports via `build.el` + `ox-slimhtml`, then bakes via `scripts/postprocess.ts`
+(same `bake.ts` core). Kept for comparison, not shipped.
 
 ### Key Files and Directories
-- `build.el` - Main build script with custom Org export functions
+- `build.ts` - Default build orchestrator (uniorg + bun, parallel)
+- `scripts/render.ts` / `render-worker.ts` - org → page HTML (worker)
+- `scripts/bake.ts` / `bake-util.ts` - shared Prism/KaTeX/card bake engine
+- `scripts/postprocess.ts` - Emacs-path bake driver (`just build-emacs`)
+- `build.el` - Emacs reference build with custom Org export functions
 - `ox-slimhtml.el` - Custom minimal HTML exporter for Org Mode
-- `scripts/postprocess.ts` - Bun post-process: build-time Prism + KaTeX + link-card SSR
 - `scripts/fetch-linkcards.ts` - Bun OGP scraper (offline) -> `linkcard-cache.json`
 - `linkcard-cache.json` - Committed OGP metadata for `[[card:URL]]` links
 - `src/` - Source Org files (articles and pages)
@@ -131,17 +145,20 @@ not the destination's trademarked logo.
 - Japanese language support with proper HTML lang attributes
 
 ### Syntax Highlighting
-Two-stage, both at build time:
-1. Emacs exports code blocks with `language-XX` classes
-2. `scripts/postprocess.ts` (Bun) bakes in Prism highlighting. Most blocks use a
-   fast `Prism.highlight()` string call; blocks needing plugin hooks
-   (coderef `keep-markup`, `line-numbers`, `diff-*`) go through a happy-dom
-   `highlightElement`. Add new languages to the `loadLanguages` list in that
-   script, or strict CI fails on the unknown tag. `org` has no Prism grammar and
-   renders as plain text.
+All at build time. Code blocks get `language-XX` classes (from uniorg in the
+default build, or from Emacs export in `build-emacs`); `scripts/bake.ts` then
+bakes Prism highlighting. Most blocks use a fast `Prism.highlight()` string call;
+blocks needing plugin hooks (coderef `keep-markup`, `line-numbers`, `diff-*`) go
+through a happy-dom `highlightElement`. **Add new languages to the
+`loadLanguages` list in `scripts/bake.ts`**, or strict CI fails on the unknown
+tag. `org` has no Prism grammar and renders as plain text.
 
 ### Build Modes
-- **Draft mode**: Includes articles from `draft/` directory
-- **Release mode**: Only publishes articles from `src/` directory (default)
+- **Default (`just build`)**: uniorg + bun, release only (skips `#+DRAFT`
+  articles; no `draft/` directory support).
+- **Draft mode**: `just build-emacs --draft` includes articles from `draft/`.
+- **Release mode**: `src/` only (the default for both paths).
 
-The build script is intentionally monolithic (865 lines in `build.el`) but well-documented. Most customization happens in this file rather than being split across multiple modules.
+`build.el` is intentionally monolithic (~1100 lines) but well-documented; it
+remains the reference renderer. The default bun build is split across `build.ts`
++ `scripts/render*.ts` + `scripts/bake*.ts`.

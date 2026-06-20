@@ -14,7 +14,7 @@
           system: f (import nixpkgs { inherit system; })
         );
 
-      # For `scripts/postprocess.ts`.
+      # node_modules for the bun build (build.ts + scripts/*).
       #
       # After bumping deps: regenerate `package-lock.json`, set `npmDepsHash` to
       # `lib.fakeHash`, run `nix build`, and copy the `got:` hash from the error.
@@ -43,24 +43,29 @@
           '';
         };
 
-      # Everything `just build` shells out to. Single source of truth, shared by
-      # the hermetic package build (runtimeInputs) and the devShell, so the two
-      # can't drift. Asset minification (CSS + TS) goes through bun now, so no
-      # esbuild. HTML is serialised by scripts/postprocess.ts (linkedom), so no
-      # Prettier. (linkcard fetch is best-effort and skipped offline.)
+      # Everything the default `just build` (uniorg/bun) shells out to. Single
+      # source of truth, shared by the hermetic package build (runtimeInputs) and
+      # the devShell, so the two can't drift. Asset minification (CSS + TS) and
+      # the whole render+bake go through bun, so no esbuild / Prettier / Emacs.
+      # (linkcard fetch is best-effort and skipped offline.)
       buildToolsFor =
         pkgs:
         with pkgs;
         [
-          (emacs.pkgs.withPackages (
-            epkgs: with epkgs; [
-              seq
-              esxml
-            ]
-          ))
           bun
           just
         ];
+
+      # Emacs (+ packages) for the reference build, `just build-emacs`. Dev-only:
+      # the shipped site is the bun build, so the hermetic package never needs it.
+      emacsFor =
+        pkgs:
+        pkgs.emacs.pkgs.withPackages (
+          epkgs: with epkgs; [
+            seq
+            esxml
+          ]
+        );
 
       buildCommandFor =
         pkgs:
@@ -72,8 +77,8 @@
           runtimeInputs = buildToolsFor pkgs;
           text = ''
             [ -e node_modules ] || ln -sfn ${nodeModules}/node_modules ./node_modules
-            # CI=1: catch error
-            CI=1 just build --release
+            # CI=1: strict (fail on unknown language / KaTeX error / uncached card)
+            CI=1 just build
           '';
         };
 
@@ -106,6 +111,7 @@
         default = pkgs.mkShell {
           packages =
             buildToolsFor pkgs
+            ++ [ (emacsFor pkgs) ] # for `just build-emacs`
             ++ (with pkgs; [
               # dev-only tooling (not needed by the hermetic build)
               pinact

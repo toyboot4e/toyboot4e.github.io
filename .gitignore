@@ -19,3 +19,6 @@ ltximg
 /src/style/prism-dark.min.css
 /src/style/prism-light.min.css
 /src/style/disco.min.js
+
+# Emacs reference-build output (just build-emacs)
+out-emacs/
