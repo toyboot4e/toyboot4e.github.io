@@ -26,7 +26,7 @@ import { Worker } from "node:worker_threads";
 import { readdir, mkdir, writeFile, rm, cp } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { cpus } from "node:os";
-import { buildIndexHtml, buildTagHtml, type Meta } from "./build/render.ts";
+import { buildIndexHtml, buildTagHtml, type Meta } from "./build/render.tsx";
 // Only the light helpers here -- the main thread never highlights, so it must
 // not import bake.ts (that triggers the heavy Prism/happy-dom setup). The
 // workers own the bake; the index/tag pages carry no code/math/cards and are

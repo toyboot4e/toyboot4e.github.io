@@ -9,6 +9,7 @@ import parse from "uniorg-parse";
 import uniorg2rehype from "uniorg-rehype";
 import rehypeKatex from "rehype-katex";
 import stringify from "rehype-stringify";
+import { h, Fragment, raw, render, type Raw } from "./html.ts";
 
 export const SITE_URL = "https://toyboot4e.github.io/";
 
@@ -18,9 +19,6 @@ const FOOTER = `<footer role="contentinfo"><p>Styled with <a href="https://simpl
 const TAIL = `<script type="text/javascript" src="/style/tocbot.min.js"></script><script>tocbot.init({ tocSelector: '#toc', contentSelector: '#content', headingSelector: 'h1, h2, h3, h4', collapseDepth: 6, scrollSmooth: false, orderedList: false });</script>`;
 const DISCO_BODY = `<div class="disco-bg-light" aria-hidden="true"></div><canvas id="disco-canvas" aria-hidden="true"></canvas>`;
 const DISCO_HEAD = `<script>try{if(localStorage.getItem('toybeam-disco')!=='off')document.documentElement.classList.add('disco-on')}catch(e){}</script><script type="text/javascript" defer src="/style/disco.min.js"></script>`;
-
-const esc = (s: string) =>
-  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 // --- keyword metadata (uniorg-extract-keywords pulls in a buggy dep) --------
 export function readKeywords(text: string): Record<string, string> {
@@ -326,85 +324,126 @@ async function orgInlineToHtml(s: string): Promise<string> {
   return out.replace(/^\s*<p>([\s\S]*?)<\/p>\s*$/, "$1").trim();
 }
 
+// Org string -> PLAIN text for <title> / og:title: convert org to HTML (so the
+// markup syntax chars like `=`, `~`, `*` are consumed) and strip all tags. No
+// KaTeX -- math stays as its readable source (`\TeX{}`) rather than katex spans.
+// Entities are decoded back to text (re-escaped later for the HTML context).
+async function orgInlineToText(s: string): Promise<string> {
+  const out = String(
+    await unified().use(parse).use(uniorg2rehype)
+      .use(stringify, { allowDangerousHtml: true }).process(s),
+  );
+  return out
+    .replace(/^\s*<p>([\s\S]*?)<\/p>\s*$/, "$1")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'").replace(/&amp;/g, "&")
+    .trim();
+}
+
 // --- page assembly ----------------------------------------------------------
 export type Meta = {
-  href: string; title: string; titleHtml: string; date: string; tags: string[];
+  href: string; title: string; titleHtml: string; titleText: string; date: string; tags: string[];
   thumbnail: string | null; draft: boolean; description: string;
 };
 
+const FAVICON =
+  "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔦</text></svg>";
+
 function headHtml(m: { title: string; description: string; url: string; thumbnail: string | null;
-  hasCode: boolean; hasMath: boolean; hasSteno: boolean }): string {
+  hasCode: boolean; hasMath: boolean; hasSteno: boolean }): Raw {
   const img = absUrl(m.thumbnail);
   const twitter = img ? "summary_large_image" : "summary";
   return (
-    `<head><meta charset="utf-8"/>` +
-    `<meta name="viewport" content="width=device-width, initial-scale=1"/>` +
-    `<title>${esc(m.title)} - Toybeam</title>` +
-    `<meta name="description" content="${esc(m.description)}"/>` +
-    `<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔦</text></svg>"/>` +
-    `<link rel="stylesheet" href="/style/simple.min.css"/>` +
-    `<link rel="stylesheet" href="/style/style.min.css"/>` +
-    (m.hasCode
-      ? `<link rel="stylesheet" id="prism-dark" href="/style/prism-dark.min.css" media="(prefers-color-scheme: dark)"/>` +
-        `<link rel="stylesheet" id="prism-light" href="/style/prism-light.min.css" media="(prefers-color-scheme: light)"/>`
-      : "") +
-    (m.hasMath ? `<link rel="stylesheet" href="/style/katex/katex.min.css"/>` : "") +
-    `<script type="text/javascript" src="/style/style.js"></script>` +
-    DISCO_HEAD +
-    (m.hasSteno ? `<script type="text/javascript" async src="/style/steno-viz.js"></script>` : "") +
-    `<meta property="og:type" content="article"/>` +
-    `<meta property="og:title" content="${esc(m.title)}"/>` +
-    `<meta property="og:description" content="${esc(m.description)}"/>` +
-    `<meta property="og:url" content="${esc(m.url)}"/>` +
-    `<meta property="og:site_name" content="Toybeam"/>` +
-    `<meta property="og:locale" content="ja_JP"/>` +
-    (img ? `<meta property="og:image" content="${esc(img)}"/>` : "") +
-    `<meta name="twitter:card" content="${twitter}"/>` +
-    `<meta name="twitter:creator" content="@toyboot4e"/>` +
-    `<meta name="twitter:site" content="@toyboot4e"/>` +
-    (img ? `<meta name="twitter:image" content="${esc(img)}"/>` : "") +
-    `</head>`
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>{`${m.title} - Toybeam`}</title>
+      <meta name="description" content={m.description} />
+      <link rel="icon" href={FAVICON} />
+      <link rel="stylesheet" href="/style/simple.min.css" />
+      <link rel="stylesheet" href="/style/style.min.css" />
+      {m.hasCode && (
+        <Fragment>
+          <link rel="stylesheet" id="prism-dark" href="/style/prism-dark.min.css" media="(prefers-color-scheme: dark)" />
+          <link rel="stylesheet" id="prism-light" href="/style/prism-light.min.css" media="(prefers-color-scheme: light)" />
+        </Fragment>
+      )}
+      {m.hasMath && <link rel="stylesheet" href="/style/katex/katex.min.css" />}
+      <script type="text/javascript" src="/style/style.js"></script>
+      {raw(DISCO_HEAD)}
+      {m.hasSteno && <script type="text/javascript" async src="/style/steno-viz.js"></script>}
+      <meta property="og:type" content="article" />
+      <meta property="og:title" content={m.title} />
+      <meta property="og:description" content={m.description} />
+      <meta property="og:url" content={m.url} />
+      <meta property="og:site_name" content="Toybeam" />
+      <meta property="og:locale" content="ja_JP" />
+      {img && <meta property="og:image" content={img} />}
+      <meta name="twitter:card" content={twitter} />
+      <meta name="twitter:creator" content="@toyboot4e" />
+      <meta name="twitter:site" content="@toyboot4e" />
+      {img && <meta name="twitter:image" content={img} />}
+    </head>
   );
 }
 
-function tagListHtml(tags: string[]): string {
-  return tags
-    .map((t) => `<a href="/tags/${t}.html" class="org-tag"><code>${esc(t)}</code></a>`)
-    .join("");
+function tagListHtml(tags: string[]): Raw {
+  return <Fragment>{tags.map((t) => (
+    <a href={`/tags/${t}.html`} class="org-tag"><code>{t}</code></a>
+  ))}</Fragment>;
 }
 
-function page(opts: {
-  htmlClass?: string; head: string; titleBlock: string; content: string;
-}): string {
-  const cls = opts.htmlClass ? ` class="${opts.htmlClass}"` : "";
+function page(opts: { htmlClass?: string; head: Raw; titleBlock: Raw; content: Raw }): Raw {
   return (
-    `<!DOCTYPE html><html lang="ja"${cls}>${opts.head}` +
-    `<body>${DISCO_BODY}${HEADER}` +
-    // <nav id="toc"> is the tocbot mount point (filled client-side from the
-    // headings); without it the tocbot init in TAIL has nothing to populate.
-    `<main role="main" id="main">${opts.titleBlock}<div id="content">${opts.content}</div><nav id="toc"></nav></main>` +
-    `${FOOTER}${TAIL}</body></html>`
+    <Fragment>
+      {raw("<!DOCTYPE html>")}
+      <html lang="ja" class={opts.htmlClass}>
+        {opts.head}
+        <body>
+          {raw(DISCO_BODY)}
+          {raw(HEADER)}
+          {/* <nav id="toc"> is the tocbot mount point, filled client-side from
+              the headings; without it the tocbot init in TAIL has nothing. */}
+          <main role="main" id="main">
+            {opts.titleBlock}
+            <div id="content">{opts.content}</div>
+            <nav id="toc"></nav>
+          </main>
+          {raw(FOOTER)}
+          {raw(TAIL)}
+        </body>
+      </html>
+    </Fragment>
   );
 }
 
-function articleTitleBlock(m: Meta): string {
+function articleTitleBlock(m: Meta): Raw {
   return (
-    `<div class="title-block"><h1>${m.titleHtml}</h1>` +
-    `<div class="title-meta"><span class="title-date">${esc(m.date)}</span>` +
-    (m.tags.length ? `<p class="org-tag-list">${tagListHtml(m.tags)}</p>` : "") +
-    `</div></div>`
+    <div class="title-block">
+      <h1>{raw(m.titleHtml)}</h1>
+      <div class="title-meta">
+        <span class="title-date">{m.date}</span>
+        {m.tags.length > 0 && <p class="org-tag-list">{tagListHtml(m.tags)}</p>}
+      </div>
+    </div>
   );
 }
 
-function articleCard(m: Meta, eager: boolean): string {
-  const thumb = m.thumbnail
-    ? `<img class="article-card-thumbnail" src="${esc(m.thumbnail)}" alt="" loading="${eager ? "eager" : "lazy"}" decoding="async"/>`
-    : "";
+function articleCard(m: Meta, eager: boolean): Raw {
   return (
-    `<div class="article-card"><div class="article-card-body">` +
-    `<div><a href="${esc(m.href)}" class="article-card-link">${m.titleHtml}</a></div>` +
-    `<div class="article-card-meta"><date>${esc(m.date)}</date>` +
-    `<span class="org-tag-list">${tagListHtml(m.tags)}</span></div></div>${thumb}</div>`
+    <div class="article-card">
+      <div class="article-card-body">
+        <div><a href={m.href} class="article-card-link">{raw(m.titleHtml)}</a></div>
+        <div class="article-card-meta">
+          <date>{m.date}</date>
+          <span class="org-tag-list">{tagListHtml(m.tags)}</span>
+        </div>
+      </div>
+      {m.thumbnail && (
+        <img class="article-card-thumbnail" src={m.thumbnail} alt="" loading={eager ? "eager" : "lazy"} decoding="async" />
+      )}
+    </div>
   );
 }
 
@@ -446,17 +485,18 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
   const title = kw.TITLE || outRel;
   const meta: Meta = {
     href: "/" + outRel,
-    title, // plain text, for <title>/og:title
-    titleHtml: await orgInlineToHtml(title), // org markup, for <h1> + cards
+    title, // raw org title (kept for reference)
+    titleHtml: await orgInlineToHtml(title), // org markup -> HTML, for <h1> + cards
+    titleText: await orgInlineToText(title), // org markup stripped, for <title>/og
     date: fmtDate(kw.DATE || ""),
     tags,
     thumbnail: thumbnailSrc(kw.THUMBNAIL),
     draft: false,
     description: kw.DESCRIPTION || firstParagraphText(body),
   };
-  const html = page({
+  const html = render(page({
     head: headHtml({
-      title: meta.title, description: meta.description, url: SITE_URL + outRel, thumbnail: meta.thumbnail,
+      title: meta.titleText, description: meta.description, url: SITE_URL + outRel, thumbnail: meta.thumbnail,
       // hasMath gates `katex.min.css`. Catch BOTH math forms: `.katex` spans
       // already rendered by rehype-katex (org `$...$`, in the body or the title),
       // and raw `\(...\)` / `\[` / `\begin{}` delimiters the bake step renders
@@ -466,41 +506,50 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
       hasSteno: body.includes("<steno-outline"),
     }),
     titleBlock: articleTitleBlock(meta),
-    content: body,
-  });
+    content: raw(body),
+  }));
   return { rel: outRel, isDiary: outRel.startsWith("diary/"), draft: !!kw.DRAFT, meta, html };
 }
 
 // index.html: Tags / Devlog (timeline) / Diary -- same three sections, ids and
 // ordering as build.el's `my-generate-sitemap`.
 export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: string[]): string {
-  const section = (id: string, cards: Meta[]) =>
-    `<h2 id="${id}"><a href="#${id}">${esc(id)}</a></h2>` +
-    `<div class="article-list">${cards.map((m, i) => articleCard(m, i === 0)).join("")}</div>`;
-  const content =
-    `<h2 id="Tags"><a href="#Tags">Tags</a></h2><div class="org-tag-list">${tagListHtml(allTags)}</div>` +
-    section("Devlog (timeline)", metas) +
-    section("Diary", diaryMetas);
+  const section = (id: string, cards: Meta[]): Raw => (
+    <Fragment>
+      <h2 id={id}><a href={`#${id}`}>{id}</a></h2>
+      <div class="article-list">{cards.map((m, i) => articleCard(m, i === 0))}</div>
+    </Fragment>
+  );
   // a card title may carry KaTeX (e.g. `$\TeX{}$`); link the stylesheet if so
   const hasMath = [...metas, ...diaryMetas].some((m) => m.titleHtml.includes('class="katex'));
-  return page({
+  return render(page({
     htmlClass: "home",
     head: headHtml({ title: "Toybeam", description: "Devlog of toyboot4e", url: SITE_URL, thumbnail: null, hasCode: false, hasMath, hasSteno: false }),
-    titleBlock: `<div class="title-block"><h1>Toybeam</h1><div class="title-meta"><span class="title-date"></span></div></div>`,
-    content,
-  });
+    titleBlock: <div class="title-block"><h1>Toybeam</h1><div class="title-meta"><span class="title-date"></span></div></div>,
+    content: (
+      <Fragment>
+        <h2 id="Tags"><a href="#Tags">Tags</a></h2><div class="org-tag-list">{tagListHtml(allTags)}</div>
+        {section("Devlog (timeline)", metas)}
+        {section("Diary", diaryMetas)}
+      </Fragment>
+    ),
+  }));
 }
 
 export function buildTagHtml(tag: string, tagged: Meta[], allTags: string[]): string {
-  const content =
-    `<h2 id="Tags"><a href="#Tags">Tags</a></h2><div class="org-tag-list">${tagListHtml(allTags)}</div>` +
-    `<h2 id="Devlog">Devlog (#${esc(tag)})</h2>` +
-    `<div class="article-list">${tagged.map((m, i) => articleCard(m, i === 0)).join("")}</div>`;
   const hasMath = tagged.some((m) => m.titleHtml.includes('class="katex'));
-  return page({
+  return render(page({
     htmlClass: "home",
     head: headHtml({ title: `Toybeam (#${tag})`, description: "Devlog of toyboot4e", url: `${SITE_URL}tags/${tag}.html`, thumbnail: null, hasCode: false, hasMath, hasSteno: false }),
-    titleBlock: `<div class="title-block"><h1>Toybeam (<code>#${esc(tag)}</code>)</h1><div class="title-meta"><span class="title-date"></span></div></div>`,
-    content,
-  });
+    titleBlock: (
+      <div class="title-block"><h1>Toybeam (<code>#{tag}</code>)</h1><div class="title-meta"><span class="title-date"></span></div></div>
+    ),
+    content: (
+      <Fragment>
+        <h2 id="Tags"><a href="#Tags">Tags</a></h2><div class="org-tag-list">{tagListHtml(allTags)}</div>
+        <h2 id="Devlog">Devlog (#{tag})</h2>
+        <div class="article-list">{tagged.map((m, i) => articleCard(m, i === 0))}</div>
+      </Fragment>
+    ),
+  }));
 }

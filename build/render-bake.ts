@@ -6,7 +6,7 @@
 // workers and tests use it; the orchestrator (build.ts) stays on render.ts +
 // bake-util.ts.
 import { parseHTML } from "linkedom";
-import { renderArticle, type Meta } from "./render.ts";
+import { renderArticle, type Meta } from "./render.tsx";
 import { bakeDocument, stamp } from "./bake.ts";
 
 export type Baked = { rel: string; isDiary: boolean; draft: boolean; meta: Meta; out: string };

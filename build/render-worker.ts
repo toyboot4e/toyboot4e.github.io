@@ -9,7 +9,7 @@
 import { parentPort, workerData } from "node:worker_threads";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join, dirname } from "node:path";
-import { type Meta } from "./render.ts";
+import { type Meta } from "./render.tsx";
 import { getStats } from "./bake.ts";
 import { renderAndBake } from "./render-bake.ts";
 

@@ -9,7 +9,7 @@ import { test, expect } from "bun:test";
 import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { renderAndBake } from "../build/render-bake.ts";
-import { buildIndexHtml, buildTagHtml, type Meta } from "../build/render.ts";
+import { buildIndexHtml, buildTagHtml, type Meta } from "../build/render.tsx";
 
 const FIX = join(import.meta.dir, "fixtures");
 const GOLD = join(import.meta.dir, "golden");
