@@ -335,6 +335,15 @@ blockquote > p:first-child {
   text-align: center;
 }
 
+/* Emacs wrapped EVERY standalone image in a centered <figure>
+   (org-html--wrap-image). uniorg only uses <figure> for captioned images
+   (those are centered by simple.css's `figure>img{margin-inline:auto}`); an
+   uncaptioned standalone image comes out as <p><img></p>, which is inline and
+   left-aligned. Center those too, so images are centered by default like Emacs. */
+#content p:has(> img:only-child) {
+  text-align: center;
+}
+
 div.WARNING {
   border-left: 2px solid #d75f5f;
   padding-top: 1px;
@@ -443,10 +452,8 @@ span.code-highlighted {
   font-size: 16px;
   line-height: 18px;
   text-indent: 0;
-  /* reset simple.css's <pre> chrome (border/background/padding) -- this is art */
-  border: 0;
-  background: none;
-  padding: 0;
+  /* keep simple.css's <pre> chrome (border/background/radius/padding) so a YARUO
+     block has a frame like a code block, matching the Emacs build */
   margin: 1rem 0;
 }
 
