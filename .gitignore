@@ -19,6 +19,9 @@ ltximg
 /src/style/prism-dark.min.css
 /src/style/prism-light.min.css
 /src/style/disco.min.js
+# CSS modules (build/styles/*.module.css): scoped CSS + the class-name map
+/src/style/components.min.css
+/build/styles/generated.js
 
 # Emacs reference-build output (just build-emacs)
 out-emacs/

@@ -418,12 +418,6 @@ span.code-highlighted {
   gap: 4px;
 }
 
-.article-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
 .org-tag {
   text-indent: 0;
   border: var(--border-width) solid var(--border);
@@ -439,77 +433,8 @@ span.code-highlighted {
   background-color: color-mix(in srgb, var(--accent-hover) 10%, transparent);
 }
 
-/* Article card, styled like a Twitter/OGP card. */
-.article-card {
-  position: relative;
-  text-indent: 0;
-  border: var(--border-width) solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  color: var(--text);
-  background: var(--bg);
-}
-
-.article-card:hover {
-  border-color: var(--accent-hover);
-  background-color: color-mix(in srgb, var(--accent-hover) 5%, transparent);
-}
-
-/* The text content is padded, while the thumbnail stays full-bleed. */
-.article-card-body {
-  padding: 0.35rem 0.75rem;
-  line-height: 1.3;
-}
-
-/* Thumbnail at the bottom of the card, flush to its edges. */
-.article-card-thumbnail {
-  display: block;
-  width: 100%;
-  /* Twitter OGP image aspect */
-  aspect-ratio: 1.91 / 1;
-  object-fit: cover;
-  /* Flush to the card border. */
-  border-radius: 0;
-  background: color-mix(in srgb, var(--text) 6%, transparent);
-}
-
-.article-card-meta {
-  font-size: 0.85rem;
-  line-height: 1.4;
-}
-
-/* keep the date and its tags the same (smaller) size on one meta row */
-.article-card-meta .org-tag-list {
-  font-size: inherit;
-}
-
-.article-card-meta date {
-  color: var(--text-light);
-  padding-right: 0.5em;
-  font-family: monospace, monospace;
-}
-
-.article-card-link {
-  /* title sits above the meta and should read bigger than the date */
-  font-size: 1.25rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.article-card-link::after {
-  /* stretch the link to the card */
-  content: "";
-  position: absolute;
-  inset: 0;
-  /* keep the thumbnail clickable even if it's in dark mode */
-  z-index: 1;
-}
-
-.article-card a:not(.article-card-link) {
-  /* clickable above the stretched link */
-  position: relative;
-  z-index: 2;
-}
+/* Article card styles moved to a CSS module: build/styles/article-card.module.css
+   (scoped class names, shipped as components.min.css). */
 
 /* Link card: `[[card:URL]]`, an OGP preview baked in at build time
    (scripts/postprocess.ts). Phrasing-only markup so it stays valid inside the
@@ -862,8 +787,6 @@ a.toc-link {
    ends cleanly on the real final value instead of snapping. */
 .disco-animating #disco-canvas,
 .disco-animating .disco-bg-light,
-.disco-animating .article-card,
-.disco-animating .article-card-thumbnail,
 .disco-animating .org-tag,
 .disco-animating .title-block,
 .disco-animating #content,
@@ -1023,21 +946,7 @@ html.disco-on {
   }
 }
 
-.disco-on .article-card {
-  background-color: var(--disco-card-bg);
-  box-shadow: var(--disco-shadow);
-}
-.disco-on .article-card:hover {
-  background-color: var(--disco-card-bg-hover);
-}
-/* Fade the (opaque) card thumbnails in disco mode so the effect shows through
-   them too; restore full opacity on hover so the image reads when focused. */
-.disco-on .article-card-thumbnail {
-  opacity: 0.75;
-}
-.disco-on .article-card:hover .article-card-thumbnail {
-  opacity: 1;
-}
+/* (.disco-on .article-card* rules moved to build/styles/article-card.module.css) */
 
 /* In disco mode the tag chips (no background of their own) float unreadably over
    the ball — give them a semi-solid backdrop so the labels stay legible while

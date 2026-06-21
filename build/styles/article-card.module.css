@@ -1,0 +1,107 @@
+/* Article card (the Twitter/OGP-style cards on the index + tag pages). CSS
+ * module: the class names below are scoped (hashed) at build time and consumed
+ * via the generated map in render.tsx. Theme tokens (var(--*)) and globally
+ * cascaded classes (.disco-on / .disco-animating ancestors, .org-tag-list) stay
+ * global via :global(). Migrated out of style.css. */
+
+.articleList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.articleCard {
+  position: relative;
+  text-indent: 0;
+  border: var(--border-width) solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.articleCard:hover {
+  border-color: var(--accent-hover);
+  background-color: color-mix(in srgb, var(--accent-hover) 5%, transparent);
+}
+
+/* The text content is padded, while the thumbnail stays full-bleed. */
+.articleCardBody {
+  padding: 0.35rem 0.75rem;
+  line-height: 1.3;
+}
+
+/* Thumbnail at the bottom of the card, flush to its edges. */
+.articleCardThumbnail {
+  display: block;
+  width: 100%;
+  /* Twitter OGP image aspect */
+  aspect-ratio: 1.91 / 1;
+  object-fit: cover;
+  /* Flush to the card border. */
+  border-radius: 0;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.articleCardMeta {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* keep the date and its tags the same (smaller) size on one meta row */
+.articleCardMeta :global(.org-tag-list) {
+  font-size: inherit;
+}
+
+.articleCardMeta date {
+  color: var(--text-light);
+  padding-right: 0.5em;
+  font-family: monospace, monospace;
+}
+
+.articleCardLink {
+  /* title sits above the meta and should read bigger than the date */
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.articleCardLink::after {
+  /* stretch the link to the card */
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* keep the thumbnail clickable even if it's in dark mode */
+  z-index: 1;
+}
+
+.articleCard a:not(.articleCardLink) {
+  /* clickable above the stretched link */
+  position: relative;
+  z-index: 2;
+}
+
+/* disco: smooth the theme-toggle transition (was in the shared .disco-animating
+ * list in style.css) */
+:global(.disco-animating) .articleCard,
+:global(.disco-animating) .articleCardThumbnail {
+  transition:
+    opacity 0.8s ease,
+    background-color 0.8s ease,
+    backdrop-filter 0.8s ease;
+}
+
+/* disco: card surface + faded thumbnails so the effect shows through */
+:global(.disco-on) .articleCard {
+  background-color: var(--disco-card-bg);
+  box-shadow: var(--disco-shadow);
+}
+:global(.disco-on) .articleCard:hover {
+  background-color: var(--disco-card-bg-hover);
+}
+:global(.disco-on) .articleCardThumbnail {
+  opacity: 0.75;
+}
+:global(.disco-on) .articleCard:hover .articleCardThumbnail {
+  opacity: 1;
+}

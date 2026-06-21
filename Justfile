@@ -47,7 +47,9 @@ clean:
 
 # run the golden tests (render+bake output pinned against test/golden/).
 # regenerate goldens after an intentional output change: `just test-update`
+# (assets first: render.tsx imports the generated CSS-module class map)
 test:
+    @just assets
     bun test test/
 
 [private]
@@ -55,6 +57,7 @@ alias t := test
 
 # regenerate golden files, then show the diff to review
 test-update:
+    @just assets
     UPDATE_GOLDEN=1 bun test test/
     git -c core.pager=cat diff --stat test/golden/
 

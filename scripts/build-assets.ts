@@ -52,3 +52,22 @@ await report(
     target: "browser",
   }),
 );
+
+// CSS modules (build/styles/*.module.css): Bun scopes the class names and emits
+// (1) the scoped CSS -> src/style/components.min.css (static-copied to out/ and
+// linked on the pages) and (2) the class-name maps -> build/styles/generated.js
+// (imported by render.tsx). Kept separate from the global style.css so the
+// entangled disco/theme rules there are untouched. Both are git-ignored, owned
+// by this step. Outputs are in-memory (no outdir) so the two artifacts can go to
+// different paths.
+const mods = await Bun.build({ entrypoints: ["build/styles/index.ts"], minify: true });
+if (!mods.success) {
+  for (const log of mods.logs) console.error(log);
+  process.exit(1);
+}
+for (const out of mods.outputs) {
+  const text = await out.text();
+  const dest = out.path.endsWith(".css") ? `${STYLE_DIR}/components.min.css` : "build/styles/generated.js";
+  await Bun.write(dest, text);
+  console.log(`  -> ${dest} (${text.length} bytes)`);
+}
