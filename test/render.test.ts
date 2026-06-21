@@ -88,6 +88,9 @@ test("coderef: line wrapped in .coderef-off, marker -> anchor, prose link styled
   expect(out).toContain('<span class="coderef-anchor">a</span>'); // (ref:a) marker -> anchor
   expect(out).toContain('<a href="#coderef-1-a"><span class="coderef-anchor">a</span></a>'); // prose link
   expect(out).not.toContain("(ref:a)"); // marker consumed
+  // JS-free hover: hovering the prose link (a[href="#ID"]) highlights the code
+  // line (#ID) via a per-id :has() rule, mirroring build.el's CodeHighlightOn.
+  expect(out).toContain('#content:has(a[href="#coderef-1-a"]:hover) #coderef-1-a{');
 });
 
 test("coderef: only coderef-bearing blocks are numbered (a plain block before it doesn't bump N)", async () => {

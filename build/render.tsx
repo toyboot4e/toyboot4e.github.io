@@ -85,6 +85,7 @@ type RenderState = {
   tableCaps: (string | null)[];  // per-table caption HTML (recovered from source)
   tableCounter: { n: number };   // index into tableCaps, advanced per table
   captionN: { figure: number; listing: number; table: number }; // per-kind caption counters
+  coderefIds: string[];       // coderef anchor ids, for the JS-free hover-highlight <style>
 };
 
 // The `(ref:label)` coderef marker, matched in place. Org replaces just the
@@ -205,6 +206,7 @@ function makeHandlers(st: RenderState) {
         if (m) {
           const label = m[1];
           const id = `coderef-${N}-${label}`;
+          st.coderefIds.push(id);
           const before = line.slice(0, m.index);
           const after = line.slice(m.index! + m[0].length);
           const lineKids: any[] = [];
@@ -464,6 +466,25 @@ function page(opts: { htmlClass?: string; head: Raw; titleBlock: Raw; content: R
   );
 }
 
+// JS-free coderef hover-highlight. A prose `[[(label)]]` link and its code line
+// both resolve to `#coderef-N-label`, but live in different DOM subtrees, so no
+// plain combinator connects them. `:has()` does: when a link to `#ID` is hovered
+// anywhere in `#content`, highlight the element `#ID` (the code line). This
+// mirrors build.el's `onmouseover="CodeHighlightOn(...)"` without runtime JS.
+// CSS can't bind the hovered href to the target id generically, so we emit one
+// rule per coderef id present on the page (there are only a handful).
+function coderefHoverStyle(ids: string[]): string {
+  const uniq = [...new Set(ids)];
+  if (!uniq.length) return "";
+  const rules = uniq
+    .map(
+      (id) =>
+        `#content:has(a[href="#${id}"]:hover) #${id}{background-color:color-mix(in srgb,var(--accent-hover) 20%,transparent)}`,
+    )
+    .join("");
+  return `<style>${rules}</style>`;
+}
+
 function articleTitleBlock(m: Meta): Raw {
   return (
     <div class="title-block">
@@ -521,14 +542,16 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
   const tableCaps = await Promise.all(
     tableCaptions(text).map((c) => (c ? orgInlineToHtml(c) : null)),
   );
-  const body = await orgToBody(text, {
+  const st: RenderState = {
     source: text,
     details: detailsSummaries(text),
     blockCounter: { n: 0 },
     tableCaps,
     tableCounter: { n: 0 },
     captionN: { figure: 0, listing: 0, table: 0 },
-  });
+    coderefIds: [],
+  };
+  const body = await orgToBody(text, st);
   const title = kw.TITLE || outRel;
   const meta: Meta = {
     href: "/" + outRel,
@@ -553,7 +576,7 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
       hasSteno: body.includes("<steno-outline"),
     }),
     titleBlock: articleTitleBlock(meta),
-    content: raw(body),
+    content: raw(body + coderefHoverStyle(st.coderefIds)),
   }));
   return { rel: outRel, isDiary: outRel.startsWith("diary/"), draft: !!kw.DRAFT, meta, html };
 }
