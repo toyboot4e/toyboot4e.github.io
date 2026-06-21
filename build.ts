@@ -33,21 +33,21 @@ import { buildIndexHtml, buildTagHtml, type Meta } from "./build/render.tsx";
 // written as-is.
 import { copyKatexAssets, mergeStats, stamp, type BakeStats } from "./build/bake-util.ts";
 
-const SRC = "src";
-const OUT = process.env.OUT_DIR ?? "out";
-const STRICT = process.argv.includes("--strict") || !!process.env.CI;
+export const SRC = "src";
+export const OUT = process.env.OUT_DIR ?? "out";
+export const STRICT = process.argv.includes("--strict") || !!process.env.CI;
 // Each worker is a fresh isolate that re-runs the Prism/happy-dom/uniorg setup
 // (~250ms), so more workers is not always faster: past ~6 the fixed per-isolate
 // setup outweighs the shrinking per-shard work (empirically flat 3-6, worse at
 // 8+ on a 20-core box). Cap accordingly; override with BUILD_WORKERS.
 const WORKERS = Math.max(1, Number(process.env.BUILD_WORKERS) || Math.min(cpus().length, 6));
 
-type WorkerOut = { results: { rel: string; isDiary: boolean; meta: Meta }[]; stats: BakeStats };
+export type WorkerOut = { results: { rel: string; isDiary: boolean; meta: Meta }[]; stats: BakeStats };
 
 // List .org sources relative to SRC, skipping generated tag pages and index.org.
 // `src/tags/` holds tag pages that build.el writes (we regenerate our own
 // below); mirrors build.el's `(not (string-match "tags/" url))`.
-async function listOrg(dir: string, base = dir): Promise<string[]> {
+export async function listOrg(dir: string, base = dir): Promise<string[]> {
   const out: string[] = [];
   for (const e of await readdir(dir, { withFileTypes: true })) {
     const p = join(dir, e.name);
@@ -66,9 +66,9 @@ async function listOrg(dir: string, base = dir): Promise<string[]> {
 // (local LaTeX previews). Catches loose files like `og-preview.html` plus the
 // `style/` and `img/` trees, while skipping `.org` sources and `.drawio`/`.ts`
 // diagram/source files that the Emacs build also leaves out.
-const STATIC_RE = /\.(html|js|css|png|jpe?g|webp|gif|svg|mp4|mov|woff2|pdf)$/i;
+export const STATIC_RE = /\.(html|js|css|png|jpe?g|webp|gif|svg|mp4|mov|woff2|pdf)$/i;
 
-async function listStatic(dir: string, base = dir): Promise<string[]> {
+export async function listStatic(dir: string, base = dir): Promise<string[]> {
   const out: string[] = [];
   for (const e of await readdir(dir, { withFileTypes: true })) {
     if (e.name === "ltximg") continue; // local LaTeX previews (excluded by build.el)
@@ -82,7 +82,7 @@ async function listStatic(dir: string, base = dir): Promise<string[]> {
 // Copy static files into OUT. Rendered pages win on the (currently nonexistent)
 // name collision -- `cp` here runs concurrently with the workers, so skip any
 // dest a worker already wrote.
-async function copyStatic(): Promise<number> {
+export async function copyStatic(): Promise<number> {
   const rels = await listStatic(SRC);
   await Promise.all(
     rels.map(async (rel) => {
@@ -112,7 +112,35 @@ function runWorker(files: string[]): Promise<WorkerOut> {
   });
 }
 
-async function main() {
+// Write one finished page: stamp (postprocess idempotency) + write. Used for the
+// index + tag pages, which carry no code/math/cards and skip the bake entirely.
+export async function writePage(rel: string, html: string): Promise<void> {
+  const dest = join(OUT, rel);
+  await mkdir(join(dest, ".."), { recursive: true });
+  await writeFile(dest, stamp(html));
+}
+
+// (Re)generate index.html + every tag page from the article metadata. The watch
+// daemon calls this whenever an article's metadata (title/date/tags) changes.
+export async function writeIndexAndTags(metas: Meta[], diaryMetas: Meta[], allTags: string[]): Promise<void> {
+  await writePage("index.html", buildIndexHtml(metas, diaryMetas, allTags));
+  await Promise.all(
+    allTags.map((tag) =>
+      writePage(`tags/${tag}.html`, buildTagHtml(tag, metas.filter((m) => m.tags.includes(tag)), allTags)),
+    ),
+  );
+}
+
+export type FullBuild = {
+  outs: WorkerOut[]; metas: Meta[]; diaryMetas: Meta[]; allTags: string[];
+  stats: BakeStats; nStatic: number; nWorkers: number;
+};
+
+// The whole site build: clean OUT, render+bake every article across workers
+// (concurrently with the static + KaTeX copies), then assemble the index + tag
+// pages. Returns the per-article worker results (so a caller can seed a metadata
+// cache -- the watch daemon does) plus aggregated metadata and bake stats.
+export async function fullBuild(): Promise<FullBuild> {
   const t0 = performance.now();
   const lap = (l: string) => { if (PROF) console.error(`  [phase] ${l}: ${Math.round(performance.now() - t0)}ms`); };
   // Wipe OUT's contents (drop stale output) but keep the dir and its tracked
@@ -133,9 +161,9 @@ async function main() {
   // and the upfront stat() pass delays worker spawn. Files come out of listOrg
   // in directory order (roughly chronological), so round-robin already
   // interleaves big/small and code-heavy/prose well enough.
-  const n = Math.min(WORKERS, files.length) || 1;
-  const shards: string[][] = Array.from({ length: n }, () => []);
-  files.forEach((f, i) => shards[i % n].push(f));
+  const nWorkers = Math.min(WORKERS, files.length) || 1;
+  const shards: string[][] = Array.from({ length: nWorkers }, () => []);
+  files.forEach((f, i) => shards[i % nWorkers].push(f));
 
   // Workers (render+bake) and the static/KaTeX copies are independent -- run
   // them together so the image/asset I/O overlaps the CPU-bound rendering.
@@ -159,28 +187,19 @@ async function main() {
   // tags come from devlog entries only (matches build.el's `all-tags`)
   const allTags = [...new Set(metas.flatMap((m) => m.tags))].sort();
 
-  // index + tag pages carry no code/math/cards, so they skip the bake entirely
-  // -- just stamp (for postprocess idempotency) and write.
-  const writePage = async (rel: string, html: string) => {
-    const dest = join(OUT, rel);
-    await mkdir(join(dest, ".."), { recursive: true });
-    await writeFile(dest, stamp(html));
-  };
-
-  await writePage("index.html", buildIndexHtml(metas, diaryMetas, allTags));
-  await Promise.all(
-    allTags.map((tag) =>
-      writePage(`tags/${tag}.html`, buildTagHtml(tag, metas.filter((m) => m.tags.includes(tag)), allTags)),
-    ),
-  );
+  await writeIndexAndTags(metas, diaryMetas, allTags);
   lap("index+tags");
 
-  // aggregate bake stats across worker shards (index/tag pages don't bake)
-  const s = mergeStats(outs.map((o) => o.stats));
+  return { outs, metas, diaryMetas, allTags, stats: mergeStats(outs.map((o) => o.stats)), nStatic, nWorkers };
+}
+
+async function main() {
+  const t0 = performance.now();
+  const { metas, diaryMetas, allTags, stats: s, nStatic, nWorkers } = await fullBuild();
   const ms = Math.round(performance.now() - t0);
   console.log(
     `build.ts: ${metas.length} articles + ${diaryMetas.length} diary + index + ${allTags.length} tags ` +
-    `+ ${nStatic} static via ${n} workers -> ${OUT}/ in ${ms}ms`,
+    `+ ${nStatic} static via ${nWorkers} workers -> ${OUT}/ in ${ms}ms`,
   );
   console.log(
     `  bake: code ${s.nPlain} fast + ${s.nDom} dom, ${s.nUnknown} unknown, ${s.nHlError} failed | ` +
@@ -197,4 +216,6 @@ async function main() {
   }
 }
 
-await main();
+// Only run the CLI build when invoked directly (`bun build.ts`); when imported
+// (e.g. by watch.ts) just expose fullBuild + helpers without building.
+if (import.meta.main) await main();

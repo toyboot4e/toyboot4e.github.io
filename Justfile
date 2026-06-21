@@ -122,14 +122,12 @@ alias ao := audit-open
 audit-ai page="index.html": (audit page)
     bun scripts/audit-summary.ts {{lh_report}}.report.json
 
-# watch source files and run the (fast bun) `build` on change. The bun build is
-# release-only (no draft/ support); use `just build-emacs --draft` for drafts.
+# warm watch daemon: one full build at startup, then keep the render+bake
+# machinery resident and rebuild ONLY the changed file on each save (~10-50ms vs
+# ~1.5s for a full build). Release-only (no draft/ support); use
+# `just build-emacs --draft` for drafts. Run `just serve` alongside to preview.
 watch:
-    #!/usr/bin/env bash
-    echo "start watching.."
-    exts="org,css,scss,ts,js,webp,png,jpg,jpeg,gif,svg"
-    ig=(--ignore 'index.org' --ignore '**/tags/**' --ignore '**/ltximg/**' --ignore '**/*.min.css' --ignore '**/*.min.js')
-    watchexec -e "$exts" -w src "${ig[@]}" "just build"
+    bun watch.ts
 
 [private]
 alias w := watch
