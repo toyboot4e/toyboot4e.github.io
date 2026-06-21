@@ -83,7 +83,7 @@ function renderCard(url) {
 // Discover every article from the generated sitemap, then render its card.
 fetch('/index.html').then(r => r.text()).then(text => {
   const doc = new DOMParser().parseFromString(text, 'text/html');
-  const urls = [...doc.querySelectorAll('a.article-card-link')].map(a => a.getAttribute('href'));
+  const urls = [...doc.querySelectorAll('a[data-article-card]')].map(a => a.getAttribute('href'));
   if (!urls.length) { root.textContent = 'No articles found in /index.html.'; return; }
   urls.forEach(renderCard);
 }).catch(() => { root.textContent = 'Failed to load /index.html.'; });

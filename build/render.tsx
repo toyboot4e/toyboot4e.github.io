@@ -515,7 +515,10 @@ function articleCard(m: Meta, eager: boolean): Raw {
   return (
     <div class={card.articleCard}>
       <div class={card.articleCardBody}>
-        <div><a href={m.href} class={card.articleCardLink}>{raw(m.titleHtml)}</a></div>
+        {/* data-article-card: a STABLE hook for tooling (og-preview.html scrapes
+            the article list from index.html). The CSS-module class is content-
+            hashed, so it can't be relied on. */}
+        <div><a href={m.href} data-article-card class={card.articleCardLink}>{raw(m.titleHtml)}</a></div>
         <div class={card.articleCardMeta}>
           <date>{m.date}</date>
           <span class="org-tag-list">{tagListHtml(m.tags)}</span>
