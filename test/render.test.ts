@@ -150,6 +150,18 @@ test("YARUO/AA: verbatim <pre>, org markup NOT parsed", async () => {
   expect(out).not.toContain("<sub>"); // _人_ stays literal, not a subscript
 });
 
+test("math: $$...$$ / \\[...\\] render as centered display, $...$ stays inline", async () => {
+  const out = await bake("m.org", "$$\na=b\n$$\n\ninline $x$ here\n\n\\[ y=2 \\]\n");
+  // uniorg-rehype renders every latex-fragment as math-inline; our handler
+  // upgrades $$ and \[ to display so KaTeX emits a centered .katex-display.
+  expect((out.match(/katex-display/g) || []).length).toBe(2); // $$ and \[ , not $x$
+});
+
+test("DETAILS summary: org markup is converted to HTML", async () => {
+  const out = await bake("d.org", "#+BEGIN_DETAILS =code= and *bold*\nhidden\n#+END_DETAILS\n");
+  expect(out).toContain('<summary><code class="inline-verbatim">code</code> and <strong>bold</strong></summary>');
+});
+
 test("diff blocks get the diff-highlight class (for +/- line backgrounds)", async () => {
   const out = await bake("d.org", "#+BEGIN_SRC diff\n- a\n+ b\n#+END_SRC\n");
   expect(out).toMatch(/<code class="src language-diff diff-highlight">/);

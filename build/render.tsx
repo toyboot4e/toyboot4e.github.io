@@ -163,13 +163,27 @@ function makeHandlers(st: RenderState) {
       if (!capHtml) return table;
       return captionedFigure(this, st, org, [table], "table", [{ type: "raw", value: capHtml }]);
     },
+    // uniorg-rehype renders EVERY latex-fragment as `span.math.math-inline`, so
+    // `$$...$$` and `\[...\]` (display delimiters) never get display mode and end
+    // up left-aligned inline -- only `\begin{}` environments (latex-environment)
+    // become centered `math-display`. Mirror the default handler but pick the
+    // class from the delimiter, so rehype-katex renders display math centered.
+    "latex-fragment": function (this: any, org: any) {
+      const v = String(org.value ?? "");
+      const display = v.startsWith("$$") || v.startsWith("\\[");
+      const cls = display ? ["math", "math-display"] : ["math", "math-inline"];
+      return this.h(org, "span", { className: cls }, [{ type: "text", value: String(org.contents ?? "").trim() }]);
+    },
     "special-block": function (this: any, org: any) {
       const t = (org.blockType || "").toUpperCase();
       const kids = this.toHast(org.children, org);
       if (t === "DETAILS") {
+        // `st.details` holds summaries already converted org->HTML (`=code=`,
+        // `*bold*`, `$math$`, ...), pre-rendered async in renderArticle since
+        // this handler is sync; insert as raw so the markup isn't escaped.
         const summary = st.details.shift() ?? "詳細";
         return this.h(org, "details", {}, [
-          this.h(org, "summary", {}, [{ type: "text", value: summary }]),
+          this.h(org, "summary", {}, [{ type: "raw", value: summary }]),
           ...kids,
         ]);
       }
@@ -544,7 +558,8 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
   );
   const st: RenderState = {
     source: text,
-    details: detailsSummaries(text),
+    // org markup in each `#+BEGIN_DETAILS <summary>` -> HTML (the handler is sync)
+    details: await Promise.all(detailsSummaries(text).map((s) => orgInlineToHtml(s))),
     blockCounter: { n: 0 },
     tableCaps,
     tableCounter: { n: 0 },
