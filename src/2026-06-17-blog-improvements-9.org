@@ -1,14 +1,14 @@
 #+TITLE: =org-mode= 製ブログの改良 (9): 最適化、リンクカード他
 #+DATE: <2026-06-17 Mon>
 #+FILETAGS: :blog:
-#+THUMBNAIL: img/2026-06-17-lighthouse-thumbnail.png
+#+THUMBNAIL: img/2026-06-17-lighthouse-thumbnail.webp
 
 * 背景
 
 前回の投稿でサムネイルを表示し、重くなったブログを高速化しました。概ね AI エージェントがやってくれました。
 
 #+CAPTION: [[https://developer.chrome.com/docs/lighthouse/overview][Lighthouse]] の結果
-[[./img/2026-06-17-lighthouse.png]]
+[[./img/2026-06-17-lighthouse.webp]]
 
 しかも積んでいたタスクが一気に片付けられてしまいました。 AI の偉大な進捗をメモしておきます。
 
@@ -83,19 +83,19 @@ const itIs = this; // (ref:1)
 devtool や Lighthouse にも指摘されていた =favicon.ico= を設定しました。ブラウザタブでの視認性が良くなったと思います。
 
 #+CAPTION: ブラウザタブにおける =favicon.ico=
-[[./img/2026-06-17-favicon.png]]
+[[./img/2026-06-17-favicon.webp]]
 
 *** ヘッダ
 
 元は [[https://simplecss.org/][Simple.css]] の慣例通り、ヘッダ内にタイトルを入れていました:
 
 #+CAPTION: 変更前
-[[./img/2026-06-17-header-prev.png]]
+[[./img/2026-06-17-header-prev.webp]]
 
 Sticky header の方が操作性が良いため、レイアウトを変更しました:
 
 #+CAPTION: 変更後
-[[./img/2026-06-17-header-now.png]]
+[[./img/2026-06-17-header-now.webp]]
 
 タイトルの感じは [[https://mizunashi-mana.github.io/blog/][続くといいな日記]] を参考にしました。『記事』っぽくて良いのではないでしょうか。
 
