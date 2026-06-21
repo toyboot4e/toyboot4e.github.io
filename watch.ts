@@ -19,7 +19,7 @@
 //
 // renderAndBake (the warm path) is imported at module load, so bake.ts's heavy
 // Prism/happy-dom setup is done once and stays warm for every incremental save.
-import { watch } from "node:fs";
+import { watch, readFileSync, unlinkSync } from "node:fs";
 import { mkdir, writeFile, rm, cp, readdir } from "node:fs/promises";
 import { join, dirname, sep } from "node:path";
 import { renderAndBake } from "./build/render-bake.ts";
@@ -79,9 +79,13 @@ async function onOrg(relOrg: string): Promise<void> {
 }
 
 // --- one static-file change --------------------------------------------------
+// The only child PROCESS the daemon spawns (worker_threads are threads, not
+// processes, so they can't be orphaned/zombied -- they die with us). Tracked so
+// shutdown() can reap it if we're killed mid-rebuild.
+let assetChild: ReturnType<typeof Bun.spawn> | null = null;
 async function runAssets(): Promise<void> {
-  const p = Bun.spawn(["bun", "scripts/build-assets.ts"], { stdout: "ignore", stderr: "inherit" });
-  await p.exited;
+  assetChild = Bun.spawn(["bun", "scripts/build-assets.ts"], { stdout: "ignore", stderr: "inherit" });
+  try { await assetChild.exited; } finally { assetChild = null; }
 }
 async function copyStyleAssets(): Promise<void> {
   const dir = join(SRC, "style");
@@ -131,6 +135,25 @@ function schedule(relPath: string): void {
   }, 40));
 }
 
+// --- single instance --------------------------------------------------------
+// A daemon orphaned by a backgrounded run whose pane was closed (bash doesn't
+// SIGHUP background jobs) would keep watching and writing out/. Make `just watch`
+// a singleton: on start, replace any prior instance recorded in .watch.pid, so
+// daemons never stack up. The /proc cmdline check avoids killing an unrelated
+// process that happens to have reused the PID (Linux; degrades to a no-op).
+const PID_FILE = ".watch.pid";
+function isWatchDaemon(pid: number): boolean {
+  try { return readFileSync(`/proc/${pid}/cmdline`, "utf8").includes("watch.ts"); } catch { return false; }
+}
+try {
+  const old = Number(readFileSync(PID_FILE, "utf8"));
+  if (old && old !== process.pid && isWatchDaemon(old)) {
+    process.kill(old, "SIGTERM");
+    console.log(`  replaced a stale watch daemon (pid ${old})`);
+  }
+} catch { /* no prior daemon */ }
+await Bun.write(PID_FILE, String(process.pid));
+
 // --- startup: one full build, seed the cache, then watch ---------------------
 console.log("warm watch: building once (render+bake stays resident)…");
 const t0 = performance.now();
@@ -141,4 +164,19 @@ console.log(`  ready in ${since(t0)}; watching ${SRC}/ — incremental saves reb
 const watcher = watch(SRC, { recursive: true }, (_event, filename) => {
   if (filename) schedule(typeof filename === "string" ? filename : filename.toString());
 });
-process.on("SIGINT", () => { watcher.close(); console.log("\nwarm watch: stopped."); process.exit(0); });
+
+// Clean teardown on EVERY termination signal we can catch -- Ctrl-C (SIGINT),
+// `kill` (SIGTERM), and tmux pane/window close (SIGHUP) -- so we close the
+// watcher, reap an in-flight asset rebuild, and drop the PID file. (SIGKILL is
+// uncatchable, but the OS reclaims our threads + the awaited child anyway.)
+let stopping = false;
+function shutdown(sig: string): void {
+  if (stopping) return;
+  stopping = true;
+  try { watcher.close(); } catch { /* already closed */ }
+  if (assetChild) { try { assetChild.kill(); } catch { /* already exited */ } }
+  try { unlinkSync(PID_FILE); } catch { /* already gone */ }
+  console.log(`\nwarm watch: stopped (${sig}).`);
+  process.exit(0);
+}
+for (const sig of ["SIGINT", "SIGTERM", "SIGHUP"] as const) process.on(sig, () => shutdown(sig));

@@ -25,3 +25,6 @@ ltximg
 
 # Emacs reference-build output (just build-emacs)
 out-emacs/
+
+# warm watch daemon singleton pid file
+.watch.pid
