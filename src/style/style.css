@@ -342,6 +342,10 @@ blockquote > p:first-child {
    left-aligned. Center those too, so images are centered by default like Emacs. */
 #content p:has(> img:only-child) {
   text-align: center;
+  /* `#content p` has `text-indent: 1em`; on a full-width image (max-width:100%)
+     that 1em pushes it past the content width. Reset it here -- `p > *
+     {text-indent:0}` doesn't undo a block's first-line indent. */
+  text-indent: 0;
 }
 
 div.WARNING {
