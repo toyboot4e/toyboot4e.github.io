@@ -22,7 +22,7 @@
 
 ** Uniorg
 
-ビルドに Emacs を使うのをやめ、 TypeScript 製の org パーサである [[https://github.com/rasendubi/uniorg][Uniorg]] に移行しました。 macs の起動を待つ必要が無くなったため、ビルドを高速化できました。
+ビルドに Emacs を使うのをやめ、 TypeScript 製の org パーサである [[https://github.com/rasendubi/uniorg][Uniorg]] に移行しました。 Emacs の起動を待つ必要が無くなったため、ビルドを高速化できました。
 
 一点のみ [[https://github.com/rasendubi/uniorg/pull/153][PR]] を送りましたが、 battle-tested なパーサだったように思います。 Regex のコンパイルはキャッシュした方が良いかも。
 
