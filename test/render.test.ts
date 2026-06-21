@@ -177,6 +177,22 @@ test("card: [[card:URL]] -> link-card placeholder (URL with :// kept intact)", a
   expect(html).toContain('<a class="link-card" data-link-card="" href="https://example.com/a?b=1">');
 });
 
+test("preserve-breaks: soft newline -> <br>, but not against a block boundary", async () => {
+  // build.el sets org-export-preserve-breaks t: soft newlines in prose/list
+  // items become <br>. The newline before a nested block (here the sub-list) is
+  // structural and must NOT become a <br>.
+  const out = await bake("b.org", "para X\npara Y\n\n- A\n  B\n\n- top\n  - nested\n");
+  expect(out).toContain("<p>para X<br>para Y</p>"); // paragraph soft break
+  expect(out).toContain("<li>A<br>B</li>");         // list-item continuation
+  expect(out).toContain("<li>top<ul><li>nested</li></ul></li>"); // no <br> before nested <ul>
+  expect(out).not.toContain("<br><ul>");
+});
+
+test("preserve-breaks: code-block newlines stay literal (no <br>)", async () => {
+  const out = await bake("b.org", "#+BEGIN_SRC bash\nx\ny\n#+END_SRC\n");
+  expect(out).not.toContain("<br>");
+});
+
 test("internal .org link -> .html", async () => {
   const out = await bake("l.org", "see [[./other.org][other]]\n");
   expect(out).toContain('<a href="./other.html">other</a>');

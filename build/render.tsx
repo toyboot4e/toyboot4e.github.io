@@ -360,6 +360,61 @@ function headingSelfLinks() {
   };
 }
 
+// build.el sets `org-export-preserve-breaks t`: every soft newline inside a
+// paragraph / list item / quote becomes a <br> (an explicit `\\` already does,
+// via uniorg's line-break node). uniorg leaves soft newlines as literal text, so
+// HTML would collapse them to a space; convert them here to match Emacs. A
+// newline (with surrounding horizontal whitespace, like a list item's
+// continuation indent) -> <br>. The trailing newline that terminates a block is
+// dropped (no trailing <br>). Skips code/verbatim and math: <pre>/<code> keep
+// their newlines literally, and a text node still carrying \(/\[/\begin{ is raw
+// math the bake step renders -- splitting it would break the TeX.
+function preserveLineBreaks() {
+  const SKIP_TAGS = new Set(["pre", "code", "script", "style", "textarea"]);
+  // Block-level neighbours: a newline butting against one of these (or a block
+  // boundary) is structural layout, not a line break -- e.g. the newline between
+  // a list item's text and its nested <ul>, or a paragraph's terminator.
+  const BLOCK = new Set([
+    "p", "ul", "ol", "li", "table", "thead", "tbody", "tr", "td", "th", "blockquote",
+    "div", "pre", "figure", "figcaption", "h1", "h2", "h3", "h4", "h5", "h6",
+    "details", "summary", "hr", "section", "dl", "dt", "dd",
+  ]);
+  const MATH_DELIM = /\\\(|\\\[|\\begin\{/;
+  const isMathEl = (n: any): boolean => {
+    const c = n.properties?.className;
+    const arr = Array.isArray(c) ? c : c ? [c] : [];
+    return arr.some((x: any) => typeof x === "string" && (x.includes("math") || x.includes("katex")));
+  };
+  const atBlock = (sib: any): boolean => !sib || (sib.type === "element" && BLOCK.has(sib.tagName));
+  return (tree: any) => {
+    const walk = (node: any, skip: boolean) => {
+      const kids = node.children;
+      if (!kids) return;
+      const childSkip = skip || (node.type === "element" && (SKIP_TAGS.has(node.tagName) || isMathEl(node)));
+      const out: any[] = [];
+      kids.forEach((child: any, idx: number) => {
+        if (!childSkip && child.type === "text" && child.value.includes("\n") && !MATH_DELIM.test(child.value)) {
+          const parts = child.value.split(/[ \t]*\n[ \t]*/);
+          // a newline adjacent to a block element (or a block boundary) is
+          // structural, not a <br>: drop the empty leading/trailing segment it
+          // produced so no spurious break is emitted there.
+          if (atBlock(kids[idx + 1])) while (parts.length > 1 && parts[parts.length - 1] === "") parts.pop();
+          if (atBlock(kids[idx - 1])) while (parts.length > 1 && parts[0] === "") parts.shift();
+          parts.forEach((p: string, i: number) => {
+            if (i > 0) out.push({ type: "element", tagName: "br", properties: {}, children: [] });
+            if (p) out.push({ type: "text", value: p });
+          });
+        } else {
+          if (child.type === "element") walk(child, childSkip);
+          out.push(child);
+        }
+      });
+      node.children = out;
+    };
+    walk(tree, false);
+  };
+}
+
 async function orgToBody(src: string, st: RenderState): Promise<string> {
   const file = await unified()
     .use(parse, PARSE_OPTS)
@@ -370,6 +425,9 @@ async function orgToBody(src: string, st: RenderState): Promise<string> {
     // uniorg emits math as <span class="math math-inline|display">; render it
     // here (the bake step only matches \(...\) delimiters, which uniorg consumes).
     .use(rehypeKatex, { throwOnError: false, strict: false })
+    // preserve-breaks AFTER katex, so display-math TeX (which can contain
+    // newlines) is already rendered and won't be split.
+    .use(preserveLineBreaks)
     .use(stringify, { allowDangerousHtml: true, closeSelfClosing: true })
     .process(src);
   return String(file);
