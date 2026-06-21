@@ -6,6 +6,7 @@
 // `just build-emacs`) is the byte-for-byte reference this mirrors. See build.ts.
 import { unified } from "unified";
 import parse from "uniorg-parse";
+import { defaultOptions } from "uniorg-parse/lib/parse-options.js";
 import uniorg2rehype from "uniorg-rehype";
 import rehypeKatex from "rehype-katex";
 import stringify from "rehype-stringify";
@@ -16,6 +17,14 @@ import { h, Fragment, raw, render, type Raw } from "./html.ts";
 import { card } from "./styles/generated.js";
 
 export const SITE_URL = "https://toyboot4e.github.io/";
+
+// Register `card` as a custom Org link type (build.el does the same via
+// `org-link-set-parameters`). uniorg-parse@3.2.2 (rasendubi/uniorg#153) anchored
+// link-type detection to the start of the link, so EXTENDING the default
+// linkTypes list makes `[[card:URL]]` parse as `linkType:"card"` with the `card:`
+// prefix stripped from `path`. Before the fix the type was mis-detected (the
+// `https://` inside matched), so we had to sniff the raw link string instead.
+const PARSE_OPTS = { linkTypes: [...defaultOptions.linkTypes, "card"] };
 
 // --- static chrome (lifted verbatim from the canonical build) --------------
 const HEADER = `<header role="banner"><nav role="navigation"><a href="/index.html"><svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg><span class="nav-label">Home</span></a><a href="https://atcoder.jp/users/toyboot4e"><svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" /><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" /><path d="M18 9h1.5a1 1 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" /><path d="M6 9H4.5a1 1 0 0 1 0-5H6" /></svg><span class="nav-label">AtCoder</span></a><a href="https://github.com/toyboot4e"><svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6a9 9 0 0 0-9 9V3" /><circle cx="18" cy="6" r="3" /><circle cx="6" cy="18" r="3" /></svg><span class="nav-label">GitHub</span></a><a href="https://qiita.com/toyboot4e"><svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18h-5" /><path d="M18 14h-8" /><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2" /><rect width="8" height="4" x="10" y="6" rx="1" /></svg><span class="nav-label">Qiita</span></a><a href="https://zenn.dev/toyboot4e"><svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14" /><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></svg><span class="nav-label">Zenn</span></a><button id="theme-toggle" onclick="toggleTheme()" title="テーマ切替" aria-label="Toggle theme"></button><button id="disco-toggle" onclick="window.toggleDisco && toggleDisco()" aria-pressed="true" title="ディスコボール切替" aria-label="Toggle disco ball"></button></nav></header>`;
@@ -254,14 +263,11 @@ function makeHandlers(st: RenderState) {
     link: function (this: any, org: any) {
       const raw: string = org.rawLink || "";
       const kids = this.toHast(org.children, org);
-      // `card:` is a custom Org link type (build.el registers it via
-      // `org-link-set-parameters`). uniorg's analog is its `linkTypes` parse
-      // option, but uniorg-parse@3.2.1 doesn't export `defaultOptions`, and the
-      // option replaces (not extends) the default list -- so we'd break https/
-      // mailto/etc. We match on `rawLink` instead, which is robust.
-      // [[card:URL]] -> placeholder the bake pass fills from the cache
-      if (raw.startsWith("card:")) {
-        const url = raw.slice("card:".length);
+      // [[card:URL]] -> placeholder the bake pass fills from the cache. `card` is
+      // registered in PARSE_OPTS.linkTypes, so the parser hands us linkType
+      // "card" with the prefix already stripped from `path`.
+      if (org.linkType === "card") {
+        const url = org.path;
         return this.h(org, "a", { className: ["link-card"], "data-link-card": "", href: url }, [
           { type: "text", value: url },
         ]);
@@ -356,7 +362,7 @@ function headingSelfLinks() {
 
 async function orgToBody(src: string, st: RenderState): Promise<string> {
   const file = await unified()
-    .use(parse)
+    .use(parse, PARSE_OPTS)
     .use(uniorg2rehype, { handlers: makeHandlers(st) })
     .use(liftMediaAttrs)
     .use(demoteHeadings)

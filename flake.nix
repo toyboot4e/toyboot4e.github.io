@@ -32,7 +32,7 @@
               in
               b == "package.json" || b == "package-lock.json";
           };
-          npmDepsHash = "sha256-KZAn5QP/3r0g8wG6cth4pfRn074yeGvTjC+wiQXIZEM=";
+          npmDepsHash = "sha256-6l11TeQ9GtVCmzv6oyAnXvQARutkyf1vA3XuCmtPdBE=";
           dontNpmBuild = true;
           # We only want node_modules, not a packaged/installed app.
           installPhase = ''

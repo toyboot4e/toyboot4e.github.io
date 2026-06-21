@@ -11,7 +11,7 @@
     "rehype-katex": "^7.0.1",
     "rehype-stringify": "^10.0.1",
     "unified": "^11.0.5",
-    "uniorg-parse": "^3.2.1",
+    "uniorg-parse": "^3.2.2",
     "uniorg-rehype": "^2.2.0"
   }
 }

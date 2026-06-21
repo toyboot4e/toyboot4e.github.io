@@ -13,7 +13,7 @@ import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parseHTML } from "linkedom";
 import { renderAndBake } from "../build/render-bake.ts";
-import { buildIndexHtml, buildTagHtml, type Meta } from "../build/render.tsx";
+import { buildIndexHtml, buildTagHtml, renderArticle, type Meta } from "../build/render.tsx";
 
 const FIX = join(import.meta.dir, "fixtures");
 const GOLD = join(import.meta.dir, "golden");
@@ -165,6 +165,16 @@ test("DETAILS summary: org markup is converted to HTML", async () => {
 test("diff blocks get the diff-highlight class (for +/- line backgrounds)", async () => {
   const out = await bake("d.org", "#+BEGIN_SRC diff\n- a\n+ b\n#+END_SRC\n");
   expect(out).toMatch(/<code class="src language-diff diff-highlight">/);
+});
+
+test("card: [[card:URL]] -> link-card placeholder (URL with :// kept intact)", async () => {
+  // `card` is registered in linkTypes (uniorg-parse@3.2.2 anchored type
+  // detection), so the `https://` inside no longer hijacks the link type. Test
+  // the RENDER placeholder (the bake step would degrade an uncached URL to a
+  // plain link) -- the point is the `card:` URL parses to linkType "card" with
+  // the full URL intact.
+  const { html } = await renderArticle("c.org", "[[card:https://example.com/a?b=1]]\n");
+  expect(html).toContain('<a class="link-card" data-link-card="" href="https://example.com/a?b=1">');
 });
 
 test("internal .org link -> .html", async () => {
