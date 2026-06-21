@@ -216,6 +216,10 @@ function makeHandlers(st: RenderState) {
       // class="src language-XX" matches what the bake/Prism step expects; omit
       // the language- class for an unlabelled block so it isn't flagged unknown.
       const cls = lang ? ["src", `language-${lang}`] : ["src"];
+      // `diff`/`diff-XX` blocks need the `diff-highlight` class for the per-line
+      // +/- background CSS (`pre>code.diff-highlight .token.inserted:not(.prefix)`)
+      // to apply; Prism already emits the inserted/deleted tokens.
+      if (lang === "diff" || lang.startsWith("diff-")) cls.push("diff-highlight");
       const pre = this.h(org, "pre", {}, [this.h(org, "code", { className: cls }, codeChildren)]);
       const cap = org.affiliated?.CAPTION?.[0];
       return cap ? captionedFigure(this, st, org, [pre], "listing", captionHast(this, cap)) : pre;

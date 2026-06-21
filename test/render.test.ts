@@ -122,6 +122,11 @@ test("YARUO/AA: verbatim <pre>, org markup NOT parsed", async () => {
   expect(out).not.toContain("<sub>"); // _人_ stays literal, not a subscript
 });
 
+test("diff blocks get the diff-highlight class (for +/- line backgrounds)", async () => {
+  const out = await bake("d.org", "#+BEGIN_SRC diff\n- a\n+ b\n#+END_SRC\n");
+  expect(out).toMatch(/<code class="src language-diff diff-highlight">/);
+});
+
 test("internal .org link -> .html", async () => {
   const out = await bake("l.org", "see [[./other.org][other]]\n");
   expect(out).toContain('<a href="./other.html">other</a>');
