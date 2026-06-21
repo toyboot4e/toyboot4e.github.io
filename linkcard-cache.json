@@ -1,8 +1,8 @@
 {
   "https://github.com/toyboot4e/toyboot4e.github.io": {
-    "title": "GitHub - toyboot4e/toyboot4e.github.io: My devlog generated with `org-publish` and custom functions",
-    "description": "My devlog generated with `org-publish` and custom functions - toyboot4e/toyboot4e.github.io",
-    "image": "https://opengraph.githubassets.com/bde17ec1041c2ffea129a264715e2ab1a24e170fa4c23cd9deb4673d5cef9339/toyboot4e/toyboot4e.github.io",
+    "title": "GitHub - toyboot4e/toyboot4e.github.io: My devlog based on Org files",
+    "description": "My devlog based on Org files. Contribute to toyboot4e/toyboot4e.github.io development by creating an account on GitHub.",
+    "image": "https://opengraph.githubassets.com/d7383f5b25d75728efa728e10970385a7e9c5156f2a1d7dc091213beba5740a3/toyboot4e/toyboot4e.github.io",
     "siteName": "GitHub",
     "favicon": "https://github.githubassets.com/favicons/favicon.svg"
   },
