@@ -105,39 +105,18 @@ function captionWrap(ctx: any, org: any, node: any): any {
   return ctx.h(org, "figure", {}, [node, ctx.h(org, "figcaption", {}, captionHast(ctx, cap))]);
 }
 
-// Parse an org `#+ATTR_HTML` plist (`[":width 75%", ":height 10"]`) into hast
-// properties. Emacs applies these verbatim as element attributes.
-function parseAttrHtml(arr: string[]): Record<string, string> {
-  const props: Record<string, string> = {};
-  const toks = arr.join(" ").trim().split(/\s+/).filter(Boolean);
-  for (let i = 0; i < toks.length; i++) {
-    if (toks[i].startsWith(":")) {
-      props[toks[i].slice(1)] = toks[i + 1] && !toks[i + 1].startsWith(":") ? toks[++i] : "";
-    }
-  }
-  return props;
-}
-
 // --- custom uniorg2rehype handlers (use `this.toHast` / `this.h`) -----------
 function makeHandlers(st: RenderState) {
   return {
-    // Paragraphs carrying `#+CAPTION` and/or `#+ATTR_HTML` (usually around a lone
-    // image): apply the ATTR_HTML attributes to the image and, when captioned,
-    // wrap in <figure>. Plain paragraphs fall through to uniorg's default <p>.
+    // A captioned paragraph (usually a lone image) -> <figure> with the caption.
+    // `#+ATTR_HTML` width is handled by uniorg-rehype + `liftMediaAttrs` (which
+    // moves it onto the <img>), so it isn't touched here. Plain paragraphs fall
+    // through to uniorg's default <p>.
     paragraph: function (this: any, org: any) {
       const cap = org.affiliated?.CAPTION?.[0];
-      const attr = org.affiliated?.ATTR_HTML;
-      if (!cap && !attr) return undefined;
+      if (!cap) return undefined;
       const kids = this.toHast(org.children, org)
         .filter((n: any) => !(n.type === "text" && !String(n.value).trim()));
-      if (attr) {
-        // uniorg drops #+ATTR_HTML -> images lose their authored width and render
-        // full-size. Apply it to the (first) img, matching Emacs.
-        const props = parseAttrHtml(attr);
-        const img = kids.find((k: any) => k.tagName === "img");
-        if (img) img.properties = { ...img.properties, ...props };
-      }
-      if (!cap) return this.h(org, "p", {}, kids); // ATTR-only: keep the <p>
       const onlyImg = kids.length === 1 && kids[0].tagName === "img";
       const inner = onlyImg ? kids : [this.h(org, "p", {}, kids)];
       return this.h(org, "figure", {}, [...inner, this.h(org, "figcaption", {}, captionHast(this, cap))]);
@@ -264,6 +243,35 @@ function makeHandlers(st: RenderState) {
   };
 }
 
+// Move a `width`/`height` attribute off a <p>/<figure> onto the <img> inside it.
+// uniorg-rehype proxies `#+ATTR_HTML` to the image only when it's the paragraph's
+// *sole* child, but a paragraph keeps a trailing "\n" text node, so the width
+// lands on the CONTAINER instead -- sizing the <p>/<figure> wider than the text
+// column (the image then fills it and overflows). On the <img> it's capped by
+// `img { max-width: 100% }`. Matches Emacs, which puts the width on the <img>.
+function liftMediaAttrs() {
+  const findImg = (n: any): any =>
+    n.tagName === "img" ? n : (n.children || []).map(findImg).find(Boolean);
+  return (tree: any) => {
+    const walk = (n: any) => {
+      if ((n.tagName === "p" || n.tagName === "figure") && n.properties) {
+        if (n.properties.width != null || n.properties.height != null) {
+          const img = findImg(n);
+          if (img) {
+            img.properties = img.properties || {};
+            for (const k of ["width", "height"]) {
+              if (n.properties[k] != null && img.properties[k] == null) img.properties[k] = n.properties[k];
+              delete n.properties[k];
+            }
+          }
+        }
+      }
+      (n.children || []).forEach(walk);
+    };
+    walk(tree);
+  };
+}
+
 // org headlines render h1.. but the page <h1> is the title-block; demote by one.
 function demoteHeadings() {
   return (tree: any) => {
@@ -298,6 +306,7 @@ async function orgToBody(src: string, st: RenderState): Promise<string> {
   const file = await unified()
     .use(parse)
     .use(uniorg2rehype, { handlers: makeHandlers(st) })
+    .use(liftMediaAttrs)
     .use(demoteHeadings)
     .use(headingSelfLinks)
     // uniorg emits math as <span class="math math-inline|display">; render it
