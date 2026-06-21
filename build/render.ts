@@ -380,7 +380,9 @@ function page(opts: {
   return (
     `<!DOCTYPE html><html lang="ja"${cls}>${opts.head}` +
     `<body>${DISCO_BODY}${HEADER}` +
-    `<main role="main" id="main">${opts.titleBlock}<div id="content">${opts.content}</div></main>` +
+    // <nav id="toc"> is the tocbot mount point (filled client-side from the
+    // headings); without it the tocbot init in TAIL has nothing to populate.
+    `<main role="main" id="main">${opts.titleBlock}<div id="content">${opts.content}</div><nav id="toc"></nav></main>` +
     `${FOOTER}${TAIL}</body></html>`
   );
 }
