@@ -1,0 +1,13 @@
+#+TITLE: =org-mode= 製の *blog* と /italic/ と $\TeX{}$
+#+DATE: <2025-10-05 Sun>
+#+FILETAGS: :tools:nix:
+#+THUMBNAIL: img/2023-03-terminal.webp
+#+DESCRIPTION: A fixture exercising title markup, thumbnail and tags.
+
+最初の段落。 =verbatim= と ~code~ と [[https://example.com][リンク]] を含む。
+
+* 見出し 1
+本文。
+
+** 子見出し
+入れ子の本文。

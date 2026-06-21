@@ -1,0 +1,17 @@
+#+TITLE: Math forms
+#+DATE: <2025-08-01 Fri>
+
+インライン org 数式 $O(N \log M)$ と、二乗 $x^2 + y^2 = z^2$ 。
+
+ディスプレイ数式:
+
+\[
+\sum_{i=1}^{n} i = \frac{n(n+1)}{2}
+\]
+
+環境付き:
+
+\begin{align}
+a &= b + c \\
+d &= e - f
+\end{align}

@@ -1,0 +1,28 @@
+#+TITLE: Code and coderefs
+#+DATE: <2025-09-01 Mon>
+#+FILETAGS: :haskell:
+
+プレーンなブロック:
+
+#+BEGIN_SRC bash
+echo "hello"
+ls -la
+#+END_SRC
+
+coderef 付きブロック（ =(ref:n)= が元の位置に残る）:
+
+#+BEGIN_SRC haskell
+main :: IO ()
+main = do
+  print "A"  -- (ref:a)
+  print "B"  -- (ref:b)
+#+END_SRC
+
+本文から [[(a)]] と [[(b)]] へジャンプできる。
+
+diff ブロック:
+
+#+BEGIN_SRC diff
+- old line
++ new line
+#+END_SRC

@@ -1,0 +1,26 @@
+#+TITLE: Custom blocks and links
+#+DATE: <2025-06-01 Sun>
+#+FILETAGS: :misc:
+
+#+BEGIN_DETAILS クリックして展開
+折りたたまれた中身。
+#+END_DETAILS
+
+#+BEGIN_YARUO
+やる夫のセリフ。
+#+END_YARUO
+
+#+BEGIN_STENO
+TKPW
+#+END_STENO
+
+リスト:
+- 項目 1
+- 項目 2
+  - 入れ子
+
+内部リンク [[./code-coderef.org][コードの記事]] と外部リンク [[https://example.com]] 。
+
+| 列 A | 列 B |
+|------+------|
+| 1    | 2    |

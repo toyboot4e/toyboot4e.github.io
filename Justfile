@@ -45,6 +45,19 @@ clean:
     # force a full rebuild of the Emacs reference build next time:
     rm -rf .org-timestamps
 
+# run the golden tests (render+bake output pinned against test/golden/).
+# regenerate goldens after an intentional output change: `just test-update`
+test:
+    bun test test/
+
+[private]
+alias t := test
+
+# regenerate golden files, then show the diff to review
+test-update:
+    UPDATE_GOLDEN=1 bun test test/
+    git -c core.pager=cat diff --stat test/golden/
+
 [private]
 alias c := clean
 

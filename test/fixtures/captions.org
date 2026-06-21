@@ -1,0 +1,22 @@
+#+TITLE: Captions
+#+DATE: <2025-07-01 Tue>
+
+キャプション付き画像:
+
+#+CAPTION: [[https://example.com][Lighthouse]] の結果
+[[./img/2023-03-terminal.webp]]
+
+キャプション付きソースブロック:
+
+#+CAPTION: =cabal.project= の設定
+#+BEGIN_SRC yaml
+packages: .
+#+END_SRC
+
+キャプション付きテーブル（インライン数式 $N - P + 1$ 入り）:
+
+#+CAPTION: 体感 Diff $N - P + 1$
+| 問題 | 難易度 |
+|------+--------|
+| A    | 易     |
+| B    | 難     |
