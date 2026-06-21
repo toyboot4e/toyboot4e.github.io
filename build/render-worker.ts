@@ -9,9 +9,9 @@
 import { parentPort, workerData } from "node:worker_threads";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join, dirname } from "node:path";
-import { parseHTML } from "linkedom";
-import { renderArticle, type Meta } from "./render.ts";
-import { bakeDocument, getStats, stamp } from "./bake.ts";
+import { type Meta } from "./render.ts";
+import { getStats } from "./bake.ts";
+import { renderAndBake } from "./render-bake.ts";
 
 type In = { files: string[]; srcDir: string; outDir: string };
 type OutMeta = { rel: string; isDiary: boolean; meta: Meta };
@@ -33,20 +33,16 @@ async function ensureDir(d: string): Promise<void> {
 
 const results: OutMeta[] = [];
 for (const relOrg of files) {
-  let a = performance.now();
+  const a = performance.now();
   const text = await Bun.file(join(srcDir, relOrg)).text();
-  const r = await renderArticle(relOrg, text);
-  tRender += performance.now() - a;
+  const r = await renderAndBake(relOrg, text);
+  tRender += performance.now() - a; // render+bake lumped (split lives in render-bake)
   if (r.draft) continue; // release build: skip drafts (no file, not indexed)
-  a = performance.now();
-  const { document } = parseHTML(r.html);
-  bakeDocument(document);
-  tBake += performance.now() - a;
-  a = performance.now();
+  const b = performance.now();
   const dest = join(outDir, r.rel);
   await ensureDir(dirname(dest));
-  await writeFile(dest, stamp(document.toString()));
-  tIo += performance.now() - a;
+  await writeFile(dest, r.out);
+  tIo += performance.now() - b;
   results.push({ rel: r.rel, isDiary: r.isDiary, meta: r.meta });
 }
 

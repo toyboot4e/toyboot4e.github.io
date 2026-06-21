@@ -41,10 +41,36 @@ function detailsSummaries(text: string): string[] {
   return [...text.matchAll(/^[ \t]*#\+BEGIN_DETAILS[ \t]+(.+?)[ \t]*$/gim)].map((m) => m[1]);
 }
 
+// uniorg-parse does NOT attach affiliated keywords (CAPTION) to `table` nodes
+// (it does for paragraphs/src-blocks), so a table's `#+CAPTION:` is lost at parse
+// time. Recover it from raw source: one entry per table in document order, the
+// caption string if the line(s) immediately above it set one, else null. The
+// table handler consumes these in order.
+function tableCaptions(text: string): (string | null)[] {
+  const caps: (string | null)[] = [];
+  let pending: string | null = null;
+  let inTable = false;
+  for (const line of text.split("\n")) {
+    if (/^[ \t]*\|/.test(line)) {
+      if (!inTable) { caps.push(pending); inTable = true; }
+      pending = null;
+      continue;
+    }
+    inTable = false;
+    const cap = line.match(/^[ \t]*#\+CAPTION:[ \t]*(.*?)[ \t]*$/i);
+    if (cap) pending = cap[1];
+    else if (!/^[ \t]*#\+/.test(line)) pending = null; // blank/text breaks the attachment
+  }
+  return caps;
+}
+
+// Mirror build.el's `my-thumbnail-src`: http(s) as-is, else strip any leading
+// `./` or `/` and prefix a single `/`. (Was prefixing `/img/`, which double-
+// prefixed the common `img/foo.webp` value -> `/img/img/foo.webp`, a broken src.)
 function thumbnailSrc(v?: string): string | null {
-  if (!v) return null;
-  if (/^https?:\/\//.test(v) || v.startsWith("/")) return v;
-  return "/img/" + v; // matches build.el's my-thumbnail-src default
+  if (!v || !v.trim()) return null;
+  if (/^https?:\/\//.test(v)) return v;
+  return "/" + v.trim().replace(/^(?:\.\/|\/)+/, "");
 }
 const absUrl = (v: string | null) =>
   v == null ? null : /^https?:\/\//.test(v) ? v : SITE_URL.replace(/\/$/, "") + v;
@@ -54,16 +80,102 @@ type RenderState = {
   details: string[];          // `#+BEGIN_DETAILS <summary>` params, in order
   blockCounter: { n: number }; // mirrors build.el's `my-codeblock-counter`
   coderefs: Map<string, string>; // coderef label -> anchor id, updated in doc order
+  tableCaps: (string | null)[];  // per-table caption HTML (recovered from source)
+  tableCounter: { n: number };   // index into tableCaps, advanced per table
 };
 
-// `# (ref:1)` / `-- (ref:main)` / `! (ref:2)` at end of a code line: an optional
-// comment leader (#, --, ;, //, %, ! across the languages used) + the
-// `(ref:label)` marker. Org strips the whole thing and leaves a line anchor.
-const CODEREF_RE = /\s*(?:#+|-{2,}|;+|\/\/+|%+|!+)?\s*\(ref:([^)]+)\)\s*$/;
+// The `(ref:label)` coderef marker, matched in place. Org replaces just the
+// marker with the label at its original position (the surrounding code, comment
+// leader included, stays) -- it does NOT strip the rest of the line.
+const CODEREF_RE = /\(ref:([^)]+)\)/;
+
+// `#+CAPTION: ...` lives in uniorg's `node.affiliated.CAPTION` (array of caption
+// rows, each an array of inline org nodes); uniorg2rehype otherwise drops it.
+// Convert the caption's inline nodes to hast. The parent passed to `toHast` must
+// own them as `.children` (uniorg-rehype does a sibling lookup on the parent) --
+// the caption lives in `affiliated`, not `org.children`, so wrap it in a
+// synthetic parent or the lookup crashes.
+function captionHast(ctx: any, cap: any[]): any[] {
+  return ctx.toHast(cap, { type: "paragraph", children: cap });
+}
+
+// Wrap an element in <figure>…<figcaption> when it carries a caption, so the
+// caption survives. (We don't add org's "Figure N:" auto-numbering.)
+function captionWrap(ctx: any, org: any, node: any): any {
+  const cap = org.affiliated?.CAPTION?.[0];
+  if (!cap) return node;
+  return ctx.h(org, "figure", {}, [node, ctx.h(org, "figcaption", {}, captionHast(ctx, cap))]);
+}
+
+// Parse an org `#+ATTR_HTML` plist (`[":width 75%", ":height 10"]`) into hast
+// properties. Emacs applies these verbatim as element attributes.
+function parseAttrHtml(arr: string[]): Record<string, string> {
+  const props: Record<string, string> = {};
+  const toks = arr.join(" ").trim().split(/\s+/).filter(Boolean);
+  for (let i = 0; i < toks.length; i++) {
+    if (toks[i].startsWith(":")) {
+      props[toks[i].slice(1)] = toks[i + 1] && !toks[i + 1].startsWith(":") ? toks[++i] : "";
+    }
+  }
+  return props;
+}
 
 // --- custom uniorg2rehype handlers (use `this.toHast` / `this.h`) -----------
 function makeHandlers(st: RenderState) {
   return {
+    // Paragraphs carrying `#+CAPTION` and/or `#+ATTR_HTML` (usually around a lone
+    // image): apply the ATTR_HTML attributes to the image and, when captioned,
+    // wrap in <figure>. Plain paragraphs fall through to uniorg's default <p>.
+    paragraph: function (this: any, org: any) {
+      const cap = org.affiliated?.CAPTION?.[0];
+      const attr = org.affiliated?.ATTR_HTML;
+      if (!cap && !attr) return undefined;
+      const kids = this.toHast(org.children, org)
+        .filter((n: any) => !(n.type === "text" && !String(n.value).trim()));
+      if (attr) {
+        // uniorg drops #+ATTR_HTML -> images lose their authored width and render
+        // full-size. Apply it to the (first) img, matching Emacs.
+        const props = parseAttrHtml(attr);
+        const img = kids.find((k: any) => k.tagName === "img");
+        if (img) img.properties = { ...img.properties, ...props };
+      }
+      if (!cap) return this.h(org, "p", {}, kids); // ATTR-only: keep the <p>
+      const onlyImg = kids.length === 1 && kids[0].tagName === "img";
+      const inner = onlyImg ? kids : [this.h(org, "p", {}, kids)];
+      return this.h(org, "figure", {}, [...inner, this.h(org, "figcaption", {}, captionHast(this, cap))]);
+    },
+    // Tables: replicate uniorg-rehype's default table rendering (so uncaptioned
+    // tables are byte-identical) but wrap in <figure> when captioned -- the
+    // default handler drops `#+CAPTION`. table.el tables fall through to default.
+    table: function (this: any, org: any) {
+      if (org.tableType === "table.el") return undefined;
+      const table = this.h(org, "table", {}, []);
+      let hasHead = false;
+      let group: any[] = [];
+      org.children.forEach((r: any) => {
+        if (r.rowType === "rule") {
+          if (!hasHead) {
+            table.children.push(this.h(org, "thead", {}, group.map((row: any) =>
+              this.h(row, "tr", {}, row.children.map((cell: any) =>
+                this.h(cell, "th", {}, this.toHast(cell.children, cell)))))));
+            hasHead = true;
+          } else {
+            table.children.push(this.h(org, "tbody", {}, this.toHast(group, org)));
+          }
+          group = [];
+        }
+        group.push(r);
+      });
+      if (group.length) table.children.push(this.h(org, "tbody", {}, this.toHast(group, org)));
+      // table captions come from raw source (uniorg drops them), pre-rendered to
+      // HTML and consumed here in document order.
+      const capHtml = st.tableCaps[st.tableCounter.n++];
+      if (!capHtml) return table;
+      return this.h(org, "figure", {}, [
+        table,
+        this.h(org, "figcaption", {}, [{ type: "raw", value: capHtml }]),
+      ]);
+    },
     "special-block": function (this: any, org: any) {
       const t = (org.blockType || "").toUpperCase();
       const kids = this.toHast(org.children, org);
@@ -78,9 +190,11 @@ function makeHandlers(st: RenderState) {
       if (t === "STENO") return this.h(org, "div", { className: ["steno"] }, kids);
       return undefined; // fall through to uniorg's default special-block
     },
-    // Code blocks: strip `(ref:label)` markers and drop a matching anchor span
-    // (id=coderef-<N>-<label>) so prose `[[(label)]]` links can jump to them.
-    // Mirrors build.el's coderef handling (minus the cosmetic hover JS).
+    // Code blocks: replace each `(ref:label)` marker in place with an anchor
+    // span (id=coderef-<N>-<label>) showing the label, so prose `[[(label)]]`
+    // links can jump to it. The marker keeps its position in the line (comment
+    // leader and surrounding code intact), matching org. The span is non-empty
+    // (holds the label) so Prism's keep-markup re-tokenisation doesn't drop it.
     "src-block": function (this: any, org: any) {
       const lang = org.language || "";
       const N = ++st.blockCounter.n;
@@ -89,16 +203,16 @@ function makeHandlers(st: RenderState) {
       lines.forEach((line, i) => {
         const m = line.match(CODEREF_RE);
         if (m) {
-          const text = line.slice(0, line.length - m[0].length);
-          const id = `coderef-${N}-${m[1]}`;
-          st.coderefs.set(m[1], id);
-          // Wrap the line's code in the anchor span (not an empty span): Prism's
-          // keep-markup re-tokenises the code and drops empty markup, so an empty
-          // anchor would vanish and its jump link would dangle. (Mirrors how the
-          // Emacs build wraps the whole coderef line.)
+          const label = m[1];
+          const id = `coderef-${N}-${label}`;
+          st.coderefs.set(label, id);
+          const before = line.slice(0, m.index);
+          const after = line.slice(m.index! + m[0].length);
+          if (before) codeChildren.push({ type: "text", value: before });
           codeChildren.push(this.h(org, "span", { id, className: ["coderef-anchor"] }, [
-            { type: "text", value: text },
+            { type: "text", value: label },
           ]));
+          if (after) codeChildren.push({ type: "text", value: after });
         } else {
           codeChildren.push({ type: "text", value: line });
         }
@@ -107,7 +221,8 @@ function makeHandlers(st: RenderState) {
       // class="src language-XX" matches what the bake/Prism step expects; omit
       // the language- class for an unlabelled block so it isn't flagged unknown.
       const cls = lang ? ["src", `language-${lang}`] : ["src"];
-      return this.h(org, "pre", {}, [this.h(org, "code", { className: cls }, codeChildren)]);
+      const pre = this.h(org, "pre", {}, [this.h(org, "code", { className: cls }, codeChildren)]);
+      return captionWrap(this, org, pre);
     },
     link: function (this: any, org: any) {
       const raw: string = org.rawLink || "";
@@ -124,15 +239,27 @@ function makeHandlers(st: RenderState) {
           { type: "text", value: url },
         ]);
       }
-      // coderef [[(label)]] -> jump to the anchor registered by its src-block
+      // coderef [[(label)]] -> link to the anchor registered by its src-block,
+      // with the label wrapped in <span class="coderef-anchor"> (matches Emacs
+      // and the in-code anchor, so the same hover/jump styling applies).
       if (org.linkType === "coderef") {
         const id = st.coderefs.get(org.path) ?? `coderef-${org.path}`;
-        return this.h(org, "a", { href: `#${id}` }, kids.length ? kids : [{ type: "text", value: org.path }]);
+        const inner = kids.length
+          ? kids
+          : [this.h(org, "span", { className: ["coderef-anchor"] }, [{ type: "text", value: org.path }])];
+        return this.h(org, "a", { href: `#${id}` }, inner);
       }
       // internal .org links -> .html
       if (raw.includes(".org") && !/^[a-z]+:\/\//.test(raw)) {
         const href = raw.replace(/^file:/, "").replace(/\.org(::.*)?$/, ".html");
         return this.h(org, "a", { href }, kids.length ? kids : [{ type: "text", value: href }]);
+      }
+      // image-file links with no description -> <img src alt>. uniorg's default
+      // emits the <img> but drops `alt`; Emacs sets alt=basename, so match it
+      // (the `paragraph` handler then applies any `#+ATTR_HTML` width to it).
+      if (!kids.length && /\.(webp|png|jpe?g|gif|svg|avif|bmp)$/i.test(raw)) {
+        const src = raw.replace(/^file:/, "");
+        return this.h(org, "img", { src, alt: src.replace(/^.*\//, "") });
       }
       return undefined; // default handles http(s)/mailto/etc.
     },
@@ -183,9 +310,25 @@ async function orgToBody(src: string, st: RenderState): Promise<string> {
   return String(file);
 }
 
+// Render a short org string (e.g. a `#+TITLE:`) as inline HTML: `=org=` ->
+// `<code>org</code>`, `$x$` -> KaTeX, links, emphasis. Strips the wrapping <p>.
+// Used for titles in the article <h1> and the index/tag cards, which were
+// previously HTML-escaped (so `=org=` showed literally).
+async function orgInlineToHtml(s: string): Promise<string> {
+  const out = String(
+    await unified()
+      .use(parse)
+      .use(uniorg2rehype)
+      .use(rehypeKatex, { throwOnError: false, strict: false })
+      .use(stringify, { allowDangerousHtml: true, closeSelfClosing: true })
+      .process(s),
+  );
+  return out.replace(/^\s*<p>([\s\S]*?)<\/p>\s*$/, "$1").trim();
+}
+
 // --- page assembly ----------------------------------------------------------
 export type Meta = {
-  href: string; title: string; date: string; tags: string[];
+  href: string; title: string; titleHtml: string; date: string; tags: string[];
   thumbnail: string | null; draft: boolean; description: string;
 };
 
@@ -244,7 +387,7 @@ function page(opts: {
 
 function articleTitleBlock(m: Meta): string {
   return (
-    `<div class="title-block"><h1>${esc(m.title)}</h1>` +
+    `<div class="title-block"><h1>${m.titleHtml}</h1>` +
     `<div class="title-meta"><span class="title-date">${esc(m.date)}</span>` +
     (m.tags.length ? `<p class="org-tag-list">${tagListHtml(m.tags)}</p>` : "") +
     `</div></div>`
@@ -257,7 +400,7 @@ function articleCard(m: Meta, eager: boolean): string {
     : "";
   return (
     `<div class="article-card"><div class="article-card-body">` +
-    `<div><a href="${esc(m.href)}" class="article-card-link">${esc(m.title)}</a></div>` +
+    `<div><a href="${esc(m.href)}" class="article-card-link">${m.titleHtml}</a></div>` +
     `<div class="article-card-meta"><date>${esc(m.date)}</date>` +
     `<span class="org-tag-list">${tagListHtml(m.tags)}</span></div></div>${thumb}</div>`
   );
@@ -287,14 +430,22 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
   const kw = readKeywords(text);
   const outRel = rel.replace(/\.org$/, ".html");
   const tags = (kw.FILETAGS || "").split(":").map((s) => s.trim()).filter(Boolean);
+  // Pre-render table captions (org inline -> HTML) since the handler is sync.
+  const tableCaps = await Promise.all(
+    tableCaptions(text).map((c) => (c ? orgInlineToHtml(c) : null)),
+  );
   const body = await orgToBody(text, {
     details: detailsSummaries(text),
     blockCounter: { n: 0 },
     coderefs: new Map(),
+    tableCaps,
+    tableCounter: { n: 0 },
   });
+  const title = kw.TITLE || outRel;
   const meta: Meta = {
     href: "/" + outRel,
-    title: kw.TITLE || outRel,
+    title, // plain text, for <title>/og:title
+    titleHtml: await orgInlineToHtml(title), // org markup, for <h1> + cards
     date: fmtDate(kw.DATE || ""),
     tags,
     thumbnail: thumbnailSrc(kw.THUMBNAIL),
@@ -305,11 +456,11 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
     head: headHtml({
       title: meta.title, description: meta.description, url: SITE_URL + outRel, thumbnail: meta.thumbnail,
       // hasMath gates `katex.min.css`. Catch BOTH math forms: `.katex` spans
-      // already rendered by rehype-katex (org `$...$`), and raw `\(...\)` / `\[`
-      // / `\begin{}` delimiters the bake step renders later. Missing the former
-      // shipped 47 math pages unstyled.
+      // already rendered by rehype-katex (org `$...$`, in the body or the title),
+      // and raw `\(...\)` / `\[` / `\begin{}` delimiters the bake step renders
+      // later. Missing the former shipped 47 math pages unstyled.
       hasCode: body.includes("language-"),
-      hasMath: body.includes('class="katex') || /\\\(|\\\[|\\begin\{/.test(body),
+      hasMath: body.includes('class="katex') || meta.titleHtml.includes('class="katex') || /\\\(|\\\[|\\begin\{/.test(body),
       hasSteno: body.includes("<steno-outline"),
     }),
     titleBlock: articleTitleBlock(meta),
@@ -328,9 +479,11 @@ export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: strin
     `<h2 id="Tags"><a href="#Tags">Tags</a></h2><div class="org-tag-list">${tagListHtml(allTags)}</div>` +
     section("Devlog (timeline)", metas) +
     section("Diary", diaryMetas);
+  // a card title may carry KaTeX (e.g. `$\TeX{}$`); link the stylesheet if so
+  const hasMath = [...metas, ...diaryMetas].some((m) => m.titleHtml.includes('class="katex'));
   return page({
     htmlClass: "home",
-    head: headHtml({ title: "Toybeam", description: "Devlog of toyboot4e", url: SITE_URL, thumbnail: null, hasCode: false, hasMath: false, hasSteno: false }),
+    head: headHtml({ title: "Toybeam", description: "Devlog of toyboot4e", url: SITE_URL, thumbnail: null, hasCode: false, hasMath, hasSteno: false }),
     titleBlock: `<div class="title-block"><h1>Toybeam</h1><div class="title-meta"><span class="title-date"></span></div></div>`,
     content,
   });
@@ -341,9 +494,10 @@ export function buildTagHtml(tag: string, tagged: Meta[], allTags: string[]): st
     `<h2 id="Tags"><a href="#Tags">Tags</a></h2><div class="org-tag-list">${tagListHtml(allTags)}</div>` +
     `<h2 id="Devlog">Devlog (#${esc(tag)})</h2>` +
     `<div class="article-list">${tagged.map((m, i) => articleCard(m, i === 0)).join("")}</div>`;
+  const hasMath = tagged.some((m) => m.titleHtml.includes('class="katex'));
   return page({
     htmlClass: "home",
-    head: headHtml({ title: `Toybeam (#${tag})`, description: "Devlog of toyboot4e", url: `${SITE_URL}tags/${tag}.html`, thumbnail: null, hasCode: false, hasMath: false, hasSteno: false }),
+    head: headHtml({ title: `Toybeam (#${tag})`, description: "Devlog of toyboot4e", url: `${SITE_URL}tags/${tag}.html`, thumbnail: null, hasCode: false, hasMath, hasSteno: false }),
     titleBlock: `<div class="title-block"><h1>Toybeam (<code>#${esc(tag)}</code>)</h1><div class="title-meta"><span class="title-date"></span></div></div>`,
     content,
   });
