@@ -74,6 +74,14 @@ The document must allow coderef # (ref:1)
 
 - [[(1)]] coderef
 
+Hardbreak
+paragraph
+
+Hardbreak list:
+
+- A
+  B
+
 #+BEGIN_YARUO
 　　　　　　　　　　　　　　　　　　　　 　 　 　 　 .|　　　　　 　 　 /
 　　　　　　　　　　　　　　　　 　 　 　 　 　 　 　 !　　　　　　　 /
