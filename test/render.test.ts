@@ -116,6 +116,12 @@ test("title: <title> strips org markup, <h1> keeps it", async () => {
   expect(out).toContain("<h1><code class=\"inline-verbatim\">org</code> and <strong>bold</strong></h1>");
 });
 
+test("YARUO/AA: verbatim <pre>, org markup NOT parsed", async () => {
+  const out = await bake("y.org", "#+BEGIN_YARUO\n( _人_ )  *not bold*\n#+END_YARUO\n");
+  expect(out).toContain('<pre class="yaruo">( _人_ )  *not bold*</pre>');
+  expect(out).not.toContain("<sub>"); // _人_ stays literal, not a subscript
+});
+
 test("internal .org link -> .html", async () => {
   const out = await bake("l.org", "see [[./other.org][other]]\n");
   expect(out).toContain('<a href="./other.html">other</a>');

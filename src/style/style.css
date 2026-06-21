@@ -404,11 +404,20 @@ span.code-highlighted {
   font-display: swap;
 }
 
+/* AA / yaruo: a <pre> of ASCII art. Keep the spacing exact and never wrap --
+   scroll on the x-axis when the art is wider than the column. */
 .yaruo {
+  white-space: pre;
+  overflow-x: auto;
   font-family: "aahub_light";
   font-size: 16px;
   line-height: 18px;
   text-indent: 0;
+  /* reset simple.css's <pre> chrome (border/background/padding) -- this is art */
+  border: 0;
+  background: none;
+  padding: 0;
+  margin: 1rem 0;
 }
 
 .org-tag-list {

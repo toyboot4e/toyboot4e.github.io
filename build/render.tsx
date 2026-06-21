@@ -79,6 +79,7 @@ const absUrl = (v: string | null) =>
 
 // Per-file render state threaded through the custom handlers.
 type RenderState = {
+  source: string;             // the raw org source, for verbatim block slicing
   details: string[];          // `#+BEGIN_DETAILS <summary>` params, in order
   blockCounter: { n: number }; // mirrors build.el's `my-codeblock-counter`
   coderefs: Map<string, string>; // coderef label -> anchor id, updated in doc order
@@ -172,7 +173,15 @@ function makeHandlers(st: RenderState) {
           ...kids,
         ]);
       }
-      if (t === "YARUO" || t === "AA") return this.h(org, "div", { className: ["yaruo"] }, kids);
+      // YARUO/AA is ASCII art -- render the block's text VERBATIM (sliced from
+      // source via uniorg's content offsets), not org-parsed: otherwise `_x_`
+      // becomes a subscript, `''` curls, etc. <pre> preserves the spacing; the
+      // CSS scrolls it on the x-axis instead of wrapping. Mirrors build.el's
+      // my-org-html-yaruo-block (raw buffer-substring -> <pre class="yaruo">).
+      if (t === "YARUO" || t === "AA") {
+        const raw = st.source.slice(org.contentsBegin, org.contentsEnd).replace(/\n$/, "");
+        return this.h(org, "pre", { className: ["yaruo"] }, [{ type: "text", value: raw }]);
+      }
       if (t === "STENO") return this.h(org, "div", { className: ["steno"] }, kids);
       return undefined; // fall through to uniorg's default special-block
     },
@@ -496,6 +505,7 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
     tableCaptions(text).map((c) => (c ? orgInlineToHtml(c) : null)),
   );
   const body = await orgToBody(text, {
+    source: text,
     details: detailsSummaries(text),
     blockCounter: { n: 0 },
     coderefs: new Map(),
