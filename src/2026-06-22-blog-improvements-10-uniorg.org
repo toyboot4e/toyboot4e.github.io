@@ -5,7 +5,7 @@
 
 * 背景
 
-ブログ生成 vibe coding シリーズです。
+ブログ生成の vibe coding シリーズです。
 
 * 変更
 
@@ -48,6 +48,8 @@ $$
 [[card:https://zenn.dev/catnose99/articles/nani-translate]]
 
 [[card:https://github.com/toyboot4e/toyboot4e.github.io/blob/c0b6beaf6ec6a4123b82e0217db43cd98b4569db/build.el#L923-L925]]
+
+[[./og-preview.html]]
 
 #+CAPTION: org-mode highlight =test=, $KaTeX$ (TODO: re-impl)
 #+BEGIN_SRC org
