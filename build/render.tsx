@@ -632,7 +632,7 @@ export function buildTagHtml(tag: string, tagged: Meta[], allTags: string[]): st
     content: (
       <Fragment>
         <h2 id="Tags"><a href="#Tags">Tags</a></h2><div class="org-tag-list">{tagListHtml(allTags)}</div>
-        <h2 id="Devlog">Devlog (#{tag})</h2>
+        <h2 id="Devlog">Devlog (<code>#{tag}</code>)</h2>
         <div class={card.articleList}>{tagged.map((m, i) => articleCard(m, i === 0))}</div>
       </Fragment>
     ),
