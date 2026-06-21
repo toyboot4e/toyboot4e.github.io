@@ -2,15 +2,12 @@
   "name": "toyboot4e-devlog-build",
   "private": true,
   "type": "module",
-  "description": "Build-time post-processing for the devlog (Prism + KaTeX SSR).",
+  "description": "Build-time rendering for the devlog (uniorg/bun render + Prism/KaTeX SSR).",
   "dependencies": {
     "happy-dom": "^15.0.0",
     "katex": "^0.16.0",
     "linkedom": "^0.18.0",
-    "prismjs": "^1.29.0"
-  },
-  "devDependencies": {
-    "hastscript": "^9.0.1",
+    "prismjs": "^1.29.0",
     "rehype-katex": "^7.0.1",
     "rehype-stringify": "^10.0.1",
     "unified": "^11.0.5",
