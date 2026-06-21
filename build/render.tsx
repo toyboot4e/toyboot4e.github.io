@@ -211,12 +211,11 @@ function makeHandlers(st: RenderState) {
           if (before) lineKids.push({ type: "text", value: before });
           lineKids.push(this.h(org, "span", { className: ["coderef-anchor"] }, [{ type: "text", value: label }]));
           if (after) lineKids.push({ type: "text", value: after });
-          // Wrap the WHOLE line in `.coderef-off` (so the line gets the coderef
-          // highlight) with a self-link + the id the prose `[[(label)]]` jumps to.
-          // Mirrors build.el; `:target` (style.css) highlights it on click.
-          codeChildren.push(this.h(org, "span", { id, className: ["coderef-off"] }, [
-            this.h(org, "a", { href: `#${id}` }, lineKids),
-          ]));
+          // Wrap the WHOLE line in `.coderef-off` (so it gets the coderef
+          // highlight). `id` is the target the prose `[[(label)]]` jumps to
+          // (-> `:target` highlight); `tabindex` makes the line itself clickable
+          // (-> `:focus` highlight), without a self-link that would just re-jump.
+          codeChildren.push(this.h(org, "span", { id, className: ["coderef-off"], tabindex: "0" }, lineKids));
         } else {
           codeChildren.push({ type: "text", value: line });
         }
