@@ -79,11 +79,33 @@ test("page shell", async () => {
 });
 
 // --- 3. behavior assertions (components, tiny inputs) ----------------------
-test("coderef: marker kept in place + prose link styled", async () => {
+test("coderef: line wrapped in .coderef-off, marker -> anchor, prose link styled", async () => {
   const out = await bake("c.org", '#+BEGIN_SRC haskell\nmain = a -- (ref:a)\n#+END_SRC\n\nsee [[(a)]]\n');
-  expect(out).toContain('<span id="coderef-1-a" class="coderef-anchor">a</span>');
-  expect(out).toContain('<a href="#coderef-1-a"><span class="coderef-anchor">a</span></a>');
+  expect(out).toContain('<span id="coderef-1-a" class="coderef-off">'); // whole line wrapped (highlight)
+  expect(out).toContain('<span class="coderef-anchor">a</span>'); // (ref:a) marker -> anchor
+  expect(out).toContain('<a href="#coderef-1-a"><span class="coderef-anchor">a</span></a>'); // prose link
   expect(out).not.toContain("(ref:a)"); // marker consumed
+});
+
+test("coderef: only coderef-bearing blocks are numbered (a plain block before it doesn't bump N)", async () => {
+  const out = await bake("c.org",
+    "#+BEGIN_SRC bash\necho hi\n#+END_SRC\n" +              // no coderef -> not numbered
+    "#+BEGIN_SRC haskell\nx -- (ref:1)\n#+END_SRC\nsee [[(1)]]\n");
+  expect(out).toContain('id="coderef-1-1"');        // first coderef block is 1, not 2
+  expect(out).not.toContain("coderef-2");
+  expect(out).toContain('<a href="#coderef-1-1">'); // prose link resolves to it
+});
+
+test("coderef: repeated labels resolve per-block (positional, not last-wins)", async () => {
+  // both blocks use label `1`; each prose `[[(1)]]` must target ITS block.
+  const out = await bake("c.org",
+    "#+BEGIN_SRC haskell\nx -- (ref:1)\n#+END_SRC\nfirst [[(1)]]\n" +
+    "#+BEGIN_SRC haskell\ny -- (ref:1)\n#+END_SRC\nsecond [[(1)]]\n");
+  expect(out).toContain('id="coderef-1-1"'); // block 1 anchor
+  expect(out).toContain('id="coderef-2-1"'); // block 2 anchor
+  // first prose link -> block 1, second -> block 2 (the bug pointed both at block 2)
+  const links = [...out.matchAll(/<a href="(#coderef-\d+-1)"><span class="coderef-anchor">/g)].map((m) => m[1]);
+  expect(links).toEqual(["#coderef-1-1", "#coderef-2-1"]);
 });
 
 test("captions: Figure/Listing/Table numbering, per kind", async () => {

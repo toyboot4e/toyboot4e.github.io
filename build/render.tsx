@@ -20,7 +20,11 @@ export const SITE_URL = "https://toyboot4e.github.io/";
 // --- static chrome (lifted verbatim from the canonical build) --------------
 const HEADER = `<header role="banner"><nav role="navigation"><a href="/index.html"><svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg><span class="nav-label">Home</span></a><a href="https://atcoder.jp/users/toyboot4e"><svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" /><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" /><path d="M18 9h1.5a1 1 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" /><path d="M6 9H4.5a1 1 0 0 1 0-5H6" /></svg><span class="nav-label">AtCoder</span></a><a href="https://github.com/toyboot4e"><svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6a9 9 0 0 0-9 9V3" /><circle cx="18" cy="6" r="3" /><circle cx="6" cy="18" r="3" /></svg><span class="nav-label">GitHub</span></a><a href="https://qiita.com/toyboot4e"><svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18h-5" /><path d="M18 14h-8" /><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2" /><rect width="8" height="4" x="10" y="6" rx="1" /></svg><span class="nav-label">Qiita</span></a><a href="https://zenn.dev/toyboot4e"><svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14" /><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></svg><span class="nav-label">Zenn</span></a><button id="theme-toggle" onclick="toggleTheme()" title="テーマ切替" aria-label="Toggle theme"></button><button id="disco-toggle" onclick="window.toggleDisco && toggleDisco()" aria-pressed="true" title="ディスコボール切替" aria-label="Toggle disco ball"></button></nav></header>`;
 const FOOTER = `<footer role="contentinfo"><p>Styled with <a href="https://simplecss.org/">Simple.css</a></p><div><a href="/index.html"><svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg><span class="nav-label">Home</span></a><a href="https://github.com/toyboot4e"><svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6a9 9 0 0 0-9 9V3" /><circle cx="18" cy="6" r="3" /><circle cx="6" cy="18" r="3" /></svg><span class="nav-label">GitHub</span></a></div></footer>`;
-const TAIL = `<script type="text/javascript" src="/style/tocbot.min.js"></script><script>tocbot.init({ tocSelector: '#toc', contentSelector: '#content', headingSelector: 'h1, h2, h3, h4', collapseDepth: 6, scrollSmooth: false, orderedList: false });</script>`;
+// coderef hover: hovering a prose `[[(label)]]` link (or the code line) adds
+// `.code-highlighted` to BOTH the line and the link -- build.el's CodeHighlightOn,
+// minus inline handlers. Self-links inside the code line only light the line.
+const CODEREF_JS = `<script>for(const a of document.querySelectorAll('a[href^="#coderef-"]')){const t=document.getElementById(a.getAttribute('href').slice(1));if(!t)continue;const p=!a.closest('.coderef-off');const on=()=>{t.classList.add('code-highlighted');if(p)a.classList.add('code-highlighted')};const off=()=>{t.classList.remove('code-highlighted');if(p)a.classList.remove('code-highlighted')};a.addEventListener('mouseenter',on);a.addEventListener('mouseleave',off)}</script>`;
+const TAIL = `<script type="text/javascript" src="/style/tocbot.min.js"></script><script>tocbot.init({ tocSelector: '#toc', contentSelector: '#content', headingSelector: 'h1, h2, h3, h4', collapseDepth: 6, scrollSmooth: false, orderedList: false });</script>${CODEREF_JS}`;
 const DISCO_BODY = `<div class="disco-bg-light" aria-hidden="true"></div><canvas id="disco-canvas" aria-hidden="true"></canvas>`;
 const DISCO_HEAD = `<script>try{if(localStorage.getItem('toybeam-disco')!=='off')document.documentElement.classList.add('disco-on')}catch(e){}</script><script type="text/javascript" defer src="/style/disco.min.js"></script>`;
 
@@ -82,7 +86,6 @@ type RenderState = {
   source: string;             // the raw org source, for verbatim block slicing
   details: string[];          // `#+BEGIN_DETAILS <summary>` params, in order
   blockCounter: { n: number }; // mirrors build.el's `my-codeblock-counter`
-  coderefs: Map<string, string>; // coderef label -> anchor id, updated in doc order
   tableCaps: (string | null)[];  // per-table caption HTML (recovered from source)
   tableCounter: { n: number };   // index into tableCaps, advanced per table
   captionN: { figure: number; listing: number; table: number }; // per-kind caption counters
@@ -192,22 +195,32 @@ function makeHandlers(st: RenderState) {
     // (holds the label) so Prism's keep-markup re-tokenisation doesn't drop it.
     "src-block": function (this: any, org: any) {
       const lang = org.language || "";
-      const N = ++st.blockCounter.n;
       const lines = String(org.value ?? "").replace(/\n$/, "").split("\n");
+      // Number only blocks that actually contain a coderef (NOT every src-block).
+      // This diverges from build.el (whose my-codeblock-counter counts all
+      // src-blocks, so a coderef in the 2nd block gets `coderef-2-…` even with no
+      // coderef in the 1st) -- that's a build.el bug; here the first coderef block
+      // is `coderef-1-…`. The prose `[[(label)]]` link reads the same counter.
+      const hasCoderef = lines.some((l) => CODEREF_RE.test(l));
+      const N = hasCoderef ? ++st.blockCounter.n : st.blockCounter.n;
       const codeChildren: any[] = [];
       lines.forEach((line, i) => {
         const m = line.match(CODEREF_RE);
         if (m) {
           const label = m[1];
           const id = `coderef-${N}-${label}`;
-          st.coderefs.set(label, id);
           const before = line.slice(0, m.index);
           const after = line.slice(m.index! + m[0].length);
-          if (before) codeChildren.push({ type: "text", value: before });
-          codeChildren.push(this.h(org, "span", { id, className: ["coderef-anchor"] }, [
-            { type: "text", value: label },
+          const lineKids: any[] = [];
+          if (before) lineKids.push({ type: "text", value: before });
+          lineKids.push(this.h(org, "span", { className: ["coderef-anchor"] }, [{ type: "text", value: label }]));
+          if (after) lineKids.push({ type: "text", value: after });
+          // Wrap the WHOLE line in `.coderef-off` (so the line gets the coderef
+          // highlight) with a self-link + the id the prose `[[(label)]]` jumps to.
+          // Mirrors build.el; `:target` (style.css) highlights it on click.
+          codeChildren.push(this.h(org, "span", { id, className: ["coderef-off"] }, [
+            this.h(org, "a", { href: `#${id}` }, lineKids),
           ]));
-          if (after) codeChildren.push({ type: "text", value: after });
         } else {
           codeChildren.push({ type: "text", value: line });
         }
@@ -239,11 +252,13 @@ function makeHandlers(st: RenderState) {
           { type: "text", value: url },
         ]);
       }
-      // coderef [[(label)]] -> link to the anchor registered by its src-block,
-      // with the label wrapped in <span class="coderef-anchor"> (matches Emacs
-      // and the in-code anchor, so the same hover/jump styling applies).
+      // coderef [[(label)]] -> jump to the anchor in the MOST-RECENTLY-rendered
+      // src-block (positional, like build.el's `my-codeblock-counter`). A flat
+      // label->id map broke when the same label (e.g. `1`) repeats across blocks:
+      // every `[[(1)]]` then pointed at the last block. The label is wrapped in
+      // <span class="coderef-anchor"> to match the in-code anchor styling.
       if (org.linkType === "coderef") {
-        const id = st.coderefs.get(org.path) ?? `coderef-${org.path}`;
+        const id = `coderef-${st.blockCounter.n}-${org.path}`;
         const inner = kids.length
           ? kids
           : [this.h(org, "span", { className: ["coderef-anchor"] }, [{ type: "text", value: org.path }])];
@@ -512,7 +527,6 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
     source: text,
     details: detailsSummaries(text),
     blockCounter: { n: 0 },
-    coderefs: new Map(),
     tableCaps,
     tableCounter: { n: 0 },
     captionN: { figure: 0, listing: 0, table: 0 },

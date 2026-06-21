@@ -396,6 +396,15 @@ span.code-highlighted {
   background-color: color-mix(in srgb, var(--accent-hover) 20%, transparent);
 }
 
+/* Hovering a prose `[[(label)]]` (or the code line itself) highlights the line
+   AND the link via `.code-highlighted`, toggled by the coderef script in TAIL --
+   the build.el CodeHighlightOn behaviour. Clicking the link also jumps + targets
+   the line (works without JS). */
+.coderef-off:target {
+  background-color: color-mix(in srgb, var(--accent-hover) 35%, transparent);
+  outline: 2px solid var(--accent-hover);
+}
+
 /* aahub_light: https://qiita.com/scrpgil/items/b8bde1257a135d173585 */
 /* TODO: delay loading */
 @font-face {
