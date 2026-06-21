@@ -18,10 +18,9 @@ $ just serve # in another tab
 - [[https://systemcrafters.net/publishing-websites-with-org-mode/building-the-site/][Build Your Website with Org Mode]]
 - [[https://www.roygbyte.com/add_syntax_highlighting_to_an_org_publish_project.html][Add syntax highlighting to an org-publish-project]]
 
-*** ELisp
+*** TypeScript
 
-- [[https://github.com/tali713/esxml][esxml]]
-- [[https://github.com/balddotcat/ox-slimhtml][ox-slimhtml]]
+- [[https://github.com/rasendubi/uniorg][rasendubi/uniorg]]
 
 *** CSS/JS
 
