@@ -81,8 +81,10 @@ test("page shell", async () => {
 // --- 3. behavior assertions (components, tiny inputs) ----------------------
 test("coderef: line wrapped in .coderef-off, marker -> anchor, prose link styled", async () => {
   const out = await bake("c.org", '#+BEGIN_SRC haskell\nmain = a -- (ref:a)\n#+END_SRC\n\nsee [[(a)]]\n');
-  // whole line wrapped + focusable (clickable -> :focus highlight)
-  expect(out).toContain('<span id="coderef-1-a" class="coderef-off" tabindex="0">');
+  // the whole line IS a single `<a class="coderef-off">` self-link, so the
+  // entire full-width highlight is clickable and clicking sets the URL to the
+  // coderef and `:target`-highlights it
+  expect(out).toContain('<a id="coderef-1-a" href="#coderef-1-a" class="coderef-off">');
   expect(out).toContain('<span class="coderef-anchor">a</span>'); // (ref:a) marker -> anchor
   expect(out).toContain('<a href="#coderef-1-a"><span class="coderef-anchor">a</span></a>'); // prose link
   expect(out).not.toContain("(ref:a)"); // marker consumed

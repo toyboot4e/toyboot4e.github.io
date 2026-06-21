@@ -381,9 +381,16 @@ div.WARNING {
   background-color: color-mix(in srgb, var(--accent-hover) 10%, transparent);
 }
 
+/* `.coderef-off` is itself the line's `<a>` self-link -- reset link styling so
+   the code reads as code (no underline/link colour), but keep the full-width
+   element clickable. */
+.coderef-off {
+  color: inherit;
+  text-decoration: none;
+}
+
 /* Disable font style by simple.css */
-.code-highlighted a,
-.coderef-off a {
+.code-highlighted a {
   color: inherit;
 }
 
@@ -397,19 +404,23 @@ span.code-highlighted {
 }
 
 /* Coderef interaction, JS-free (build.el used a CodeHighlightOn hover handler):
-   - hover the code line               -> light highlight
-   - click the code line (it's tabindex=0, so it focuses) -> strong, sticky
-   - click a prose `[[(label)]]` link  -> jumps to the line + strong (`:target`)
-   The line is clickable, not just hoverable; focus/target persist until you
-   click elsewhere. `cursor: pointer` signals the affordance. */
+   - hover the code line              -> light highlight
+   - click the code line              -> URL becomes #coderef-N-label, strong
+                                         highlight via `:target` (sticky + shareable)
+   - click a prose `[[(label)]]` link -> same: jumps + `:target`-highlights it
+   The line's self-link is what updates the URL on click. */
 .coderef-off {
   cursor: pointer;
-  outline: none; /* replaced by our own focus highlight below */
+}
+
+/* Anchor jumps (a prose `[[(label)]]`, a TOC/heading self-link) must clear the
+   sticky header (~3.75rem) so the target isn't hidden behind it. */
+:is(h1, h2, h3, h4, h5, h6, .coderef-off) {
+  scroll-margin-top: 4.5rem;
 }
 .coderef-off:hover {
   background-color: color-mix(in srgb, var(--accent-hover) 20%, transparent);
 }
-.coderef-off:focus,
 .coderef-off:target {
   background-color: color-mix(in srgb, var(--accent-hover) 35%, transparent);
   outline: 2px solid var(--accent-hover);

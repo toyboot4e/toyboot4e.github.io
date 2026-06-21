@@ -211,11 +211,14 @@ function makeHandlers(st: RenderState) {
           if (before) lineKids.push({ type: "text", value: before });
           lineKids.push(this.h(org, "span", { className: ["coderef-anchor"] }, [{ type: "text", value: label }]));
           if (after) lineKids.push({ type: "text", value: after });
-          // Wrap the WHOLE line in `.coderef-off` (so it gets the coderef
-          // highlight). `id` is the target the prose `[[(label)]]` jumps to
-          // (-> `:target` highlight); `tabindex` makes the line itself clickable
-          // (-> `:focus` highlight), without a self-link that would just re-jump.
-          codeChildren.push(this.h(org, "span", { id, className: ["coderef-off"], tabindex: "0" }, lineKids));
+          // The WHOLE line is a single `<a class="coderef-off">` self-link: the
+          // full-width highlight (`.coderef-off` is `min-width:100%`) and the
+          // clickable link are the SAME element, so the entire highlighted line
+          // -- not just the text run -- is clickable. Clicking it (or a prose
+          // `[[(label)]]`) sets the URL to `#coderef-N-label` and
+          // `:target`-highlights it (shareable). build.el needed onmouseover/
+          // onclick JS to make the full span clickable; this is JS-free.
+          codeChildren.push(this.h(org, "a", { id, href: `#${id}`, className: ["coderef-off"] }, lineKids));
         } else {
           codeChildren.push({ type: "text", value: line });
         }
