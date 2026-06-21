@@ -84,6 +84,7 @@ type RenderState = {
   coderefs: Map<string, string>; // coderef label -> anchor id, updated in doc order
   tableCaps: (string | null)[];  // per-table caption HTML (recovered from source)
   tableCounter: { n: number };   // index into tableCaps, advanced per table
+  captionN: { figure: number; listing: number; table: number }; // per-kind caption counters
 };
 
 // The `(ref:label)` coderef marker, matched in place. Org replaces just the
@@ -101,12 +102,19 @@ function captionHast(ctx: any, cap: any[]): any[] {
   return ctx.toHast(cap, { type: "paragraph", children: cap });
 }
 
-// Wrap an element in <figure>…<figcaption> when it carries a caption, so the
-// caption survives. (We don't add org's "Figure N:" auto-numbering.)
-function captionWrap(ctx: any, org: any, node: any): any {
-  const cap = org.affiliated?.CAPTION?.[0];
-  if (!cap) return node;
-  return ctx.h(org, "figure", {}, [node, ctx.h(org, "figcaption", {}, captionHast(ctx, cap))]);
+// Caption numbering, matching org HTML export: a per-kind, per-document counter
+// (only captioned elements are counted) and a typed prefix span.
+const CAPTION_LABEL = { figure: "Figure", listing: "Listing", table: "Table" } as const;
+type CaptionKind = keyof typeof CAPTION_LABEL;
+
+// Wrap `body` in <figure> with a numbered <figcaption>, e.g.
+// `<figcaption><span class="figure-number">Figure 1: </span>{caption}</figcaption>`.
+function captionedFigure(ctx: any, st: RenderState, org: any, body: any[], kind: CaptionKind, capNodes: any[]): any {
+  const n = ++st.captionN[kind];
+  const num = ctx.h(org, "span", { className: [`${kind}-number`] }, [
+    { type: "text", value: `${CAPTION_LABEL[kind]} ${n}: ` },
+  ]);
+  return ctx.h(org, "figure", {}, [...body, ctx.h(org, "figcaption", {}, [num, ...capNodes])]);
 }
 
 // --- custom uniorg2rehype handlers (use `this.toHast` / `this.h`) -----------
@@ -123,7 +131,7 @@ function makeHandlers(st: RenderState) {
         .filter((n: any) => !(n.type === "text" && !String(n.value).trim()));
       const onlyImg = kids.length === 1 && kids[0].tagName === "img";
       const inner = onlyImg ? kids : [this.h(org, "p", {}, kids)];
-      return this.h(org, "figure", {}, [...inner, this.h(org, "figcaption", {}, captionHast(this, cap))]);
+      return captionedFigure(this, st, org, inner, "figure", captionHast(this, cap));
     },
     // Tables: replicate uniorg-rehype's default table rendering (so uncaptioned
     // tables are byte-identical) but wrap in <figure> when captioned -- the
@@ -152,10 +160,7 @@ function makeHandlers(st: RenderState) {
       // HTML and consumed here in document order.
       const capHtml = st.tableCaps[st.tableCounter.n++];
       if (!capHtml) return table;
-      return this.h(org, "figure", {}, [
-        table,
-        this.h(org, "figcaption", {}, [{ type: "raw", value: capHtml }]),
-      ]);
+      return captionedFigure(this, st, org, [table], "table", [{ type: "raw", value: capHtml }]);
     },
     "special-block": function (this: any, org: any) {
       const t = (org.blockType || "").toUpperCase();
@@ -203,7 +208,8 @@ function makeHandlers(st: RenderState) {
       // the language- class for an unlabelled block so it isn't flagged unknown.
       const cls = lang ? ["src", `language-${lang}`] : ["src"];
       const pre = this.h(org, "pre", {}, [this.h(org, "code", { className: cls }, codeChildren)]);
-      return captionWrap(this, org, pre);
+      const cap = org.affiliated?.CAPTION?.[0];
+      return cap ? captionedFigure(this, st, org, [pre], "listing", captionHast(this, cap)) : pre;
     },
     link: function (this: any, org: any) {
       const raw: string = org.rawLink || "";
@@ -495,6 +501,7 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
     coderefs: new Map(),
     tableCaps,
     tableCounter: { n: 0 },
+    captionN: { figure: 0, listing: 0, table: 0 },
   });
   const title = kw.TITLE || outRel;
   const meta: Meta = {
