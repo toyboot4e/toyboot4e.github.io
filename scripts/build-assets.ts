@@ -18,7 +18,7 @@ import { basename } from "node:path";
 
 const STYLE_DIR = "src/style";
 const CSS = ["style", "prism-dark", "prism-light"];
-const TS = ["disco"];
+const TS = ["disco", "toc"];
 
 async function report(result: Awaited<ReturnType<typeof Bun.build>>) {
   if (!result.success) {
