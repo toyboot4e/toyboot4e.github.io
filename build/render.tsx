@@ -711,16 +711,18 @@ function page(opts: { htmlClass?: string; head: Raw; titleBlock: Raw; content: R
 // hover-to-highlight behavior without any runtime JS.
 // CSS can't bind the hovered href to the target id generically, so we emit one
 // rule per coderef id present on the page (there are only a handful).
-function coderefHoverStyle(ids: string[]): string {
+function coderefHoverStyle(ids: string[]): Raw {
   const uniq = [...new Set(ids)];
-  if (!uniq.length) return "";
+  if (!uniq.length) return raw("");
+  // CSS rule text (a stylesheet body, not HTML) -> raw inside a JSX <style>; it
+  // must not be entity-escaped or the `a[href="#id"]` selectors would break.
   const rules = uniq
     .map(
       (id) =>
         `#content:has(a[href="#${id}"]:hover) #${id}{background-color:color-mix(in srgb,var(--accent-hover) 20%,transparent)}`,
     )
     .join("");
-  return `<style>${rules}</style>`;
+  return <style>{raw(rules)}</style>;
 }
 
 function articleTitleBlock(m: Meta): Raw {
@@ -817,7 +819,12 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
       hasMath: body.includes('class="katex') || meta.titleHtml.includes('class="katex') || /\\\(|\\\[|\\begin\{/.test(body),
     }),
     titleBlock: articleTitleBlock(meta),
-    content: raw(body + coderefHoverStyle(st.coderefIds)),
+    content: (
+      <Fragment>
+        {raw(body)}
+        {coderefHoverStyle(st.coderefIds)}
+      </Fragment>
+    ),
   }));
   return { rel: outRel, isDiary: outRel.startsWith("diary/"), draft: !!kw.DRAFT, meta, html };
 }
