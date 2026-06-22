@@ -24,7 +24,7 @@ export const SITE_URL = "https://toyboot4e.github.io/";
 // `https://` inside matched), so we had to sniff the raw link string instead.
 const PARSE_OPTS = { linkTypes: [...defaultOptions.linkTypes, "card"] };
 
-// --- static chrome (lifted verbatim from the canonical build) --------------
+// --- static chrome (header / footer / disco) -------------------------------
 // Inline nav/footer icon wrapper (Lucide, stroked). One <svg> with the shared
 // attributes; the caller supplies the <path>/<circle>/<rect> children.
 const NavIcon = ({ children }: { children?: any }): Raw => (
