@@ -89,7 +89,7 @@ test("coderef: line wrapped in .coderef-off, marker -> anchor, prose link styled
   expect(out).toContain('<a href="#coderef-1-a"><span class="coderef-anchor">a</span></a>'); // prose link
   expect(out).not.toContain("(ref:a)"); // marker consumed
   // JS-free hover: hovering the prose link (a[href="#ID"]) highlights the code
-  // line (#ID) via a per-id :has() rule, mirroring build.el's CodeHighlightOn.
+  // line (#ID) via a per-id :has() rule (no runtime JS).
   expect(out).toContain('#content:has(a[href="#coderef-1-a"]:hover) #coderef-1-a{');
 });
 
@@ -178,7 +178,7 @@ test("card: [[card:URL]] -> link-card placeholder (URL with :// kept intact)", a
 });
 
 test("preserve-breaks: soft newline -> <br>, but not against a block boundary", async () => {
-  // build.el sets org-export-preserve-breaks t: soft newlines in prose/list
+  // preserve-breaks (org-export-preserve-breaks): soft newlines in prose/list
   // items become <br>. The newline before a nested block (here the sub-list) is
   // structural and must NOT become a <br>.
   const out = await bake("b.org", "para X\npara Y\n\n- A\n  B\n\n- top\n  - nested\n");

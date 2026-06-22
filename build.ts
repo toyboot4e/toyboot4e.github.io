@@ -42,8 +42,8 @@ const WORKERS = Math.max(1, Number(process.env.BUILD_WORKERS) || Math.min(cpus()
 export type WorkerOut = { results: { rel: string; isDiary: boolean; meta: Meta }[]; stats: BakeStats };
 
 // List .org sources relative to SRC, skipping generated tag pages and index.org.
-// `src/tags/` holds tag pages that build.el writes (we regenerate our own
-// below); mirrors build.el's `(not (string-match "tags/" url))`.
+// `src/tags/` holds generated tag pages (we regenerate our own below), so skip
+// the whole `tags/` subtree here.
 export async function listOrg(dir: string, base = dir): Promise<string[]> {
   const out: string[] = [];
   for (const e of await readdir(dir, { withFileTypes: true })) {
@@ -58,17 +58,16 @@ export async function listOrg(dir: string, base = dir): Promise<string[]> {
   return out;
 }
 
-// Static files copied verbatim, mirroring build.el's "static" component
-// (`org-publish-attachment`): these extensions, recursive, excluding `ltximg/`
+// Static files copied verbatim: these extensions, recursive, excluding `ltximg/`
 // (local LaTeX previews). Catches loose files like `og-preview.html` plus the
 // `style/` and `img/` trees, while skipping `.org` sources and `.drawio`/`.ts`
-// diagram/source files that the Emacs build also leaves out.
+// diagram/source files.
 export const STATIC_RE = /\.(html|js|css|png|jpe?g|webp|gif|svg|mp4|mov|woff2|pdf)$/i;
 
 export async function listStatic(dir: string, base = dir): Promise<string[]> {
   const out: string[] = [];
   for (const e of await readdir(dir, { withFileTypes: true })) {
-    if (e.name === "ltximg") continue; // local LaTeX previews (excluded by build.el)
+    if (e.name === "ltximg") continue; // local LaTeX previews (not shipped)
     const p = join(dir, e.name);
     if (e.isDirectory()) out.push(...(await listStatic(p, base)));
     else if (STATIC_RE.test(e.name)) out.push(p.slice(base.length + 1));
@@ -181,7 +180,7 @@ export async function fullBuild(): Promise<FullBuild> {
   const byHrefDesc = (a: Meta, b: Meta) => (a.href < b.href ? 1 : -1);
   metas.sort(byHrefDesc);
   diaryMetas.sort(byHrefDesc);
-  // tags come from devlog entries only (matches build.el's `all-tags`)
+  // tags come from devlog entries only (not diary entries)
   const allTags = [...new Set(metas.flatMap((m) => m.tags))].sort();
 
   await writeIndexAndTags(metas, diaryMetas, allTags);

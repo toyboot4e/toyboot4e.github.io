@@ -16,8 +16,8 @@ import { card, steno } from "./styles/generated.js";
 
 export const SITE_URL = "https://toyboot4e.github.io/";
 
-// Register `card` as a custom Org link type (build.el does the same via
-// `org-link-set-parameters`). uniorg-parse@3.2.2 (rasendubi/uniorg#153) anchored
+// Register `card` as a custom Org link type. uniorg-parse@3.2.2
+// (rasendubi/uniorg#153) anchored
 // link-type detection to the start of the link, so EXTENDING the default
 // linkTypes list makes `[[card:URL]]` parse as `linkType:"card"` with the `card:`
 // prefix stripped from `path`. Before the fix the type was mis-detected (the
@@ -73,7 +73,7 @@ function tableCaptions(text: string): (string | null)[] {
   return caps;
 }
 
-// Mirror build.el's `my-thumbnail-src`: http(s) as-is, else strip any leading
+// Thumbnail src normalization: http(s) as-is, else strip any leading
 // `./` or `/` and prefix a single `/`. (Was prefixing `/img/`, which double-
 // prefixed the common `img/foo.webp` value -> `/img/img/foo.webp`, a broken src.)
 function thumbnailSrc(v?: string): string | null {
@@ -88,7 +88,7 @@ const absUrl = (v: string | null) =>
 type RenderState = {
   source: string;             // the raw org source, for verbatim block slicing
   details: string[];          // `#+BEGIN_DETAILS <summary>` params, in order
-  blockCounter: { n: number }; // mirrors build.el's `my-codeblock-counter`
+  blockCounter: { n: number }; // positional src-block counter (for coderef ids)
   tableCaps: (string | null)[];  // per-table caption HTML (recovered from source)
   tableCounter: { n: number };   // index into tableCaps, advanced per table
   captionN: { figure: number; listing: number; table: number }; // per-kind caption counters
@@ -262,8 +262,8 @@ function makeHandlers(st: RenderState) {
       // YARUO/AA is ASCII art -- render the block's text VERBATIM (sliced from
       // source via uniorg's content offsets), not org-parsed: otherwise `_x_`
       // becomes a subscript, `''` curls, etc. <pre> preserves the spacing; the
-      // CSS scrolls it on the x-axis instead of wrapping. Mirrors build.el's
-      // my-org-html-yaruo-block (raw buffer-substring -> <pre class="yaruo">).
+      // CSS scrolls it on the x-axis instead of wrapping (raw source slice ->
+      // <pre class="yaruo">).
       if (t === "YARUO" || t === "AA") {
         const raw = st.source.slice(org.contentsBegin, org.contentsEnd).replace(/\n$/, "");
         return this.h(org, "pre", { className: ["yaruo"] }, [{ type: "text", value: raw }]);
@@ -286,11 +286,9 @@ function makeHandlers(st: RenderState) {
     "src-block": function (this: any, org: any) {
       const lang = org.language || "";
       const lines = String(org.value ?? "").replace(/\n$/, "").split("\n");
-      // Number only blocks that actually contain a coderef (NOT every src-block).
-      // This diverges from build.el (whose my-codeblock-counter counts all
-      // src-blocks, so a coderef in the 2nd block gets `coderef-2-…` even with no
-      // coderef in the 1st) -- that's a build.el bug; here the first coderef block
-      // is `coderef-1-…`. The prose `[[(label)]]` link reads the same counter.
+      // Number only blocks that actually contain a coderef (NOT every src-block),
+      // so the first coderef block is `coderef-1-…` regardless of how many plain
+      // code blocks precede it. The prose `[[(label)]]` link reads the same counter.
       const hasCoderef = lines.some((l) => CODEREF_RE.test(l));
       const N = hasCoderef ? ++st.blockCounter.n : st.blockCounter.n;
       const codeChildren: any[] = [];
@@ -311,8 +309,8 @@ function makeHandlers(st: RenderState) {
           // clickable link are the SAME element, so the entire highlighted line
           // -- not just the text run -- is clickable. Clicking it (or a prose
           // `[[(label)]]`) sets the URL to `#coderef-N-label` and
-          // `:target`-highlights it (shareable). build.el needed onmouseover/
-          // onclick JS to make the full span clickable; this is JS-free.
+          // `:target`-highlights it (shareable) -- no onmouseover/onclick JS
+          // needed to make the full line clickable; this is JS-free.
           codeChildren.push(this.h(org, "a", { id, href: `#${id}`, className: ["coderef-off"] }, lineKids));
         } else {
           codeChildren.push({ type: "text", value: line });
@@ -343,7 +341,7 @@ function makeHandlers(st: RenderState) {
         ]);
       }
       // coderef [[(label)]] -> jump to the anchor in the MOST-RECENTLY-rendered
-      // src-block (positional, like build.el's `my-codeblock-counter`). A flat
+      // src-block (positional, via the shared block counter). A flat
       // label->id map broke when the same label (e.g. `1`) repeats across blocks:
       // every `[[(1)]]` then pointed at the last block. The label is wrapped in
       // <span class="coderef-anchor"> to match the in-code anchor styling.
@@ -411,8 +409,8 @@ function demoteHeadings() {
   };
 }
 
-// Match build.el (`org-html-self-link-headlines`): give each heading
-// id="<text>" and wrap its content in <a href="#<text>">…</a>.
+// Self-link headlines (like Org's `org-html-self-link-headlines`): give each
+// heading id="<text>" and wrap its content in <a href="#<text>">…</a>.
 function headingSelfLinks() {
   const textOf = (n: any): string =>
     n.type === "text" ? n.value : (n.children || []).map(textOf).join("");
@@ -430,11 +428,11 @@ function headingSelfLinks() {
   };
 }
 
-// build.el sets `org-export-preserve-breaks t`: every soft newline inside a
-// paragraph / list item / quote becomes a <br> (an explicit `\\` already does,
-// via uniorg's line-break node). uniorg leaves soft newlines as literal text, so
-// HTML would collapse them to a space; convert them here to match Emacs. A
-// newline (with surrounding horizontal whitespace, like a list item's
+// preserve-breaks (Org's `org-export-preserve-breaks t`): every soft newline
+// inside a paragraph / list item / quote becomes a <br> (an explicit `\\` already
+// does, via uniorg's line-break node). uniorg leaves soft newlines as literal
+// text, so HTML would collapse them to a space; convert them here. A newline
+// (with surrounding horizontal whitespace, like a list item's
 // continuation indent) -> <br>. The trailing newline that terminates a block is
 // dropped (no trailing <br>). Skips code/verbatim and math: <pre>/<code> keep
 // their newlines literally, and a text node still carrying \(/\[/\begin{ is raw
@@ -616,8 +614,8 @@ function page(opts: { htmlClass?: string; head: Raw; titleBlock: Raw; content: R
 // JS-free coderef hover-highlight. A prose `[[(label)]]` link and its code line
 // both resolve to `#coderef-N-label`, but live in different DOM subtrees, so no
 // plain combinator connects them. `:has()` does: when a link to `#ID` is hovered
-// anywhere in `#content`, highlight the element `#ID` (the code line). This
-// mirrors build.el's `onmouseover="CodeHighlightOn(...)"` without runtime JS.
+// anywhere in `#content`, highlight the element `#ID` (the code line) -- the
+// hover-to-highlight behavior without any runtime JS.
 // CSS can't bind the hovered href to the target id generically, so we emit one
 // rule per coderef id present on the page (there are only a handful).
 function coderefHoverStyle(ids: string[]): string {
@@ -731,8 +729,7 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
   return { rel: outRel, isDiary: outRel.startsWith("diary/"), draft: !!kw.DRAFT, meta, html };
 }
 
-// index.html: Tags / Devlog (timeline) / Diary -- same three sections, ids and
-// ordering as build.el's `my-generate-sitemap`.
+// index.html: Tags / Devlog (timeline) / Diary -- three sections, in that order.
 export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: string[]): string {
   const section = (id: string, cards: Meta[]): Raw => (
     <Fragment>

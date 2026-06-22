@@ -223,11 +223,11 @@ function replaceWithBlock(a: any, html: string, document: any): void {
 // the `line-numbers` class + `data-start` off the parent), so -- unlike the
 // general highlightCode path which reuses a detached <code> -- we highlight a
 // full <pre> built in the happy-dom document, then splice its HTML into the card.
-// build.el only links the Prism stylesheets when the *exported* page already
-// contains `language-` (see `has-code`). A GitHub embed's code is injected here,
-// after export, so a page whose only code is an embed would ship unstyled
-// (no highlighting, no gutter). Add the links if missing, mirroring build.el's
-// markup exactly (ids + media) so style.js's theme toggle still controls them.
+// The render step only links the Prism stylesheets when the page already
+// contains `language-` (see `hasCode`). A GitHub embed's code is injected here,
+// after render, so a page whose only code is an embed would ship unstyled
+// (no highlighting, no gutter). Add the links if missing, with the same markup
+// (ids + media) so style.js's theme toggle still controls them.
 function ensurePrismCss(document: any): void {
   if (document.getElementById("prism-dark")) return;
   const head = document.querySelector("head");
