@@ -22,9 +22,12 @@ const esc = (s: string): string =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 // HTML void elements -> self-closing (`<meta .../>`), matching the prior output.
+// The always-empty SVG leaf elements (used in the inline nav/footer icons) are
+// included so JSX serialises them self-closed (`<path .../>`) too.
 const VOID = new Set([
   "area", "base", "br", "col", "embed", "hr", "img", "input",
   "link", "meta", "param", "source", "track", "wbr",
+  "path", "circle", "rect", "line", "polyline", "polygon", "ellipse",
 ]);
 
 function renderChildren(children: any[]): string {
