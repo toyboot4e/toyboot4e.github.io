@@ -1,14 +1,9 @@
-// Shared build-time "bake" core: Prism syntax highlighting + KaTeX math +
+// Build-time "bake" core: Prism syntax highlighting + KaTeX math +
 // `[[card:URL]]` link cards, applied to a parsed HTML `document`.
 //
-// This is the representation-agnostic engine extracted from the original
-// `postprocess.ts`. Two drivers use it, on the same kind of linkedom/DOM
-// `document`, so the highlighting/math/card logic never drifts between paths:
-//   - `scripts/render-worker.ts` -- the default (uniorg + bun) build: bakes each
-//     freshly rendered article in-process (no separate postprocess run), in a
-//     worker.
-//   - `scripts/postprocess.ts` -- the Emacs path (`just build-emacs`): reads the
-//     built HTML files, parses each, bakes, writes back.
+// A representation-agnostic engine: it operates on a linkedom/DOM `document`.
+// `build/render-worker.ts` drives it -- each freshly rendered article is baked
+// in-process (no separate postprocess run, no disk round-trip), in a worker.
 //
 // Counters are module-level and therefore per-isolate; a worker reports its own
 // `getStats()` back to the orchestrator, which aggregates. Call `resetStats()`

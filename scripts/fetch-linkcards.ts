@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
 // Populate `linkcard-cache.json` for `[[card:URL]]` links by scraping OGP /
-// GitHub metadata from the live web; `scripts/postprocess.ts` only ever *reads*
-// it.
+// GitHub metadata from the live web; the build (`build/bake.ts`) only ever
+// *reads* it.
 //
 // The cache is NOT committed -- it's derived from the working tree, which may
 // hold unpublished drafts. It's regenerated each build: `just build` runs this
@@ -45,8 +45,8 @@ type Card = {
 };
 
 // File extension -> Prism language. Only languages already loaded in
-// `scripts/postprocess.ts` (loadLanguages) are mapped; an unmapped extension
-// yields a plain, unhighlighted block (no `language-` class, no strict failure).
+// `build/bake.ts` (loadLanguages) are mapped; an unmapped extension yields a
+// plain, unhighlighted block (no `language-` class, no strict failure).
 const EXT_LANG: Record<string, string> = {
   rs: "rust", hs: "haskell", nix: "nix", sh: "bash", bash: "bash", lua: "lua",
   php: "php", ts: "typescript", tsx: "tsx", js: "javascript", mjs: "javascript",

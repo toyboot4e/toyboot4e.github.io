@@ -1,9 +1,7 @@
 // uniorg rendering core: org source -> page HTML string, plus the index /
 // tag-page templates. Pure string production -- no disk, no bake. Shared by the
-// render workers (articles) and the orchestrator (index + tag pages).
-//
-// This is the default build. The Emacs path (build.el + ox-slimhtml, run via
-// `just build-emacs`) is the byte-for-byte reference this mirrors. See build.ts.
+// render workers (articles) and the orchestrator (index + tag pages). See
+// build.ts for how this fits into the parallel build.
 import { unified } from "unified";
 import parse from "uniorg-parse";
 import { defaultOptions } from "uniorg-parse/lib/parse-options.js";
@@ -273,8 +271,7 @@ function makeHandlers(st: RenderState) {
       if (t === "STENO") {
         // The block body is a `/`-separated list of strokes (e.g. `KAT` or
         // `KAT/-S`), sliced verbatim from source (not org-parsed) and drawn as a
-        // static keyboard chart per stroke. Mirrors build.el's
-        // my-org-html-steno-block.
+        // static keyboard chart per stroke (see stenoStrokeHtml above).
         const strokes = st.source.slice(org.contentsBegin, org.contentsEnd).trim().toUpperCase().split("/");
         return this.h(org, "div", { className: [steno.outline] },
           strokes.map((s) => ({ type: "raw", value: stenoStrokeHtml(s) })));

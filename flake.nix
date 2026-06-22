@@ -43,10 +43,10 @@
           '';
         };
 
-      # Everything the default `just build` (uniorg/bun) shells out to. Single
-      # source of truth, shared by the hermetic package build (runtimeInputs) and
-      # the devShell, so the two can't drift. Asset minification (CSS + TS) and
-      # the whole render+bake go through bun, so no esbuild / Prettier / Emacs.
+      # Everything `just build` (uniorg/bun) shells out to. Single source of
+      # truth, shared by the hermetic package build (runtimeInputs) and the
+      # devShell, so the two can't drift. Asset minification (CSS + TS) and the
+      # whole render+bake go through bun, so no esbuild / Prettier / Emacs.
       # (linkcard fetch is best-effort and skipped offline.)
       buildToolsFor =
         pkgs:
@@ -55,17 +55,6 @@
           bun
           just
         ];
-
-      # Emacs (+ packages) for the reference build, `just build-emacs`. Dev-only:
-      # the shipped site is the bun build, so the hermetic package never needs it.
-      emacsFor =
-        pkgs:
-        pkgs.emacs.pkgs.withPackages (
-          epkgs: with epkgs; [
-            seq
-            esxml
-          ]
-        );
 
       buildCommandFor =
         pkgs:
@@ -111,7 +100,6 @@
         default = pkgs.mkShell {
           packages =
             buildToolsFor pkgs
-            ++ [ (emacsFor pkgs) ] # for `just build-emacs`
             ++ (with pkgs; [
               # dev-only tooling (not needed by the hermetic build)
               pinact

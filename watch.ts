@@ -14,8 +14,8 @@
 //   - `style/*.css|*.ts`      -> rebuild the minified assets, copy them to out/.
 //   - other static (img, ...) -> copy the one file.
 //
-// Release-only, like `just build` (drafts are skipped, no `draft/` support); use
-// `just build-emacs --draft` for drafts. Run `just serve` alongside to preview.
+// Release-only, like `just build` (drafts are skipped). Run `just serve`
+// alongside to preview.
 //
 // renderAndBake (the warm path) is imported at module load, so bake.ts's heavy
 // Prism/happy-dom setup is done once and stays warm for every incremental save.

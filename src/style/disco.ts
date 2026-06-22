@@ -6,8 +6,8 @@
 // `.js`/`.css`/… by extension); only the compiled `disco.min.js` ships.
 //
 // Design (see docs/adr/0003-homepage-disco-ball-webgl.md and CONTEXT.md):
-//   - Homepage only, gated by `has-disco` in build.el (a `<canvas id="disco-canvas">`
-//     and this script are emitted only on index.html).
+//   - Site-wide: `build/render.tsx` emits the `<canvas id="disco-canvas">` and
+//     this script (DISCO_BODY / DISCO_HEAD) on every page.
 //   - Raw WebGL, one full-screen fragment shader — no framework. Runs in both
 //     themes (u_light selects the palette/effect); starts/stops live as the user
 //     toggles the theme or the disco button.
@@ -475,7 +475,7 @@ function start(): void {
   // pages: DARK dims to 0.55; LIGHT to 0.7 — the old 0.55 over the bright page
   // was what washed the light-theme article background into fog, and the
   // drop-shadowed reading panes (CSS) give the separation instead of heavy dim.
-  // "home" = a card-listing page (homepage or a tag page); build.el puts the
+  // "home" = a card-listing page (homepage or a tag page); render.tsx puts the
   // `home` class on those. They run the effect at full opacity like the homepage;
   // long-form article pages (no `home` class) dim (below). Keying off the class
   // keeps this in sync with the CSS, which switches on the same `home` class.

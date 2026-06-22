@@ -13,37 +13,23 @@ lh_report := "/tmp/lh-report" # {{lh_report}}.report.{html,json}`
 help:
     @just -l
 
-# build the devlog (uniorg/bun, no Emacs) into out/ -- this is what nix/CI ship.
-# Builds assets, fetches link cards (best-effort), then renders AND bakes
-# (Prism/KaTeX/cards) across worker threads in one pass. BUILD_WORKERS=N caps the
-# worker count; BUILD_PROF=1 prints timings.
+# build the devlog into out/ -- this is what nix/CI ship. Builds assets, fetches
+# link cards (best-effort), then renders AND bakes (Prism/KaTeX/cards) across
+# worker threads in one pass. BUILD_WORKERS=N caps the worker count; BUILD_PROF=1
+# prints timings.
 build *args:
     @just assets
     # Refresh `linkcard-cache.json`, dismissing errors (offline/CI just reads it):
     -bun scripts/fetch-linkcards.ts
     bun build.ts {{args}}
 
-# Emacs reference build (build.el + ox-slimhtml) into out-emacs/, for
-# side-by-side comparison with the default bun build. Exports with Emacs, then
-# bakes via scripts/postprocess.ts (-d --draft, -f --force passed through).
-build-emacs *args:
-    @just assets
-    -bun scripts/fetch-linkcards.ts
-    OUT_DIR=out-emacs emacs -Q --script "./build.el" -- {{args}}
-    OUT_DIR=out-emacs just format
-
-[private]
-alias be := build-emacs
-
 [private]
 alias b := build
 
-# cleans up the output directories
+# cleans up the output directory
 clean:
-    echo "cleaning up the \`out/\` and \`out-emacs/\` directories.."
-    rm -rf out/* out-emacs/* > /dev/null 2>&1
-    # force a full rebuild of the Emacs reference build next time:
-    rm -rf .org-timestamps
+    echo "cleaning up the \`out/\` directory.."
+    rm -rf out/* > /dev/null 2>&1
 
 # run the golden tests (render+bake output pinned against test/golden/).
 # regenerate goldens after an intentional output change: `just test-update`
@@ -63,17 +49,6 @@ test-update:
 
 [private]
 alias c := clean
-
-# run the post-processing script (Prism/KaTeX/link-card bake + serialise),
-# embedding the `<!--pp-->` sentinel. CI=1 makes the post-process strict.
-format:
-    bash scripts/format.sh
-
-[private]
-alias fmt := format
-
-[private]
-alias f := format
 
 # fetch OGP metadata for `[[card:URL]]` links into `linkcard-cache.json` (-f, URLs)
 linkcards *args:
@@ -124,8 +99,8 @@ audit-ai page="index.html": (audit page)
 
 # warm watch daemon: one full build at startup, then keep the render+bake
 # machinery resident and rebuild ONLY the changed file on each save (~10-50ms vs
-# ~1.5s for a full build). Release-only (no draft/ support); use
-# `just build-emacs --draft` for drafts. Run `just serve` alongside to preview.
+# ~1.5s for a full build). Release-only (drafts are skipped). Run `just serve`
+# alongside to preview.
 watch:
     bun watch.ts
 

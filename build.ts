@@ -1,22 +1,19 @@
 #!/usr/bin/env bun
-// The default build: `.org` sources -> static site, with uniorg (a JS org-mode
-// parser) + bun, no Emacs. This is what `just build` runs and what nix/CI ship.
-// The Emacs path (build.el + ox-slimhtml) is kept as `just build-emacs` -- the
-// original, byte-for-byte reference renderer -- for side-by-side comparison.
+// The build: `.org` sources -> static site, with uniorg (a JS org-mode parser)
+// + bun, no Emacs. This is what `just build` runs and what nix/CI ship.
 //
 // Two things make it fast:
 //
 //   1. Merge: each article is rendered AND baked (Prism + KaTeX + link cards)
-//      in one pass -- no intermediate write-then-re-parse via postprocess. The
-//      bake logic is shared with the Emacs path through `scripts/bake.ts`, so
-//      the two never drift. (`scripts/postprocess.ts` is the Emacs-path driver.)
+//      in one pass -- no intermediate write-then-re-parse. Render lives in
+//      `build/render.tsx`, the bake engine in `build/bake.ts`.
 //   2. Parallel: articles are sharded across worker threads (one isolate each),
 //      so all cores render+bake at once. The orchestrator only assembles the
 //      index + tag pages from the returned metadata.
 //
-// Writes to `out/` by default (set OUT_DIR to target another dir, e.g.
-// `build-emacs` uses out-emacs/). Opt-in `BUILD_PROF=1` prints phase/worker
-// timings; `BUILD_WORKERS=N` overrides the worker count.
+// Writes to `out/` by default (set OUT_DIR to target another dir). Opt-in
+// `BUILD_PROF=1` prints phase/worker timings; `BUILD_WORKERS=N` overrides the
+// worker count.
 //
 // Coverage note: paragraphs/headings/lists/tables/links/emphasis/code come from
 // uniorg; the custom bits (DETAILS/YARUO/STENO blocks, [[card:]] links, .org->

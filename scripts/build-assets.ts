@@ -1,13 +1,13 @@
 // Minify the hand-written CSS and bundle+minify the hand-written TypeScript in
 // src/style/ into the *.min.css / *.min.js that ship. Replaces the old
 // scripts/min-css.sh + scripts/build-js.sh esbuild pair: Bun is already a build
-// dependency (it runs postprocess.ts / fetch-linkcards.ts), and its bundler
+// dependency (it runs the render+bake and fetch-linkcards.ts), and its bundler
 // minifies both CSS and TS offline — so esbuild is no longer needed anywhere.
 //
 // Run via `bun scripts/build-assets.ts` (by `just assets`, itself run by
 // `just build`). Works in the hermetic nix sandbox: no network, no /usr/bin/env.
-// The generated *.min.* are git-ignored — the build owns them; build.el's static
-// publish step copies them into out/style/ by extension.
+// The generated *.min.* are git-ignored — the build owns them; build.ts's static
+// copy step ships them into out/style/ by extension.
 //
 // CSS is minified in place (`external: ["*"]`): Bun's bundler would otherwise try
 // to resolve url(...) assets, but the font/data URIs must ship as written. JS is
