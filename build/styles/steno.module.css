@@ -1,0 +1,50 @@
+/* Steno chord chart -- the Uni 3x12 keyboard outline drawn for `#+BEGIN_STENO`
+ * blocks. Rendered to static HTML at build time (render.tsx `stenoStrokeHtml`,
+ * build.el `my-org-html-steno-block`); replaces the old client-side
+ * <steno-outline> web component + steno-viz.js. CSS module: the class names
+ * below are scoped (hashed) at build time and consumed via the generated map in
+ * render.tsx. `var(--text)` is a global theme token (custom properties aren't
+ * scoped), so it cascades as before. */
+
+.outline {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.stroke {
+  display: inline-grid;
+  grid-template-rows: repeat(3, 32px);
+  grid-template-columns: repeat(12, 32px);
+  gap: 4px;
+  position: relative;
+}
+
+.key,
+.cell {
+  width: 32px;
+  height: 32px;
+  box-sizing: border-box;
+}
+
+.key {
+  text-align: center;
+  border: 1px solid var(--text);
+  border-radius: 3px;
+}
+
+.keyPressed {
+  background: #4a90e2;
+}
+
+.keyFat {
+  /* the `*` key is twice as tall: 32 + 4 (gap) + 32 */
+  width: 32px;
+  height: 66px;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+}

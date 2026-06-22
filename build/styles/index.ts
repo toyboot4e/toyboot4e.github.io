@@ -4,5 +4,6 @@
 // imports the generated map (`build/styles/generated.js`) -- NOT this file
 // directly, since `.module.css` only resolves through the bundler.
 import card from "./article-card.module.css";
+import steno from "./steno.module.css";
 
-export { card };
+export { card, steno };
