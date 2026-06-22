@@ -128,25 +128,7 @@ main {
   opacity: 1;
 }
 
-#toc {
-  grid-column: 3;
-  /* span both grid rows (title + content) so the TOC can start at the top,
-     next to the header — otherwise auto-placement drops it into the content
-     row, below the title. Use `span 2`, not `1 / -1`: with no explicit
-     grid-template-rows, `-1` resolves to line 1, so a tall TOC would land
-     entirely in row 1 and inflate it, pushing the content far down. */
-  grid-row: 1 / span 2;
-  align-self: start;
-  position: sticky;
-  top: 3.75rem; /* clear the sticky header */
-  margin-top: 2.5rem; /* align with the title block's top */
-  max-height: calc(100vh - 4.5rem);
-  width: 250px;
-  overflow-y: auto;
-  margin-left: 33px; /* 32px + --border-width */
-  padding-left: 0rem;
-  border-left: var(--border-width) solid rgb(96, 96, 114);
-}
+/* The ToC (#toc, grid column 3) is styled in build/styles/toc.module.css. */
 
 #content p {
   text-indent: 1em;
@@ -703,10 +685,8 @@ span.code-highlighted {
   overflow: auto;
 }
 
-/* ToC (sticky, right side) */
-
+/* Page grid: single-column mode (the ToC itself hides via its own module). */
 @media (max-width: 1100px) {
-  /* single-column mode */
   main {
     display: grid;
     grid-template-columns: 1fr;
@@ -715,33 +695,6 @@ span.code-highlighted {
   .title-block {
     grid-column: 1;
   }
-  #toc {
-    display: none;
-  }
-}
-
-
-a.toc-link {
-  display: block;
-}
-
-/* active section (set by the scrollspy, src/style/toc.ts) */
-#toc a[aria-current="true"] {
-  background-color: color-mix(in srgb, var(--accent-hover) 10%, transparent);
-  font-weight: 700;
-}
-
-#toc a:hover {
-  background-color: color-mix(in srgb, var(--accent-hover) 5%, transparent);
-  text-decoration: underline;
-}
-
-.toc-list {
-  margin: 0;
-}
-
-ul.toc-list {
-  list-style: none;
 }
 
 /* highlight on jump */
@@ -757,38 +710,6 @@ h4:target,
 h5:target,
 h6:target {
   animation: fadeHighlight 2s ease-out forwards;
-}
-
-/* ToC list: indent each link by its heading level (the static ToC is flat, so
-   indentation is class-driven, not nesting-driven). */
-
-#toc ul {
-  padding-left: 0;
-}
-
-#toc > .toc-list {
-  overflow: hidden;
-  position: relative;
-}
-
-a.toc-link {
-  height: 100%;
-  text-decoration: none;
-  padding-top: 2px;
-  padding-bottom: 2px;
-  padding-right: 4px;
-}
-
-.node-name--H2 {
-  padding-left: 16px;
-}
-
-.node-name--H3 {
-  padding-left: 32px;
-}
-
-.node-name--H4 {
-  padding-left: 48px;
 }
 
 /* ============================================================
@@ -821,7 +742,6 @@ a.toc-link {
 .disco-animating .org-tag,
 .disco-animating .title-block,
 .disco-animating #content,
-.disco-animating #toc,
 .disco-animating body > header,
 .disco-animating body > footer {
   transition:
@@ -1054,22 +974,5 @@ html.disco-on:not(.home) #content::before {
   border-radius: 10px;
   box-shadow: var(--disco-shadow);
 }
-/* #toc has `overflow-y: auto`, which would clip a ::before backdrop (cutting off
-   the rounded corners → a rect, and the upward extension → misaligned top). So
-   give the TOC its background DIRECTLY (border-radius clips fine with overflow)
-   and swap its left border for a full border in the article-card colour so it
-   reads as a clean rounded panel that matches the cards. */
-html.disco-on #toc {
-  border: var(--border-width) solid var(--border);
-  background-color: var(--disco-toc-bg);
-  border-radius: 10px;
-  padding: 0.5rem 0.7rem;
-  box-shadow: var(--disco-shadow);
-}
-/* Article/tag pages only: lift the toc 0.6rem to meet the title backdrop, which
-   ::before extends 0.6rem above the title box. The homepage title is a plain chip
-   (no upward ::before), so its toc keeps the base 2.5rem top and aligns there. */
-html.disco-on:not(.home) #toc {
-  margin-top: calc(2.5rem - 0.6rem);
-}
+/* (disco ToC panel styling moved to build/styles/toc.module.css) */
 

@@ -5,5 +5,6 @@
 // directly, since `.module.css` only resolves through the bundler.
 import card from "./article-card.module.css";
 import steno from "./steno.module.css";
+import toc from "./toc.module.css";
 
-export { card, steno };
+export { card, steno, toc };

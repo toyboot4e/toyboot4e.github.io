@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { parseHTML } from "linkedom";
 import { renderAndBake } from "../build/render-bake.ts";
 import { buildIndexHtml, buildTagHtml, renderArticle, type Meta } from "../build/render.tsx";
+import { toc } from "../build/styles/generated.js";
 
 const FIX = join(import.meta.dir, "fixtures");
 const GOLD = join(import.meta.dir, "golden");
@@ -74,18 +75,18 @@ test("page shell", async () => {
   expect(out).toContain('<link rel="stylesheet" href="/style/components.min.css">');
   expect(out).toContain('<header role="banner">');
   expect(out).toContain('<footer role="contentinfo">');
-  expect(out).toContain('<nav id="toc"></nav>'); // empty ToC (no headings)
+  expect(out).toContain(`<nav id="toc" class="${toc.toc}"></nav>`); // empty ToC (no headings)
   expect(out).not.toContain("toc.min.js"); // no scrollspy when there's no ToC
   expect(out).toContain("<!--pp-->"); // bake sentinel
 });
 
 test("toc: static list from headings, scrollspy shipped only when present", async () => {
   const out = await bake("t.org", "* First\nbody\n** Nested\nmore\n* Second\n");
-  // org level-1 headline -> h2, level-2 -> h3; flat list, indent via node-name
-  expect(out).toContain('<nav id="toc"><ul class="toc-list">');
-  expect(out).toContain('<a class="toc-link node-name--H2" href="#First">First</a>');
-  expect(out).toContain('<a class="toc-link node-name--H3" href="#Nested">Nested</a>');
-  expect(out).toContain('<a class="toc-link node-name--H2" href="#Second">Second</a>');
+  // org level-1 headline -> h2, level-2 -> h3; flat list, indent via scoped class
+  expect(out).toContain(`<nav id="toc" class="${toc.toc}"><ul class="${toc.tocList}">`);
+  expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH2}" href="#First">First</a>`);
+  expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH3}" href="#Nested">Nested</a>`);
+  expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH2}" href="#Second">Second</a>`);
   expect(out).toContain('defer src="/style/toc.min.js"'); // scrollspy shipped
 });
 

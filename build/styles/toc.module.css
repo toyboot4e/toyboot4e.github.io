@@ -1,0 +1,107 @@
+/* Table of contents -- the sticky right-column outline on article / tag / index
+ * pages. CSS module: class names are scoped at build time and consumed via the
+ * generated map in render.tsx (buildToc). The list is generated statically; the
+ * scrollspy (src/style/toc.ts) marks the current link with `aria-current="true"`
+ * (the nav keeps a global `id="toc"` purely as that script's hook). Theme tokens
+ * (var(--*)) and the disco ancestor classes stay global via :global(). Migrated
+ * out of style.css; the `main` grid that places this in column 3 and the
+ * `--disco-toc-bg` token remain global there. */
+
+.toc {
+  grid-column: 3;
+  /* span both grid rows (title + content) so the TOC can start at the top,
+     next to the header — otherwise auto-placement drops it into the content
+     row, below the title. Use `span 2`, not `1 / -1`: with no explicit
+     grid-template-rows, `-1` resolves to line 1, so a tall TOC would land
+     entirely in row 1 and inflate it, pushing the content far down. */
+  grid-row: 1 / span 2;
+  align-self: start;
+  position: sticky;
+  top: 3.75rem; /* clear the sticky header */
+  margin-top: 2.5rem; /* align with the title block's top */
+  max-height: calc(100vh - 4.5rem);
+  width: 250px;
+  overflow-y: auto;
+  margin-left: 33px; /* 32px + --border-width */
+  padding-left: 0rem;
+  border-left: var(--border-width) solid rgb(96, 96, 114);
+}
+
+@media (max-width: 1100px) {
+  /* single-column mode: the page grid collapses (see style.css) and the ToC hides */
+  .toc {
+    display: none;
+  }
+}
+
+/* The list is flat, so indentation is class-driven (.nodeH{n}), not nesting. */
+.tocList {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.toc > .tocList {
+  overflow: hidden;
+  position: relative;
+}
+
+.tocLink {
+  display: block;
+  height: 100%;
+  text-decoration: none;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-right: 4px;
+}
+
+/* active section (set by the scrollspy, src/style/toc.ts) */
+.tocLink[aria-current="true"] {
+  background-color: color-mix(in srgb, var(--accent-hover) 10%, transparent);
+  font-weight: 700;
+}
+
+.tocLink:hover {
+  background-color: color-mix(in srgb, var(--accent-hover) 5%, transparent);
+  text-decoration: underline;
+}
+
+.nodeH2 {
+  padding-left: 16px;
+}
+
+.nodeH3 {
+  padding-left: 32px;
+}
+
+.nodeH4 {
+  padding-left: 48px;
+}
+
+/* disco: smooth the theme-toggle transition (was in the shared .disco-animating
+ * list in style.css) */
+:global(.disco-animating) .toc {
+  transition:
+    opacity 0.8s ease,
+    background-color 0.8s ease,
+    backdrop-filter 0.8s ease;
+}
+
+/* disco: overflow-y:auto would clip a ::before backdrop (cutting off the rounded
+ * corners → a rect, and the upward extension → misaligned top), so give the ToC
+ * its background DIRECTLY and swap its left border for a full border in the
+ * article-card colour, so it reads as a clean rounded panel matching the cards. */
+:global(html.disco-on) .toc {
+  border: var(--border-width) solid var(--border);
+  background-color: var(--disco-toc-bg);
+  border-radius: 10px;
+  padding: 0.5rem 0.7rem;
+  box-shadow: var(--disco-shadow);
+}
+
+/* Article/tag pages only: lift the toc 0.6rem to meet the title backdrop, which
+ * ::before extends 0.6rem above the title box. The homepage title is a plain chip
+ * (no upward ::before), so its toc keeps the base 2.5rem top and aligns there. */
+:global(html.disco-on:not(.home)) .toc {
+  margin-top: calc(2.5rem - 0.6rem);
+}
