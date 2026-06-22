@@ -121,6 +121,10 @@ Hardbreak list:
 　　　　　　　　　　　　　　　.　　　　 　 ';i;i;i;i;i;i;i;ｉ:ｌ:;i;i;i;i;i;i;i;i;i;i;i;i;i;i;i;iﾑ.;;;;;;;;;;;;;;;;;〉
 #+END_YARUO
 
+#+BEGIN_STENO
+THROFR
+#+END_STENO
+
 #+END_DETAILS
 
 * まとめ

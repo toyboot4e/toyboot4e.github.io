@@ -92,6 +92,10 @@ const [shuffle, setShuffle] = useState(false);
 const [defaultShuffle] = useState(() => shuffle);
 #+END_SRC
 
+#+BEGIN_QUOTE
+しかし =defaultValue= + =key= による頻繁な更新はアンチパタンで、むしろ controlled value を使うべきでした。後ほど修正しました。
+#+END_QUOTE
+
 *** =useEffect=, =useLocalStorage=
 
 React においては状態を最小化し、状態を元に他の値を計算すべきとされています。これはシリアライズするデータを最小限にし、デシリアライズのコードを書くのと似ています。
