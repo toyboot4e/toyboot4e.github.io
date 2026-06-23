@@ -24,7 +24,7 @@
 // gone from disk, and we skip git-tracked entries that no longer exist.
 
 import { $ } from "bun";
-import { stat, rm, readFile, writeFile } from "node:fs/promises";
+import { stat, rm, rename, readFile, writeFile } from "node:fs/promises";
 import { basename } from "node:path";
 
 const IMG_DIRS = ["src/img", "src/diary/img"];
@@ -141,6 +141,31 @@ for (const src of images) {
   );
   totalSrc += srcSize;
   totalWebp += webpSize;
+  made++;
+}
+
+// Existing .webp wider than the cap: these were added directly as WebP (e.g. a
+// phone photo exported to webp), so they skipped the resize above. Downscale them
+// in place, preserving the encoding -- lossy photos stay lossy (q80), lossless
+// screenshots stay lossless (so text doesn't pick up artifacts). No rename, so no
+// article references change. (Once capped they're <= MAX_WIDTH and re-runs skip.)
+for (const src of await committed(IMG_DIRS, /\.webp$/i)) {
+  if ((await pixelWidth(src)) <= MAX_WIDTH) continue;
+  const lossless = (await $`webpinfo ${src}`.quiet().text()).includes("Format: Lossless");
+  const srcSize = (await stat(src)).size;
+  const tmp = `${src}.tmp.webp`;
+  const enc = lossless ? ["-lossless", "-z", "9"] : ["-q", String(JPG_QUALITY)];
+  await $`cwebp -quiet ${enc} -m 6 -metadata none -resize ${String(MAX_WIDTH)} 0 ${src} -o ${tmp}`;
+  const newSize = (await stat(tmp)).size;
+  if (newSize >= srcSize) { await rm(tmp); skipped++; continue; }
+  await rename(tmp, src);
+  staged.push(src);
+  console.log(
+    `  ${basename(src).padEnd(40)} ${kb(srcSize).padStart(9)} -> ${kb(newSize).padStart(9)} ` +
+    `webp resize (${lossless ? "lossless" : "lossy"}, ${pct(srcSize, newSize)})`,
+  );
+  totalSrc += srcSize;
+  totalWebp += newSize;
   made++;
 }
 
