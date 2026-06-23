@@ -159,6 +159,15 @@ test("title: <title> strips org markup, <h1> keeps it", async () => {
   expect(out).toContain("<h1><code class=\"inline-verbatim\">org</code> and <strong>bold</strong></h1>");
 });
 
+test("mathbb: lowercase/digits -> Unicode double-struck, uppercase keeps KaTeX_AMS", async () => {
+  const out = await bake("m.org", "$\\mathbb{R}$ $\\mathbb{n}$ $\\mathbb{1}$ and raw \\(\\mathbb{q}\\)\n");
+  expect(out).toContain('mord mathbb">R'); // uppercase: native KaTeX_AMS glyph
+  expect(out).toContain("\u{1D55F}"); // \mathbb{n} -> 𝕟 (textbb span, LMMathBB font)
+  expect(out).toContain("\u{1D7D9}"); // \mathbb{1} -> 𝟙
+  expect(out).toContain("\u{1D562}"); // raw-path \mathbb{q} -> 𝕢
+  expect(out).not.toContain("\\mathbb{n}"); // no leftover lowercase \mathbb
+});
+
 test("YARUO/AA: verbatim <pre>, org markup NOT parsed", async () => {
   const out = await bake("y.org", "#+BEGIN_YARUO\n( _人_ )  *not bold*\n#+END_YARUO\n");
   expect(out).toContain('<pre class="yaruo">( _人_ )  *not bold*</pre>');

@@ -17,6 +17,7 @@ import { h, Fragment, raw, render, type Raw } from "./html.ts";
 import card from "./styles/article-card.module.css";
 import steno from "./styles/steno.module.css";
 import toc from "./styles/toc.module.css";
+import { expandMathbb } from "./math-util.ts";
 
 export const SITE_URL = "https://toyboot4e.github.io/";
 
@@ -285,7 +286,7 @@ function makeHandlers(st: RenderState) {
       const v = String(org.value ?? "");
       const display = v.startsWith("$$") || v.startsWith("\\[");
       const cls = display ? ["math", "math-display"] : ["math", "math-inline"];
-      return this.h(org, "span", { className: cls }, [{ type: "text", value: String(org.contents ?? "").trim() }]);
+      return this.h(org, "span", { className: cls }, [{ type: "text", value: expandMathbb(String(org.contents ?? "").trim()) }]);
     },
     "special-block": function (this: any, org: any) {
       const t = (org.blockType || "").toUpperCase();

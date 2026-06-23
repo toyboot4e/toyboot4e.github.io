@@ -17,6 +17,7 @@ import { readFile } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { BakeStats } from "./bake-util.ts";
+import { expandMathbb } from "./math-util.ts";
 
 // Re-export the lightweight helpers so existing importers keep one entry point.
 export { SENTINEL, stamp, mergeStats, copyKatexAssets, type BakeStats } from "./bake-util.ts";
@@ -152,7 +153,7 @@ function renderMath(document: any): void {
     while ((m = MATH_RE.exec(text))) {
       if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
       const displayMode = m[2] !== undefined || m[3] !== undefined;
-      const tex = m[1] ?? m[2] ?? `\\begin{${m[3]}}${m[4]}\\end{${m[3]}}`;
+      const tex = expandMathbb(m[1] ?? m[2] ?? `\\begin{${m[3]}}${m[4]}\\end{${m[3]}}`);
       const span = document.createElement("span");
       let html: string;
       try {
