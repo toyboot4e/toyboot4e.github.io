@@ -14,12 +14,16 @@
 import { Window } from "happy-dom";
 import katex from "katex";
 import { readFile } from "node:fs/promises";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { BakeStats } from "./bake-util.ts";
 
 // Re-export the lightweight helpers so existing importers keep one entry point.
 export { SENTINEL, stamp, mergeStats, copyKatexAssets, type BakeStats } from "./bake-util.ts";
 
-const CARD_CACHE = "linkcard-cache.json";
+// Repo-root-relative (builder/src/bake.ts -> ../..), so the cache resolves
+// regardless of cwd.
+const CARD_CACHE = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "linkcard-cache.json");
 
 // Rendered as-is, never highlighted, never an error: the plaintext aliases plus
 // languages that stock Prism has no grammar for and that we deliberately show

@@ -14,17 +14,19 @@
           system: f (import nixpkgs { inherit system; })
         );
 
-      # node_modules for the bun build (build.ts + scripts/*).
+      # node_modules for the Vite builder (builder/). Vendored from
+      # builder/package-lock.json (generated with `--legacy-peer-deps`, mirrored
+      # by npmFlags below).
       #
-      # After bumping deps: regenerate `package-lock.json`, set `npmDepsHash` to
-      # `lib.fakeHash`, run `nix build`, and copy the `got:` hash from the error.
+      # After bumping deps: regenerate builder/package-lock.json, set
+      # `npmDepsHash` to `lib.fakeHash`, run `nix build`, and copy the `got:` hash.
       nodeModulesFor =
         pkgs:
         pkgs.buildNpmPackage {
           pname = "devlog-node-deps";
           version = "0";
           src = pkgs.lib.cleanSourceWith {
-            src = ./.;
+            src = ./builder;
             filter =
               path: _type:
               let
@@ -32,7 +34,8 @@
               in
               b == "package.json" || b == "package-lock.json";
           };
-          npmDepsHash = "sha256-6l11TeQ9GtVCmzv6oyAnXvQARutkyf1vA3XuCmtPdBE=";
+          npmDepsHash = "sha256-vogfuK60C0spRBvxvHNvTdj9PabaoH3YpkxW0z9kNlg=";
+          npmFlags = [ "--legacy-peer-deps" ];
           dontNpmBuild = true;
           # We only want node_modules, not a packaged/installed app.
           installPhase = ''
@@ -43,11 +46,10 @@
           '';
         };
 
-      # Everything `just build` (uniorg/bun) shells out to. Single source of
-      # truth, shared by the hermetic package build (runtimeInputs) and the
-      # devShell, so the two can't drift. Asset minification (CSS + TS) and the
-      # whole render+bake go through bun, so no esbuild / Prettier / Emacs.
-      # (linkcard fetch is best-effort and skipped offline.)
+      # Everything `just build` shells out to. Single source of truth, shared by
+      # the hermetic package build (runtimeInputs) and the devShell, so the two
+      # can't drift. The build is a Vite project (builder/) run via `bunx
+      # vite-node` -- bun runs vite-node, so no separate node is needed; no Emacs.
       buildToolsFor =
         pkgs:
         with pkgs;
@@ -65,7 +67,7 @@
           name = "build-command";
           runtimeInputs = buildToolsFor pkgs;
           text = ''
-            [ -e node_modules ] || ln -sfn ${nodeModules}/node_modules ./node_modules
+            [ -e builder/node_modules ] || ln -sfn ${nodeModules}/node_modules builder/node_modules
             # CI=1: strict (fail on unknown language / KaTeX error / uncached card)
             CI=1 just build
           '';
@@ -80,8 +82,8 @@
           name = "linkcard";
           runtimeInputs = [ pkgs.bun ];
           text = ''
-            [ -e node_modules ] || ln -sfn ${nodeModules}/node_modules ./node_modules
-            bun scripts/fetch-linkcards.ts "$@"
+            [ -e builder/node_modules ] || ln -sfn ${nodeModules}/node_modules builder/node_modules
+            ( cd builder && bunx vite-node src/fetch-linkcards.ts "$@" )
           '';
         };
     in

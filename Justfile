@@ -14,14 +14,13 @@ help:
     @just -l
 
 # build the devlog into out/ -- this is what nix/CI ship. Builds assets, fetches
-# link cards (best-effort), then renders AND bakes (Prism/KaTeX/cards) across
-# worker threads in one pass. BUILD_WORKERS=N caps the worker count; BUILD_PROF=1
-# prints timings.
+# link cards (best-effort), then renders AND bakes (Prism/KaTeX/cards) via the
+# Vite builder (`builder/`, vite-node). BUILD_PROF=1 prints phase timings.
 build *args:
     @just assets
     # Refresh `linkcard-cache.json`, dismissing errors (offline/CI just reads it):
-    -bun scripts/fetch-linkcards.ts
-    bun build.ts {{args}}
+    -cd builder && bunx vite-node src/fetch-linkcards.ts
+    cd builder && bunx vite-node src/main.ts {{args}}
 
 [private]
 alias b := build
@@ -33,33 +32,31 @@ clean:
 
 # run the golden tests (render+bake output pinned against test/golden/).
 # regenerate goldens after an intentional output change: `just test-update`
-# (assets first: render.tsx imports the generated CSS-module class map)
 test:
-    @just assets
-    bun test test/
+    cd builder && bunx vitest run
 
 [private]
 alias t := test
 
 # regenerate golden files, then show the diff to review
 test-update:
-    @just assets
-    UPDATE_GOLDEN=1 bun test test/
-    git -c core.pager=cat diff --stat test/golden/
+    cd builder && UPDATE_GOLDEN=1 bunx vitest run
+    git -c core.pager=cat diff --stat builder/test/golden/
 
 [private]
 alias c := clean
 
 # fetch OGP metadata for `[[card:URL]]` links into `linkcard-cache.json` (-f, URLs)
 linkcards *args:
-    bun scripts/fetch-linkcards.ts {{args}}
+    cd builder && bunx vite-node src/fetch-linkcards.ts {{args}}
 
 [private]
 alias lc := linkcards
 
-# minify CSS + bundle/minify TS in `src/style/` into `*.min.{css,js}` (also run by `build`)
+# build CSS modules (-> components.min.css) + minify CSS + bundle/minify TS in
+# `src/style/` into `*.min.{css,js}` via the Vite builder (also run by `build`)
 assets:
-    bun scripts/build-assets.ts
+    cd builder && bunx vite-node src/assets.ts
 
 # starts HTTP server
 serve:
@@ -102,7 +99,7 @@ audit-ai page="index.html": (audit page)
 # ~1.5s for a full build). Release-only (drafts are skipped). Run `just serve`
 # alongside to preview.
 watch:
-    bun watch.ts
+    cd builder && bunx vite-node src/watch.ts
 
 [private]
 alias w := watch

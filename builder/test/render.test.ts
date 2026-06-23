@@ -8,16 +8,19 @@
 //
 // Regenerate the body goldens after an intentional change:
 //   UPDATE_GOLDEN=1 bun test
-import { test, expect } from "bun:test";
+import { test, expect } from "vitest";
 import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { parseHTML } from "linkedom";
-import { renderAndBake } from "../build/render-bake.ts";
-import { buildIndexHtml, buildTagHtml, renderArticle, type Meta } from "../build/render.tsx";
-import { toc } from "../build/styles/generated.js";
+import { renderAndBake } from "../src/render-bake.ts";
+import { buildIndexHtml, buildTagHtml, renderArticle, type Meta } from "../src/render.tsx";
+import toc from "../src/styles/toc.module.css";
+import card from "../src/styles/article-card.module.css";
 
-const FIX = join(import.meta.dir, "fixtures");
-const GOLD = join(import.meta.dir, "golden");
+const HERE = dirname(fileURLToPath(import.meta.url));
+const FIX = join(HERE, "fixtures");
+const GOLD = join(HERE, "golden");
 const UPDATE = !!process.env.UPDATE_GOLDEN;
 
 // The rendered org body only -- the page chrome lives in the shell test below.
@@ -145,7 +148,7 @@ test("image: #+ATTR_HTML width lands on <img>, not the container", async () => {
 test("article card: scoped class, org-markup title, thumbnail path", async () => {
   const { meta } = await renderAndBake("a.org", "#+TITLE: =code= t\n#+THUMBNAIL: img/a.webp\nx\n");
   const html = buildIndexHtml([meta], [], []);
-  expect(html).toMatch(/class="articleCard_[A-Za-z0-9]+"/); // CSS-module scoped
+  expect(html).toContain(`class="${card.articleCard}"`); // CSS-module scoped class
   expect(html).toContain("<code class=\"inline-verbatim\">code</code> t"); // title htmlized
   expect(html).toContain('src="/img/a.webp"'); // thumbnail not /img/img/
 });

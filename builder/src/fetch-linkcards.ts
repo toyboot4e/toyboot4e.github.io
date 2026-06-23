@@ -1,8 +1,6 @@
-#!/usr/bin/env bun
-
 // Populate `linkcard-cache.json` for `[[card:URL]]` links by scraping OGP /
-// GitHub metadata from the live web; the build (`build/bake.ts`) only ever
-// *reads* it.
+// GitHub metadata from the live web; the build (`builder/src/bake.ts`) only ever
+// *reads* it. Run via vite-node (`just linkcards`).
 //
 // The cache is NOT committed -- it's derived from the working tree, which may
 // hold unpublished drafts. It's regenerated each build: `just build` runs this
@@ -15,10 +13,13 @@
 
 import { parseHTML } from "linkedom";
 import { readFile, writeFile, readdir } from "node:fs/promises";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const CACHE_FILE = "linkcard-cache.json";
-const SRC_DIR = "src";
+// Repo-root-relative (builder/src/ -> ../..), so paths resolve regardless of cwd.
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const CACHE_FILE = join(ROOT, "linkcard-cache.json");
+const SRC_DIR = join(ROOT, "src");
 const CARD_RE = /\[\[card:([^\]]+)\]\]/g;
 const UA =
   "Mozilla/5.0 (compatible; toyboot4e-devlog-linkcard/1.0; +https://toyboot4e.github.io/)";

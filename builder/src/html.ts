@@ -39,11 +39,16 @@ function renderChildren(children: any[]): string {
   return out;
 }
 
+// `__source` / `__self` are debug props esbuild's dev JSX transform injects; the
+// build disables that (vite.config esbuild.jsxDev:false), but vitest forces it on,
+// so drop them here too -- they must never reach the HTML.
+const SKIP_PROP = new Set(["children", "__source", "__self"]);
+
 function renderAttrs(props: Record<string, any> | null): string {
   if (!props) return "";
   let out = "";
   for (const [k, v] of Object.entries(props)) {
-    if (k === "children" || v == null || v === false) continue;
+    if (SKIP_PROP.has(k) || v == null || v === false) continue;
     if (v === true) out += ` ${k}`;
     else out += ` ${k}="${esc(String(v))}"`;
   }

@@ -19,12 +19,16 @@
 //
 // renderAndBake (the warm path) is imported at module load, so bake.ts's heavy
 // Prism/happy-dom setup is done once and stays warm for every incremental save.
-import { watch, readFileSync, unlinkSync } from "node:fs";
-import { mkdir, writeFile, rm, cp, readdir } from "node:fs/promises";
+import { watch, readFileSync, existsSync, unlinkSync } from "node:fs";
+import { mkdir, writeFile, readFile, rm, cp, readdir } from "node:fs/promises";
 import { join, dirname, sep } from "node:path";
-import { renderAndBake } from "./build/render-bake.ts";
-import { type Meta } from "./build/render.tsx";
+import { fileURLToPath } from "node:url";
+import { spawn, type ChildProcess } from "node:child_process";
+import { renderAndBake } from "./render-bake.ts";
+import { type Meta } from "./render.tsx";
 import { SRC, OUT, STATIC_RE, fullBuild, writeIndexAndTags } from "./build.ts";
+
+const HERE = dirname(fileURLToPath(import.meta.url)); // builder/src
 
 // --- in-memory article metadata cache, keyed by output rel (e.g. diary/x.html).
 // Seeded from the startup full build, kept in sync on every change; the index +
@@ -56,12 +60,12 @@ async function onOrg(relOrg: string): Promise<void> {
   const abs = join(SRC, relOrg);
   const outRel = relOrg.replace(/\.org$/, ".html");
   // deleted -> drop its page; reindex only if it was a published article
-  if (!(await Bun.file(abs).exists())) {
+  if (!existsSync(abs)) {
     if (cache.delete(outRel)) { await rm(join(OUT, outRel), { force: true }); await regenIndexTags(); }
     log(`- ${relOrg} removed (${since(t)})`);
     return;
   }
-  const r = await renderAndBake(relOrg, await Bun.file(abs).text());
+  const r = await renderAndBake(relOrg, await readFile(abs, "utf8"));
   // became a #+DRAFT -> treat like a delete (release build skips drafts)
   if (r.draft) {
     if (cache.delete(r.rel)) { await rm(join(OUT, r.rel), { force: true }); await regenIndexTags(); }
@@ -79,13 +83,15 @@ async function onOrg(relOrg: string): Promise<void> {
 }
 
 // --- one static-file change --------------------------------------------------
-// The only child PROCESS the daemon spawns (worker_threads are threads, not
-// processes, so they can't be orphaned/zombied -- they die with us). Tracked so
-// shutdown() can reap it if we're killed mid-rebuild.
-let assetChild: ReturnType<typeof Bun.spawn> | null = null;
+// The only child PROCESS the daemon spawns (the asset rebuild, via vite-node).
+// Tracked so shutdown() can reap it if we're killed mid-rebuild.
+let assetChild: ChildProcess | null = null;
 async function runAssets(): Promise<void> {
-  assetChild = Bun.spawn(["bun", "scripts/build-assets.ts"], { stdout: "ignore", stderr: "inherit" });
-  try { await assetChild.exited; } finally { assetChild = null; }
+  assetChild = spawn("bunx", ["vite-node", join(HERE, "assets.ts")], {
+    cwd: join(HERE, ".."), // builder/, so vite-node finds vite.config.ts
+    stdio: ["ignore", "ignore", "inherit"],
+  });
+  try { await new Promise<void>((res) => assetChild!.on("exit", () => res())); } finally { assetChild = null; }
 }
 async function copyStyleAssets(): Promise<void> {
   const dir = join(SRC, "style");
@@ -141,7 +147,7 @@ function schedule(relPath: string): void {
 // a singleton: on start, replace any prior instance recorded in .watch.pid, so
 // daemons never stack up. The /proc cmdline check avoids killing an unrelated
 // process that happens to have reused the PID (Linux; degrades to a no-op).
-const PID_FILE = ".watch.pid";
+const PID_FILE = join(HERE, "..", "..", ".watch.pid"); // repo root
 function isWatchDaemon(pid: number): boolean {
   try { return readFileSync(`/proc/${pid}/cmdline`, "utf8").includes("watch.ts"); } catch { return false; }
 }
@@ -152,7 +158,7 @@ try {
     console.log(`  replaced a stale watch daemon (pid ${old})`);
   }
 } catch { /* no prior daemon */ }
-await Bun.write(PID_FILE, String(process.pid));
+await writeFile(PID_FILE, String(process.pid));
 
 // --- startup: one full build, seed the cache, then watch ---------------------
 console.log("warm watch: building once (render+bake stays resident)…");

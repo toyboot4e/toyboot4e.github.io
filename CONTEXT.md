@@ -34,7 +34,7 @@ its brightness stays in the side margins and title area, keeping the reading
 column dark enough to read over without any per-card backdrop.
 
 **Has-flag**:
-A build-time predicate in `headHtml` (`build/render.tsx`, e.g. `hasCode`,
+A build-time predicate in `headHtml` (`builder/src/render.tsx`, e.g. `hasCode`,
 `hasMath`) that decides whether a page ships a given JS/CSS payload, so pages pay
 only for what they use. (The **Disco Ball** is the exception — it ships site-wide
 on every page, not behind a has-flag.)
