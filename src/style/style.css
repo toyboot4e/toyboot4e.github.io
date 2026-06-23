@@ -909,32 +909,29 @@ html.disco-on {
   background-color: var(--disco-tag-bg-hover);
 }
 
-/* The "Tags" list on the homepage / tag pages gets its own pane, like the
-   heading chips — a full-width semi-solid panel (its tag chips stay more opaque
-   on top). `> .org-tag-list` targets only the section list, not card/meta tags. */
-.disco-on.home #content > .org-tag-list {
+/* The homepage Tags list + headings each get a disco "panel" (the title h1, the
+   section h2s, and the `> .org-tag-list` section list). The panel LAYOUT (padding
+   + full-width) is reserved on `.home` REGARDLESS of disco-on, so that disable()
+   dropping `disco-on` on a no-GPU device (Lighthouse runs --disable-gpu) doesn't
+   strip the padding and reflow #content -- that toggle was a big CLS. Only the
+   panel's VISUAL (background / shadow / border) is gated on `.disco-on`, so it
+   never changes geometry. (0.9rem left/right matches the article reading pane.)
+   `> .org-tag-list` targets only the section list, not card/meta tags. */
+.home #content > .org-tag-list {
   display: flex; /* full-width pane (vs the default inline-flex) */
-  background-color: var(--disco-heading-bg);
   border-radius: 8px;
   padding: 0.5rem 0.9rem;
-  box-shadow: var(--disco-shadow);
 }
-
-/* Homepage headings (the title h1 and the section h2s) sit directly over the
-   ball — unlike article pages, the homepage has no #content backdrop (it shows
-   translucent cards instead). Give them a semi-solid panel spanning the content
-   column so they stay legible. The h1 (page title) carries the full article-card
-   border; the h2s keep their shared `::after` underline instead, so it reads the
-   same as in plain mode. */
+.home .title-block h1,
+.home #content h2 {
+  border-radius: 8px;
+  padding: 0.3em 0.9rem;
+  width: 100%;
+}
+.disco-on.home #content > .org-tag-list,
 .disco-on.home .title-block h1,
 .disco-on.home #content h2 {
   background-color: var(--disco-heading-bg);
-  border-radius: 8px;
-  /* 0.9rem left/right matches the article reading pane's horizontal inset
-     (#content::before { inset: -0.6rem -0.9rem }); em-based padding scaled with
-     the big heading font and read wider than the article. */
-  padding: 0.3em 0.9rem;
-  width: 100%;
   box-shadow: var(--disco-shadow);
 }
 .disco-on.home .title-block h1 {
