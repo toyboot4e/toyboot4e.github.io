@@ -17,18 +17,20 @@ help:
 # link cards (best-effort), then renders AND bakes (Prism/KaTeX/cards) via the
 # Vite builder (`builder/`, vite-node). BUILD_PROF=1 prints phase timings.
 build *args:
-    @just assets
-    # Refresh `linkcard-cache.json`, dismissing errors (offline/CI just reads it):
-    -cd builder && bunx vite-node src/fetch-linkcards.ts
-    cd builder && bunx vite-node src/main.ts {{args}}
+    # Refresh `linkcard-cache.json` (bun runs the .ts directly -- no .module.css here):
+    -cd builder && bun src/fetch-linkcards.ts
+    # Bundle the build to dist/ only when a source is newer than it (else reuse the
+    # bundle), then run the plain JS under bun -- no per-process vite-node boot.
+    cd builder && if [ ! -f dist/main.js ] || [ -n "$(find src config-shared.ts vite.build.config.ts vite.config.ts -newer dist/main.js 2>/dev/null)" ]; then bunx vite build -c vite.build.config.ts; fi
+    cd builder && bun dist/main.js {{args}}
 
 [private]
 alias b := build
 
-# cleans up the output directory
+# cleans up the output directory + the cached build bundle
 clean:
-    echo "cleaning up the \`out/\` directory.."
-    rm -rf out/* > /dev/null 2>&1
+    echo "cleaning up the \`out/\` directory + \`builder/dist\` bundle.."
+    rm -rf out/* builder/dist > /dev/null 2>&1
 
 # run the golden tests (render+bake output pinned against test/golden/).
 # regenerate goldens after an intentional output change: `just test-update`
@@ -56,7 +58,7 @@ alias lc := linkcards
 # build CSS modules (-> components.min.css) + minify CSS + bundle/minify TS in
 # `src/style/` into `*.min.{css,js}` via the Vite builder (also run by `build`)
 assets:
-    cd builder && bunx vite-node src/assets.ts
+    cd builder && ASSETS_CLI=1 bunx vite-node src/assets.ts
 
 # starts HTTP server
 serve:
@@ -99,6 +101,8 @@ audit-ai page="index.html": (audit page)
 # ~1.5s for a full build). Release-only (drafts are skipped). Run `just serve`
 # alongside to preview.
 watch:
+    # the daemon's startup build spawns the bundled dist/render-shard.js, so build it first
+    cd builder && bunx vite build -c vite.build.config.ts
     cd builder && bunx vite-node src/watch.ts
 
 [private]

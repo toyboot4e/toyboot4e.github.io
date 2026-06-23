@@ -28,3 +28,6 @@ ltximg
 
 # bun lockfile (the committed lockfile is package-lock.json, used by nix)
 bun.lock
+
+# bundled build output (rebuilt by `just build` when sources change)
+/builder/dist

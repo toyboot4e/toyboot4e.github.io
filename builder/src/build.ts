@@ -9,19 +9,27 @@
 //
 // Paths are resolved relative to the repo root (this file's ../..), so the build
 // is cwd-independent. Writes to `out/` by default (set OUT_DIR to override).
-import { readdir, readFile, mkdir, writeFile, rm, cp } from "node:fs/promises";
+import { readdir, mkdir, writeFile, rm, cp } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawn } from "node:child_process";
+import { cpus } from "node:os";
 import { buildIndexHtml, buildTagHtml, type Meta } from "./render.tsx";
+// Light helpers only -- the orchestrator must NOT import bake.ts (its Prism /
+// happy-dom setup is ~250ms); the render shards own the bake.
 import { copyKatexAssets, mergeStats, stamp, type BakeStats } from "./bake-util.ts";
-import { renderAndBake } from "./render-bake.ts";
-import { getStats } from "./bake.ts";
+import { buildAssets } from "./assets.ts";
 
-// builder/src/build.ts -> repo root
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+// builder/src/build.ts -> repo root; HERE is builder/src
+const HERE = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(HERE, "..", "..");
 export const SRC = join(ROOT, "src");
 export const OUT = process.env.OUT_DIR ?? join(ROOT, "out");
 export const STRICT = process.argv.includes("--strict") || !!process.env.CI;
+// Render is sharded across this many parallel `vite-node` child processes (one
+// warm Prism/happy-dom/uniorg setup each). Past ~6 the per-process startup
+// outweighs the shrinking per-shard work; override with BUILD_WORKERS.
+const WORKERS = Math.max(1, Number(process.env.BUILD_WORKERS) || Math.min(cpus().length, 6));
 
 export type WorkerOut = { results: { rel: string; isDiary: boolean; meta: Meta }[]; stats: BakeStats };
 
@@ -76,21 +84,25 @@ export async function copyStatic(): Promise<number> {
 
 const PROF = !!process.env.BUILD_PROF;
 
-// Render+bake every article in-process and write each finished page.
-async function renderAll(files: string[]): Promise<WorkerOut> {
-  const results: WorkerOut["results"] = [];
-  const madeDirs = new Set<string>();
-  for (const relOrg of files) {
-    const text = await readFile(join(SRC, relOrg), "utf8");
-    const r = await renderAndBake(relOrg, text);
-    if (r.draft) continue; // release build: skip drafts (no file, not indexed)
-    const dest = join(OUT, r.rel);
-    const dir = dirname(dest);
-    if (!madeDirs.has(dir)) { await mkdir(dir, { recursive: true }); madeDirs.add(dir); }
-    await writeFile(dest, r.out);
-    results.push({ rel: r.rel, isDiary: r.isDiary, meta: r.meta });
-  }
-  return { results, stats: getStats() };
+// Render+bake one shard in a child `bun` process running the bundled
+// dist/render-shard.js (plain JS -- no per-process Vite boot), which writes the
+// pages and prints its metadata + stats as JSON on stdout. Sharding across child
+// processes is how we parallelise. `HERE` is dist/ at runtime (this file is
+// bundled to dist/main.js), so the sibling render-shard.js is right here.
+function runShard(files: string[]): Promise<WorkerOut> {
+  return new Promise((resolve, reject) => {
+    const child = spawn("bun", [join(HERE, "render-shard.js"), ...files], {
+      cwd: join(HERE, ".."), // builder/, for node_modules resolution
+      env: { ...process.env, OUT_DIR: OUT },
+      stdio: ["ignore", "pipe", "inherit"],
+    });
+    let buf = "";
+    child.stdout!.on("data", (d) => (buf += d));
+    child.once("error", reject);
+    child.once("exit", (code) =>
+      code === 0 ? resolve(JSON.parse(buf)) : reject(new Error(`render shard failed (exit ${code})`)),
+    );
+  });
 }
 
 // Write one finished page: stamp (postprocess idempotency) + write. Used for the
@@ -135,19 +147,24 @@ export async function fullBuild(): Promise<FullBuild> {
   const files = await listOrg(SRC);
   lap("listOrg");
 
-  // Render+bake and the static/KaTeX copies are independent -- run them together
-  // so the image/asset I/O overlaps the CPU-bound rendering.
-  const [workerOut, nStatic] = await Promise.all([
-    renderAll(files),
-    copyStatic(),
+  // Round-robin the sources across shards (interleaves big/small, code-heavy/
+  // prose), then render each shard in a parallel child process. The static +
+  // KaTeX copies run alongside so their I/O overlaps the CPU-bound rendering.
+  const nShards = Math.min(WORKERS, files.length) || 1;
+  const shards: string[][] = Array.from({ length: nShards }, () => []);
+  files.forEach((f, i) => shards[i % nShards].push(f));
+  // buildAssets() runs concurrently with the render (the shards don't need its
+  // output); copyStatic waits for it, since it ships the freshly built *.min.*.
+  const [outs, nStatic] = await Promise.all([
+    Promise.all(shards.map(runShard)),
+    buildAssets().then(() => copyStatic()),
     copyKatexAssets(OUT),
   ]);
-  lap("render+static+katex");
+  lap("render+assets+static+katex");
 
-  const outs = [workerOut];
   const metas: Meta[] = [];       // devlog (src/*.org)
   const diaryMetas: Meta[] = [];  // diary (src/diary/*.org)
-  for (const r of workerOut.results) (r.isDiary ? diaryMetas : metas).push(r.meta);
+  for (const o of outs) for (const r of o.results) (r.isDiary ? diaryMetas : metas).push(r.meta);
 
   // sort newest-first by href (dates lead the filenames)
   const byHrefDesc = (a: Meta, b: Meta) => (a.href < b.href ? 1 : -1);

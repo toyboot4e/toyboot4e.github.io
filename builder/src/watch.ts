@@ -89,6 +89,7 @@ let assetChild: ChildProcess | null = null;
 async function runAssets(): Promise<void> {
   assetChild = spawn("bunx", ["vite-node", join(HERE, "assets.ts")], {
     cwd: join(HERE, ".."), // builder/, so vite-node finds vite.config.ts
+    env: { ...process.env, ASSETS_CLI: "1" }, // trigger the standalone run
     stdio: ["ignore", "ignore", "inherit"],
   });
   try { await new Promise<void>((res) => assetChild!.on("exit", () => res())); } finally { assetChild = null; }
