@@ -811,19 +811,8 @@ function start(): void {
   sync();
 }
 
-// Defer the WebGL init past the LCP paint: the shader compile + first frame are
-// heavy, and starting them while the page is still painting steals the main
-// thread from the LCP element -- on sparse listing pages that pushed LCP from
-// ~1.5s to ~7s (Lighthouse). Wait for `load` (the LCP element has painted by
-// then), THEN an idle callback; at DOMContentLoaded the init sometimes landed
-// right on top of the LCP paint, making the score flaky (100 vs 77 run to run).
-// The effect fades in, so starting a beat after load is invisible.
-const kick = () =>
-  "requestIdleCallback" in window
-    ? (window as any).requestIdleCallback(start, { timeout: 1500 })
-    : setTimeout(start, 200);
-if (document.readyState === "complete") {
-  kick();
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", start);
 } else {
-  window.addEventListener("load", kick);
+  start();
 }
