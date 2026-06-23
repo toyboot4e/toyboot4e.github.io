@@ -811,8 +811,17 @@ function start(): void {
   sync();
 }
 
+// Defer the WebGL init until the browser is idle AFTER the first content paint:
+// the shader compile + first frame are heavy, and starting them at
+// DOMContentLoaded steals the main thread from the LCP element -- on sparse
+// listing pages that pushed LCP from ~1.5s to ~7s (Lighthouse). The effect is
+// decorative and fades in, so a beat later is invisible.
+const kick = () =>
+  "requestIdleCallback" in window
+    ? (window as any).requestIdleCallback(start, { timeout: 1500 })
+    : setTimeout(start, 200);
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", start);
+  document.addEventListener("DOMContentLoaded", kick);
 } else {
-  start();
+  kick();
 }
