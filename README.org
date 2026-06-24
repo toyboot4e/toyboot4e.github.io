@@ -22,7 +22,6 @@ $ just serve # in another tab
 - [[https://github.com/kevquirk/simple.css/][Simple.css]]
 - [[https://prismjs.com/][Prism.js]]
 - [[https://katex.org/][KaTeX]]
-- [[https://tscanlin.github.io/tocbot/][Tocbot]]
 
 *** Fonts
 
