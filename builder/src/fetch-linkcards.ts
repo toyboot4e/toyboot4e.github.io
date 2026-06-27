@@ -59,8 +59,8 @@ const EXT_LANG: Record<string, string> = {
 };
 
 const args = process.argv.slice(2);
-const force = args.includes("--force");
-const urlArgs = args.filter((a) => !a.startsWith("--"));
+const force = args.includes("--force") || args.includes("-f");
+const urlArgs = args.filter((a) => !a.startsWith("-"));
 
 // --- collect card URLs from org sources ------------------------------------
 async function walkOrg(dir: string): Promise<string[]> {
