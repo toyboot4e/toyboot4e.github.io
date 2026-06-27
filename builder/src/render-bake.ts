@@ -1,8 +1,8 @@
-// Render one article AND bake it (Prism + KaTeX + cards) into final HTML -- the
+// Render one article AND bake it (tree-sitter + KaTeX + cards) into final HTML -- the
 // per-article unit of work. Shared by the render worker (the real build) and the
 // golden tests, so what the tests pin is exactly what ships.
 //
-// Importing this pulls in bake.ts -> the heavy Prism/happy-dom setup, so only the
+// Importing this pulls in bake.ts -> the heavy tree-sitter setup, so only the
 // workers and tests use it; the orchestrator (build.ts) stays on render.ts +
 // bake-util.ts.
 import { parseHTML } from "linkedom";

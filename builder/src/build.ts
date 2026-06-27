@@ -2,10 +2,10 @@
 // Run via Vite (`vite-node src/main.ts`), so `render.tsx` can import its
 // `.module.css` files directly (Vite resolves the scoped class maps).
 //
-// Each article is rendered AND baked (Prism + KaTeX + link cards) in one pass --
-// no intermediate write-then-re-parse. Render lives in `render.tsx`, the bake
-// engine in `bake.ts`. Rendering is single-threaded (the per-file work shares one
-// warm Prism/happy-dom/uniorg setup), overlapped with the static + KaTeX copies.
+// Each article is rendered AND baked (tree-sitter + KaTeX + link cards) in one
+// pass -- no intermediate write-then-re-parse. Render lives in `render.tsx`, the
+// bake engine in `bake.ts`. Rendering is single-threaded (the per-file work shares
+// one warm tree-sitter/uniorg setup), overlapped with the static + KaTeX copies.
 //
 // Paths are resolved relative to the repo root (this file's ../..), so the build
 // is cwd-independent. Writes to `out/` by default (set OUT_DIR to override).
@@ -15,8 +15,8 @@ import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { cpus } from "node:os";
 import { buildIndexHtml, buildTagHtml, type Meta } from "./render.tsx";
-// Light helpers only -- the orchestrator must NOT import bake.ts (its Prism /
-// happy-dom setup is ~250ms); the render shards own the bake.
+// Light helpers only -- the orchestrator must NOT import bake.ts (its tree-sitter
+// grammar-loading setup is heavy); the render shards own the bake.
 import { copyKatexAssets, mergeStats, stamp, type BakeStats } from "./bake-util.ts";
 import { buildAssets } from "./assets.ts";
 
@@ -27,7 +27,7 @@ export const SRC = join(ROOT, "src");
 export const OUT = process.env.OUT_DIR ?? join(ROOT, "out");
 export const STRICT = process.argv.includes("--strict") || !!process.env.CI;
 // Render is sharded across this many parallel `vite-node` child processes (one
-// warm Prism/happy-dom/uniorg setup each). Past ~6 the per-process startup
+// warm tree-sitter/uniorg setup each). Past ~6 the per-process startup
 // outweighs the shrinking per-shard work; override with BUILD_WORKERS.
 const WORKERS = Math.max(1, Number(process.env.BUILD_WORKERS) || Math.min(cpus().length, 6));
 

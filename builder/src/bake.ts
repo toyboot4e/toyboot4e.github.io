@@ -1,4 +1,4 @@
-// Build-time "bake" core: Prism syntax highlighting + KaTeX math +
+// Build-time "bake" core: tree-sitter syntax highlighting + KaTeX math +
 // `[[card:URL]]` link cards, applied to a parsed HTML `document`.
 //
 // A representation-agnostic engine: it operates on a linkedom/DOM `document`.
@@ -8,10 +8,8 @@
 // Counters are module-level and therefore per-isolate; a worker reports its own
 // `getStats()` back to the orchestrator, which aggregates. Call `resetStats()`
 // between independent runs in the same isolate.
-//
-// See `docs/adr/0001-build-time-prism-katex-ssr.md` and `0002-link-cards.md`.
 
-import { Window } from "happy-dom";
+import { initHighlighter, highlight } from "./highlight.ts";
 import katex from "katex";
 import { readFile } from "node:fs/promises";
 import { join, dirname } from "node:path";
@@ -26,46 +24,20 @@ export { SENTINEL, stamp, mergeStats, copyKatexAssets, type BakeStats } from "./
 // regardless of cwd.
 const CARD_CACHE = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "linkcard-cache.json");
 
-// Rendered as-is, never highlighted, never an error: the plaintext aliases plus
-// languages that stock Prism has no grammar for and that we deliberately show
-// verbatim -- `ditaa` (an org-babel diagram DSL that also emits a generated
-// image) and `org` (no official Prism grammar; Org source stays readable plain).
-const PLAIN = new Set(["txt", "text", "plaintext", "plain", "ditaa", "org"]);
+// Rendered verbatim, never highlighted, never an error: plaintext aliases plus
+// languages we have no tree-sitter grammar for and deliberately show plain --
+// `ditaa` (an org-babel diagram DSL that also emits a generated image), `org`
+// (no usable grammar; Org source stays readable plain) and `plantuml`. They
+// still go through the highlighter as `text` for the same `.hl` / `.line`
+// framing as every other block. (dot/fortran ARE highlighted now -- see
+// highlight.ts + grammars/.)
+const PLAIN = new Set(["txt", "text", "plaintext", "plain", "ditaa", "org", "plantuml"]);
 
-// --- Prism setup -----------------------------------------------------------
-// Prism's browser-oriented plugins read DOM globals at import time, so a
-// complete DOM (happy-dom) must be live on `globalThis` before `prismjs` loads.
-const hw = new Window();
-const g = globalThis as any;
-g.window = hw;
-g.self = hw;
-g.document = hw.document;
-g.Node = hw.Node;
-g.Element = hw.Element;
-g.HTMLElement = hw.HTMLElement;
-g.DocumentFragment = hw.DocumentFragment;
-g.getComputedStyle = hw.getComputedStyle.bind(hw);
-g.Option = (hw as any).Option;
-
-const Prism = (await import("prismjs")).default as any;
-g.Prism = Prism;
-const loadLanguages = (await import("prismjs/components/index.js")).default as any;
-// Languages in use across the corpus (loadLanguages resolves inter-deps and
-// aliases, e.g. `lisp` -> `elisp`). Add here when a new language appears.
-loadLanguages([
-  "haskell", "nix", "bash", "fortran", "lua", "rust", "php", "typescript",
-  "tsx", "json", "toml", "makefile", "csharp", "cpp", "lisp", "yaml",
-  "python", "css", "ini", "diff", "markdown", "clike", "c", "javascript",
-  "plantuml", "dot",
-]);
-// Kept plugins (see ADR / plan). keep-markup preserves coderef markup;
-// diff-highlight handles `diff-*`; autolinker + inline-color are visual.
-await import("prismjs/plugins/keep-markup/prism-keep-markup.js");
-await import("prismjs/plugins/diff-highlight/prism-diff-highlight.js");
-await import("prismjs/plugins/autolinker/prism-autolinker.js");
-await import("prismjs/plugins/inline-color/prism-inline-color.js");
-await import("prismjs/plugins/line-numbers/prism-line-numbers.js");
-const hdoc = hw.document;
+// --- tree-sitter setup -----------------------------------------------------
+// web-tree-sitter parses a code STRING and we emit HTML from the highlight
+// query, so -- like Shiki before it -- no live DOM is needed. The engine
+// (dual-theme + line numbers + diff-<lang> + coderefs) lives in highlight.ts.
+await initHighlighter();
 
 // --- counters --------------------------------------------------------------
 let nPlain = 0, nDom = 0, nUnknown = 0, nHlError = 0;
@@ -87,14 +59,16 @@ export function resetStats(): void {
 }
 
 // --- code highlighting -----------------------------------------------------
-// A block needs the DOM path if it has embedded markup (coderef callouts), a
-// `line-numbers` class, or a `diff-*` language -- all rely on highlightElement
-// hooks that the fast `Prism.highlight()` string path does not fire.
-function needsDom(code: any, pre: any, lang: string): boolean {
-  if (code.children.length > 0) return true;
-  if (lang.startsWith("diff-")) return true;
-  const cls = (code.getAttribute("class") || "") + " " + ((pre && pre.getAttribute("class")) || "");
-  return /\bline-numbers\b/.test(cls);
+// Each `<pre><code class="language-XX">` carries the raw source as text plus the
+// opt-in metadata render.tsx attached: `data-line-numbers`/`data-line-start`
+// (org `-n`/`+n`) and `data-coderefs`/`data-coderef-block` (the `(ref:label)`
+// callouts). highlight() turns that into a fresh `<pre class="hl">`, swapped in
+// for the placeholder.
+function swapPre(document: any, pre: any, html: string): void {
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html;
+  const node = tmp.firstElementChild;
+  if (node) pre.parentNode.replaceChild(node, pre);
 }
 
 function highlightCode(document: any): void {
@@ -102,32 +76,30 @@ function highlightCode(document: any): void {
     const lc = (code.getAttribute("class") || "").split(/\s+/).find((c: string) => c.startsWith("language-"));
     if (!lc) continue;
     const lang = lc.slice("language-".length);
-    if (PLAIN.has(lang)) continue;
     const pre = code.parentNode;
-    const dom = needsDom(code, pre, lang);
-    if (!dom && !Prism.languages[lang]) {
+    const crAttr = code.getAttribute("data-coderefs");
+    const opts = {
+      lineNumbers: code.hasAttribute("data-line-numbers"),
+      lineStart: code.getAttribute("data-line-start") ? Number(code.getAttribute("data-line-start")) : 1,
+      coderefBlock: code.hasAttribute("data-coderef-block") ? Number(code.getAttribute("data-coderef-block")) : undefined,
+      coderefs: crAttr ? JSON.parse(crAttr) : undefined,
+    };
+    let html: string | null = null;
+    try {
+      // PLAIN languages go through the highlighter as `text` -- same framing, no colours.
+      html = highlight(code.textContent, PLAIN.has(lang) ? "text" : lang, opts);
+    } catch (e: any) {
+      nHlError++;
+      warn(`highlight failed (${lang}): ${e?.message ?? e}`);
+      continue;
+    }
+    if (html == null) {
       nUnknown++; unknownLangs.add(lang);
       warn(`unknown language: ${lang}`);
       continue;
     }
-    if (dom) {
-      // Highlight in a reused happy-dom <code> (keep-markup needs a real DOM),
-      // then splice the result back into the linkedom node.
-      const hc = hdoc.createElement("code");
-      hc.className = code.getAttribute("class");
-      hc.innerHTML = code.innerHTML;
-      try {
-        Prism.highlightElement(hc);
-        code.innerHTML = hc.innerHTML;
-        nDom++;
-      } catch (e: any) {
-        nHlError++;
-        warn(`highlight failed (${lang}): ${e?.message ?? e}`);
-      }
-    } else {
-      code.innerHTML = Prism.highlight(code.textContent, Prism.languages[lang], lang);
-      nPlain++;
-    }
+    swapPre(document, pre, html);
+    if (PLAIN.has(lang)) nPlain++; else nDom++;
   }
 }
 
@@ -222,34 +194,10 @@ function replaceWithBlock(a: any, html: string, document: any): void {
   target.parentNode.replaceChild(node, target);
 }
 
-// GitHub code embeds are highlighted with Prism (same as the rest of the site),
-// with a line-number gutter starting at the real source line. The Prism
-// `line-numbers` plugin only emits its gutter for an *attached* <pre> (it reads
-// the `line-numbers` class + `data-start` off the parent), so -- unlike the
-// general highlightCode path which reuses a detached <code> -- we highlight a
-// full <pre> built in the happy-dom document, then splice its HTML into the card.
-// The render step only links the Prism stylesheets when the page already
-// contains `language-` (see `hasCode`). A GitHub embed's code is injected here,
-// after render, so a page whose only code is an embed would ship unstyled
-// (no highlighting, no gutter). Add the links if missing, with the same markup
-// (ids + media) so style.js's theme toggle still controls them.
-function ensurePrismCss(document: any): void {
-  if (document.getElementById("prism-dark")) return;
-  const head = document.querySelector("head");
-  if (!head) return;
-  for (const [id, file, scheme] of [
-    ["prism-dark", "prism-dark.min.css", "dark"],
-    ["prism-light", "prism-light.min.css", "light"],
-  ]) {
-    const link = document.createElement("link");
-    link.setAttribute("rel", "stylesheet");
-    link.setAttribute("id", id);
-    link.setAttribute("href", `/style/${file}`);
-    link.setAttribute("media", `(prefers-color-scheme: ${scheme})`);
-    head.appendChild(link);
-  }
-}
-
+// GitHub code embeds are highlighted by tree-sitter like the rest of the site,
+// with a line-number gutter starting at the real source line (`lineStart`). The
+// dual-theme colours are class-based and the CSS is global (style.css), so
+// there's no per-page stylesheet to inject.
 function renderGitHubCode(a: any, url: string, c: Card, document: any): void {
   // Header leads with `filename:Lnn` (leftmost); repo + ref pushed to the right.
   const lines =
@@ -257,7 +205,7 @@ function renderGitHubCode(a: any, url: string, c: Card, document: any): void {
   const repo = `${c.owner}/${c.repo}${c.refLabel ? ` @ ${c.refLabel}` : ""}`;
   // A code-repo mark (Lucide `git-branch`, stroked, inlined so no external
   // request) + a ↗ next to the line range mark the header as an external link,
-  // since the Prism-highlighted body otherwise reads as a plain code block. We
+  // since the tree-sitter-highlighted body otherwise reads as a plain code block. We
   // use a generic stand-in rather than the real GitHub logo on purpose: GitHub's
   // brand guidelines forbid recolouring, and `gh-embed-icon` is themed/tinted
   // with `currentColor`. Matches the nav's stand-in (see `my-icon-github`).
@@ -274,29 +222,21 @@ function renderGitHubCode(a: any, url: string, c: Card, document: any): void {
     `<span class="gh-embed-repo">${esc(repo)}</span>`;
 
   let codeBlock: string;
-  if (c.lang && Prism.languages[c.lang]) {
-    const pre = hdoc.createElement("pre");
-    pre.className = "gh-embed-code line-numbers";
-    pre.setAttribute("data-start", String(c.startLine || 1));
-    const code = hdoc.createElement("code");
-    code.className = `language-${c.lang}`;
-    code.textContent = c.code || "";
-    pre.appendChild(code);
-    hdoc.body.appendChild(pre); // line-numbers plugin needs the <pre> parent
+  let hl: string | null = null;
+  if (c.lang) {
     try {
-      Prism.highlightElement(code);
-      codeBlock = pre.outerHTML;
-      ensurePrismCss(document); // page may have no other code block
-      nDom++;
+      hl = highlight(c.code || "", c.lang, { lineNumbers: true, lineStart: c.startLine || 1 });
     } catch (e: any) {
       nHlError++;
       warn(`gh embed highlight failed (${c.lang}): ${e?.message ?? e}`);
-      codeBlock = `<pre class="gh-embed-code gh-embed-plain"><code>${esc(c.code || "")}</code></pre>`;
-    } finally {
-      hdoc.body.removeChild(pre);
     }
+  }
+  if (hl != null) {
+    // Tag the highlighter's <pre> with the card class (its output always opens `<pre class="hl`).
+    codeBlock = hl.replace('<pre class="hl', '<pre class="gh-embed-code hl');
+    nDom++;
   } else {
-    codeBlock = `<pre class="gh-embed-code gh-embed-plain"><code>${esc(c.code || "")}</code></pre>`;
+    codeBlock = `<pre class="gh-embed-code gh-embed-plain hl"><code>${esc(c.code || "")}</code></pre>`;
   }
 
   const html =

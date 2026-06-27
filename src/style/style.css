@@ -373,6 +373,8 @@ div.WARNING {
 .coderef-off {
   display: inline-block;
   min-width: 100%;
+  /* Idle highlight: a coderef line is tinted at rest so it reads as a callout
+     line (stronger on hover / :target below). */
   background-color: color-mix(in srgb, var(--accent-hover) 10%, transparent);
 }
 
@@ -419,6 +421,131 @@ span.code-highlighted {
 .coderef-off:target {
   background-color: color-mix(in srgb, var(--accent-hover) 35%, transparent);
   outline: 2px solid var(--accent-hover);
+}
+
+/* ── Tree-sitter code blocks ─────────────────────────────────────────────────
+   Highlighted at build time (builder/src/highlight.ts): web-tree-sitter parses
+   the source and each token span gets a CLASS (`hl-<bucket>`), not an inline
+   colour. The dual theme is just a palette of CSS variables rebound per theme —
+   `[data-theme]` (the explicit toggle set by style.js) with a
+   `prefers-color-scheme` fallback. Dark = sonokai, light = One Light (both
+   separate function/type/namespace, unlike okaidia). Swap the palettes to restyle. */
+.hl {
+  /* Light palette (One Light): varied hues so type-heavy code (haskell module
+     paths!) doesn't read as a wall of one colour — types gold, functions blue,
+     keywords purple, strings green. */
+  --c-fg: #383a42; --c-bg: #fafafa;
+  --c-com: #a0a1a7; --c-kw: #a626a4; --c-str: #50a14f; --c-esc: #0184bc;
+  --c-rex: #0184bc; --c-num: #986801; --c-fn: #4078f2; --c-ty: #c18401;
+  --c-con: #986801; --c-vbi: #e45649; --c-tag: #e45649;
+  color: var(--c-fg);
+  background-color: var(--accent-bg);
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  tab-size: 2;
+  -moz-tab-size: 2;
+}
+/* Default (un-tokenised) text — operators, punctuation, plain identifiers — is
+   NOT wrapped in a span, so without this it would inherit Simple.css's
+   `code { color: var(--code) }` (pink) instead of the code foreground. */
+.hl code {
+  color: var(--c-fg);
+}
+.hl-com { color: var(--c-com); }
+.hl-kw  { color: var(--c-kw); }
+.hl-str { color: var(--c-str); }
+.hl-esc { color: var(--c-esc); }
+.hl-rex { color: var(--c-rex); }
+.hl-num { color: var(--c-num); }
+.hl-fn  { color: var(--c-fn); }
+.hl-ty  { color: var(--c-ty); }
+.hl-con { color: var(--c-con); }
+.hl-vbi { color: var(--c-vbi); }
+.hl-tag { color: var(--c-tag); }
+
+/* Dark palette (sonokai — Monokai-family, but separates function/type/namespace,
+   unlike okaidia which colours function == type). rebind the variables. */
+html[data-theme="dark"] .hl {
+  --c-fg: #e2e2e3; --c-bg: #272822;
+  --c-com: #7f8490; --c-kw: #fc5d7c; --c-str: #e7c664; --c-esc: #f39660;
+  --c-rex: #f39660; --c-num: #b39df3; --c-fn: #9ed072; --c-ty: #76cce0;
+  --c-con: #b39df3; --c-vbi: #b39df3; --c-tag: #e7c664;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .hl {
+    --c-fg: #e2e2e3; --c-bg: #272822;
+    --c-com: #7f8490; --c-kw: #fc5d7c; --c-str: #e7c664; --c-esc: #f39660;
+    --c-rex: #f39660; --c-num: #b39df3; --c-fn: #9ed072; --c-ty: #76cce0;
+    --c-con: #b39df3; --c-vbi: #b39df3; --c-tag: #e7c664;
+  }
+}
+
+/* Line numbers: opt-in per block (org `-n`/`+n`). A CSS counter on the `.line`
+   spans draws the gutter; highlight.ts seeds `counter-reset: ln <start-1>`
+   inline on <code> so it begins at the requested source line. */
+.hl.line-numbers .line {
+  counter-increment: ln;
+}
+.hl.line-numbers .line::before {
+  content: counter(ln);
+  display: inline-block;
+  min-width: 1.5em; /* fits ~2-3 digits, grows for more; tight gutter */
+  padding-right: 0.6em;
+  margin-right: 0.7em;
+  /* thin separator between the gutter and the source; per-line borders stack into
+     a continuous rule. Softer than the (already dimmed) number so it doesn't
+     compete. currentColor tracks the theme. */
+  border-right: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  color: color-mix(in srgb, currentColor 45%, transparent);
+  text-align: right;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* diff-<lang>: changed lines get a tinted background + a +/- gutter marker. The
+   body was highlighted as <lang> with the prefix column stripped (highlight.ts),
+   so context lines align under the markers. */
+.hl.diff .line {
+  display: inline-block;
+  width: 100%;
+}
+.hl.diff .line::before {
+  content: " ";
+  display: inline-block;
+  width: 1.25em;
+  margin-right: 0.5em;
+  text-align: center;
+  opacity: 0.8;
+}
+.hl.diff .line.add {
+  background-color: rgba(46, 160, 67, 0.13);
+}
+.hl.diff .line.remove {
+  background-color: rgba(248, 81, 73, 0.13);
+}
+.hl.diff .line.add::before {
+  content: "+";
+  color: #2ea043;
+}
+.hl.diff .line.remove::before {
+  content: "-";
+  color: #f85149;
+}
+
+/* A line that is BOTH a diff change and a coderef: the CODEREF highlight takes
+   precedence in EVERY state -- idle / hover / :target -- so the coderef tint wins
+   over the `.diff.add`/`.remove` background above (these come later and, for
+   hover/:target, out-specify it via the pseudo-class). The +/- gutter marker
+   still shows, so the diff status isn't lost. */
+.hl.diff .line.coderef-off {
+  background-color: color-mix(in srgb, var(--accent-hover) 10%, transparent);
+}
+.hl.diff .line.coderef-off:hover {
+  background-color: color-mix(in srgb, var(--accent-hover) 20%, transparent);
+}
+.hl.diff .line.coderef-off:target {
+  background-color: color-mix(in srgb, var(--accent-hover) 35%, transparent);
 }
 
 /* aahub_light: https://qiita.com/scrpgil/items/b8bde1257a135d173585 */

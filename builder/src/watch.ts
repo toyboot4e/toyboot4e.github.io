@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 // Warm watch daemon: a long-lived process that does ONE full build, then keeps
-// the uniorg + Prism + KaTeX + happy-dom machinery resident and re-renders only
+// the uniorg + tree-sitter + KaTeX machinery resident and re-renders only
 // the file you just changed. The full `just build` reloads all of that (~235ms
 // per worker isolate) and re-renders all ~140 articles every run (~1.5s); here
 // the heavy setup is paid once at startup, so an incremental `.org` save lands
@@ -18,7 +18,7 @@
 // alongside to preview.
 //
 // renderAndBake (the warm path) is imported at module load, so bake.ts's heavy
-// Prism/happy-dom setup is done once and stays warm for every incremental save.
+// tree-sitter setup is done once and stays warm for every incremental save.
 import { watch, readFileSync, existsSync, unlinkSync } from "node:fs";
 import { mkdir, writeFile, readFile, rm, cp, readdir } from "node:fs/promises";
 import { join, dirname, sep } from "node:path";
@@ -105,7 +105,7 @@ async function onStatic(relStatic: string): Promise<void> {
   // generated *.min.* are produced by runAssets below; ignore their own events
   // (no rebuild loop).
   if (/\.min\.(css|js)$/.test(relStatic)) return;
-  // a hand-written style source (style.css, prism-*.css, disco.ts) -> re-minify
+  // a hand-written style source (style.css, disco.ts, ...) -> re-minify
   // and copy all generated style assets.
   if (relStatic.startsWith(`style${sep}`)) {
     await runAssets();

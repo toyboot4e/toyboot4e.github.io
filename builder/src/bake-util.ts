@@ -1,7 +1,7 @@
-// Lightweight bake helpers with NO Prism/happy-dom/KaTeX import, so the build
+// Lightweight bake helpers with NO tree-sitter/KaTeX import, so the build
 // orchestrator (build.ts) can stamp output, copy KaTeX assets and merge worker
-// stats without paying the heavy Prism+DOM setup cost that `bake.ts` triggers at
-// import time. Only the workers (which actually highlight) import `bake.ts`.
+// stats without paying the heavy tree-sitter + DOM setup cost that `bake.ts`
+// triggers at import time. Only the workers (which actually highlight) import `bake.ts`.
 import { createRequire } from "node:module";
 import { readdir, mkdir, cp } from "node:fs/promises";
 import { dirname, join } from "node:path";

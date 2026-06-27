@@ -2,7 +2,7 @@
 // the build no longer boots vite-node per process -- that Vite-dev-server startup
 // (~244ms) was the main perf tax. `vite build` runs ONCE (~180ms), resolving the
 // `.module.css` imports to their scoped maps at build time; the heavy node deps
-// (uniorg/prism/katex/happy-dom/linkedom) are externalized and load natively at
+// (uniorg/web-tree-sitter/katex/linkedom) are externalized and load natively at
 // runtime. The Justfile's staleness guard skips even this 180ms when nothing
 // changed. Shares the scoped-name + JSX config with the render/test paths.
 import { defineConfig } from "vite";

@@ -99,8 +99,8 @@ test("coderef: line wrapped in .coderef-off, marker -> anchor, prose link styled
   // the whole line IS a single `<a class="coderef-off">` self-link, so the
   // entire full-width highlight is clickable and clicking sets the URL to the
   // coderef and `:target`-highlights it
-  expect(out).toContain('<a id="coderef-1-a" href="#coderef-1-a" class="coderef-off">');
-  expect(out).toContain('<span class="coderef-anchor">a</span>'); // (ref:a) marker -> anchor
+  expect(out).toContain('<a class="line coderef-off" id="coderef-1-a" href="#coderef-1-a">');
+  expect(out).toContain('class="coderef-anchor">a</span>'); // (ref:a) marker -> Shiki-styled anchor
   expect(out).toContain('<a href="#coderef-1-a"><span class="coderef-anchor">a</span></a>'); // prose link
   expect(out).not.toContain("(ref:a)"); // marker consumed
   // JS-free hover: hovering the prose link (a[href="#ID"]) highlights the code
@@ -186,9 +186,11 @@ test("DETAILS summary: org markup is converted to HTML", async () => {
   expect(out).toContain('<summary><code class="inline-verbatim">code</code> and <strong>bold</strong></summary>');
 });
 
-test("diff blocks get the diff-highlight class (for +/- line backgrounds)", async () => {
+test("diff blocks: changed lines get .diff.add / .diff.remove for +/- backgrounds", async () => {
   const out = await bake("d.org", "#+BEGIN_SRC diff\n- a\n+ b\n#+END_SRC\n");
-  expect(out).toMatch(/<code class="src language-diff diff-highlight">/);
+  expect(out).toContain('<pre class="hl'); // baked by the tree-sitter highlighter
+  expect(out).toMatch(/class="line diff remove"/); // `- a`
+  expect(out).toMatch(/class="line diff add"/); // `+ b`
 });
 
 test("card: [[card:URL]] -> link-card placeholder (URL with :// kept intact)", async () => {
@@ -215,6 +217,15 @@ test("preserve-breaks: soft newline -> <br>, but not against a block boundary", 
 test("preserve-breaks: code-block newlines stay literal (no <br>)", async () => {
   const out = await bake("b.org", "#+BEGIN_SRC bash\nx\ny\n#+END_SRC\n");
   expect(out).not.toContain("<br>");
+});
+
+test("hardbreak: explicit org `\\\\` -> single <br> in paragraphs and list items", async () => {
+  // org's explicit line break `\\` at end of line becomes one <br> (NOT doubled
+  // against preserve-breaks' own newline handling), in both prose and list items.
+  const out = await bake("h.org", "line A \\\\\nline B\n\n- item A \\\\\n  item B\n");
+  expect(out).toContain("<p>line A <br>line B</p>"); // paragraph hard break
+  expect(out).toContain("<li>item A <br>  item B</li>"); // list-item hard break
+  expect(out).not.toContain("<br><br>"); // not doubled
 });
 
 test("internal .org link -> .html", async () => {

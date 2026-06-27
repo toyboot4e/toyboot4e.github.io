@@ -320,53 +320,54 @@ function makeHandlers(st: RenderState) {
       }
       return undefined; // fall through to uniorg's default special-block
     },
-    // Code blocks: replace each `(ref:label)` marker in place with an anchor
-    // span (id=coderef-<N>-<label>) showing the label, so prose `[[(label)]]`
-    // links can jump to it. The marker keeps its position in the line (comment
-    // leader and surrounding code intact), matching org. The span is non-empty
-    // (holds the label) so Prism's keep-markup re-tokenisation doesn't drop it.
+    // Code blocks: emit the raw source as text plus opt-in metadata; the
+    // tree-sitter highlighter (in bake.ts) does the highlighting + markup.
+    // `(ref:label)` callouts are replaced
+    // in-place with the bare label, and their line + char span recorded in
+    // `data-coderefs` so the bake step re-creates the whole-line `<a class=
+    // "coderef-off">` self-link + `<span class="coderef-anchor">` label (and prose
+    // `[[(label)]]` jumps stay valid). Line numbers are opt-in via org's `-n`/`+n`.
     "src-block": function (this: any, org: any) {
       const lang = org.language || "";
+      // org switches: `-n [N]` numbers from N (default 1); `+n [N]` continues from
+      // the previous numbered block (+N, default +1). No switch -> no gutter.
+      const lnm = String(org.switches || "").match(/(^|\s)([-+])n(?:\s+(\d+))?(\s|$)/);
+      const lineNumbers = !!lnm;
+      let lineStart = 1;
+      if (lnm) {
+        const n = lnm[3] ? parseInt(lnm[3], 10) : null;
+        lineStart = lnm[2] === "-" ? (n ?? 1) : (st.lastLineNum ?? 0) + (n ?? 1);
+      }
       const lines = String(org.value ?? "").replace(/\n$/, "").split("\n");
+      if (lineNumbers) st.lastLineNum = lineStart + lines.length - 1;
+
       // Number only blocks that actually contain a coderef (NOT every src-block),
       // so the first coderef block is `coderef-1-…` regardless of how many plain
       // code blocks precede it. The prose `[[(label)]]` link reads the same counter.
       const hasCoderef = lines.some((l) => CODEREF_RE.test(l));
       const N = hasCoderef ? ++st.blockCounter.n : st.blockCounter.n;
-      const codeChildren: any[] = [];
-      lines.forEach((line, i) => {
+      const coderefs: { line: number; label: string; start: number; end: number }[] = [];
+      const outLines = lines.map((line, i) => {
         const m = line.match(CODEREF_RE);
-        if (m) {
-          const label = m[1];
-          const id = `coderef-${N}-${label}`;
-          st.coderefIds.push(id);
-          const before = line.slice(0, m.index);
-          const after = line.slice(m.index! + m[0].length);
-          const lineKids: any[] = [];
-          if (before) lineKids.push({ type: "text", value: before });
-          lineKids.push(this.h(org, "span", { className: ["coderef-anchor"] }, [{ type: "text", value: label }]));
-          if (after) lineKids.push({ type: "text", value: after });
-          // The WHOLE line is a single `<a class="coderef-off">` self-link: the
-          // full-width highlight (`.coderef-off` is `min-width:100%`) and the
-          // clickable link are the SAME element, so the entire highlighted line
-          // -- not just the text run -- is clickable. Clicking it (or a prose
-          // `[[(label)]]`) sets the URL to `#coderef-N-label` and
-          // `:target`-highlights it (shareable) -- no onmouseover/onclick JS
-          // needed to make the full line clickable; this is JS-free.
-          codeChildren.push(this.h(org, "a", { id, href: `#${id}`, className: ["coderef-off"] }, lineKids));
-        } else {
-          codeChildren.push({ type: "text", value: line });
-        }
-        if (i < lines.length - 1) codeChildren.push({ type: "text", value: "\n" });
+        if (!m) return line;
+        const label = m[1];
+        st.coderefIds.push(`coderef-${N}-${label}`);
+        const before = line.slice(0, m.index);
+        coderefs.push({ line: i, label, start: before.length, end: before.length + label.length });
+        return before + label + line.slice(m.index! + m[0].length);
       });
-      // class="src language-XX" matches what the bake/Prism step expects; omit
-      // the language- class for an unlabelled block so it isn't flagged unknown.
+
       const cls = lang ? ["src", `language-${lang}`] : ["src"];
-      // `diff`/`diff-XX` blocks need the `diff-highlight` class for the per-line
-      // +/- background CSS (`pre>code.diff-highlight .token.inserted:not(.prefix)`)
-      // to apply; Prism already emits the inserted/deleted tokens.
-      if (lang === "diff" || lang.startsWith("diff-")) cls.push("diff-highlight");
-      const pre = this.h(org, "pre", {}, [this.h(org, "code", { className: cls }, codeChildren)]);
+      const attrs: Record<string, any> = { className: cls };
+      if (coderefs.length) {
+        attrs["data-coderefs"] = JSON.stringify(coderefs);
+        attrs["data-coderef-block"] = String(N);
+      }
+      if (lineNumbers) {
+        attrs["data-line-numbers"] = "";
+        if (lineStart !== 1) attrs["data-line-start"] = String(lineStart);
+      }
+      const pre = this.h(org, "pre", {}, [this.h(org, "code", attrs, [{ type: "text", value: outLines.join("\n") }])]);
       const cap = org.affiliated?.CAPTION?.[0];
       return cap ? captionedFigure(this, st, org, [pre], "listing", captionHast(this, cap)) : pre;
     },
@@ -600,12 +601,8 @@ function headHtml(m: { title: string; description: string; url: string; thumbnai
       <link rel="stylesheet" href="/style/simple.min.css" />
       <link rel="stylesheet" href="/style/style.min.css" />
       <link rel="stylesheet" href="/style/components.min.css" />
-      {m.hasCode && (
-        <Fragment>
-          <link rel="stylesheet" id="prism-dark" href="/style/prism-dark.min.css" media="(prefers-color-scheme: dark)" />
-          <link rel="stylesheet" id="prism-light" href="/style/prism-light.min.css" media="(prefers-color-scheme: light)" />
-        </Fragment>
-      )}
+      {/* tree-sitter highlight colours are class-based (dual-theme palette);
+          the `.hl` / coderef / diff / line-number rules live in style.css. */}
       {m.hasMath && <link rel="stylesheet" href="/style/katex/katex.min.css" />}
       <script type="text/javascript" src="/style/style.js"></script>
       {DISCO_HEAD}

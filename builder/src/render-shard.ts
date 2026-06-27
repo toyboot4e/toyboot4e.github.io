@@ -16,7 +16,7 @@ const SRC = join(ROOT, "src");
 const OUT = process.env.OUT_DIR ?? join(ROOT, "out");
 
 // performance.now() here ~= time since this process started, i.e. the vite-node
-// startup + transform + heavy imports (prism/happy-dom/uniorg). BUILD_PROF prints
+// startup + transform + heavy imports (tree-sitter/uniorg). BUILD_PROF prints
 // that "setup" cost vs the actual render time, to stderr (stdout carries JSON).
 const tSetup = performance.now();
 const files = process.argv.slice(2);

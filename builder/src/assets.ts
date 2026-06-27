@@ -3,7 +3,7 @@
 //   1. CSS modules (src/styles/*.module.css) -> components.min.css, scoped via the
 //      SAME vite.config.ts `generateScopedName` the render uses, so the class
 //      names match. Built with Vite's programmatic API (write:false, in-memory).
-//   2. style/prism CSS -> *.min.css (esbuild minify, url()/data: kept verbatim).
+//   2. plain style CSS -> *.min.css (esbuild minify, url()/data: kept verbatim).
 //   3. disco.ts / toc.ts -> *.min.js (esbuild bundle + minify for the browser).
 import { build as viteBuild } from "vite";
 import * as esbuild from "esbuild";
@@ -48,7 +48,7 @@ export async function buildAssets(): Promise<void> {
   log(`components.min.css (${css.length} bytes)`);
 
   // 2. Plain CSS -> *.min.css (minify only; keep every url()/data: URI as authored).
-  for (const f of ["style", "prism-dark", "prism-light"]) {
+  for (const f of ["style"]) {
     const r = await esbuild.build({
       entryPoints: [join(STYLE, `${f}.css`)],
       minify: true,

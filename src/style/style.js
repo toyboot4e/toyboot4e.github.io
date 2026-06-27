@@ -16,28 +16,15 @@
   }
 
   function applyTheme(theme) {
+    // Set/clear `data-theme` on <html>; CSS keys off it (Shiki code colours,
+    // disco palette, simple.css). No stylesheet juggling needed -- Shiki's
+    // dual-theme colours are inline CSS vars switched by the `[data-theme]`
+    // selectors in style.css (the old Prism dark/light <link> toggle is gone).
     if (theme) {
       document.documentElement.setAttribute("data-theme", theme);
     } else {
       document.documentElement.removeAttribute("data-theme");
     }
-
-    // Update Prism.js stylesheets
-    var dark = document.getElementById("prism-dark");
-    var light = document.getElementById("prism-light");
-    if (dark && light) {
-      if (theme === "dark") {
-        dark.media = "all";
-        light.media = "not all";
-      } else if (theme === "light") {
-        dark.media = "not all";
-        light.media = "all";
-      } else {
-        dark.media = "(prefers-color-scheme: dark)";
-        light.media = "(prefers-color-scheme: light)";
-      }
-    }
-
   }
 
   // Apply saved theme immediately (before body renders) to prevent FOUC
