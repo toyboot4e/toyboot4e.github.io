@@ -5,7 +5,7 @@
 // NOT copied into `out/` (the org-publish "static" component only matches
 // `.js`/`.css`/… by extension); only the compiled `disco.min.js` ships.
 //
-// Design (see docs/adr/0003-homepage-disco-ball-webgl.md and CONTEXT.md):
+// Design (see CONTEXT.md):
 //   - Site-wide: `build/render.tsx` emits the `<canvas id="disco-canvas">` and
 //     this script (DISCO_BODY / DISCO_HEAD) on every page.
 //   - Raw WebGL, one full-screen fragment shader — no framework. Runs in both

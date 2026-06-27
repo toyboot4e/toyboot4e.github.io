@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a static site generator for a Japanese technical devlog. Content is authored in Org Mode (`.org` files) and converted to HTML by a custom TypeScript build (uniorg + Prism/KaTeX, no Emacs). The build is a **Vite project in `builder/`**, run with `vite-node` — so the render imports its CSS modules (`*.module.css`) directly, Vite-scoped.
+This is a static site generator for a Japanese technical devlog. Content is authored in Org Mode (`.org` files) and converted to HTML by a custom TypeScript build (uniorg + tree-sitter + KaTeX, no Emacs). The build is a **Vite project in `builder/`**, run with `vite-node` — so the render imports its CSS modules (`*.module.css`) directly, Vite-scoped.
 
 ## Core Commands
 
 ### Building and Development
 - `just build` - Build the devlog into `out/`. Runs the Vite builder
   (`cd builder && vite-node src/main.ts`): builds assets (`src/assets.ts`), then
-  renders `.org` → HTML and bakes Prism/KaTeX/link-cards in one pass
+  renders `.org` → HTML and bakes tree-sitter/KaTeX/link-cards in one pass
   (`builder/src/render.tsx` + `builder/src/bake.ts`), in-process, no separate
   format step. This is what nix/CI ship. `BUILD_PROF=1` prints phase timings.
 - `just test` - Run the render/bake goldens + behavior tests with **vitest**
@@ -44,23 +44,24 @@ This is a static site generator for a Japanese technical devlog. Content is auth
    + tag pages from the rendered metadata; `builder/src/main.ts` is the CLI entry.
 4. **Render**: each `.org` is parsed with uniorg and rendered to page HTML
    (`builder/src/render.tsx`: uniorg2rehype + custom handlers + rehype-katex).
-   Single-threaded — one warm Prism/happy-dom/uniorg setup, overlapped with the
-   copies (the old worker-thread fan-out is gone; vite-node can't run workers).
-5. **Bake**: the same pass bakes Prism highlighting + KaTeX + `[[card:URL]]`
-   cards in-process (`builder/src/bake.ts`), stamping a `<!--pp-->` sentinel.
+   Sharded across parallel `bun dist/render-shard.js` child processes, each with
+   one warm tree-sitter/uniorg setup, overlapped with the asset/static/KaTeX copies.
+5. **Bake**: the same pass bakes tree-sitter highlighting + KaTeX + `[[card:URL]]`
+   cards in-process (`builder/src/bake.ts` + `builder/src/highlight.ts`),
+   stamping a `<!--pp-->` sentinel.
 6. **Static**: `html/js/css/png/...` (excluding `ltximg/`) copied from `src/`,
    concurrently with the render. Output: static files in `out/`.
 
 Strict mode (`CI=1` / `--strict`) fails on unknown languages / KaTeX errors /
-uncached cards. See `docs/adr/0001-build-time-prism-katex-ssr.md` and
-`docs/adr/0002-link-cards.md`.
+uncached cards.
 
 ### Key Files and Directories
 - `builder/` - the Vite project: `vite.config.ts` (CSS-module scoping + JSX `h`
   factory), `vitest.config.ts`, `config-shared.ts`, `package.json`/`node_modules`
 - `builder/src/main.ts` - CLI entry; `build.ts` - orchestration + helpers
 - `builder/src/render.tsx` - org → page HTML; imports `./styles/*.module.css` directly
-- `builder/src/bake.ts` / `bake-util.ts` - Prism/KaTeX/card bake engine
+- `builder/src/bake.ts` / `bake-util.ts` - KaTeX/card bake engine; `highlight.ts` - tree-sitter engine
+- `builder/grammars/` - vendored grammar `wasm/` + `queries/` (+ `vendor.sh`); see its README
 - `builder/src/assets.ts` - builds `components.min.css` + minifies/bundles assets
 - `builder/src/styles/*.module.css` - scoped CSS modules (Vite resolves them)
 - `builder/src/html.ts` - tiny JSX-to-string runtime (`h`/`Fragment`/`raw`)
@@ -84,17 +85,17 @@ kinds, chosen by URL:
 - **OGP card** — title / description / image / favicon scraped from the page.
 - **GitHub code embed** — a blob permalink *with a line range*
   (`github.com/owner/repo/blob/<sha>/file#L10-L20`) embeds the actual source
-  lines, Prism-highlighted (same theme as the rest of the site) with a
+  lines, tree-sitter-highlighted (same theme as the rest of the site) with a
   line-number gutter that starts at the real source line. Use a commit-SHA
   permalink (`y` on GitHub) for reproducibility. Without a line range it's just an
-  OGP card. See `docs/adr/0002-link-cards.md`.
+  OGP card.
 
 Because the build is offline/hermetic (nix/CI sandbox has no network), metadata
 is fetched **ahead of time** by `scripts/fetch-linkcards.ts` (`just linkcards`)
 into the committed `linkcard-cache.json`; `builder/src/bake.ts` bakes the card
 HTML from that cache. A URL absent from the cache degrades to a plain link and
 fails the build under `--strict` (CI/nix), so the cache must be committed
-alongside the article. See `docs/adr/0002-link-cards.md`.
+alongside the article.
 
 ### Header & Footer Icons
 The header nav and footer links carry small inline-SVG icons (no icon font, no
@@ -138,8 +139,8 @@ global CSS stays in `src/style/style.css`.
 - **Build tooling** (in `builder/`): `vite` + `vite-node` (run the build, resolve
   CSS modules), `esbuild` (minify CSS / bundle browser TS), `vitest` (tests). Bun
   is used as the launcher (`bunx vite-node`) and still runs `scripts/fetch-linkcards.ts`.
-- **Node deps**: `prismjs`, `katex`, `linkedom`, `happy-dom`, `uniorg` (render/bake)
-- **Frontend**: Simple.css, custom fonts, `katex.min.css` (no runtime Prism/MathJax)
+- **Node deps**: `web-tree-sitter`, `katex`, `linkedom`, `uniorg` (render/bake)
+- **Frontend**: Simple.css, custom fonts, `katex.min.css` (no runtime highlighter/MathJax)
 
 ## Development Notes
 
@@ -150,17 +151,39 @@ global CSS stays in `src/style/style.css`.
 - Japanese language support with proper HTML lang attributes
 
 ### Syntax Highlighting
-All at build time. Code blocks get `language-XX` classes from uniorg;
-`builder/src/bake.ts` then bakes Prism highlighting. Most blocks use a fast
-`Prism.highlight()` string call; blocks needing plugin hooks (coderef
-`keep-markup`, `line-numbers`, `diff-*`, `autolinker`) go through a happy-dom
-`highlightElement`. **Add new languages to the `loadLanguages` list in
-`builder/src/bake.ts`**, or strict CI fails on the unknown tag. `org` has no Prism
-grammar and renders as plain text.
+All at build time, by **tree-sitter** via `web-tree-sitter`
+(`builder/src/highlight.ts`; replaced Shiki — parses a string, no DOM). It
+implements the **official `tree-sitter-highlight` algorithm** (the one Helix /
+GitHub use), NOT a naive pass — this is what makes highlighting *semantic*:
+- **last-pattern-wins** precedence (curated queries put generic captures first,
+  specific ones later to override);
+- **locals**: a `@local.reference` reuses its `@local.definition`'s highlight, so
+  real local variables aren't mislabeled by broad fallback patterns (e.g. a
+  haskell function name is coloured as a function, a bound var stays plain);
+- **injections**: a sub-region is re-highlighted with another grammar (makefile
+  recipe → bash, markdown → markdown_inline, fenced code → its language).
+Nesting resolves by painting larger ranges first so inner nodes win. `render.tsx`
+emits each code block as raw text on `<code class="language-XX">` + opt-in
+metadata; `bake.ts` feeds that to `highlight()` and swaps in the `<pre
+class="hl">`. Capture names → `hl-<bucket>` CSS classes via `CLASS_TABLE`. Features:
+- **Dual theme** (mandatory light/dark): CLASS-based. `style.css` defines an `.hl`
+  palette of CSS variables (`--c-kw`, `--c-str`, …) rebound per theme via
+  `[data-theme]` + `prefers-color-scheme`. Palette = okaidia (dark) + One Light
+  (light) — swap the two `.hl` blocks in `style.css` to restyle everything.
+- **Line numbers**: opt-in per block via org's `-n`/`+n` switch; a CSS counter on
+  the `.line` spans (also on GitHub code-embeds, starting at the source line).
+- **diff-`<lang>`**: strip the +/- column, highlight the body as `<lang>`, mark
+  `.line.diff.add`/`.remove`. **Coderefs**: `(ref:label)` → the line becomes an
+  `<a class="line coderef-off">` and the label span gets `coderef-anchor`.
+- **Languages**: each needs a vendored `grammars/wasm/<id>.wasm` + Helix-sourced
+  `grammars/queries/<id>.{scm,locals.scm,injections.scm}` — **add one with
+  `grammars/vendor.sh`** (see its README), then map the org token in `ALIAS` in
+  `highlight.ts`; otherwise strict CI fails on the unknown tag.
+  `org`/`ditaa`/`plantuml` have no grammar and render as plain text.
 
 ### Build Modes
 - **Release (the only mode)**: `just build` renders `src/` only and skips
   `#+DRAFT` articles. There is no draft build path.
 
 The build is split across `builder/src/build.ts` (orchestration) +
-`builder/src/render.tsx` (org → HTML) + `builder/src/bake.ts` (Prism/KaTeX/cards).
+`builder/src/render.tsx` (org → HTML) + `builder/src/bake.ts` + `highlight.ts` (tree-sitter/KaTeX/cards).

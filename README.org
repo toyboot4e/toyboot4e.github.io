@@ -20,7 +20,8 @@ $ just serve # in another tab
 *** CSS/JS
 
 - [[https://github.com/kevquirk/simple.css/][Simple.css]]
-- [[https://prismjs.com/][Prism.js]]
+- [[https://tree-sitter.github.io/tree-sitter/][Tree-sitter]] (build-time syntax highlighting via web-tree-sitter)
+- [[https://helix-editor.com/][Helix]] (highlight queries + themes: Sonokai, One Light)
 - [[https://katex.org/][KaTeX]]
 
 *** Fonts

@@ -840,7 +840,7 @@ h6:target {
 }
 
 /* ============================================================
-   Homepage disco ball (see docs/adr/0003, CONTEXT.md)
+   Homepage disco ball (see CONTEXT.md)
    A fixed, full-viewport WebGL canvas behind all content. Emitted only on the
    homepage (`has-disco` in build.el) and only rendered in dark theme (disco.ts
    gates the render loop and fades the canvas in/out via `opacity`). `z-index:-1`
