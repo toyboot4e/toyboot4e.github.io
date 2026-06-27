@@ -1,8 +1,8 @@
 {
   "https://github.com/toyboot4e/toyboot4e.github.io": {
-    "title": "GitHub - toyboot4e/toyboot4e.github.io: My devlog based on Org files",
-    "description": "My devlog based on Org files. Contribute to toyboot4e/toyboot4e.github.io development by creating an account on GitHub.",
-    "image": "https://opengraph.githubassets.com/d7383f5b25d75728efa728e10970385a7e9c5156f2a1d7dc091213beba5740a3/toyboot4e/toyboot4e.github.io",
+    "title": "GitHub - toyboot4e/toyboot4e.github.io: My devlog powered by uniorg",
+    "description": "My devlog powered by uniorg. Contribute to toyboot4e/toyboot4e.github.io development by creating an account on GitHub.",
+    "image": "https://opengraph.githubassets.com/6b030f6ec66bc8c42e82fd70a7e087aa1c020a87a09b583067eb8baf667bb6fe/toyboot4e/toyboot4e.github.io",
     "siteName": "GitHub",
     "favicon": "https://github.githubassets.com/favicons/favicon.svg"
   },
@@ -25,7 +25,7 @@
   },
   "https://toyboot4e.github.io/2026-03-14-light-theme.html": {
     "title": "ライトテーマの設定",
-    "description": "背景 ダークテーマを使い始めて n 年、目に良いとされるライトテーマも設定してみました。 設定内容テキストエディタ (Emacs + tmux) 配色は 12 年前に定義された dichromacy-theme をベースに、 AI が調整してくれました: Figure 1: Co…",
+    "description": "ダークテーマを使い始めて n 年、目に良いとされるライトテーマも設定してみました。",
     "image": "https://toyboot4e.github.io/img/2026-03-14-light-theme-1.webp",
     "siteName": "Toybeam",
     "favicon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%94%A6</text></svg>"

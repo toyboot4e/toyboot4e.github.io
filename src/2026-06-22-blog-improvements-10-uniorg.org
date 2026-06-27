@@ -74,6 +74,21 @@ The document must allow coderef # (ref:1)
 
 - [[(1)]] coderef
 
+#+BEGIN_SRC python -n
+# line 1
+# line 2
+# line 3
+#+END_SRC
+
+#+BEGIN_SRC python -n 10
+# line 10
+#+END_SRC
+
+#+BEGIN_SRC python +n
+# line 11
+#+END_SRC
+
+
 Hardbreak
 paragraph
 
