@@ -26,12 +26,11 @@ const CARD_CACHE = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "li
 
 // Rendered verbatim, never highlighted, never an error: plaintext aliases plus
 // languages we have no tree-sitter grammar for and deliberately show plain --
-// `ditaa` (an org-babel diagram DSL that also emits a generated image), `org`
-// (no usable grammar; Org source stays readable plain) and `plantuml`. They
-// still go through the highlighter as `text` for the same `.hl` / `.line`
-// framing as every other block. (dot/fortran ARE highlighted now -- see
-// highlight.ts + grammars/.)
-const PLAIN = new Set(["txt", "text", "plaintext", "plain", "ditaa", "org", "plantuml"]);
+// `ditaa` (an org-babel diagram DSL that also emits a generated image) and
+// `plantuml`. They still go through the highlighter as `text` for the same
+// `.hl` / `.line` framing as every other block. (dot/fortran/org ARE
+// highlighted now -- see highlight.ts + grammars/.)
+const PLAIN = new Set(["txt", "text", "plaintext", "plain", "ditaa", "plantuml"]);
 
 // --- tree-sitter setup -----------------------------------------------------
 // web-tree-sitter parses a code STRING and we emit HTML from the highlight

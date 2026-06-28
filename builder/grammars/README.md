@@ -28,6 +28,20 @@ node types line up with the queries. `<id>` is the canonical grammar id; org
 language tokens (`hs`, `sh`, `ts`, `md`, `lisp`, …) alias onto it via `ALIAS` in
 `highlight.ts`. `MANIFEST.txt` records each id's grammar source + rev.
 
+### `; inherits:` and shared base queries
+
+Helix's js/ts/tsx (and cpp) query files are thin: they start with a
+`; inherits: ecma,_javascript`-style directive and keep only the
+language-specific rules, sharing the bulk via base "pseudo-languages" (`ecma`,
+`_javascript`, `_typescript`, `_jsx`) that have query files but **no grammar**.
+`highlight.ts`'s `readQuery` resolves the directive exactly as Helix does —
+splicing the inherited file's contents in place, recursively, same kind
+(highlights/locals/injections) — so the language's own (more specific) patterns
+still come last (last-wins). `vendor.sh` fetches those base sets (`BASE_QUERIES`)
+under the same `<base>.scm` naming. **Forgetting either half** (the base files or
+the resolution) leaves js/ts/tsx with almost no highlighting even though the
+build reports no error — the thin query compiles fine, it just matches nothing.
+
 ## Re-vendoring
 
 `vendor.sh` is the source of truth — run it to add/bump a language (edit its
@@ -47,5 +61,12 @@ The hermetic site build only READS these files; it never runs `vendor.sh`.
 
 ## Not highlighted
 
-`org`, `ditaa` and `plantuml` have no grammar here and render as plain text (same
+`ditaa` and `plantuml` have no grammar here and render as plain text (same
 `.hl` / `.line` framing, no colour) — see the `PLAIN` set in `../src/bake.ts`.
+
+`org` IS highlighted (`org.wasm` + Helix's org queries). Note its grammar is
+pinned NEWER than Helix's `languages.toml` rev: Helix's pinned org grammar has a
+C++ scanner (`scanner.cc`, `std::vector`) the tree-sitter Wasm sandbox rejects;
+the newer milisims rev rewrote the scanner in C (wasm-safe), with node types that
+still match Helix's org queries. `org`'s `injections.scm` re-highlights each
+`#+BEGIN_SRC <lang>` body with `<lang>`, so an org sample colours its nested code.

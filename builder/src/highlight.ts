@@ -39,6 +39,9 @@ const ALIAS: Record<string, string> = {
   "c++": "cpp", "c#": "csharp", js: "javascript", ts: "typescript", yml: "yaml",
   "fortran-free-form": "fortran", md: "markdown", lisp: "commonlisp",
   "markdown.inline": "markdown_inline", "markdown-inline": "markdown_inline",
+  // the tsx grammar parses JSX/TSX (and plain js); the javascript grammar has no
+  // JSX, so `jsx` must map here, not to `javascript`.
+  jsx: "tsx",
 };
 
 // Plaintext aliases: framed like every other block but never highlighted.
@@ -83,6 +86,7 @@ const CLASS_TABLE: [string, string][] = [
   ["markup.link", "tag"],
   ["markup.list", "kw"],
   ["markup.quote", "com"],
+  ["markup.label", "con"], // org directives (#+TITLE:) / property drawers
 ];
 
 // Returns the colour bucket for a capture name, or "" for default foreground.
@@ -124,19 +128,39 @@ export async function initHighlighter(): Promise<void> {
     .map((f) => f.slice(0, -".wasm".length));
   for (const id of ids) {
     const language = await Language.load(readFileSync(join(WASM_DIR, `${id}.wasm`)));
-    let src = readFileSync(join(QUERY_DIR, `${id}.scm`), "utf8");
-    const localsPath = join(QUERY_DIR, `${id}.locals.scm`);
-    if (existsSync(localsPath)) src += "\n" + readFileSync(localsPath, "utf8");
+    // highlights + locals combined (locals capture names recognised by name);
+    // both resolve `; inherits:` against shared base queries (ecma, c, …).
+    let src = readQuery(id, "") + "\n" + readQuery(id, ".locals");
     // Local patches, appended LAST so they win (last-pattern-wins). These are our
     // own additions/overrides on top of Helix's queries and are NOT touched by
     // vendor.sh, so they survive re-vendoring.
     const localPath = join(QUERY_DIR, `${id}.local.scm`);
     if (existsSync(localPath)) src += "\n" + readFileSync(localPath, "utf8");
     const g: Grammar = { language, query: new Query(language, src) };
-    const injPath = join(QUERY_DIR, `${id}.injections.scm`);
-    if (existsSync(injPath)) g.inj = new Query(language, readFileSync(injPath, "utf8"));
+    const inj = readQuery(id, ".injections");
+    if (inj.trim()) g.inj = new Query(language, inj);
     grammars.set(id, g);
   }
+}
+
+// Helix `; inherits: a,b` directive: a query file pulls in shared base queries
+// (e.g. javascript -> ecma,_javascript; cpp -> c). The base "languages" (ecma,
+// _javascript, _typescript, _jsx) have query files but no grammar of their own.
+// We replicate Helix's read_query: replace the directive line IN PLACE with the
+// inherited files' contents (same kind: highlights/locals/injections), recursively,
+// so the language's own (more specific) patterns still come last (last-wins).
+const INHERITS_RE = /^[ \t]*;+[ \t]*inherits[ \t]*:?[ \t]*([a-z_,()-]+)[ \t]*$/gm;
+
+// Read query file `${id}${suffix}.scm` (suffix: "" highlights, ".locals",
+// ".injections"), resolving `; inherits:` against the same suffix. Missing file
+// or already-visited id -> "" (so a base that lacks e.g. injections is skipped).
+function readQuery(id: string, suffix: string, seen: Set<string> = new Set()): string {
+  if (seen.has(id)) return "";
+  seen.add(id);
+  const path = join(QUERY_DIR, `${id}${suffix}.scm`);
+  if (!existsSync(path)) return "";
+  return readFileSync(path, "utf8").replace(INHERITS_RE, (_m, langs: string) =>
+    langs.split(",").map((l) => `\n${readQuery(l.trim().replace(/[()]/g, ""), suffix, seen)}\n`).join(""));
 }
 
 /** Canonical grammar id for an org language token, or null if we have no grammar. */
@@ -227,10 +251,15 @@ function paintInto(cls: (string | null)[], src: string, id: string, offset: numb
   resolved.sort((a, b) => b.e - b.s - (a.e - a.s));
   for (const r of resolved) for (let k = r.s; k < r.e; k++) cls[offset + k] = r.hl;
 
-  // Injected sub-regions overwrite the parent's colours for their range.
+  // Injected sub-regions overwrite the parent's colours for their range: clear
+  // the region first so the inner grammar fully owns it (e.g. an org `#+BEGIN_SRC`
+  // body painted `markup.raw.block` by the parent must not bleed string-colour
+  // onto tokens the inner language leaves plain), then paint the inner grammar.
   for (const reg of regions) {
     const cid = canonical(reg.lang);
-    if (cid) paintInto(cls, src.slice(reg.start, reg.end), cid, offset + reg.start, depth + 1);
+    if (!cid) continue;
+    for (let k = offset + reg.start; k < offset + reg.end; k++) cls[k] = null;
+    paintInto(cls, src.slice(reg.start, reg.end), cid, offset + reg.start, depth + 1);
   }
 }
 

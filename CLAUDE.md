@@ -179,7 +179,11 @@ class="hl">`. Capture names → `hl-<bucket>` CSS classes via `CLASS_TABLE`. Fea
   `grammars/queries/<id>.{scm,locals.scm,injections.scm}` — **add one with
   `grammars/vendor.sh`** (see its README), then map the org token in `ALIAS` in
   `highlight.ts`; otherwise strict CI fails on the unknown tag.
-  `org`/`ditaa`/`plantuml` have no grammar and render as plain text.
+  `ditaa`/`plantuml` have no grammar and render as plain text. Helix's thin
+  js/ts/tsx (and cpp) queries use `; inherits:` to pull in shared base query sets
+  (`ecma`/`_javascript`/`_typescript`/`_jsx`, grammar-less) — `highlight.ts`'s
+  `readQuery` resolves that, so those bases must be vendored too or js/ts/tsx
+  highlight almost nothing (with no build error).
 
 ### Build Modes
 - **Release (the only mode)**: `just build` renders `src/` only and skips

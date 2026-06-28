@@ -19,6 +19,12 @@
 # (its postinstall fetches a native binary that would break the hermetic nix build).
 # Re-run to add/bump a language; commit the regenerated files. `validate.mjs`
 # checks every query still compiles against its grammar.
+#
+# Exception: `org` is pinned NEWER than Helix's languages.toml rev. Helix's pinned
+# org grammar ships a C++ scanner (scanner.cc, std::vector) that the tree-sitter
+# Wasm sandbox rejects ("uses a symbol that isn't available to Wasm parsers"); the
+# newer milisims rev rewrote the scanner in C (wasm-safe). Node types still match
+# Helix's org queries.
 set -uo pipefail
 cd "$(dirname "$0")" # builder/grammars
 TS_CLI="tree-sitter-cli@0.26.9" # keep matching web-tree-sitter in package.json
@@ -55,7 +61,17 @@ dot|rydesun/tree-sitter-dot|917230743aa10f45a408fea2ddb54bbbf5fbe7b7||dot
 markdown|tree-sitter-grammars/tree-sitter-markdown|f969cd3ae3f9fbd4e43205431d0ae286014c05b5|tree-sitter-markdown|markdown
 markdown_inline|tree-sitter-grammars/tree-sitter-markdown|f969cd3ae3f9fbd4e43205431d0ae286014c05b5|tree-sitter-markdown-inline|markdown.inline
 commonlisp|tree-sitter-grammars/tree-sitter-commonlisp|32323509b3d9fe96607d151c2da2c9009eb13a2f||common-lisp
+org|milisims/tree-sitter-org|64cfbc213f5a83da17632c95382a5a0a2f3357c1||org
 "
+
+# Shared base ("pseudo") query sets that have NO grammar of their own: other
+# languages pull them in via `; inherits:` (resolved in highlight.ts's readQuery).
+# e.g. javascript -> ecma,_javascript; tsx -> ecma,_typescript,_jsx. Without these
+# the js/ts/tsx highlights.scm are nearly empty (just a few language-specific rules)
+# and almost nothing highlights. We fetch their highlights/locals/injections under
+# the SAME `<base>.scm` naming the grammars use, so `; inherits:` finds them.
+# (`c` is a real grammar above, so cpp's `; inherits: c` already resolves.)
+BASE_QUERIES="ecma _javascript _typescript _jsx"
 
 ok=0; fail=0; manifest=""
 echo "Vendoring grammars with $($TS --version)…"
@@ -80,7 +96,18 @@ while IFS='|' read -r id repo rev sub hx; do
   ok=$((ok+1))
 done <<< "$GRAMMARS"
 
+# Grammar-less base query sets pulled in via `; inherits:` (see BASE_QUERIES note).
+echo "Fetching shared base query sets (inherited via \`; inherits:\`)…"
+for base in $BASE_QUERIES; do
+  hb="https://raw.githubusercontent.com/helix-editor/helix/$HELIX_REF/runtime/queries/$base"
+  curl -sf "$hb/highlights.scm" -o "queries/$base.scm" || { echo "  ✗ $base (no highlights)"; fail=$((fail+1)); continue; }
+  curl -sf "$hb/locals.scm" -o "queries/$base.locals.scm" 2>/dev/null || rm -f "queries/$base.locals.scm"
+  curl -sf "$hb/injections.scm" -o "queries/$base.injections.scm" 2>/dev/null || rm -f "queries/$base.injections.scm"
+  echo "  ✓ $base (base queries)"
+  manifest+="$base  (base queries)  helix:$base\n"
+done
+
 echo
 echo "Done: $ok ok, $fail failed."
 printf "$manifest" | sort > MANIFEST.txt
-echo "Manifest -> grammars/MANIFEST.txt  (org/ditaa/plantuml have no grammar -> plain text)"
+echo "Manifest -> grammars/MANIFEST.txt  (ditaa/plantuml have no grammar -> plain text)"
