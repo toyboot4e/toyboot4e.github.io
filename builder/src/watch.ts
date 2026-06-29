@@ -19,9 +19,9 @@
 //
 // renderAndBake (the warm path) is imported at module load, so bake.ts's heavy
 // tree-sitter setup is done once and stays warm for every incremental save.
-import { watch, readFileSync, existsSync, unlinkSync } from "node:fs";
+import { watch, readdirSync, readFileSync, existsSync, unlinkSync, type FSWatcher } from "node:fs";
 import { mkdir, writeFile, readFile, rm, cp, readdir } from "node:fs/promises";
-import { join, dirname, sep } from "node:path";
+import { join, dirname, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn, type ChildProcess } from "node:child_process";
 import { renderAndBake } from "./render-bake.ts";
@@ -184,9 +184,24 @@ for (const o of outs) for (const r of o.results) cache.set(r.rel, { isDiary: r.i
 if (DEV_PORT > 0) dev = startDevServer(DEV_PORT);
 console.log(`  ready in ${since(t0)}; watching ${SRC}/ — incremental saves rebuild one file. Ctrl-C to stop.`);
 
-const watcher = watch(SRC, { recursive: true }, (_event, filename) => {
-  if (filename) schedule(typeof filename === "string" ? filename : filename.toString());
-});
+// Watch one fs.watch per directory, recursing ourselves -- NOT
+// `fs.watch(SRC, { recursive: true })`. On Linux that recursive flag is a JS shim
+// that watches each file's inode; an atomic save (editors/sed/git write a temp
+// file then rename it over the original) swaps the inode, so the watch goes stale
+// and only the first save to a file is ever seen. A directory watch survives the
+// swap (the dir's inode is stable), firing on every save.
+const watchers: FSWatcher[] = [];
+function watchTree(dir: string): void {
+  try {
+    const w = watch(dir, (_event, filename) => {
+      if (filename) schedule(relative(SRC, join(dir, filename.toString())));
+    });
+    w.on("error", () => { /* dir removed mid-session: ignore, don't crash */ });
+    watchers.push(w);
+  } catch { return; } // unreadable/vanished dir -> skip
+  for (const e of readdirSync(dir, { withFileTypes: true })) if (e.isDirectory()) watchTree(join(dir, e.name));
+}
+watchTree(SRC);
 
 // Clean teardown on EVERY termination signal we can catch -- Ctrl-C (SIGINT),
 // `kill` (SIGTERM), and tmux pane/window close (SIGHUP) -- so we close the
@@ -196,7 +211,7 @@ let stopping = false;
 function shutdown(sig: string): void {
   if (stopping) return;
   stopping = true;
-  try { watcher.close(); } catch { /* already closed */ }
+  for (const w of watchers) { try { w.close(); } catch { /* already closed */ } }
   if (assetChild) { try { assetChild.kill(); } catch { /* already exited */ } }
   try { unlinkSync(PID_FILE); } catch { /* already gone */ }
   console.log(`\nwarm watch: stopped (${sig}).`);
