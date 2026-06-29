@@ -18,8 +18,15 @@ This is a static site generator for a Japanese technical devlog. Content is auth
   (`cd builder && vitest run`); `just test-update` regenerates goldens.
 - `just clean` - Clean `out/`
 - `just watch` - Watch `src/` and run the fast warm `build` on change (release
-  only; drafts are skipped)
-- `just serve` - Start HTTP server on port 8080 to preview `out/`
+  only; drafts are skipped). Also serves `out/` on port 8080 with **Vite-style
+  live reload**: the browser refreshes the instant a rebuild lands (CSS edits
+  hot-swap without navigating; a body-only edit reloads just the tab on that
+  page). The reload client is injected at serve time only (SSE on
+  `/__livereload`), so `out/` stays the byte-exact release output. `DEV_PORT=0`
+  disables the server (preview with `just serve` instead);
+  `builder/src/dev-server.ts` is the server.
+- `just serve` - Start HTTP server on port 8080 to preview `out/` (plain static,
+  no live reload — for inspecting the exact release output)
 
 ### Processing
 - `just linkcards` - Fetch OGP metadata for `[[card:URL]]` links into

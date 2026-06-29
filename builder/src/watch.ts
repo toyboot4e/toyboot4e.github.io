@@ -27,8 +27,16 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { renderAndBake } from "./render-bake.ts";
 import { type Meta } from "./render.tsx";
 import { SRC, OUT, STATIC_RE, fullBuild, writeIndexAndTags } from "./build.ts";
+import { startDevServer, type DevServer } from "./dev-server.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url)); // builder/src
+
+// Live preview: an HTTP server over out/ that pushes a browser reload after each
+// rebuild (set DEV_PORT=0 to disable and preview with `just serve` instead).
+const DEV_PORT = Number(process.env.DEV_PORT ?? "8080");
+let dev: DevServer | null = null;
+// "/diary/x.html" — the URL the dev client matches against location.pathname.
+const urlOf = (outRel: string) => "/" + outRel.split(sep).join("/");
 
 // --- in-memory article metadata cache, keyed by output rel (e.g. diary/x.html).
 // Seeded from the startup full build, kept in sync on every change; the index +
@@ -61,14 +69,14 @@ async function onOrg(relOrg: string): Promise<void> {
   const outRel = relOrg.replace(/\.org$/, ".html");
   // deleted -> drop its page; reindex only if it was a published article
   if (!existsSync(abs)) {
-    if (cache.delete(outRel)) { await rm(join(OUT, outRel), { force: true }); await regenIndexTags(); }
+    if (cache.delete(outRel)) { await rm(join(OUT, outRel), { force: true }); await regenIndexTags(); dev?.reload(); }
     log(`- ${relOrg} removed (${since(t)})`);
     return;
   }
   const r = await renderAndBake(relOrg, await readFile(abs, "utf8"));
   // became a #+DRAFT -> treat like a delete (release build skips drafts)
   if (r.draft) {
-    if (cache.delete(r.rel)) { await rm(join(OUT, r.rel), { force: true }); await regenIndexTags(); }
+    if (cache.delete(r.rel)) { await rm(join(OUT, r.rel), { force: true }); await regenIndexTags(); dev?.reload(); }
     log(`~ ${relOrg} draft, skipped (${since(t)})`);
     return;
   }
@@ -79,6 +87,9 @@ async function onOrg(relOrg: string): Promise<void> {
   const reindex = !prev || metaKey(prev.meta) !== metaKey(r.meta);
   cache.set(r.rel, { isDiary: r.isDiary, meta: r.meta });
   if (reindex) await regenIndexTags();
+  // body-only edit -> reload just the tab on that page; a metadata change also
+  // rewrote the index + tag pages, so reload every tab.
+  if (reindex) dev?.reload(); else dev?.reload(urlOf(r.rel));
   log(`✓ ${r.rel}${reindex ? " + index/tags" : ""} (${since(t)})`);
 }
 
@@ -110,6 +121,9 @@ async function onStatic(relStatic: string): Promise<void> {
   if (relStatic.startsWith(`style${sep}`)) {
     await runAssets();
     await copyStyleAssets();
+    // .css edit -> swap stylesheets in place (no navigation); a .ts/.js edit
+    // changes behaviour, so do a full reload to re-run it.
+    if (relStatic.endsWith(".css")) dev?.cssReload(); else dev?.reload();
     log(`style ${relStatic} -> re-minified (${since(t)})`);
     return;
   }
@@ -117,6 +131,7 @@ async function onStatic(relStatic: string): Promise<void> {
   const dest = join(OUT, relStatic);
   await mkdir(dirname(dest), { recursive: true });
   await cp(join(SRC, relStatic), dest, { force: true }).catch(() => {});
+  dev?.reload();
   log(`static ${relStatic} (${since(t)})`);
 }
 
@@ -166,6 +181,7 @@ console.log("warm watch: building once (render+bake stays resident)…");
 const t0 = performance.now();
 const { outs } = await fullBuild();
 for (const o of outs) for (const r of o.results) cache.set(r.rel, { isDiary: r.isDiary, meta: r.meta });
+if (DEV_PORT > 0) dev = startDevServer(DEV_PORT);
 console.log(`  ready in ${since(t0)}; watching ${SRC}/ — incremental saves rebuild one file. Ctrl-C to stop.`);
 
 const watcher = watch(SRC, { recursive: true }, (_event, filename) => {

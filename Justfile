@@ -96,14 +96,17 @@ alias ao := audit-open
 audit-ai page="index.html": (audit page)
     bun scripts/audit-summary.ts {{lh_report}}.report.json
 
-# warm watch daemon: one full build at startup, then keep the render+bake
-# machinery resident and rebuild ONLY the changed file on each save (~10-50ms vs
-# ~1.5s for a full build). Release-only (drafts are skipped). Run `just serve`
-# alongside to preview.
+# warm watch daemon + live preview: one full build at startup, then keep the
+# render+bake machinery resident and rebuild ONLY the changed file on each save
+# (~10-50ms vs ~1.5s for a full build). Also serves out/ on {{port}} with
+# Vite-style live reload — the browser refreshes the moment a rebuild lands (CSS
+# edits hot-swap without navigating). Release-only (drafts are skipped); the
+# reload client is injected at serve time, so out/ stays the byte-exact release
+# output. Set DEV_PORT=0 to disable the server and preview with `just serve`.
 watch:
     # the daemon's startup build spawns the bundled dist/render-shard.js, so build it first
     cd builder && bunx vite build -c vite.build.config.ts
-    cd builder && bunx vite-node src/watch.ts
+    cd builder && DEV_PORT={{port}} bunx vite-node src/watch.ts
 
 [private]
 alias w := watch
