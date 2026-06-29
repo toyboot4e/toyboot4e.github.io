@@ -175,7 +175,7 @@ metadata; `bake.ts` feeds that to `highlight()` and swaps in the `<pre
 class="hl">`. Capture names → `hl-<bucket>` CSS classes via `CLASS_TABLE`. Features:
 - **Dual theme** (mandatory light/dark): CLASS-based. `style.css` defines an `.hl`
   palette of CSS variables (`--c-kw`, `--c-str`, …) rebound per theme via
-  `[data-theme]` + `prefers-color-scheme`. Palette = okaidia (dark) + One Light
+  `[data-theme]` + `prefers-color-scheme`. Palette = sonokai (dark) + One Light
   (light) — swap the two `.hl` blocks in `style.css` to restyle everything.
 - **Line numbers**: opt-in per block via org's `-n`/`+n` switch; a CSS counter on
   the `.line` spans (also on GitHub code-embeds, starting at the source line).
