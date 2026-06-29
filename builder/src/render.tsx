@@ -547,16 +547,13 @@ async function orgToBody(src: string, st: RenderState): Promise<string> {
 // Render a short org string (e.g. a `#+TITLE:`) as inline HTML: `=org=` ->
 // `<code>org</code>`, `$x$` -> KaTeX, links, emphasis. Strips the wrapping <p>.
 // Used for titles in the article <h1> and the index/tag cards, which were
-// previously HTML-escaped (so `=org=` showed literally).
-async function orgInlineToHtml(s: string, katex = true): Promise<string> {
-  let pipe = unified().use(parse).use(uniorg2rehype);
-  // The index/tag card titles pass katex=false: rendering math there would pull
-  // katex.min.css + its `font-display:block` fonts onto the card-listing pages
-  // just for a rare title, and the late-loading font causes a big layout shift
-  // (CLS) + delayed LCP. Without it the math span stays as its readable source.
-  if (katex) pipe = pipe.use(rehypeKatex, { throwOnError: false, strict: false });
+// previously HTML-escaped (so `=org=` showed literally). Listing pages link
+// katex.min.css only when a shown card title actually has math (listingHasMath).
+async function orgInlineToHtml(s: string): Promise<string> {
   const out = String(
-    await pipe.use(stringify, { allowDangerousHtml: true, closeSelfClosing: true }).process(s),
+    await unified().use(parse).use(uniorg2rehype)
+      .use(rehypeKatex, { throwOnError: false, strict: false })
+      .use(stringify, { allowDangerousHtml: true, closeSelfClosing: true }).process(s),
   );
   return out.replace(/^\s*<p>([\s\S]*?)<\/p>\s*$/, "$1").trim();
 }
@@ -580,7 +577,7 @@ async function orgInlineToText(s: string): Promise<string> {
 
 // --- page assembly ----------------------------------------------------------
 export type Meta = {
-  href: string; title: string; titleHtml: string; titleCardHtml: string; titleText: string;
+  href: string; title: string; titleHtml: string; titleText: string;
   date: string; tags: string[]; thumbnail: string | null; draft: boolean; description: string;
 };
 
@@ -747,7 +744,7 @@ function articleCard(m: Meta, eager: boolean): Raw {
         {/* data-article-card: a STABLE hook for tooling (og-preview.html scrapes
             the article list from index.html). The CSS-module class is content-
             hashed, so it can't be relied on. */}
-        <div><a href={m.href} data-article-card class={card.articleCardLink}>{raw(m.titleCardHtml)}</a></div>
+        <div><a href={m.href} data-article-card class={card.articleCardLink}>{raw(m.titleHtml)}</a></div>
         <div class={card.articleCardMeta}>
           <date>{m.date}</date>
           <span class="org-tag-list">{tagListHtml(m.tags)}</span>
@@ -803,8 +800,7 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
   const meta: Meta = {
     href: "/" + outRel,
     title, // raw org title (kept for reference)
-    titleHtml: await orgInlineToHtml(title), // org markup -> HTML (w/ KaTeX), for the article <h1>
-    titleCardHtml: await orgInlineToHtml(title, false), // no KaTeX -> keeps katex off the listing pages
+    titleHtml: await orgInlineToHtml(title), // org markup -> HTML (w/ KaTeX); article <h1> + listing cards
     titleText: await orgInlineToText(title), // org markup stripped, for <title>/og
     date: fmtDate(kw.DATE || ""),
     tags,
@@ -833,6 +829,12 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
   return { rel: outRel, isDiary: outRel.startsWith("diary/"), draft: !!kw.DRAFT, meta, html };
 }
 
+// A card title may carry KaTeX (e.g. `$\TeX{}$`), rendered into titleHtml by
+// rehype-katex. Ship katex.min.css on the listing only when some shown card
+// actually needs it -- the common all-prose case stays free of the CSS payload.
+const listingHasMath = (cards: Meta[]): boolean =>
+  cards.some((m) => m.titleHtml.includes('class="katex'));
+
 // index.html: Tags / Devlog (timeline) / Diary -- three sections, in that order.
 export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: string[]): string {
   const section = (id: string, cards: Meta[]): Raw => (
@@ -841,8 +843,7 @@ export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: strin
       <div class={card.articleList}>{cards.map((m, i) => articleCard(m, i === 0))}</div>
     </Fragment>
   );
-  // a card title may carry KaTeX (e.g. `$\TeX{}$`); link the stylesheet if so
-  const hasMath = false; // cards use titleCardHtml (no KaTeX), so no katex.css on the listing
+  const hasMath = listingHasMath([...metas, ...diaryMetas]);
   return render(page({
     htmlClass: "home",
     head: headHtml({ title: "Toybeam", description: "Devlog of toyboot4e", url: SITE_URL, thumbnail: null, hasCode: false, hasMath }),
@@ -858,7 +859,7 @@ export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: strin
 }
 
 export function buildTagHtml(tag: string, tagged: Meta[], allTags: string[]): string {
-  const hasMath = false; // cards use titleCardHtml (no KaTeX), so no katex.css on the listing
+  const hasMath = listingHasMath(tagged);
   return render(page({
     htmlClass: "home",
     head: headHtml({ title: `Toybeam (#${tag})`, description: "Devlog of toyboot4e", url: `${SITE_URL}tags/${tag}.html`, thumbnail: null, hasCode: false, hasMath }),
