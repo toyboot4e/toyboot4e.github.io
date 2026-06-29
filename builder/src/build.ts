@@ -10,6 +10,7 @@
 // Paths are resolved relative to the repo root (this file's ../..), so the build
 // is cwd-independent. Writes to `out/` by default (set OUT_DIR to override).
 import { readdir, mkdir, writeFile, rm, cp } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
@@ -30,6 +31,15 @@ export const STRICT = process.argv.includes("--strict") || !!process.env.CI;
 // warm tree-sitter/uniorg setup each). Past ~6 the per-process startup
 // outweighs the shrinking per-shard work; override with BUILD_WORKERS.
 const WORKERS = Math.max(1, Number(process.env.BUILD_WORKERS) || Math.min(cpus().length, 6));
+
+// Render shards MUST run the Vite-built bundle (dist/render-shard.js): Vite
+// resolves the `*.module.css` imports to their scoped class maps at build time.
+// Running the .ts source directly (e.g. `bun src/render-shard.ts`) bypasses Vite,
+// so those imports are undefined and every CSS-module class (ToC, cards, steno)
+// silently vanishes. `HERE` is dist/ under `bun dist/main.js` but src/ under the
+// vite-node watch daemon, so derive the shard path from ROOT, not HERE.
+const BUILDER = join(ROOT, "builder");
+const SHARD = join(BUILDER, "dist", "render-shard.js");
 
 export type WorkerOut = { results: { rel: string; isDiary: boolean; meta: Meta }[]; stats: BakeStats };
 
@@ -87,12 +97,16 @@ const PROF = !!process.env.BUILD_PROF;
 // Render+bake one shard in a child `bun` process running the bundled
 // dist/render-shard.js (plain JS -- no per-process Vite boot), which writes the
 // pages and prints its metadata + stats as JSON on stdout. Sharding across child
-// processes is how we parallelise. `HERE` is dist/ at runtime (this file is
-// bundled to dist/main.js), so the sibling render-shard.js is right here.
+// processes is how we parallelise. The shard MUST be the Vite-built bundle (see
+// SHARD) -- the raw .ts has unresolved CSS-module imports.
 function runShard(files: string[]): Promise<WorkerOut> {
   return new Promise((resolve, reject) => {
-    const child = spawn("bun", [join(HERE, "render-shard.js"), ...files], {
-      cwd: join(HERE, ".."), // builder/, for node_modules resolution
+    if (!existsSync(SHARD)) {
+      reject(new Error(`render shard bundle missing: ${SHARD}\n  run \`bunx vite build -c vite.build.config.ts\` (in builder/) first`));
+      return;
+    }
+    const child = spawn("bun", [SHARD, ...files], {
+      cwd: BUILDER, // builder/, for node_modules resolution
       env: { ...process.env, OUT_DIR: OUT },
       stdio: ["ignore", "pipe", "inherit"],
     });
