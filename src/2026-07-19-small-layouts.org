@@ -1,0 +1,96 @@
+#+TITLE: 30 キー未満のキーボード配列の検討
+#+DATE: <2026-07-18 Sat>
+
+* 背景
+
+[[https://nollelectronics.com/products/leversteno][Leversteno]] を発注しました。 8 月末までに到着予定です。これはレバー機構を有した比較的安価な速記キーボードなのですが、速記の話は今回は割愛します。
+
+Leversteno を通常のキーボードとして使うには、キー数に難があります。下図の通り、左手には 2x4 キー (および =*= キーと親指キー) しか割り当てられません:
+
+#+BEGIN_KEYBOARD leversteno
+#+END_KEYBOARD
+
+この限られたキー数で、どのキーボード配列を使用するか検討してみました。
+
+* キーボード配列の検討
+
+** 24 キー QWERTY (二段圧縮)
+
+まずはおなじみの [[https://note.com/jeebis_keyboard/n/ncbc327906050][二段圧縮]] です。上下 2 キーを同時押しすると、QWERTY キーボードの中央列を入力できます (例: q+z = a):
+
+#+BEGIN_KEYBOARD qwerty-24
+#+END_KEYBOARD
+
+左手に 5x2 キーが必要なため、 Leversteno では使用できません。二段圧縮を止め、他の配列を検討します。
+
+#+BEGIN_QUOTE
+横方向のコンボを使えば、 Leversteno 上でも "準" 二段圧縮ができます。しかし本来の二段圧縮ほど綺麗な表現ではないため、あまり魅力的に感じませんでした。
+#+END_QUOTE
+
+** 18 キー QWERTY (Tiny18)
+
+[[https://github.com/k3peta/zmk-config-tiny18][Tiny 18]] キーボードも QWERTY 配列のメンタルモデルを活かした小型キーボードです。やはり QWERTY が大きく崩れるため、僕としては候補から外れます。
+
+#+BEGIN_KEYBOARD tiny-18
+#+END_KEYBOARD
+
+** Piano (Ben Vallack)
+
+Ben Vallack 氏の Piano キーボードではコンボ (複数キーの同時押し) を禁止し、レイヤー切り替えを多用することで 18 キーでやりくりしています。
+
+[[https://www.youtube.com/watch?v=5RN_4PQ0j1A][Has Your Keyboard Got Too Many Keys? (Youtube)]]
+
+#+BEGIN_KEYBOARD piano
+#+END_KEYBOARD
+
+たとえば Ctrl+a を押すために 2 ストローク必要になります。これは僕の好みでは無いため候補外です。
+
+#+BEGIN_QUOTE
+Ben Vallack 氏自身も、後に他のキーボードに移行したように見られます:
+
+[[https://www.youtube.com/watch?v=dg2TT1OJlQs][Is This the Perfect Custom Keyboard?]]
+#+END_QUOTE
+
+** Taipo 配列
+
+[[https://inkeys.wiki/en/keymaps/taipo][Taipo 配列]] は片手用の配列で、左右対象な形での使用が意図されています。左手部分のみを表示すると、次の通りです:
+
+#+BEGIN_KEYBOARD taipo
+#+END_KEYBOARD
+
+18 種類のコンボにより、片手で 28 キーを表現できます。内 4 種類のコンボは、縦列が修飾キーとなります ([[https://precondition.github.io/home-row-mods][home-row mod]] 的です) 。
+
+さらに、親指キーとのコンボでシフトキーや他レイヤーを表現します。第一候補です。
+
+** ARTSEY / ardux 配列
+
+[[https://artsey.io/][ARTSEY]] (および派生した [[https://inkeys.wiki/en/keymaps/ardux][ardux]]) 片手用のキー配列で、親指部分がありません。
+
+#+BEGIN_KEYBOARD artsey
+#+END_KEYBOARD
+
+Taipo と比べて理不尽な難易度のコンボが多く、候補から外れます。
+
+** ASENTIOP
+
+[[https://asetniop.com/][ASETNIOP]] 配列は僅か 10 キーのタブレット用の配列です。見るからに異常で、これは心が踊ります。
+
+#+BEGIN_KEYBOARD asetniop
+#+END_KEYBOARD
+
+しかし (修飾キー + 他キー) は二回のストロークで表現されます。今回の候補からは外れます。
+
+* まとめ
+
+以上から、現状は [[https://inkeys.wiki/en/keymaps/taipo][Taipo]] が第一候補です。さらに親指キーを削ってみたいのと、 ASENTIOP も気になります。
+
+| 配列                                                           | キー数 | 特徴                             |
+|----------------------------------------------------------------+--------+----------------------------------|
+| [[https://note.com/jeebis_keyboard/n/ncbc327906050][二段圧縮]] |     24 | QWERTY のメンタルモデルを継承    |
+| [[https://github.com/k3peta/zmk-config-tiny18][Tiny18]]                                                         |     18 | QWERTY を崩しつつも継承          |
+| [[https://www.youtube.com/watch?v=5RN_4PQ0j1A][Piano]]                                                          |     18 | コンボ無し、レイヤ切り替えを多用 |
+| [[https://inkeys.wiki/en/keymaps/taipo][Taipo]]                                                          |     20 | 左右対称、そこまで難しくない？   |
+| [[https://artsey.io/][ARTSEY]] / [[https://inkeys.wiki/en/keymaps/ardux][ardux]]                                                 |     16 | 左右対象、高難度                 |
+| [[https://asetniop.com/][ASENTIOP]]                                                       |     10 | 未知 (理解できず)                |
+
+[[https://nollelectronics.com/products/leversteno][Leversteno]] が届くまでは Taipo 配列を練習してみます。幸い AI のおかげで、ボタン 1 つでキーボード配列を切り替えることができます (QMK ファームウェア) 。やるぞやるぞ
