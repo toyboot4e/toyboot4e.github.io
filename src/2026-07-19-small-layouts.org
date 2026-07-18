@@ -1,5 +1,6 @@
 #+TITLE: 30 キー未満のキーボード配列の検討
 #+DATE: <2026-07-18 Sat>
+#+FILETAGS: :keyboard:steno:
 
 * 背景
 
