@@ -83,7 +83,24 @@ uncached cards.
 The build system supports these custom blocks:
 - `#+BEGIN_DETAILS` / `#+END_DETAILS` - Collapsible details sections
 - `#+BEGIN_YARUO` / `#+END_YARUO` - Special formatting for character dialogue
-- `#+BEGIN_STENO` / `#+END_STENO` - Stenography notation blocks
+- `#+BEGIN_STENO` / `#+END_STENO` - Steno chord chart (the `uni-v4` keyboard
+  layout; body = `/`-separated strokes like `KAT/-S`)
+- `#+BEGIN_KEYBOARD <layout>` / `#+END_KEYBOARD` - Keyboard chart with
+  highlighted keys (`builder/src/keyboard.tsx`). Layouts: `uni-v4` (steno
+  stroke body, same as STENO) and `qwerty-24` (two qwerty rows + 4 thumb keys;
+  body lines are case-sensitive key specs — lowercase letters, uppercase
+  `A`/`S`/`J`/`E` = Alphabet / Space / Japanese / Enter thumb keys; the IME
+  keys show text labels "A" / "あ", Space/Enter are Lucide icons; e.g. `qzyAS`
+  highlights q, z, y, Alphabet, Space; one chart per line), `tiny-18`
+  (k3peta's Tiny 18 default layer, explicitly placed keys with stagger; 17
+  lowercase letters + uppercase `E` = Enter), `leversteno` (stenotype
+  layout: one-piece number bar, tall `*` keys, A O / E U vowels; steno stroke
+  body like STENO), `piano` (Ben Vallack's Piano: tiny-18 shape, 14 letters +
+  wide `S` = Space / `A` = α thumb keys), `taipo` (right-hand half: i n s r /
+  e t o a + `I`/`O` = inner/outer thumb), `asetniop` (a s e t | n i o p +
+  `^` = Shift, `S` =
+  Space) and `artsey` (right-handed 2x4: a r t s / e y i o; ardux shares
+  this base grid). Unknown layout/key fails the build.
 
 ### Link Cards
 `[[card:https://example.com]]` (a custom Org link type, registered in
@@ -133,8 +150,8 @@ wrap its `<path>`s in `<NavIcon>`). Keep external-site links to generic icons, n
 the destination's trademarked logo.
 
 ### CSS Modules
-Component styles live in `builder/src/styles/*.module.css` (article-card, steno,
-toc). `render.tsx` imports them directly (`import card from
+Component styles live in `builder/src/styles/*.module.css` (article-card,
+keyboard, toc). `render.tsx` imports them directly (`import card from
 "./styles/article-card.module.css"`) and Vite returns the scoped class map.
 `generateScopedName` (`builder/config-shared.ts`) is deterministic and hash-free
 (`article-card.module.css` class `articleCard` -> `article-card_articleCard`), so

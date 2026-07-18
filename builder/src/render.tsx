@@ -15,8 +15,9 @@ import { h, Fragment, raw, render, type Raw } from "./html.ts";
 // headHtml); Vite's `generateScopedName` (vite.config.ts) keeps the names in
 // sync between this render and that CSS build.
 import card from "./styles/article-card.module.css";
-import steno from "./styles/steno.module.css";
+import kb from "./styles/keyboard.module.css";
 import toc from "./styles/toc.module.css";
+import { keyboardStrokesHtml } from "./keyboard.tsx";
 import { expandMathbb } from "./math-util.ts";
 
 export const SITE_URL = "https://toyboot4e.github.io/";
@@ -130,6 +131,7 @@ const absUrl = (v: string | null) =>
 type RenderState = {
   source: string;             // the raw org source, for verbatim block slicing
   details: string[];          // `#+BEGIN_DETAILS <summary>` params, in order
+  keyboards: string[];        // `#+BEGIN_KEYBOARD <layout>` params, in order
   blockCounter: { n: number }; // positional src-block counter (for coderef ids)
   tableCaps: (string | null)[];  // per-table caption HTML (recovered from source)
   tableCounter: { n: number };   // index into tableCaps, advanced per table
@@ -142,69 +144,12 @@ type RenderState = {
 // leader included, stays) -- it does NOT strip the rest of the line.
 const CODEREF_RE = /\(ref:([^)]+)\)/;
 
-// Steno chord chart (`#+BEGIN_STENO`). The Uni 3x12 keyboard layout; a stroke
-// like `KAT` highlights the keys it presses. Rendered to static HTML here at
-// build time -- this is the port of the old client-side steno-viz.js
-// (`collectKeyPress` + `renderStroke`), so the <steno-outline> web component and
-// its async script are gone. Styling lives in build/styles/steno.module.css
-// (scoped class names via the `steno` map).
-const STENO_CHARS = [
-  ["#", "T", "P", "H", "*", "", "*", "F", "P", "L", "T", "D"],
-  ["S", "K", "W", "R", "", "", "", "R", "B", "G", "S", "Z"],
-  ["", "", "#", "A", "O", "", "E", "U", "#", "", "", ""],
-];
-// Steno key order (#STKPWHRAO*EUFRPBLGTSDZ) mapped to [row, col] in STENO_CHARS.
-const STENO_ORDER: Array<[number, number]> = [
-  [0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2], [0, 3], [1, 3],
-  [2, 2], [2, 3], [2, 4], [0, 4], [2, 6], [2, 7], [2, 8], [0, 7],
-  [1, 7], [0, 8], [1, 8], [0, 9], [1, 9], [0, 10], [1, 10], [0, 11], [1, 11],
-];
-
-// Which keys a single (already upper-cased) stroke presses -> 3x12 boolean grid.
-function stenoPressed(stroke: string): boolean[][] {
-  const ret = [Array(12).fill(false), Array(12).fill(false), Array(12).fill(false)];
-  if (stroke) {
-    const iRhs = 12; // first right-hand entry in STENO_ORDER; `-` jumps here
-    let iOrder = 0;
-    for (const c of stroke) {
-      if (iOrder >= STENO_ORDER.length) break;
-      if (c === "-") {
-        if (iOrder < iRhs) iOrder = iRhs;
-        continue;
-      }
-      while (iOrder < STENO_ORDER.length) {
-        const [row, col] = STENO_ORDER[iOrder++];
-        if (c === STENO_CHARS[row][col]) {
-          ret[row][col] = true;
-          break;
-        }
-      }
-    }
-  }
-  // `*` (two cells) and `#` (three cells) light together if any of them is hit.
-  const star = ret[0][4] || ret[0][6];
-  ret[0][4] = ret[0][6] = star;
-  const hash = ret[0][0] || ret[2][2] || ret[2][8];
-  ret[0][0] = ret[2][2] = ret[2][8] = hash;
-  return ret;
-}
-
-// One stroke -> its grid of <div> keys (raw HTML, scoped class names).
-function stenoStrokeHtml(stroke: string): string {
-  const pressed = stenoPressed(stroke);
-  let cells = "";
-  for (let row = 0; row < 3; row++) {
-    for (let col = 0; col < 12; col++) {
-      const c = STENO_CHARS[row][col];
-      const on = pressed[row][col];
-      let cls: string;
-      if (c === "*") cls = `${steno.key} ${steno.keyFat}${on ? ` ${steno.keyPressed}` : ""}`;
-      else if (c === "") cls = steno.cell;
-      else cls = `${steno.key}${on ? ` ${steno.keyPressed}` : ""}`;
-      cells += `<div class="${cls}">${c}</div>`;
-    }
-  }
-  return `<div class="${steno.stroke}">${cells}</div>`;
+// Keyboard charts (`#+BEGIN_STENO`, `#+BEGIN_KEYBOARD <layout>`) are rendered
+// by keyboard.tsx (layouts uni-v4 / qwerty-24). uniorg drops the special-block
+// parameter line, so like DETAILS summaries the `#+BEGIN_KEYBOARD <layout>`
+// params are recovered from raw source and consumed in document order.
+function keyboardLayouts(text: string): string[] {
+  return [...text.matchAll(/^[ \t]*#\+BEGIN_KEYBOARD[ \t]*(\S*)[ \t]*$/gim)].map((m) => m[1]);
 }
 
 // `#+CAPTION: ...` lives in uniorg's `node.affiliated.CAPTION` (array of caption
@@ -310,13 +255,16 @@ function makeHandlers(st: RenderState) {
         const raw = st.source.slice(org.contentsBegin, org.contentsEnd).replace(/\n$/, "");
         return this.h(org, "pre", { className: ["yaruo"] }, [{ type: "text", value: raw }]);
       }
-      if (t === "STENO") {
-        // The block body is a `/`-separated list of strokes (e.g. `KAT` or
-        // `KAT/-S`), sliced verbatim from source (not org-parsed) and drawn as a
-        // static keyboard chart per stroke (see stenoStrokeHtml above).
-        const strokes = st.source.slice(org.contentsBegin, org.contentsEnd).trim().toUpperCase().split("/");
-        return this.h(org, "div", { className: [steno.outline] },
-          strokes.map((s) => ({ type: "raw", value: stenoStrokeHtml(s) })));
+      if (t === "STENO" || t === "KEYBOARD") {
+        // The block body (sliced verbatim from source, not org-parsed) is a
+        // pressed-key spec drawn as a static keyboard chart per stroke/line
+        // (keyboard.tsx). STENO is the steno chord chart (uni-v4 layout,
+        // `/`-separated strokes like `KAT/-S`); KEYBOARD reads its layout from
+        // the block parameter recovered into `st.keyboards`.
+        const layout = t === "STENO" ? "uni-v4" : (st.keyboards.shift() || "");
+        const body = st.source.slice(org.contentsBegin, org.contentsEnd);
+        return this.h(org, "div", { className: [kb.outline] },
+          keyboardStrokesHtml(layout, body).map((v) => ({ type: "raw", value: v })));
       }
       return undefined; // fall through to uniorg's default special-block
     },
@@ -789,6 +737,7 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
     source: text,
     // org markup in each `#+BEGIN_DETAILS <summary>` -> HTML (the handler is sync)
     details: await Promise.all(detailsSummaries(text).map((s) => orgInlineToHtml(s))),
+    keyboards: keyboardLayouts(text),
     blockCounter: { n: 0 },
     tableCaps,
     tableCounter: { n: 0 },

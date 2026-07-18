@@ -1,0 +1,116 @@
+/* Keyboard chart -- key-layout outlines drawn for `#+BEGIN_STENO` (uni-v4) and
+ * `#+BEGIN_KEYBOARD <layout>` blocks. Rendered to static HTML at build time
+ * (keyboard.tsx `keyboardStrokesHtml`); replaces the old client-side
+ * <steno-outline> web component + steno-viz.js. CSS module: the class names
+ * below are scoped at build time and consumed via the generated map in
+ * keyboard.tsx. `var(--text)` is a global theme token (custom properties aren't
+ * scoped), so it cascades as before. */
+
+.outline {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* keys/cells take their width from the layout's grid tracks (the qwerty-24
+ * spacer column is half-width, so no fixed width here) */
+.stroke {
+  display: inline-grid;
+  gap: 4px;
+  position: relative;
+}
+
+/* uni-v4: the Uni steno keyboard, 3x12 */
+.strokeUni {
+  grid-template-rows: repeat(3, 32px);
+  grid-template-columns: repeat(12, 32px);
+}
+
+/* qwerty-24: 5|5 split with a half-width spacer column between the halves */
+.strokeQwerty24 {
+  grid-template-rows: repeat(3, 32px);
+  grid-template-columns: repeat(5, 32px) 16px repeat(5, 32px);
+}
+
+/* tiny-18: explicitly placed keys on half-unit (18px) tracks, 36px pitch --
+ * keys carry inline grid-row/grid-column and .keyPlaced/.keyDrop */
+.strokeTiny18 {
+  gap: 0;
+  grid-template-rows: repeat(3, 36px);
+  grid-template-columns: repeat(22, 18px);
+}
+
+/* leversteno: 4 rows; full-width number bar + tall `*` keys span cells */
+.strokeLever {
+  gap: 0;
+  grid-template-rows: repeat(4, 36px);
+  grid-template-columns: repeat(23, 18px);
+}
+
+/* taipo: right hand, 2x4 block + 2 offset thumb keys */
+.strokeTaipo {
+  gap: 0;
+  grid-template-rows: repeat(3, 36px);
+  grid-template-columns: repeat(10, 18px);
+}
+
+/* asetniop: 4|4 home keys + 2u-wide Shift/Space thumb keys */
+.strokeAsetniop {
+  gap: 0;
+  grid-template-rows: repeat(2, 36px);
+  grid-template-columns: repeat(17, 18px);
+}
+
+/* artsey: one-handed 2x4 */
+.strokeArtsey {
+  grid-template-rows: repeat(2, 32px);
+  grid-template-columns: repeat(4, 32px);
+}
+
+
+.key,
+.cell {
+  box-sizing: border-box;
+  height: 32px;
+}
+
+.key {
+  text-align: center;
+  border: 1px solid var(--text);
+  border-radius: 3px;
+}
+
+.keyPressed {
+  background: #4a90e2;
+}
+
+.keyFat {
+  /* the `*` key is twice as tall: 32 + 4 (gap) + 32 */
+  height: 66px;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+}
+
+.keyIcon {
+  /* thumb keys carry an inline-SVG icon instead of a text label */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Explicitly placed keys (tiny-18, leversteno): fill the spanned grid area,
+ * leaving the 4px pitch gap on the right/bottom. Must sort after `.key` -- its
+ * fixed 32px height would otherwise win and flatten row-spanning keys. */
+.keyPlaced {
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+}
+
+.keyDrop {
+  /* outer pinky keys sit 0.75u lower (tiny18.json / keymap-drawer chart) */
+  margin-top: 27px;
+}

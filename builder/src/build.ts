@@ -35,7 +35,7 @@ const WORKERS = Math.max(1, Number(process.env.BUILD_WORKERS) || Math.min(cpus()
 // Render shards MUST run the Vite-built bundle (dist/render-shard.js): Vite
 // resolves the `*.module.css` imports to their scoped class maps at build time.
 // Running the .ts source directly (e.g. `bun src/render-shard.ts`) bypasses Vite,
-// so those imports are undefined and every CSS-module class (ToC, cards, steno)
+// so those imports are undefined and every CSS-module class (ToC, cards, keyboard)
 // silently vanishes. `HERE` is dist/ under `bun dist/main.js` but src/ under the
 // vite-node watch daemon, so derive the shard path from ROOT, not HERE.
 const BUILDER = join(ROOT, "builder");

@@ -14,6 +14,38 @@
 TKPW
 #+END_STENO
 
+#+BEGIN_KEYBOARD qwerty-24
+qzyAS
+#+END_KEYBOARD
+
+#+BEGIN_KEYBOARD qwerty-24
+#+END_KEYBOARD
+
+#+BEGIN_KEYBOARD tiny-18
+wanE
+#+END_KEYBOARD
+
+#+BEGIN_KEYBOARD leversteno
+#KAT/-TS
+#+END_KEYBOARD
+
+#+BEGIN_KEYBOARD taipo
+inI
+#+END_KEYBOARD
+
+#+BEGIN_KEYBOARD piano
+lsS
+#+END_KEYBOARD
+
+#+BEGIN_KEYBOARD asetniop
+a^
+etS
+#+END_KEYBOARD
+
+#+BEGIN_KEYBOARD artsey
+ars
+#+END_KEYBOARD
+
 リスト:
 - 項目 1
 - 項目 2
