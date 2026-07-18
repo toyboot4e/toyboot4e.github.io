@@ -60,11 +60,11 @@ Ben Vallack 氏自身も、後に他のキーボードに移行したように�
 
 18 種類のコンボにより、片手で 28 キーを表現できます。内 4 種類のコンボは、縦列が修飾キーとなります ([[https://precondition.github.io/home-row-mods][home-row mod]] 的です) 。
 
-さらに、親指キーとのコンボでシフトキーや他レイヤーを表現します。第一候補です。
+さらに、親指キーとのコンボでシフトキーや他レイヤーを表現します。 QWERTY 以外の新配列でありつつも、そこまで難易度が高くないため、第一候補です。
 
 ** ARTSEY / ardux 配列
 
-[[https://artsey.io/][ARTSEY]] (および派生した [[https://inkeys.wiki/en/keymaps/ardux][ardux]]) 片手用のキー配列で、親指部分がありません。
+[[https://artsey.io/][ARTSEY]] (および派生した [[https://inkeys.wiki/en/keymaps/ardux][ardux]]) も片手用のキー配列で、親指キーが無い点が魅力的です。
 
 #+BEGIN_KEYBOARD artsey
 #+END_KEYBOARD
