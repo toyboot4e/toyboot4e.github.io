@@ -54,7 +54,7 @@ Ben Vallack 氏自身も、後に他のキーボードに移行したように�
 
 ** Taipo 配列
 
-[[https://inkeys.wiki/en/keymaps/taipo][Taipo 配列]] は片手用の配列で、左右対象な形での使用が意図されています。左手部分のみを表示すると、次の通りです:
+[[https://inkeys.wiki/en/keymaps/taipo][Taipo 配列]] は片手用の配列で、左右対象な形での使用が意図されています。右手部分のみを表示すると、次の通りです:
 
 #+BEGIN_KEYBOARD taipo
 #+END_KEYBOARD
