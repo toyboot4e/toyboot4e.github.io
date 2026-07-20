@@ -59,7 +59,7 @@ Ben Vallack 氏自身も、後に他のキーボードに移行したように�
 #+BEGIN_KEYBOARD taipo
 #+END_KEYBOARD
 
-レイヤは無く、 18 種類のコンボにより、片手で 28 キーを表現できます。内 4 種類のコンボは、縦列が修飾キーとなります ([[https://precondition.github.io/home-row-mods][home-row mod]] 的です) 。
+レイヤは無く、 18 種類のコンボにより、片手で 28 キーを表現できます。内 4 種類のコンボは、縦列が修飾キーとなります ([[https://precondition.github.io/home-row-mods][home-row mods]] 的です) 。
 
 さらに親指キーとのコンボでシフトキーや他レイヤーを表現します。 QWERTY 以外の新配列でありつつも、そこまで難易度が高くないため、第一候補です。
 
