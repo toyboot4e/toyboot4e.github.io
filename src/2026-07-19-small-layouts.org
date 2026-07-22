@@ -47,7 +47,7 @@ Ben Vallack 氏の Piano キーボードではコンボ (複数キーの同時�
 たとえば Ctrl+a を押すために 2 ストローク必要になります。これは僕の好みでは無いため候補外です。
 
 #+BEGIN_QUOTE
-Ben Vallack 氏自身も、後に他のキーボードに移行したように見られます:
+Ben Vallack 氏自身も、後に他のキーボードに移行したように見受けられます:
 
 [[https://www.youtube.com/watch?v=dg2TT1OJlQs][Is This the Perfect Custom Keyboard?]]
 #+END_QUOTE
@@ -59,7 +59,7 @@ Ben Vallack 氏自身も、後に他のキーボードに移行したように�
 #+BEGIN_KEYBOARD taipo
 #+END_KEYBOARD
 
-レイヤは無く、 18 種類のコンボにより、片手で 28 キーを表現できます。内 4 種類のコンボは、縦列が修飾キーとなります ([[https://precondition.github.io/home-row-mods][home-row mods]] 的です) 。
+レイヤは無く、 18 種類のコンボにより、片手で 28 キーを表現できます。内 4 種類は、縦列のコンボが修飾キーとなります ([[https://precondition.github.io/home-row-mods][home-row mods]] 的です) 。
 
 さらに親指キーとのコンボでシフトキーや他レイヤーを表現します。 QWERTY 以外の新配列でありつつも、そこまで難易度が高くないため、第一候補です。
 
@@ -72,7 +72,7 @@ Ben Vallack 氏自身も、後に他のキーボードに移行したように�
 
 Taipo と異なり、レイヤ切り替えを使用します。 Taipo の方がより素直な配列に見えるため、候補から外れます。
 
-** ASENTIOP
+** ASETNIOP
 
 [[https://asetniop.com/][ASETNIOP]] 配列は僅か 10 キーのタブレット用の配列です。見るからに異常で、これは心が踊ります。
 
@@ -83,7 +83,7 @@ Taipo と異なり、レイヤ切り替えを使用します。 Taipo の方が�
 
 * まとめ
 
-以上から、現状は [[https://inkeys.wiki/en/keymaps/taipo][Taipo]] が第一候補です。さらに親指キーを削ってみたいのと、 ASENTIOP も気になります。
+以上から、現状は [[https://inkeys.wiki/en/keymaps/taipo][Taipo]] が第一候補です。さらに親指キーを削ってみたいのと、 ASETNIOP も気になります。
 
 | 配列           | キー数 | 特徴                             |
 |----------------+--------+----------------------------------|
@@ -92,6 +92,6 @@ Taipo と異なり、レイヤ切り替えを使用します。 Taipo の方が�
 | [[https://www.youtube.com/watch?v=5RN_4PQ0j1A][Piano]]          |     18 | コンボ無し、レイヤ切り替えを多用 |
 | [[https://inkeys.wiki/en/keymaps/taipo][Taipo]]          |     20 | 左右対称、レイヤ無し             |
 | [[https://artsey.io/][ARTSEY]] / [[https://inkeys.wiki/en/keymaps/ardux][ardux]] |     16 | 左右対象、レイヤ有り             |
-| [[https://asetniop.com/][ASENTIOP]]       |     10 | 未知 (理解できず)                |
+| [[https://asetniop.com/][ASETNIOP]]       |     10 | 未知 (理解できず)                |
 
 [[https://nollelectronics.com/products/leversteno][Leversteno]] が届くまでは Taipo 配列を練習してみます。幸い AI のおかげで、ボタン 1 つでキーボード配列を切り替えることができます (QMK ファームウェア) 。やるぞやるぞ
