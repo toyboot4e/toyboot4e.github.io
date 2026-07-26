@@ -405,13 +405,62 @@ function demoteHeadings() {
 function headingSelfLinks() {
   const textOf = (n: any): string =>
     n.type === "text" ? n.value : (n.children || []).map(textOf).join("");
+  const hasLink = (n: any): boolean =>
+    n.tagName === "a" || (n.children || []).some(hasLink);
   return (tree: any) => {
     const walk = (n: any) => {
       if (n.tagName && /^h[1-6]$/.test(n.tagName)) {
         const id = textOf(n);
+        // A textless headline (a stray `*** ` in the org source) would otherwise
+        // get id="" and a self-link to `#` with nothing in it: an unnamed link
+        // sitting in the tab order (axe: link-name). No text, no anchor.
+        if (!id.trim()) return;
         n.properties = { ...n.properties, id };
-        n.children = [{ type: "element", tagName: "a", properties: { href: `#${id}` }, children: n.children }];
+        // A headline whose text is itself a link (`* [[url][label]]`) must NOT
+        // get the self-link wrapper: nested <a> is invalid HTML, and the parser
+        // recovers by splitting it into an EMPTY <a> plus the real one -- an
+        // unnamed link in the tab order on every such heading (axe: link-name).
+        // The id alone still makes the heading a fragment target and ToC entry.
+        if (!hasLink(n)) {
+          n.children = [{ type: "element", tagName: "a", properties: { href: `#${id}` }, children: n.children }];
+        }
         return; // headings don't nest
+      }
+      (n.children || []).forEach(walk);
+    };
+    walk(tree);
+  };
+}
+
+// A headline that is nothing but math (`*** $S_1, S_2$`) renders to a self-link
+// whose only content is KaTeX output: a `<math>` for AT plus an `aria-hidden`
+// visual span. Name computation does not descend into MathML, so both the link
+// and the heading come out UNNAMED -- "link" with nothing after it, and a
+// heading a screen reader cannot announce or list.
+//
+// Must run AFTER rehype-katex: before it the TeX is still ordinary text, so
+// there is no way to tell a math-only headline from a normal one. The label is
+// the heading's own id, which is the raw headline text (`S_1, S_2`) -- not
+// beautiful read aloud, but it is the real name and it matches what the ToC and
+// the URL fragment already say.
+function nameMathOnlyHeadings() {
+  // Text a name computation would actually use. KaTeX output is skipped
+  // wholesale: its MathML branch is full of text nodes (`S`, `3`, and a
+  // `<annotation>` holding the raw TeX) that no name computation reads, and its
+  // visual branch is aria-hidden. Counting either would make every math heading
+  // look adequately named.
+  const isKatex = (n: any) => String(n.properties?.className ?? "").includes("katex");
+  const nameText = (n: any): string =>
+    n.type === "text" ? n.value : isKatex(n) ? "" : (n.children || []).map(nameText).join("");
+  return (tree: any) => {
+    const walk = (n: any) => {
+      if (n.tagName && /^h[1-6]$/.test(n.tagName)) {
+        const link = (n.children || [])[0];
+        const id = n.properties?.id;
+        if (id && link?.tagName === "a" && !nameText(link).trim()) {
+          link.properties = { ...link.properties, "aria-label": id };
+        }
+        return;
       }
       (n.children || []).forEach(walk);
     };
@@ -484,6 +533,8 @@ async function orgToBody(src: string, st: RenderState): Promise<string> {
     // uniorg emits math as <span class="math math-inline|display">; render it
     // here (the bake step only matches \(...\) delimiters, which uniorg consumes).
     .use(rehypeKatex, { throwOnError: false, strict: false })
+    // ...and only now can we tell which self-links KaTeX left textless.
+    .use(nameMathOnlyHeadings)
     // preserve-breaks AFTER katex, so display-math TeX (which can contain
     // newlines) is already rendered and won't be split.
     .use(preserveLineBreaks)
