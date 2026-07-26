@@ -658,7 +658,12 @@ html[data-theme="dark"] .hl {
   border: var(--border-width) solid var(--border);
   border-radius: var(--standard-border-radius);
   color: var(--text);
-  display: inline-block;
+  /* inline-flex + min-height 24px: WCAG 2.2 "Target Size (Minimum)" wants a
+     24x24 CSS-px pointer target, and the chips were 21px tall. Centring the
+     label keeps the visual weight identical -- only the hit area grows. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   padding: 0px 6px;
   text-decoration: none;
   /* transition: background-color 0.15s; */
