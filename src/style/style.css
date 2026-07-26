@@ -4,6 +4,46 @@
    Component-specific tweaks stay with their component below.
    ============================================================ */
 
+/* ============================================================
+   Skip link (WCAG 2.4.1 "Bypass Blocks")
+   The chrome nav repeats on every page, so a keyboard or screen-reader user
+   would otherwise tab through it before reaching the article every single time.
+   Hidden until focused, then pinned above the sticky header.
+   NOT `display: none` / `visibility: hidden` -- either would take it out of the
+   tab order entirely, which is the whole point of the link.
+   ============================================================ */
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  padding: 0.35rem 0.9rem;
+  border: var(--border-width) solid var(--accent);
+  border-radius: var(--standard-border-radius);
+  background: var(--bg);
+  color: var(--text);
+  text-decoration: none;
+  /* Parked just off the top edge rather than removed, so it animates in. */
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skip-link {
+    transition: transform 0.15s ease-out;
+  }
+}
+
+/* `main` is the skip link's target and carries tabindex="-1" so focus really
+   lands there. Suppress the ring it would otherwise draw around the whole
+   column -- the user just chose to go here, so there is nothing to point out. */
+main:focus {
+  outline: none;
+}
+
 /* Header: drop simple.css's bottom padding; pin the bar to the top. */
 body > header {
   padding: 0;
@@ -20,12 +60,19 @@ body > header > *:only-child {
   margin-block-start: 0;
 }
 
-/* Shorten the header bar without changing the button size: flex the nav so its
+/* The flex row lives on the `<ul>`, so simple.css's `header nav` padding is no
+   longer being overridden by it — cancel that separately or its `1rem 0 0 0`
+   adds a 16px strip above the bar. */
+header > nav {
+  padding: 0;
+}
+
+/* Shorten the header bar without changing the button size: flex the list so its
    height tracks the buttons rather than simple.css's tall inline line box
    (line-height: 2), and drop the button margins (flex `gap` handles spacing,
    including the row gap when the buttons wrap on narrow screens). The roomy
    bordered-button look is simple.css's default, kept as-is. */
-header > nav {
+header > nav > ul {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -35,6 +82,10 @@ header > nav {
      narrow screens don't sit far apart. */
   gap: 0.4rem 1rem;
   padding: 0.3rem 0.5rem;
+  /* The nav links are marked up as a list (so AT announces "list, 7 items" and
+     can skip the run); strip the list presentation. */
+  list-style: none;
+  margin: 0;
 }
 header > nav a,
 header > nav a:visited {
@@ -272,7 +323,7 @@ h6 a {
    tracks the buttons instead of an inline line-box strut, and drop the button
    margins (flex `gap` handles spacing). Keep line-height: 2 so the buttons stay
    full size (a flex container adds no line-box strut of its own). */
-footer > div {
+footer > nav > ul {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -281,10 +332,12 @@ footer > div {
   font-size: 1rem;
   line-height: 2;
   padding: 0;
+  list-style: none;
+  margin: 0;
 }
 
-footer > div a,
-footer > div a:visited {
+footer > nav a,
+footer > nav a:visited {
   margin: 0;
   border: 1px solid var(--border);
   border-radius: 5px;
@@ -297,7 +350,7 @@ footer > div a:visited {
   text-decoration: none;
 }
 
-footer > div a:hover {
+footer > nav a:hover {
   border-color: var(--accent);
   color: var(--accent);
   cursor: pointer;
@@ -575,6 +628,11 @@ html[data-theme="dark"] .hl {
   display: inline-flex;
   flex-wrap: wrap;
   gap: 4px;
+  /* a <ul> now (AT announces the tag count and can skip the run) -- drop the
+     UA marker, indent and block margins so the chips lay out as before */
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .org-tag {

@@ -8,6 +8,12 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  /* A <ul> of cards (each .articleCard is the <li>), so AT announces the card
+     count and can step card-by-card instead of reading one long run of links.
+     Strip the list presentation -- the flex layout is unchanged. */
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .articleCard {
