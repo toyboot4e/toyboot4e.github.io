@@ -36,6 +36,27 @@ This is a static site generator for a Japanese technical devlog. Content is auth
   initial fetch when offline-building still need it. The hermetic nix/CI build
   only *reads* the cache (no network), so the cache must be committed.
 
+### Accessibility
+- `just a11y` - **The a11y gate.** axe-core over every built page in *both*
+  themes, in headless Chromium; groups violations by rule, exits non-zero on a
+  serious+ finding. `--sample` for a fast representative slice, `--all` to add
+  advisory best-practice rules, or pass page paths. (Lighthouse's `just audit`
+  only samples one page and a subset of the rules — it is not the gate.)
+- `just a11y-tree [page]` - The accessibility tree in reading order (roles,
+  accessible names, heading levels) — what a screen reader is actually handed.
+  Read this before/after any markup change: it catches unnamed landmarks, runs of
+  links with no list around them and unannounceable headings, none of which are
+  rule violations.
+- `just a11y-tab [page]` - Tab order, accessible names and focus rings.
+- `just a11y-contrast` - One row per `hl-*` bucket with its measured ratio per
+  theme, alpha washes composited. **Run after touching either `.hl` palette.**
+- Tooling lives in `scripts/a11y/` with its *own* `package.json` (axe-core +
+  puppeteer-core), deliberately outside `builder/` so the hermetic nix build's
+  pinned `node_modules` is untouched. `scripts/a11y/README.md` documents all of
+  it plus how to test with a real screen reader (Orca/NVDA/VoiceOver).
+- Don't rebuild while a scan runs — the scanner reads `out/` off disk and a
+  half-written page reports bogus `html-has-lang` / `document-title` failures.
+
 ### Nix Build
 - `nix build` - Build the shipped site using Nix flakes
 - `nix develop` - Dev shell with all deps
