@@ -69,7 +69,37 @@ just a bad experience, and they are invisible unless you look at this.
 ```sh
 just a11y-tree                       # index.html, dark
 just a11y-tree 2024-07-07-nix-flakes.html --theme=light
+just a11y-tree index.html --flat     # announcement order (see below)
 ```
+
+`--flat` drops the indentation and prints the same nodes as an **announcement
+sequence** — `"<name>", <role>`, with list item counts and heading levels, the way
+the page will actually be read out:
+
+```
+"Toybeam", document
+"本文へスキップ", link
+banner landmark
+"サイトナビゲーション", navigation landmark
+list with 7 items
+"Home", link
+...
+"Toybeam", heading level 1
+"Tags", heading level 2
+```
+
+It is an approximation, not an emulator: every screen reader words things
+differently and verbosity settings change what is spoken at all. What it tells
+you reliably is *what is exposed, and in what order* — the part markup controls.
+
+Two things it is good for:
+
+- **Spotting defects by eye.** A control with no accessible name prints as
+  `(UNNAMED), link`. Grepping for `UNNAMED` across a few pages is a fast check
+  that no unnamed control has crept back in.
+- **Diffing between builds.** `just a11y-tree <page> --flat > before.txt`, make
+  the change, diff. A structural regression shows up as a changed line, which is
+  much easier to review than a screenshot.
 
 ### `just a11y-tab` — keyboard walkthrough
 
@@ -122,6 +152,18 @@ Specific things on this site that no rule can check:
 - Do the KaTeX formulas read correctly? (MathML is rendered for AT, but coverage
   differs sharply per screen reader.)
 - Is the disco ball's motion distracting even though it is `aria-hidden`?
+
+### A quick reading-order check with no browser at all
+
+`w3m -dump` linearises the page to text in DOM order, which is a cheap sanity
+check on reading order (and it is already installed):
+
+```sh
+w3m -dump out/index.html | head -40
+```
+
+It knows nothing about ARIA, roles or names, so it cannot replace `--flat` — but
+if the *text* comes out in a nonsensical order there, it will read that way too.
 
 ## Testing with a screen reader
 

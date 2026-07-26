@@ -44,6 +44,9 @@ This is a static site generator for a Japanese technical devlog. Content is auth
   only samples one page and a subset of the rules — it is not the gate.)
 - `just a11y-tree [page]` - The accessibility tree in reading order (roles,
   accessible names, heading levels) — what a screen reader is actually handed.
+  `--flat` prints it as an announcement sequence instead (`"<name>", <role>`,
+  list counts, heading levels); unnamed controls show as `(UNNAMED)`, and the
+  output diffs cleanly between builds.
   Read this before/after any markup change: it catches unnamed landmarks, runs of
   links with no list around them and unannounceable headings, none of which are
   rule violations.

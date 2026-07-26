@@ -8,6 +8,7 @@
  * Subcommands
  *   scan  [pages...]   axe-core over every built page, in BOTH themes (default)
  *   tree  <page>       accessibility-tree dump -- what a screen reader sees
+ *                      (--flat: announcement order, the way it will be read)
  *   tab   <page>       tab order + focus-ring visibility for keyboard-only use
  *   contrast [pages]   one row per syntax-highlight bucket -- tune the palettes
  *
@@ -40,6 +41,8 @@ const flagValue = (name: string): string | undefined =>
 
 const OPTS = {
   json: flags.has("--json"),
+  // `tree --flat`: announcement order instead of an indented tree.
+  flat: flags.has("--flat"),
   // Best-practice rules are advisory (not WCAG); off by default to keep the
   // report actionable, on with --all.
   all: flags.has("--all"),
@@ -306,6 +309,57 @@ function report(rules: Rule[], pageCount: number, jobCount: number, incomplete: 
  * a11y API. Ignored/presentational nodes are dropped, so what prints is roughly
  * the announcement sequence in reading order.
  */
+// Roles a screen reader names as landmarks when it reaches them.
+const LANDMARKS: Record<string, string> = {
+  banner: "banner", navigation: "navigation", main: "main",
+  contentinfo: "contentinfo", complementary: "complementary",
+  region: "region", search: "search", form: "form",
+};
+
+/**
+ * Render the exposed nodes as an announcement sequence rather than a tree.
+ * A screen reader does not read indentation -- it reads "<name>, <role>", says
+ * how many items a list holds, and says the level of a heading. This is the view
+ * to diff between builds: a structural change shows up as a changed line, and it
+ * reads the way the page will actually sound.
+ *
+ * An approximation, not an emulator: every screen reader words things
+ * differently and verbosity settings change what is spoken at all. It tells you
+ * WHAT is exposed and in what order, which is the part that markup controls.
+ */
+function announce(seq: { node: any; name: string }[], byId: Map<any, any>, prop: (n: any, k: string) => any): string[] {
+  const out: string[] = [];
+  for (const { node: n, name } of seq) {
+    const role = n.role?.value ?? "";
+    // A missing name is a defect on a control and meaningless on a wrapper, so
+    // only call it out where it is one.
+    const MUST_BE_NAMED = new Set(["link", "button", "heading", "textbox", "checkbox", "img"]);
+    const q = name ? `"${name.slice(0, 90)}"` : MUST_BE_NAMED.has(role) ? "(UNNAMED)" : "";
+    if (role === "StaticText") {
+      out.push(name);
+    } else if (role === "heading") {
+      out.push(`${q}, heading level ${prop(n, "level") ?? "?"}`);
+    } else if (role === "list") {
+      const items = (n.childIds ?? []).filter((c: any) => byId.get(c)?.role?.value === "listitem").length;
+      out.push(`list with ${items} item${items === 1 ? "" : "s"}`);
+    } else if (role === "listitem") {
+      continue; // the item's own content is announced by its children
+    } else if (LANDMARKS[role]) {
+      out.push(name ? `${q}, ${LANDMARKS[role]} landmark` : `${LANDMARKS[role]} landmark`);
+    } else if (role === "button") {
+      const pressed = prop(n, "pressed");
+      out.push(`${q}, button${pressed !== undefined ? `, ${pressed === "true" ? "pressed" : "not pressed"}` : ""}`);
+    } else if (role === "link") {
+      out.push(`${q}, link`);
+    } else if (role === "RootWebArea") {
+      out.push(`${q}, document`);
+    } else {
+      out.push(q ? `${q}, ${role}` : role);
+    }
+  }
+  return out;
+}
+
 async function tree(pagePath: string, theme: string) {
   const server = serve();
   const browser = await launch();
@@ -316,6 +370,7 @@ async function tree(pagePath: string, theme: string) {
   const { nodes } = (await cdp.send("Accessibility.getFullAXTree")) as any;
   const byId = new Map(nodes.map((n: any) => [n.nodeId, n]));
   const lines: string[] = [];
+  const seq: { node: any; name: string }[] = [];
   const prop = (n: any, name: string) => n.properties?.find((p: any) => p.name === name)?.value?.value;
   const walk = (id: string, depth: number, parentName?: string) => {
     const n: any = byId.get(id);
@@ -343,12 +398,19 @@ async function tree(pagePath: string, theme: string) {
         .join(" ");
       const text = n.role?.value === "StaticText" ? "" : name;
       lines.push(`${"  ".repeat(depth)}${n.role?.value}${text || name}${extra ? ` (${extra})` : ""}`);
+      seq.push({ node: n, name: n.name?.value ? String(n.name.value).replace(/\s+/g, " ").trim() : "" });
     }
-    for (const c of n.childIds ?? []) walk(c, skip ? depth : depth + 1, n.name?.value ?? parentName);
+    for (const c of n.childIds ?? []) walk(c, skip ? depth : depth + 1, n.name?.value || parentName);
   };
   walk(nodes[0].nodeId, 0);
-  console.log(`# accessibility tree — ${pagePath} [${theme}]  (what AT is handed, in reading order)\n`);
-  console.log(lines.join("\n"));
+
+  if (OPTS.flat) {
+    console.log(`# announcement order — ${pagePath} [${theme}]  (approximates a screen reader reading top to bottom)\n`);
+    console.log(announce(seq, byId, prop).join("\n"));
+  } else {
+    console.log(`# accessibility tree — ${pagePath} [${theme}]  (what AT is handed, in reading order)\n`);
+    console.log(lines.join("\n"));
+  }
   await browser.close();
   server.stop(true);
 }
