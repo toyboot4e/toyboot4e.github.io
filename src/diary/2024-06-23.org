@@ -6,7 +6,11 @@
 [[https://atcoder.jp/contests/ahc034][AHC 034]] に参加しました。グリッドに +-100 の値が設定されており、効率良く 0 に均す問題でした。いつも通り適当にパスを作ってうろちょろすることしかできず、成長の仕方が分かりません。
 
 #+BEGIN_EXPORT html
-<video src="./img/2024-06-23-ahc034.mp4" preload="auto" controls></video>
+<figure>
+  <video src="./img/2024-06-23-ahc034.mp4" preload="auto" controls
+         aria-label="AHC 034 の提出解の可視化 (音声なし)"></video>
+  <figcaption>AHC 034 の提出解の可視化。グリッド上をパスに沿って移動しながら、各マスの +-100 の値を 0 に均していく様子 (音声なし)。</figcaption>
+</figure>
 #+END_EXPORT
 
 yosupo さんが 1 位でした。かっこいい。 [[https://yosupo.hatenablog.com/entry/2024/06/17/221003][トヨタ自動車プログラミングコンテスト2024#6（AtCoder Heuristic Contest 034) 解法 - よすぽの日記]]
