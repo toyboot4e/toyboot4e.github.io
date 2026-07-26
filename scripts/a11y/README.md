@@ -86,6 +86,24 @@ touching either `.hl` palette in `style.css`** — axe reports the same handful 
 palette entries as thousands of nodes, which tells you nothing about which
 colours to change.
 
+## Where axe over-reports
+
+`scrollable-region-focusable` checks the *markup* for a tab stop or focusable
+content. It does not know that **Chromium 127+ and Firefox put overflowing scroll
+containers in the tab order natively, and only the overflowing ones** — measured
+here on Chromium 149 and Firefox 151, where Tab visits the overflowing `<pre>`s
+and never a fitting one. So the rule fires on markup that already works in both
+engines.
+
+We satisfy it at build time anyway (`focusableScrollBlocks` in `bake.ts` puts
+`tabindex="0"` on every `<pre>`), because the native behaviour is not universal —
+WebKit and older engines are untested/unsupported here — and because a static
+attribute needs no JavaScript. Do not "fix" this by measuring overflow in the
+browser and setting the attribute at runtime: that puts an accessibility
+affordance behind JS on a site that otherwise ships almost none, and only saves a
+no-op tab stop on blocks that happen to fit (a median page has 3 code blocks;
+p90 is 9, max 26).
+
 ## What automated testing does not catch
 
 Rule engines catch on the order of a third of real accessibility problems. They

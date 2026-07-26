@@ -220,6 +220,12 @@ class="hl">`. Capture names → `hl-<bucket>` CSS classes via `CLASS_TABLE`. Fea
   code background, but also the alpha washes a coderef line and a `diff` added
   line lay over it. Stock One Light fails this badly (comments 2.4:1). After any
   palette edit run `just a11y-contrast`, which composites those washes.
+- **Keyboard access**: `bakeDocument` gives every `<pre>` `tabindex="0"`
+  (`focusableScrollBlocks`), because simple.css makes them all scroll containers
+  and a mouse-less user otherwise can't reach past the right edge (WCAG 2.1.1).
+  Keyed off the element, not the emitting code path, so a new kind of `<pre>`
+  can't miss it. Deliberately NOT measured in the browser at runtime — see
+  `scripts/a11y/README.md` ("Where axe over-reports").
 - **Line numbers**: opt-in per block via org's `-n`/`+n` switch; a CSS counter on
   the `.line` spans (also on GitHub code-embeds, starting at the source line).
 - **diff-`<lang>`**: strip the +/- column, highlight the body as `<lang>`, mark
