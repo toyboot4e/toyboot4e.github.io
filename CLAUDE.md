@@ -215,6 +215,11 @@ class="hl">`. Capture names → `hl-<bucket>` CSS classes via `CLASS_TABLE`. Fea
   palette of CSS variables (`--c-kw`, `--c-str`, …) rebound per theme via
   `[data-theme]` + `prefers-color-scheme`. Palette = sonokai (dark) + One Light
   (light) — swap the two `.hl` blocks in `style.css` to restyle everything.
+  Both palettes are **contrast-corrected**: every entry clears 4.5:1 (WCAG 1.4.3)
+  against the *lightest/darkest* background it can land on — not just the plain
+  code background, but also the alpha washes a coderef line and a `diff` added
+  line lay over it. Stock One Light fails this badly (comments 2.4:1). After any
+  palette edit run `just a11y-contrast`, which composites those washes.
 - **Line numbers**: opt-in per block via org's `-n`/`+n` switch; a CSS counter on
   the `.line` spans (also on GitHub code-embeds, starting at the source line).
 - **diff-`<lang>`**: strip the +/- column, highlight the body as `<lang>`, mark

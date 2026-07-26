@@ -403,8 +403,11 @@ div.WARNING {
   position: relative;
   top: -0.15em;
   display: inline-block;
+  /* White on the stock 80%-alpha tan came out at 4.35:1 on dark and 2.70:1 on
+     light — the number in the disc was the least readable text on the page.
+     Full opacity and a darker brown put it at ~7:1 in both themes. */
   color: #fff !important;
-  background: rgba(175, 134, 90, 0.8);
+  background: #6f4f2a;
   border-radius: 50%;
   text-align: center;
   font-size: 0.75em;
@@ -484,13 +487,21 @@ span.code-highlighted {
    `prefers-color-scheme` fallback. Dark = sonokai, light = One Light (both
    separate function/type/namespace, unlike okaidia). Swap the palettes to restyle. */
 .hl {
-  /* Light palette (One Light): varied hues so type-heavy code (haskell module
-     paths!) doesn't read as a wall of one colour — types gold, functions blue,
-     keywords purple, strings green. */
+  /* Light palette (One Light, contrast-corrected): varied hues so type-heavy
+     code (haskell module paths!) doesn't read as a wall of one colour — types
+     gold, functions blue, keywords purple, strings green.
+     Stock One Light is tuned for looks, not contrast: against this background
+     its comment grey sat at 2.4:1 and gold/green/blue at 3.0–3.8:1, all under
+     the 4.5:1 WCAG 1.4.3 floor. Every entry is the stock hue+saturation with
+     lightness lowered the MINIMUM amount to clear 4.5:1 — the theme still reads
+     as One Light, it is just legible. Checked against the DARKEST background a
+     token lands on (#dddee6, the GitHub code-embed card), not just the ordinary
+     code background, so both pass.
+     Re-check after any edit: `just a11y-contrast`. */
   --c-fg: #383a42; --c-bg: #fafafa;
-  --c-com: #a0a1a7; --c-kw: #a626a4; --c-str: #50a14f; --c-esc: #0184bc;
-  --c-rex: #0184bc; --c-num: #986801; --c-fn: #4078f2; --c-ty: #c18401;
-  --c-con: #986801; --c-vbi: #e45649; --c-tag: #e45649;
+  --c-com: #606168; --c-kw: #a526a3; --c-str: #366d36; --c-esc: #016894;
+  --c-rex: #016894; --c-num: #835901; --c-fn: #1053e6; --c-ty: #835901;
+  --c-con: #835901; --c-vbi: #b9291c; --c-tag: #b9291c;
   color: var(--c-fg);
   background-color: var(--accent-bg);
   padding: 0.8rem 1rem;
@@ -518,17 +529,24 @@ span.code-highlighted {
 .hl-tag { color: var(--c-tag); }
 
 /* Dark palette (sonokai — Monokai-family, but separates function/type/namespace,
-   unlike okaidia which colours function == type). rebind the variables. */
+   unlike okaidia which colours function == type). rebind the variables.
+   Two entries moved from stock sonokai, both for the 4.5:1 floor: the comment
+   grey (#7f8490 -> #a6a9b2, was 3.8:1) and the keyword pink (#fc5d7c -> #fc849b).
+   Both are checked against the LIGHTEST background a token can land on, which is
+   not the plain code background: a coderef line carries a 10%-accent wash and a
+   diff added line a green one, and each lifts the backdrop enough to sink a
+   token that passed on plain #2b2b2b. Check with `just a11y-contrast`, which
+   composites those washes rather than assuming the base colour. */
 html[data-theme="dark"] .hl {
   --c-fg: #e2e2e3; --c-bg: #272822;
-  --c-com: #7f8490; --c-kw: #fc5d7c; --c-str: #e7c664; --c-esc: #f39660;
+  --c-com: #a6a9b2; --c-kw: #fc849b; --c-str: #e7c664; --c-esc: #f39660;
   --c-rex: #f39660; --c-num: #b39df3; --c-fn: #9ed072; --c-ty: #76cce0;
   --c-con: #b39df3; --c-vbi: #b39df3; --c-tag: #e7c664;
 }
 @media (prefers-color-scheme: dark) {
   html:not([data-theme="light"]) .hl {
     --c-fg: #e2e2e3; --c-bg: #272822;
-    --c-com: #7f8490; --c-kw: #fc5d7c; --c-str: #e7c664; --c-esc: #f39660;
+    --c-com: #a6a9b2; --c-kw: #fc849b; --c-str: #e7c664; --c-esc: #f39660;
     --c-rex: #f39660; --c-num: #b39df3; --c-fn: #9ed072; --c-ty: #76cce0;
     --c-con: #b39df3; --c-vbi: #b39df3; --c-tag: #e7c664;
   }
