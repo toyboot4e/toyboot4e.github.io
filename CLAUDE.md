@@ -21,7 +21,10 @@ This is a static site generator for a Japanese technical devlog. Content is auth
   only; drafts are skipped). Also serves `out/` on port 8080 with **Vite-style
   live reload**: the browser refreshes the instant a rebuild lands (CSS edits
   hot-swap without navigating; a body-only edit reloads just the tab on that
-  page). The reload client is injected at serve time only (SSE on
+  page). Builder-source edits (`builder/src`, `grammars`, configs) can't apply
+  warm, so the daemon exits 75 and the recipe loop restarts it with a fresh full
+  build; the browser reloads when its SSE channel reconnects. The reload client
+  is injected at serve time only (SSE on
   `/__livereload`), so `out/` stays the byte-exact release output. `DEV_PORT=0`
   disables the server (preview with `just serve` instead);
   `builder/src/dev-server.ts` is the server.

@@ -137,13 +137,23 @@ a11y-contrast *args:
 # render+bake machinery resident and rebuild ONLY the changed file on each save
 # (~10-50ms vs ~1.5s for a full build). Also serves out/ on {{port}} with
 # Vite-style live reload — the browser refreshes the moment a rebuild lands (CSS
-# edits hot-swap without navigating). Release-only (drafts are skipped); the
-# reload client is injected at serve time, so out/ stays the byte-exact release
-# output. Set DEV_PORT=0 to disable the server and preview with `just serve`.
+# edits hot-swap without navigating). Builder-source edits (builder/src,
+# grammars, configs) restart the daemon with a fresh full build — the loop below
+# catches its exit code 75 — and the browser reloads when it reconnects.
+# Release-only (drafts are skipped); the reload client is injected at serve
+# time, so out/ stays the byte-exact release output. Set DEV_PORT=0 to disable
+# the server and preview with `just serve`.
 watch:
-    # the daemon's startup build spawns the bundled dist/render-shard.js, so build it first
-    cd builder && bunx vite build -c vite.build.config.ts
-    cd builder && DEV_PORT={{port}} bunx vite-node src/watch.ts
+    #!/usr/bin/env bash
+    set -u
+    while :; do
+        # the daemon's startup build spawns the bundled dist/render-shard.js, so build it first
+        (cd builder && bunx vite build -c vite.build.config.ts) || exit 1
+        (cd builder && DEV_PORT={{port}} bunx vite-node src/watch.ts)
+        code=$?
+        [ "$code" -eq 75 ] || exit "$code" # 75 = builder change, anything else = done
+        echo "watch: builder sources changed — rebuilding + restarting the daemon…"
+    done
 
 [private]
 alias w := watch

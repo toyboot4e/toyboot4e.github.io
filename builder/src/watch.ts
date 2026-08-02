@@ -14,6 +14,12 @@
 //   - `style/*.css|*.ts`      -> rebuild the minified assets, copy them to out/.
 //   - other static (img, ...) -> copy the one file.
 //
+// It also watches the builder's OWN sources (builder/src, grammars, configs).
+// Those can't be applied warm -- this process already loaded the old modules and
+// dist/render-shard.js is stale -- so on a builder change the daemon exits with
+// code 75 and the `just watch` loop rebuilds the bundle and starts a fresh
+// daemon; browsers reload when their SSE channel reconnects.
+//
 // Release-only, like `just build` (drafts are skipped). Run `just serve`
 // alongside to preview.
 //
@@ -191,30 +197,59 @@ console.log(`  ready in ${since(t0)}; watching ${SRC}/ — incremental saves reb
 // and only the first save to a file is ever seen. A directory watch survives the
 // swap (the dir's inode is stable), firing on every save.
 const watchers: FSWatcher[] = [];
-function watchTree(dir: string): void {
+function watchDir(dir: string, onFile: (abs: string) => void): boolean {
   try {
     const w = watch(dir, (_event, filename) => {
-      if (filename) schedule(relative(SRC, join(dir, filename.toString())));
+      if (filename) onFile(join(dir, filename.toString()));
     });
     w.on("error", () => { /* dir removed mid-session: ignore, don't crash */ });
     watchers.push(w);
-  } catch { return; } // unreadable/vanished dir -> skip
-  for (const e of readdirSync(dir, { withFileTypes: true })) if (e.isDirectory()) watchTree(join(dir, e.name));
+    return true;
+  } catch { return false; } // unreadable/vanished dir -> skip
 }
-watchTree(SRC);
+function watchTree(dir: string, onFile: (abs: string) => void): void {
+  if (!watchDir(dir, onFile)) return;
+  for (const e of readdirSync(dir, { withFileTypes: true })) if (e.isDirectory()) watchTree(join(dir, e.name), onFile);
+}
+watchTree(SRC, (abs) => schedule(relative(SRC, abs)));
+
+// --- builder self-watch ------------------------------------------------------
+// A builder-source change can't take effect in this warm process, so hand
+// control back to the `just watch` loop: exit 75 (EX_TEMPFAIL, "restart me").
+// The loop re-bundles dist/render-shard.js and starts a fresh daemon, whose
+// startup full build renders everything with the new code; the reload client
+// reloads each open tab when its SSE channel reconnects to the new server.
+const RESTART_EXIT = 75;
+const BUILDER = join(HERE, ".."); // builder/
+// sources that shape the output: TS/TSX + CSS modules (src/), grammar wasm +
+// queries (grammars/), the top-level vite/shared configs. Ignores dist/ writes,
+// node_modules, editor temp files.
+const BUILDER_RE = /\.(ts|tsx|css|scm|wasm)$/;
+let restartTimer: ReturnType<typeof setTimeout> | null = null;
+function onBuilderChange(abs: string): void {
+  if (!BUILDER_RE.test(abs)) return;
+  if (restartTimer) clearTimeout(restartTimer);
+  restartTimer = setTimeout(() => {
+    log(`builder change: ${relative(BUILDER, abs)} — restarting with a fresh build…`);
+    shutdown("builder-change", RESTART_EXIT);
+  }, 150);
+}
+watchTree(join(BUILDER, "src"), onBuilderChange);
+watchTree(join(BUILDER, "grammars"), onBuilderChange);
+watchDir(BUILDER, onBuilderChange); // non-recursive: vite*.config.ts, config-shared.ts
 
 // Clean teardown on EVERY termination signal we can catch -- Ctrl-C (SIGINT),
 // `kill` (SIGTERM), and tmux pane/window close (SIGHUP) -- so we close the
 // watcher, reap an in-flight asset rebuild, and drop the PID file. (SIGKILL is
 // uncatchable, but the OS reclaims our threads + the awaited child anyway.)
 let stopping = false;
-function shutdown(sig: string): void {
+function shutdown(sig: string, code = 0): void {
   if (stopping) return;
   stopping = true;
   for (const w of watchers) { try { w.close(); } catch { /* already closed */ } }
   if (assetChild) { try { assetChild.kill(); } catch { /* already exited */ } }
   try { unlinkSync(PID_FILE); } catch { /* already gone */ }
   console.log(`\nwarm watch: stopped (${sig}).`);
-  process.exit(0);
+  process.exit(code);
 }
 for (const sig of ["SIGINT", "SIGTERM", "SIGHUP"] as const) process.on(sig, () => shutdown(sig));

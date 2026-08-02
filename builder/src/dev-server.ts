@@ -11,7 +11,8 @@
 // flow server -> browser (one-way), and SSE gives that with a few lines of plain
 // HTTP, no framing code and no dependency — staying true to the hermetic,
 // dep-light build. EventSource also reconnects on its own, so a browser tab
-// survives a daemon restart and re-attaches when it comes back.
+// survives a daemon restart (builder-source change) and reloads itself once the
+// fresh daemon is serving again.
 import { createServer, type ServerResponse } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { join, normalize, extname, sep } from "node:path";
@@ -43,9 +44,16 @@ const MIME: Record<string, string> = {
 //   - reload -> full navigation. A `path` scopes it to the page that changed, so
 //              editing article A doesn't reload the tab reading article B; a
 //              path-less reload (index/tags/global asset changed) reloads anyone.
+//   - reconnect -> full reload. The channel only drops when the daemon goes away,
+//              i.e. a builder-change restart; the new daemon serves only after
+//              its full rebuild, so reloading on reconnect picks up the new
+//              output the moment it's ready.
 const CLIENT = `<script>(function(){
   var here=function(){var p=location.pathname;return p==="/"||p===""?"/index.html":p;};
   var es=new EventSource(${JSON.stringify(SSE_PATH)});
+  var dropped=false;
+  es.onerror=function(){dropped=true;};
+  es.onopen=function(){if(dropped)location.reload();};
   es.onmessage=function(e){
     var m;try{m=JSON.parse(e.data);}catch(_){return;}
     if(m.type==="css"){
