@@ -270,8 +270,13 @@ function makeHandlers(st: RenderState) {
         // the block parameter recovered into `st.keyboards`.
         const layout = t === "STENO" ? "uni-v4" : (st.keyboards.shift() || "");
         const body = st.source.slice(org.contentsBegin, org.contentsEnd);
-        return this.h(org, "div", { className: [kb.outline] },
+        const chart = this.h(org, "div", { className: [kb.outline] },
           keyboardStrokesHtml(layout, body).map((v) => ({ type: "raw", value: v })));
+        // `#+CAPTION:` -> numbered <figure>, same as a captioned image. uniorg
+        // attaches CAPTION to special-block nodes, so no source recovery needed.
+        const cap = org.affiliated?.CAPTION?.[0];
+        if (!cap) return chart;
+        return captionedFigure(this, st, org, [chart], "figure", captionHast(this, cap));
       }
       return undefined; // fall through to uniorg's default special-block
     },
