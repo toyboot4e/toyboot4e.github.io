@@ -1,0 +1,10 @@
+{
+  "name": "devlog-a11y",
+  "private": true,
+  "type": "module",
+  "description": "Dev-only accessibility tooling (axe-core in headless Chromium). Deliberately NOT part of builder/package.json: the hermetic nix build must not depend on it.",
+  "dependencies": {
+    "axe-core": "^4.10.0",
+    "puppeteer-core": "^23.0.0"
+  }
+}

@@ -25,6 +25,9 @@
 </style>
 </head>
 <body>
+<!-- a <main> landmark so the whole page isn't orphaned content a screen reader
+     has no way to jump to (axe: region / landmark-one-main) -->
+<main>
 <h1>OGP card preview</h1>
 <p class="hint">How each article looks when shared on X/Twitter. The article list comes from <code>/index.html</code>; each card is rendered from the live <code>&lt;meta&gt;</code> tags of the built page.</p>
 <div id="cards"></div>
@@ -88,5 +91,6 @@ fetch('/index.html').then(r => r.text()).then(text => {
   urls.forEach(renderCard);
 }).catch(() => { root.textContent = 'Failed to load /index.html.'; });
 </script>
+</main>
 </body>
 </html>

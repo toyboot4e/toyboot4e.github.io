@@ -11,15 +11,17 @@ on:
     branches: 'main'
     paths:
       - src/**
-      # the bun build (uniorg render + bake) shipped by `nix build .#devlog`
-      - build.ts
-      - build/**
+      # the vite-node build (uniorg render + bake) shipped by `nix build .#devlog`;
+      # builder/** covers its src, grammars, config and package(-lock).json
+      - builder/**
       - scripts/**
+      # baked into the link cards, so a refresh changes the output
+      - linkcard-cache.json
       - Justfile
       - flake.nix
       - flake.lock
-      - package.json
-      - package-lock.json
+      - .github/actions/build/**
+      - .github/workflows/main.yml
 
 # Deny all permissions by default; grant per job below
 permissions: {}

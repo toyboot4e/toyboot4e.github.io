@@ -290,6 +290,36 @@ function renderLinkCards(document: any): void {
   }
 }
 
+// --- keyboard access to scrollable blocks ----------------------------------
+// simple.css gives every `<pre>` `overflow: auto`, so any block wider than the
+// column can only be scrolled by dragging it -- a keyboard-only user cannot read
+// past the right edge (WCAG 2.1.1; axe: scrollable-region-focusable). A tab stop
+// makes the arrow keys scroll it.
+//
+// Applied to EVERY `<pre>`, unconditionally, rather than only the ones that
+// actually overflow. Overflow depends on the viewport, so it is not knowable at
+// build time -- it was previously measured in the browser and the attribute set
+// at runtime, which was the wrong trade: it put an accessibility affordance
+// behind JS on a site that otherwise ships none, and it duplicated work the
+// platform already does (Chromium 149 and Firefox 151 both put overflowing
+// scroll containers in the tab order natively, and only the overflowing ones).
+// The static attribute is a superset of that native behaviour, so it costs a
+// no-op tab stop on blocks that happen to fit -- a median page has 3 code blocks
+// -- and in exchange it needs no JS and also covers engines without the feature.
+//
+// Keyed off the element here rather than at the four places that emit a `<pre>`
+// (highlight.ts, the GitHub-embed fallback, YARUO and plain example blocks), so
+// a future fifth cannot miss it.
+//
+// Deliberately no `role`: `role="region"` would add dozens of landmarks to a
+// screen reader's landmark menu, and any explicit role overrides `<pre>`'s own
+// "preformatted text" semantics.
+function focusableScrollBlocks(document: any): void {
+  for (const pre of document.querySelectorAll("pre")) {
+    if (!pre.hasAttribute("tabindex")) pre.setAttribute("tabindex", "0");
+  }
+}
+
 // --- public API ------------------------------------------------------------
 // Bake one parsed document in place: highlight code, render math, fill cards.
 export function bakeDocument(document: any): void {
@@ -298,4 +328,7 @@ export function bakeDocument(document: any): void {
   // Last: renderGitHubCode highlights its own (attached) <pre>, so running after
   // highlightCode keeps that pass from re-processing the embed's code.
   renderLinkCards(document);
+  // After every pass that can create a <pre> (highlightCode swaps in fresh ones,
+  // renderLinkCards builds the GitHub embeds).
+  focusableScrollBlocks(document);
 }

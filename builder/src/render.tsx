@@ -37,25 +37,32 @@ const NavIcon = ({ children }: { children?: any }): Raw => (
   <svg class="nav-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{children}</svg>
 );
 
+// The chrome links repeat on every page, so a keyboard/screen-reader user hits
+// them before the article every single time -- hence the skip link (WCAG 2.4.1)
+// and the list markup (AT announces "list, 7 items" and can skip the whole run).
+// Each landmark is NAMED: two unnamed <nav>s (chrome + ToC) are indistinguishable
+// in a screen reader's landmark menu (axe: landmark-unique).
+const SKIP_LINK = <a class="skip-link" href="#main">本文へスキップ</a>;
+
 const HEADER = (
-  <header role="banner"><nav role="navigation">
-    <a href="/index.html"><NavIcon><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></NavIcon><span class="nav-label">Home</span></a>
-    <a href="https://atcoder.jp/users/toyboot4e"><NavIcon><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" /><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" /><path d="M18 9h1.5a1 1 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" /><path d="M6 9H4.5a1 1 0 0 1 0-5H6" /></NavIcon><span class="nav-label">AtCoder</span></a>
-    <a href="https://github.com/toyboot4e"><NavIcon><path d="M15 6a9 9 0 0 0-9 9V3" /><circle cx="18" cy="6" r="3" /><circle cx="6" cy="18" r="3" /></NavIcon><span class="nav-label">GitHub</span></a>
-    <a href="https://qiita.com/toyboot4e"><NavIcon><path d="M15 18h-5" /><path d="M18 14h-8" /><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2" /><rect width="8" height="4" x="10" y="6" rx="1" /></NavIcon><span class="nav-label">Qiita</span></a>
-    <a href="https://zenn.dev/toyboot4e"><NavIcon><path d="M12 7v14" /><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></NavIcon><span class="nav-label">Zenn</span></a>
-    <button id="theme-toggle" onclick="toggleTheme()" title="テーマ切替" aria-label="Toggle theme"></button>
-    <button id="disco-toggle" onclick="window.toggleDisco && toggleDisco()" aria-pressed="true" title="ディスコボール切替" aria-label="Toggle disco ball"></button>
-  </nav></header>
+  <header role="banner"><nav aria-label="サイトナビゲーション"><ul>
+    <li><a href="/index.html"><NavIcon><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></NavIcon><span class="nav-label">Home</span></a></li>
+    <li><a href="https://atcoder.jp/users/toyboot4e"><NavIcon><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" /><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" /><path d="M18 9h1.5a1 1 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" /><path d="M6 9H4.5a1 1 0 0 1 0-5H6" /></NavIcon><span class="nav-label">AtCoder</span></a></li>
+    <li><a href="https://github.com/toyboot4e"><NavIcon><path d="M15 6a9 9 0 0 0-9 9V3" /><circle cx="18" cy="6" r="3" /><circle cx="6" cy="18" r="3" /></NavIcon><span class="nav-label">GitHub</span></a></li>
+    <li><a href="https://qiita.com/toyboot4e"><NavIcon><path d="M15 18h-5" /><path d="M18 14h-8" /><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2" /><rect width="8" height="4" x="10" y="6" rx="1" /></NavIcon><span class="nav-label">Qiita</span></a></li>
+    <li><a href="https://zenn.dev/toyboot4e"><NavIcon><path d="M12 7v14" /><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></NavIcon><span class="nav-label">Zenn</span></a></li>
+    <li><button id="theme-toggle" onclick="toggleTheme()" title="テーマ切替" aria-label="テーマ切替"></button></li>
+    <li><button id="disco-toggle" onclick="window.toggleDisco && toggleDisco()" aria-pressed="true" title="ディスコボール切替" aria-label="ディスコボール切替"></button></li>
+  </ul></nav></header>
 );
 
 const FOOTER = (
   <footer role="contentinfo">
     <p>Styled with <a href="https://simplecss.org/">Simple.css</a></p>
-    <div>
-      <a href="/index.html"><NavIcon><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></NavIcon><span class="nav-label">Home</span></a>
-      <a href="https://github.com/toyboot4e"><NavIcon><path d="M15 6a9 9 0 0 0-9 9V3" /><circle cx="18" cy="6" r="3" /><circle cx="6" cy="18" r="3" /></NavIcon><span class="nav-label">GitHub</span></a>
-    </div>
+    <nav aria-label="フッターリンク"><ul>
+      <li><a href="/index.html"><NavIcon><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></NavIcon><span class="nav-label">Home</span></a></li>
+      <li><a href="https://github.com/toyboot4e"><NavIcon><path d="M15 6a9 9 0 0 0-9 9V3" /><circle cx="18" cy="6" r="3" /><circle cx="6" cy="18" r="3" /></NavIcon><span class="nav-label">GitHub</span></a></li>
+    </ul></nav>
   </footer>
 );
 
@@ -263,8 +270,13 @@ function makeHandlers(st: RenderState) {
         // the block parameter recovered into `st.keyboards`.
         const layout = t === "STENO" ? "uni-v4" : (st.keyboards.shift() || "");
         const body = st.source.slice(org.contentsBegin, org.contentsEnd);
-        return this.h(org, "div", { className: [kb.outline] },
+        const chart = this.h(org, "div", { className: [kb.outline] },
           keyboardStrokesHtml(layout, body).map((v) => ({ type: "raw", value: v })));
+        // `#+CAPTION:` -> numbered <figure>, same as a captioned image. uniorg
+        // attaches CAPTION to special-block nodes, so no source recovery needed.
+        const cap = org.affiliated?.CAPTION?.[0];
+        if (!cap) return chart;
+        return captionedFigure(this, st, org, [chart], "figure", captionHast(this, cap));
       }
       return undefined; // fall through to uniorg's default special-block
     },
@@ -405,13 +417,62 @@ function demoteHeadings() {
 function headingSelfLinks() {
   const textOf = (n: any): string =>
     n.type === "text" ? n.value : (n.children || []).map(textOf).join("");
+  const hasLink = (n: any): boolean =>
+    n.tagName === "a" || (n.children || []).some(hasLink);
   return (tree: any) => {
     const walk = (n: any) => {
       if (n.tagName && /^h[1-6]$/.test(n.tagName)) {
         const id = textOf(n);
+        // A textless headline (a stray `*** ` in the org source) would otherwise
+        // get id="" and a self-link to `#` with nothing in it: an unnamed link
+        // sitting in the tab order (axe: link-name). No text, no anchor.
+        if (!id.trim()) return;
         n.properties = { ...n.properties, id };
-        n.children = [{ type: "element", tagName: "a", properties: { href: `#${id}` }, children: n.children }];
+        // A headline whose text is itself a link (`* [[url][label]]`) must NOT
+        // get the self-link wrapper: nested <a> is invalid HTML, and the parser
+        // recovers by splitting it into an EMPTY <a> plus the real one -- an
+        // unnamed link in the tab order on every such heading (axe: link-name).
+        // The id alone still makes the heading a fragment target and ToC entry.
+        if (!hasLink(n)) {
+          n.children = [{ type: "element", tagName: "a", properties: { href: `#${id}` }, children: n.children }];
+        }
         return; // headings don't nest
+      }
+      (n.children || []).forEach(walk);
+    };
+    walk(tree);
+  };
+}
+
+// A headline that is nothing but math (`*** $S_1, S_2$`) renders to a self-link
+// whose only content is KaTeX output: a `<math>` for AT plus an `aria-hidden`
+// visual span. Name computation does not descend into MathML, so both the link
+// and the heading come out UNNAMED -- "link" with nothing after it, and a
+// heading a screen reader cannot announce or list.
+//
+// Must run AFTER rehype-katex: before it the TeX is still ordinary text, so
+// there is no way to tell a math-only headline from a normal one. The label is
+// the heading's own id, which is the raw headline text (`S_1, S_2`) -- not
+// beautiful read aloud, but it is the real name and it matches what the ToC and
+// the URL fragment already say.
+function nameMathOnlyHeadings() {
+  // Text a name computation would actually use. KaTeX output is skipped
+  // wholesale: its MathML branch is full of text nodes (`S`, `3`, and a
+  // `<annotation>` holding the raw TeX) that no name computation reads, and its
+  // visual branch is aria-hidden. Counting either would make every math heading
+  // look adequately named.
+  const isKatex = (n: any) => String(n.properties?.className ?? "").includes("katex");
+  const nameText = (n: any): string =>
+    n.type === "text" ? n.value : isKatex(n) ? "" : (n.children || []).map(nameText).join("");
+  return (tree: any) => {
+    const walk = (n: any) => {
+      if (n.tagName && /^h[1-6]$/.test(n.tagName)) {
+        const link = (n.children || [])[0];
+        const id = n.properties?.id;
+        if (id && link?.tagName === "a" && !nameText(link).trim()) {
+          link.properties = { ...link.properties, "aria-label": id };
+        }
+        return;
       }
       (n.children || []).forEach(walk);
     };
@@ -484,6 +545,8 @@ async function orgToBody(src: string, st: RenderState): Promise<string> {
     // uniorg emits math as <span class="math math-inline|display">; render it
     // here (the bake step only matches \(...\) delimiters, which uniorg consumes).
     .use(rehypeKatex, { throwOnError: false, strict: false })
+    // ...and only now can we tell which self-links KaTeX left textless.
+    .use(nameMathOnlyHeadings)
     // preserve-breaks AFTER katex, so display-math TeX (which can contain
     // newlines) is already rendered and won't be split.
     .use(preserveLineBreaks)
@@ -526,7 +589,7 @@ async function orgInlineToText(s: string): Promise<string> {
 // --- page assembly ----------------------------------------------------------
 export type Meta = {
   href: string; title: string; titleHtml: string; titleText: string;
-  date: string; tags: string[]; thumbnail: string | null; draft: boolean; description: string;
+  date: string; dateIso: string; tags: string[]; thumbnail: string | null; draft: boolean; description: string;
 };
 
 const FAVICON =
@@ -540,7 +603,9 @@ function headHtml(m: { title: string; description: string; url: string; thumbnai
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <title>{`${m.title} - Toybeam`}</title>
+      {/* The site title is the suffix, so the home page would read "Toybeam -
+          Toybeam" -- the first thing a screen reader announces on page load. */}
+      <title>{m.title === "Toybeam" ? "Toybeam" : `${m.title} - Toybeam`}</title>
       <meta name="description" content={m.description} />
       <link rel="icon" href={FAVICON} />
       <link rel="stylesheet" href="/style/simple.min.css" />
@@ -566,9 +631,13 @@ function headHtml(m: { title: string; description: string; url: string; thumbnai
   );
 }
 
+// A run of tag links: real list markup, so AT announces "list, N items" and can
+// jump past it instead of reading every tag as a loose link. `.org-tag-list` was
+// already a flex container with the links as items -- the <li> just takes over as
+// the flex item (CSS resets the marker/padding), so the layout is unchanged.
 function tagListHtml(tags: string[]): Raw {
   return <Fragment>{tags.map((t) => (
-    <a href={`/tags/${t}.html`} class="org-tag"><code>{t}</code></a>
+    <li><a href={`/tags/${t}.html`} class="org-tag"><code>{t}</code></a></li>
   ))}</Fragment>;
 }
 
@@ -610,7 +679,7 @@ function buildToc(contentHtml: string): { nav: Raw; count: number } {
     items.push({ level: m[1], id, label });
   }
   const nav = (
-    <nav id="toc" class={toc.toc}>
+    <nav id="toc" class={toc.toc} aria-label="目次">
       {items.length > 0 && (
         <ul class={toc.tocList}>
           {items.map((it) => (
@@ -636,8 +705,11 @@ function page(opts: { htmlClass?: string; head: Raw; titleBlock: Raw; content: R
         {opts.head}
         <body>
           {DISCO_BODY}
+          {SKIP_LINK}
           {HEADER}
-          <main role="main" id="main">
+          {/* tabindex="-1" so the skip link actually MOVES focus here; without it
+              the browser only scrolls and the AT cursor stays in the header. */}
+          <main id="main" tabindex="-1">
             {opts.titleBlock}
             <div id="content">{opts.content}</div>
             {nav}
@@ -678,35 +750,44 @@ function articleTitleBlock(m: Meta): Raw {
     <div class="title-block">
       <h1>{raw(m.titleHtml)}</h1>
       <div class="title-meta">
-        <span class="title-date">{m.date}</span>
-        {m.tags.length > 0 && <p class="org-tag-list">{tagListHtml(m.tags)}</p>}
+        <time class="title-date" datetime={m.dateIso}>{m.date}</time>
+        {m.tags.length > 0 && <ul class="org-tag-list">{tagListHtml(m.tags)}</ul>}
       </div>
     </div>
   );
 }
 
+// One card in the listing `<ul>`. The card IS the <li> (it was already the flex
+// item), so AT announces "list, N items" and can step card-by-card instead of
+// wading through an undifferentiated run of title/date/tag links.
 function articleCard(m: Meta, eager: boolean): Raw {
   return (
-    <div class={card.articleCard}>
+    <li class={card.articleCard}>
       <div class={card.articleCardBody}>
         {/* data-article-card: a STABLE hook for tooling (og-preview.html scrapes
             the article list from index.html). The CSS-module class is content-
             hashed, so it can't be relied on. */}
         <div><a href={m.href} data-article-card class={card.articleCardLink}>{raw(m.titleHtml)}</a></div>
         <div class={card.articleCardMeta}>
-          <date>{m.date}</date>
-          <span class="org-tag-list">{tagListHtml(m.tags)}</span>
+          {/* <date> is not an HTML element -- it parsed as an unknown inline box
+              with no date semantics at all. <time datetime> is the real one. */}
+          <time datetime={m.dateIso}>{m.date}</time>
+          <ul class="org-tag-list">{tagListHtml(m.tags)}</ul>
         </div>
       </div>
       {m.thumbnail && (
         <img class={card.articleCardThumbnail} src={m.thumbnail} alt="" loading={eager ? "eager" : "lazy"} decoding="async" />
       )}
-    </div>
+    </li>
   );
 }
 
 // --- date formatting: `<2025-10-05 Sun>` -> `Oct  5, 2025` ------------------
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+// Machine-readable form of the same stamp, for <time datetime>.
+function isoDate(raw: string): string {
+  return raw.match(/(\d{4}-\d{2}-\d{2})/)?.[1] ?? "";
+}
 function fmtDate(raw: string): string {
   const m = raw.match(/(\d{4})-(\d{2})-(\d{2})/);
   if (!m) return "";
@@ -752,6 +833,7 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
     titleHtml: await orgInlineToHtml(title), // org markup -> HTML (w/ KaTeX); article <h1> + listing cards
     titleText: await orgInlineToText(title), // org markup stripped, for <title>/og
     date: fmtDate(kw.DATE || ""),
+    dateIso: isoDate(kw.DATE || ""),
     tags,
     thumbnail: thumbnailSrc(kw.THUMBNAIL),
     draft: false,
@@ -789,7 +871,7 @@ export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: strin
   const section = (id: string, cards: Meta[]): Raw => (
     <Fragment>
       <h2 id={id}><a href={`#${id}`}>{id}</a></h2>
-      <div class={card.articleList}>{cards.map((m, i) => articleCard(m, i === 0))}</div>
+      <ul class={card.articleList}>{cards.map((m, i) => articleCard(m, i === 0))}</ul>
     </Fragment>
   );
   const hasMath = listingHasMath([...metas, ...diaryMetas]);
@@ -799,7 +881,7 @@ export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: strin
     titleBlock: <div class="title-block"><h1>Toybeam</h1><div class="title-meta"><span class="title-date"></span></div></div>,
     content: (
       <Fragment>
-        <h2 id="Tags"><a href="#Tags">Tags</a></h2><div class="org-tag-list">{tagListHtml(allTags)}</div>
+        <h2 id="Tags"><a href="#Tags">Tags</a></h2><ul class="org-tag-list">{tagListHtml(allTags)}</ul>
         {section("Devlog (timeline)", metas)}
         {section("Diary", diaryMetas)}
       </Fragment>
@@ -817,9 +899,9 @@ export function buildTagHtml(tag: string, tagged: Meta[], allTags: string[]): st
     ),
     content: (
       <Fragment>
-        <h2 id="Tags"><a href="#Tags">Tags</a></h2><div class="org-tag-list">{tagListHtml(allTags)}</div>
+        <h2 id="Tags"><a href="#Tags">Tags</a></h2><ul class="org-tag-list">{tagListHtml(allTags)}</ul>
         <h2 id="Devlog">Devlog (<code>#{tag}</code>)</h2>
-        <div class={card.articleList}>{tagged.map((m, i) => articleCard(m, i === 0))}</div>
+        <ul class={card.articleList}>{tagged.map((m, i) => articleCard(m, i === 0))}</ul>
       </Fragment>
     ),
   }));

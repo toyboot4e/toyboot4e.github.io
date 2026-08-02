@@ -13,6 +13,13 @@
 packages: .
 #+END_SRC
 
+キャプション付きキーボード:
+
+#+CAPTION: 右手のレイアウト
+#+BEGIN_KEYBOARD taipo
+ins
+#+END_KEYBOARD
+
 キャプション付きテーブル（インライン数式 $N - P + 1$ 入り）:
 
 #+CAPTION: 体感 Diff $N - P + 1$

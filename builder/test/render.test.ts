@@ -78,7 +78,7 @@ test("page shell", async () => {
   expect(out).toContain('<link rel="stylesheet" href="/style/components.min.css">');
   expect(out).toContain('<header role="banner">');
   expect(out).toContain('<footer role="contentinfo">');
-  expect(out).toContain(`<nav id="toc" class="${toc.toc}"></nav>`); // empty ToC (no headings)
+  expect(out).toContain(`<nav id="toc" class="${toc.toc}" aria-label="目次"></nav>`); // empty ToC (no headings)
   expect(out).not.toContain("toc.min.js"); // no scrollspy when there's no ToC
   expect(out).toContain("<!--pp-->"); // bake sentinel
 });
@@ -86,7 +86,7 @@ test("page shell", async () => {
 test("toc: static list from headings, scrollspy shipped only when present", async () => {
   const out = await bake("t.org", "* First\nbody\n** Nested\nmore\n* Second\n");
   // org level-1 headline -> h2, level-2 -> h3; flat list, indent via scoped class
-  expect(out).toContain(`<nav id="toc" class="${toc.toc}"><ul class="${toc.tocList}">`);
+  expect(out).toContain(`<nav id="toc" class="${toc.toc}" aria-label="目次"><ul class="${toc.tocList}">`);
   expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH2}" href="#First">First</a>`);
   expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH3}" href="#Nested">Nested</a>`);
   expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH2}" href="#Second">Second</a>`);
@@ -170,8 +170,21 @@ test("mathbb: lowercase/digits -> Unicode double-struck, uppercase keeps KaTeX_A
 
 test("YARUO/AA: verbatim <pre>, org markup NOT parsed", async () => {
   const out = await bake("y.org", "#+BEGIN_YARUO\n( _人_ )  *not bold*\n#+END_YARUO\n");
-  expect(out).toContain('<pre class="yaruo">( _人_ )  *not bold*</pre>');
+  expect(out).toContain('<pre tabindex="0" class="yaruo">( _人_ )  *not bold*</pre>');
   expect(out).not.toContain("<sub>"); // _人_ stays literal, not a subscript
+});
+
+test("every <pre> is keyboard-focusable so it can be scrolled without a mouse", async () => {
+  // simple.css makes every <pre> a scroll container, so each needs a tab stop
+  // (WCAG 2.1.1) -- highlighted code, a YARUO block and a plain example alike.
+  const code = await bake("c.org", "#+BEGIN_SRC haskell\nmain = pure ()\n#+END_SRC\n");
+  expect(code).toContain('<pre tabindex="0" class="hl">');
+  const yaruo = await bake("y.org", "#+BEGIN_YARUO\n( _人_ )\n#+END_YARUO\n");
+  expect(yaruo).toContain('<pre tabindex="0" class="yaruo">');
+  // a src block with no language stays unhighlighted, so its <pre> carries no
+  // class at all -- the pass keys off the element, not off a class
+  const plain = await bake("p.org", "#+BEGIN_SRC\nplain text\n#+END_SRC\n");
+  expect(plain).toContain('<pre tabindex="0">');
 });
 
 test("math: $$...$$ / \\[...\\] render as centered display, $...$ stays inline", async () => {
@@ -188,7 +201,7 @@ test("DETAILS summary: org markup is converted to HTML", async () => {
 
 test("diff blocks: changed lines get .diff.add / .diff.remove for +/- backgrounds", async () => {
   const out = await bake("d.org", "#+BEGIN_SRC diff\n- a\n+ b\n#+END_SRC\n");
-  expect(out).toContain('<pre class="hl'); // baked by the tree-sitter highlighter
+  expect(out).toContain('<pre tabindex="0" class="hl'); // baked by the tree-sitter highlighter
   expect(out).toMatch(/class="line diff remove"/); // `- a`
   expect(out).toMatch(/class="line diff add"/); // `+ b`
 });

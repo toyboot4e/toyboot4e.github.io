@@ -207,7 +207,6 @@ vmunstreamUnknown s
 #+END_SRC
 #+END_DETAILS
 
-*** 
 *** =concat= の計算量
 
 =concat= はサイズが =Exact n= の =Bundle= を作って =unstream= にかけています。

@@ -369,8 +369,12 @@ function keyDiv(layout: Layout, c: string, on: boolean, extraCls: (string | fals
   const isIcon = meta && typeof meta.label !== "string";
   const cls = [kb.key, layout.keyClass?.(c), isIcon && kb.keyIcon, ...extraCls, on && kb.keyPressed]
     .filter(Boolean).join(" ");
+  // An icon key's only content is an inline SVG, so `aria-label` carries its
+  // name -- but aria-label is prohibited on a role-less <div> (axe:
+  // aria-prohibited-attr) and would be dropped. role="img" makes the div a named
+  // leaf, which is exactly what a glyph-with-a-name is.
   return meta
-    ? <div class={cls} style={style} title={meta.name} aria-label={meta.name}>{meta.label}</div>
+    ? <div class={cls} style={style} title={meta.name} role="img" aria-label={meta.name}>{meta.label}</div>
     : <div class={cls} style={style}>{c}</div>;
 }
 

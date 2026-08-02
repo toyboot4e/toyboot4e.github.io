@@ -21,7 +21,10 @@ This is a static site generator for a Japanese technical devlog. Content is auth
   only; drafts are skipped). Also serves `out/` on port 8080 with **Vite-style
   live reload**: the browser refreshes the instant a rebuild lands (CSS edits
   hot-swap without navigating; a body-only edit reloads just the tab on that
-  page). The reload client is injected at serve time only (SSE on
+  page). Builder-source edits (`builder/src`, `grammars`, configs) can't apply
+  warm, so the daemon exits 75 and the recipe loop restarts it with a fresh full
+  build; the browser reloads when its SSE channel reconnects. The reload client
+  is injected at serve time only (SSE on
   `/__livereload`), so `out/` stays the byte-exact release output. `DEV_PORT=0`
   disables the server (preview with `just serve` instead);
   `builder/src/dev-server.ts` is the server.
@@ -35,6 +38,30 @@ This is a static site generator for a Japanese technical devlog. Content is auth
   runs this best-effort, so you rarely call it directly — but `--force` and the
   initial fetch when offline-building still need it. The hermetic nix/CI build
   only *reads* the cache (no network), so the cache must be committed.
+
+### Accessibility
+- `just a11y` - **The a11y gate.** axe-core over every built page in *both*
+  themes, in headless Chromium; groups violations by rule, exits non-zero on a
+  serious+ finding. `--sample` for a fast representative slice, `--all` to add
+  advisory best-practice rules, or pass page paths. (Lighthouse's `just audit`
+  only samples one page and a subset of the rules — it is not the gate.)
+- `just a11y-tree [page]` - The accessibility tree in reading order (roles,
+  accessible names, heading levels) — what a screen reader is actually handed.
+  `--flat` prints it as an announcement sequence instead (`"<name>", <role>`,
+  list counts, heading levels); unnamed controls show as `(UNNAMED)`, and the
+  output diffs cleanly between builds.
+  Read this before/after any markup change: it catches unnamed landmarks, runs of
+  links with no list around them and unannounceable headings, none of which are
+  rule violations.
+- `just a11y-tab [page]` - Tab order, accessible names and focus rings.
+- `just a11y-contrast` - One row per `hl-*` bucket with its measured ratio per
+  theme, alpha washes composited. **Run after touching either `.hl` palette.**
+- Tooling lives in `scripts/a11y/` with its *own* `package.json` (axe-core +
+  puppeteer-core), deliberately outside `builder/` so the hermetic nix build's
+  pinned `node_modules` is untouched. `scripts/a11y/README.md` documents all of
+  it plus how to test with a real screen reader (Orca/NVDA/VoiceOver).
+- Don't rebuild while a scan runs — the scanner reads `out/` off disk and a
+  half-written page reports bogus `html-has-lang` / `document-title` failures.
 
 ### Nix Build
 - `nix build` - Build the shipped site using Nix flakes
@@ -194,6 +221,17 @@ class="hl">`. Capture names → `hl-<bucket>` CSS classes via `CLASS_TABLE`. Fea
   palette of CSS variables (`--c-kw`, `--c-str`, …) rebound per theme via
   `[data-theme]` + `prefers-color-scheme`. Palette = sonokai (dark) + One Light
   (light) — swap the two `.hl` blocks in `style.css` to restyle everything.
+  Both palettes are **contrast-corrected**: every entry clears 4.5:1 (WCAG 1.4.3)
+  against the *lightest/darkest* background it can land on — not just the plain
+  code background, but also the alpha washes a coderef line and a `diff` added
+  line lay over it. Stock One Light fails this badly (comments 2.4:1). After any
+  palette edit run `just a11y-contrast`, which composites those washes.
+- **Keyboard access**: `bakeDocument` gives every `<pre>` `tabindex="0"`
+  (`focusableScrollBlocks`), because simple.css makes them all scroll containers
+  and a mouse-less user otherwise can't reach past the right edge (WCAG 2.1.1).
+  Keyed off the element, not the emitting code path, so a new kind of `<pre>`
+  can't miss it. Deliberately NOT measured in the browser at runtime — see
+  `scripts/a11y/README.md` ("Where axe over-reports").
 - **Line numbers**: opt-in per block via org's `-n`/`+n` switch; a CSS counter on
   the `.line` spans (also on GitHub code-embeds, starting at the source line).
 - **diff-`<lang>`**: strip the +/- column, highlight the body as `<lang>`, mark
