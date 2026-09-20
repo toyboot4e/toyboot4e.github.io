@@ -1,0 +1,86 @@
+#+TITLE: ここ一年でやったモノレポの開発環境改善
+#+DATE: <2026-09-19 Sat>
+#+FILETAGS: :work:
+
+* 背景
+
+[[https://jobs.atcoder.jp/][AtCoder Jobs]] で東京の SWE 職を得て一年 (※ 初出し情報) 、何をやっても「いいね」と言ってもらえるので、ホイホイ開発環境を高速化して来ました。
+
+こうした環境構築が大好きな人たちは、要職に付いていて時間が無いことも多く、肯定的に捉えて頂けたように思います。ラッキー！
+
+* 改善内容
+
+** biome
+
+そもそも formatter/linter が導入されていないプロジェクトもあり、 [[https://biomejs.dev/][biome]] を導入しました。当時は oxlint/oxfmt の安定版がリリースされていなかった他、 biome もセンスが良いです。
+
+たとえば Zenn 記事の [[https://zenn.dev/estie/articles/64b80da2fbf175][同じRust製のBiomeとOxlintで、なぜ速度差が大きいのか]] では rust-analyzer/rowan 同様に CST (concrete syntax tree) を使ってパースしているとありますし、 Rust 的で好ましく感じています。
+
+VS Code 拡張の動作が怪しい時期もありましたが、ちょうど導入する頃に upstream 側で修正されて助かりました。
+
+** VS Code workspace
+
+=biome= が自動的に動いて欲しかったので、 VS Code の [[https://code.visualstudio.com/docs/editing/workspaces/workspaces][workspace]] ファイルを作成しました。プロジェクト毎に =.vscode/= を置いても、そのフォルダをルートとして開かなければ =.vscode/= の内容は読み込まれません。そのため workspace に各プロジェクトのフォルダを登録することで、初めて =.vscode/= が機能するようになりました。
+
+僕は普段 Emacs を使っているので VS Code の設定が壊れていても気付けないのですが、聞く限りは現在も正しく動いているようです。
+
+** ESLint
+
+ESLint のキャッシュを有効化しました。変更ファイルの影響範囲の lint のみが実施されるようになり、ローカル実行の ESLint は爆速になったと思います。
+
+また ESLint のバージョンを 6 から 10 まで上げました。やはり dependabot alerts に対応しているだけだと、パッケージを積極的に更新しなくなるのでしょうか。定期的にパッケージバージョンを確認する CI を設定した方が良いかもしれません。
+
+** oxfmt
+
+=prettier= を =oxfmt= に置き換えました。速いですね。 oxlint は ESLint を部分的にしか置換できないため、速度的な改善も見られず、更新待ちの状態です。
+
+** TypeScript 7
+
+TypeScript 5 から 7 にバージョンアップしました。型チェックの時間が 20 秒から 3 秒になったプロジェクトもあり、非常に快適になりました。
+
+TS 7 はまだ安定した API を公開していないため、 ESLint 用に TS 6 もインストールしたり、一時的に =babel= に置き換えたりしました。
+
+** Vite, Vitest
+
+=webpack= から =vite= に、 =jest= から =vitest= に移行しました。 =vite= への移行にあたって、 ESModule の構文を使いながら CommonJS を吐き出す設定に変える必要がありました。
+
+やはり =vite= によるバンドリングは問答無用で速いですね。 =vitest= では [[https://vitest.dev/config/isolate][=isolate: false=]] を設定すると単体テストが 3 倍速で実行されるようになったりしました。
+
+** CI 高速化
+
+CircleCI を使っています。正直 GitHub Actions の方が機能的に良いのですが、デプロイを含めたパスが CircleCI に載っているので、置き換えは未検討です。これだけは、政治的な問題もありそうでした。
+
+コミット毎の CI に 8 分かかっていたり、重症だったと思います。僕は Haskell プロジェクトの CI を 10 分から 3 分に削減するために 100 回 GitHub Actions を回したりしていましたから、 8 分も完全な赤信号に見えました。
+
+デフォルト設定の medium [[https://circleci.com/docs/guides/execution-managed/executor-intro/][executor]] は 2 CPU 環境なので、並列実行します:
+
+- ESLint の =--concurrency 2=
+- [[https://pytest-xdist.readthedocs.io/en/latest/][pytest-xdist]] による並列実行
+- シェルの =&= を使った並列実行
+
+その他の主な改善内容としては、
+
+- blobless checkout を使う (既に設定があったので)
+- Python 用のプロジェクトで (corepack を含めて 2 回も) Node.js をインストールしない
+- キャッシュのキー名のミスマッチを直したり、設定漏れを埋める
+- setup 用の job を後続の job に埋め込む
+- =uv cache prune --ci= を呼ぶ
+- テスト時のみ sleep を何もしない関数に置き換える
+- テスト時のみ重い hash 関数を軽い hash 関数に置き換える
+
+現在、 PR に対する CI は 2 分 30 秒〜長くても 3 分 30 秒になりました。まだ長く、 job 分割したい気がします。
+
+** 別チームの作業
+
+- Ansible の設定を変えて、デプロイ関係のパスを 2.5 倍高速化していました。最高ですね。
+- Python 環境が =uv= へ移行になりました。やったー！！
+- その他、 Docker や AWS 関係で多くの改善点があったはずです。
+
+* まとめ
+
+社風が良く、政治的な問題が何も無いのが良かったです。上手く転がしてもらっていますね。
+
+やったことは趣味プロジェクトの内容に近く、余裕でした。実力というよりモチベの問題ですね。会社に設定厨を放てばこうなる。
+
+今は [[https://mise.jdx.dev/][jdx/mise]] を入れている最中なのと、 Node.js を [[https://pnpm.io/][pnpm]] に置き換えてインストールを爆速にしたいです。こうした大きめの変更はさっさと大胆にやるべきだと学びました。 10 月末までにモダンな開発環境に仕上げちゃいましょう。
+
