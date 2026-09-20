@@ -4,6 +4,13 @@
    Component-specific tweaks stay with their component below.
    ============================================================ */
 
+:root {
+  --mono-font:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Cascadia Mono",
+    "Segoe UI Mono", "DejaVu Sans Mono", "Liberation Mono", "Noto Sans Mono",
+    monospace;
+}
+
 /* ============================================================
    Skip link (WCAG 2.4.1 "Bypass Blocks")
    The chrome nav repeats on every page, so a keyboard or screen-reader user
@@ -847,7 +854,7 @@ html[data-theme="dark"] .hl {
   display: flex;
   align-items: baseline;
   flex: none;
-  font-family: monospace, monospace;
+  font-family: var(--mono-font);
 }
 
 .gh-embed-path {
@@ -867,7 +874,7 @@ html[data-theme="dark"] .hl {
   margin-left: auto;
   padding-left: 0.5em;
   white-space: nowrap;
-  font-family: monospace, monospace;
+  font-family: var(--mono-font);
 }
 
 /* Prism-highlighted code (same theme as the rest of the site). Prism's theme +
