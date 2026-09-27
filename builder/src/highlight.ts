@@ -39,6 +39,7 @@ const ALIAS: Record<string, string> = {
   "c++": "cpp", "c#": "csharp", js: "javascript", ts: "typescript", yml: "yaml",
   "fortran-free-form": "fortran", md: "markdown", lisp: "commonlisp",
   "markdown.inline": "markdown_inline", "markdown-inline": "markdown_inline",
+  justfile: "just", kk: "koka",
   // the tsx grammar parses JSX/TSX (and plain js); the javascript grammar has no
   // JSX, so `jsx` must map here, not to `javascript`.
   jsx: "tsx",

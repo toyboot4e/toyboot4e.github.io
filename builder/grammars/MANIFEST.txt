@@ -15,6 +15,8 @@ _javascript  (base queries)  helix:_javascript
 javascript  tree-sitter/tree-sitter-javascript@58404d8cf1  helix:javascript
 json  tree-sitter/tree-sitter-json@001c28d7a2  helix:json
 _jsx  (base queries)  helix:_jsx
+just  poliorcetics/tree-sitter-just@00859eebfb  helix:just
+koka  koka-community/tree-sitter-koka@fd3b482274  helix:koka
 lua  tree-sitter-grammars/tree-sitter-lua@10fe005473  helix:lua
 makefile  alemuller/tree-sitter-make@a4b9187417  helix:make
 markdown_inline  tree-sitter-grammars/tree-sitter-markdown@f969cd3ae3  helix:markdown.inline

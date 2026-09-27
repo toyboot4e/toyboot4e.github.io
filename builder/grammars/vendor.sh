@@ -62,6 +62,8 @@ markdown|tree-sitter-grammars/tree-sitter-markdown|f969cd3ae3f9fbd4e43205431d0ae
 markdown_inline|tree-sitter-grammars/tree-sitter-markdown|f969cd3ae3f9fbd4e43205431d0ae286014c05b5|tree-sitter-markdown-inline|markdown.inline
 commonlisp|tree-sitter-grammars/tree-sitter-commonlisp|32323509b3d9fe96607d151c2da2c9009eb13a2f||common-lisp
 org|milisims/tree-sitter-org|64cfbc213f5a83da17632c95382a5a0a2f3357c1||org
+just|poliorcetics/tree-sitter-just|00859eebfb774d371af174ea1e582d46e697b469||just
+koka|koka-community/tree-sitter-koka|fd3b482274d6988349ba810ea5740e29153b1baf||koka
 "
 
 # Shared base ("pseudo") query sets that have NO grammar of their own: other
