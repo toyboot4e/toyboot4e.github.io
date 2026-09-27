@@ -73,10 +73,17 @@ org|milisims/tree-sitter-org|64cfbc213f5a83da17632c95382a5a0a2f3357c1||org
 # (`c` is a real grammar above, so cpp's `; inherits: c` already resolves.)
 BASE_QUERIES="ecma _javascript _typescript _jsx"
 
+# Optional args: only (re-)vendor these ids, e.g. `./vendor.sh just koka`. Without
+# args every language above is rebuilt and its queries refetched at $HELIX_REF,
+# which churns unrelated files; pass ids when adding one.
+ONLY=" $* "
+want() { [ "$ONLY" = "  " ] || case "$ONLY" in *" $1 "*) ;; *) return 1 ;; esac; }
+
 ok=0; fail=0; manifest=""
 echo "Vendoring grammars with $($TS --version)…"
 while IFS='|' read -r id repo rev sub hx; do
   [ -z "$id" ] && continue
+  want "$id" || { manifest+="$(grep -m1 "^$id  " MANIFEST.txt 2>/dev/null)\n"; continue; }
   # 1. grammar -> wasm (from Helix's pinned rev)
   curl -sL "https://github.com/$repo/archive/$rev.tar.gz" | tar xz -C "$TMP" 2>/dev/null
   gdir="$TMP/$(basename "$repo")-$rev${sub:+/$sub}"
@@ -99,6 +106,7 @@ done <<< "$GRAMMARS"
 # Grammar-less base query sets pulled in via `; inherits:` (see BASE_QUERIES note).
 echo "Fetching shared base query sets (inherited via \`; inherits:\`)…"
 for base in $BASE_QUERIES; do
+  want "$base" || { manifest+="$(grep -m1 "^$base  " MANIFEST.txt 2>/dev/null)\n"; continue; }
   hb="https://raw.githubusercontent.com/helix-editor/helix/$HELIX_REF/runtime/queries/$base"
   curl -sf "$hb/highlights.scm" -o "queries/$base.scm" || { echo "  ✗ $base (no highlights)"; fail=$((fail+1)); continue; }
   curl -sf "$hb/locals.scm" -o "queries/$base.locals.scm" 2>/dev/null || rm -f "queries/$base.locals.scm"
@@ -109,5 +117,5 @@ done
 
 echo
 echo "Done: $ok ok, $fail failed."
-printf "$manifest" | sort > MANIFEST.txt
+printf "$manifest" | sed '/^[[:space:]]*$/d' | sort -o MANIFEST.txt
 echo "Manifest -> grammars/MANIFEST.txt  (ditaa/plantuml have no grammar -> plain text)"

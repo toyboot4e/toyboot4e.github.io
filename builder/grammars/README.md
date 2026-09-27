@@ -46,7 +46,9 @@ build reports no error — the thin query compiles fine, it just matches nothing
 
 `vendor.sh` is the source of truth — run it to add/bump a language (edit its
 `GRAMMARS` table), then commit the regenerated `wasm/` + `queries/` +
-`MANIFEST.txt`. It needs network and pulls the tree-sitter CLI on demand via
+`MANIFEST.txt`. Pass ids to limit it to those (`./vendor.sh just koka`); a bare
+run rebuilds every grammar and refetches all queries at `HELIX_REF`, churning
+files you didn't touch. It needs network and pulls the tree-sitter CLI on demand via
 `npx` (pinned in `TS_CLI`); the CLI is deliberately NOT a `package.json`
 dependency, because its postinstall downloads a native binary that would break
 the hermetic (offline) nix build. The first run downloads a wasi-sdk toolchain
