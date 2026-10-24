@@ -12,14 +12,10 @@ import { test, expect } from "vitest";
 import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parseHTML } from "linkedom";
-import { classes } from "../src/css-module.ts";
 import { renderAndBake } from "../src/render-bake.ts";
 import { buildIndexHtml, buildTagHtml, renderArticle, type Meta } from "../src/render.tsx";
-import tocModule from "../src/styles/toc.module.css";
-import cardModule from "../src/styles/article-card.module.css";
-
-const toc = classes(tocModule, "toc.module.css");
-const card = classes(cardModule, "article-card.module.css");
+import toc from "../src/styles/toc.module.css";
+import card from "../src/styles/article-card.module.css";
 
 const HERE = import.meta.dirname;
 const FIX = join(HERE, "fixtures");
@@ -91,7 +87,7 @@ test("page shell", async () => {
   expect(out).toContain('<link rel="stylesheet" href="/style/components.min.css">');
   expect(out).toContain('<header role="banner">');
   expect(out).toContain('<footer role="contentinfo">');
-  expect(out).toContain(`<nav id="toc" class="${toc("toc")}" aria-label="目次"></nav>`); // empty ToC (no headings)
+  expect(out).toContain(`<nav id="toc" class="${toc.toc}" aria-label="目次"></nav>`); // empty ToC (no headings)
   expect(out).not.toContain("toc.min.js"); // no scrollspy when there's no ToC
   expect(out).toContain("<!--pp-->"); // bake sentinel
 });
@@ -99,10 +95,10 @@ test("page shell", async () => {
 test("toc: static list from headings, scrollspy shipped only when present", async () => {
   const out = await bake("t.org", "* First\nbody\n** Nested\nmore\n* Second\n");
   // org level-1 headline -> h2, level-2 -> h3; flat list, indent via scoped class
-  expect(out).toContain(`<nav id="toc" class="${toc("toc")}" aria-label="目次"><ul class="${toc("tocList")}">`);
-  expect(out).toContain(`<a class="${toc("tocLink")} ${toc("nodeH2")}" href="#First">First</a>`);
-  expect(out).toContain(`<a class="${toc("tocLink")} ${toc("nodeH3")}" href="#Nested">Nested</a>`);
-  expect(out).toContain(`<a class="${toc("tocLink")} ${toc("nodeH2")}" href="#Second">Second</a>`);
+  expect(out).toContain(`<nav id="toc" class="${toc.toc}" aria-label="目次"><ul class="${toc.tocList}">`);
+  expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH2}" href="#First">First</a>`);
+  expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH3}" href="#Nested">Nested</a>`);
+  expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH2}" href="#Second">Second</a>`);
   expect(out).toContain('defer src="/style/toc.min.js"'); // scrollspy shipped
 });
 
@@ -167,7 +163,7 @@ test("image: #+ATTR_HTML width lands on <img>, not the container", async () => {
 test("article card: scoped class, org-markup title, thumbnail path", async () => {
   const { meta } = await renderAndBake("a.org", "#+TITLE: =code= t\n#+THUMBNAIL: img/a.webp\nx\n");
   const html = buildIndexHtml([meta], [], []);
-  expect(html).toContain(`class="${card("articleCard")}"`); // CSS-module scoped class
+  expect(html).toContain(`class="${card.articleCard}"`); // CSS-module scoped class
   expect(html).toContain('<code class="inline-verbatim">code</code> t'); // title htmlized
   expect(html).toContain('src="/img/a.webp"'); // thumbnail not /img/img/
 });

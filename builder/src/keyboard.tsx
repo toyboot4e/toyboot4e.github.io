@@ -8,11 +8,8 @@
 // Two layout kinds: a uniform chars grid (`chars`, one cell per grid track:
 // uni-v4, qwerty-24) and explicitly placed keys (`keys`, half-unit x offsets
 // and per-key vertical drop on an 18px track grid: tiny-18).
-import { classes } from "./css-module.ts";
 import { h, render, type Child, type Raw } from "./html.ts";
-import kbModule from "./styles/keyboard.module.css";
-
-const kb = classes(kbModule, "keyboard.module.css");
+import kb from "./styles/keyboard.module.css";
 
 // --- uni-v4: The Uni v4 steno keyboard (3x12) -------------------------------
 // A stroke like `KAT` or `-S` highlights the keys it presses, resolved in steno
@@ -370,56 +367,56 @@ type Layout = GridLayout | PlacedLayout;
 const LAYOUTS: Record<string, Layout> = {
   "uni-v4": {
     chars: UNI_CHARS,
-    gridClass: kb("strokeUni"),
+    gridClass: kb.strokeUni,
     // `/`-separated strokes (e.g. `KAT/-S`), one chart per stroke.
     specs: (body) => body.trim().toUpperCase().split("/"),
     pressed: uniPressed,
-    keyClass: (c) => (c === "*" ? kb("keyFat") : undefined),
+    keyClass: (c) => (c === "*" ? kb.keyFat : undefined),
   },
   "qwerty-24": {
     chars: QWERTY24_CHARS,
-    gridClass: kb("strokeQwerty24"),
+    gridClass: kb.strokeQwerty24,
     specs: lineSpecs,
     pressed: gridCharSpecPressed("qwerty-24", QWERTY24_CHARS),
     keyLabel: (c) => QWERTY24_THUMBS[c],
   },
   "tiny-18": {
     keys: TINY18_KEYS,
-    gridClass: kb("strokeTiny18"),
+    gridClass: kb.strokeTiny18,
     specs: lineSpecs,
     pressed: placedCharSpecPressed("tiny-18", TINY18_KEYS),
     keyLabel: (c) => (c === "E" ? ENTER_KEY : undefined),
   },
   piano: {
     keys: PIANO_KEYS,
-    gridClass: kb("strokeTiny18"), // same geometry/grid as tiny-18
+    gridClass: kb.strokeTiny18, // same geometry/grid as tiny-18
     specs: lineSpecs,
     pressed: placedCharSpecPressed("piano", PIANO_KEYS),
     keyLabel: (c) => PIANO_THUMBS[c],
   },
   taipo: {
     keys: TAIPO_KEYS,
-    gridClass: kb("strokeTaipo"),
+    gridClass: kb.strokeTaipo,
     specs: lineSpecs,
     pressed: placedCharSpecPressed("taipo", TAIPO_KEYS),
     keyLabel: (c) => TAIPO_THUMBS[c],
   },
   asetniop: {
     keys: ASETNIOP_KEYS,
-    gridClass: kb("strokeAsetniop"),
+    gridClass: kb.strokeAsetniop,
     specs: lineSpecs,
     pressed: placedCharSpecPressed("asetniop", ASETNIOP_KEYS),
     keyLabel: (c) => ASETNIOP_THUMBS[c],
   },
   artsey: {
     chars: ARTSEY_CHARS,
-    gridClass: kb("strokeArtsey"),
+    gridClass: kb.strokeArtsey,
     specs: lineSpecs,
     pressed: gridCharSpecPressed("artsey", ARTSEY_CHARS),
   },
   leversteno: {
     keys: LEVER_KEYS,
-    gridClass: kb("strokeLever"),
+    gridClass: kb.strokeLever,
     // uni-v4 stroke notation: `/`-separated strokes, one chart per stroke.
     specs: (body) => body.trim().toUpperCase().split("/"),
     pressed: leverPressed,
@@ -430,7 +427,7 @@ const LAYOUTS: Record<string, Layout> = {
 function keyDiv(layout: Layout, c: string, on: boolean, extraCls: (string | false | undefined)[], style?: string): Raw {
   const meta = layout.keyLabel?.(c);
   const isIcon = meta !== undefined && typeof meta.label !== "string";
-  const cls = [kb("key"), layout.keyClass?.(c), isIcon && kb("keyIcon"), ...extraCls, on && kb("keyPressed")]
+  const cls = [kb.key, layout.keyClass?.(c), isIcon && kb.keyIcon, ...extraCls, on && kb.keyPressed]
     .filter(Boolean)
     .join(" ");
   // An icon key's only content is an inline SVG, so `aria-label` carries its
@@ -455,7 +452,7 @@ function strokeHtml(layout: Layout, spec: string): string {
     const pressed = layout.pressed(spec);
     for (const [row, chars] of layout.chars.entries()) {
       for (const [col, c] of chars.entries()) {
-        cells.push(c === "" ? <div class={kb("cell")}></div> : keyDiv(layout, c, pressed[row]?.[col] ?? false, []));
+        cells.push(c === "" ? <div class={kb.cell}></div> : keyDiv(layout, c, pressed[row]?.[col] ?? false, []));
       }
     }
   } else {
@@ -464,10 +461,10 @@ function strokeHtml(layout: Layout, spec: string): string {
       // 18px half-unit tracks: key unit x -> track x*2+1, one unit = 2 tracks
       const span = k.h === undefined ? "" : `/span ${k.h}`;
       const style = `grid-row:${k.row + 1}${span};grid-column:${k.x * 2 + 1}/span ${(k.w ?? 1) * 2}`;
-      cells.push(keyDiv(layout, k.c, on[i] ?? false, [kb("keyPlaced"), k.drop === true && kb("keyDrop")], style));
+      cells.push(keyDiv(layout, k.c, on[i] ?? false, [kb.keyPlaced, k.drop === true && kb.keyDrop], style));
     }
   }
-  return render(<div class={`${kb("stroke")} ${layout.gridClass}`}>{cells}</div>);
+  return render(<div class={`${kb.stroke} ${layout.gridClass}`}>{cells}</div>);
 }
 
 // The block body -> chart HTML strings, one per stroke/line. Throws on an

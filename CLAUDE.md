@@ -18,6 +18,10 @@ This is a static site generator for a Japanese technical devlog. Content is auth
   (`cd builder && vitest run`); `just test-update` regenerates goldens.
 - `just fmt` - Format `builder/` with oxfmt (120 cols; `--check` to verify).
   Hand-aligned tables (key layouts, tag sets) carry `// oxfmt-ignore`.
+- `just css-types` - Regenerate `builder/src/styles/*.module.d.css.ts` from
+  Vite's own CSS-module class maps (committed; the pre-commit hook regenerates
+  them and fails the commit until the update is staged). They make a typo'd
+  class a `tsc` error.
 - `just lint` - oxlint (`builder/.oxlintrc.json`: every category, type-aware)
   + strict `tsc`. Rules that ban language features or contradict each other are
   off, each with its reason in the config. vitest runs on **node** but the build
@@ -186,7 +190,8 @@ the destination's trademarked logo.
 ### CSS Modules
 Component styles live in `builder/src/styles/*.module.css` (article-card,
 keyboard, toc). `render.tsx` imports them directly (`import card from
-"./styles/article-card.module.css"`) and Vite returns the scoped class map.
+"./styles/article-card.module.css"`) and Vite returns the scoped class map,
+typed by the generated `*.module.d.css.ts` beside it (`just css-types`).
 `generateScopedName` (`builder/config-shared.ts`) is deterministic and hash-free
 (`article-card.module.css` class `articleCard` -> `article-card_articleCard`), so
 the render and the CSS build (`assets.ts` -> `components.min.css`) agree on names.

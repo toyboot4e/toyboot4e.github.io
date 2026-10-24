@@ -92,7 +92,9 @@
         };
 
       # pre-commit: oxfmt + oxlint over builder/, check only (never rewrites the
-      # staged files). Installed by entering the devShell; also a flake check.
+      # staged files), and css-types, which regenerates the CSS-module typings
+      # (a changed typing fails the commit until it is staged). Installed by
+      # entering the devShell; also a flake check.
       # Runs the locked tools from builder/node_modules (the nix-vendored copy
       # when absent), since type-aware oxlint needs the builder's deps anyway.
       preCommitFor =
@@ -120,6 +122,10 @@
         git-hooks.lib.${pkgs.stdenv.hostPlatform.system}.run {
           src = ./.;
           hooks = {
+            css-types = hook "css-types" "css-types" // {
+              name = "css-types (regenerate)";
+              files = "^builder/src/styles/";
+            };
             oxfmt = hook "oxfmt" "fmt:check";
             oxlint = hook "oxlint" "lint";
           };

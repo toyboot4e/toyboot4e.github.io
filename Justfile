@@ -45,7 +45,11 @@ fmt *args:
 
 # lint builder/ (oxlint, every category + type-aware rules) and typecheck (strict tsc)
 lint:
-    cd builder && bun run lint && bun run typecheck
+    cd builder && bun run css-types:check && bun run lint && bun run typecheck
+
+# regenerate the CSS-module typings (builder/src/styles/*.module.d.css.ts)
+css-types:
+    cd builder && bun run css-types
 
 # regenerate golden files, then show the diff to review
 test-update:

@@ -15,7 +15,9 @@
     "fmt:check": "oxfmt --check",
     "lint": "oxlint",
     "typecheck": "tsc -p .",
-    "check": "oxfmt --check && oxlint && tsc -p ."
+    "check": "bun run css-types:check && oxfmt --check && oxlint && tsc -p .",
+    "css-types": "bun src/css-types.ts",
+    "css-types:check": "bun src/css-types.ts --check"
   },
   "dependencies": {
     "katex": "^0.19.1",

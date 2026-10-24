@@ -10,23 +10,18 @@ import { defaultOptions } from "uniorg-parse/lib/parse-options.js";
 import uniorg2rehype, { type Options as RehypeOptions } from "uniorg-rehype";
 import rehypeKatex from "rehype-katex";
 import stringify from "rehype-stringify";
-import { classes } from "./css-module.ts";
-import { arrayOf, isBoolean, isString, nullable, objectOf } from "./guard.ts";
+import { arrayOf, isBoolean, isString, literal, nullable, objectOf } from "./guard.ts";
 import { h, Fragment, raw, render, type Child, type Raw } from "./html.ts";
 // Scoped CSS-module class maps, resolved directly by Vite (`vite build` at bundle
 // time, vite-node under watch). Each default export is `{ authoredName: scopedName }`. The matching
 // scoped CSS ships as components.min.css (emitted by assets.ts, linked in
 // headHtml); Vite's `generateScopedName` (vite.config.ts) keeps the names in
 // sync between this render and that CSS build.
-import cardModule from "./styles/article-card.module.css";
-import kbModule from "./styles/keyboard.module.css";
-import tocModule from "./styles/toc.module.css";
+import card from "./styles/article-card.module.css";
+import kb from "./styles/keyboard.module.css";
+import toc from "./styles/toc.module.css";
 import { keyboardStrokesHtml } from "./keyboard.tsx";
 import { expandMathbb } from "./math-util.ts";
-
-const card = classes(cardModule, "article-card.module.css");
-const kb = classes(kbModule, "keyboard.module.css");
-const toc = classes(tocModule, "toc.module.css");
 
 export const SITE_URL = "https://toyboot4e.github.io/";
 
@@ -455,7 +450,7 @@ function makeHandlers(st: RenderState): Handlers {
         const chart = this.h(
           org,
           "div",
-          { className: [kb("outline")] },
+          { className: [kb.outline] },
           keyboardStrokesHtml(layout, body).map((v) => rawNode(v)),
         );
         // `#+CAPTION:` -> numbered <figure>, same as a captioned image. uniorg
@@ -975,13 +970,12 @@ function decodeEntities(s: string): string {
     .replaceAll("&amp;", "&");
 }
 
-type TocItem = { level: string; id: string; label: string };
+type TocItem = { level: keyof typeof TOC_NODE_CLASS; id: string; label: string };
 
 // Scoped indentation class per heading level (the list is flat, so the depth is
 // expressed by the link's class, not by nested <ul>s).
-function tocNodeClass(level: string): string {
-  return toc(`nodeH${level}`);
-}
+const TOC_NODE_CLASS = { "2": toc.nodeH2, "3": toc.nodeH3, "4": toc.nodeH4 } as const;
+const isTocLevel = literal("2", "3", "4");
 
 // Build the static table of contents from a page's content HTML: a flat list of
 // links to its h2-h4 headings. Returns the `<nav>` plus the heading count, so the
@@ -992,7 +986,7 @@ function buildToc(contentHtml: string): { nav: Raw; count: number } {
   const items: TocItem[] = [];
   for (const [, level = "", attrs = "", inner = ""] of contentHtml.matchAll(TOC_HEADING_RE)) {
     const id = /\sid="([^"]*)"/u.exec(attrs)?.[1];
-    if (id === undefined || id === "") {
+    if (id === undefined || id === "" || !isTocLevel(level)) {
       continue;
     }
     // strip the inner self-link anchor / inline markup down to plain text
@@ -1005,12 +999,12 @@ function buildToc(contentHtml: string): { nav: Raw; count: number } {
     items.push({ level, id, label });
   }
   const nav = (
-    <nav id="toc" class={toc("toc")} aria-label="目次">
+    <nav id="toc" class={toc.toc} aria-label="目次">
       {items.length > 0 && (
-        <ul class={toc("tocList")}>
+        <ul class={toc.tocList}>
           {items.map((it) => (
             <li>
-              <a class={`${toc("tocLink")} ${tocNodeClass(it.level)}`} href={`#${it.id}`}>
+              <a class={`${toc.tocLink} ${TOC_NODE_CLASS[it.level]}`} href={`#${it.id}`}>
                 {it.label}
               </a>
             </li>
@@ -1094,17 +1088,17 @@ function articleTitleBlock(m: Meta): Raw {
 // wading through an undifferentiated run of title/date/tag links.
 function articleCard(m: Meta, eager: boolean): Raw {
   return (
-    <li class={card("articleCard")}>
-      <div class={card("articleCardBody")}>
+    <li class={card.articleCard}>
+      <div class={card.articleCardBody}>
         {/* data-article-card: a STABLE hook for tooling (og-preview.html scrapes
             the article list from index.html). The CSS-module class is content-
             hashed, so it can't be relied on. */}
         <div>
-          <a href={m.href} data-article-card class={card("articleCardLink")}>
+          <a href={m.href} data-article-card class={card.articleCardLink}>
             {raw(m.titleHtml)}
           </a>
         </div>
-        <div class={card("articleCardMeta")}>
+        <div class={card.articleCardMeta}>
           {/* <date> is not an HTML element -- it parsed as an unknown inline box
               with no date semantics at all. <time datetime> is the real one. */}
           <time datetime={m.dateIso}>{m.date}</time>
@@ -1113,7 +1107,7 @@ function articleCard(m: Meta, eager: boolean): Raw {
       </div>
       {m.thumbnail !== null && (
         <img
-          class={card("articleCardThumbnail")}
+          class={card.articleCardThumbnail}
           src={m.thumbnail}
           alt=""
           loading={eager ? "eager" : "lazy"}
@@ -1236,7 +1230,7 @@ export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: strin
       <h2 id={id}>
         <a href={`#${id}`}>{id}</a>
       </h2>
-      <ul class={card("articleList")}>{cards.map((m, i) => articleCard(m, i === 0))}</ul>
+      <ul class={card.articleList}>{cards.map((m, i) => articleCard(m, i === 0))}</ul>
     </Fragment>
   );
   const hasMath = listingHasMath([...metas, ...diaryMetas]);
@@ -1305,7 +1299,7 @@ export function buildTagHtml(tag: string, tagged: Meta[], allTags: string[]): st
           <h2 id="Devlog">
             Devlog (<code>#{tag}</code>)
           </h2>
-          <ul class={card("articleList")}>{tagged.map((m, i) => articleCard(m, i === 0))}</ul>
+          <ul class={card.articleList}>{tagged.map((m, i) => articleCard(m, i === 0))}</ul>
         </Fragment>
       ),
     }),
