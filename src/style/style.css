@@ -9,6 +9,7 @@
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Cascadia Mono",
     "Segoe UI Mono", "DejaVu Sans Mono", "Liberation Mono", "Noto Sans Mono",
     monospace;
+  --panel-pad-x: 1rem; /* side padding of cards and disco panels */
 }
 
 /* ============================================================
@@ -270,13 +271,12 @@ header > nav a {
 }
 
 .title-block h1 {
-  max-width: 100% !important; /* overwrite simple.css's default */
   /* smaller than simple.css's 3rem — matches the section h2 size */
   font-size: 2.6rem;
   /* Just reset the framework's heading margins — the title→meta gap is owned by
      .title-meta's margin-top below, so the h1 box relies only on its (disco chip)
      padding for its own spacing, like the section h2s. */
-  margin: 0 !important;
+  margin-block: 0 !important;
 }
 
 /* date + tags on a single line */
@@ -904,7 +904,7 @@ html[data-theme="dark"] .hl {
 @media (max-width: 1100px) {
   main {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr); /* 1fr would grow to a wide <pre>, breaking %-widths */
   }
   #content,
   .title-block {
@@ -1124,33 +1124,31 @@ html.disco-on {
   background-color: var(--disco-tag-bg-hover);
 }
 
-/* The homepage Tags list + headings each get a disco "panel" (the title h1, the
-   section h2s, and the `> .org-tag-list` section list). The panel LAYOUT (padding
-   + full-width) is reserved on `.home` REGARDLESS of disco-on, so that disable()
-   dropping `disco-on` on a no-GPU device (Lighthouse runs --disable-gpu) doesn't
-   strip the padding and reflow #content -- that toggle was a big CLS. Only the
-   panel's VISUAL (background / shadow / border) is gated on `.disco-on`, so it
-   never changes geometry. (0.9rem left/right matches the article reading pane.)
-   `> .org-tag-list` targets only the section list, not card/meta tags. */
-.home #content > .org-tag-list {
-  display: flex; /* full-width pane (vs the default inline-flex) */
-  border-radius: 8px;
-  padding: 0.5rem 0.9rem;
-}
+/* Homepage: every item (cards, title, section h2s, the section tag list) grows
+   outward by --panel-pad-x, like the article backdrop, so its text column is as
+   wide as an article's. In disco the non-card items become card-like panels with
+   the cards' side padding; their height is the same either way, so disable()
+   dropping `disco-on` (no GPU) only shifts text sideways, never reflows. */
 .home .title-block h1,
-.home #content h2 {
-  border-radius: 8px;
-  padding: 0.3em 0.9rem;
-  width: 100%;
+.home #content > * {
+  margin-inline: calc(-1 * var(--panel-pad-x));
 }
-.disco-on.home #content > .org-tag-list,
-.disco-on.home .title-block h1,
-.disco-on.home #content h2 {
+.home :where(.title-block h1, #content > h2, #content > .org-tag-list) {
+  padding-block: 0.3em;
+  border: var(--border-width) solid transparent;
+  border-radius: 8px;
+}
+.home #content > .org-tag-list {
+  display: flex; /* block-level pane (vs the default inline-flex) */
+  padding-block: 0.5rem;
+}
+.disco-on.home :is(.title-block h1, #content > h2, #content > .org-tag-list) {
+  padding-inline: var(--panel-pad-x);
   background-color: var(--disco-heading-bg);
   box-shadow: var(--disco-shadow);
 }
 .disco-on.home .title-block h1 {
-  border: var(--border-width) solid var(--border);
+  border-color: var(--border);
 }
 
 /* In disco mode, make the sticky header and the footer glassy so the effect shows
@@ -1179,12 +1177,20 @@ html.disco-on:not(.home) .title-block::before,
 html.disco-on:not(.home) #content::before {
   content: "";
   position: absolute;
-  inset: -0.6rem -0.9rem;
+  inset: -0.6rem calc(-1 * var(--panel-pad-x));
   z-index: -1;
   background-color: var(--disco-backdrop-bg);
   border: var(--border-width) solid var(--border);
   border-radius: 10px;
   box-shadow: var(--disco-shadow);
+}
+/* Narrow: run the panels to the window edges, keeping --panel-pad-x of padding
+   instead of the whole 5vw gutter. */
+@media (max-width: 55.5rem) {
+  html.disco-on .title-block,
+  html.disco-on #content {
+    width: calc(100% - 2 * var(--panel-pad-x));
+  }
 }
 /* (disco ToC panel styling moved to build/styles/toc.module.css) */
 

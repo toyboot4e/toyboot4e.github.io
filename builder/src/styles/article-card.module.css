@@ -33,7 +33,7 @@
 
 /* The text content is padded, while the thumbnail stays full-bleed. */
 .articleCardBody {
-  padding: 0.35rem 0.75rem;
+  padding: 0.35rem var(--panel-pad-x);
   line-height: 1.3;
 }
 
