@@ -77,6 +77,8 @@
     "vitest/prefer-expect-assertions": "off",
     "vitest/require-test-timeout": "off",
     "vitest/no-importing-vitest-globals": "off",
+    // toBeTruthy() is weaker than toBe(true) (passes for 1, "x", {})
+    "vitest/prefer-to-be-truthy": "off",
 
     "vitest/expect-expect": ["error", { "assertFunctionNames": ["expect", "golden"] }],
     "eslint/no-void": ["error", { "allowAsStatement": true }],

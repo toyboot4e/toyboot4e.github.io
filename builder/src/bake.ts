@@ -9,11 +9,12 @@
 // `getStats()` back to the orchestrator, which aggregates. Call `resetStats()`
 // between independent runs in the same isolate.
 
-import { initHighlighter, highlight, type Coderef, type HlOpts } from "./highlight.ts";
+import { initHighlighter, highlight, isCoderefs, type HlOpts } from "./highlight.ts";
 import { renderToString } from "katex";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { parseTrustedJson, type BakeStats, type Card } from "./bake-util.ts";
+import { isCard, type BakeStats, type Card } from "./bake-util.ts";
+import { errorText, parseJson, recordOf } from "./guard.ts";
 import { expandMathbb } from "./math-util.ts";
 
 // Re-export the lightweight helpers so existing importers keep one entry point.
@@ -51,7 +52,6 @@ const missingCards = new Set<string>();
 const warn = (m: string): void => {
   console.warn(`  ! ${m}`);
 };
-const errorText = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
 export function getStats(): BakeStats {
   return {
@@ -105,7 +105,7 @@ function codeOpts(code: HTMLElement): HlOpts {
     opts.coderefBlock = Number(coderefBlock);
   }
   if (coderefs !== undefined && coderefs !== "") {
-    opts.coderefs = parseTrustedJson<Coderef[]>(coderefs);
+    opts.coderefs = parseJson(coderefs, isCoderefs, "data-coderefs");
   }
   return opts;
 }
@@ -213,7 +213,7 @@ function renderMath(document: Document): void {
 let cards = new Map<string, Card>();
 try {
   const text = await readFile(CARD_CACHE, "utf8");
-  cards = new Map(Object.entries(parseTrustedJson<Record<string, Card>>(text)));
+  cards = new Map(Object.entries(parseJson(text, recordOf(isCard), "linkcard-cache.json")));
 } catch {
   /* no cache yet -- every card will degrade (and fail strict) */
 }

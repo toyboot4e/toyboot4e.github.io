@@ -27,6 +27,7 @@ import { Parser, Language, Query } from "web-tree-sitter";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { createRequire } from "node:module";
+import { arrayOf, isNumber, isString, objectOf } from "./guard.ts";
 
 const HERE = import.meta.dirname; // builder/src
 const WASM_DIR = join(HERE, "..", "grammars", "wasm");
@@ -115,6 +116,9 @@ function classOf(name: string): string {
 
 /** A coderef callout on `line` (0-based); `[start,end)` is the label's char span. */
 export type Coderef = { line: number; label: string; start: number; end: number };
+export const isCoderefs = arrayOf(
+  objectOf<Coderef>({ line: isNumber, label: isString, start: isNumber, end: isNumber }),
+);
 
 export type HlOpts = {
   lineNumbers?: boolean; // org -n/+n switch present

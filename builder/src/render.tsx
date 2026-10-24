@@ -11,6 +11,7 @@ import uniorg2rehype, { type Options as RehypeOptions } from "uniorg-rehype";
 import rehypeKatex from "rehype-katex";
 import stringify from "rehype-stringify";
 import { classes } from "./css-module.ts";
+import { arrayOf, isBoolean, isString, nullable, objectOf } from "./guard.ts";
 import { h, Fragment, raw, render, type Child, type Raw } from "./html.ts";
 // Scoped CSS-module class maps, resolved directly by Vite (`vite build` at bundle
 // time, vite-node under watch). Each default export is `{ authoredName: scopedName }`. The matching
@@ -879,6 +880,19 @@ export type Meta = {
   draft: boolean;
   description: string;
 };
+
+export const isMeta = objectOf<Meta>({
+  href: isString,
+  title: isString,
+  titleHtml: isString,
+  titleText: isString,
+  date: isString,
+  dateIso: isString,
+  tags: arrayOf(isString),
+  thumbnail: nullable(isString),
+  draft: isBoolean,
+  description: isString,
+});
 
 const FAVICON =
   "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔦</text></svg>";

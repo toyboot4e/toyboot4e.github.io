@@ -14,10 +14,11 @@ import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { spawn } from "node:child_process";
 import { cpus } from "node:os";
-import { buildIndexHtml, buildTagHtml, type Meta } from "./render.tsx";
+import { buildIndexHtml, buildTagHtml, isMeta, type Meta } from "./render.tsx";
 // Light helpers only -- the orchestrator must NOT import bake.ts (its tree-sitter
 // grammar-loading setup is heavy); the render shards own the bake.
-import { copyKatexAssets, mergeStats, parseTrustedJson, stamp, type BakeStats } from "./bake-util.ts";
+import { copyKatexAssets, isBakeStats, mergeStats, stamp, type BakeStats } from "./bake-util.ts";
+import { arrayOf, isBoolean, isString, objectOf, parseJson } from "./guard.ts";
 import { buildAssets } from "./assets.ts";
 
 // builder/src/build.ts -> repo root; HERE is builder/src
@@ -40,7 +41,12 @@ const WORKERS = Math.max(1, Number(process.env.BUILD_WORKERS) || Math.min(cpus()
 const BUILDER = join(ROOT, "builder");
 const SHARD = join(BUILDER, "dist", "render-shard.js");
 
-export type WorkerOut = { results: { rel: string; isDiary: boolean; meta: Meta }[]; stats: BakeStats };
+export type ShardResult = { rel: string; isDiary: boolean; meta: Meta };
+export type WorkerOut = { results: ShardResult[]; stats: BakeStats };
+const isWorkerOut = objectOf<WorkerOut>({
+  results: arrayOf(objectOf<ShardResult>({ rel: isString, isDiary: isBoolean, meta: isMeta })),
+  stats: isBakeStats,
+});
 
 // List .org sources relative to SRC, skipping generated tag pages and index.org.
 // `src/tags/` holds generated tag pages (we regenerate our own below), so skip
@@ -133,7 +139,7 @@ async function runShard(files: string[]): Promise<WorkerOut> {
     child.once("error", reject);
     child.once("exit", (code) => {
       if (code === 0) {
-        resolve(parseTrustedJson<WorkerOut>(buf));
+        resolve(parseJson(buf, isWorkerOut, "render shard output"));
       } else {
         reject(new Error(`render shard failed (exit ${String(code)})`));
       }

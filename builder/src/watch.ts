@@ -33,6 +33,7 @@ import { renderAndBake } from "./render-bake.ts";
 import type { Meta } from "./render.tsx";
 import { SRC, OUT, STATIC_RE, byHrefDesc, fullBuild, writeIndexAndTags } from "./build.ts";
 import { startDevServer, type DevServer } from "./dev-server.ts";
+import { errorText } from "./guard.ts";
 
 const HERE = import.meta.dirname; // builder/src
 
@@ -191,8 +192,6 @@ async function route(relPath: string): Promise<void> {
   // else .drawio, .ts diagrams, etc. -- not shipped
 }
 
-const errorText = (error: unknown): string => (error instanceof Error ? (error.stack ?? error.message) : String(error));
-
 // debounce per path: editors fire several events (write + rename + chmod) per
 // save; collapse them into one rebuild ~40ms after the last event.
 const pending = new Map<string, ReturnType<typeof setTimeout>>();
@@ -209,7 +208,7 @@ function schedule(relPath: string): void {
         try {
           await route(relPath);
         } catch (error) {
-          console.error(`  ! ${relPath}: ${errorText(error)}`);
+          console.error(`  ! ${relPath}: ${errorText(error, true)}`);
         }
       })();
     }, 40),

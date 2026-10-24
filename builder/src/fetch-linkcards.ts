@@ -14,7 +14,8 @@
 import { parseHTML } from "linkedom";
 import { readFile, writeFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
-import { parseTrustedJson, type Card } from "./bake-util.ts";
+import { isCard, type Card } from "./bake-util.ts";
+import { errorText, parseJson, recordOf } from "./guard.ts";
 
 // Repo-root-relative (builder/src/ -> ../..), so paths resolve regardless of cwd.
 const ROOT = join(import.meta.dirname, "..", "..");
@@ -99,8 +100,6 @@ async function collectUrls(): Promise<string[]> {
   }
   return [...urls];
 }
-
-const errorText = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
 // --- OGP scraping ----------------------------------------------------------
 function abs(base: string, ref: string | null | undefined): string | undefined {
@@ -242,7 +241,7 @@ async function fetchEntry(url: string): Promise<Card | null> {
 const cache = new Map<string, Card>();
 try {
   const text = await readFile(CACHE_FILE, "utf8");
-  for (const [url, card] of Object.entries(parseTrustedJson<Record<string, Card>>(text))) {
+  for (const [url, card] of Object.entries(parseJson(text, recordOf(isCard), "linkcard-cache.json"))) {
     cache.set(url, card);
   }
 } catch {

@@ -8,6 +8,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { renderAndBake } from "./render-bake.ts";
 import { getStats } from "./bake.ts";
+import type { ShardResult } from "./build.ts";
 
 const ROOT = join(import.meta.dirname, "..", "..");
 const SRC = join(ROOT, "src");
@@ -18,7 +19,7 @@ const OUT = process.env.OUT_DIR ?? join(ROOT, "out");
 // that "setup" cost vs the actual render time, to stderr (stdout carries JSON).
 const tSetup = performance.now();
 const files = process.argv.slice(2);
-const results: { rel: string; isDiary: boolean; meta: unknown }[] = [];
+const results: ShardResult[] = [];
 const madeDirs = new Set<string>();
 const tRender0 = performance.now();
 const texts = await Promise.all(files.map(async (relOrg) => readFile(join(SRC, relOrg), "utf8")));

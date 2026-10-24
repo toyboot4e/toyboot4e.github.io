@@ -5,14 +5,9 @@
 import { createRequire } from "node:module";
 import { readdir, mkdir, cp } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import { arrayOf, isNumber, isString, literal, objectOf, optional } from "./guard.ts";
 
 export const SENTINEL = "<!--pp-->";
-
-// JSON this build wrote itself (shard IPC, the committed card cache, our own data attributes).
-// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- T names the shape the caller trusts
-export const parseTrustedJson = <T>(text: string): T =>
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the producer is this build, not user input
-  JSON.parse(text) as T;
 
 // A `linkcard-cache.json` entry: an OGP `card` (default, `kind` absent for
 // back-compat) or a `github-code` embed (the literal source lines of a GitHub blob permalink).
@@ -35,6 +30,25 @@ export type Card = {
   code?: string;
 };
 
+const optString = optional(isString);
+const optNumber = optional(isNumber);
+export const isCard = objectOf<Card>({
+  kind: optional(literal("card", "github-code")),
+  title: optString,
+  description: optString,
+  image: optString,
+  siteName: optString,
+  favicon: optString,
+  owner: optString,
+  repo: optString,
+  refLabel: optString,
+  path: optString,
+  startLine: optNumber,
+  endLine: optNumber,
+  lang: optString,
+  code: optString,
+});
+
 export type BakeStats = {
   nPlain: number;
   nDom: number;
@@ -47,6 +61,19 @@ export type BakeStats = {
   unknownLangs: string[];
   missingCards: string[];
 };
+
+export const isBakeStats = objectOf<BakeStats>({
+  nPlain: isNumber,
+  nDom: isNumber,
+  nUnknown: isNumber,
+  nHlError: isNumber,
+  nMath: isNumber,
+  nMathError: isNumber,
+  nCards: isNumber,
+  nCardMiss: isNumber,
+  unknownLangs: arrayOf(isString),
+  missingCards: arrayOf(isString),
+});
 
 // Stamp the sentinel right after the doctype so a later run can skip via a
 // string scan.
