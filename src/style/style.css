@@ -1132,19 +1132,22 @@ html.disco-on {
    edge to edge like the cards. Disco on, every item grows outward by
    --panel-pad-x, like the article backdrop, and the non-card items become
    card-like panels with the cards' padding and border. */
-.home :where(.title-block h1, #content > h2, #content > .org-tag-list) {
+.home :where(.title-block h1, #content > h2, #content > nav > .org-tag-list) {
   padding-block: 0.3em;
   border-radius: 8px;
 }
-.home #content > .org-tag-list {
+.home #content > nav > .org-tag-list {
   display: flex; /* block-level pane (vs the default inline-flex) */
   padding-block: 0.5rem;
+}
+.home #content > nav {
+  margin-bottom: 0.75rem;
 }
 .disco-on.home .title-block h1,
 .disco-on.home #content > * {
   margin-inline: calc(-1 * var(--panel-pad-x));
 }
-.disco-on.home :where(.title-block h1, #content > h2, #content > .org-tag-list) {
+.disco-on.home :where(.title-block h1, #content > h2, #content > nav > .org-tag-list) {
   padding-inline: var(--panel-pad-x);
   border: var(--border-width) solid transparent;
   background-color: var(--disco-heading-bg);

@@ -1223,13 +1223,20 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
 // actually needs it -- the common all-prose case stays free of the CSS payload.
 const listingHasMath = (cards: Meta[]): boolean => cards.some((m) => m.titleHtml.includes('class="katex'));
 
-// index.html: Tags / Devlog (timeline) / Diary -- three sections, in that order.
+const tagNav = (allTags: string[]): Raw => (
+  <nav aria-label="タグ">
+    <ul class="org-tag-list">{tagListHtml(allTags)}</ul>
+  </nav>
+);
+
+// index.html: Devlog (timeline) with the tag nav under its heading, then Diary.
 export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: string[]): string {
-  const section = (id: string, cards: Meta[]): Raw => (
+  const section = (id: string, cards: Meta[], nav?: Raw): Raw => (
     <Fragment>
       <h2 id={id}>
         <a href={`#${id}`}>{id}</a>
       </h2>
+      {nav}
       <ul class={card.articleList}>{cards.map((m, i) => articleCard(m, i === 0))}</ul>
     </Fragment>
   );
@@ -1248,18 +1255,11 @@ export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: strin
       titleBlock: (
         <div class="title-block">
           <h1>Toybeam</h1>
-          <div class="title-meta">
-            <span class="title-date"></span>
-          </div>
         </div>
       ),
       content: (
         <Fragment>
-          <h2 id="Tags">
-            <a href="#Tags">Tags</a>
-          </h2>
-          <ul class="org-tag-list">{tagListHtml(allTags)}</ul>
-          {section("Devlog (timeline)", metas)}
+          {section("Devlog (timeline)", metas, tagNav(allTags))}
           {section("Diary", diaryMetas)}
         </Fragment>
       ),
@@ -1285,20 +1285,14 @@ export function buildTagHtml(tag: string, tagged: Meta[], allTags: string[]): st
           <h1>
             Toybeam (<code>#{tag}</code>)
           </h1>
-          <div class="title-meta">
-            <span class="title-date"></span>
-          </div>
         </div>
       ),
       content: (
         <Fragment>
-          <h2 id="Tags">
-            <a href="#Tags">Tags</a>
-          </h2>
-          <ul class="org-tag-list">{tagListHtml(allTags)}</ul>
           <h2 id="Devlog">
             Devlog (<code>#{tag}</code>)
           </h2>
+          {tagNav(allTags)}
           <ul class={card.articleList}>{tagged.map((m, i) => articleCard(m, i === 0))}</ul>
         </Fragment>
       ),
