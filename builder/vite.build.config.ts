@@ -7,11 +7,11 @@
 // changed. Shares the scoped-name + JSX config with the render/test paths.
 import { defineConfig } from "vite";
 import { builtinModules } from "node:module";
-import { generateScopedName, jsxEsbuild } from "./config-shared.ts";
+import { generateScopedName, jsxOxc } from "./config-shared.ts";
 
 export default defineConfig({
   css: { modules: { generateScopedName } },
-  esbuild: jsxEsbuild,
+  oxc: jsxOxc,
   build: {
     ssr: true,
     outDir: "dist",

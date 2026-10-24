@@ -9,12 +9,9 @@ export const generateScopedName = (name: string, filename: string) => {
   return `${base}_${name}`;
 };
 
-// Classic JSX via the `h` runtime (src/html.ts). jsxDev:false stops esbuild's dev
+// Classic JSX via the `h` runtime (src/html.ts). development:false stops the dev
 // transform from injecting `__source`/`__self` debug attributes into every
 // element (vite-node / vitest run in dev mode, where they're on by default).
-export const jsxEsbuild = {
-  jsx: "transform" as const,
-  jsxFactory: "h",
-  jsxFragment: "Fragment",
-  jsxDev: false,
+export const jsxOxc = {
+  jsx: { runtime: "classic" as const, pragma: "h", pragmaFrag: "Fragment", development: false },
 };
