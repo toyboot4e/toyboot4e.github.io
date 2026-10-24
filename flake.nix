@@ -3,10 +3,14 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    { nixpkgs, ... }:
+    { nixpkgs, git-hooks, ... }:
     let
       forAllSystems =
         f:
@@ -86,8 +90,45 @@
             ( cd builder && bun run linkcards "$@" )
           '';
         };
+
+      # pre-commit: oxfmt + oxlint over builder/, check only (never rewrites the
+      # staged files). Installed by entering the devShell; also a flake check.
+      # Runs the locked tools from builder/node_modules (the nix-vendored copy
+      # when absent), since type-aware oxlint needs the builder's deps anyway.
+      preCommitFor =
+        pkgs:
+        let
+          nodeModules = nodeModulesFor pkgs;
+          builderHook =
+            name: script:
+            pkgs.writeShellApplication {
+              name = "pre-commit-${name}";
+              runtimeInputs = [ pkgs.bun ];
+              text = ''
+                [ -e builder/node_modules ] || ln -sfn ${nodeModules}/node_modules builder/node_modules
+                cd builder && bun run ${script}
+              '';
+            };
+          hook = name: script: {
+            enable = true;
+            name = "${name} (check only)";
+            entry = "${builderHook name script}/bin/pre-commit-${name}";
+            files = "^builder/";
+            pass_filenames = false;
+          };
+        in
+        git-hooks.lib.${pkgs.stdenv.hostPlatform.system}.run {
+          src = ./.;
+          hooks = {
+            oxfmt = hook "oxfmt" "fmt:check";
+            oxlint = hook "oxlint" "lint";
+          };
+        };
     in
     {
+      checks = forAllSystems (pkgs: {
+        pre-commit = preCommitFor pkgs;
+      });
       apps = forAllSystems (pkgs: {
         build = {
           type = "app";
@@ -100,6 +141,7 @@
       });
       devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell {
+          inherit (preCommitFor pkgs) shellHook;
           packages =
             buildToolsFor pkgs
             ++ (with pkgs; [
