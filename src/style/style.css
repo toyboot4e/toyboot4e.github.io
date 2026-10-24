@@ -1124,31 +1124,31 @@ html.disco-on {
   background-color: var(--disco-tag-bg-hover);
 }
 
-/* Homepage: every item (cards, title, section h2s, the section tag list) grows
-   outward by --panel-pad-x, like the article backdrop, so its text column is as
-   wide as an article's. In disco the non-card items become card-like panels with
-   the cards' side padding; their height is the same either way, so disable()
-   dropping `disco-on` (no GPU) only shifts text sideways, never reflows. */
-.home .title-block h1,
-.home #content > * {
-  margin-inline: calc(-1 * var(--panel-pad-x));
-}
+/* Homepage: disco off, every item (cards, title, section h2s, the section tag
+   list) spans the article text column and the headings' text and underline run
+   edge to edge like the cards. Disco on, every item grows outward by
+   --panel-pad-x, like the article backdrop, and the non-card items become
+   card-like panels with the cards' padding and border. */
 .home :where(.title-block h1, #content > h2, #content > .org-tag-list) {
   padding-block: 0.3em;
-  border: var(--border-width) solid transparent;
   border-radius: 8px;
 }
 .home #content > .org-tag-list {
   display: flex; /* block-level pane (vs the default inline-flex) */
   padding-block: 0.5rem;
 }
-.disco-on.home :is(.title-block h1, #content > h2, #content > .org-tag-list) {
+.disco-on.home .title-block h1,
+.disco-on.home #content > * {
+  margin-inline: calc(-1 * var(--panel-pad-x));
+}
+.disco-on.home :where(.title-block h1, #content > h2, #content > .org-tag-list) {
   padding-inline: var(--panel-pad-x);
+  border: var(--border-width) solid transparent;
   background-color: var(--disco-heading-bg);
   box-shadow: var(--disco-shadow);
 }
 .disco-on.home .title-block h1 {
-  border-color: var(--border);
+  border-color: var(--border); /* beats the :where() above */
 }
 
 /* In disco mode, make the sticky header and the footer glassy so the effect shows
@@ -1184,11 +1184,11 @@ html.disco-on:not(.home) #content::before {
   border-radius: 10px;
   box-shadow: var(--disco-shadow);
 }
-/* Narrow: run the panels to the window edges, keeping --panel-pad-x of padding
-   instead of the whole 5vw gutter. */
+/* Narrow: swap the 5vw gutters for --panel-pad-x, disco or not, so the disco
+   panels run to the window edges and every page keeps the same text column. */
 @media (max-width: 55.5rem) {
-  html.disco-on .title-block,
-  html.disco-on #content {
+  .title-block,
+  #content {
     width: calc(100% - 2 * var(--panel-pad-x));
   }
 }
