@@ -22,10 +22,10 @@ export default defineConfig({
       entry: { main: "src/main.ts", "render-shard": "src/render-shard.ts" },
       formats: ["es"],
     },
-    rollupOptions: {
+    rolldownOptions: {
       // externalize every bare specifier (node builtins + npm deps); only our
       // own relative modules + the resolved .module.css maps get bundled.
-      external: [...builtinModules, ...builtinModules.map((m) => `node:${m}`), /^[a-z@]/],
+      external: [...builtinModules, ...builtinModules.map((m) => `node:${m}`), /^[a-z@]/u],
     },
   },
 });

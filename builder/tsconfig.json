@@ -6,11 +6,26 @@
     "moduleResolution": "bundler",
     "module": "esnext",
     "target": "esnext",
-    "strict": false,
+    "lib": ["esnext", "dom"],
     "types": ["node", "vite/client"],
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
-    "noEmit": true
+    "noEmit": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noUncheckedSideEffectImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src", "test", "*.ts"]
 }

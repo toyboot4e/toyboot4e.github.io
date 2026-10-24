@@ -1,0 +1,89 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "node", "promise", "vitest"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "pedantic": "error",
+    "perf": "error",
+    "style": "error",
+    "restriction": "error"
+  },
+  "options": { "typeAware": true, "reportUnusedDisableDirectives": "error" },
+  "overrides": [
+    // ambient declaration files are scripts by design
+    { "files": ["**/*.d.ts"], "rules": { "import/unambiguous": "off" } }
+  ],
+  "ignorePatterns": ["dist", "test/golden", "test/fixtures", "grammars"],
+  "rules": {
+    // Off: rules that ban core language features, contradict another enabled rule, or set arbitrary size caps.
+
+    "eslint/no-ternary": "off",
+    "eslint/no-plusplus": "off",
+    "eslint/no-continue": "off",
+    "eslint/no-undefined": "off",
+    "unicorn/no-null": "off",
+    "oxc/no-async-await": "off",
+    "oxc/no-optional-chaining": "off",
+    "oxc/no-rest-spread-properties": "off",
+    "node/no-top-level-await": "off",
+
+    "import/no-named-export": "off",
+    "import/no-default-export": "off",
+    "import/prefer-default-export": "off",
+    "import/group-exports": "off",
+    "import/exports-last": "off",
+    "import/no-nodejs-modules": "off",
+    "import/no-relative-parent-imports": "off",
+    "import/max-dependencies": "off",
+    "unicorn/import-style": "off",
+
+    "eslint/no-console": "off",
+    "node/no-process-env": "off",
+    "node/no-sync": "off",
+    "unicorn/no-process-exit": "off",
+
+    "eslint/max-statements": "off",
+    "eslint/max-lines": "off",
+    "eslint/max-lines-per-function": "off",
+    "eslint/max-params": "off",
+    "eslint/max-depth": "off",
+    "eslint/complexity": "off",
+    "unicorn/max-nested-calls": "off",
+    "vitest/max-expects": "off",
+
+    "eslint/one-var": "off",
+    "eslint/sort-vars": "off",
+    "eslint/sort-keys": "off",
+    "eslint/sort-imports": "off",
+    "eslint/id-length": "off",
+    "eslint/func-style": "off",
+    "eslint/init-declarations": "off",
+    "eslint/capitalized-comments": "off",
+    "eslint/no-inline-comments": "off",
+    "eslint/no-magic-numbers": "off",
+    "eslint/prefer-named-capture-group": "off",
+    "typescript/prefer-readonly-parameter-types": "off",
+    "promise/avoid-new": "off",
+    // oxfmt lowercases hex digits; the formatter owns literal case
+    "unicorn/number-literal-case": "off",
+    // either style contradicts no-import-type-side-effects or no-duplicate-imports; both of those stay on
+    "import/consistent-type-specifier-style": "off",
+    // contradicts typescript/promise-function-async (a promise-returning function must be async)
+    "eslint/require-await": "off",
+
+    "vitest/require-hook": "off",
+    "vitest/require-top-level-describe": "off",
+    "vitest/prefer-expect-assertions": "off",
+    "vitest/require-test-timeout": "off",
+    "vitest/no-importing-vitest-globals": "off",
+
+    "vitest/expect-expect": ["error", { "assertFunctionNames": ["expect", "golden"] }],
+    "eslint/no-void": ["error", { "allowAsStatement": true }],
+    "eslint/eqeqeq": ["error", "always", { "null": "ignore" }],
+    "eslint/no-eq-null": "off",
+    "eslint/no-underscore-dangle": ["error", { "allow": ["__html", "__source", "__self"] }],
+    "typescript/consistent-type-definitions": ["error", "type"],
+    "typescript/no-namespace": ["error", { "allowDeclarations": true }]
+  }
+}

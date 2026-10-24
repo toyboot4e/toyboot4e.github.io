@@ -25,11 +25,10 @@
 
 import { Parser, Language, Query } from "web-tree-sitter";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { createRequire } from "node:module";
 
-const HERE = dirname(fileURLToPath(import.meta.url)); // builder/src
+const HERE = import.meta.dirname; // builder/src
 const WASM_DIR = join(HERE, "..", "grammars", "wasm");
 const QUERY_DIR = join(HERE, "..", "grammars", "queries");
 
@@ -107,7 +106,9 @@ const CLASS_TABLE: [string, string][] = [
 // Returns the colour bucket for a capture name, or "" for default foreground.
 function classOf(name: string): string {
   for (const [key, bucket] of CLASS_TABLE) {
-    if (name === key || name.startsWith(key + ".")) return bucket;
+    if (name === key || name.startsWith(`${key}.`)) {
+      return bucket;
+    }
   }
   return "";
 }
@@ -130,9 +131,39 @@ type Grammar = { language: Language; query: Query; inj?: Query };
 let parser: Parser | undefined;
 const grammars = new Map<string, Grammar>();
 
+// Helix `; inherits: a,b` directive: a query file pulls in shared base queries
+// (e.g. javascript -> ecma,_javascript; cpp -> c). The base "languages" (ecma,
+// _javascript, _typescript, _jsx) have query files but no grammar of their own.
+// We replicate Helix's read_query: replace the directive line IN PLACE with the
+// inherited files' contents (same kind: highlights/locals/injections), recursively,
+// so the language's own (more specific) patterns still come last (last-wins).
+const INHERITS_RE = /^[ \t]*;+[ \t]*inherits[ \t]*:?[ \t]*([a-z_,()-]+)[ \t]*$/gmu;
+
+// Read query file `${id}${suffix}.scm` (suffix: "" highlights, ".locals",
+// ".injections"), resolving `; inherits:` against the same suffix. Missing file
+// or already-visited id -> "" (so a base that lacks e.g. injections is skipped).
+function readQuery(id: string, suffix: string, seen = new Set<string>()): string {
+  if (seen.has(id)) {
+    return "";
+  }
+  seen.add(id);
+  const path = join(QUERY_DIR, `${id}${suffix}.scm`);
+  if (!existsSync(path)) {
+    return "";
+  }
+  return readFileSync(path, "utf8").replaceAll(INHERITS_RE, (_m, langs: string) =>
+    langs
+      .split(",")
+      .map((l) => `\n${readQuery(l.trim().replaceAll(/[()]/gu, ""), suffix, seen)}\n`)
+      .join(""),
+  );
+}
+
 /** Build the parser + load every vendored grammar. Awaited once at bake startup. */
 export async function initHighlighter(): Promise<void> {
-  if (parser) return;
+  if (parser) {
+    return;
+  }
   const require = createRequire(import.meta.url);
   const runtimeWasm = require.resolve("web-tree-sitter/web-tree-sitter.wasm");
   await Parser.init({ locateFile: () => runtimeWasm });
@@ -141,45 +172,29 @@ export async function initHighlighter(): Promise<void> {
   const ids = readdirSync(WASM_DIR)
     .filter((f) => f.endsWith(".wasm"))
     .map((f) => f.slice(0, -".wasm".length));
-  for (const id of ids) {
-    const language = await Language.load(readFileSync(join(WASM_DIR, `${id}.wasm`)));
+  const languages = await Promise.all(ids.map(async (id) => Language.load(readFileSync(join(WASM_DIR, `${id}.wasm`)))));
+  for (const [i, id] of ids.entries()) {
+    const language = languages[i];
+    if (language === undefined) {
+      continue;
+    }
     // highlights + locals combined (locals capture names recognised by name);
     // both resolve `; inherits:` against shared base queries (ecma, c, …).
-    let src = readQuery(id, "") + "\n" + readQuery(id, ".locals");
+    let src = `${readQuery(id, "")}\n${readQuery(id, ".locals")}`;
     // Local patches, appended LAST so they win (last-pattern-wins). These are our
     // own additions/overrides on top of Helix's queries and are NOT touched by
     // vendor.sh, so they survive re-vendoring.
     const localPath = join(QUERY_DIR, `${id}.local.scm`);
-    if (existsSync(localPath)) src += "\n" + readFileSync(localPath, "utf8");
+    if (existsSync(localPath)) {
+      src += `\n${readFileSync(localPath, "utf8")}`;
+    }
     const g: Grammar = { language, query: new Query(language, src) };
     const inj = readQuery(id, ".injections");
-    if (inj.trim()) g.inj = new Query(language, inj);
+    if (inj.trim() !== "") {
+      g.inj = new Query(language, inj);
+    }
     grammars.set(id, g);
   }
-}
-
-// Helix `; inherits: a,b` directive: a query file pulls in shared base queries
-// (e.g. javascript -> ecma,_javascript; cpp -> c). The base "languages" (ecma,
-// _javascript, _typescript, _jsx) have query files but no grammar of their own.
-// We replicate Helix's read_query: replace the directive line IN PLACE with the
-// inherited files' contents (same kind: highlights/locals/injections), recursively,
-// so the language's own (more specific) patterns still come last (last-wins).
-const INHERITS_RE = /^[ \t]*;+[ \t]*inherits[ \t]*:?[ \t]*([a-z_,()-]+)[ \t]*$/gm;
-
-// Read query file `${id}${suffix}.scm` (suffix: "" highlights, ".locals",
-// ".injections"), resolving `; inherits:` against the same suffix. Missing file
-// or already-visited id -> "" (so a base that lacks e.g. injections is skipped).
-function readQuery(id: string, suffix: string, seen: Set<string> = new Set()): string {
-  if (seen.has(id)) return "";
-  seen.add(id);
-  const path = join(QUERY_DIR, `${id}${suffix}.scm`);
-  if (!existsSync(path)) return "";
-  return readFileSync(path, "utf8").replace(INHERITS_RE, (_m, langs: string) =>
-    langs
-      .split(",")
-      .map((l) => `\n${readQuery(l.trim().replace(/[()]/g, ""), suffix, seen)}\n`)
-      .join(""),
-  );
 }
 
 /** Canonical grammar id for an org language token, or null if we have no grammar. */
@@ -188,18 +203,28 @@ function canonical(lang: string): string | null {
   return grammars.has(id) ? id : null;
 }
 
-const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const esc = (s: string): string => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 
 type Def = { name: string; hl: string };
 type Scope = { end: number; defs: Def[] };
+
+const blank = (n: number): (string | null)[] => Array.from({ length: n }, () => null);
 
 // Parse `src` with grammar `id` and paint colour buckets into `cls` at `offset`,
 // implementing the official tree-sitter-highlight algorithm (see file header).
 function paintInto(cls: (string | null)[], src: string, id: string, offset: number, depth: number): void {
   const g = grammars.get(id);
-  if (!g) return;
-  parser!.setLanguage(g.language);
-  const tree = parser!.parse(src)!;
+  if (!g) {
+    return;
+  }
+  if (!parser) {
+    throw new Error("highlight: initHighlighter() was not awaited");
+  }
+  parser.setLanguage(g.language);
+  const tree = parser.parse(src);
+  if (!tree) {
+    throw new Error(`highlight: ${id} parse failed`);
+  }
 
   const caps = g.query.captures(tree.rootNode);
   // Group same-node captures together (start asc, then outer-first), with the
@@ -213,33 +238,33 @@ function paintInto(cls: (string | null)[], src: string, id: string, offset: numb
   const resolved: { s: number; e: number; hl: string }[] = [];
 
   let i = 0;
-  while (i < caps.length) {
-    const s = caps[i].node.startIndex;
-    const e = caps[i].node.endIndex;
-    while (scopes.length > 1 && s >= scopes[scopes.length - 1].end) scopes.pop();
+  for (let [first] = caps; first !== undefined; first = caps[i]) {
+    const s = first.node.startIndex;
+    const e = first.node.endIndex;
+    while (scopes.length > 1 && s >= (scopes.at(-1)?.end ?? Infinity)) {
+      scopes.pop();
+    }
 
     let def: Def | null = null;
     let refHl: string | undefined; // a local.reference reuses its definition's bucket
     let sel: string | undefined; // selected highlight bucket; last pattern wins
 
     // Consume every capture on this exact node.
-    while (i < caps.length && caps[i].node.startIndex === s && caps[i].node.endIndex === e) {
-      const name = caps[i].name;
+    for (let cap = caps[i]; cap?.node.startIndex === s && cap.node.endIndex === e; cap = caps[i]) {
+      const { name } = cap;
       if (name === "local.scope") {
         scopes.push({ end: e, defs: [] });
       } else if (name === "local.definition-value") {
         /* value-range hint only; ignored */
       } else if (name.startsWith("local.definition")) {
         def = { name: src.slice(s, e), hl: "" };
-        scopes[scopes.length - 1].defs.push(def);
+        scopes.at(-1)?.defs.push(def);
       } else if (name === "local.reference") {
         const nm = src.slice(s, e);
-        for (let k = scopes.length - 1; k >= 0 && refHl === undefined; k--) {
-          for (let j = scopes[k].defs.length - 1; j >= 0; j--) {
-            if (scopes[k].defs[j].name === nm) {
-              refHl = scopes[k].defs[j].hl;
-              break;
-            }
+        for (const scope of scopes.toReversed()) {
+          refHl = scope.defs.findLast((d) => d.name === nm)?.hl;
+          if (refHl !== undefined) {
+            break;
           }
         }
       } else {
@@ -249,9 +274,13 @@ function paintInto(cls: (string | null)[], src: string, id: string, offset: numb
     }
 
     const bucket = sel ?? ""; // "" => default foreground
-    if (def) def.hl = bucket;
-    const emit = refHl !== undefined ? refHl : bucket;
-    if (emit) resolved.push({ s, e, hl: emit });
+    if (def) {
+      def.hl = bucket;
+    }
+    const emit = refHl ?? bucket;
+    if (emit !== "") {
+      resolved.push({ s, e, hl: emit });
+    }
   }
 
   // Collect injection regions (as plain values) before freeing the tree.
@@ -261,17 +290,24 @@ function paintInto(cls: (string | null)[], src: string, id: string, offset: numb
       let lang = m.setProperties?.["injection.language"];
       let content: { startIndex: number; endIndex: number } | null = null;
       for (const cap of m.captures) {
-        if (cap.name === "injection.content") content = cap.node;
-        else if (cap.name === "injection.language") lang = src.slice(cap.node.startIndex, cap.node.endIndex);
+        if (cap.name === "injection.content") {
+          content = cap.node;
+        } else if (cap.name === "injection.language") {
+          lang = src.slice(cap.node.startIndex, cap.node.endIndex);
+        }
       }
-      if (content && lang) regions.push({ start: content.startIndex, end: content.endIndex, lang });
+      if (content !== null && lang !== undefined && lang !== null && lang !== "") {
+        regions.push({ start: content.startIndex, end: content.endIndex, lang });
+      }
     }
   }
   tree.delete();
 
   // Paint larger ranges first so inner (more specific) nodes override them.
   resolved.sort((a, b) => b.e - b.s - (a.e - a.s));
-  for (const r of resolved) for (let k = r.s; k < r.e; k++) cls[offset + k] = r.hl;
+  for (const r of resolved) {
+    cls.fill(r.hl, offset + r.s, offset + r.e);
+  }
 
   // Injected sub-regions overwrite the parent's colours for their range: clear
   // the region first so the inner grammar fully owns it (e.g. an org `#+BEGIN_SRC`
@@ -279,14 +315,16 @@ function paintInto(cls: (string | null)[], src: string, id: string, offset: numb
   // onto tokens the inner language leaves plain), then paint the inner grammar.
   for (const reg of regions) {
     const cid = canonical(reg.lang);
-    if (!cid) continue;
-    for (let k = offset + reg.start; k < offset + reg.end; k++) cls[k] = null;
+    if (cid === null) {
+      continue;
+    }
+    cls.fill(null, offset + reg.start, offset + reg.end);
     paintInto(cls, src.slice(reg.start, reg.end), cid, offset + reg.start, depth + 1);
   }
 }
 
 function paint(src: string, id: string): (string | null)[] {
-  const cls: (string | null)[] = new Array(src.length).fill(null);
+  const cls = blank(src.length);
   paintInto(cls, src, id, 0, 0);
   return cls;
 }
@@ -302,20 +340,27 @@ function renderLine(
   le: number,
   anchor: { s: number; e: number } | null,
 ): string {
+  const isAnchorEdge = (j: number): boolean => anchor !== null && (j === anchor.s || j === anchor.e);
   let html = "";
   let i = ls;
   while (i < le) {
-    const k = cls[i];
+    const k = cls[i] ?? null;
     let j = i + 1;
-    while (j < le && cls[j] === k && !(anchor && (j === anchor.s || j === anchor.e))) j++;
-    const inAnchor = !!anchor && i >= anchor.s && i < anchor.e;
+    while (j < le && cls[j] === k && !isAnchorEdge(j)) {
+      j++;
+    }
+    const inAnchor = anchor !== null && i >= anchor.s && i < anchor.e;
     const raw = src.slice(i, j);
     const text = esc(raw);
     const classes: string[] = [];
     // Colouring whitespace has no visual effect; skip the class to cut span noise.
-    if (k && /\S/.test(raw)) classes.push("hl-" + k);
-    if (inAnchor) classes.push("coderef-anchor");
-    html += classes.length ? `<span class="${classes.join(" ")}">${text}</span>` : text;
+    if (k !== null && k !== "" && /\S/u.test(raw)) {
+      classes.push(`hl-${k}`);
+    }
+    if (inAnchor) {
+      classes.push("coderef-anchor");
+    }
+    html += classes.length > 0 ? `<span class="${classes.join(" ")}">${text}</span>` : text;
     i = j;
   }
   return html;
@@ -328,13 +373,15 @@ type LineStatus = "add" | "remove" | "context";
 function assemble(src: string, cls: (string | null)[], opts: HlOpts, status: LineStatus[] | null): string {
   const lineTexts = src.split("\n");
   const coderefByLine = new Map<number, Coderef>();
-  for (const c of opts.coderefs ?? []) coderefByLine.set(c.line, c);
+  for (const c of opts.coderefs ?? []) {
+    coderefByLine.set(c.line, c);
+  }
 
   const rows: string[] = [];
   let pos = 0;
-  for (let ln = 0; ln < lineTexts.length; ln++) {
+  for (const [ln, lineText] of lineTexts.entries()) {
     const ls = pos;
-    const le = pos + lineTexts[ln].length;
+    const le = pos + lineText.length;
     pos = le + 1; // skip the '\n'
 
     const cr = coderefByLine.get(ln);
@@ -342,9 +389,12 @@ function assemble(src: string, cls: (string | null)[], opts: HlOpts, status: Lin
     const inner = renderLine(src, cls, ls, le, anchor);
 
     const lineClasses = ["line"];
-    if (status && status[ln] !== "context") lineClasses.push("diff", status[ln]);
+    const st = status?.[ln];
+    if (st !== undefined && st !== "context") {
+      lineClasses.push("diff", st);
+    }
 
-    if (cr && opts.coderefBlock != null) {
+    if (cr && opts.coderefBlock !== undefined) {
       const id = `coderef-${opts.coderefBlock}-${cr.label}`;
       lineClasses.push("coderef-off");
       rows.push(`<a class="${lineClasses.join(" ")}" id="${id}" href="#${id}">${inner}</a>`);
@@ -354,28 +404,39 @@ function assemble(src: string, cls: (string | null)[], opts: HlOpts, status: Lin
   }
 
   const preClasses = ["hl"];
-  if (status) preClasses.push("diff");
-  if (opts.lineNumbers) preClasses.push("line-numbers");
-  const codeStyle = opts.lineNumbers ? ` style="counter-reset: ln ${(opts.lineStart ?? 1) - 1}"` : "";
+  if (status !== null) {
+    preClasses.push("diff");
+  }
+  if (opts.lineNumbers === true) {
+    preClasses.push("line-numbers");
+  }
+  const codeStyle = opts.lineNumbers === true ? ` style="counter-reset: ln ${(opts.lineStart ?? 1) - 1}"` : "";
   return `<pre class="${preClasses.join(" ")}"><code${codeStyle}>${rows.join("\n")}</code></pre>`;
 }
 
 // diff-<lang>: the org corpus marks changes with a leading `+`/`-` at column 0
 // and leaves context lines unprefixed. Strip that column, highlight the aligned
 // body as <lang>, then tag changed lines so CSS draws the +/- gutter + bg.
+const lineStatus = (l: string): LineStatus => {
+  if (l.startsWith("+")) {
+    return "add";
+  }
+  return l.startsWith("-") ? "remove" : "context";
+};
+
 function highlightDiff(code: string, inner: string, opts: HlOpts): string {
   const lines = code.split("\n");
-  const status: LineStatus[] = lines.map((l) => (l[0] === "+" ? "add" : l[0] === "-" ? "remove" : "context"));
+  const status = lines.map((l) => lineStatus(l));
   const bodies = lines.map((l, i) => (status[i] === "context" ? l : l.slice(1)));
   const body = bodies.join("\n");
   const id = canonical(inner); // e.g. diff-org -> null -> plain body, still diffed
-  const cls = id ? paint(body, id) : new Array(body.length).fill(null);
+  const cls = id === null ? blank(body.length) : paint(body, id);
   // Coderef char offsets were measured on the un-stripped line; on a +/- line the
   // body lost its 1-char prefix, so shift those decorations left by one.
   const shifted: HlOpts = {
     ...opts,
     coderefs: (opts.coderefs ?? []).map((c) =>
-      status[c.line] === "context" ? c : { ...c, start: c.start - 1, end: c.end - 1 },
+      status[c.line] === "context" ? c : { line: c.line, label: c.label, start: c.start - 1, end: c.end - 1 },
     ),
   };
   return assemble(body, cls, shifted, status);
@@ -386,12 +447,17 @@ function highlightDiff(code: string, inner: string, opts: HlOpts): string {
  * HTML, or null if we have no grammar for `lang` (caller renders it verbatim).
  */
 export function highlight(code: string, lang: string, opts: HlOpts = {}): string | null {
-  const src = code.replace(/\n$/, ""); // trailing newline -> no phantom last line
+  const src = code.replace(/\n$/u, ""); // trailing newline -> no phantom last line
   // `diff` (plain) diffs a text body; `diff-<lang>` diffs <lang> source.
-  if (lang === "diff" || lang.startsWith("diff-"))
+  if (lang === "diff" || lang.startsWith("diff-")) {
     return highlightDiff(src, lang === "diff" ? "text" : lang.slice(5), opts);
-  if (PLAIN_TOKENS.has(lang)) return assemble(src, new Array(src.length).fill(null), opts, null);
+  }
+  if (PLAIN_TOKENS.has(lang)) {
+    return assemble(src, blank(src.length), opts, null);
+  }
   const id = canonical(lang);
-  if (!id) return null;
+  if (id === null) {
+    return null;
+  }
   return assemble(src, paint(src, id), opts, null);
 }

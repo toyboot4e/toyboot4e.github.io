@@ -15,5 +15,7 @@ export async function renderAndBake(rel: string, text: string): Promise<Baked> {
   const r = await renderArticle(rel, text);
   const { document } = parseHTML(r.html);
   bakeDocument(document);
-  return { rel: r.rel, isDiary: r.isDiary, draft: r.draft, meta: r.meta, out: stamp(document.toString()) };
+  // oxlint-disable-next-line typescript/no-base-to-string -- linkedom's toString() serialises the document (untyped)
+  const html = document.toString();
+  return { rel: r.rel, isDiary: r.isDiary, draft: r.draft, meta: r.meta, out: stamp(html) };
 }

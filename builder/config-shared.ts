@@ -4,11 +4,8 @@
 // Deterministic, hash-free scoped names so the render (vite-node) and the CSS
 // build (assets.ts) produce identical class names: `article-card.module.css`
 // class `articleCard` -> `article-card_articleCard`.
-export const generateScopedName = (name: string, filename: string) => {
-  const base = filename
-    .split("/")
-    .pop()!
-    .replace(/\.module\.css$/, "");
+export const generateScopedName = (name: string, filename: string): string => {
+  const base = (filename.split("/").at(-1) ?? filename).replace(/\.module\.css$/u, "");
   return `${base}_${name}`;
 };
 

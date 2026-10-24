@@ -3,13 +3,16 @@
 // highlighted). Rendered at build time and consumed by render.tsx for both
 // `#+BEGIN_STENO` (layout `uni-v4`, the steno chord chart formerly inlined
 // there) and the general `#+BEGIN_KEYBOARD <layout>` block. Styling lives in
-// styles/keyboard.module.css (scoped class names via the `kb` map).
+// styles/keyboard.module.css (scoped class names via `kb`).
 //
 // Two layout kinds: a uniform chars grid (`chars`, one cell per grid track:
 // uni-v4, qwerty-24) and explicitly placed keys (`keys`, half-unit x offsets
 // and per-key vertical drop on an 18px track grid: tiny-18).
-import { h, render, type Raw } from "./html.ts";
-import kb from "./styles/keyboard.module.css";
+import { classes } from "./css-module.ts";
+import { h, render, type Child, type Raw } from "./html.ts";
+import kbModule from "./styles/keyboard.module.css";
+
+const kb = classes(kbModule, "keyboard.module.css");
 
 // --- uni-v4: The Uni v4 steno keyboard (3x12) -------------------------------
 // A stroke like `KAT` or `-S` highlights the keys it presses, resolved in steno
@@ -22,7 +25,7 @@ const UNI_CHARS = [
 ];
 // Steno key order (#STKPWHRAO*EUFRPBLGTSDZ) mapped to [row, col] in UNI_CHARS.
 // oxfmt-ignore
-const UNI_ORDER: Array<[number, number]> = [
+const UNI_ORDER: [number, number][] = [
   [0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2], [0, 3], [1, 3],
   [2, 2], [2, 3], [2, 4], [0, 4], [2, 6], [2, 7], [2, 8], [0, 7],
   [1, 7], [0, 8], [1, 8], [0, 9], [1, 9], [0, 10], [1, 10], [0, 11], [1, 11],
@@ -30,30 +33,37 @@ const UNI_ORDER: Array<[number, number]> = [
 
 // Which keys a single (already upper-cased) stroke presses -> 3x12 boolean grid.
 function uniPressed(stroke: string): boolean[][] {
-  const ret = [Array(12).fill(false), Array(12).fill(false), Array(12).fill(false)];
-  if (stroke) {
-    const iRhs = 12; // first right-hand entry in UNI_ORDER; `-` jumps here
-    let iOrder = 0;
-    for (const c of stroke) {
-      if (iOrder >= UNI_ORDER.length) break;
-      if (c === "-") {
-        if (iOrder < iRhs) iOrder = iRhs;
-        continue;
+  const ret = UNI_CHARS.map((row) => row.map(() => false));
+  const get = (row: number, col: number): boolean => ret[row]?.[col] ?? false;
+  const set = (on: boolean, ...cells: [number, number][]): void => {
+    for (const [row, col] of cells) {
+      const r = ret[row];
+      if (r !== undefined) {
+        r[col] = on;
       }
-      while (iOrder < UNI_ORDER.length) {
-        const [row, col] = UNI_ORDER[iOrder++];
-        if (c === UNI_CHARS[row][col]) {
-          ret[row][col] = true;
-          break;
-        }
+    }
+  };
+  const iRhs = 12; // first right-hand entry in UNI_ORDER; `-` jumps here
+  let iOrder = 0;
+  for (const c of stroke) {
+    if (iOrder >= UNI_ORDER.length) {
+      break;
+    }
+    if (c === "-") {
+      iOrder = Math.max(iOrder, iRhs);
+      continue;
+    }
+    for (const [row, col] of UNI_ORDER.slice(iOrder)) {
+      iOrder++;
+      if (c === UNI_CHARS[row]?.[col]) {
+        set(true, [row, col]);
+        break;
       }
     }
   }
   // `*` (two cells) and `#` (three cells) light together if any of them is hit.
-  const star = ret[0][4] || ret[0][6];
-  ret[0][4] = ret[0][6] = star;
-  const hash = ret[0][0] || ret[2][2] || ret[2][8];
-  ret[0][0] = ret[2][2] = ret[2][8] = hash;
+  set(get(0, 4) || get(0, 6), [0, 4], [0, 6]);
+  set(get(0, 0) || get(2, 2) || get(2, 8), [0, 0], [2, 2], [2, 8]);
   return ret;
 }
 
@@ -65,16 +75,17 @@ function lineSpecs(body: string): string[] {
     .split("\n")
     .map((l) => l.trim())
     .filter(Boolean);
-  return lines.length ? lines : [""];
+  return lines.length > 0 ? lines : [""];
 }
 
 // Case-sensitive key spec -> the set of pressed key chars (whitespace ignored;
 // an unknown key is an authoring error and fails the build).
 function charSpecPressed(layoutName: string, known: Set<string>, spec: string): Set<string> {
   const on = new Set<string>();
-  for (const c of spec.replace(/\s/g, "")) {
-    if (!known.has(c))
+  for (const c of spec.replaceAll(/\s/gu, "")) {
+    if (!known.has(c)) {
       throw new Error(`keyboard ${layoutName}: unknown key ${JSON.stringify(c)} in ${JSON.stringify(spec)}`);
+    }
     on.add(c);
   }
   return on;
@@ -88,7 +99,7 @@ function placedCharSpecPressed(layoutName: string, keys: PlacedKey[]): (spec: st
   };
 }
 
-const KeyIcon = ({ children }: { children?: any }): Raw => (
+const KeyIcon = ({ children }: { readonly children?: Child }): Raw => (
   <svg
     viewBox="0 0 24 24"
     width="1em"
@@ -224,7 +235,7 @@ const LEVER_KEYS: PlacedKey[] = [
 // Steno key order (#STKPWHRAO*EUFRPBLGTSDZ) -> the key ids each stroke char
 // lights (multi-cell # / * / S light together, like uni-v4's merged cells).
 // oxfmt-ignore
-const LEVER_ORDER: Array<[string, string[]]> = [
+const LEVER_ORDER: [string, string[]][] = [
   ["#", ["#"]], ["S", ["S1", "S2"]], ["T", ["T-"]], ["K", ["K-"]], ["P", ["P-"]],
   ["W", ["W-"]], ["H", ["H-"]], ["R", ["R-"]], ["A", ["A"]], ["O", ["O"]],
   ["*", ["*L", "*R"]], ["E", ["E"]], ["U", ["U"]], ["F", ["-F"]], ["R", ["-R"]],
@@ -236,18 +247,25 @@ const LEVER_INDEX = new Map(LEVER_KEYS.map((k, i) => [k.id, i]));
 
 // Which keys a single (already upper-cased) stroke presses, in LEVER_KEYS order.
 function leverPressed(stroke: string): boolean[] {
-  const ret = Array(LEVER_KEYS.length).fill(false);
+  const ret = LEVER_KEYS.map(() => false);
   let iOrder = 0;
   for (const ch of stroke) {
-    if (iOrder >= LEVER_ORDER.length) break;
+    if (iOrder >= LEVER_ORDER.length) {
+      break;
+    }
     if (ch === "-") {
-      if (iOrder < LEVER_RHS) iOrder = LEVER_RHS;
+      iOrder = Math.max(iOrder, LEVER_RHS);
       continue;
     }
-    while (iOrder < LEVER_ORDER.length) {
-      const [c, ids] = LEVER_ORDER[iOrder++];
+    for (const [c, ids] of LEVER_ORDER.slice(iOrder)) {
+      iOrder++;
       if (c === ch) {
-        for (const id of ids) ret[LEVER_INDEX.get(id)!] = true;
+        for (const id of ids) {
+          const i = LEVER_INDEX.get(id);
+          if (i !== undefined) {
+            ret[i] = true;
+          }
+        }
         break;
       }
     }
@@ -338,70 +356,70 @@ type KeyMeta = { label: Raw | string; name: string };
 type LayoutBase = {
   gridClass: string; // scoped grid-template class for this layout
   // block body -> one pressed-key spec per chart
-  specs(body: string): string[];
+  specs: (body: string) => string[];
   // per-key overrides: extra class / rendered label + accessible name
-  keyClass?(c: string): string | undefined;
-  keyLabel?(c: string): KeyMeta | undefined;
+  keyClass?: (c: string) => string | undefined;
+  keyLabel?: (c: string) => KeyMeta | undefined;
 };
 // uniform grid: one chars cell per grid track ("" = empty cell)
-type GridLayout = LayoutBase & { chars: string[][]; pressed(spec: string): boolean[][] };
+type GridLayout = LayoutBase & { chars: string[][]; pressed: (spec: string) => boolean[][] };
 // explicit placement on half-unit tracks; pressed is parallel to `keys`
-type PlacedLayout = LayoutBase & { keys: PlacedKey[]; pressed(spec: string): boolean[] };
+type PlacedLayout = LayoutBase & { keys: PlacedKey[]; pressed: (spec: string) => boolean[] };
 type Layout = GridLayout | PlacedLayout;
 
 const LAYOUTS: Record<string, Layout> = {
   "uni-v4": {
     chars: UNI_CHARS,
-    gridClass: kb.strokeUni,
+    gridClass: kb("strokeUni"),
     // `/`-separated strokes (e.g. `KAT/-S`), one chart per stroke.
     specs: (body) => body.trim().toUpperCase().split("/"),
     pressed: uniPressed,
-    keyClass: (c) => (c === "*" ? kb.keyFat : undefined),
+    keyClass: (c) => (c === "*" ? kb("keyFat") : undefined),
   },
   "qwerty-24": {
     chars: QWERTY24_CHARS,
-    gridClass: kb.strokeQwerty24,
+    gridClass: kb("strokeQwerty24"),
     specs: lineSpecs,
     pressed: gridCharSpecPressed("qwerty-24", QWERTY24_CHARS),
     keyLabel: (c) => QWERTY24_THUMBS[c],
   },
   "tiny-18": {
     keys: TINY18_KEYS,
-    gridClass: kb.strokeTiny18,
+    gridClass: kb("strokeTiny18"),
     specs: lineSpecs,
     pressed: placedCharSpecPressed("tiny-18", TINY18_KEYS),
     keyLabel: (c) => (c === "E" ? ENTER_KEY : undefined),
   },
   piano: {
     keys: PIANO_KEYS,
-    gridClass: kb.strokeTiny18, // same geometry/grid as tiny-18
+    gridClass: kb("strokeTiny18"), // same geometry/grid as tiny-18
     specs: lineSpecs,
     pressed: placedCharSpecPressed("piano", PIANO_KEYS),
     keyLabel: (c) => PIANO_THUMBS[c],
   },
   taipo: {
     keys: TAIPO_KEYS,
-    gridClass: kb.strokeTaipo,
+    gridClass: kb("strokeTaipo"),
     specs: lineSpecs,
     pressed: placedCharSpecPressed("taipo", TAIPO_KEYS),
     keyLabel: (c) => TAIPO_THUMBS[c],
   },
   asetniop: {
     keys: ASETNIOP_KEYS,
-    gridClass: kb.strokeAsetniop,
+    gridClass: kb("strokeAsetniop"),
     specs: lineSpecs,
     pressed: placedCharSpecPressed("asetniop", ASETNIOP_KEYS),
     keyLabel: (c) => ASETNIOP_THUMBS[c],
   },
   artsey: {
     chars: ARTSEY_CHARS,
-    gridClass: kb.strokeArtsey,
+    gridClass: kb("strokeArtsey"),
     specs: lineSpecs,
     pressed: gridCharSpecPressed("artsey", ARTSEY_CHARS),
   },
   leversteno: {
     keys: LEVER_KEYS,
-    gridClass: kb.strokeLever,
+    gridClass: kb("strokeLever"),
     // uni-v4 stroke notation: `/`-separated strokes, one chart per stroke.
     specs: (body) => body.trim().toUpperCase().split("/"),
     pressed: leverPressed,
@@ -411,21 +429,21 @@ const LAYOUTS: Record<string, Layout> = {
 // One key -> its <div> (label text or icon, pressed highlight, extra classes).
 function keyDiv(layout: Layout, c: string, on: boolean, extraCls: (string | false | undefined)[], style?: string): Raw {
   const meta = layout.keyLabel?.(c);
-  const isIcon = meta && typeof meta.label !== "string";
-  const cls = [kb.key, layout.keyClass?.(c), isIcon && kb.keyIcon, ...extraCls, on && kb.keyPressed]
+  const isIcon = meta !== undefined && typeof meta.label !== "string";
+  const cls = [kb("key"), layout.keyClass?.(c), isIcon && kb("keyIcon"), ...extraCls, on && kb("keyPressed")]
     .filter(Boolean)
     .join(" ");
   // An icon key's only content is an inline SVG, so `aria-label` carries its
   // name -- but aria-label is prohibited on a role-less <div> (axe:
   // aria-prohibited-attr) and would be dropped. role="img" makes the div a named
   // leaf, which is exactly what a glyph-with-a-name is.
-  return meta ? (
-    <div class={cls} style={style} title={meta.name} role="img" aria-label={meta.name}>
-      {meta.label}
-    </div>
-  ) : (
+  return meta === undefined ? (
     <div class={cls} style={style}>
       {c}
+    </div>
+  ) : (
+    <div class={cls} style={style} title={meta.name} role="img" aria-label={meta.name}>
+      {meta.label}
     </div>
   );
 }
@@ -435,23 +453,21 @@ function strokeHtml(layout: Layout, spec: string): string {
   const cells: Raw[] = [];
   if ("chars" in layout) {
     const pressed = layout.pressed(spec);
-    for (let row = 0; row < layout.chars.length; row++) {
-      for (let col = 0; col < layout.chars[row].length; col++) {
-        const c = layout.chars[row][col];
-        if (c === "") cells.push(<div class={kb.cell}></div>);
-        else cells.push(keyDiv(layout, c, pressed[row][col], []));
+    for (const [row, chars] of layout.chars.entries()) {
+      for (const [col, c] of chars.entries()) {
+        cells.push(c === "" ? <div class={kb("cell")}></div> : keyDiv(layout, c, pressed[row]?.[col] ?? false, []));
       }
     }
   } else {
     const on = layout.pressed(spec);
-    layout.keys.forEach((k, i) => {
+    for (const [i, k] of layout.keys.entries()) {
       // 18px half-unit tracks: key unit x -> track x*2+1, one unit = 2 tracks
-      const style =
-        `grid-row:${k.row + 1}${k.h ? `/span ${k.h}` : ""};` + `grid-column:${k.x * 2 + 1}/span ${(k.w ?? 1) * 2}`;
-      cells.push(keyDiv(layout, k.c, on[i], [kb.keyPlaced, k.drop && kb.keyDrop], style));
-    });
+      const span = k.h === undefined ? "" : `/span ${k.h}`;
+      const style = `grid-row:${k.row + 1}${span};grid-column:${k.x * 2 + 1}/span ${(k.w ?? 1) * 2}`;
+      cells.push(keyDiv(layout, k.c, on[i] ?? false, [kb("keyPlaced"), k.drop === true && kb("keyDrop")], style));
+    }
   }
-  return render(<div class={`${kb.stroke} ${layout.gridClass}`}>{cells}</div>);
+  return render(<div class={`${kb("stroke")} ${layout.gridClass}`}>{cells}</div>);
 }
 
 // The block body -> chart HTML strings, one per stroke/line. Throws on an

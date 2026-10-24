@@ -11,7 +11,7 @@ export default defineConfig({
   test: {
     // process every CSS module (vitest stubs them to `{}` by default) and scope
     // via the real `generateScopedName` ('scoped'), so test class names == shipped.
-    css: { include: [/.*/], modules: { classNameStrategy: "scoped" } },
+    css: { include: [/.*/u], modules: { classNameStrategy: "scoped" } },
     include: ["test/**/*.test.ts"],
   },
 });

@@ -8,6 +8,33 @@ import { dirname, join } from "node:path";
 
 export const SENTINEL = "<!--pp-->";
 
+// JSON this build wrote itself (shard IPC, the committed card cache, our own data attributes).
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- T names the shape the caller trusts
+export const parseTrustedJson = <T>(text: string): T =>
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the producer is this build, not user input
+  JSON.parse(text) as T;
+
+// A `linkcard-cache.json` entry: an OGP `card` (default, `kind` absent for
+// back-compat) or a `github-code` embed (the literal source lines of a GitHub blob permalink).
+export type Card = {
+  kind?: "card" | "github-code";
+  // kind: card (OGP)
+  title?: string;
+  description?: string;
+  image?: string;
+  siteName?: string;
+  favicon?: string;
+  // kind: github-code
+  owner?: string;
+  repo?: string;
+  refLabel?: string;
+  path?: string;
+  startLine?: number;
+  endLine?: number;
+  lang?: string;
+  code?: string;
+};
+
 export type BakeStats = {
   nPlain: number;
   nDom: number;
@@ -24,7 +51,7 @@ export type BakeStats = {
 // Stamp the sentinel right after the doctype so a later run can skip via a
 // string scan.
 export function stamp(out: string): string {
-  return /<!doctype html>/i.test(out) ? out.replace(/(<!doctype html>)/i, `$1${SENTINEL}`) : SENTINEL + out;
+  return /<!doctype html>/iu.test(out) ? out.replace(/(<!doctype html>)/iu, `$1${SENTINEL}`) : SENTINEL + out;
 }
 
 // Combine per-worker stats into one (used by the orchestrator).
@@ -52,8 +79,12 @@ export function mergeStats(parts: BakeStats[]): BakeStats {
     acc.nMathError += p.nMathError;
     acc.nCards += p.nCards;
     acc.nCardMiss += p.nCardMiss;
-    p.unknownLangs.forEach((x) => ul.add(x));
-    p.missingCards.forEach((x) => mc.add(x));
+    for (const x of p.unknownLangs) {
+      ul.add(x);
+    }
+    for (const x of p.missingCards) {
+      mc.add(x);
+    }
   }
   acc.unknownLangs = [...ul];
   acc.missingCards = [...mc];
@@ -69,7 +100,7 @@ export async function copyKatexAssets(outDir: string): Promise<void> {
   const dest = join(outDir, "style", "katex");
   await mkdir(join(dest, "fonts"), { recursive: true });
   await cp(join(dist, "katex.min.css"), join(dest, "katex.min.css"));
-  for (const f of await readdir(join(dist, "fonts"))) {
-    if (f.endsWith(".woff2")) await cp(join(dist, "fonts", f), join(dest, "fonts", f));
-  }
+  const files = await readdir(join(dist, "fonts"));
+  const fonts = files.filter((f) => f.endsWith(".woff2"));
+  await Promise.all(fonts.map(async (f) => cp(join(dist, "fonts", f), join(dest, "fonts", f))));
 }

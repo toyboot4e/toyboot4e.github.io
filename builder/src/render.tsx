@@ -2,23 +2,30 @@
 // tag-page templates. Pure string production -- no disk, no bake. Shared by the
 // render workers (articles) and the orchestrator (index + tag pages). See
 // build.ts for how this fits into the parallel build.
+import type { Element, Properties, Root, RootContent, Text } from "hast";
 import { unified } from "unified";
+import type { AffiliatedKeywords, ObjectType, OrgNode, TableRow } from "uniorg";
 import parse from "uniorg-parse";
 import { defaultOptions } from "uniorg-parse/lib/parse-options.js";
-import uniorg2rehype from "uniorg-rehype";
+import uniorg2rehype, { type Options as RehypeOptions } from "uniorg-rehype";
 import rehypeKatex from "rehype-katex";
 import stringify from "rehype-stringify";
-import { h, Fragment, raw, render, type Raw } from "./html.ts";
+import { classes } from "./css-module.ts";
+import { h, Fragment, raw, render, type Child, type Raw } from "./html.ts";
 // Scoped CSS-module class maps, resolved directly by Vite (`vite build` at bundle
 // time, vite-node under watch). Each default export is `{ authoredName: scopedName }`. The matching
 // scoped CSS ships as components.min.css (emitted by assets.ts, linked in
 // headHtml); Vite's `generateScopedName` (vite.config.ts) keeps the names in
 // sync between this render and that CSS build.
-import card from "./styles/article-card.module.css";
-import kb from "./styles/keyboard.module.css";
-import toc from "./styles/toc.module.css";
+import cardModule from "./styles/article-card.module.css";
+import kbModule from "./styles/keyboard.module.css";
+import tocModule from "./styles/toc.module.css";
 import { keyboardStrokesHtml } from "./keyboard.tsx";
 import { expandMathbb } from "./math-util.ts";
+
+const card = classes(cardModule, "article-card.module.css");
+const kb = classes(kbModule, "keyboard.module.css");
+const toc = classes(tocModule, "toc.module.css");
 
 export const SITE_URL = "https://toyboot4e.github.io/";
 
@@ -33,7 +40,7 @@ const PARSE_OPTS = { linkTypes: [...defaultOptions.linkTypes, "card"] };
 // --- static chrome (header / footer / disco) -------------------------------
 // Inline nav/footer icon wrapper (Lucide, stroked). One <svg> with the shared
 // attributes; the caller supplies the <path>/<circle>/<rect> children.
-const NavIcon = ({ children }: { children?: any }): Raw => (
+const NavIcon = ({ children }: { readonly children?: Child }): Raw => (
   <svg
     class="nav-icon"
     viewBox="0 0 24 24"
@@ -185,13 +192,13 @@ const DISCO_HEAD = (
 );
 
 // --- keyword metadata (uniorg-extract-keywords pulls in a buggy dep) --------
-export function readKeywords(text: string): Record<string, string> {
-  const re = /^[ \t]*#\+([A-Za-z_]+):[ \t]*(.*?)[ \t]*$/gm;
-  const kw: Record<string, string> = {};
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(text))) {
-    const k = m[1].toUpperCase();
-    if (!(k in kw)) kw[k] = m[2];
+export function readKeywords(text: string): Map<string, string> {
+  const kw = new Map<string, string>();
+  for (const [, key = "", value = ""] of text.matchAll(/^[ \t]*#\+([A-Za-z_]+):[ \t]*(.*?)[ \t]*$/gmu)) {
+    const k = key.toUpperCase();
+    if (!kw.has(k)) {
+      kw.set(k, value);
+    }
   }
   return kw;
 }
@@ -200,7 +207,7 @@ export function readKeywords(text: string): Record<string, string> {
 // <summary>` parameters, so we recover them from the raw source and consume them
 // as the special-block handler fires.
 function detailsSummaries(text: string): string[] {
-  return [...text.matchAll(/^[ \t]*#\+BEGIN_DETAILS[ \t]+(.+?)[ \t]*$/gim)].map((m) => m[1]);
+  return Array.from(text.matchAll(/^[ \t]*#\+BEGIN_DETAILS[ \t]+(.+?)[ \t]*$/gimu), ([, s = ""]) => s);
 }
 
 // uniorg-parse does NOT attach affiliated keywords (CAPTION) to `table` nodes
@@ -213,7 +220,7 @@ function tableCaptions(text: string): (string | null)[] {
   let pending: string | null = null;
   let inTable = false;
   for (const line of text.split("\n")) {
-    if (/^[ \t]*\|/.test(line)) {
+    if (/^[ \t]*\|/u.test(line)) {
       if (!inTable) {
         caps.push(pending);
         inTable = true;
@@ -222,9 +229,13 @@ function tableCaptions(text: string): (string | null)[] {
       continue;
     }
     inTable = false;
-    const cap = line.match(/^[ \t]*#\+CAPTION:[ \t]*(.*?)[ \t]*$/i);
-    if (cap) pending = cap[1];
-    else if (!/^[ \t]*#\+/.test(line)) pending = null; // blank/text breaks the attachment
+    const cap = /^[ \t]*#\+CAPTION:[ \t]*(.*?)[ \t]*$/iu.exec(line);
+    if (cap) {
+      pending = cap[1] ?? "";
+    } else if (!/^[ \t]*#\+/u.test(line)) {
+      // blank/text breaks the attachment
+      pending = null;
+    }
   }
   return caps;
 }
@@ -232,12 +243,21 @@ function tableCaptions(text: string): (string | null)[] {
 // Thumbnail src normalization: http(s) as-is, else strip any leading
 // `./` or `/` and prefix a single `/`. (Was prefixing `/img/`, which double-
 // prefixed the common `img/foo.webp` value -> `/img/img/foo.webp`, a broken src.)
-function thumbnailSrc(v?: string): string | null {
-  if (!v || !v.trim()) return null;
-  if (/^https?:\/\//.test(v)) return v;
-  return "/" + v.trim().replace(/^(?:\.\/|\/)+/, "");
+function thumbnailSrc(v: string | undefined): string | null {
+  if (v === undefined || v.trim() === "") {
+    return null;
+  }
+  if (/^https?:\/\//u.test(v)) {
+    return v;
+  }
+  return `/${v.trim().replace(/^(?:\.\/|\/)+/u, "")}`;
 }
-const absUrl = (v: string | null) => (v == null ? null : /^https?:\/\//.test(v) ? v : SITE_URL.replace(/\/$/, "") + v);
+function absUrl(v: string | null): string | null {
+  if (v === null || /^https?:\/\//u.test(v)) {
+    return v;
+  }
+  return SITE_URL.replace(/\/$/u, "") + v;
+}
 
 // Per-file render state threaded through the custom handlers.
 type RenderState = {
@@ -249,19 +269,39 @@ type RenderState = {
   tableCounter: { n: number }; // index into tableCaps, advanced per table
   captionN: { figure: number; listing: number; table: number }; // per-kind caption counters
   coderefIds: string[]; // coderef anchor ids, for the JS-free hover-highlight <style>
+  lastLineNum: number; // last line number of the previous numbered block, for `+n`
 };
+
+// rehype-stringify passes `raw` nodes through verbatim (allowDangerousHtml).
+type RawNode = { type: "raw"; value: string };
+declare module "hast" {
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- module augmentation needs an interface
+  interface RootContentMap {
+    raw: RawNode;
+  }
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- module augmentation needs an interface
+  interface ElementContentMap {
+    raw: RawNode;
+  }
+}
+const textNode = (value: string): Text => ({ type: "text", value });
+const rawNode = (value: string): RawNode => ({ type: "raw", value });
+
+type Handlers = NonNullable<RehypeOptions["handlers"]>;
+type Ctx = ThisParameterType<NonNullable<Handlers["paragraph"]>>;
+type Hast = RootContent;
 
 // The `(ref:label)` coderef marker, matched in place. Org replaces just the
 // marker with the label at its original position (the surrounding code, comment
 // leader included, stays) -- it does NOT strip the rest of the line.
-const CODEREF_RE = /\(ref:([^)]+)\)/;
+const CODEREF_RE = /\(ref:([^)]+)\)/u;
 
 // Keyboard charts (`#+BEGIN_STENO`, `#+BEGIN_KEYBOARD <layout>`) are rendered
 // by keyboard.tsx (layouts uni-v4 / qwerty-24). uniorg drops the special-block
 // parameter line, so like DETAILS summaries the `#+BEGIN_KEYBOARD <layout>`
 // params are recovered from raw source and consumed in document order.
 function keyboardLayouts(text: string): string[] {
-  return [...text.matchAll(/^[ \t]*#\+BEGIN_KEYBOARD[ \t]*(\S*)[ \t]*$/gim)].map((m) => m[1]);
+  return Array.from(text.matchAll(/^[ \t]*#\+BEGIN_KEYBOARD[ \t]*(\S*)[ \t]*$/gimu), ([, s = ""]) => s);
 }
 
 // `#+CAPTION: ...` lives in uniorg's `node.affiliated.CAPTION` (array of caption
@@ -270,8 +310,18 @@ function keyboardLayouts(text: string): string[] {
 // own them as `.children` (uniorg-rehype does a sibling lookup on the parent) --
 // the caption lives in `affiliated`, not `org.children`, so wrap it in a
 // synthetic parent or the lookup crashes.
-function captionHast(ctx: any, cap: any[]): any[] {
-  return ctx.toHast(cap, { type: "paragraph", children: cap });
+function captionHast(ctx: Ctx, cap: ObjectType[]): Hast[] {
+  return ctx.toHast(cap, { type: "paragraph", children: cap, affiliated: {}, contentsBegin: 0, contentsEnd: 0 });
+}
+
+const isInlineNodes = (v: unknown): v is ObjectType[] =>
+  Array.isArray(v) && v.every((x) => typeof x === "object" && x !== null && "type" in x);
+
+// The first `#+CAPTION:` row's inline nodes (uniorg keeps CAPTION as a list of rows).
+function captionOf(affiliated: AffiliatedKeywords | undefined): ObjectType[] | null {
+  const rows = affiliated?.["CAPTION"];
+  const first: unknown = Array.isArray(rows) ? rows[0] : undefined;
+  return isInlineNodes(first) ? first : null;
 }
 
 // Caption numbering, matching org HTML export: a per-kind, per-document counter
@@ -281,92 +331,108 @@ type CaptionKind = keyof typeof CAPTION_LABEL;
 
 // Wrap `body` in <figure> with a numbered <figcaption>, e.g.
 // `<figcaption><span class="figure-number">Figure 1: </span>{caption}</figcaption>`.
-function captionedFigure(ctx: any, st: RenderState, org: any, body: any[], kind: CaptionKind, capNodes: any[]): any {
-  const n = ++st.captionN[kind];
+function captionedFigure(
+  ctx: Ctx,
+  st: RenderState,
+  org: OrgNode,
+  body: Hast[],
+  kind: CaptionKind,
+  capNodes: Hast[],
+): Element {
+  st.captionN[kind]++;
+  const n = st.captionN[kind];
   const num = ctx.h(org, "span", { className: [`${kind}-number`] }, [
-    { type: "text", value: `${CAPTION_LABEL[kind]} ${n}: ` },
+    textNode(`${CAPTION_LABEL[kind]} ${String(n)}: `),
   ]);
   return ctx.h(org, "figure", {}, [...body, ctx.h(org, "figcaption", {}, [num, ...capNodes])]);
 }
 
 // --- custom uniorg2rehype handlers (use `this.toHast` / `this.h`) -----------
-function makeHandlers(st: RenderState) {
+// A null return falls through to uniorg-rehype's default handler.
+function makeHandlers(st: RenderState): Handlers {
   return {
     // A captioned paragraph (usually a lone image) -> <figure> with the caption.
     // `#+ATTR_HTML` width is handled by uniorg-rehype + `liftMediaAttrs` (which
     // moves it onto the <img>), so it isn't touched here. Plain paragraphs fall
     // through to uniorg's default <p>.
-    paragraph: function (this: any, org: any) {
-      const cap = org.affiliated?.CAPTION?.[0];
-      if (!cap) return undefined;
-      const kids = this.toHast(org.children, org).filter((n: any) => !(n.type === "text" && !String(n.value).trim()));
-      const onlyImg = kids.length === 1 && kids[0].tagName === "img";
+    paragraph(org) {
+      const cap = captionOf(org.affiliated);
+      if (cap === null) {
+        return null;
+      }
+      const kids = this.toHast(org.children, org).filter((n) => !(n.type === "text" && n.value.trim() === ""));
+      const [only] = kids;
+      const onlyImg = kids.length === 1 && only?.type === "element" && only.tagName === "img";
       const inner = onlyImg ? kids : [this.h(org, "p", {}, kids)];
       return captionedFigure(this, st, org, inner, "figure", captionHast(this, cap));
     },
     // Tables: replicate uniorg-rehype's default table rendering (so uncaptioned
     // tables are byte-identical) but wrap in <figure> when captioned -- the
     // default handler drops `#+CAPTION`. table.el tables fall through to default.
-    table: function (this: any, org: any) {
-      if (org.tableType === "table.el") return undefined;
+    table(org) {
+      if (org.tableType === "table.el") {
+        return null;
+      }
       const table = this.h(org, "table", {}, []);
+      const headRow = (row: TableRow): Element =>
+        this.h(
+          row,
+          "tr",
+          {},
+          row.children.map((cell) => this.h(cell, "th", {}, this.toHast(cell.children, cell))),
+        );
       let hasHead = false;
-      let group: any[] = [];
-      org.children.forEach((r: any) => {
+      let group: TableRow[] = [];
+      for (const r of org.children) {
         if (r.rowType === "rule") {
-          if (!hasHead) {
+          if (hasHead) {
+            table.children.push(this.h(org, "tbody", {}, this.toHast(group, org)));
+          } else {
             table.children.push(
               this.h(
                 org,
                 "thead",
                 {},
-                group.map((row: any) =>
-                  this.h(
-                    row,
-                    "tr",
-                    {},
-                    row.children.map((cell: any) => this.h(cell, "th", {}, this.toHast(cell.children, cell))),
-                  ),
-                ),
+                group.map((row) => headRow(row)),
               ),
             );
             hasHead = true;
-          } else {
-            table.children.push(this.h(org, "tbody", {}, this.toHast(group, org)));
           }
           group = [];
         }
         group.push(r);
-      });
-      if (group.length) table.children.push(this.h(org, "tbody", {}, this.toHast(group, org)));
+      }
+      if (group.length > 0) {
+        table.children.push(this.h(org, "tbody", {}, this.toHast(group, org)));
+      }
       // table captions come from raw source (uniorg drops them), pre-rendered to
       // HTML and consumed here in document order.
-      const capHtml = st.tableCaps[st.tableCounter.n++];
-      if (!capHtml) return table;
-      return captionedFigure(this, st, org, [table], "table", [{ type: "raw", value: capHtml }]);
+      const capHtml = st.tableCaps[st.tableCounter.n] ?? null;
+      st.tableCounter.n++;
+      if (capHtml === null || capHtml === "") {
+        return table;
+      }
+      return captionedFigure(this, st, org, [table], "table", [rawNode(capHtml)]);
     },
     // uniorg-rehype renders EVERY latex-fragment as `span.math.math-inline`, so
-    // `$$...$$` and `\[...\]` (display delimiters) never get display mode and end
-    // up left-aligned inline -- only `\begin{}` environments (latex-environment)
+    // `$$...$$` and `\\[...\\]` (display delimiters) never get display mode and end
+    // up left-aligned inline -- only `\\begin{}` environments (latex-environment)
     // become centered `math-display`. Mirror the default handler but pick the
     // class from the delimiter, so rehype-katex renders display math centered.
-    "latex-fragment": function (this: any, org: any) {
-      const v = String(org.value ?? "");
-      const display = v.startsWith("$$") || v.startsWith("\\[");
+    "latex-fragment"(org) {
+      const display = org.value.startsWith("$$") || org.value.startsWith(String.raw`\[`);
       const cls = display ? ["math", "math-display"] : ["math", "math-inline"];
-      return this.h(org, "span", { className: cls }, [
-        { type: "text", value: expandMathbb(String(org.contents ?? "").trim()) },
-      ]);
+      return this.h(org, "span", { className: cls }, [textNode(expandMathbb(org.contents.trim()))]);
     },
-    "special-block": function (this: any, org: any) {
-      const t = (org.blockType || "").toUpperCase();
+    "special-block"(org) {
+      const t = org.blockType.toUpperCase();
       const kids = this.toHast(org.children, org);
       if (t === "DETAILS") {
         // `st.details` holds summaries already converted org->HTML (`=code=`,
         // `*bold*`, `$math$`, ...), pre-rendered async in renderArticle since
         // this handler is sync; insert as raw so the markup isn't escaped.
         const summary = st.details.shift() ?? "詳細";
-        return this.h(org, "details", {}, [this.h(org, "summary", {}, [{ type: "raw", value: summary }]), ...kids]);
+        return this.h(org, "details", {}, [this.h(org, "summary", {}, [rawNode(summary)]), ...kids]);
       }
       // YARUO/AA is ASCII art -- render the block's text VERBATIM (sliced from
       // source via uniorg's content offsets), not org-parsed: otherwise `_x_`
@@ -374,8 +440,8 @@ function makeHandlers(st: RenderState) {
       // CSS scrolls it on the x-axis instead of wrapping (raw source slice ->
       // <pre class="yaruo">).
       if (t === "YARUO" || t === "AA") {
-        const raw = st.source.slice(org.contentsBegin, org.contentsEnd).replace(/\n$/, "");
-        return this.h(org, "pre", { className: ["yaruo"] }, [{ type: "text", value: raw }]);
+        const verbatim = st.source.slice(org.contentsBegin, org.contentsEnd).replace(/\n$/u, "");
+        return this.h(org, "pre", { className: ["yaruo"] }, [textNode(verbatim)]);
       }
       if (t === "STENO" || t === "KEYBOARD") {
         // The block body (sliced verbatim from source, not org-parsed) is a
@@ -383,21 +449,23 @@ function makeHandlers(st: RenderState) {
         // (keyboard.tsx). STENO is the steno chord chart (uni-v4 layout,
         // `/`-separated strokes like `KAT/-S`); KEYBOARD reads its layout from
         // the block parameter recovered into `st.keyboards`.
-        const layout = t === "STENO" ? "uni-v4" : st.keyboards.shift() || "";
+        const layout = t === "STENO" ? "uni-v4" : (st.keyboards.shift() ?? "");
         const body = st.source.slice(org.contentsBegin, org.contentsEnd);
         const chart = this.h(
           org,
           "div",
-          { className: [kb.outline] },
-          keyboardStrokesHtml(layout, body).map((v) => ({ type: "raw", value: v })),
+          { className: [kb("outline")] },
+          keyboardStrokesHtml(layout, body).map((v) => rawNode(v)),
         );
         // `#+CAPTION:` -> numbered <figure>, same as a captioned image. uniorg
         // attaches CAPTION to special-block nodes, so no source recovery needed.
-        const cap = org.affiliated?.CAPTION?.[0];
-        if (!cap) return chart;
+        const cap = captionOf(org.affiliated);
+        if (cap === null) {
+          return chart;
+        }
         return captionedFigure(this, st, org, [chart], "figure", captionHast(this, cap));
       }
-      return undefined; // fall through to uniorg's default special-block
+      return null;
     },
     // Code blocks: emit the raw source as text plus opt-in metadata; the
     // tree-sitter highlighter (in bake.ts) does the highlighting + markup.
@@ -406,63 +474,71 @@ function makeHandlers(st: RenderState) {
     // `data-coderefs` so the bake step re-creates the whole-line `<a class=
     // "coderef-off">` self-link + `<span class="coderef-anchor">` label (and prose
     // `[[(label)]]` jumps stay valid). Line numbers are opt-in via org's `-n`/`+n`.
-    "src-block": function (this: any, org: any) {
-      const lang = org.language || "";
+    "src-block"(org) {
+      const lang = org.language ?? "";
+      // uniorg-parse sets `switches` but its types omit it.
+      const switches = "switches" in org && typeof org.switches === "string" ? org.switches : "";
       // org switches: `-n [N]` numbers from N (default 1); `+n [N]` continues from
       // the previous numbered block (+N, default +1). No switch -> no gutter.
-      const lnm = String(org.switches || "").match(/(^|\s)([-+])n(?:\s+(\d+))?(\s|$)/);
-      const lineNumbers = !!lnm;
+      const lnm = /(?:^|\s)([-+])n(?:\s+(\d+))?(?:\s|$)/u.exec(switches);
+      const lineNumbers = lnm !== null;
       let lineStart = 1;
       if (lnm) {
-        const n = lnm[3] ? parseInt(lnm[3], 10) : null;
-        lineStart = lnm[2] === "-" ? (n ?? 1) : (st.lastLineNum ?? 0) + (n ?? 1);
+        const [, sign, num] = lnm;
+        const n = num === undefined ? 1 : Math.trunc(Number(num));
+        lineStart = sign === "-" ? n : st.lastLineNum + n;
       }
-      const lines = String(org.value ?? "")
-        .replace(/\n$/, "")
-        .split("\n");
-      if (lineNumbers) st.lastLineNum = lineStart + lines.length - 1;
+      const lines = org.value.replace(/\n$/u, "").split("\n");
+      if (lineNumbers) {
+        st.lastLineNum = lineStart + lines.length - 1;
+      }
 
       // Number only blocks that actually contain a coderef (NOT every src-block),
       // so the first coderef block is `coderef-1-…` regardless of how many plain
       // code blocks precede it. The prose `[[(label)]]` link reads the same counter.
       const hasCoderef = lines.some((l) => CODEREF_RE.test(l));
-      const N = hasCoderef ? ++st.blockCounter.n : st.blockCounter.n;
+      if (hasCoderef) {
+        st.blockCounter.n++;
+      }
+      const N = String(st.blockCounter.n);
       const coderefs: { line: number; label: string; start: number; end: number }[] = [];
       const outLines = lines.map((line, i) => {
-        const m = line.match(CODEREF_RE);
-        if (!m) return line;
-        const label = m[1];
+        const m = CODEREF_RE.exec(line);
+        if (!m) {
+          return line;
+        }
+        const [marker, label = ""] = m;
         st.coderefIds.push(`coderef-${N}-${label}`);
         const before = line.slice(0, m.index);
         coderefs.push({ line: i, label, start: before.length, end: before.length + label.length });
-        return before + label + line.slice(m.index! + m[0].length);
+        return before + label + line.slice(m.index + marker.length);
       });
 
-      const cls = lang ? ["src", `language-${lang}`] : ["src"];
-      const attrs: Record<string, any> = { className: cls };
-      if (coderefs.length) {
+      const cls = lang === "" ? ["src"] : ["src", `language-${lang}`];
+      const attrs: Properties = { className: cls };
+      if (coderefs.length > 0) {
         attrs["data-coderefs"] = JSON.stringify(coderefs);
-        attrs["data-coderef-block"] = String(N);
+        attrs["data-coderef-block"] = N;
       }
       if (lineNumbers) {
         attrs["data-line-numbers"] = "";
-        if (lineStart !== 1) attrs["data-line-start"] = String(lineStart);
+        if (lineStart !== 1) {
+          attrs["data-line-start"] = String(lineStart);
+        }
       }
-      const pre = this.h(org, "pre", {}, [this.h(org, "code", attrs, [{ type: "text", value: outLines.join("\n") }])]);
-      const cap = org.affiliated?.CAPTION?.[0];
-      return cap ? captionedFigure(this, st, org, [pre], "listing", captionHast(this, cap)) : pre;
+      const pre = this.h(org, "pre", {}, [this.h(org, "code", attrs, [textNode(outLines.join("\n"))])]);
+      const cap = captionOf(org.affiliated);
+      return cap === null ? pre : captionedFigure(this, st, org, [pre], "listing", captionHast(this, cap));
     },
-    link: function (this: any, org: any) {
-      const raw: string = org.rawLink || "";
+    link(org) {
+      const { rawLink } = org;
       const kids = this.toHast(org.children, org);
       // [[card:URL]] -> placeholder the bake pass fills from the cache. `card` is
       // registered in PARSE_OPTS.linkTypes, so the parser hands us linkType
       // "card" with the prefix already stripped from `path`.
       if (org.linkType === "card") {
         const url = org.path;
-        return this.h(org, "a", { className: ["link-card"], "data-link-card": "", href: url }, [
-          { type: "text", value: url },
-        ]);
+        return this.h(org, "a", { className: ["link-card"], "data-link-card": "", href: url }, [textNode(url)]);
       }
       // coderef [[(label)]] -> jump to the anchor in the MOST-RECENTLY-rendered
       // src-block (positional, via the shared block counter). A flat
@@ -470,28 +546,34 @@ function makeHandlers(st: RenderState) {
       // every `[[(1)]]` then pointed at the last block. The label is wrapped in
       // <span class="coderef-anchor"> to match the in-code anchor styling.
       if (org.linkType === "coderef") {
-        const id = `coderef-${st.blockCounter.n}-${org.path}`;
-        const inner = kids.length
-          ? kids
-          : [this.h(org, "span", { className: ["coderef-anchor"] }, [{ type: "text", value: org.path }])];
+        const id = `coderef-${String(st.blockCounter.n)}-${org.path}`;
+        const inner =
+          kids.length > 0 ? kids : [this.h(org, "span", { className: ["coderef-anchor"] }, [textNode(org.path)])];
         return this.h(org, "a", { href: `#${id}` }, inner);
       }
       // internal .org links -> .html
-      if (raw.includes(".org") && !/^[a-z]+:\/\//.test(raw)) {
-        const href = raw.replace(/^file:/, "").replace(/\.org(::.*)?$/, ".html");
-        return this.h(org, "a", { href }, kids.length ? kids : [{ type: "text", value: href }]);
+      if (rawLink.includes(".org") && !/^[a-z]+:\/\//u.test(rawLink)) {
+        const href = rawLink.replace(/^file:/u, "").replace(/\.org(::.*)?$/u, ".html");
+        return this.h(org, "a", { href }, kids.length > 0 ? kids : [textNode(href)]);
       }
       // image-file links with no description -> <img src alt>. uniorg's default
       // emits the <img> but drops `alt`; Emacs sets alt=basename, so match it
       // (the `paragraph` handler then applies any `#+ATTR_HTML` width to it).
-      if (!kids.length && /\.(webp|png|jpe?g|gif|svg|avif|bmp)$/i.test(raw)) {
-        const src = raw.replace(/^file:/, "");
-        return this.h(org, "img", { src, alt: src.replace(/^.*\//, "") });
+      if (kids.length === 0 && /\.(webp|png|jpe?g|gif|svg|avif|bmp)$/iu.test(rawLink)) {
+        const src = rawLink.replace(/^file:/u, "");
+        return this.h(org, "img", { src, alt: src.replace(/^.*\//u, "") });
       }
-      return undefined; // default handles http(s)/mailto/etc.
+      // default handles http(s)/mailto/etc.
+      return null;
     },
   };
 }
+
+type HNode = Root | RootContent;
+const childrenOf = (n: HNode): readonly RootContent[] => ("children" in n ? n.children : []);
+const isElement = (n: HNode): n is Element => n.type === "element";
+const isTextNode = (n: HNode): n is Text => n.type === "text";
+const isHeading = (n: HNode, levels: RegExp): n is Element => isElement(n) && levels.test(n.tagName);
 
 // Move a `width`/`height` attribute off a <p>/<figure> onto the <img> inside it.
 // uniorg-rehype proxies `#+ATTR_HTML` to the image only when it's the paragraph's
@@ -499,67 +581,95 @@ function makeHandlers(st: RenderState) {
 // lands on the CONTAINER instead -- sizing the <p>/<figure> wider than the text
 // column (the image then fills it and overflows). On the <img> it's capped by
 // `img { max-width: 100% }`. Matches Emacs, which puts the width on the <img>.
-function liftMediaAttrs() {
-  const findImg = (n: any): any => (n.tagName === "img" ? n : (n.children || []).map(findImg).find(Boolean));
-  return (tree: any) => {
-    const walk = (n: any) => {
-      if ((n.tagName === "p" || n.tagName === "figure") && n.properties) {
-        if (n.properties.width != null || n.properties.height != null) {
-          const img = findImg(n);
-          if (img) {
-            img.properties = img.properties || {};
-            for (const k of ["width", "height"]) {
-              if (n.properties[k] != null && img.properties[k] == null) img.properties[k] = n.properties[k];
-              delete n.properties[k];
-            }
-          }
-        }
+const lift = (from: Properties, to: Properties, k: "width" | "height"): void => {
+  if (from[k] != null && to[k] == null) {
+    to[k] = from[k];
+  }
+};
+
+function liftMediaAttrs(): (tree: Root) => void {
+  const findImg = (n: HNode): Element | undefined => {
+    if (isElement(n) && n.tagName === "img") {
+      return n;
+    }
+    for (const c of childrenOf(n)) {
+      const img = findImg(c);
+      if (img) {
+        return img;
       }
-      (n.children || []).forEach(walk);
-    };
-    walk(tree);
+    }
+    return undefined;
   };
+  const walk = (n: HNode): void => {
+    if (
+      isElement(n) &&
+      (n.tagName === "p" || n.tagName === "figure") &&
+      (n.properties.width != null || n.properties.height != null)
+    ) {
+      const img = findImg(n);
+      if (img) {
+        lift(n.properties, img.properties, "width");
+        lift(n.properties, img.properties, "height");
+        delete n.properties.width;
+        delete n.properties.height;
+      }
+    }
+    for (const c of childrenOf(n)) {
+      walk(c);
+    }
+  };
+  return walk;
 }
 
 // org headlines render h1.. but the page <h1> is the title-block; demote by one.
-function demoteHeadings() {
-  return (tree: any) => {
-    const walk = (n: any) => {
-      if (n.tagName && /^h[1-5]$/.test(n.tagName)) n.tagName = "h" + (Number(n.tagName[1]) + 1);
-      (n.children || []).forEach(walk);
-    };
-    walk(tree);
+function demoteHeadings(): (tree: Root) => void {
+  const walk = (n: HNode): void => {
+    if (isHeading(n, /^h[1-5]$/u)) {
+      n.tagName = `h${String(Number(n.tagName.slice(1)) + 1)}`;
+    }
+    for (const c of childrenOf(n)) {
+      walk(c);
+    }
   };
+  return walk;
 }
 
 // Self-link headlines (like Org's `org-html-self-link-headlines`): give each
 // heading id="<text>" and wrap its content in <a href="#<text>">…</a>.
-function headingSelfLinks() {
-  const textOf = (n: any): string => (n.type === "text" ? n.value : (n.children || []).map(textOf).join(""));
-  const hasLink = (n: any): boolean => n.tagName === "a" || (n.children || []).some(hasLink);
-  return (tree: any) => {
-    const walk = (n: any) => {
-      if (n.tagName && /^h[1-6]$/.test(n.tagName)) {
-        const id = textOf(n);
-        // A textless headline (a stray `*** ` in the org source) would otherwise
-        // get id="" and a self-link to `#` with nothing in it: an unnamed link
-        // sitting in the tab order (axe: link-name). No text, no anchor.
-        if (!id.trim()) return;
-        n.properties = { ...n.properties, id };
-        // A headline whose text is itself a link (`* [[url][label]]`) must NOT
-        // get the self-link wrapper: nested <a> is invalid HTML, and the parser
-        // recovers by splitting it into an EMPTY <a> plus the real one -- an
-        // unnamed link in the tab order on every such heading (axe: link-name).
-        // The id alone still makes the heading a fragment target and ToC entry.
-        if (!hasLink(n)) {
-          n.children = [{ type: "element", tagName: "a", properties: { href: `#${id}` }, children: n.children }];
-        }
-        return; // headings don't nest
+function headingSelfLinks(): (tree: Root) => void {
+  const textOf = (n: HNode): string =>
+    isTextNode(n)
+      ? n.value
+      : childrenOf(n)
+          .map((c) => textOf(c))
+          .join("");
+  const hasLink = (n: HNode): boolean => (isElement(n) && n.tagName === "a") || childrenOf(n).some((c) => hasLink(c));
+  const walk = (n: HNode): void => {
+    if (isHeading(n, /^h[1-6]$/u)) {
+      const id = textOf(n);
+      // A textless headline (a stray `*** ` in the org source) would otherwise
+      // get id="" and a self-link to `#` with nothing in it: an unnamed link
+      // sitting in the tab order (axe: link-name). No text, no anchor.
+      if (id.trim() === "") {
+        return;
       }
-      (n.children || []).forEach(walk);
-    };
-    walk(tree);
+      n.properties = { ...n.properties, id };
+      // A headline whose text is itself a link (`* [[url][label]]`) must NOT
+      // get the self-link wrapper: nested <a> is invalid HTML, and the parser
+      // recovers by splitting it into an EMPTY <a> plus the real one -- an
+      // unnamed link in the tab order on every such heading (axe: link-name).
+      // The id alone still makes the heading a fragment target and ToC entry.
+      if (!hasLink(n)) {
+        n.children = [{ type: "element", tagName: "a", properties: { href: `#${id}` }, children: n.children }];
+      }
+      // headings don't nest
+      return;
+    }
+    for (const c of childrenOf(n)) {
+      walk(c);
+    }
   };
+  return walk;
 }
 
 // A headline that is nothing but math (`*** $S_1, S_2$`) renders to a self-link
@@ -573,84 +683,130 @@ function headingSelfLinks() {
 // the heading's own id, which is the raw headline text (`S_1, S_2`) -- not
 // beautiful read aloud, but it is the real name and it matches what the ToC and
 // the URL fragment already say.
-function nameMathOnlyHeadings() {
+const classNames = (n: Element): string[] => {
+  const c = n.properties.className;
+  const list = Array.isArray(c) ? c : [c];
+  return list.filter((x): x is string => typeof x === "string");
+};
+
+const isKatex = (n: HNode): boolean => isElement(n) && classNames(n).join(",").includes("katex");
+
+function nameMathOnlyHeadings(): (tree: Root) => void {
   // Text a name computation would actually use. KaTeX output is skipped
   // wholesale: its MathML branch is full of text nodes (`S`, `3`, and a
   // `<annotation>` holding the raw TeX) that no name computation reads, and its
   // visual branch is aria-hidden. Counting either would make every math heading
   // look adequately named.
-  const isKatex = (n: any) => String(n.properties?.className ?? "").includes("katex");
-  const nameText = (n: any): string =>
-    n.type === "text" ? n.value : isKatex(n) ? "" : (n.children || []).map(nameText).join("");
-  return (tree: any) => {
-    const walk = (n: any) => {
-      if (n.tagName && /^h[1-6]$/.test(n.tagName)) {
-        const link = (n.children || [])[0];
-        const id = n.properties?.id;
-        if (id && link?.tagName === "a" && !nameText(link).trim()) {
-          link.properties = { ...link.properties, "aria-label": id };
-        }
-        return;
-      }
-      (n.children || []).forEach(walk);
-    };
-    walk(tree);
+  const nameText = (n: HNode): string => {
+    if (isTextNode(n)) {
+      return n.value;
+    }
+    return isKatex(n)
+      ? ""
+      : childrenOf(n)
+          .map((c) => nameText(c))
+          .join("");
   };
+  const walk = (n: HNode): void => {
+    if (isHeading(n, /^h[1-6]$/u)) {
+      const [link] = n.children;
+      const { id } = n.properties;
+      if (
+        typeof id === "string" &&
+        id !== "" &&
+        link?.type === "element" &&
+        link.tagName === "a" &&
+        nameText(link).trim() === ""
+      ) {
+        link.properties = { ...link.properties, "aria-label": id };
+      }
+      return;
+    }
+    for (const c of childrenOf(n)) {
+      walk(c);
+    }
+  };
+  return walk;
 }
 
 // preserve-breaks (Org's `org-export-preserve-breaks t`): every soft newline
-// inside a paragraph / list item / quote becomes a <br> (an explicit `\\` already
+// inside a paragraph / list item / quote becomes a <br> (an explicit `\\\\` already
 // does, via uniorg's line-break node). uniorg leaves soft newlines as literal
 // text, so HTML would collapse them to a space; convert them here. A newline
 // (with surrounding horizontal whitespace, like a list item's
 // continuation indent) -> <br>. The trailing newline that terminates a block is
 // dropped (no trailing <br>). Skips code/verbatim and math: <pre>/<code> keep
-// their newlines literally, and a text node still carrying \(/\[/\begin{ is raw
+// their newlines literally, and a text node still carrying \\(/\\[/\\begin{ is raw
 // math the bake step renders -- splitting it would break the TeX.
-function preserveLineBreaks() {
-  const SKIP_TAGS = new Set(["pre", "code", "script", "style", "textarea"]);
-  // Block-level neighbours: a newline butting against one of these (or a block
-  // boundary) is structural layout, not a line break -- e.g. the newline between
-  // a list item's text and its nested <ul>, or a paragraph's terminator.
-  // oxfmt-ignore
-  const BLOCK = new Set([
-    "p", "ul", "ol", "li", "table", "thead", "tbody", "tr", "td", "th", "blockquote",
-    "div", "pre", "figure", "figcaption", "h1", "h2", "h3", "h4", "h5", "h6",
-    "details", "summary", "hr", "section", "dl", "dt", "dd",
-  ]);
-  const MATH_DELIM = /\\\(|\\\[|\\begin\{/;
-  const isMathEl = (n: any): boolean => {
-    const c = n.properties?.className;
-    const arr = Array.isArray(c) ? c : c ? [c] : [];
-    return arr.some((x: any) => typeof x === "string" && (x.includes("math") || x.includes("katex")));
-  };
-  const atBlock = (sib: any): boolean => !sib || (sib.type === "element" && BLOCK.has(sib.tagName));
-  return (tree: any) => {
-    const walk = (node: any, skip: boolean) => {
-      const kids = node.children;
-      if (!kids) return;
-      const childSkip = skip || (node.type === "element" && (SKIP_TAGS.has(node.tagName) || isMathEl(node)));
-      const out: any[] = [];
-      kids.forEach((child: any, idx: number) => {
-        if (!childSkip && child.type === "text" && child.value.includes("\n") && !MATH_DELIM.test(child.value)) {
-          const parts = child.value.split(/[ \t]*\n[ \t]*/);
-          // a newline adjacent to a block element (or a block boundary) is
-          // structural, not a <br>: drop the empty leading/trailing segment it
-          // produced so no spurious break is emitted there.
-          if (atBlock(kids[idx + 1])) while (parts.length > 1 && parts[parts.length - 1] === "") parts.pop();
-          if (atBlock(kids[idx - 1])) while (parts.length > 1 && parts[0] === "") parts.shift();
-          parts.forEach((p: string, i: number) => {
-            if (i > 0) out.push({ type: "element", tagName: "br", properties: {}, children: [] });
-            if (p) out.push({ type: "text", value: p });
-          });
-        } else {
-          if (child.type === "element") walk(child, childSkip);
-          out.push(child);
+const SKIP_BREAK_TAGS = new Set(["pre", "code", "script", "style", "textarea"]);
+// Block-level neighbours: a newline butting against one of these (or a block
+// boundary) is structural layout, not a line break -- e.g. the newline between
+// a list item's text and its nested <ul>, or a paragraph's terminator.
+// oxfmt-ignore
+const BLOCK = new Set([
+  "p", "ul", "ol", "li", "table", "thead", "tbody", "tr", "td", "th", "blockquote",
+  "div", "pre", "figure", "figcaption", "h1", "h2", "h3", "h4", "h5", "h6",
+  "details", "summary", "hr", "section", "dl", "dt", "dd",
+]);
+const MATH_DELIM = /\\\(|\\\[|\\begin\{/u;
+const isMathEl = (n: Element): boolean => classNames(n).some((x) => x.includes("math") || x.includes("katex"));
+const atBlock = (sib: HNode | undefined): boolean => sib === undefined || (isElement(sib) && BLOCK.has(sib.tagName));
+const BR: Element = { type: "element", tagName: "br", properties: {}, children: [] };
+
+// One text node's soft newlines -> text + <br> runs.
+function breakText(text: string, prev: HNode | undefined, next: HNode | undefined): (Text | Element)[] {
+  const parts = text.split(/[ \t]*\n[ \t]*/u);
+  // a newline adjacent to a block element (or a block boundary) is
+  // structural, not a <br>: drop the empty leading/trailing segment it
+  // produced so no spurious break is emitted there.
+  if (atBlock(next)) {
+    while (parts.length > 1 && parts.at(-1) === "") {
+      parts.pop();
+    }
+  }
+  if (atBlock(prev)) {
+    while (parts.length > 1 && parts[0] === "") {
+      parts.shift();
+    }
+  }
+  const out: (Text | Element)[] = [];
+  for (const [i, p] of parts.entries()) {
+    if (i > 0) {
+      out.push({ ...BR, properties: {}, children: [] });
+    }
+    if (p !== "") {
+      out.push(textNode(p));
+    }
+  }
+  return out;
+}
+
+function walkBreaks(node: Root | Element, skip: boolean): void {
+  const childSkip = node.type === "element" ? skip || SKIP_BREAK_TAGS.has(node.tagName) || isMathEl(node) : skip;
+  const breakLines = <T extends RootContent>(kids: readonly T[]): (T | Text | Element)[] => {
+    const out: (T | Text | Element)[] = [];
+    for (const [idx, child] of kids.entries()) {
+      if (!childSkip && isTextNode(child) && child.value.includes("\n") && !MATH_DELIM.test(child.value)) {
+        out.push(...breakText(child.value, kids[idx - 1], kids[idx + 1]));
+      } else {
+        if (isElement(child)) {
+          walkBreaks(child, childSkip);
         }
-      });
-      node.children = out;
-    };
-    walk(tree, false);
+        out.push(child);
+      }
+    }
+    return out;
+  };
+  if (node.type === "root") {
+    node.children = breakLines(node.children);
+    return;
+  }
+  node.children = breakLines(node.children);
+}
+
+function preserveLineBreaks(): (tree: Root) => void {
+  return (tree) => {
+    walkBreaks(tree, false);
   };
 }
 
@@ -688,7 +844,7 @@ async function orgInlineToHtml(s: string): Promise<string> {
       .use(stringify, { allowDangerousHtml: true, closeSelfClosing: true })
       .process(s),
   );
-  return out.replace(/^\s*<p>([\s\S]*?)<\/p>\s*$/, "$1").trim();
+  return out.replace(/^\s*<p>([\s\S]*?)<\/p>\s*$/u, "$1").trim();
 }
 
 // Org string -> PLAIN text for <title> / og:title: convert org to HTML (so the
@@ -700,13 +856,13 @@ async function orgInlineToText(s: string): Promise<string> {
     await unified().use(parse).use(uniorg2rehype).use(stringify, { allowDangerousHtml: true }).process(s),
   );
   return out
-    .replace(/^\s*<p>([\s\S]*?)<\/p>\s*$/, "$1")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, "&")
+    .replace(/^\s*<p>([\s\S]*?)<\/p>\s*$/u, "$1")
+    .replaceAll(/<[^>]+>/gu, "")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&amp;", "&")
     .trim();
 }
 
@@ -736,7 +892,7 @@ function headHtml(m: {
   hasMath: boolean;
 }): Raw {
   const img = absUrl(m.thumbnail);
-  const twitter = img ? "summary_large_image" : "summary";
+  const twitter = img === null ? "summary" : "summary_large_image";
   return (
     <head>
       <meta charset="utf-8" />
@@ -760,11 +916,11 @@ function headHtml(m: {
       <meta property="og:url" content={m.url} />
       <meta property="og:site_name" content="Toybeam" />
       <meta property="og:locale" content="ja_JP" />
-      {img && <meta property="og:image" content={img} />}
+      {img !== null && <meta property="og:image" content={img} />}
       <meta name="twitter:card" content={twitter} />
       <meta name="twitter:creator" content="@toyboot4e" />
       <meta name="twitter:site" content="@toyboot4e" />
-      {img && <meta name="twitter:image" content={img} />}
+      {img !== null && <meta name="twitter:image" content={img} />}
     </head>
   );
 }
@@ -790,6 +946,7 @@ function tagListHtml(tags: string[]): Raw {
 // Open tags of the headings a ToC lists (h2-h4 -- h1 is the page title). Matches
 // the `<h2 id="...">` the render pipeline emits (id via headingSelfLinks), robust
 // to attribute order.
+// oxlint-disable-next-line eslint/require-unicode-regexp -- bun (JSC) drops backreference matches on non-ASCII input under `u`
 const TOC_HEADING_RE = /<h([2-4])\b([^>]*)>([\s\S]*?)<\/h\1>/g;
 
 // Decode the handful of entities that survive tag-stripping back to text, so the
@@ -797,11 +954,11 @@ const TOC_HEADING_RE = /<h([2-4])\b([^>]*)>([\s\S]*?)<\/h\1>/g;
 // `&amp;` is decoded last so it can't re-introduce another entity.
 function decodeEntities(s: string): string {
   return s
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, "&");
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&amp;", "&");
 }
 
 type TocItem = { level: string; id: string; label: string };
@@ -809,7 +966,7 @@ type TocItem = { level: string; id: string; label: string };
 // Scoped indentation class per heading level (the list is flat, so the depth is
 // expressed by the link's class, not by nested <ul>s).
 function tocNodeClass(level: string): string {
-  return level === "2" ? toc.nodeH2 : level === "3" ? toc.nodeH3 : toc.nodeH4;
+  return toc(`nodeH${level}`);
 }
 
 // Build the static table of contents from a page's content HTML: a flat list of
@@ -819,23 +976,27 @@ function tocNodeClass(level: string): string {
 // (build/styles/toc.module.css). Replaces the old client-side tocbot.
 function buildToc(contentHtml: string): { nav: Raw; count: number } {
   const items: TocItem[] = [];
-  for (const m of contentHtml.matchAll(TOC_HEADING_RE)) {
-    const id = m[2].match(/\sid="([^"]*)"/)?.[1];
-    if (!id) continue;
+  for (const [, level = "", attrs = "", inner = ""] of contentHtml.matchAll(TOC_HEADING_RE)) {
+    const id = /\sid="([^"]*)"/u.exec(attrs)?.[1];
+    if (id === undefined || id === "") {
+      continue;
+    }
     // strip the inner self-link anchor / inline markup down to plain text
-    const label = decodeEntities(m[3].replace(/<[^>]+>/g, ""))
-      .replace(/\s+/g, " ")
+    const label = decodeEntities(inner.replaceAll(/<[^>]+>/gu, ""))
+      .replaceAll(/\s+/gu, " ")
       .trim();
-    if (!label) continue;
-    items.push({ level: m[1], id, label });
+    if (label === "") {
+      continue;
+    }
+    items.push({ level, id, label });
   }
   const nav = (
-    <nav id="toc" class={toc.toc} aria-label="目次">
+    <nav id="toc" class={toc("toc")} aria-label="目次">
       {items.length > 0 && (
-        <ul class={toc.tocList}>
+        <ul class={toc("tocList")}>
           {items.map((it) => (
             <li>
-              <a class={`${toc.tocLink} ${tocNodeClass(it.level)}`} href={`#${it.id}`}>
+              <a class={`${toc("tocLink")} ${tocNodeClass(it.level)}`} href={`#${it.id}`}>
                 {it.label}
               </a>
             </li>
@@ -886,7 +1047,9 @@ function page(opts: { htmlClass?: string; head: Raw; titleBlock: Raw; content: R
 // rule per coderef id present on the page (there are only a handful).
 function coderefHoverStyle(ids: string[]): Raw {
   const uniq = [...new Set(ids)];
-  if (!uniq.length) return raw("");
+  if (uniq.length === 0) {
+    return raw("");
+  }
   // CSS rule text (a stylesheet body, not HTML) -> raw inside a JSX <style>; it
   // must not be entity-escaped or the `a[href="#id"]` selectors would break.
   const rules = uniq
@@ -917,26 +1080,26 @@ function articleTitleBlock(m: Meta): Raw {
 // wading through an undifferentiated run of title/date/tag links.
 function articleCard(m: Meta, eager: boolean): Raw {
   return (
-    <li class={card.articleCard}>
-      <div class={card.articleCardBody}>
+    <li class={card("articleCard")}>
+      <div class={card("articleCardBody")}>
         {/* data-article-card: a STABLE hook for tooling (og-preview.html scrapes
             the article list from index.html). The CSS-module class is content-
             hashed, so it can't be relied on. */}
         <div>
-          <a href={m.href} data-article-card class={card.articleCardLink}>
+          <a href={m.href} data-article-card class={card("articleCardLink")}>
             {raw(m.titleHtml)}
           </a>
         </div>
-        <div class={card.articleCardMeta}>
+        <div class={card("articleCardMeta")}>
           {/* <date> is not an HTML element -- it parsed as an unknown inline box
               with no date semantics at all. <time datetime> is the real one. */}
           <time datetime={m.dateIso}>{m.date}</time>
           <ul class="org-tag-list">{tagListHtml(m.tags)}</ul>
         </div>
       </div>
-      {m.thumbnail && (
+      {m.thumbnail !== null && (
         <img
-          class={card.articleCardThumbnail}
+          class={card("articleCardThumbnail")}
           src={m.thumbnail}
           alt=""
           loading={eager ? "eager" : "lazy"}
@@ -950,24 +1113,33 @@ function articleCard(m: Meta, eager: boolean): Raw {
 // --- date formatting: `<2025-10-05 Sun>` -> `Oct  5, 2025` ------------------
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 // Machine-readable form of the same stamp, for <time datetime>.
-function isoDate(raw: string): string {
-  return raw.match(/(\d{4}-\d{2}-\d{2})/)?.[1] ?? "";
+function isoDate(stamp: string): string {
+  return /(\d{4}-\d{2}-\d{2})/u.exec(stamp)?.[1] ?? "";
 }
-function fmtDate(raw: string): string {
-  const m = raw.match(/(\d{4})-(\d{2})-(\d{2})/);
-  if (!m) return "";
-  const day = String(Number(m[3]));
-  return `${MONTHS[Number(m[2]) - 1]} ${day.padStart(2, " ")}, ${m[1]}`;
+function fmtDate(stamp: string): string {
+  const m = /(\d{4})-(\d{2})-(\d{2})/u.exec(stamp);
+  if (!m) {
+    return "";
+  }
+  const [, year = "", month = "", dom = ""] = m;
+  const day = String(Number(dom));
+  return `${MONTHS[Number(month) - 1] ?? ""} ${day.padStart(2, " ")}, ${year}`;
 }
 
 function firstParagraphText(body: string): string {
-  const m = body.match(/<p>([\s\S]*?)<\/p>/);
-  const text = (m ? m[1] : "")
-    .replace(/<[^>]+>/g, "")
-    .replace(/\s+/g, " ")
+  const m = /<p>([\s\S]*?)<\/p>/u.exec(body);
+  const text = (m?.[1] ?? "")
+    .replaceAll(/<[^>]+>/gu, "")
+    .replaceAll(/\s+/gu, " ")
     .trim();
-  return text.length > 150 ? text.slice(0, 150) + "…" : text;
+  return text.length > 150 ? `${text.slice(0, 150)}…` : text;
 }
+
+// A keyword's value, or undefined when unset or empty (`#+TITLE:` with nothing after it).
+const keyword = (kw: Map<string, string>, key: string): string | undefined => {
+  const v = kw.get(key);
+  return v === "" ? undefined : v;
+};
 
 // --- public rendering API ---------------------------------------------------
 export type Rendered = { rel: string; isDiary: boolean; draft: boolean; meta: Meta; html: string };
@@ -976,37 +1148,40 @@ export type Rendered = { rel: string; isDiary: boolean; draft: boolean; meta: Me
 // `rel` is the output path relative to OUT (e.g. `diary/2023-09-24.html`).
 export async function renderArticle(rel: string, text: string): Promise<Rendered> {
   const kw = readKeywords(text);
-  const outRel = rel.replace(/\.org$/, ".html");
-  const tags = (kw.FILETAGS || "")
+  const outRel = rel.replace(/\.org$/u, ".html");
+  const tags = (kw.get("FILETAGS") ?? "")
     .split(":")
     .map((s) => s.trim())
-    .filter(Boolean);
+    .filter((s) => s !== "");
   // Pre-render table captions (org inline -> HTML) since the handler is sync.
-  const tableCaps = await Promise.all(tableCaptions(text).map((c) => (c ? orgInlineToHtml(c) : null)));
+  const tableCaps = await Promise.all(
+    tableCaptions(text).map(async (c) => (c === null || c === "" ? null : orgInlineToHtml(c))),
+  );
   const st: RenderState = {
     source: text,
     // org markup in each `#+BEGIN_DETAILS <summary>` -> HTML (the handler is sync)
-    details: await Promise.all(detailsSummaries(text).map((s) => orgInlineToHtml(s))),
+    details: await Promise.all(detailsSummaries(text).map(async (s) => orgInlineToHtml(s))),
     keyboards: keyboardLayouts(text),
     blockCounter: { n: 0 },
     tableCaps,
     tableCounter: { n: 0 },
     captionN: { figure: 0, listing: 0, table: 0 },
     coderefIds: [],
+    lastLineNum: 0,
   };
   const body = await orgToBody(text, st);
-  const title = kw.TITLE || outRel;
+  const title = keyword(kw, "TITLE") ?? outRel;
   const meta: Meta = {
-    href: "/" + outRel,
+    href: `/${outRel}`,
     title, // raw org title (kept for reference)
     titleHtml: await orgInlineToHtml(title), // org markup -> HTML (w/ KaTeX); article <h1> + listing cards
     titleText: await orgInlineToText(title), // org markup stripped, for <title>/og
-    date: fmtDate(kw.DATE || ""),
-    dateIso: isoDate(kw.DATE || ""),
+    date: fmtDate(kw.get("DATE") ?? ""),
+    dateIso: isoDate(kw.get("DATE") ?? ""),
     tags,
-    thumbnail: thumbnailSrc(kw.THUMBNAIL),
+    thumbnail: thumbnailSrc(kw.get("THUMBNAIL")),
     draft: false,
-    description: kw.DESCRIPTION || firstParagraphText(body),
+    description: keyword(kw, "DESCRIPTION") ?? firstParagraphText(body),
   };
   const html = render(
     page({
@@ -1021,7 +1196,7 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
         // later. Missing the former shipped 47 math pages unstyled.
         hasCode: body.includes("language-"),
         hasMath:
-          body.includes('class="katex') || meta.titleHtml.includes('class="katex') || /\\\(|\\\[|\\begin\{/.test(body),
+          body.includes('class="katex') || meta.titleHtml.includes('class="katex') || /\\\(|\\\[|\\begin\{/u.test(body),
       }),
       titleBlock: articleTitleBlock(meta),
       content: (
@@ -1032,7 +1207,7 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
       ),
     }),
   );
-  return { rel: outRel, isDiary: outRel.startsWith("diary/"), draft: !!kw.DRAFT, meta, html };
+  return { rel: outRel, isDiary: outRel.startsWith("diary/"), draft: keyword(kw, "DRAFT") !== undefined, meta, html };
 }
 
 // A card title may carry KaTeX (e.g. `$\TeX{}$`), rendered into titleHtml by
@@ -1047,7 +1222,7 @@ export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: strin
       <h2 id={id}>
         <a href={`#${id}`}>{id}</a>
       </h2>
-      <ul class={card.articleList}>{cards.map((m, i) => articleCard(m, i === 0))}</ul>
+      <ul class={card("articleList")}>{cards.map((m, i) => articleCard(m, i === 0))}</ul>
     </Fragment>
   );
   const hasMath = listingHasMath([...metas, ...diaryMetas]);
@@ -1116,7 +1291,7 @@ export function buildTagHtml(tag: string, tagged: Meta[], allTags: string[]): st
           <h2 id="Devlog">
             Devlog (<code>#{tag}</code>)
           </h2>
-          <ul class={card.articleList}>{tagged.map((m, i) => articleCard(m, i === 0))}</ul>
+          <ul class={card("articleList")}>{tagged.map((m, i) => articleCard(m, i === 0))}</ul>
         </Fragment>
       ),
     }),

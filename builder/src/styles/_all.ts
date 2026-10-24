@@ -4,4 +4,6 @@
 import card from "./article-card.module.css";
 import keyboard from "./keyboard.module.css";
 import toc from "./toc.module.css";
-export default Object.assign({}, card, keyboard, toc);
+
+const all = { ...card, ...keyboard, ...toc };
+export default all;

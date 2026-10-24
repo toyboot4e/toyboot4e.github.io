@@ -43,6 +43,10 @@ alias t := test
 fmt *args:
     cd builder && bun run fmt {{args}}
 
+# lint builder/ (oxlint, every category + type-aware rules) and typecheck (strict tsc)
+lint:
+    cd builder && bun run lint && bun run typecheck
+
 # regenerate golden files, then show the diff to review
 test-update:
     cd builder && bun run test:update

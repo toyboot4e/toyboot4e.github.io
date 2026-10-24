@@ -10,23 +10,26 @@
 //   UPDATE_GOLDEN=1 bun test
 import { test, expect } from "vitest";
 import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { parseHTML } from "linkedom";
+import { classes } from "../src/css-module.ts";
 import { renderAndBake } from "../src/render-bake.ts";
 import { buildIndexHtml, buildTagHtml, renderArticle, type Meta } from "../src/render.tsx";
-import toc from "../src/styles/toc.module.css";
-import card from "../src/styles/article-card.module.css";
+import tocModule from "../src/styles/toc.module.css";
+import cardModule from "../src/styles/article-card.module.css";
 
-const HERE = dirname(fileURLToPath(import.meta.url));
+const toc = classes(tocModule, "toc.module.css");
+const card = classes(cardModule, "article-card.module.css");
+
+const HERE = import.meta.dirname;
 const FIX = join(HERE, "fixtures");
 const GOLD = join(HERE, "golden");
-const UPDATE = !!process.env.UPDATE_GOLDEN;
+const UPDATE = Boolean(process.env.UPDATE_GOLDEN);
 
 // The rendered org body only -- the page chrome lives in the shell test below.
-const contentOf = (html: string): string => parseHTML(html).document.getElementById("content")?.innerHTML ?? "";
+const contentOf = (html: string): string => parseHTML(html).document.querySelector("#content")?.innerHTML ?? "";
 // `#main` inner minus the title block -- for the index/tag listing pages.
-const mainOf = (html: string): string => parseHTML(html).document.getElementById("main")?.innerHTML ?? "";
+const mainOf = (html: string): string => parseHTML(html).document.querySelector("#main")?.innerHTML ?? "";
 
 async function golden(name: string, actual: string): Promise<void> {
   const file = join(GOLD, name);
@@ -44,27 +47,30 @@ async function golden(name: string, actual: string): Promise<void> {
   expect(actual).toBe(expected);
 }
 
-const bake = async (name: string, org: string) => (await renderAndBake(name, org)).out;
+const bake = async (name: string, org: string): Promise<string> => {
+  const r = await renderAndBake(name, org);
+  return r.out;
+};
 
 // --- 1. body-fragment goldens (one per fixture) ----------------------------
-const fixtures = (await readdir(FIX)).filter((f) => f.endsWith(".org")).sort();
+const entries = await readdir(FIX);
+const fixtures = entries.filter((f) => f.endsWith(".org")).toSorted();
 const baked = await Promise.all(
   fixtures.map(async (fx) => ({ fx, r: await renderAndBake(fx, await readFile(join(FIX, fx), "utf8")) })),
 );
 const metas: Meta[] = baked.map((b) => b.r.meta);
-const allTags = [...new Set(metas.flatMap((m) => m.tags))].sort();
+const allTags = [...new Set(metas.flatMap((m) => m.tags))].toSorted();
 
-for (const { fx, r } of baked) {
-  test(`body: ${fx}`, async () => {
-    await golden(fx.replace(/\.org$/, ".body.html"), contentOf(r.out));
-  });
-}
+test.each(baked)("body: $fx", async ({ fx, r }) => {
+  await golden(fx.replace(/\.org$/u, ".body.html"), contentOf(r.out));
+});
 
 test("index listing", async () => {
   await golden("index.main.html", mainOf(buildIndexHtml(metas, [], allTags)));
 });
+
 test("tag listing", async () => {
-  const tag = allTags[0];
+  const [tag = ""] = allTags;
   await golden(
     "tag.main.html",
     mainOf(
@@ -80,12 +86,12 @@ test("tag listing", async () => {
 // --- 2. page shell (chrome), asserted once ---------------------------------
 test("page shell", async () => {
   const out = await bake("x.org", "#+TITLE: Hi\nbody\n");
-  expect(out.startsWith("<!DOCTYPE html>")).toBe(true);
+  expect(out).toMatch(/^<!DOCTYPE html>/u);
   expect(out).toContain('<html lang="ja">');
   expect(out).toContain('<link rel="stylesheet" href="/style/components.min.css">');
   expect(out).toContain('<header role="banner">');
   expect(out).toContain('<footer role="contentinfo">');
-  expect(out).toContain(`<nav id="toc" class="${toc.toc}" aria-label="目次"></nav>`); // empty ToC (no headings)
+  expect(out).toContain(`<nav id="toc" class="${toc("toc")}" aria-label="目次"></nav>`); // empty ToC (no headings)
   expect(out).not.toContain("toc.min.js"); // no scrollspy when there's no ToC
   expect(out).toContain("<!--pp-->"); // bake sentinel
 });
@@ -93,10 +99,10 @@ test("page shell", async () => {
 test("toc: static list from headings, scrollspy shipped only when present", async () => {
   const out = await bake("t.org", "* First\nbody\n** Nested\nmore\n* Second\n");
   // org level-1 headline -> h2, level-2 -> h3; flat list, indent via scoped class
-  expect(out).toContain(`<nav id="toc" class="${toc.toc}" aria-label="目次"><ul class="${toc.tocList}">`);
-  expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH2}" href="#First">First</a>`);
-  expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH3}" href="#Nested">Nested</a>`);
-  expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH2}" href="#Second">Second</a>`);
+  expect(out).toContain(`<nav id="toc" class="${toc("toc")}" aria-label="目次"><ul class="${toc("tocList")}">`);
+  expect(out).toContain(`<a class="${toc("tocLink")} ${toc("nodeH2")}" href="#First">First</a>`);
+  expect(out).toContain(`<a class="${toc("tocLink")} ${toc("nodeH3")}" href="#Nested">Nested</a>`);
+  expect(out).toContain(`<a class="${toc("tocLink")} ${toc("nodeH2")}" href="#Second">Second</a>`);
   expect(out).toContain('defer src="/style/toc.min.js"'); // scrollspy shipped
 });
 
@@ -136,8 +142,8 @@ test("coderef: repeated labels resolve per-block (positional, not last-wins)", a
   expect(out).toContain('id="coderef-1-1"'); // block 1 anchor
   expect(out).toContain('id="coderef-2-1"'); // block 2 anchor
   // first prose link -> block 1, second -> block 2 (the bug pointed both at block 2)
-  const links = [...out.matchAll(/<a href="(#coderef-\d+-1)"><span class="coderef-anchor">/g)].map((m) => m[1]);
-  expect(links).toEqual(["#coderef-1-1", "#coderef-2-1"]);
+  const links = [...out.matchAll(/<a href="(#coderef-\d+-1)"><span class="coderef-anchor">/gu)].map(([, href]) => href);
+  expect(links).toStrictEqual(["#coderef-1-1", "#coderef-2-1"]);
 });
 
 test("captions: Figure/Listing/Table numbering, per kind", async () => {
@@ -155,13 +161,13 @@ test("captions: Figure/Listing/Table numbering, per kind", async () => {
 test("image: #+ATTR_HTML width lands on <img>, not the container", async () => {
   const out = await bake("i.org", "#+ATTR_HTML: :width 880px\n[[./img/a.webp]]\n");
   expect(out).toContain('<img src="./img/a.webp" alt="a.webp" width="880px"');
-  expect(out).not.toMatch(/<(p|figure)[^>]*width=/);
+  expect(out).not.toMatch(/<(p|figure)[^>]*width=/u);
 });
 
 test("article card: scoped class, org-markup title, thumbnail path", async () => {
   const { meta } = await renderAndBake("a.org", "#+TITLE: =code= t\n#+THUMBNAIL: img/a.webp\nx\n");
   const html = buildIndexHtml([meta], [], []);
-  expect(html).toContain(`class="${card.articleCard}"`); // CSS-module scoped class
+  expect(html).toContain(`class="${card("articleCard")}"`); // CSS-module scoped class
   expect(html).toContain('<code class="inline-verbatim">code</code> t'); // title htmlized
   expect(html).toContain('src="/img/a.webp"'); // thumbnail not /img/img/
 });
@@ -178,10 +184,10 @@ test("mathbb: lowercase/digits -> Unicode double-struck, uppercase keeps KaTeX_A
   expect(out).toContain("\u{1D55F}"); // \mathbb{n} -> 𝕟 (textbb span, LMMathBB font)
   expect(out).toContain("\u{1D7D9}"); // \mathbb{1} -> 𝟙
   expect(out).toContain("\u{1D562}"); // raw-path \mathbb{q} -> 𝕢
-  expect(out).not.toContain("\\mathbb{n}"); // no leftover lowercase \mathbb
+  expect(out).not.toContain(String.raw`\mathbb{n}`); // no leftover lowercase \mathbb
 });
 
-test("YARUO/AA: verbatim <pre>, org markup NOT parsed", async () => {
+test("yARUO/AA: verbatim <pre>, org markup NOT parsed", async () => {
   const out = await bake("y.org", "#+BEGIN_YARUO\n( _人_ )  *not bold*\n#+END_YARUO\n");
   expect(out).toContain('<pre tabindex="0" class="yaruo">( _人_ )  *not bold*</pre>');
   expect(out).not.toContain("<sub>"); // _人_ stays literal, not a subscript
@@ -200,14 +206,14 @@ test("every <pre> is keyboard-focusable so it can be scrolled without a mouse", 
   expect(plain).toContain('<pre tabindex="0">');
 });
 
-test("math: $$...$$ / \\[...\\] render as centered display, $...$ stays inline", async () => {
+test(String.raw`math: $$...$$ / \[...\] render as centered display, $...$ stays inline`, async () => {
   const out = await bake("m.org", "$$\na=b\n$$\n\ninline $x$ here\n\n\\[ y=2 \\]\n");
   // uniorg-rehype renders every latex-fragment as math-inline; our handler
   // upgrades $$ and \[ to display so KaTeX emits a centered .katex-display.
-  expect((out.match(/katex-display/g) || []).length).toBe(2); // $$ and \[ , not $x$
+  expect([...out.matchAll(/katex-display/gu)]).toHaveLength(2); // $$ and \[ , not $x$
 });
 
-test("DETAILS summary: org markup is converted to HTML", async () => {
+test("dETAILS summary: org markup is converted to HTML", async () => {
   const out = await bake("d.org", "#+BEGIN_DETAILS =code= and *bold*\nhidden\n#+END_DETAILS\n");
   expect(out).toContain('<summary><code class="inline-verbatim">code</code> and <strong>bold</strong></summary>');
 });
@@ -215,8 +221,8 @@ test("DETAILS summary: org markup is converted to HTML", async () => {
 test("diff blocks: changed lines get .diff.add / .diff.remove for +/- backgrounds", async () => {
   const out = await bake("d.org", "#+BEGIN_SRC diff\n- a\n+ b\n#+END_SRC\n");
   expect(out).toContain('<pre tabindex="0" class="hl'); // baked by the tree-sitter highlighter
-  expect(out).toMatch(/class="line diff remove"/); // `- a`
-  expect(out).toMatch(/class="line diff add"/); // `+ b`
+  expect(out).toMatch(/class="line diff remove"/u); // `- a`
+  expect(out).toMatch(/class="line diff add"/u); // `+ b`
 });
 
 test("card: [[card:URL]] -> link-card placeholder (URL with :// kept intact)", async () => {

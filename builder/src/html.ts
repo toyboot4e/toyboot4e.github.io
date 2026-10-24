@@ -8,17 +8,20 @@
 // every `h(...)` returns a `Raw`, and `raw(s)` wraps a pre-rendered string so it
 // passes through unescaped. A bare string child is treated as text and escaped.
 
-export type Raw = { __html: string };
-export const Fragment = Symbol("Fragment");
+export type Raw = { readonly __html: string };
+export type Child = Raw | string | number | boolean | null | undefined | readonly Child[];
+type AttrValue = string | number | boolean | null | undefined;
+type Props = Readonly<Record<string, unknown>>;
+type Component = (props: Props) => Raw;
 
-const isRaw = (x: unknown): x is Raw => typeof x === "object" && x !== null && "__html" in (x as any);
+const isRaw = (x: unknown): x is Raw => typeof x === "object" && x !== null && "__html" in x;
 
 export const raw = (s: string): Raw => ({ __html: s });
 
 // One escaper for both text and attributes (matches the prior templating, which
 // used a single esc covering & < > ").
 const esc = (s: string): string =>
-  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 
 // HTML void elements -> self-closing (`<meta .../>`), matching the prior output.
 // The always-empty SVG leaf elements (used in the inline nav/footer icons) are
@@ -30,40 +33,75 @@ const VOID = new Set([
   "path", "circle", "rect", "line", "polyline", "polygon", "ellipse",
 ]);
 
-function renderChildren(children: any[]): string {
+// Array.isArray doesn't narrow a readonly array out of a union.
+const isList = (c: Child): c is readonly Child[] => Array.isArray(c);
+
+const renderChildren = (children: readonly Child[]): string => {
   let out = "";
-  for (const c of children.flat(Infinity)) {
-    if (c == null || c === false || c === true) continue;
-    out += isRaw(c) ? c.__html : esc(String(c));
+  for (const c of children) {
+    if (isList(c)) {
+      out += renderChildren(c);
+    } else if (isRaw(c)) {
+      out += c.__html;
+    } else if (typeof c === "string") {
+      out += esc(c);
+    } else if (typeof c === "number") {
+      out += String(c);
+    }
   }
   return out;
-}
+};
+
+export const Fragment = ({ children }: { readonly children?: Child }): Raw =>
+  raw(renderChildren(children === undefined ? [] : [children]));
 
 // `__source` / `__self` are debug props the dev JSX transform injects; the
 // build disables that (config-shared oxc jsx.development:false), but vitest forces it on,
 // so drop them here too -- they must never reach the HTML.
 const SKIP_PROP = new Set(["children", "__source", "__self"]);
 
-function renderAttrs(props: Record<string, any> | null): string {
-  if (!props) return "";
+const attrText = (k: string, v: unknown): string => {
+  if (typeof v === "string") {
+    return v;
+  }
+  if (typeof v === "number") {
+    return String(v);
+  }
+  throw new TypeError(`html: attribute ${k} is not a string or number`);
+};
+
+const renderAttrs = (props: Props | null): string => {
+  if (!props) {
+    return "";
+  }
   let out = "";
   for (const [k, v] of Object.entries(props)) {
-    if (SKIP_PROP.has(k) || v == null || v === false) continue;
-    if (v === true) out += ` ${k}`;
-    else out += ` ${k}="${esc(String(v))}"`;
+    if (SKIP_PROP.has(k) || v === null || v === undefined || v === false) {
+      continue;
+    }
+    out += v === true ? ` ${k}` : ` ${k}="${esc(attrText(k, v))}"`;
   }
   return out;
-}
+};
 
-export function h(tag: any, props: Record<string, any> | null, ...children: any[]): Raw {
-  // children may also arrive via props.children (automatic-runtime-style usage)
-  const kids = children.length ? children : props?.children != null ? [props.children] : [];
-  if (tag === Fragment) return raw(renderChildren(kids));
-  if (typeof tag === "function") return tag(props ? { ...props, children: kids } : { children: kids });
-  const inner = renderChildren(kids);
-  if (VOID.has(tag) && !inner) return raw(`<${tag}${renderAttrs(props)}/>`);
+export function h(tag: string | Component, props: Props | null, ...children: Child[]): Raw {
+  if (typeof tag === "function") {
+    return tag({ ...props, children });
+  }
+  const inner = renderChildren(children);
+  if (VOID.has(tag) && !inner) {
+    return raw(`<${tag}${renderAttrs(props)}/>`);
+  }
   return raw(`<${tag}${renderAttrs(props)}>${inner}</${tag}>`);
 }
 
 // Final stringify of a top-level node (or raw passthrough).
 export const render = (node: Raw | string): string => (isRaw(node) ? node.__html : node);
+
+declare global {
+  namespace JSX {
+    type Element = Raw;
+    type ElementChildrenAttribute = { children: unknown };
+    type IntrinsicElements = Record<string, Readonly<Record<string, AttrValue | Child>>>;
+  }
+}

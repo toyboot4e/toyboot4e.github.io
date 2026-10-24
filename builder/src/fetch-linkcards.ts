@@ -13,36 +13,15 @@
 
 import { parseHTML } from "linkedom";
 import { readFile, writeFile, readdir } from "node:fs/promises";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
+import { parseTrustedJson, type Card } from "./bake-util.ts";
 
 // Repo-root-relative (builder/src/ -> ../..), so paths resolve regardless of cwd.
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const ROOT = join(import.meta.dirname, "..", "..");
 const CACHE_FILE = join(ROOT, "linkcard-cache.json");
 const SRC_DIR = join(ROOT, "src");
-const CARD_RE = /\[\[card:([^\]]+)\]\]/g;
+const CARD_RE = /\[\[card:([^\]]+)\]\]/gu;
 const UA = "Mozilla/5.0 (compatible; toyboot4e-devlog-linkcard/1.0; +https://toyboot4e.github.io/)";
-
-// A cache entry is either an OGP `card` (default, `kind` absent for back-compat)
-// or a `github-code` embed (the literal source lines of a GitHub blob permalink).
-type Card = {
-  kind?: "card" | "github-code";
-  // kind: card (OGP)
-  title?: string;
-  description?: string;
-  image?: string;
-  siteName?: string;
-  favicon?: string;
-  // kind: github-code
-  owner?: string;
-  repo?: string;
-  refLabel?: string;
-  path?: string;
-  startLine?: number;
-  endLine?: number;
-  lang?: string;
-  code?: string;
-};
 
 // File extension -> Prism language. Only languages already loaded in
 // `build/bake.ts` (loadLanguages) are mapped; an unmapped extension yields a
@@ -93,28 +72,41 @@ const urlArgs = args.filter((a) => !a.startsWith("-"));
 
 // --- collect card URLs from org sources ------------------------------------
 async function walkOrg(dir: string): Promise<string[]> {
-  const out: string[] = [];
-  for (const e of await readdir(dir, { withFileTypes: true })) {
-    const p = join(dir, e.name);
-    if (e.isDirectory()) out.push(...(await walkOrg(p)));
-    else if (e.name.endsWith(".org")) out.push(p);
-  }
-  return out;
+  const entries = await readdir(dir, { withFileTypes: true });
+  const lists = await Promise.all(
+    entries.map(async (e): Promise<string[]> => {
+      const p = join(dir, e.name);
+      if (e.isDirectory()) {
+        return walkOrg(p);
+      }
+      return e.name.endsWith(".org") ? [p] : [];
+    }),
+  );
+  return lists.flat();
 }
 
 async function collectUrls(): Promise<string[]> {
-  if (urlArgs.length) return [...new Set(urlArgs)];
+  if (urlArgs.length > 0) {
+    return [...new Set(urlArgs)];
+  }
+  const files = await walkOrg(SRC_DIR);
+  const texts = await Promise.all(files.map(async (file) => readFile(file, "utf8")));
   const urls = new Set<string>();
-  for (const file of await walkOrg(SRC_DIR)) {
-    const text = await readFile(file, "utf8");
-    for (const m of text.matchAll(CARD_RE)) urls.add(m[1].trim());
+  for (const text of texts) {
+    for (const [, url = ""] of text.matchAll(CARD_RE)) {
+      urls.add(url.trim());
+    }
   }
   return [...urls];
 }
 
+const errorText = (error: unknown): string => (error instanceof Error ? error.message : String(error));
+
 // --- OGP scraping ----------------------------------------------------------
 function abs(base: string, ref: string | null | undefined): string | undefined {
-  if (!ref) return undefined;
+  if (ref === null || ref === undefined || ref === "") {
+    return undefined;
+  }
   try {
     return new URL(ref, base).toString();
   } catch {
@@ -129,32 +121,36 @@ function abs(base: string, ref: string | null | undefined): string | undefined {
 type GhBlob = { owner: string; repo: string; ref: string; path: string; startLine: number; endLine: number };
 
 function parseGitHubBlob(url: string): GhBlob | null {
-  const m = url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+?)(?:#L(\d+)(?:-L(\d+))?)?$/);
-  if (!m) return null;
-  const startLine = m[5] ? +m[5] : 0;
-  const endLine = m[6] ? +m[6] : startLine;
-  return { owner: m[1], repo: m[2], ref: m[3], path: m[4], startLine, endLine };
+  const m = /^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+?)(?:#L(\d+)(?:-L(\d+))?)?$/u.exec(url);
+  if (!m) {
+    return null;
+  }
+  const [, owner = "", repo = "", ref = "", path = "", start, end] = m;
+  const startLine = start === undefined ? 0 : Number(start);
+  const endLine = end === undefined ? startLine : Number(end);
+  return { owner, repo, ref, path, startLine, endLine };
 }
 
-async function fetchGitHubCode(url: string, gh: GhBlob): Promise<Card | null> {
+async function fetchGitHubCode(gh: GhBlob): Promise<Card | null> {
   const raw = `https://raw.githubusercontent.com/${gh.owner}/${gh.repo}/${gh.ref}/${gh.path}`;
   let res: Response;
   try {
-    res = await fetch(raw, { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(15000) });
-  } catch (e: any) {
-    console.warn(`  ! raw fetch failed: ${raw} (${e?.message ?? e})`);
+    res = await fetch(raw, { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(15_000) });
+  } catch (error) {
+    console.warn(`  ! raw fetch failed: ${raw} (${errorText(error)})`);
     return null;
   }
   if (!res.ok) {
     console.warn(`  ! ${res.status} ${res.statusText}: ${raw}`);
     return null;
   }
-  const all = (await res.text()).split("\n");
+  const body = await res.text();
+  const all = body.split("\n");
   const start = Math.max(1, gh.startLine);
-  const end = Math.min(all.length, gh.endLine || gh.startLine);
+  const end = Math.min(all.length, gh.endLine === 0 ? gh.startLine : gh.endLine);
   const code = all.slice(start - 1, end).join("\n");
-  const ext = (gh.path.split("/").pop() || "").split(".").pop()?.toLowerCase() || "";
-  const refLabel = /^[0-9a-f]{40}$/i.test(gh.ref) ? gh.ref.slice(0, 7) : gh.ref;
+  const ext = (gh.path.split("/").at(-1) ?? "").split(".").at(-1)?.toLowerCase() ?? "";
+  const refLabel = /^[0-9a-f]{40}$/iu.test(gh.ref) ? gh.ref.slice(0, 7) : gh.ref;
   const card: Card = {
     kind: "github-code",
     owner: gh.owner,
@@ -165,15 +161,11 @@ async function fetchGitHubCode(url: string, gh: GhBlob): Promise<Card | null> {
     endLine: end,
     code,
   };
-  if (EXT_LANG[ext]) card.lang = EXT_LANG[ext];
+  const lang = EXT_LANG[ext];
+  if (lang !== undefined) {
+    card.lang = lang;
+  }
   return card;
-}
-
-// Dispatch: GitHub blob + line range -> code embed; everything else -> OGP card.
-async function fetchEntry(url: string): Promise<Card | null> {
-  const gh = parseGitHubBlob(url);
-  if (gh && gh.startLine) return fetchGitHubCode(url, gh);
-  return fetchCard(url);
 }
 
 async function fetchCard(url: string): Promise<Card | null> {
@@ -182,10 +174,10 @@ async function fetchCard(url: string): Promise<Card | null> {
     res = await fetch(url, {
       headers: { "User-Agent": UA, Accept: "text/html,*/*" },
       redirect: "follow",
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(15_000),
     });
-  } catch (e: any) {
-    console.warn(`  ! fetch failed: ${url} (${e?.message ?? e})`);
+  } catch (error) {
+    console.warn(`  ! fetch failed: ${url} (${errorText(error)})`);
     return null;
   }
   if (!res.ok) {
@@ -193,20 +185,18 @@ async function fetchCard(url: string): Promise<Card | null> {
     return null;
   }
   const finalUrl = res.url || url;
-  const { document } = parseHTML(await res.text());
+  const html = await res.text();
+  const { document } = parseHTML(html);
 
   const meta = (sel: string): string | undefined => {
-    const el = document.querySelector(sel);
-    const v = el?.getAttribute("content");
-    return v && v.trim() ? v.trim() : undefined;
+    const v = document.querySelector(sel)?.getAttribute("content")?.trim();
+    return v === undefined || v === "" ? undefined : v;
   };
-  const ogp = (prop: string) => meta(`meta[property="og:${prop}"]`) ?? meta(`meta[name="og:${prop}"]`);
+  const ogp = (prop: string): string | undefined =>
+    meta(`meta[property="og:${prop}"]`) ?? meta(`meta[name="og:${prop}"]`);
 
   const title =
-    ogp("title") ??
-    meta('meta[name="twitter:title"]') ??
-    (document.querySelector("title")?.textContent || "").trim() ??
-    "";
+    ogp("title") ?? meta('meta[name="twitter:title"]') ?? (document.querySelector("title")?.textContent ?? "").trim();
   const description =
     ogp("description") ?? meta('meta[name="description"]') ?? meta('meta[name="twitter:description"]');
   const image = abs(finalUrl, ogp("image") ?? ogp("image:url") ?? meta('meta[name="twitter:image"]'));
@@ -219,41 +209,61 @@ async function fetchCard(url: string): Promise<Card | null> {
     document.querySelector('link[rel="apple-touch-icon"]')?.getAttribute("href");
   const favicon = abs(finalUrl, iconHref) ?? abs(finalUrl, "/favicon.ico");
 
-  if (!title) {
+  if (title === "") {
     console.warn(`  ! no title found: ${url}`);
     return null;
   }
   const card: Card = { title };
-  if (description) card.description = description;
-  if (image) card.image = image;
-  if (siteName) card.siteName = siteName;
-  if (favicon) card.favicon = favicon;
+  if (description !== undefined) {
+    card.description = description;
+  }
+  if (image !== undefined) {
+    card.image = image;
+  }
+  if (siteName !== "") {
+    card.siteName = siteName;
+  }
+  if (favicon !== undefined) {
+    card.favicon = favicon;
+  }
   return card;
 }
 
+// Dispatch: GitHub blob + line range -> code embed; everything else -> OGP card.
+async function fetchEntry(url: string): Promise<Card | null> {
+  const gh = parseGitHubBlob(url);
+  if (gh !== null && gh.startLine > 0) {
+    return fetchGitHubCode(gh);
+  }
+  return fetchCard(url);
+}
+
 // --- driver ----------------------------------------------------------------
-let cache: Record<string, Card> = {};
+const cache = new Map<string, Card>();
 try {
-  cache = JSON.parse(await readFile(CACHE_FILE, "utf8"));
+  const text = await readFile(CACHE_FILE, "utf8");
+  for (const [url, card] of Object.entries(parseTrustedJson<Record<string, Card>>(text))) {
+    cache.set(url, card);
+  }
 } catch {
   /* first run */
 }
 
 const urls = await collectUrls();
 const referenced = new Set(urls);
-let nFetched = 0,
-  nKept = 0,
-  nFailed = 0;
-
-for (const url of urls) {
-  if (!force && cache[url]) {
-    nKept++;
-    continue;
-  }
-  console.log(`  fetching: ${url}`);
-  const card = await fetchEntry(url);
+const toFetch = urls.filter((url) => force || !cache.has(url));
+const nKept = urls.length - toFetch.length;
+const fetched = await Promise.all(
+  toFetch.map(async (url) => {
+    console.log(`  fetching: ${url}`);
+    return [url, await fetchEntry(url)] as const;
+  }),
+);
+let nFetched = 0;
+let nFailed = 0;
+for (const [url, card] of fetched) {
   if (card) {
-    cache[url] = card;
+    cache.set(url, card);
     nFetched++;
   } else {
     nFailed++;
@@ -262,22 +272,23 @@ for (const url of urls) {
 
 // Drop entries no longer referenced by any org file (only on a full scan).
 let nPruned = 0;
-if (!urlArgs.length) {
-  for (const key of Object.keys(cache)) {
+if (urlArgs.length === 0) {
+  for (const key of cache.keys()) {
     if (!referenced.has(key)) {
-      delete cache[key];
+      cache.delete(key);
       nPruned++;
     }
   }
 }
 
 // Write sorted by key for stable diffs.
-const sorted: Record<string, Card> = {};
-for (const key of Object.keys(cache).sort()) sorted[key] = cache[key];
-await writeFile(CACHE_FILE, JSON.stringify(sorted, null, 2) + "\n");
+const sorted = Object.fromEntries([...cache.keys()].toSorted().map((k) => [k, cache.get(k)]));
+await writeFile(CACHE_FILE, `${JSON.stringify(sorted, null, 2)}\n`);
 
 console.log(
   `linkcards: ${nFetched} fetched, ${nKept} cached, ${nFailed} failed, ${nPruned} pruned ` +
     `(${Object.keys(sorted).length} total)`,
 );
-if (nFailed > 0) process.exit(1);
+if (nFailed > 0) {
+  process.exit(1);
+}

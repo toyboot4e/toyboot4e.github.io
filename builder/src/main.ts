@@ -19,8 +19,8 @@ console.log(
 if (STRICT && (s.nMathError > 0 || s.nUnknown > 0 || s.nCardMiss > 0)) {
   console.error(
     `build: FAILED (strict) -- ${s.nMathError} math error(s), ` +
-      `${s.nUnknown} unknown language(s)${s.unknownLangs.length ? `: ${s.unknownLangs.join(", ")}` : ""}` +
-      `, ${s.nCardMiss} uncached link card(s)${s.missingCards.length ? `: ${s.missingCards.join(", ")}` : ""}`,
+      `${s.nUnknown} unknown language(s)${s.unknownLangs.length > 0 ? `: ${s.unknownLangs.join(", ")}` : ""}` +
+      `, ${s.nCardMiss} uncached link card(s)${s.missingCards.length > 0 ? `: ${s.missingCards.join(", ")}` : ""}`,
   );
   process.exit(1);
 }
