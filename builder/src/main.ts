@@ -1,4 +1,4 @@
-// CLI entry for the build (`vite-node src/main.ts`). build.ts is the library
+// CLI entry for the build (`bun dist/main.js`, bundled by `vite build`). build.ts is the library
 // (fullBuild + helpers, imported by watch + tests); this just runs it once and
 // prints the summary, failing under strict mode on unknown langs / KaTeX errors /
 // uncached cards.

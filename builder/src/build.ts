@@ -1,6 +1,6 @@
 // The build: `.org` sources -> static site, with uniorg (a JS org-mode parser).
-// Run via Vite (`vite-node src/main.ts`), so `render.tsx` can import its
-// `.module.css` files directly (Vite resolves the scoped class maps).
+// Bundled by `vite build` (run as `bun dist/main.js`), so `render.tsx` can import
+// its `.module.css` files directly (Vite resolves the scoped class maps).
 //
 // Each article is rendered AND baked (tree-sitter + KaTeX + link cards) in one
 // pass -- no intermediate write-then-re-parse. Render lives in `render.tsx`, the
@@ -27,7 +27,7 @@ const ROOT = join(HERE, "..", "..");
 export const SRC = join(ROOT, "src");
 export const OUT = process.env.OUT_DIR ?? join(ROOT, "out");
 export const STRICT = process.argv.includes("--strict") || !!process.env.CI;
-// Render is sharded across this many parallel `vite-node` child processes (one
+// Render is sharded across this many parallel `bun dist/render-shard.js` child processes (one
 // warm tree-sitter/uniorg setup each). Past ~6 the per-process startup
 // outweighs the shrinking per-shard work; override with BUILD_WORKERS.
 const WORKERS = Math.max(1, Number(process.env.BUILD_WORKERS) || Math.min(cpus().length, 6));

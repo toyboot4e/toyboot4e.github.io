@@ -11,7 +11,7 @@ import { writeFile } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// This module runs from builder/src (vite-node) OR builder/dist (bundled), both
+// This module runs from builder/src (bun / vite-node) OR builder/dist (bundled), both
 // one level under builder/, so anchor everything to builder/ and the repo root.
 const BUILDER = join(dirname(fileURLToPath(import.meta.url)), "..");
 const ROOT = join(BUILDER, "..");
@@ -76,6 +76,6 @@ export async function buildAssets(): Promise<void> {
 
 // Run standalone for `just assets` and the watch daemon's incremental rebuild
 // (both set ASSETS_CLI=1). The build orchestrator imports buildAssets() instead
-// and runs it overlapped with the render -- vite-node doesn't expose the entry
-// script in argv, so an env flag is the reliable way to tell the two apart.
+// and runs it overlapped with the render -- once bundled into dist/main.js this
+// module has no entry of its own, so an env flag is the reliable way to tell the two apart.
 if (process.env.ASSETS_CLI) await buildAssets();

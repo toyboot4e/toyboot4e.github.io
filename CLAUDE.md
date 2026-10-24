@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a static site generator for a Japanese technical devlog. Content is authored in Org Mode (`.org` files) and converted to HTML by a custom TypeScript build (uniorg + tree-sitter + KaTeX, no Emacs). The build is a **Vite project in `builder/`**, run with `vite-node` — so the render imports its CSS modules (`*.module.css`) directly, Vite-scoped.
+This is a static site generator for a Japanese technical devlog. Content is authored in Org Mode (`.org` files) and converted to HTML by a custom TypeScript build (uniorg + tree-sitter + KaTeX, no Emacs). The build is a **Vite project in `builder/`**, bundled by `vite build` into `builder/dist/` and run with bun — so the render imports its CSS modules (`*.module.css`) directly, Vite-scoped.
 
 ## Core Commands
 
 ### Building and Development
-- `just build` - Build the devlog into `out/`. Runs the Vite builder
-  (`cd builder && vite-node src/main.ts`): builds assets (`src/assets.ts`), then
+- `just build` - Build the devlog into `out/`. Bundles the builder
+  (`vite build`, skipped when `dist/` is fresh) and runs `bun dist/main.js`: builds assets (`src/assets.ts`), then
   renders `.org` → HTML and bakes tree-sitter/KaTeX/link-cards in one pass
   (`builder/src/render.tsx` + `builder/src/bake.ts`), in-process, no separate
   format step. This is what nix/CI ship. `BUILD_PROF=1` prints phase timings.
@@ -69,7 +69,7 @@ This is a static site generator for a Japanese technical devlog. Content is auth
 
 ## Architecture
 
-### Build Flow (the `builder/` Vite project, run via vite-node)
+### Build Flow (the `builder/` Vite project, bundled and run under bun)
 1. **Content**: Articles written in Org Mode format in `src/`
 2. **Assets**: `builder/src/assets.ts` builds the CSS modules into
    `components.min.css` (Vite, same `generateScopedName` the render uses) and
@@ -100,7 +100,7 @@ uncached cards.
 - `builder/src/styles/*.module.css` - scoped CSS modules (Vite resolves them)
 - `builder/src/html.ts` - tiny JSX-to-string runtime (`h`/`Fragment`/`raw`)
 - `builder/test/` - vitest goldens (`golden/`) + fixtures (`fixtures/`)
-- `scripts/fetch-linkcards.ts` - Bun OGP scraper (offline) -> `linkcard-cache.json`
+- `builder/src/fetch-linkcards.ts` - Bun OGP scraper (offline) -> `linkcard-cache.json`
 - `linkcard-cache.json` - Committed OGP metadata for `[[card:URL]]` links
 - `src/` - Source Org files (articles and pages); `src/style/` - global CSS + browser TS
 - `src/tags/` - Auto-generated tag pages
@@ -142,7 +142,7 @@ kinds, chosen by URL:
   OGP card.
 
 Because the build is offline/hermetic (nix/CI sandbox has no network), metadata
-is fetched **ahead of time** by `scripts/fetch-linkcards.ts` (`just linkcards`)
+is fetched **ahead of time** by `builder/src/fetch-linkcards.ts` (`just linkcards`)
 into the committed `linkcard-cache.json`; `builder/src/bake.ts` bakes the card
 HTML from that cache. A URL absent from the cache degrades to a plain link and
 fails the build under `--strict` (CI/nix), so the cache must be committed
@@ -187,9 +187,11 @@ Disco/theme rules in a module use `:global()` for ancestor classes. The remainin
 global CSS stays in `src/style/style.css`.
 
 ### Dependencies
-- **Build tooling** (in `builder/`): `vite` + `vite-node` (run the build, resolve
-  CSS modules), `esbuild` (minify CSS / bundle browser TS), `vitest` (tests). Bun
-  is used as the launcher (`bunx vite-node`) and still runs `scripts/fetch-linkcards.ts`.
+- **Build tooling** (in `builder/`): `vite` (bundles the build, resolving CSS
+  modules), `vite-node` (only the `just watch` daemon, which imports the render
+  from source), `esbuild` (minify CSS / bundle browser TS), `vitest` (tests). Bun
+  runs the bundle, `assets.ts` and `fetch-linkcards.ts`; recipes go through
+  `builder/package.json` scripts (`bun run <script>`).
 - **Node deps**: `web-tree-sitter`, `katex`, `linkedom`, `uniorg` (render/bake)
 - **Frontend**: Simple.css, custom fonts, `katex.min.css` (no runtime highlighter/MathJax)
 

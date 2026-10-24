@@ -9,8 +9,8 @@ import uniorg2rehype from "uniorg-rehype";
 import rehypeKatex from "rehype-katex";
 import stringify from "rehype-stringify";
 import { h, Fragment, raw, render, type Raw } from "./html.ts";
-// Scoped CSS-module class maps, resolved directly by Vite (vite-node at build
-// time). Each default export is `{ authoredName: scopedName }`. The matching
+// Scoped CSS-module class maps, resolved directly by Vite (`vite build` at bundle
+// time, vite-node under watch). Each default export is `{ authoredName: scopedName }`. The matching
 // scoped CSS ships as components.min.css (emitted by assets.ts, linked in
 // headHtml); Vite's `generateScopedName` (vite.config.ts) keeps the names in
 // sync between this render and that CSS build.
