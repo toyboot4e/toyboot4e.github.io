@@ -1290,7 +1290,9 @@ export function buildTagHtml(tag: string, tagged: Meta[], allTags: string[]): st
       content: (
         <Fragment>
           <h2 id="Devlog">
-            Devlog (<code>#{tag}</code>)
+            <a href="#Devlog">
+              Devlog (<code>#{tag}</code>)
+            </a>
           </h2>
           {tagNav(allTags)}
           <ul class={card.articleList}>{tagged.map((m, i) => articleCard(m, i === 0))}</ul>
