@@ -48,8 +48,8 @@
 
       # Everything `just build` shells out to. Single source of truth, shared by
       # the hermetic package build (runtimeInputs) and the devShell, so the two
-      # can't drift. The build is a Vite project (builder/) run via `bunx
-      # vite-node` -- bun runs vite-node, so no separate node is needed; no Emacs.
+      # can't drift. The build is a Vite project (builder/) bundled by `vite build`
+      # and run under bun, so no separate node is needed; no Emacs.
       buildToolsFor =
         pkgs:
         with pkgs;
@@ -83,7 +83,7 @@
           runtimeInputs = [ pkgs.bun ];
           text = ''
             [ -e builder/node_modules ] || ln -sfn ${nodeModules}/node_modules builder/node_modules
-            ( cd builder && bunx vite-node src/fetch-linkcards.ts "$@" )
+            ( cd builder && bun run linkcards "$@" )
           '';
         };
     in

@@ -100,12 +100,12 @@ async function onOrg(relOrg: string): Promise<void> {
 }
 
 // --- one static-file change --------------------------------------------------
-// The only child PROCESS the daemon spawns (the asset rebuild, via vite-node).
+// The only child PROCESS the daemon spawns (the asset rebuild).
 // Tracked so shutdown() can reap it if we're killed mid-rebuild.
 let assetChild: ChildProcess | null = null;
 async function runAssets(): Promise<void> {
-  assetChild = spawn("bunx", ["vite-node", join(HERE, "assets.ts")], {
-    cwd: join(HERE, ".."), // builder/, so vite-node finds vite.config.ts
+  assetChild = spawn("bun", [join(HERE, "assets.ts")], {
+    cwd: join(HERE, ".."),
     env: { ...process.env, ASSETS_CLI: "1" }, // trigger the standalone run
     stdio: ["ignore", "ignore", "inherit"],
   });

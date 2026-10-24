@@ -2,11 +2,15 @@
   "name": "toyboot4e-devlog-builder",
   "private": true,
   "type": "module",
-  "description": "Vite-based build for the devlog (uniorg render + Shiki/KaTeX SSR, CSS modules).",
+  "description": "Vite-based build for the devlog (uniorg render + tree-sitter/KaTeX bake, CSS modules).",
   "scripts": {
-    "build": "vite-node src/build.ts",
-    "assets": "vite-node src/assets.ts",
-    "test": "vitest run"
+    "bundle": "vite build -c vite.build.config.ts",
+    "build": "bun run bundle && bun dist/main.js",
+    "assets": "ASSETS_CLI=1 bun src/assets.ts",
+    "linkcards": "bun src/fetch-linkcards.ts",
+    "watch": "vite-node src/watch.ts",
+    "test": "vitest run",
+    "test:update": "UPDATE_GOLDEN=1 vitest run"
   },
   "dependencies": {
     "katex": "^0.16.0",

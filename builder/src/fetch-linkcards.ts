@@ -1,6 +1,6 @@
 // Populate `linkcard-cache.json` for `[[card:URL]]` links by scraping OGP /
 // GitHub metadata from the live web; the build (`builder/src/bake.ts`) only ever
-// *reads* it. Run via vite-node (`just linkcards`).
+// *reads* it. Run via bun (`just linkcards`).
 //
 // The cache is NOT committed -- it's derived from the working tree, which may
 // hold unpublished drafts. It's regenerated each build: `just build` runs this

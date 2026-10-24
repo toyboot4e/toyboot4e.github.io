@@ -13,15 +13,14 @@ lh_report := "/tmp/lh-report" # {{lh_report}}.report.{html,json}`
 help:
     @just -l
 
-# build the devlog into out/ -- this is what nix/CI ship. Builds assets, fetches
-# link cards (best-effort), then renders AND bakes (Prism/KaTeX/cards) via the
-# Vite builder (`builder/`, vite-node). BUILD_PROF=1 prints phase timings.
+# build the devlog into out/ -- this is what nix/CI ship. Fetches link cards
+# (best-effort), then builds assets and renders AND bakes (tree-sitter/KaTeX/cards)
+# via the Vite builder (`builder/`). BUILD_PROF=1 prints phase timings.
 build *args:
-    # Refresh `linkcard-cache.json` (bun runs the .ts directly -- no .module.css here):
-    -cd builder && bun src/fetch-linkcards.ts
+    -cd builder && bun run linkcards
     # Bundle the build to dist/ only when a source is newer than it (else reuse the
     # bundle), then run the plain JS under bun -- no per-process vite-node boot.
-    cd builder && if [ ! -f dist/main.js ] || [ -n "$(find src config-shared.ts vite.build.config.ts vite.config.ts -newer dist/main.js 2>/dev/null)" ]; then bunx vite build -c vite.build.config.ts; fi
+    cd builder && if [ ! -f dist/main.js ] || [ -n "$(find src config-shared.ts vite.build.config.ts vite.config.ts -newer dist/main.js 2>/dev/null)" ]; then bun run bundle; fi
     cd builder && bun dist/main.js {{args}}
 
 [private]
@@ -35,14 +34,14 @@ clean:
 # run the golden tests (render+bake output pinned against test/golden/).
 # regenerate goldens after an intentional output change: `just test-update`
 test:
-    cd builder && bunx vitest run
+    cd builder && bun run test
 
 [private]
 alias t := test
 
 # regenerate golden files, then show the diff to review
 test-update:
-    cd builder && UPDATE_GOLDEN=1 bunx vitest run
+    cd builder && bun run test:update
     git -c core.pager=cat diff --stat builder/test/golden/
 
 [private]
@@ -50,15 +49,15 @@ alias c := clean
 
 # fetch OGP metadata for `[[card:URL]]` links into `linkcard-cache.json` (-f, URLs)
 linkcards *args:
-    cd builder && bunx vite-node src/fetch-linkcards.ts {{args}}
+    cd builder && bun run linkcards {{args}}
 
 [private]
 alias lc := linkcards
 
 # build CSS modules (-> components.min.css) + minify CSS + bundle/minify TS in
-# `src/style/` into `*.min.{css,js}` via the Vite builder (also run by `build`)
+# `src/style/` into `*.min.{css,js}` (also run by `build`)
 assets:
-    cd builder && ASSETS_CLI=1 bunx vite-node src/assets.ts
+    cd builder && bun run assets
 
 # starts HTTP server
 serve:
@@ -148,8 +147,8 @@ watch:
     set -u
     while :; do
         # the daemon's startup build spawns the bundled dist/render-shard.js, so build it first
-        (cd builder && bunx vite build -c vite.build.config.ts) || exit 1
-        (cd builder && DEV_PORT={{port}} bunx vite-node src/watch.ts)
+        (cd builder && bun run bundle) || exit 1
+        (cd builder && DEV_PORT={{port}} bun run watch)
         code=$?
         [ "$code" -eq 75 ] || exit "$code" # 75 = builder change, anything else = done
         echo "watch: builder sources changed — rebuilding + restarting the daemon…"
