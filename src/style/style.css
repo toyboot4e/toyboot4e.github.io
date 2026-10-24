@@ -1136,6 +1136,14 @@ html.disco-on {
   padding-block: 0.3em;
   border-radius: 8px;
 }
+/* Take the h2 padding back out of its margins (UA 0.83em below, simple.css 3rem
+   above, 1.5rem when first) so the spacing matches the article pages. */
+.home #content > h2 {
+  margin-block: calc(3rem - 0.3em) 0.53em;
+}
+.home #content > h2:first-child {
+  margin-top: calc(1.5rem - 0.3em);
+}
 .home #content > nav > .org-tag-list {
   display: flex; /* block-level pane (vs the default inline-flex) */
   padding-block: 0.5rem;
