@@ -55,7 +55,8 @@ const cache = new Map<string, Entry>();
 const metaKey = (m: Meta) => JSON.stringify([m.href, m.titleHtml, m.date, m.tags, m.thumbnail]);
 
 function lists() {
-  const metas: Meta[] = [], diaryMetas: Meta[] = [];
+  const metas: Meta[] = [],
+    diaryMetas: Meta[] = [];
   for (const e of cache.values()) (e.isDiary ? diaryMetas : metas).push(e.meta);
   const byHrefDesc = (a: Meta, b: Meta) => (a.href < b.href ? 1 : -1);
   metas.sort(byHrefDesc);
@@ -63,7 +64,10 @@ function lists() {
   const allTags = [...new Set(metas.flatMap((m) => m.tags))].sort();
   return { metas, diaryMetas, allTags };
 }
-const regenIndexTags = () => { const l = lists(); return writeIndexAndTags(l.metas, l.diaryMetas, l.allTags); };
+const regenIndexTags = () => {
+  const l = lists();
+  return writeIndexAndTags(l.metas, l.diaryMetas, l.allTags);
+};
 
 const since = (t: number) => `${Math.round(performance.now() - t)}ms`;
 const log = (msg: string) => console.log(`  ${msg}`);
@@ -75,14 +79,22 @@ async function onOrg(relOrg: string): Promise<void> {
   const outRel = relOrg.replace(/\.org$/, ".html");
   // deleted -> drop its page; reindex only if it was a published article
   if (!existsSync(abs)) {
-    if (cache.delete(outRel)) { await rm(join(OUT, outRel), { force: true }); await regenIndexTags(); dev?.reload(); }
+    if (cache.delete(outRel)) {
+      await rm(join(OUT, outRel), { force: true });
+      await regenIndexTags();
+      dev?.reload();
+    }
     log(`- ${relOrg} removed (${since(t)})`);
     return;
   }
   const r = await renderAndBake(relOrg, await readFile(abs, "utf8"));
   // became a #+DRAFT -> treat like a delete (release build skips drafts)
   if (r.draft) {
-    if (cache.delete(r.rel)) { await rm(join(OUT, r.rel), { force: true }); await regenIndexTags(); dev?.reload(); }
+    if (cache.delete(r.rel)) {
+      await rm(join(OUT, r.rel), { force: true });
+      await regenIndexTags();
+      dev?.reload();
+    }
     log(`~ ${relOrg} draft, skipped (${since(t)})`);
     return;
   }
@@ -95,7 +107,8 @@ async function onOrg(relOrg: string): Promise<void> {
   if (reindex) await regenIndexTags();
   // body-only edit -> reload just the tab on that page; a metadata change also
   // rewrote the index + tag pages, so reload every tab.
-  if (reindex) dev?.reload(); else dev?.reload(urlOf(r.rel));
+  if (reindex) dev?.reload();
+  else dev?.reload(urlOf(r.rel));
   log(`✓ ${r.rel}${reindex ? " + index/tags" : ""} (${since(t)})`);
 }
 
@@ -109,7 +122,11 @@ async function runAssets(): Promise<void> {
     env: { ...process.env, ASSETS_CLI: "1" }, // trigger the standalone run
     stdio: ["ignore", "ignore", "inherit"],
   });
-  try { await new Promise<void>((res) => assetChild!.on("exit", () => res())); } finally { assetChild = null; }
+  try {
+    await new Promise<void>((res) => assetChild!.on("exit", () => res()));
+  } finally {
+    assetChild = null;
+  }
 }
 async function copyStyleAssets(): Promise<void> {
   const dir = join(SRC, "style");
@@ -129,7 +146,8 @@ async function onStatic(relStatic: string): Promise<void> {
     await copyStyleAssets();
     // .css edit -> swap stylesheets in place (no navigation); a .ts/.js edit
     // changes behaviour, so do a full reload to re-run it.
-    if (relStatic.endsWith(".css")) dev?.cssReload(); else dev?.reload();
+    if (relStatic.endsWith(".css")) dev?.cssReload();
+    else dev?.reload();
     log(`style ${relStatic} -> re-minified (${since(t)})`);
     return;
   }
@@ -157,10 +175,13 @@ const pending = new Map<string, ReturnType<typeof setTimeout>>();
 function schedule(relPath: string): void {
   const prev = pending.get(relPath);
   if (prev) clearTimeout(prev);
-  pending.set(relPath, setTimeout(() => {
-    pending.delete(relPath);
-    route(relPath).catch((e) => console.error(`  ! ${relPath}: ${e?.stack ?? e}`));
-  }, 40));
+  pending.set(
+    relPath,
+    setTimeout(() => {
+      pending.delete(relPath);
+      route(relPath).catch((e) => console.error(`  ! ${relPath}: ${e?.stack ?? e}`));
+    }, 40),
+  );
 }
 
 // --- single instance --------------------------------------------------------
@@ -171,7 +192,11 @@ function schedule(relPath: string): void {
 // process that happens to have reused the PID (Linux; degrades to a no-op).
 const PID_FILE = join(HERE, "..", "..", ".watch.pid"); // repo root
 function isWatchDaemon(pid: number): boolean {
-  try { return readFileSync(`/proc/${pid}/cmdline`, "utf8").includes("watch.ts"); } catch { return false; }
+  try {
+    return readFileSync(`/proc/${pid}/cmdline`, "utf8").includes("watch.ts");
+  } catch {
+    return false;
+  }
 }
 try {
   const old = Number(readFileSync(PID_FILE, "utf8"));
@@ -179,7 +204,9 @@ try {
     process.kill(old, "SIGTERM");
     console.log(`  replaced a stale watch daemon (pid ${old})`);
   }
-} catch { /* no prior daemon */ }
+} catch {
+  /* no prior daemon */
+}
 await writeFile(PID_FILE, String(process.pid));
 
 // --- startup: one full build, seed the cache, then watch ---------------------
@@ -202,10 +229,14 @@ function watchDir(dir: string, onFile: (abs: string) => void): boolean {
     const w = watch(dir, (_event, filename) => {
       if (filename) onFile(join(dir, filename.toString()));
     });
-    w.on("error", () => { /* dir removed mid-session: ignore, don't crash */ });
+    w.on("error", () => {
+      /* dir removed mid-session: ignore, don't crash */
+    });
     watchers.push(w);
     return true;
-  } catch { return false; } // unreadable/vanished dir -> skip
+  } catch {
+    return false;
+  } // unreadable/vanished dir -> skip
 }
 function watchTree(dir: string, onFile: (abs: string) => void): void {
   if (!watchDir(dir, onFile)) return;
@@ -246,9 +277,25 @@ let stopping = false;
 function shutdown(sig: string, code = 0): void {
   if (stopping) return;
   stopping = true;
-  for (const w of watchers) { try { w.close(); } catch { /* already closed */ } }
-  if (assetChild) { try { assetChild.kill(); } catch { /* already exited */ } }
-  try { unlinkSync(PID_FILE); } catch { /* already gone */ }
+  for (const w of watchers) {
+    try {
+      w.close();
+    } catch {
+      /* already closed */
+    }
+  }
+  if (assetChild) {
+    try {
+      assetChild.kill();
+    } catch {
+      /* already exited */
+    }
+  }
+  try {
+    unlinkSync(PID_FILE);
+  } catch {
+    /* already gone */
+  }
   console.log(`\nwarm watch: stopped (${sig}).`);
   process.exit(code);
 }

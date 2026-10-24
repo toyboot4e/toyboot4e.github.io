@@ -35,11 +35,22 @@ const QUERY_DIR = join(HERE, "..", "grammars", "queries");
 
 // org `#+BEGIN_SRC <tok>` language tokens that differ from the vendored grammar id.
 const ALIAS: Record<string, string> = {
-  hs: "haskell", sh: "bash", shell: "bash", elisp: "emacs-lisp",
-  "c++": "cpp", "c#": "csharp", js: "javascript", ts: "typescript", yml: "yaml",
-  "fortran-free-form": "fortran", md: "markdown", lisp: "commonlisp",
-  "markdown.inline": "markdown_inline", "markdown-inline": "markdown_inline",
-  justfile: "just", kk: "koka",
+  hs: "haskell",
+  sh: "bash",
+  shell: "bash",
+  elisp: "emacs-lisp",
+  "c++": "cpp",
+  "c#": "csharp",
+  js: "javascript",
+  ts: "typescript",
+  yml: "yaml",
+  "fortran-free-form": "fortran",
+  md: "markdown",
+  lisp: "commonlisp",
+  "markdown.inline": "markdown_inline",
+  "markdown-inline": "markdown_inline",
+  justfile: "just",
+  kk: "koka",
   // the tsx grammar parses JSX/TSX (and plain js); the javascript grammar has no
   // JSX, so `jsx` must map here, not to `javascript`.
   jsx: "tsx",
@@ -81,9 +92,12 @@ const CLASS_TABLE: [string, string][] = [
   ["variable.builtin", "vbi"],
   // markdown markup
   ["markup.heading", "kw"],
-  ["markup.bold", "con"], ["markup.strong", "con"],
-  ["markup.italic", "ty"], ["markup.emphasis", "ty"],
-  ["markup.raw", "str"], ["markup.inline", "str"],
+  ["markup.bold", "con"],
+  ["markup.strong", "con"],
+  ["markup.italic", "ty"],
+  ["markup.emphasis", "ty"],
+  ["markup.raw", "str"],
+  ["markup.inline", "str"],
   ["markup.link", "tag"],
   ["markup.list", "kw"],
   ["markup.quote", "com"],
@@ -161,7 +175,11 @@ function readQuery(id: string, suffix: string, seen: Set<string> = new Set()): s
   const path = join(QUERY_DIR, `${id}${suffix}.scm`);
   if (!existsSync(path)) return "";
   return readFileSync(path, "utf8").replace(INHERITS_RE, (_m, langs: string) =>
-    langs.split(",").map((l) => `\n${readQuery(l.trim().replace(/[()]/g, ""), suffix, seen)}\n`).join(""));
+    langs
+      .split(",")
+      .map((l) => `\n${readQuery(l.trim().replace(/[()]/g, ""), suffix, seen)}\n`)
+      .join(""),
+  );
 }
 
 /** Canonical grammar id for an org language token, or null if we have no grammar. */
@@ -186,10 +204,10 @@ function paintInto(cls: (string | null)[], src: string, id: string, offset: numb
   const caps = g.query.captures(tree.rootNode);
   // Group same-node captures together (start asc, then outer-first), with the
   // LAST query pattern last so it wins the selection below.
-  caps.sort((a, b) =>
-    a.node.startIndex - b.node.startIndex ||
-    b.node.endIndex - a.node.endIndex ||
-    a.patternIndex - b.patternIndex);
+  caps.sort(
+    (a, b) =>
+      a.node.startIndex - b.node.startIndex || b.node.endIndex - a.node.endIndex || a.patternIndex - b.patternIndex,
+  );
 
   const scopes: Scope[] = [{ end: src.length, defs: [] }];
   const resolved: { s: number; e: number; hl: string }[] = [];
@@ -218,7 +236,10 @@ function paintInto(cls: (string | null)[], src: string, id: string, offset: numb
         const nm = src.slice(s, e);
         for (let k = scopes.length - 1; k >= 0 && refHl === undefined; k--) {
           for (let j = scopes[k].defs.length - 1; j >= 0; j--) {
-            if (scopes[k].defs[j].name === nm) { refHl = scopes[k].defs[j].hl; break; }
+            if (scopes[k].defs[j].name === nm) {
+              refHl = scopes[k].defs[j].hl;
+              break;
+            }
           }
         }
       } else {
@@ -274,7 +295,13 @@ function paint(src: string, id: string): (string | null)[] {
 // `<span class="hl-X">`, breaking runs at the coderef-anchor boundaries and
 // merging the `coderef-anchor` class onto the segments inside it (matching the
 // old Shiki decoration output: a single span, not a nested wrapper).
-function renderLine(src: string, cls: (string | null)[], ls: number, le: number, anchor: { s: number; e: number } | null): string {
+function renderLine(
+  src: string,
+  cls: (string | null)[],
+  ls: number,
+  le: number,
+  anchor: { s: number; e: number } | null,
+): string {
   let html = "";
   let i = ls;
   while (i < le) {
@@ -348,7 +375,8 @@ function highlightDiff(code: string, inner: string, opts: HlOpts): string {
   const shifted: HlOpts = {
     ...opts,
     coderefs: (opts.coderefs ?? []).map((c) =>
-      status[c.line] === "context" ? c : { ...c, start: c.start - 1, end: c.end - 1 }),
+      status[c.line] === "context" ? c : { ...c, start: c.start - 1, end: c.end - 1 },
+    ),
   };
   return assemble(body, cls, shifted, status);
 }

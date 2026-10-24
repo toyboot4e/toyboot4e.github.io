@@ -39,16 +39,30 @@ const PLAIN = new Set(["txt", "text", "plaintext", "plain", "ditaa", "plantuml"]
 await initHighlighter();
 
 // --- counters --------------------------------------------------------------
-let nPlain = 0, nDom = 0, nUnknown = 0, nHlError = 0;
-let nMath = 0, nMathError = 0, nCards = 0, nCardMiss = 0;
+let nPlain = 0,
+  nDom = 0,
+  nUnknown = 0,
+  nHlError = 0;
+let nMath = 0,
+  nMathError = 0,
+  nCards = 0,
+  nCardMiss = 0;
 const unknownLangs = new Set<string>();
 const missingCards = new Set<string>();
 const warn = (m: string) => console.warn(`  ! ${m}`);
 
 export function getStats(): BakeStats {
   return {
-    nPlain, nDom, nUnknown, nHlError, nMath, nMathError, nCards, nCardMiss,
-    unknownLangs: [...unknownLangs], missingCards: [...missingCards],
+    nPlain,
+    nDom,
+    nUnknown,
+    nHlError,
+    nMath,
+    nMathError,
+    nCards,
+    nCardMiss,
+    unknownLangs: [...unknownLangs],
+    missingCards: [...missingCards],
   };
 }
 export function resetStats(): void {
@@ -80,7 +94,9 @@ function highlightCode(document: any): void {
     const opts = {
       lineNumbers: code.hasAttribute("data-line-numbers"),
       lineStart: code.getAttribute("data-line-start") ? Number(code.getAttribute("data-line-start")) : 1,
-      coderefBlock: code.hasAttribute("data-coderef-block") ? Number(code.getAttribute("data-coderef-block")) : undefined,
+      coderefBlock: code.hasAttribute("data-coderef-block")
+        ? Number(code.getAttribute("data-coderef-block"))
+        : undefined,
       coderefs: crAttr ? JSON.parse(crAttr) : undefined,
     };
     let html: string | null = null;
@@ -93,12 +109,14 @@ function highlightCode(document: any): void {
       continue;
     }
     if (html == null) {
-      nUnknown++; unknownLangs.add(lang);
+      nUnknown++;
+      unknownLangs.add(lang);
       warn(`unknown language: ${lang}`);
       continue;
     }
     swapPre(document, pre, html);
-    if (PLAIN.has(lang)) nPlain++; else nDom++;
+    if (PLAIN.has(lang)) nPlain++;
+    else nDom++;
   }
 }
 
@@ -112,14 +130,18 @@ function renderMath(document: any): void {
   for (let n = walker.nextNode(); n; n = walker.nextNode()) {
     let inSkip = false;
     for (let p = n.parentNode; p; p = p.parentNode) {
-      if (SKIP_MATH.has(p.nodeName)) { inSkip = true; break; }
+      if (SKIP_MATH.has(p.nodeName)) {
+        inSkip = true;
+        break;
+      }
     }
     if (!inSkip && /\\\(|\\\[|\\begin\{/.test(n.data)) targets.push(n);
   }
   for (const node of targets) {
     const text: string = node.data;
     const frag = document.createDocumentFragment();
-    let last = 0, m: RegExpExecArray | null;
+    let last = 0,
+      m: RegExpExecArray | null;
     MATH_RE.lastIndex = 0;
     while ((m = MATH_RE.exec(text))) {
       if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
@@ -157,10 +179,20 @@ function renderMath(document: any): void {
 type Card = {
   kind?: "card" | "github-code";
   // kind: card (OGP)
-  title?: string; description?: string; image?: string; siteName?: string; favicon?: string;
+  title?: string;
+  description?: string;
+  image?: string;
+  siteName?: string;
+  favicon?: string;
   // kind: github-code
-  owner?: string; repo?: string; refLabel?: string; path?: string;
-  startLine?: number; endLine?: number; lang?: string; code?: string;
+  owner?: string;
+  repo?: string;
+  refLabel?: string;
+  path?: string;
+  startLine?: number;
+  endLine?: number;
+  lang?: string;
+  code?: string;
 };
 let cards: Record<string, Card> = {};
 try {
@@ -169,8 +201,7 @@ try {
   /* no cache yet -- every card will degrade (and fail strict) */
 }
 
-const esc = (s: string) =>
-  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 function addClass(el: any, cls: string): void {
   const cur = (el.getAttribute("class") || "").split(/\s+/).filter(Boolean);
@@ -199,8 +230,7 @@ function replaceWithBlock(a: any, html: string, document: any): void {
 // there's no per-page stylesheet to inject.
 function renderGitHubCode(a: any, url: string, c: Card, document: any): void {
   // Header leads with `filename:Lnn` (leftmost); repo + ref pushed to the right.
-  const lines =
-    c.startLine === c.endLine ? `L${c.startLine}` : `L${c.startLine}-L${c.endLine}`;
+  const lines = c.startLine === c.endLine ? `L${c.startLine}` : `L${c.startLine}-L${c.endLine}`;
   const repo = `${c.owner}/${c.repo}${c.refLabel ? ` @ ${c.refLabel}` : ""}`;
   // A code-repo mark (Lucide `git-branch`, stroked, inlined so no external
   // request) + a ↗ next to the line range mark the header as an external link,
@@ -268,14 +298,16 @@ function renderLinkCards(document: any): void {
     a.setAttribute("target", "_blank");
     a.setAttribute("rel", "noopener");
     let host = "";
-    try { host = new URL(url).hostname; } catch { /* keep empty */ }
+    try {
+      host = new URL(url).hostname;
+    } catch {
+      /* keep empty */
+    }
     const site = esc(card.siteName || host);
     const favicon = card.favicon
       ? `<img class="link-card-favicon" src="${esc(card.favicon)}" alt="" loading="lazy" decoding="async" width="16" height="16">`
       : "";
-    const desc = card.description
-      ? `<span class="link-card-desc">${esc(card.description)}</span>`
-      : "";
+    const desc = card.description ? `<span class="link-card-desc">${esc(card.description)}</span>` : "";
     const image = card.image
       ? `<span class="link-card-image"><img src="${esc(card.image)}" alt="" loading="lazy" decoding="async"></span>`
       : "";

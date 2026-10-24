@@ -69,7 +69,6 @@
   grid-template-columns: repeat(4, 32px);
 }
 
-
 .key,
 .cell {
   box-sizing: border-box;

@@ -21,8 +21,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const CACHE_FILE = join(ROOT, "linkcard-cache.json");
 const SRC_DIR = join(ROOT, "src");
 const CARD_RE = /\[\[card:([^\]]+)\]\]/g;
-const UA =
-  "Mozilla/5.0 (compatible; toyboot4e-devlog-linkcard/1.0; +https://toyboot4e.github.io/)";
+const UA = "Mozilla/5.0 (compatible; toyboot4e-devlog-linkcard/1.0; +https://toyboot4e.github.io/)";
 
 // A cache entry is either an OGP `card` (default, `kind` absent for back-compat)
 // or a `github-code` embed (the literal source lines of a GitHub blob permalink).
@@ -49,13 +48,43 @@ type Card = {
 // `build/bake.ts` (loadLanguages) are mapped; an unmapped extension yields a
 // plain, unhighlighted block (no `language-` class, no strict failure).
 const EXT_LANG: Record<string, string> = {
-  rs: "rust", hs: "haskell", nix: "nix", sh: "bash", bash: "bash", lua: "lua",
-  php: "php", ts: "typescript", tsx: "tsx", js: "javascript", mjs: "javascript",
-  cjs: "javascript", jsx: "javascript", json: "json", toml: "toml", py: "python",
-  css: "css", c: "c", h: "c", cpp: "cpp", cc: "cpp", cxx: "cpp", hpp: "cpp",
-  cs: "csharp", yaml: "yaml", yml: "yaml", md: "markdown", el: "emacs-lisp",
-  f90: "fortran", f95: "fortran", f: "fortran", for: "fortran", ini: "ini",
-  diff: "diff", patch: "diff", dot: "dot", mk: "makefile",
+  rs: "rust",
+  hs: "haskell",
+  nix: "nix",
+  sh: "bash",
+  bash: "bash",
+  lua: "lua",
+  php: "php",
+  ts: "typescript",
+  tsx: "tsx",
+  js: "javascript",
+  mjs: "javascript",
+  cjs: "javascript",
+  jsx: "javascript",
+  json: "json",
+  toml: "toml",
+  py: "python",
+  css: "css",
+  c: "c",
+  h: "c",
+  cpp: "cpp",
+  cc: "cpp",
+  cxx: "cpp",
+  hpp: "cpp",
+  cs: "csharp",
+  yaml: "yaml",
+  yml: "yaml",
+  md: "markdown",
+  el: "emacs-lisp",
+  f90: "fortran",
+  f95: "fortran",
+  f: "fortran",
+  for: "fortran",
+  ini: "ini",
+  diff: "diff",
+  patch: "diff",
+  dot: "dot",
+  mk: "makefile",
 };
 
 const args = process.argv.slice(2);
@@ -100,9 +129,7 @@ function abs(base: string, ref: string | null | undefined): string | undefined {
 type GhBlob = { owner: string; repo: string; ref: string; path: string; startLine: number; endLine: number };
 
 function parseGitHubBlob(url: string): GhBlob | null {
-  const m = url.match(
-    /^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+?)(?:#L(\d+)(?:-L(\d+))?)?$/,
-  );
+  const m = url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+?)(?:#L(\d+)(?:-L(\d+))?)?$/);
   if (!m) return null;
   const startLine = m[5] ? +m[5] : 0;
   const endLine = m[6] ? +m[6] : startLine;
@@ -181,9 +208,7 @@ async function fetchCard(url: string): Promise<Card | null> {
     (document.querySelector("title")?.textContent || "").trim() ??
     "";
   const description =
-    ogp("description") ??
-    meta('meta[name="description"]') ??
-    meta('meta[name="twitter:description"]');
+    ogp("description") ?? meta('meta[name="description"]') ?? meta('meta[name="twitter:description"]');
   const image = abs(finalUrl, ogp("image") ?? ogp("image:url") ?? meta('meta[name="twitter:image"]'));
   const siteName = ogp("site_name") ?? new URL(finalUrl).hostname;
 
@@ -253,6 +278,6 @@ await writeFile(CACHE_FILE, JSON.stringify(sorted, null, 2) + "\n");
 
 console.log(
   `linkcards: ${nFetched} fetched, ${nKept} cached, ${nFailed} failed, ${nPruned} pruned ` +
-  `(${Object.keys(sorted).length} total)`,
+    `(${Object.keys(sorted).length} total)`,
 );
 if (nFailed > 0) process.exit(1);

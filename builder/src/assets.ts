@@ -43,7 +43,10 @@ export async function buildAssets(): Promise<void> {
   const cssAsset = output.find((o: any) => o.type === "asset" && o.fileName.endsWith(".css"));
   if (!cssAsset) throw new Error("assets: CSS-module build emitted no stylesheet");
   // strip Vite's `/*$vite$:N*/` chunk marker
-  const css = String(cssAsset.source).replace(/\/\*\$vite\$:\d+\*\//g, "").trim() + "\n";
+  const css =
+    String(cssAsset.source)
+      .replace(/\/\*\$vite\$:\d+\*\//g, "")
+      .trim() + "\n";
   await writeFile(join(STYLE, "components.min.css"), css);
   log(`components.min.css (${css.length} bytes)`);
 

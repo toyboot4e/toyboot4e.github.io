@@ -28,11 +28,16 @@ for (const relOrg of files) {
   if (r.draft) continue; // release build: skip drafts
   const dest = join(OUT, r.rel);
   const dir = dirname(dest);
-  if (!madeDirs.has(dir)) { await mkdir(dir, { recursive: true }); madeDirs.add(dir); }
+  if (!madeDirs.has(dir)) {
+    await mkdir(dir, { recursive: true });
+    madeDirs.add(dir);
+  }
   await writeFile(dest, r.out);
   results.push({ rel: r.rel, isDiary: r.isDiary, meta: r.meta });
 }
 if (process.env.BUILD_PROF) {
-  console.error(`  [shard] setup=${Math.round(tSetup)}ms render=${Math.round(performance.now() - tRender0)}ms (${files.length} files)`);
+  console.error(
+    `  [shard] setup=${Math.round(tSetup)}ms render=${Math.round(performance.now() - tRender0)}ms (${files.length} files)`,
+  );
 }
 process.stdout.write(JSON.stringify({ results, stats: getStats() }));

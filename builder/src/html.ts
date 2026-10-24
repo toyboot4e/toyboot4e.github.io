@@ -11,8 +11,7 @@
 export type Raw = { __html: string };
 export const Fragment = Symbol("Fragment");
 
-const isRaw = (x: unknown): x is Raw =>
-  typeof x === "object" && x !== null && "__html" in (x as any);
+const isRaw = (x: unknown): x is Raw => typeof x === "object" && x !== null && "__html" in (x as any);
 
 export const raw = (s: string): Raw => ({ __html: s });
 
@@ -24,6 +23,7 @@ const esc = (s: string): string =>
 // HTML void elements -> self-closing (`<meta .../>`), matching the prior output.
 // The always-empty SVG leaf elements (used in the inline nav/footer icons) are
 // included so JSX serialises them self-closed (`<path .../>`) too.
+// oxfmt-ignore
 const VOID = new Set([
   "area", "base", "br", "col", "embed", "hr", "img", "input",
   "link", "meta", "param", "source", "track", "wbr",

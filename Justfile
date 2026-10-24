@@ -39,6 +39,10 @@ test:
 [private]
 alias t := test
 
+# format builder/ sources in place (oxfmt, 120 cols); `--check` to only verify
+fmt *args:
+    cd builder && bun run fmt {{args}}
+
 # regenerate golden files, then show the diff to review
 test-update:
     cd builder && bun run test:update

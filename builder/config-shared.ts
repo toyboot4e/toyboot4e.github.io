@@ -5,7 +5,10 @@
 // build (assets.ts) produce identical class names: `article-card.module.css`
 // class `articleCard` -> `article-card_articleCard`.
 export const generateScopedName = (name: string, filename: string) => {
-  const base = filename.split("/").pop()!.replace(/\.module\.css$/, "");
+  const base = filename
+    .split("/")
+    .pop()!
+    .replace(/\.module\.css$/, "");
   return `${base}_${name}`;
 };
 

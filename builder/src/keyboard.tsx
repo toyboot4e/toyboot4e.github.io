@@ -14,12 +14,14 @@ import kb from "./styles/keyboard.module.css";
 // --- uni-v4: The Uni v4 steno keyboard (3x12) -------------------------------
 // A stroke like `KAT` or `-S` highlights the keys it presses, resolved in steno
 // key order (this is the port of the old client-side steno-viz.js).
+// oxfmt-ignore
 const UNI_CHARS = [
   ["#", "T", "P", "H", "*", "", "*", "F", "P", "L", "T", "D"],
   ["S", "K", "W", "R", "", "", "", "R", "B", "G", "S", "Z"],
   ["", "", "#", "A", "O", "", "E", "U", "#", "", "", ""],
 ];
 // Steno key order (#STKPWHRAO*EUFRPBLGTSDZ) mapped to [row, col] in UNI_CHARS.
+// oxfmt-ignore
 const UNI_ORDER: Array<[number, number]> = [
   [0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2], [0, 3], [1, 3],
   [2, 2], [2, 3], [2, 4], [0, 4], [2, 6], [2, 7], [2, 8], [0, 7],
@@ -59,7 +61,10 @@ function uniPressed(stroke: string): boolean[][] {
 // One chart per non-empty line; an empty body still draws one blank chart
 // (matching uni-v4, where an empty stroke shows the unpressed layout).
 function lineSpecs(body: string): string[] {
-  const lines = body.split("\n").map((l) => l.trim()).filter(Boolean);
+  const lines = body
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
   return lines.length ? lines : [""];
 }
 
@@ -68,7 +73,8 @@ function lineSpecs(body: string): string[] {
 function charSpecPressed(layoutName: string, known: Set<string>, spec: string): Set<string> {
   const on = new Set<string>();
   for (const c of spec.replace(/\s/g, "")) {
-    if (!known.has(c)) throw new Error(`keyboard ${layoutName}: unknown key ${JSON.stringify(c)} in ${JSON.stringify(spec)}`);
+    if (!known.has(c))
+      throw new Error(`keyboard ${layoutName}: unknown key ${JSON.stringify(c)} in ${JSON.stringify(spec)}`);
     on.add(c);
   }
   return on;
@@ -83,14 +89,45 @@ function placedCharSpecPressed(layoutName: string, keys: PlacedKey[]): (spec: st
 }
 
 const KeyIcon = ({ children }: { children?: any }): Raw => (
-  <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{children}</svg>
+  <svg
+    viewBox="0 0 24 24"
+    width="1em"
+    height="1em"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    {children}
+  </svg>
 );
 
 // Lucide `space` / `corner-down-left` / `delete`
-const SPACE_ICON: Raw = <KeyIcon><path d="M22 17v1c0 .5-.5 1-1 1H3c-.5 0-1-.5-1-1v-1" /></KeyIcon>;
-const ENTER_ICON: Raw = <KeyIcon><path d="M20 4v7a4 4 0 0 1-4 4H4" /><path d="m9 10-5 5 5 5" /></KeyIcon>;
-const BACKSPACE_ICON: Raw = <KeyIcon><path d="M10 5a2 2 0 0 0-1.344.519l-6.328 5.74a1 1 0 0 0 0 1.481l6.328 5.741A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z" /><path d="m12 9 6 6" /><path d="m18 9-6 6" /></KeyIcon>;
-const SHIFT_ICON: Raw = <KeyIcon><path d="M9 19a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-6a1 1 0 0 1 1-1h3.293a.707.707 0 0 0 .5-1.207l-7.086-7.086a1 1 0 0 0-1.414 0l-7.086 7.086a.707.707 0 0 0 .5 1.207H8a1 1 0 0 1 1 1z" /></KeyIcon>;
+const SPACE_ICON: Raw = (
+  <KeyIcon>
+    <path d="M22 17v1c0 .5-.5 1-1 1H3c-.5 0-1-.5-1-1v-1" />
+  </KeyIcon>
+);
+const ENTER_ICON: Raw = (
+  <KeyIcon>
+    <path d="M20 4v7a4 4 0 0 1-4 4H4" />
+    <path d="m9 10-5 5 5 5" />
+  </KeyIcon>
+);
+const BACKSPACE_ICON: Raw = (
+  <KeyIcon>
+    <path d="M10 5a2 2 0 0 0-1.344.519l-6.328 5.74a1 1 0 0 0 0 1.481l6.328 5.741A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z" />
+    <path d="m12 9 6 6" />
+    <path d="m18 9-6 6" />
+  </KeyIcon>
+);
+const SHIFT_ICON: Raw = (
+  <KeyIcon>
+    <path d="M9 19a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-6a1 1 0 0 1 1-1h3.293a.707.707 0 0 0 .5-1.207l-7.086-7.086a1 1 0 0 0-1.414 0l-7.086 7.086a.707.707 0 0 0 .5 1.207H8a1 1 0 0 1 1 1z" />
+  </KeyIcon>
+);
 const SPACE_KEY = { name: "Space", label: SPACE_ICON };
 const ENTER_KEY = { name: "Enter", label: ENTER_ICON };
 
@@ -105,6 +142,7 @@ const ENTER_KEY = { name: "Enter", label: ENTER_ICON };
 // nav icons: currentColor, 1em, stroked). Key spec is case-sensitive:
 // lowercase = letter keys, uppercase = thumb keys (the layout has both `e` and
 // Enter).
+// oxfmt-ignore
 const QWERTY24_CHARS = [
   ["q", "w", "e", "r", "t", "", "y", "u", "i", "o", "p"],
   ["z", "x", "c", "v", "b", "", "n", "m", ",", ".", "/"],
@@ -141,6 +179,7 @@ function gridCharSpecPressed(layoutName: string, chars: string[][]): (spec: stri
 // `w`/`h` span multiple key units / rows (default 1); `id` names a key for
 // order-based parsing when the display char is ambiguous (steno S-/-S etc.).
 type PlacedKey = { c: string; row: number; x: number; w?: number; h?: number; drop?: boolean; id?: string };
+// oxfmt-ignore
 const TINY18_KEYS: PlacedKey[] = [
   { c: "w", row: 0, x: 1 }, { c: "e", row: 0, x: 2 }, { c: "r", row: 0, x: 3 },
   { c: "u", row: 0, x: 7 }, { c: "i", row: 0, x: 8 }, { c: "o", row: 0, x: 9 },
@@ -163,6 +202,7 @@ const TINY18_KEYS: PlacedKey[] = [
 //         A O  E U
 // A stroke (uni-v4 notation, e.g. `KAT` or `KAT/-S`) highlights keys in steno
 // order; `#`, `*` and the doubled left `S` each light as one unit.
+// oxfmt-ignore
 const LEVER_KEYS: PlacedKey[] = [
   { c: "#", id: "#", row: 0, x: 0, w: 11.5 },
   { c: "S", id: "S1", row: 1, x: 0 }, { c: "T", id: "T-", row: 1, x: 1 },
@@ -183,6 +223,7 @@ const LEVER_KEYS: PlacedKey[] = [
 
 // Steno key order (#STKPWHRAO*EUFRPBLGTSDZ) -> the key ids each stroke char
 // lights (multi-cell # / * / S light together, like uni-v4's merged cells).
+// oxfmt-ignore
 const LEVER_ORDER: Array<[string, string[]]> = [
   ["#", ["#"]], ["S", ["S1", "S2"]], ["T", ["T-"]], ["K", ["K-"]], ["P", ["P-"]],
   ["W", ["W-"]], ["H", ["H-"]], ["R", ["R-"]], ["A", ["A"]], ["O", ["O"]],
@@ -225,6 +266,7 @@ function leverPressed(stroke: string): boolean[] {
 //  O I          (O = outer thumb, I = inner thumb; inner sits closer to palm)
 // Key spec: the 8 letters + uppercase I/O for the thumbs (case-sensitive; the
 // layout has both `i`/`o` and I/O), e.g. `in` (chord y) or `inI`.
+// oxfmt-ignore
 const TAIPO_KEYS: PlacedKey[] = [
   { c: "i", row: 0, x: 1 }, { c: "n", row: 0, x: 2 }, { c: "s", row: 0, x: 3 }, { c: "r", row: 0, x: 4 },
   { c: "e", row: 1, x: 1 }, { c: "t", row: 1, x: 2 }, { c: "o", row: 1, x: 3 }, { c: "a", row: 1, x: 4 },
@@ -244,6 +286,7 @@ const TAIPO_THUMBS: Record<string, KeyMeta> = {
 //        [ S ]    [ α ]
 // Key spec: the 14 letters + uppercase S = Space and A = α (case-sensitive;
 // the layout has both `s`/`a` and S/A), e.g. `lsS`.
+// oxfmt-ignore
 const PIANO_KEYS: PlacedKey[] = [
   { c: "l", row: 0, x: 1 }, { c: "g", row: 0, x: 2 }, { c: "d", row: 0, x: 3 },
   { c: "h", row: 0, x: 7 }, { c: "u", row: 0, x: 8 }, { c: "o", row: 0, x: 9 },
@@ -267,6 +310,7 @@ const PIANO_THUMBS: Record<string, KeyMeta> = {
 //       ⇧     ␣
 // Key spec: the 8 letters + `^` = Shift and uppercase `S` = Space
 // (case-sensitive: `s` is the home key), e.g. `et` (a chord) or `a^` (A).
+// oxfmt-ignore
 const ASETNIOP_KEYS: PlacedKey[] = [
   { c: "a", row: 0, x: 0 }, { c: "s", row: 0, x: 1 }, { c: "e", row: 0, x: 2 }, { c: "t", row: 0, x: 3 },
   { c: "n", row: 0, x: 4.5 }, { c: "i", row: 0, x: 5.5 }, { c: "o", row: 0, x: 6.5 }, { c: "p", row: 0, x: 7.5 },
@@ -283,6 +327,7 @@ const ASETNIOP_THUMBS: Record<string, KeyMeta> = {
 // is its mirror). Letters only -- everything else is combos, so the chart is a
 // plain 2x4 grid. Key spec: the 8 lowercase letters, e.g. `ars`. (ardux, the
 // community fork, shares this exact base grid -- use `artsey` for it too.)
+// oxfmt-ignore
 const ARTSEY_CHARS = [
   ["a", "r", "t", "s"],
   ["e", "y", "i", "o"],
@@ -291,7 +336,7 @@ const ARTSEY_CHARS = [
 // --- shared chart rendering -------------------------------------------------
 type KeyMeta = { label: Raw | string; name: string };
 type LayoutBase = {
-  gridClass: string;        // scoped grid-template class for this layout
+  gridClass: string; // scoped grid-template class for this layout
   // block body -> one pressed-key spec per chart
   specs(body: string): string[];
   // per-key overrides: extra class / rendered label + accessible name
@@ -327,34 +372,34 @@ const LAYOUTS: Record<string, Layout> = {
     pressed: placedCharSpecPressed("tiny-18", TINY18_KEYS),
     keyLabel: (c) => (c === "E" ? ENTER_KEY : undefined),
   },
-  "piano": {
+  piano: {
     keys: PIANO_KEYS,
     gridClass: kb.strokeTiny18, // same geometry/grid as tiny-18
     specs: lineSpecs,
     pressed: placedCharSpecPressed("piano", PIANO_KEYS),
     keyLabel: (c) => PIANO_THUMBS[c],
   },
-  "taipo": {
+  taipo: {
     keys: TAIPO_KEYS,
     gridClass: kb.strokeTaipo,
     specs: lineSpecs,
     pressed: placedCharSpecPressed("taipo", TAIPO_KEYS),
     keyLabel: (c) => TAIPO_THUMBS[c],
   },
-  "asetniop": {
+  asetniop: {
     keys: ASETNIOP_KEYS,
     gridClass: kb.strokeAsetniop,
     specs: lineSpecs,
     pressed: placedCharSpecPressed("asetniop", ASETNIOP_KEYS),
     keyLabel: (c) => ASETNIOP_THUMBS[c],
   },
-  "artsey": {
+  artsey: {
     chars: ARTSEY_CHARS,
     gridClass: kb.strokeArtsey,
     specs: lineSpecs,
     pressed: gridCharSpecPressed("artsey", ARTSEY_CHARS),
   },
-  "leversteno": {
+  leversteno: {
     keys: LEVER_KEYS,
     gridClass: kb.strokeLever,
     // uni-v4 stroke notation: `/`-separated strokes, one chart per stroke.
@@ -368,14 +413,21 @@ function keyDiv(layout: Layout, c: string, on: boolean, extraCls: (string | fals
   const meta = layout.keyLabel?.(c);
   const isIcon = meta && typeof meta.label !== "string";
   const cls = [kb.key, layout.keyClass?.(c), isIcon && kb.keyIcon, ...extraCls, on && kb.keyPressed]
-    .filter(Boolean).join(" ");
+    .filter(Boolean)
+    .join(" ");
   // An icon key's only content is an inline SVG, so `aria-label` carries its
   // name -- but aria-label is prohibited on a role-less <div> (axe:
   // aria-prohibited-attr) and would be dropped. role="img" makes the div a named
   // leaf, which is exactly what a glyph-with-a-name is.
-  return meta
-    ? <div class={cls} style={style} title={meta.name} role="img" aria-label={meta.name}>{meta.label}</div>
-    : <div class={cls} style={style}>{c}</div>;
+  return meta ? (
+    <div class={cls} style={style} title={meta.name} role="img" aria-label={meta.name}>
+      {meta.label}
+    </div>
+  ) : (
+    <div class={cls} style={style}>
+      {c}
+    </div>
+  );
 }
 
 // One spec -> its grid of <div> keys (an HTML string with scoped class names).
@@ -394,8 +446,8 @@ function strokeHtml(layout: Layout, spec: string): string {
     const on = layout.pressed(spec);
     layout.keys.forEach((k, i) => {
       // 18px half-unit tracks: key unit x -> track x*2+1, one unit = 2 tracks
-      const style = `grid-row:${k.row + 1}${k.h ? `/span ${k.h}` : ""};`
-        + `grid-column:${k.x * 2 + 1}/span ${(k.w ?? 1) * 2}`;
+      const style =
+        `grid-row:${k.row + 1}${k.h ? `/span ${k.h}` : ""};` + `grid-column:${k.x * 2 + 1}/span ${(k.w ?? 1) * 2}`;
       cells.push(keyDiv(layout, k.c, on[i], [kb.keyPlaced, k.drop && kb.keyDrop], style));
     });
   }

@@ -24,11 +24,9 @@ const GOLD = join(HERE, "golden");
 const UPDATE = !!process.env.UPDATE_GOLDEN;
 
 // The rendered org body only -- the page chrome lives in the shell test below.
-const contentOf = (html: string): string =>
-  parseHTML(html).document.getElementById("content")?.innerHTML ?? "";
+const contentOf = (html: string): string => parseHTML(html).document.getElementById("content")?.innerHTML ?? "";
 // `#main` inner minus the title block -- for the index/tag listing pages.
-const mainOf = (html: string): string =>
-  parseHTML(html).document.getElementById("main")?.innerHTML ?? "";
+const mainOf = (html: string): string => parseHTML(html).document.getElementById("main")?.innerHTML ?? "";
 
 async function golden(name: string, actual: string): Promise<void> {
   const file = join(GOLD, name);
@@ -67,7 +65,16 @@ test("index listing", async () => {
 });
 test("tag listing", async () => {
   const tag = allTags[0];
-  await golden("tag.main.html", mainOf(buildTagHtml(tag, metas.filter((m) => m.tags.includes(tag)), allTags)));
+  await golden(
+    "tag.main.html",
+    mainOf(
+      buildTagHtml(
+        tag,
+        metas.filter((m) => m.tags.includes(tag)),
+        allTags,
+      ),
+    ),
+  );
 });
 
 // --- 2. page shell (chrome), asserted once ---------------------------------
@@ -95,7 +102,7 @@ test("toc: static list from headings, scrollspy shipped only when present", asyn
 
 // --- 3. behavior assertions (components, tiny inputs) ----------------------
 test("coderef: line wrapped in .coderef-off, marker -> anchor, prose link styled", async () => {
-  const out = await bake("c.org", '#+BEGIN_SRC haskell\nmain = a -- (ref:a)\n#+END_SRC\n\nsee [[(a)]]\n');
+  const out = await bake("c.org", "#+BEGIN_SRC haskell\nmain = a -- (ref:a)\n#+END_SRC\n\nsee [[(a)]]\n");
   // the whole line IS a single `<a class="coderef-off">` self-link, so the
   // entire full-width highlight is clickable and clicking sets the URL to the
   // coderef and `:target`-highlights it
@@ -109,19 +116,23 @@ test("coderef: line wrapped in .coderef-off, marker -> anchor, prose link styled
 });
 
 test("coderef: only coderef-bearing blocks are numbered (a plain block before it doesn't bump N)", async () => {
-  const out = await bake("c.org",
-    "#+BEGIN_SRC bash\necho hi\n#+END_SRC\n" +              // no coderef -> not numbered
-    "#+BEGIN_SRC haskell\nx -- (ref:1)\n#+END_SRC\nsee [[(1)]]\n");
-  expect(out).toContain('id="coderef-1-1"');        // first coderef block is 1, not 2
+  const out = await bake(
+    "c.org",
+    "#+BEGIN_SRC bash\necho hi\n#+END_SRC\n" + // no coderef -> not numbered
+      "#+BEGIN_SRC haskell\nx -- (ref:1)\n#+END_SRC\nsee [[(1)]]\n",
+  );
+  expect(out).toContain('id="coderef-1-1"'); // first coderef block is 1, not 2
   expect(out).not.toContain("coderef-2");
   expect(out).toContain('<a href="#coderef-1-1">'); // prose link resolves to it
 });
 
 test("coderef: repeated labels resolve per-block (positional, not last-wins)", async () => {
   // both blocks use label `1`; each prose `[[(1)]]` must target ITS block.
-  const out = await bake("c.org",
+  const out = await bake(
+    "c.org",
     "#+BEGIN_SRC haskell\nx -- (ref:1)\n#+END_SRC\nfirst [[(1)]]\n" +
-    "#+BEGIN_SRC haskell\ny -- (ref:1)\n#+END_SRC\nsecond [[(1)]]\n");
+      "#+BEGIN_SRC haskell\ny -- (ref:1)\n#+END_SRC\nsecond [[(1)]]\n",
+  );
   expect(out).toContain('id="coderef-1-1"'); // block 1 anchor
   expect(out).toContain('id="coderef-2-1"'); // block 2 anchor
   // first prose link -> block 1, second -> block 2 (the bug pointed both at block 2)
@@ -130,9 +141,11 @@ test("coderef: repeated labels resolve per-block (positional, not last-wins)", a
 });
 
 test("captions: Figure/Listing/Table numbering, per kind", async () => {
-  const out = await bake("cap.org",
+  const out = await bake(
+    "cap.org",
     "#+CAPTION: one\n[[./img/a.webp]]\n\n#+CAPTION: two\n[[./img/b.webp]]\n\n" +
-    "#+CAPTION: code\n#+BEGIN_SRC bash\nx\n#+END_SRC\n\n#+CAPTION: tbl\n| a |\n|---|\n| 1 |\n");
+      "#+CAPTION: code\n#+BEGIN_SRC bash\nx\n#+END_SRC\n\n#+CAPTION: tbl\n| a |\n|---|\n| 1 |\n",
+  );
   expect(out).toContain('<span class="figure-number">Figure 1: </span>');
   expect(out).toContain('<span class="figure-number">Figure 2: </span>');
   expect(out).toContain('<span class="listing-number">Listing 1: </span>');
@@ -149,14 +162,14 @@ test("article card: scoped class, org-markup title, thumbnail path", async () =>
   const { meta } = await renderAndBake("a.org", "#+TITLE: =code= t\n#+THUMBNAIL: img/a.webp\nx\n");
   const html = buildIndexHtml([meta], [], []);
   expect(html).toContain(`class="${card.articleCard}"`); // CSS-module scoped class
-  expect(html).toContain("<code class=\"inline-verbatim\">code</code> t"); // title htmlized
+  expect(html).toContain('<code class="inline-verbatim">code</code> t'); // title htmlized
   expect(html).toContain('src="/img/a.webp"'); // thumbnail not /img/img/
 });
 
 test("title: <title> strips org markup, <h1> keeps it", async () => {
   const out = await bake("t.org", "#+TITLE: =org= and *bold*\nx\n");
   expect(out).toContain("<title>org and bold - Toybeam</title>"); // stripped
-  expect(out).toContain("<h1><code class=\"inline-verbatim\">org</code> and <strong>bold</strong></h1>");
+  expect(out).toContain('<h1><code class="inline-verbatim">org</code> and <strong>bold</strong></h1>');
 });
 
 test("mathbb: lowercase/digits -> Unicode double-struck, uppercase keeps KaTeX_AMS", async () => {
@@ -222,7 +235,7 @@ test("preserve-breaks: soft newline -> <br>, but not against a block boundary", 
   // structural and must NOT become a <br>.
   const out = await bake("b.org", "para X\npara Y\n\n- A\n  B\n\n- top\n  - nested\n");
   expect(out).toContain("<p>para X<br>para Y</p>"); // paragraph soft break
-  expect(out).toContain("<li>A<br>B</li>");         // list-item continuation
+  expect(out).toContain("<li>A<br>B</li>"); // list-item continuation
   expect(out).toContain("<li>top<ul><li>nested</li></ul></li>"); // no <br> before nested <ul>
   expect(out).not.toContain("<br><ul>");
 });

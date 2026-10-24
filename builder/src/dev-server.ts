@@ -83,14 +83,14 @@ async function serveFile(abs: string, res: ServerResponse): Promise<void> {
   let target = abs;
   try {
     if ((await stat(target)).isDirectory()) target = join(target, "index.html");
-  } catch { /* fall through to the read, which 404s */ }
+  } catch {
+    /* fall through to the read, which 404s */
+  }
   const ext = extname(target).toLowerCase();
   try {
     if (ext === ".html") {
       const html = await readFile(target, "utf8");
-      const body = html.includes("</body>")
-        ? html.replace("</body>", CLIENT + "</body>")
-        : html + CLIENT;
+      const body = html.includes("</body>") ? html.replace("</body>", CLIENT + "</body>") : html + CLIENT;
       res.writeHead(200, { "Content-Type": MIME[".html"], "Cache-Control": "no-store" });
       res.end(body);
       return;
@@ -132,14 +132,24 @@ export function startDevServer(port: number): DevServer {
       return;
     }
     const abs = resolveSafe(url);
-    if (!abs) { res.writeHead(403); res.end("403 Forbidden"); return; }
-    serveFile(abs, res).catch(() => { res.writeHead(500); res.end("500"); });
+    if (!abs) {
+      res.writeHead(403);
+      res.end("403 Forbidden");
+      return;
+    }
+    serveFile(abs, res).catch(() => {
+      res.writeHead(500);
+      res.end("500");
+    });
   });
   server.listen(port, () => {
     console.log(`  live preview: http://localhost:${port}/ (reloads on save)`);
   });
   // Don't let stranded SSE connections keep the process alive past shutdown.
-  server.on("close", () => { for (const c of clients) c.end(); clients.clear(); });
+  server.on("close", () => {
+    for (const c of clients) c.end();
+    clients.clear();
+  });
   return {
     reload: (path) => broadcast(path ? { type: "reload", path } : { type: "reload" }),
     cssReload: () => broadcast({ type: "css" }),

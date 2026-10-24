@@ -11,9 +11,7 @@ const dsDigit = (c: string) => String.fromCodePoint(0x1d7d8 + c.charCodeAt(0) - 
 export function expandMathbb(tex: string): string {
   return tex.replace(/\\mathbb\s*\{([A-Za-z0-9]+)\}/g, (_m, body: string) =>
     [...body]
-      .map((c) =>
-        c >= "a" && c <= "z" ? dsLower(c) : c >= "0" && c <= "9" ? dsDigit(c) : `\\mathbb{${c}}`,
-      )
+      .map((c) => (c >= "a" && c <= "z" ? dsLower(c) : c >= "0" && c <= "9" ? dsDigit(c) : `\\mathbb{${c}}`))
       .join(""),
   );
 }

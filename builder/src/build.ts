@@ -102,7 +102,11 @@ const PROF = !!process.env.BUILD_PROF;
 function runShard(files: string[]): Promise<WorkerOut> {
   return new Promise((resolve, reject) => {
     if (!existsSync(SHARD)) {
-      reject(new Error(`render shard bundle missing: ${SHARD}\n  run \`bunx vite build -c vite.build.config.ts\` (in builder/) first`));
+      reject(
+        new Error(
+          `render shard bundle missing: ${SHARD}\n  run \`bunx vite build -c vite.build.config.ts\` (in builder/) first`,
+        ),
+      );
       return;
     }
     const child = spawn("bun", [SHARD, ...files], {
@@ -133,28 +137,39 @@ export async function writeIndexAndTags(metas: Meta[], diaryMetas: Meta[], allTa
   await writePage("index.html", buildIndexHtml(metas, diaryMetas, allTags));
   await Promise.all(
     allTags.map((tag) =>
-      writePage(`tags/${tag}.html`, buildTagHtml(tag, metas.filter((m) => m.tags.includes(tag)), allTags)),
+      writePage(
+        `tags/${tag}.html`,
+        buildTagHtml(
+          tag,
+          metas.filter((m) => m.tags.includes(tag)),
+          allTags,
+        ),
+      ),
     ),
   );
 }
 
 export type FullBuild = {
-  outs: WorkerOut[]; metas: Meta[]; diaryMetas: Meta[]; allTags: string[];
-  stats: BakeStats; nStatic: number;
+  outs: WorkerOut[];
+  metas: Meta[];
+  diaryMetas: Meta[];
+  allTags: string[];
+  stats: BakeStats;
+  nStatic: number;
 };
 
 // The whole site build: clean OUT, render+bake every article (concurrently with
 // the static + KaTeX copies), then assemble the index + tag pages.
 export async function fullBuild(): Promise<FullBuild> {
   const t0 = performance.now();
-  const lap = (l: string) => { if (PROF) console.error(`  [phase] ${l}: ${Math.round(performance.now() - t0)}ms`); };
+  const lap = (l: string) => {
+    if (PROF) console.error(`  [phase] ${l}: ${Math.round(performance.now() - t0)}ms`);
+  };
   // Wipe OUT's contents (drop stale output) but keep the dir and its tracked
   // `.gitkeep`, so building the default `out/` doesn't churn git every run.
   await mkdir(OUT, { recursive: true });
   await Promise.all(
-    (await readdir(OUT))
-      .filter((e) => e !== ".gitkeep")
-      .map((e) => rm(join(OUT, e), { recursive: true, force: true })),
+    (await readdir(OUT)).filter((e) => e !== ".gitkeep").map((e) => rm(join(OUT, e), { recursive: true, force: true })),
   );
   lap("clean OUT");
 
@@ -176,8 +191,8 @@ export async function fullBuild(): Promise<FullBuild> {
   ]);
   lap("render+assets+static+katex");
 
-  const metas: Meta[] = [];       // devlog (src/*.org)
-  const diaryMetas: Meta[] = [];  // diary (src/diary/*.org)
+  const metas: Meta[] = []; // devlog (src/*.org)
+  const diaryMetas: Meta[] = []; // diary (src/diary/*.org)
   for (const o of outs) for (const r of o.results) (r.isDiary ? diaryMetas : metas).push(r.meta);
 
   // sort newest-first by href (dates lead the filenames)
