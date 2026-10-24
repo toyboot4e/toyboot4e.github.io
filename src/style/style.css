@@ -110,9 +110,12 @@ body > footer {
 }
 
 /* tighten the roomy "Styled with…" paragraph (simple.css gives p a 1.5rem
-   block margin) */
+   block margin). line-height: 1 drops the half-leading, so the text sits the
+   same 0.6rem from the border and the buttons as the buttons sit from the
+   page bottom (the footer's padding-bottom). */
 body > footer > p {
   margin: 0.6rem 0;
+  line-height: 1;
 }
 
 /* The title block supplies the spacing above the content; trim simple.css's
