@@ -1127,6 +1127,7 @@ function page(opts: {
           {/* scrollspy only -- the ToC list itself is static (buildToc); ship it
               only on pages that actually have a ToC */}
           {count > 0 && <script type="text/javascript" defer src="/style/toc.min.js"></script>}
+          <script type="text/javascript" defer src="/style/nav.min.js"></script>
         </body>
       </html>
     </Fragment>

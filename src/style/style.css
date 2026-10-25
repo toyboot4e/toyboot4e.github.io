@@ -80,6 +80,24 @@ header > nav {
   overflow-x: auto;
   scrollbar-width: thin;
 }
+/* fade the edge(s) with more buttons beyond them (classes set by style.js) */
+header > nav:is(.fade-start, .fade-end) {
+  --fade-l: 0px;
+  --fade-r: 0px;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--fade-l),
+    #000 calc(100% - var(--fade-r)),
+    transparent
+  );
+}
+header > nav.fade-start {
+  --fade-l: 2.5rem;
+}
+header > nav.fade-end {
+  --fade-r: 2.5rem;
+}
 
 /* Shorten the header bar without changing the button size: flex the list so its
    height tracks the buttons rather than simple.css's tall inline line box
