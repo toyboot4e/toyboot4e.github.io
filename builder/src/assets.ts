@@ -4,7 +4,7 @@
 //      SAME vite.config.ts `generateScopedName` the render uses, so the class
 //      names match. Built with Vite's programmatic API (write:false, in-memory).
 //   2. plain style CSS -> *.min.css (esbuild minify, url()/data: kept verbatim).
-//   3. disco.ts / toc.ts / nav.ts -> *.min.js (esbuild bundle + minify for the browser).
+//   3. style.ts / disco.ts / toc.ts / nav.ts -> *.min.js (esbuild bundle + minify for the browser).
 import { build as viteBuild } from "vite";
 import { build as esbuild } from "esbuild";
 import { writeFile } from "node:fs/promises";
@@ -75,14 +75,16 @@ export async function buildAssets(): Promise<void> {
       ),
     ),
     // 3. Browser TS -> *.min.js (bundle + minify).
-    ...["disco", "toc", "nav"].map(async (f) =>
+    ...["style", "disco", "toc", "nav"].map(async (f) =>
       writeAsset(
         `${f}.min.js`,
         await esbuildText({
           entryPoints: [join(STYLE, `${f}.ts`)],
           bundle: true,
           minify: true,
-          format: "esm",
+          // classic scripts share one global scope: wrap each so minified
+          // top-level names can't collide across them
+          format: "iife",
           target: "es2020",
         }),
       ),

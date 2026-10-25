@@ -983,7 +983,7 @@ function headHtml(m: {
       {/* tree-sitter highlight colours are class-based (dual-theme palette);
           the `.hl` / coderef / diff / line-number rules live in style.css. */}
       {m.hasMath && <link rel="stylesheet" href="/style/katex/katex.min.css" />}
-      <script type="text/javascript" src="/style/style.js"></script>
+      <script type="text/javascript" src="/style/style.min.js"></script>
       {m.redirect === true && <script>{LANG_REDIRECT}</script>}
       {DISCO_HEAD}
       {canonical !== null && <link rel="canonical" href={canonical} />}

@@ -24,6 +24,7 @@ ltximg
 /src/style/disco.min.js
 /src/style/toc.min.js
 /src/style/nav.min.js
+/src/style/style.min.js
 # CSS modules (builder/src/styles/*.module.css): scoped CSS shipped here
 /src/style/components.min.css
 
