@@ -16,8 +16,8 @@ In this article, I will share my competitive programming experience and thoughts
 
 ** What are AtCoder and competitive programming?
 
-[[https://atcoder.jp/][AtCoder]] is a Japanese website for competitive programming contests, similar to [[https://codeforces.com/][Codeforces]]. Around 10,000 people join its weekly contests, and it holds the AtCoder World Tour Finals for the top players in the world.
-
+[[https://atcoder.jp/][AtCoder]] is a website for competitive programming contests, similar to [[https://codeforces.com/][Codeforces]]. Around 10,000 people join its weekly contests, and it holds the AtCoder World Tour Finals for the top players in the world.
+a
 In a contest, you solve algorithm and math problems in a limited time (e.g., 100 minutes), reading the input from stdin and printing the answer to stdout. Naive solutions are usually too slow. An $O(n^2)$ algorithm fails for $n = 1{,}000{,}000$, so you look for $O(n \log n)$ or faster. That's what we're addicted to!
 
 * The journey
@@ -28,7 +28,7 @@ Then I read algorithm books and editorials, and slowly got the idea. Cumulative 
 
 It was even harder for me, because I was using Haskell for the first time. My code often didn't compile, and the compiler gave me cryptic messages. The cause was usually a type mismatch, an indentation error, a missing argument or an operator precedence mistake, but the messages never pointed to it directly. I had to figure out the root cause for every error message, and I made little progress.
 
-After six months, I was able to write basic Haskell, but my rating was very poor. It was less than 400, which classified me as a "beginner". I had years of programming experience in C++, C#, Rust and Python, but none of it helped. Haskell beat me. I was not who I hoped I was.
+After six months, I was able to write basic Haskell, but my rating was very poor. It was less than 400, which classified me as a "beginner". I had years of programming experience in C++, C#, Rust and Python, but none of it helped. Haskell beat me. I was not who I hoped I was!
 
 I was beaten every day by every problem. Someday I might become who I wanted to be, but not today, tomorrow or next month. I couldn't identify with that person. I was someone who just suffered from Haskell and competitive programming. It took courage to accept that truth.
 
@@ -65,7 +65,7 @@ let (_, !result) = foldl' f (HM.empty, 1 :: Int) xs
           Nothing -> (HM.insert x 1 m, res)
 #+END_SRC
 
-This one is still basic, but even in more complex situations, we stick with the idea of "states as new values". It may look odd, but now I like this very explicit style.
+This one is basic, but even in more complex situations, we stick with the idea of "states as new values". It may look odd, but now I like this very explicit style.
 
 * Wrapping up
 
