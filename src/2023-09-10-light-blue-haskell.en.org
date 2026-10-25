@@ -84,6 +84,6 @@ I kept learning Haskell and competitive programming over the past 15 months, and
 #+CAPTION: I solved 100+ light blue difficulty problems
 [[./img/2023-09-light-blue-problems-3.webp]]
 
-#+CAPTION: 662 solved in total
+#+CAPTION: 662 problems solved in total
 [[./img/2023-09-light-blue-problems-4.webp]]
 
