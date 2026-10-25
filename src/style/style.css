@@ -204,6 +204,16 @@ li p {
   text-indent: 0em;
 }
 
+/* English drops the (Japanese) first-line indent and justifies, so its right
+   edge is flush like Japanese text; hyphenation keeps narrow screens from
+   opening wide word gaps (where the browser has dictionaries -- Linux
+   Chromium doesn't). Must precede the centred-image rule below. */
+#content p:lang(en) {
+  text-indent: 0;
+  text-align: justify;
+  hyphens: auto;
+}
+
 /* inline icon + label in the header nav (footer links set this themselves) */
 header > nav a {
   display: inline-flex;
