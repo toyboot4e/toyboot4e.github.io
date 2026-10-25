@@ -25,7 +25,7 @@ This is a static site generator for a Japanese technical devlog. Content is auth
   class a `tsc` error.
 - `just lint` - oxlint (`builder/.oxlintrc.json`: every category, type-aware)
   + strict `tsc`, over `builder/` and `src/style/*.ts` (browser scripts, own
-  `tsconfig.json`; each bundled by esbuild as an IIFE into `*.min.js`). The
+  `tsconfig.json`; each bundled by rolldown as an IIFE into `*.min.js`). The
   same checks run as git pre-commit hooks (`flake.nix`, installed by `nix develop`). Rules that ban language features or contradict each other are
   off, each with its reason in the config. vitest runs on **node** but the build
   ships on **bun**, so after touching regexes diff the real `just build` output:
@@ -87,7 +87,7 @@ This is a static site generator for a Japanese technical devlog. Content is auth
 1. **Content**: Articles written in Org Mode format in `src/`
 2. **Assets**: `builder/src/assets.ts` builds the CSS modules into
    `components.min.css` (Vite, same `generateScopedName` the render uses) and
-   minifies/bundles the rest (esbuild).
+   minifies/bundles the rest (lightningcss for CSS, rolldown for browser TS).
 3. **Orchestrate**: `builder/src/build.ts` lists sources and assembles the index
    + tag pages from the rendered metadata; `builder/src/main.ts` is the CLI entry.
 4. **Render**: each `.org` is parsed with uniorg and rendered to page HTML
@@ -205,7 +205,8 @@ global CSS stays in `src/style/style.css`.
 ### Dependencies
 - **Build tooling** (in `builder/`): `vite` (bundles the build, resolving CSS
   modules), `vite-node` (only the `just watch` daemon, which imports the render
-  from source), `esbuild` (minify CSS / bundle browser TS), `vitest` (tests). Bun
+  from source), `rolldown` + `lightningcss` (Vite's own bundler / CSS minifier,
+  used directly to bundle browser TS / minify plain CSS), `vitest` (tests). Bun
   runs the bundle, `assets.ts` and `fetch-linkcards.ts`; recipes go through
   `builder/package.json` scripts (`bun run <script>`).
 - **Node deps**: `web-tree-sitter`, `katex`, `linkedom`, `uniorg` (render/bake)

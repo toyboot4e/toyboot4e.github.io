@@ -38,7 +38,7 @@
               in
               b == "package.json" || b == "package-lock.json";
           };
-          npmDepsHash = "sha256-kdl7W3Q2QvvqIxHCo0p8XlgSqQ7WYQKaIv+WMsNbm7k=";
+          npmDepsHash = "sha256-6W26kCUhPkjHb6XaFyfoXSITp8XIxYw30Z5fqhM/6ps=";
           npmFlags = [ "--legacy-peer-deps" ];
           dontNpmBuild = true;
           # We only want node_modules, not a packaged/installed app.

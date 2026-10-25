@@ -3,11 +3,14 @@
 //   1. CSS modules (src/styles/*.module.css) -> components.min.css, scoped via the
 //      SAME vite.config.ts `generateScopedName` the render uses, so the class
 //      names match. Built with Vite's programmatic API (write:false, in-memory).
-//   2. plain style CSS -> *.min.css (esbuild minify, url()/data: kept verbatim).
-//   3. style.ts / disco.ts / toc.ts / nav.ts -> *.min.js (esbuild bundle + minify for the browser).
+//   2. plain style CSS -> *.min.css (lightningcss minify, url()/data: kept verbatim).
+//   3. style.ts / disco.ts / toc.ts / nav.ts -> *.min.js (rolldown bundle + minify for the browser).
+// rolldown and lightningcss are Vite's own bundler and CSS minifier, so the
+// whole build runs on one toolchain.
 import { build as viteBuild } from "vite";
-import { build as esbuild } from "esbuild";
-import { writeFile } from "node:fs/promises";
+import { build as rolldownBuild } from "rolldown";
+import { transform as cssTransform } from "lightningcss";
+import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 // This module runs from builder/src (bun / vite-node) OR builder/dist (bundled), both
@@ -30,13 +33,39 @@ const writeAsset = async (name: string, text: string): Promise<void> => {
   log(`${name} (${text.length} bytes)`);
 };
 
-const esbuildText = async (opts: Parameters<typeof esbuild>[0]): Promise<string> => {
-  const r = await esbuild({ ...opts, write: false });
-  const [file] = r.outputFiles;
-  if (!file) {
-    throw new Error("assets: esbuild emitted no output");
+// Browsers to keep prefixes for (Vite's "baseline widely available" default).
+// Without targets lightningcss assumes the newest engines and folds prefixed
+// properties away -- e.g. `-webkit-backdrop-filter`, which Safari < 18 needs.
+// lightningcss packs a version as major << 16 | minor << 8
+const version = (major: number, minor = 0): number => major * 0x1_00_00 + minor * 0x1_00;
+const CSS_TARGETS = {
+  chrome: version(111),
+  edge: version(111),
+  firefox: version(114),
+  safari: version(16, 4),
+  ios_saf: version(16, 4),
+};
+
+const minifyCss = async (file: string): Promise<string> => {
+  const { code } = cssTransform({ filename: file, code: await readFile(file), minify: true, targets: CSS_TARGETS });
+  return new TextDecoder().decode(code);
+};
+
+const bundleScript = async (file: string): Promise<string> => {
+  const r = await rolldownBuild({
+    input: file,
+    platform: "browser",
+    write: false,
+    transform: { target: "es2020" },
+    // classic scripts share one global scope: wrap each so minified top-level
+    // names can't collide across them
+    output: { format: "iife", minify: true },
+  });
+  const [chunk] = r.output;
+  if (chunk?.type !== "chunk") {
+    throw new Error(`assets: rolldown emitted no chunk for ${file}`);
   }
-  return file.text;
+  return chunk.code;
 };
 
 export async function buildAssets(): Promise<void> {
@@ -68,26 +97,10 @@ export async function buildAssets(): Promise<void> {
 
   await Promise.all([
     // 2. Plain CSS -> *.min.css (minify only; keep every url()/data: URI as authored).
-    ...["style"].map(async (f) =>
-      writeAsset(
-        `${f}.min.css`,
-        await esbuildText({ entryPoints: [join(STYLE, `${f}.css`)], minify: true, bundle: false }),
-      ),
-    ),
+    ...["style"].map(async (f) => writeAsset(`${f}.min.css`, await minifyCss(join(STYLE, `${f}.css`)))),
     // 3. Browser TS -> *.min.js (bundle + minify).
     ...["style", "disco", "toc", "nav"].map(async (f) =>
-      writeAsset(
-        `${f}.min.js`,
-        await esbuildText({
-          entryPoints: [join(STYLE, `${f}.ts`)],
-          bundle: true,
-          minify: true,
-          // classic scripts share one global scope: wrap each so minified
-          // top-level names can't collide across them
-          format: "iife",
-          target: "es2020",
-        }),
-      ),
+      writeAsset(`${f}.min.js`, await bundleScript(join(STYLE, `${f}.ts`))),
     ),
   ]);
 }
