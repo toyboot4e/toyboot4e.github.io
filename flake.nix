@@ -91,10 +91,10 @@
           '';
         };
 
-      # pre-commit: oxfmt + oxlint over builder/, check only (never rewrites the
-      # staged files), and css-types, which regenerates the CSS-module typings
-      # (a changed typing fails the commit until it is staged). Installed by
-      # entering the devShell; also a flake check.
+      # pre-commit: oxfmt + oxlint + tsc over builder/ and src/style/*.ts, check only
+      # (never rewrites the staged files), and css-types, which regenerates the
+      # CSS-module typings (a changed typing fails the commit until it is
+      # staged). Installed by entering the devShell; also a flake check.
       # Runs the locked tools from builder/node_modules (the nix-vendored copy
       # when absent), since type-aware oxlint needs the builder's deps anyway.
       preCommitFor =
@@ -115,7 +115,7 @@
             enable = true;
             name = "${name} (check only)";
             entry = "${builderHook name script}/bin/pre-commit-${name}";
-            files = "^builder/";
+            files = "^(builder/|src/style/.*\\.(ts|json)$)";
             pass_filenames = false;
           };
         in
@@ -128,6 +128,7 @@
             };
             oxfmt = hook "oxfmt" "fmt:check";
             oxlint = hook "oxlint" "lint";
+            tsc = hook "tsc" "typecheck";
           };
         };
     in

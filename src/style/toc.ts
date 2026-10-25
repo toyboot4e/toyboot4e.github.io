@@ -4,40 +4,50 @@
 // this is the only ToC JS, and it ships only on pages that have a ToC. Replaces
 // the scrollspy tocbot used to provide.
 
-const links = Array.from(document.querySelectorAll<HTMLAnchorElement>("#toc a[href^='#']"));
+const links = [...document.querySelectorAll<HTMLAnchorElement>("#toc a[href^='#']")];
 
-if (links.length) {
+if (links.length > 0) {
   // heading element -> its ToC link, in document (scroll) order
   const linkFor = new Map<HTMLElement, HTMLAnchorElement>();
   for (const a of links) {
-    const el = document.getElementById(decodeURIComponent(a.hash.slice(1)));
-    if (el) linkFor.set(el, a);
+    const el = document.querySelector<HTMLElement>(`#${CSS.escape(decodeURIComponent(a.hash.slice(1)))}`);
+    if (el) {
+      linkFor.set(el, a);
+    }
   }
-  const headings = Array.from(linkFor.keys());
+  const headings = [...linkFor.keys()];
 
   let active: HTMLAnchorElement | null = null;
-  const setActive = (a: HTMLAnchorElement | null) => {
-    if (a === active) return;
+  const setActive = (a: HTMLAnchorElement | null): void => {
+    if (a === active) {
+      return;
+    }
     active?.removeAttribute("aria-current");
     active = a;
     active?.setAttribute("aria-current", "true");
   };
 
-  const update = () => {
+  const update = (): void => {
     // the current section is the last heading whose top has scrolled above the
     // line; headings are in order, so stop at the first one still below it.
     const line = 120;
     let cur: HTMLElement | null = null;
     for (const h of headings) {
-      if (h.getBoundingClientRect().top <= line) cur = h;
-      else break;
+      if (h.getBoundingClientRect().top <= line) {
+        cur = h;
+      } else {
+        break;
+      }
     }
-    setActive(linkFor.get(cur ?? headings[0]) ?? null);
+    const at = cur ?? headings[0];
+    setActive(at === undefined ? null : (linkFor.get(at) ?? null));
   };
 
   let ticking = false;
-  const onScroll = () => {
-    if (ticking) return;
+  const onScroll = (): void => {
+    if (ticking) {
+      return;
+    }
     ticking = true;
     requestAnimationFrame(() => {
       ticking = false;

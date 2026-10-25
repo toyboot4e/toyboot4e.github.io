@@ -359,11 +359,12 @@ void main(){
 
 function compile(gl: WebGLRenderingContext, type: number, src: string): WebGLShader | null {
   const sh = gl.createShader(type);
-  if (!sh) return null;
+  if (!sh) {
+    return null;
+  }
   gl.shaderSource(sh, src);
   gl.compileShader(sh);
-  if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
-    // eslint-disable-next-line no-console
+  if (gl.getShaderParameter(sh, gl.COMPILE_STATUS) !== true) {
     console.warn("disco: shader compile failed:", gl.getShaderInfoLog(sh));
     gl.deleteShader(sh);
     return null;
@@ -374,13 +375,18 @@ function compile(gl: WebGLRenderingContext, type: number, src: string): WebGLSha
 function link(gl: WebGLRenderingContext): WebGLProgram | null {
   const vs = compile(gl, gl.VERTEX_SHADER, VERT);
   const fs = compile(gl, gl.FRAGMENT_SHADER, FRAG);
-  if (!vs || !fs) return null;
-  const prog = gl.createProgram();
-  if (!prog) return null;
+  if (vs === null || fs === null) {
+    return null;
+  }
+  // lib.dom says non-null, but a lost context returns null
+  const prog: WebGLProgram | null = gl.createProgram();
+  if (prog === null) {
+    return null;
+  }
   gl.attachShader(prog, vs);
   gl.attachShader(prog, fs);
   gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+  if (gl.getProgramParameter(prog, gl.LINK_STATUS) !== true) {
     console.warn("disco: program link failed:", gl.getProgramInfoLog(prog));
     return null;
   }
@@ -393,7 +399,7 @@ const DISCO_KEY = "toybeam-disco";
 function discoPref(): boolean {
   try {
     return localStorage.getItem(DISCO_KEY) !== "off";
-  } catch (e) {
+  } catch {
     return true;
   }
 }
@@ -406,28 +412,28 @@ function discoPref(): boolean {
 function isSoftwareRenderer(g: WebGLRenderingContext): boolean {
   try {
     const ext = g.getExtension("WEBGL_debug_renderer_info");
-    if (!ext) return false;
-    const r = String(g.getParameter((ext as any).UNMASKED_RENDERER_WEBGL) || "").toLowerCase();
-    return /swiftshader|llvmpipe|softpipe|software|basic render|microsoft basic|mesa offscreen/.test(r);
-  } catch (e) {
+    if (ext === null) {
+      return false;
+    }
+    const r = String(g.getParameter(ext.UNMASKED_RENDERER_WEBGL) ?? "").toLowerCase();
+    return /swiftshader|llvmpipe|softpipe|software|basic render|microsoft basic|mesa offscreen/u.test(r);
+  } catch {
     return false;
   }
 }
 
 // matchMedia helpers (guarded — matchMedia is absent in very old engines).
 function mm(query: string): MediaQueryList | null {
-  return window.matchMedia ? window.matchMedia(query) : null;
+  return "matchMedia" in globalThis ? globalThis.matchMedia(query) : null;
 }
-function onMedia(mql: MediaQueryList | null, cb: () => void): void {
-  if (!mql) return;
-  // addListener is the deprecated fallback for old WebKit.
-  mql.addEventListener ? mql.addEventListener("change", cb) : mql.addListener(cb);
+function onMedia(mql: MediaQueryList | null, listener: () => void): void {
+  mql?.addEventListener("change", listener);
 }
 
 function sameOrigin(url: string): boolean {
   try {
     return new URL(url).origin === location.origin;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -438,37 +444,50 @@ function sameOrigin(url: string): boolean {
 function discoEpoch(): number {
   try {
     const s = sessionStorage.getItem("toybeam-disco-t0");
-    if (s) return parseFloat(s);
+    if (s !== null && s !== "") {
+      return Number(s);
+    }
     const e = Date.now();
     sessionStorage.setItem("toybeam-disco-t0", String(e));
     return e;
-  } catch (e) {
+  } catch {
     return Date.now();
   }
 }
 
 function effectiveDark(): boolean {
-  const attr = document.documentElement.getAttribute("data-theme");
-  if (attr === "dark") return true;
-  if (attr === "light") return false;
+  const attr = document.documentElement.dataset["theme"];
+  if (attr === "dark") {
+    return true;
+  }
+  if (attr === "light") {
+    return false;
+  }
   const m = mm("(prefers-color-scheme: dark)");
-  return !!(m && m.matches);
+  return Boolean(m && m.matches);
 }
 
 function start(): void {
-  const canvas = document.getElementById("disco-canvas") as HTMLCanvasElement | null;
-  if (!canvas) return;
+  const canvasEl = document.querySelector<HTMLCanvasElement>("#disco-canvas");
+  if (!canvasEl) {
+    return;
+  }
+  const canvas = canvasEl;
 
   // Tear down ALL disco UI — the effect can't/shouldn't run on this device. This
   // includes the disco-toggle button: a control for an absent effect is just a
   // dead button, so remove it rather than leave it unresponsive.
   function disable(): void {
     document.documentElement.classList.remove("disco-on", "disco-static");
-    canvas!.remove();
+    canvas.remove();
     const bg = document.querySelector(".disco-bg-light");
-    if (bg) bg.remove();
-    const tgl = document.getElementById("disco-toggle");
-    if (tgl) tgl.remove();
+    if (bg) {
+      bg.remove();
+    }
+    const tgl = document.querySelector("#disco-toggle");
+    if (tgl) {
+      tgl.remove();
+    }
   }
 
   // Canvas opacity (recomputed per theme in sync). Homepage: full. Article/tag
@@ -483,7 +502,7 @@ function start(): void {
   let onOpacity = "1";
   // Same-site navigation shows the disco instantly (no fade-in); a fresh/external
   // visit (or toggling it on) fades via the `disco-animating` opt-in class.
-  const fromSameSite = !!document.referrer && sameOrigin(document.referrer);
+  const fromSameSite = Boolean(document.referrer) && sameOrigin(document.referrer);
 
   const opts: WebGLContextAttributes = {
     alpha: true,
@@ -493,13 +512,13 @@ function start(): void {
     premultipliedAlpha: false,
     powerPreference: "low-power",
   };
-  let gl = (canvas.getContext("webgl", opts) ||
-    canvas.getContext("experimental-webgl", opts)) as WebGLRenderingContext | null;
-  if (!gl) {
+  const ctx = canvas.getContext("webgl", opts) ?? canvas.getContext("experimental-webgl", opts);
+  if (!(ctx instanceof WebGLRenderingContext)) {
     // Graceful no-WebGL skip: leave the plain dark homepage.
     disable();
     return;
   }
+  const gl = ctx;
 
   // Drop the effect entirely on software renderers (no real GPU): a full-screen
   // shader is far too heavy on the CPU, and even the static-ball + CSS-light
@@ -531,19 +550,21 @@ function start(): void {
 
   // Quality tier: cheaper internal resolution, cheaper still on touch devices.
   const coarseMql = mm("(pointer: coarse)");
-  const coarse = !!(coarseMql && coarseMql.matches);
-  const maxDpr = coarse ? 1.0 : 1.5;
-  const resScale = coarse ? 0.7 : 1.0;
+  const coarse = Boolean(coarseMql && coarseMql.matches);
+  const maxDpr = coarse ? 1 : 1.5;
+  const resScale = coarse ? 0.7 : 1;
+
+  let govScale = 1; // resolution multiplier, lowered under load (see the governor below)
 
   function resize(): void {
-    const dpr = Math.min(window.devicePixelRatio || 1, maxDpr) * resScale * govScale;
-    const w = Math.max(1, Math.round(canvas!.clientWidth * dpr));
-    const h = Math.max(1, Math.round(canvas!.clientHeight * dpr));
-    if (canvas!.width !== w || canvas!.height !== h) {
-      canvas!.width = w;
-      canvas!.height = h;
+    const dpr = Math.min(globalThis.devicePixelRatio || 1, maxDpr) * resScale * govScale;
+    const w = Math.max(1, Math.round(canvas.clientWidth * dpr));
+    const h = Math.max(1, Math.round(canvas.clientHeight * dpr));
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
     }
-    gl!.viewport(0, 0, w, h);
+    gl.viewport(0, 0, w, h);
   }
 
   const reduce = mm("(prefers-reduced-motion: reduce)");
@@ -564,12 +585,19 @@ function start(): void {
   // slow, lower the resolution; if they're catastrophic or stay slow at the floor,
   // REMOVE the effect (no usable GPU). Only `prefers-reduced-motion` keeps a static
   // ball; a struggling device gets the plain dark homepage.
-  let govScale = 1.0; // resolution multiplier, lowered under load
   let dropped = false; // effect removed entirely (no GPU / too weak)
   let lastDraw = 0; // timestamp of the last actual draw
   let warmup = 0; // drawn-frame count (skip governor during startup jank)
   let slow = 0; // consecutive sustained-slow frames (weak GPU → lower res)
   let vslow = 0; // consecutive catastrophic frames (no GPU → drop fast)
+
+  function stop(): void {
+    running = false;
+    if (raf) {
+      globalThis.cancelAnimationFrame(raf);
+    }
+    raf = 0;
+  }
 
   function drop(): void {
     dropped = true;
@@ -578,31 +606,39 @@ function start(): void {
   }
 
   function degrade(): void {
-    if (govScale > 0.34) govScale *= 0.6; // shrink the buffer a notch, keep animating
-    else drop(); // can't hold even the floor → give up and remove it
+    if (govScale > 0.34) {
+      govScale *= 0.6;
+    } // shrink the buffer a notch, keep animating
+    else {
+      drop();
+    } // can't hold even the floor → give up and remove it
   }
 
   // Resize, set uniforms, draw, and reveal on the first frame. Shared by the
   // animated loop and the static (ball-only) render.
   function paint(timeSeconds: number, ballOnly: boolean): void {
     resize();
-    gl!.uniform2f(uRes, canvas!.width, canvas!.height);
-    gl!.uniform1f(uTime, timeSeconds);
-    gl!.uniform1f(uBallOnly, ballOnly ? 1 : 0);
-    gl!.uniform1f(uLight, light ? 1 : 0);
-    gl!.drawArrays(gl!.TRIANGLES, 0, 3);
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+    gl.uniform1f(uTime, timeSeconds);
+    gl.uniform1f(uBallOnly, ballOnly ? 1 : 0);
+    gl.uniform1f(uLight, light ? 1 : 0);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
     if (!started) {
       started = true;
-      canvas!.style.opacity = onOpacity;
+      canvas.style.opacity = onOpacity;
     }
   }
 
   function frame(now: number): void {
-    if (!running) return;
-    raf = window.requestAnimationFrame(frame);
+    if (!running) {
+      return;
+    }
+    raf = globalThis.requestAnimationFrame(frame);
 
     // Framerate cap: skip this callback if too little time has passed.
-    if (lastDraw && now - lastDraw < MIN_INTERVAL - 1) return;
+    if (lastDraw && now - lastDraw < MIN_INTERVAL - 1) {
+      return;
+    }
     const dt = lastDraw ? now - lastDraw : MIN_INTERVAL;
     lastDraw = now;
 
@@ -639,7 +675,7 @@ function start(): void {
   // drifting light. `disco-static` on <html> reveals it. (Software / weak GPUs are
   // dropped, not frozen — see drop().)
   function staticMode(): boolean {
-    return !!(reduce && reduce.matches);
+    return Boolean(reduce && reduce.matches);
   }
 
   let stillPending = 0;
@@ -650,15 +686,19 @@ function start(): void {
     // light layer is dark-theme only — on light, a reflective ball over the bright
     // page is enough and the bright-speck layer would vanish.
     document.documentElement.classList.toggle("disco-static", !light);
-    if (stillPending) return;
-    stillPending = window.setTimeout(() => {
+    if (stillPending) {
+      return;
+    }
+    stillPending = globalThis.setTimeout(() => {
       stillPending = 0;
-      paint(9.0, true);
+      paint(9, true);
     }, 0);
   }
 
   function run(): void {
-    if (running) return;
+    if (running) {
+      return;
+    }
     // Reduced motion → the static ball + CSS light path. Capable GPUs animate the
     // full shader; software / weak GPUs are dropped by the governor.
     if (staticMode()) {
@@ -670,21 +710,17 @@ function start(): void {
     lastDraw = 0;
     warmup = 0;
     slow = 0;
-    raf = window.requestAnimationFrame(frame);
-  }
-
-  function stop(): void {
-    running = false;
-    if (raf) window.cancelAnimationFrame(raf);
-    raf = 0;
+    raf = globalThis.requestAnimationFrame(frame);
   }
 
   // Briefly enable the disco transitions so this on/off (or first appearance)
   // fades; removed after, so hover / theme / same-site nav stay instant.
   function animate(): void {
     document.documentElement.classList.add("disco-animating");
-    if (animTimer) clearTimeout(animTimer);
-    animTimer = window.setTimeout(() => {
+    if (animTimer) {
+      clearTimeout(animTimer);
+    }
+    animTimer = globalThis.setTimeout(() => {
       document.documentElement.classList.remove("disco-animating");
       animTimer = 0;
     }, 900);
@@ -695,11 +731,14 @@ function start(): void {
   // u_light), re-applied live on theme toggle. The `disco-on` class marks "the
   // ball is the active background" so CSS can make content translucent to reveal it.
   function sync(): void {
-    if (dropped) return;
+    if (dropped) {
+      return;
+    }
     light = !effectiveDark();
     // Homepage: full. Article/tag pages dim — dark to 0.55, light to 0.7 (enough
     // to settle the effect behind the drop-shadowed panes without the fog wash).
-    onOpacity = home ? "1" : light ? "0.7" : "0.55";
+    const dimmed = light ? "0.7" : "0.55";
+    onOpacity = home ? "1" : dimmed;
     if (enabled) {
       document.documentElement.classList.add("disco-on");
       // Cancel any in-flight switch-off fade and bring it back.
@@ -707,34 +746,37 @@ function start(): void {
         clearTimeout(fadeTimer);
         fadeTimer = 0;
       }
-      if (!document.hidden) {
+      if (document.hidden) {
+        // Hidden tab: pause rendering but keep the mode (disco-on stays).
+        stop();
+        canvas.style.opacity = "0";
+        started = false;
+      } else {
         run();
         // Reflect the theme/page opacity live on a theme toggle (paint only sets
         // it on the first frame). Guard on `started` so we never reveal a blank
         // canvas before its first draw.
-        if (started) canvas!.style.opacity = onOpacity;
-      } else {
-        // Hidden tab: pause rendering but keep the mode (disco-on stays).
-        stop();
-        canvas!.style.opacity = "0";
-        started = false;
+        if (started) {
+          canvas.style.opacity = onOpacity;
+        }
       }
     } else {
       // Switched off: revert the content styling immediately so it animates back
       // (via disco-animating) IN SYNC with the canvas fade — no late snap — then
       // keep the ball spinning through the fade before stopping.
       document.documentElement.classList.remove("disco-on", "disco-static");
-      canvas!.style.opacity = "0";
-      const finish = () => {
+      canvas.style.opacity = "0";
+      const finish = (): void => {
         stop();
         started = false;
         fadeTimer = 0;
       };
+      if (fadeTimer) {
+        clearTimeout(fadeTimer);
+      }
       if (!document.hidden && running) {
-        if (fadeTimer) clearTimeout(fadeTimer);
-        fadeTimer = window.setTimeout(finish, 850);
+        fadeTimer = globalThis.setTimeout(finish, 850);
       } else {
-        if (fadeTimer) clearTimeout(fadeTimer);
         finish();
       }
     }
@@ -742,22 +784,25 @@ function start(): void {
 
   // The disco-toggle button (homepage, dark theme): flip the preference, persist
   // it, and reflect the pressed state for the dimmed-when-off styling.
-  const btn = document.getElementById("disco-toggle");
+  const btn = document.querySelector("#disco-toggle");
   function reflectBtn(): void {
-    if (btn) btn.setAttribute("aria-pressed", enabled ? "true" : "false");
+    if (btn) {
+      btn.setAttribute("aria-pressed", enabled ? "true" : "false");
+    }
   }
   reflectBtn();
-  (window as any).toggleDisco = function (): void {
+  function toggleDisco(): void {
     enabled = !enabled;
     try {
       localStorage.setItem(DISCO_KEY, enabled ? "on" : "off");
-    } catch (e) {
+    } catch {
       /* storage blocked — preference is session-only */
     }
     reflectBtn();
     animate(); // fade this on/off in or out
     sync();
-  };
+  }
+  Object.assign(globalThis, { toggleDisco });
 
   // React to: theme toggle (data-theme mutation), OS theme change, tab
   // visibility, reduced-motion change, and viewport resize.
@@ -771,13 +816,15 @@ function start(): void {
     sync();
   });
   document.addEventListener("visibilitychange", sync);
-  window.addEventListener("resize", () => {
+  globalThis.addEventListener("resize", () => {
     // The animated loop already resizes itself each frame (resize + redraw in the
     // same frame). Calling resize() here too reallocates+clears the canvas with
     // the redraw deferred to the next frame → a blank flash, e.g. when a mobile
     // URL/search bar shows and changes the viewport height. So only the static
     // render needs a nudge to avoid stretching.
-    if (!running && document.documentElement.classList.contains("disco-on")) drawStill();
+    if (!running && document.documentElement.classList.contains("disco-on")) {
+      drawStill();
+    }
   });
 
   // WebGL context loss: stop cleanly, then rebuild on restore.
@@ -792,9 +839,11 @@ function start(): void {
   canvas.addEventListener(
     "webglcontextrestored",
     () => {
-      prog = link(gl!);
-      if (!prog) return;
-      gl!.useProgram(prog);
+      prog = link(gl);
+      if (!prog) {
+        return;
+      }
+      gl.useProgram(prog);
       sync();
     },
     false,
@@ -806,7 +855,9 @@ function start(): void {
   // is extra compositor work that can amplify display-level tearing. The shared
   // clock (discoEpoch) keeps the animation continuous across pages either way;
   // this only governs the opacity reveal.
-  if (!fromSameSite) animate();
+  if (!fromSameSite) {
+    animate();
+  }
 
   sync();
 }

@@ -15,20 +15,29 @@ if (nav) {
   };
 
   const LINE_PX = 16;
+  const wheelUnit = (e: WheelEvent): number => {
+    if (e.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+      return LINE_PX;
+    }
+    if (e.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+      return nav.clientWidth;
+    }
+    return 1;
+  };
   nav.addEventListener(
     "wheel",
     (e) => {
       // pinch-zoom and trackpad sideways swipes stay native; a bar that fits
       // leaves the wheel to the page
-      if (e.ctrlKey || Math.abs(e.deltaX) >= Math.abs(e.deltaY) || maxScroll() <= 0) return;
+      if (e.ctrlKey || Math.abs(e.deltaX) >= Math.abs(e.deltaY) || maxScroll() <= 0) {
+        return;
+      }
       e.preventDefault();
-      const unit =
-        e.deltaMode === WheelEvent.DOM_DELTA_LINE ? LINE_PX : e.deltaMode === WheelEvent.DOM_DELTA_PAGE ? nav.clientWidth : 1;
-      nav.scrollLeft += e.deltaY * unit;
+      nav.scrollLeft += e.deltaY * wheelUnit(e);
     },
     { passive: false },
   );
   nav.addEventListener("scroll", update, { passive: true });
-  window.addEventListener("resize", update);
+  globalThis.addEventListener("resize", update);
   update();
 }

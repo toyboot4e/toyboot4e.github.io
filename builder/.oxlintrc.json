@@ -12,7 +12,10 @@
   "options": { "typeAware": true, "reportUnusedDisableDirectives": "error" },
   "overrides": [
     // ambient declaration files are scripts by design
-    { "files": ["**/*.d.ts"], "rules": { "import/unambiguous": "off" } }
+    { "files": ["**/*.d.ts"], "rules": { "import/unambiguous": "off" } },
+    // src/style/*.ts ship as classic browser scripts (no imports/exports), each
+    // wrapped by esbuild; their top-level names are file-local by construction
+    { "files": ["**/src/style/*.ts"], "rules": { "import/unambiguous": "off", "eslint/no-implicit-globals": "off" } }
   ],
   "ignorePatterns": ["dist", "test/golden", "test/fixtures", "grammars/wasm", "grammars/queries"],
   "rules": {

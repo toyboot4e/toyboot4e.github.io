@@ -16,14 +16,17 @@ This is a static site generator for a Japanese technical devlog. Content is auth
   format step. This is what nix/CI ship. `BUILD_PROF=1` prints phase timings.
 - `just test` - Run the render/bake goldens + behavior tests with **vitest**
   (`cd builder && vitest run`); `just test-update` regenerates goldens.
-- `just fmt` - Format `builder/` with oxfmt (120 cols; `--check` to verify).
+- `just fmt` - Format `builder/` and the browser scripts `src/style/*.ts` with
+  oxfmt (120 cols; `--check` to verify).
   Hand-aligned tables (key layouts, tag sets) carry `// oxfmt-ignore`.
 - `just css-types` - Regenerate `builder/src/styles/*.module.d.css.ts` from
   Vite's own CSS-module class maps (committed; the pre-commit hook regenerates
   them and fails the commit until the update is staged). They make a typo'd
   class a `tsc` error.
 - `just lint` - oxlint (`builder/.oxlintrc.json`: every category, type-aware)
-  + strict `tsc`. Rules that ban language features or contradict each other are
+  + strict `tsc`, over `builder/` and `src/style/*.ts` (browser scripts, own
+  `tsconfig.json`; each bundled by esbuild as an IIFE into `*.min.js`). The
+  same checks run as git pre-commit hooks (`flake.nix`, installed by `nix develop`). Rules that ban language features or contradict each other are
   off, each with its reason in the config. vitest runs on **node** but the build
   ships on **bun**, so after touching regexes diff the real `just build` output:
   bun (JSC) drops backreference matches on non-ASCII input under the `u` flag.

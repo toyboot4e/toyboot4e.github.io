@@ -39,11 +39,11 @@ test:
 [private]
 alias t := test
 
-# format builder/ sources in place (oxfmt, 120 cols); `--check` to only verify
+# format builder/ and the browser scripts (src/style/*.ts) in place (oxfmt, 120 cols); `--check` to only verify
 fmt *args:
-    cd builder && bun run fmt {{args}}
+    cd builder && bun run fmt {{args}} && bun run fmt:browser {{args}}
 
-# lint builder/ (oxlint, every category + type-aware rules) and typecheck (strict tsc)
+# lint builder/ and src/style/*.ts (oxlint, every category + type-aware rules) and typecheck (strict tsc)
 lint:
     cd builder && bun run css-types:check && bun run lint && bun run typecheck
 
