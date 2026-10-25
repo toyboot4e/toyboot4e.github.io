@@ -54,8 +54,8 @@ dependency, because its postinstall downloads a native binary that would break
 the hermetic (offline) nix build. The first run downloads a wasi-sdk toolchain
 (cached in `~/.cache/tree-sitter`).
 
-`validate.mjs` loads every grammar + its combined query in the web-tree-sitter
-runtime and reports any that fail to compile (catches grammar/query version
+`validate.ts` (`bun grammars/validate.ts`, from `builder/`) loads every grammar +
+its combined query in the web-tree-sitter runtime and reports any that fail to compile (catches grammar/query version
 skew) plus the union of capture names (to spot a new name needing a `CLASS_TABLE`
 bucket). Run it after re-vendoring.
 

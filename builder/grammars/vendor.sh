@@ -17,7 +17,7 @@
 # Needs network + a one-time wasi-sdk download (cached in ~/.cache/tree-sitter).
 # The tree-sitter CLI is pulled via npx (pinned in TS_CLI), NOT a package.json dep
 # (its postinstall fetches a native binary that would break the hermetic nix build).
-# Re-run to add/bump a language; commit the regenerated files. `validate.mjs`
+# Re-run to add/bump a language; commit the regenerated files. `validate.ts`
 # checks every query still compiles against its grammar.
 #
 # Exception: `org` is pinned NEWER than Helix's languages.toml rev. Helix's pinned

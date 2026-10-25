@@ -1,5 +1,5 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "printWidth": 120,
-  "ignorePatterns": ["dist", "test/golden", "test/fixtures", "grammars"]
+  "ignorePatterns": ["dist", "test/golden", "test/fixtures", "grammars/wasm", "grammars/queries", "grammars/*.md"]
 }

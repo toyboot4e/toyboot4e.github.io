@@ -14,7 +14,7 @@
     // ambient declaration files are scripts by design
     { "files": ["**/*.d.ts"], "rules": { "import/unambiguous": "off" } }
   ],
-  "ignorePatterns": ["dist", "test/golden", "test/fixtures", "grammars"],
+  "ignorePatterns": ["dist", "test/golden", "test/fixtures", "grammars/wasm", "grammars/queries"],
   "rules": {
     // Off: rules that ban core language features, contradict another enabled rule, or set arbitrary size caps.
 

@@ -28,5 +28,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["src", "test", "*.ts"]
+  "include": ["src", "test", "grammars/*.ts", "*.ts"]
 }
