@@ -17,7 +17,7 @@ In this article, I will share my competitive programming experience and thoughts
 ** What are AtCoder and competitive programming?
 
 [[https://atcoder.jp/][AtCoder]] is a website for competitive programming contests, similar to [[https://codeforces.com/][Codeforces]]. Around 10,000 people join its weekly contests, and it holds the AtCoder World Tour Finals for the top players in the world.
-a
+
 In a contest, you solve algorithm and math problems in a limited time (e.g., 100 minutes), reading the input from stdin and printing the answer to stdout. Naive solutions are usually too slow. An $O(n^2)$ algorithm fails for $n = 1{,}000{,}000$, so you look for $O(n \log n)$ or faster. That's what we're addicted to!
 
 * The journey
@@ -32,11 +32,11 @@ After six months, I was able to write basic Haskell, but my rating was very poor
 
 I was beaten every day by every problem. Someday I might become who I wanted to be, but not today, tomorrow or next month. I couldn't identify with that person. I was someone who just suffered from Haskell and competitive programming. It took courage to accept that truth.
 
-Today I'm probably that person after long practice, but it does not rewrite history.
+Today, after long practice, I'm probably that person, but it does not rewrite history.
 
 * What Haskell taught me
 
-Haskell is known for purity, lazy evaluation, and monads. Did it change the way I program and think?
+Haskell is known for purity, lazy evaluation and monads. Did it change the way I program and think?
 
 Yes! But in a minor way. Purity, laziness and monads mattered less than I expected. The biggest difference was in handling temporary states.
 
@@ -69,7 +69,7 @@ This one is basic, but even in more complex situations, we stick with the idea o
 
 * Wrapping up
 
-I kept learning Haskell and competitive programming over the past 15 months, and finally reached a rating of 1,200! I experienced some despair, courage, and purely functional programming. Let's see where the next 15 months take me.
+I kept learning Haskell and competitive programming over the past 15 months, and finally reached a rating of 1,200! I experienced some despair, courage and purely functional programming. Let's see where the next 15 months take me.
 
 #+CAPTION: My contest performances and rating ([[https://atcoder-charts.netlify.app/#/][AtCoder Charts]])
 [[./img/2023-09-light-blue-performances.webp]]
@@ -81,7 +81,7 @@ I kept learning Haskell and competitive programming over the past 15 months, and
 #+CAPTION: Heatmap
 [[./img/2023-09-light-blue-heatmap.webp]]
 
-#+CAPTION: I solved 100+ light-blue-difficulty problems
+#+CAPTION: I solved 100+ light blue difficulty problems
 [[./img/2023-09-light-blue-problems-3.webp]]
 
 #+CAPTION: 662 solved in total
