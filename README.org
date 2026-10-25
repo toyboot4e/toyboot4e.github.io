@@ -7,8 +7,7 @@ This is [[https://toyboot4e.github.io/][my devlog (link)]] written in =.org= fil
 See the [[./Justfile][./Justfile]].
 
 #+BEGIN_SRC sh
-$ just watch # in one tab
-$ just serve # in another tab
+$ just watch # start a local server and rebuild it on file changes
 #+END_SRC
 
 ** Thanks
