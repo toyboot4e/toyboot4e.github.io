@@ -105,7 +105,7 @@ uncached cards.
   factory), `vitest.config.ts`, `config-shared.ts`, `package.json`/`node_modules`
 - `builder/src/main.ts` - CLI entry; `build.ts` - orchestration + helpers
 - `builder/src/render.tsx` - org → page HTML; imports `./styles/*.module.css` directly
-- `builder/src/lang.ts` - `.en.org` ↔ `/en/` path mapping, counterpart lookup
+- `builder/src/lang.ts` - root (EN) / `/ja/` / `/en/` path mapping, counterpart lookup
 - `builder/src/bake.ts` / `bake-util.ts` - KaTeX/card bake engine; `highlight.ts` - tree-sitter engine
 - `builder/grammars/` - vendored grammar `wasm/` + `queries/` (+ `vendor.sh`); see its README
 - `builder/src/assets.ts` - builds `components.min.css` + minifies/bundles assets
@@ -263,17 +263,20 @@ class="hl">`. Capture names → `hl-<bucket>` CSS classes via `CLASS_TABLE`. Fea
   highlight almost nothing (with no build error).
 
 ### Languages (EN/JA)
-Japanese is primary at the root URLs. An English translation is `<name>.en.org`
-beside its source and ships at `/en/<name>.html` (`builder/src/lang.ts` maps
-paths). `/en/index.html` and `/en/tags/` list translated articles only. Every
-untranslated Japanese article still gets an `/en/` stand-in (Japanese body,
-English chrome, a notice, `canonical` -> the Japanese page) so the header's
-language switch never 404s; it is baked from the Japanese page's already-baked
-`#content` (`render-bake.ts`), and relative asset URLs are pinned to absolute
-there since `/en/` is one directory deeper. Real pairs get `hreflang`
-alternates. The root index alone redirects non-`ja` browsers to `/en/`
-(skipped for bots/headless, overridden by the switch's stored
-`toybeam-lang`), and only once some translation exists. The watch daemon
+English is the default at the root URLs; Japanese ships under `/ja/`
+(`builder/src/lang.ts` maps paths). An English translation is `<name>.en.org`
+beside its Japanese source and ships at `/<name>.html`. Every root page is
+also written byte-identical under `/en/`; English pages carry a `canonical`
+to their root URL, so the copies defer to it. The root index and tags list
+translated articles only. Every untranslated Japanese article still gets a
+root stand-in (Japanese body, English chrome, a notice, `canonical` -> its
+`/ja/` page), so the language switch and pre-`/ja/` URLs never 404; it is
+baked from the Japanese page's already-baked `#content` (`render-bake.ts`).
+Relative asset URLs (and links to static `.html` in `src/`) are pinned to
+absolute since `/ja/` and `/en/` sit a directory deeper. Real pairs get
+`hreflang` alternates (`x-default` = English). The root index alone (not its
+`/en/` copy) redirects `ja` browsers to `/ja/` (skipped for bots/headless,
+overridden by the EN/JA switches' stored `toybeam-lang`). The watch daemon
 re-renders the counterpart after any `.org` change.
 
 ### Build Modes

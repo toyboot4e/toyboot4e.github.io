@@ -27,12 +27,15 @@ const texts = await Promise.all(files.map(async (relOrg) => readFile(join(SRC, r
 const writes: Promise<void>[] = [];
 for (const [i, relOrg] of files.entries()) {
   // oxlint-disable-next-line eslint/no-await-in-loop -- one warm tree-sitter/KaTeX setup, rendered one at a time
-  const r = await renderAndBake(relOrg, texts[i] ?? "", { counterpart: isPublished(SRC, counterpartOf(relOrg)) });
+  const r = await renderAndBake(relOrg, texts[i] ?? "", {
+    counterpart: isPublished(SRC, counterpartOf(relOrg)),
+    src: SRC,
+  });
   // release build: skip drafts
   if (r.draft) {
     continue;
   }
-  for (const page of [{ rel: r.rel, out: r.out }, ...(r.fallback ? [r.fallback] : [])]) {
+  for (const page of r.pages) {
     const dest = join(OUT, page.rel);
     const dir = dirname(dest);
     if (!madeDirs.has(dir)) {

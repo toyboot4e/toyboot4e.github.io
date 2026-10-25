@@ -1,8 +1,9 @@
-// Article languages. Japanese is the primary language at the root URLs; an
-// English translation sits beside its source as `<name>.en.org` and ships under
-// `/en/`. A Japanese article without a published translation still gets an
-// `/en/` page (its Japanese body under English chrome + a notice), so the
-// language switch never 404s; it is left out of the English listings.
+// Article languages. English is the default at the root URLs (also served
+// under `/en/` as canonical-pointing copies); Japanese ships under `/ja/`. An
+// English translation sits beside its Japanese source as `<name>.en.org`. A
+// Japanese article without a published translation still gets a root page (its
+// Japanese body under English chrome + a notice), so the language switch and
+// the pre-`/ja/` URLs never 404; it is left out of the English listings.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { literal } from "./guard.ts";
@@ -16,12 +17,19 @@ export const langOf = (relOrg: string): Lang => (relOrg.endsWith(".en.org") ? "e
 export const counterpartOf = (relOrg: string): string =>
   langOf(relOrg) === "en" ? relOrg.replace(/\.en\.org$/u, ".org") : relOrg.replace(/\.org$/u, ".en.org");
 
-// `foo.org` -> `foo.html`, `foo.en.org` -> `en/foo.html`
+// `foo.org` -> `ja/foo.html`, `foo.en.org` -> `foo.html`
 export const outRelOf = (relOrg: string): string =>
-  langOf(relOrg) === "en" ? `en/${relOrg.replace(/\.en\.org$/u, ".html")}` : relOrg.replace(/\.org$/u, ".html");
+  langOf(relOrg) === "en" ? relOrg.replace(/\.en\.org$/u, ".html") : `ja/${relOrg.replace(/\.org$/u, ".html")}`;
 
-// The `/en/` page standing in for an untranslated Japanese article.
-export const fallbackRelOf = (relOrg: string): string => `en/${relOrg.replace(/\.org$/u, ".html")}`;
+// The root page standing in for an untranslated Japanese article.
+export const fallbackRelOf = (relOrg: string): string => relOrg.replace(/\.org$/u, ".html");
+
+// Every root (English) page is also written here, byte-identical: its
+// `canonical` already names the root URL.
+export const aliasRelOf = (rootRel: string): string => `en/${rootRel}`;
+
+// Where a page in `lang` is written: an English page also gets its `/en/` copy.
+export const destsOf = (lang: Lang, rel: string): string[] => (lang === "en" ? [rel, aliasRelOf(rel)] : [rel]);
 
 // Mirrors render.tsx's `keyword(kw, "DRAFT") !== undefined`: a non-empty value.
 const DRAFT_RE = /^[ \t]*#\+draft:[ \t]*\S/imu;

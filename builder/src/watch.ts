@@ -32,7 +32,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { renderAndBake } from "./render-bake.ts";
 import type { Meta } from "./render.tsx";
 import { SRC, OUT, STATIC_RE, fullBuild, listings, writeIndexAndTags } from "./build.ts";
-import { counterpartOf, fallbackRelOf, isPublished, langOf, outRelOf, type Lang } from "./lang.ts";
+import { counterpartOf, destsOf, fallbackRelOf, isPublished, langOf, outRelOf, type Lang } from "./lang.ts";
 import { startDevServer, type DevServer } from "./dev-server.ts";
 import { errorText } from "./guard.ts";
 
@@ -63,14 +63,18 @@ const log = (msg: string): void => {
 };
 
 // --- one .org change ---------------------------------------------------------
-// Drop an unpublished article's page, and its `/en/` stand-in unless a real
+// Drop an unpublished article's page(s), and its root stand-in unless a real
 // translation has taken that path.
+const rmAll = async (rels: string[]): Promise<void> => {
+  await Promise.all(rels.map(async (rel) => rm(join(OUT, rel), { force: true })));
+};
 async function unpublish(relOrg: string, outRel: string): Promise<void> {
-  if (langOf(relOrg) === "ja" && !isPublished(SRC, counterpartOf(relOrg))) {
-    await rm(join(OUT, fallbackRelOf(relOrg)), { force: true });
+  const lang = langOf(relOrg);
+  if (lang === "ja" && !isPublished(SRC, counterpartOf(relOrg))) {
+    await rmAll(destsOf("en", fallbackRelOf(relOrg)));
   }
   if (cache.delete(outRel)) {
-    await rm(join(OUT, outRel), { force: true });
+    await rmAll(destsOf(lang, outRel));
     await regenIndexTags();
     dev?.reload();
   }
@@ -87,18 +91,21 @@ async function onOrgFile(relOrg: string): Promise<void> {
     return;
   }
   const text = await readFile(abs, "utf8");
-  const r = await renderAndBake(relOrg, text, { counterpart: isPublished(SRC, counterpartOf(relOrg)) });
+  const r = await renderAndBake(relOrg, text, {
+    counterpart: isPublished(SRC, counterpartOf(relOrg)),
+    src: SRC,
+  });
   // became a #+DRAFT -> treat like a delete (release build skips drafts)
   if (r.draft) {
     await unpublish(relOrg, r.rel);
     log(`~ ${relOrg} draft, skipped (${since(t)})`);
     return;
   }
-  for (const page of [{ rel: r.rel, out: r.out }, ...(r.fallback ? [r.fallback] : [])]) {
+  for (const page of r.pages) {
     const dest = join(OUT, page.rel);
-    // oxlint-disable-next-line eslint/no-await-in-loop -- two pages at most
+    // oxlint-disable-next-line eslint/no-await-in-loop -- four pages at most
     await mkdir(dirname(dest), { recursive: true });
-    // oxlint-disable-next-line eslint/no-await-in-loop -- two pages at most
+    // oxlint-disable-next-line eslint/no-await-in-loop -- four pages at most
     await writeFile(dest, page.out);
   }
   const prev = cache.get(r.rel);
@@ -119,7 +126,7 @@ async function onOrgFile(relOrg: string): Promise<void> {
 
 // Publishing/unpublishing one language changes the other's language switch,
 // hreflang links and (Japanese) `/en/` stand-in, so re-render the counterpart
-// too, AFTER the changed file: an unpublished translation's rm of `en/x.html`
+// too, AFTER the changed file: an unpublished translation's rm of `x.html`
 // must come before the Japanese re-render writes the stand-in there.
 async function onOrg(relOrg: string): Promise<void> {
   await onOrgFile(relOrg);

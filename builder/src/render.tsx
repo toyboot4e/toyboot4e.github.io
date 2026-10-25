@@ -62,11 +62,11 @@ const NavIcon = ({ children }: { readonly children?: Child }): Raw => (
 // oxfmt-ignore
 const UI = {
   ja: {
-    prefix: "", locale: "ja_JP", skip: "本文へスキップ", siteNav: "サイトナビゲーション", footerNav: "フッターリンク",
+    prefix: "/ja", locale: "ja_JP", skip: "本文へスキップ", siteNav: "サイトナビゲーション", footerNav: "フッターリンク",
     theme: "テーマ切替", disco: "ディスコボール切替", toc: "目次", tags: "タグ",
   },
   en: {
-    prefix: "/en", locale: "en_US", skip: "Skip to content", siteNav: "Site navigation", footerNav: "Footer links",
+    prefix: "", locale: "en_US", skip: "Skip to content", siteNav: "Site navigation", footerNav: "Footer links",
     theme: "Toggle theme", disco: "Toggle disco ball", toc: "Contents", tags: "Tags",
   },
 } as const;
@@ -89,7 +89,7 @@ const skipLink = (c: Chrome): Raw => (
 );
 
 // Remembers an explicit choice so the root index stops auto-redirecting by the
-// browser language (see langRedirect).
+// browser language (see LANG_REDIRECT).
 const rememberLang = (to: Lang): string => `try{localStorage.setItem('toybeam-lang','${to}')}catch(e){}`;
 
 const langSwitch = (ui: Lang, alt: string): Raw => {
@@ -938,11 +938,11 @@ export const isMeta = objectOf<Meta>({
 const FAVICON =
   "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔦</text></svg>";
 
-// Sent to `/en/` once, from the root index only: an explicit switch (stored by
-// langSwitch) wins over the browser language, deep links are never redirected,
-// and crawlers / the headless a11y scanner stay on the Japanese index.
+// Sends a Japanese browser from the root index to `/ja/`: an explicit switch
+// (stored by rememberLang) wins over the browser language, deep links and the
+// explicit `/en/` alias are never redirected, and crawlers stay on the root.
 const LANG_REDIRECT = raw(
-  String.raw`try{var l=localStorage.getItem('toybeam-lang');if(l==='en'||(l===null&&!/^ja\b/i.test(navigator.language||'ja')&&!/bot|crawl|spider|slurp|headless|lighthouse/i.test(navigator.userAgent)))location.replace('/en/')}catch(e){}`,
+  String.raw`try{var l=localStorage.getItem('toybeam-lang');if(/^\/(index\.html)?$/.test(location.pathname)&&(l==='ja'||(l===null&&/^ja\b/i.test(navigator.language||'')&&!/bot|crawl|spider|slurp|headless|lighthouse/i.test(navigator.userAgent))))location.replace('/ja/')}catch(e){}`,
 );
 
 function headHtml(m: {
@@ -955,15 +955,17 @@ function headHtml(m: {
   hasMath: boolean;
   // site-relative hrefs of the real translations, this page's own included
   alternates: Partial<Record<Lang, string>>;
+  // English pages default to their own root URL, so their `/en/` copies defer to it
   canonical?: string;
   redirect?: boolean;
 }): Raw {
   const img = absUrl(m.thumbnail);
-  const alts = (["ja", "en"] as const).flatMap((l) => {
+  const alts = (["en", "ja"] as const).flatMap((l) => {
     const href = m.alternates[l];
     return href === undefined ? [] : [{ l, url: absUrl(href) }];
   });
-  const canonical = m.canonical === undefined ? null : absUrl(m.canonical);
+  const ownUrl = m.ui === "en" ? m.url : null;
+  const canonical = m.canonical === undefined ? ownUrl : absUrl(m.canonical);
   const twitter = img === null ? "summary" : "summary_large_image";
   return (
     <head>
@@ -1397,14 +1399,9 @@ const langPick = (ui: Lang, alt: string): Raw => (
 );
 
 // index.html: Devlog (timeline) with the tag nav under its heading, then Diary.
-// `/en/index.html` lists the translated articles only; `redirect` (root index
-// only) sends non-Japanese browsers there.
-export function buildIndexHtml(
-  metas: Meta[],
-  diaryMetas: Meta[],
-  allTags: string[],
-  opts: { ui?: Lang; redirect?: boolean } = {},
-): string {
+// The English root index lists the translated articles only and sends Japanese
+// browsers to `/ja/`.
+export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: string[], opts: { ui?: Lang } = {}): string {
   const ui = opts.ui ?? "ja";
   const section = (id: string, cards: Meta[], nav?: Raw): Raw => (
     <Fragment>
@@ -1431,7 +1428,7 @@ export function buildIndexHtml(
         hasCode: false,
         hasMath,
         alternates: { ja: rootOf("ja"), en: rootOf("en") },
-        redirect: opts.redirect ?? false,
+        redirect: ui === "en",
       }),
       titleBlock: (
         <div class="title-block">

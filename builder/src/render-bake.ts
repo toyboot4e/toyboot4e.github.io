@@ -5,11 +5,12 @@
 // Importing this pulls in bake.ts -> the heavy tree-sitter setup, so only the
 // workers and tests use it; the orchestrator (build.ts) stays on render.ts +
 // bake-util.ts.
-import { posix } from "node:path";
+import { existsSync } from "node:fs";
+import { join, posix } from "node:path";
 import { parseHTML } from "linkedom";
 import { renderArticle, type Meta } from "./render.tsx";
 import { bakeDocument, stamp } from "./bake.ts";
-import type { Lang } from "./lang.ts";
+import { destsOf, type Lang } from "./lang.ts";
 
 export type Baked = {
   rel: string;
@@ -19,39 +20,54 @@ export type Baked = {
   meta: Meta;
   out: string;
   fallback: { rel: string; out: string } | null;
+  // every file to write: the page, its stand-in, and their `/en/` copies
+  pages: { rel: string; out: string }[];
 };
 
-// A page served under `/en/` is one directory deeper than its source, so its
-// relative asset URLs (`./img/x.webp`) must be pinned to the source's directory.
+// A page may be served a directory deeper than its source (`/ja/`, `/en/`), so
+// relative asset URLs (`./img/x.webp`) are pinned to the source's directory.
 // Relative article links (`./other.html`) are left alone: they resolve to the
-// other article's `/en/` page, translated or stand-in.
-const SKIP_URL_RE = /^(?:[a-z][a-z\d+.-]*:|[/#?])|\.html(?:[#?]|$)/iu;
-function pinAssetUrls(root: Element, srcDir: string): void {
+// other article in the same language tree. A static `.html` copied from `src`
+// (`src` given) exists at the root only, so it is pinned like an asset.
+const SKIP_URL_RE = /^(?:[a-z][a-z\d+.-]*:|[/#?])/iu;
+const HTML_RE = /\.html(?:[#?]|$)/u;
+function pinAssetUrls(root: Element, srcDir: string, src: string | undefined): void {
   for (const attr of ["src", "href", "poster"]) {
     for (const el of root.querySelectorAll(`[${attr}]`)) {
       const v = el.getAttribute(attr) ?? "";
-      if (v !== "" && !SKIP_URL_RE.test(v)) {
-        el.setAttribute(attr, posix.join("/", srcDir, v));
+      if (v === "" || SKIP_URL_RE.test(v)) {
+        continue;
+      }
+      const pinned = posix.join("/", srcDir, v);
+      if (!HTML_RE.test(v) || (src !== undefined && existsSync(join(src, pinned.replace(/[#?].*$/u, ""))))) {
+        el.setAttribute(attr, pinned);
       }
     }
   }
 }
 
-export async function renderAndBake(rel: string, text: string, opts: { counterpart?: boolean } = {}): Promise<Baked> {
+export async function renderAndBake(
+  rel: string,
+  text: string,
+  opts: { counterpart?: boolean; src?: string } = {},
+): Promise<Baked> {
   const r = await renderArticle(rel, text, opts);
   const { document } = parseHTML(r.html);
   bakeDocument(document);
   // oxlint-disable-next-line typescript/no-base-to-string -- linkedom's toString() serialises the document (untyped)
   const serialize = (): string => document.toString();
   const content = document.querySelector("#content");
-  if (r.lang === "en" && content !== null) {
-    pinAssetUrls(content, posix.dirname(rel));
+  if (content !== null) {
+    pinAssetUrls(content, posix.dirname(rel), opts.src);
   }
-  const html = serialize();
-  let fallback: Baked["fallback"] = null;
-  if (r.fallback !== null && content !== null) {
-    pinAssetUrls(content, posix.dirname(rel));
-    fallback = { rel: r.fallback.rel, out: stamp(r.fallback.page(content.innerHTML)) };
-  }
-  return { rel: r.rel, lang: r.lang, isDiary: r.isDiary, draft: r.draft, meta: r.meta, out: stamp(html), fallback };
+  const out = stamp(serialize());
+  const fallback =
+    r.fallback === null || content === null
+      ? null
+      : { rel: r.fallback.rel, out: stamp(r.fallback.page(content.innerHTML)) };
+  const pages = [
+    ...destsOf(r.lang, r.rel).map((d) => ({ rel: d, out })),
+    ...(fallback === null ? [] : destsOf("en", fallback.rel).map((d) => ({ rel: d, out: fallback.out }))),
+  ];
+  return { rel: r.rel, lang: r.lang, isDiary: r.isDiary, draft: r.draft, meta: r.meta, out, fallback, pages };
 }

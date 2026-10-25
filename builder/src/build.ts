@@ -20,7 +20,7 @@ import { buildIndexHtml, buildTagHtml, isMeta, type Meta } from "./render.tsx";
 import { copyKatexAssets, isBakeStats, mergeStats, stamp, type BakeStats } from "./bake-util.ts";
 import { arrayOf, isBoolean, isString, objectOf, parseJson } from "./guard.ts";
 import { buildAssets } from "./assets.ts";
-import { isLang, type Lang } from "./lang.ts";
+import { destsOf, isLang, type Lang } from "./lang.ts";
 
 // builder/src/build.ts -> repo root; HERE is builder/src
 const HERE = import.meta.dirname;
@@ -178,28 +178,26 @@ export function listings(entries: Iterable<{ lang: Lang; isDiary: boolean; meta:
 // (Re)generate both indexes + every tag page from the article metadata. The watch
 // daemon calls this whenever an article's metadata (title/date/tags) changes.
 export async function writeIndexAndTags(ls: Listings): Promise<void> {
-  const prefix = { ja: "", en: "en/" } as const;
-  const hasEn = ls.en.metas.length + ls.en.diaryMetas.length > 0;
+  const prefix = { ja: "ja/", en: "" } as const;
   const writes: Promise<void>[] = [];
+  const write = (ui: Lang, rel: string, html: string): void => {
+    for (const dest of destsOf(ui, `${prefix[ui]}${rel}`)) {
+      writes.push(writePage(dest, html));
+    }
+  };
   for (const ui of ["ja", "en"] as const) {
     const { metas, diaryMetas, allTags } = ls[ui];
     const otherTags = new Set(ls[ui === "ja" ? "en" : "ja"].allTags);
-    writes.push(
-      writePage(
-        `${prefix[ui]}index.html`,
-        buildIndexHtml(metas, diaryMetas, allTags, { ui, redirect: ui === "ja" && hasEn }),
-      ),
-    );
+    write(ui, "index.html", buildIndexHtml(metas, diaryMetas, allTags, { ui }));
     for (const tag of allTags) {
-      writes.push(
-        writePage(
-          `${prefix[ui]}tags/${tag}.html`,
-          buildTagHtml(
-            tag,
-            metas.filter((m) => m.tags.includes(tag)),
-            allTags,
-            { ui, altTag: otherTags.has(tag) },
-          ),
+      write(
+        ui,
+        `tags/${tag}.html`,
+        buildTagHtml(
+          tag,
+          metas.filter((m) => m.tags.includes(tag)),
+          allTags,
+          { ui, altTag: otherTags.has(tag) },
         ),
       );
     }
