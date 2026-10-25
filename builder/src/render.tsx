@@ -22,6 +22,7 @@ import kb from "./styles/keyboard.module.css";
 import toc from "./styles/toc.module.css";
 import { keyboardStrokesHtml } from "./keyboard.tsx";
 import { expandMathbb } from "./math-util.ts";
+import { counterpartOf, fallbackRelOf, langOf, outRelOf, type Lang } from "./lang.ts";
 
 export const SITE_URL = "https://toyboot4e.github.io/";
 
@@ -58,18 +59,62 @@ const NavIcon = ({ children }: { readonly children?: Child }): Raw => (
 // and the list markup (AT announces "list, 7 items" and can skip the whole run).
 // Each landmark is NAMED: two unnamed <nav>s (chrome + ToC) are indistinguishable
 // in a screen reader's landmark menu (axe: landmark-unique).
-const SKIP_LINK = (
-  <a class="skip-link" href="#main">
-    本文へスキップ
+// oxfmt-ignore
+const UI = {
+  ja: {
+    prefix: "", locale: "ja_JP", skip: "本文へスキップ", siteNav: "サイトナビゲーション", footerNav: "フッターリンク",
+    theme: "テーマ切替", disco: "ディスコボール切替", toc: "目次", tags: "タグ",
+  },
+  en: {
+    prefix: "/en", locale: "en_US", skip: "Skip to content", siteNav: "Site navigation", footerNav: "Footer links",
+    theme: "Toggle theme", disco: "Toggle disco ball", toc: "Contents", tags: "Tags",
+  },
+} as const;
+
+const LANG_TAG = { ja: "JA", en: "EN" } as const;
+const other = (l: Lang): Lang => (l === "ja" ? "en" : "ja");
+const homeOf = (l: Lang): string => `${UI[l].prefix}/index.html`;
+const rootOf = (l: Lang): string => `${UI[l].prefix}/`;
+const tagHref = (l: Lang, tag: string): string => `${UI[l].prefix}/tags/${tag}.html`;
+
+// The chrome speaks `ui`; `mark` tags it with `lang` when that differs from the
+// page's <html lang> (an untranslated article's English chrome).
+type Chrome = { ui: Lang; mark: boolean };
+const chromeLang = (c: Chrome): Lang | undefined => (c.mark ? c.ui : undefined);
+
+const skipLink = (c: Chrome): Raw => (
+  <a class="skip-link" href="#main" lang={chromeLang(c)}>
+    {UI[c.ui].skip}
   </a>
 );
 
-const HEADER = (
-  <header role="banner">
-    <nav aria-label="サイトナビゲーション">
+// Remembers an explicit choice so the root index stops auto-redirecting by the
+// browser language (see langRedirect).
+const rememberLang = (to: Lang): string => `try{localStorage.setItem('toybeam-lang','${to}')}catch(e){}`;
+
+const langSwitch = (ui: Lang, alt: string): Raw => {
+  const to = other(ui);
+  return (
+    <a href={alt} hreflang={to} lang={to} onclick={rememberLang(to)}>
+      <NavIcon>
+        <path d="m5 8 6 6" />
+        <path d="m4 14 6-6 2-3" />
+        <path d="M2 5h12" />
+        <path d="M7 2h1" />
+        <path d="m22 22-5-10-5 10" />
+        <path d="M14 18h6" />
+      </NavIcon>
+      <span class="nav-label">{LANG_TAG[to]}</span>
+    </a>
+  );
+};
+
+const header = (c: Chrome, alt: string | null): Raw => (
+  <header role="banner" lang={chromeLang(c)}>
+    <nav aria-label={UI[c.ui].siteNav}>
       <ul>
         <li>
-          <a href="/index.html">
+          <a href={homeOf(c.ui)}>
             <NavIcon>
               <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
               <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -120,16 +165,17 @@ const HEADER = (
             <span class="nav-label">Zenn</span>
           </a>
         </li>
+        {alt !== null && <li>{langSwitch(c.ui, alt)}</li>}
         <li>
-          <button id="theme-toggle" onclick="toggleTheme()" title="テーマ切替" aria-label="テーマ切替"></button>
+          <button id="theme-toggle" onclick="toggleTheme()" title={UI[c.ui].theme} aria-label={UI[c.ui].theme}></button>
         </li>
         <li>
           <button
             id="disco-toggle"
             onclick="window.toggleDisco && toggleDisco()"
             aria-pressed="true"
-            title="ディスコボール切替"
-            aria-label="ディスコボール切替"
+            title={UI[c.ui].disco}
+            aria-label={UI[c.ui].disco}
           ></button>
         </li>
       </ul>
@@ -137,15 +183,15 @@ const HEADER = (
   </header>
 );
 
-const FOOTER = (
-  <footer role="contentinfo">
+const footer = (c: Chrome): Raw => (
+  <footer role="contentinfo" lang={chromeLang(c)}>
     <p>
       Styled with <a href="https://simplecss.org/">Simple.css</a>
     </p>
-    <nav aria-label="フッターリンク">
+    <nav aria-label={UI[c.ui].footerNav}>
       <ul>
         <li>
-          <a href="/index.html">
+          <a href={homeOf(c.ui)}>
             <NavIcon>
               <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
               <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -892,15 +938,32 @@ export const isMeta = objectOf<Meta>({
 const FAVICON =
   "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔦</text></svg>";
 
+// Sent to `/en/` once, from the root index only: an explicit switch (stored by
+// langSwitch) wins over the browser language, deep links are never redirected,
+// and crawlers / the headless a11y scanner stay on the Japanese index.
+const LANG_REDIRECT = raw(
+  String.raw`try{var l=localStorage.getItem('toybeam-lang');if(l==='en'||(l===null&&!/^ja\b/i.test(navigator.language||'ja')&&!/bot|crawl|spider|slurp|headless|lighthouse/i.test(navigator.userAgent)))location.replace('/en/')}catch(e){}`,
+);
+
 function headHtml(m: {
+  ui: Lang;
   title: string;
   description: string;
   url: string;
   thumbnail: string | null;
   hasCode: boolean;
   hasMath: boolean;
+  // site-relative hrefs of the real translations, this page's own included
+  alternates: Partial<Record<Lang, string>>;
+  canonical?: string;
+  redirect?: boolean;
 }): Raw {
   const img = absUrl(m.thumbnail);
+  const alts = (["ja", "en"] as const).flatMap((l) => {
+    const href = m.alternates[l];
+    return href === undefined ? [] : [{ l, url: absUrl(href) }];
+  });
+  const canonical = m.canonical === undefined ? null : absUrl(m.canonical);
   const twitter = img === null ? "summary" : "summary_large_image";
   return (
     <head>
@@ -918,13 +981,23 @@ function headHtml(m: {
           the `.hl` / coderef / diff / line-number rules live in style.css. */}
       {m.hasMath && <link rel="stylesheet" href="/style/katex/katex.min.css" />}
       <script type="text/javascript" src="/style/style.js"></script>
+      {m.redirect === true && <script>{LANG_REDIRECT}</script>}
       {DISCO_HEAD}
+      {canonical !== null && <link rel="canonical" href={canonical} />}
+      {alts.length > 1 && (
+        <Fragment>
+          {alts.map((a) => (
+            <link rel="alternate" hreflang={a.l} href={a.url} />
+          ))}
+          <link rel="alternate" hreflang="x-default" href={alts[0]?.url} />
+        </Fragment>
+      )}
       <meta property="og:type" content="article" />
       <meta property="og:title" content={m.title} />
       <meta property="og:description" content={m.description} />
-      <meta property="og:url" content={m.url} />
+      <meta property="og:url" content={canonical ?? m.url} />
       <meta property="og:site_name" content="Toybeam" />
-      <meta property="og:locale" content="ja_JP" />
+      <meta property="og:locale" content={UI[m.ui].locale} />
       {img !== null && <meta property="og:image" content={img} />}
       <meta name="twitter:card" content={twitter} />
       <meta name="twitter:creator" content="@toyboot4e" />
@@ -938,12 +1011,12 @@ function headHtml(m: {
 // jump past it instead of reading every tag as a loose link. `.org-tag-list` was
 // already a flex container with the links as items -- the <li> just takes over as
 // the flex item (CSS resets the marker/padding), so the layout is unchanged.
-function tagListHtml(tags: string[]): Raw {
+function tagListHtml(tags: string[], ui: Lang): Raw {
   return (
     <Fragment>
       {tags.map((t) => (
         <li>
-          <a href={`/tags/${t}.html`} class="org-tag">
+          <a href={tagHref(ui, t)} class="org-tag">
             <code>{t}</code>
           </a>
         </li>
@@ -982,7 +1055,7 @@ const isTocLevel = literal("2", "3", "4");
 // caller can skip the scrollspy script when empty. The nav keeps a global
 // `id="toc"` purely as the scrollspy's hook; styling is the scoped CSS module
 // (build/styles/toc.module.css). Replaces the old client-side tocbot.
-function buildToc(contentHtml: string): { nav: Raw; count: number } {
+function buildToc(contentHtml: string, c: Chrome): { nav: Raw; count: number } {
   const items: TocItem[] = [];
   for (const [, level = "", attrs = "", inner = ""] of contentHtml.matchAll(TOC_HEADING_RE)) {
     const id = /\sid="([^"]*)"/u.exec(attrs)?.[1];
@@ -999,7 +1072,7 @@ function buildToc(contentHtml: string): { nav: Raw; count: number } {
     items.push({ level, id, label });
   }
   const nav = (
-    <nav id="toc" class={toc.toc} aria-label="目次">
+    <nav id="toc" class={toc.toc} aria-label={UI[c.ui].toc} lang={chromeLang(c)}>
       {items.length > 0 && (
         <ul class={toc.tocList}>
           {items.map((it) => (
@@ -1016,19 +1089,30 @@ function buildToc(contentHtml: string): { nav: Raw; count: number } {
   return { nav, count: items.length };
 }
 
-function page(opts: { htmlClass?: string; head: Raw; titleBlock: Raw; content: Raw }): Raw {
+// `lang` is the content's language, `ui` the chrome's; they differ only on an
+// untranslated article's `/en/` page. `alt` is the other language's page.
+function page(opts: {
+  lang: Lang;
+  ui: Lang;
+  alt: string | null;
+  htmlClass?: string;
+  head: Raw;
+  titleBlock: Raw;
+  content: Raw;
+}): Raw {
+  const c: Chrome = { ui: opts.ui, mark: opts.ui !== opts.lang };
   // h(...) builds strings eagerly, so the content is already serialised here --
   // scan it for headings and emit the ToC statically (no client-side pass).
-  const { nav, count } = buildToc(render(opts.content));
+  const { nav, count } = buildToc(render(opts.content), c);
   return (
     <Fragment>
       {raw("<!DOCTYPE html>")}
-      <html lang="ja" class={opts.htmlClass}>
+      <html lang={opts.lang} class={opts.htmlClass}>
         {opts.head}
         <body>
           {DISCO_BODY}
-          {SKIP_LINK}
-          {HEADER}
+          {skipLink(c)}
+          {header(c, opts.alt)}
           {/* tabindex="-1" so the skip link actually MOVES focus here; without it
               the browser only scrolls and the AT cursor stays in the header. */}
           <main id="main" tabindex="-1">
@@ -1036,7 +1120,7 @@ function page(opts: { htmlClass?: string; head: Raw; titleBlock: Raw; content: R
             <div id="content">{opts.content}</div>
             {nav}
           </main>
-          {FOOTER}
+          {footer(c)}
           {/* scrollspy only -- the ToC list itself is static (buildToc); ship it
               only on pages that actually have a ToC */}
           {count > 0 && <script type="text/javascript" defer src="/style/toc.min.js"></script>}
@@ -1069,15 +1153,16 @@ function coderefHoverStyle(ids: string[]): Raw {
   return <style>{raw(rules)}</style>;
 }
 
-function articleTitleBlock(m: Meta): Raw {
+function articleTitleBlock(m: Meta, ui: Lang, notice?: Raw): Raw {
   return (
     <div class="title-block">
+      {notice}
       <h1>{raw(m.titleHtml)}</h1>
       <div class="title-meta">
         <time class="title-date" datetime={m.dateIso}>
           {m.date}
         </time>
-        {m.tags.length > 0 && <ul class="org-tag-list">{tagListHtml(m.tags)}</ul>}
+        {m.tags.length > 0 && <ul class="org-tag-list">{tagListHtml(m.tags, ui)}</ul>}
       </div>
     </div>
   );
@@ -1086,7 +1171,7 @@ function articleTitleBlock(m: Meta): Raw {
 // One card in the listing `<ul>`. The card IS the <li> (it was already the flex
 // item), so AT announces "list, N items" and can step card-by-card instead of
 // wading through an undifferentiated run of title/date/tag links.
-function articleCard(m: Meta, eager: boolean): Raw {
+function articleCard(m: Meta, eager: boolean, ui: Lang): Raw {
   return (
     <li class={card.articleCard}>
       <div class={card.articleCardBody}>
@@ -1102,7 +1187,7 @@ function articleCard(m: Meta, eager: boolean): Raw {
           {/* <date> is not an HTML element -- it parsed as an unknown inline box
               with no date semantics at all. <time datetime> is the real one. */}
           <time datetime={m.dateIso}>{m.date}</time>
-          <ul class="org-tag-list">{tagListHtml(m.tags)}</ul>
+          <ul class="org-tag-list">{tagListHtml(m.tags, ui)}</ul>
         </div>
       </div>
       {m.thumbnail !== null && (
@@ -1150,13 +1235,30 @@ const keyword = (kw: Map<string, string>, key: string): string | undefined => {
 };
 
 // --- public rendering API ---------------------------------------------------
-export type Rendered = { rel: string; isDiary: boolean; draft: boolean; meta: Meta; html: string };
+export type Rendered = {
+  rel: string;
+  lang: Lang;
+  isDiary: boolean;
+  draft: boolean;
+  meta: Meta;
+  html: string;
+  // An untranslated Japanese article's `/en/` page, built from the BAKED
+  // #content of `html` so the body is only baked once.
+  fallback: { rel: string; page: (bakedContent: string) => string } | null;
+};
 
 // Render one article's source to its full page HTML (pre-bake) + metadata.
-// `rel` is the output path relative to OUT (e.g. `diary/2023-09-24.html`).
-export async function renderArticle(rel: string, text: string): Promise<Rendered> {
+// `rel` is the source path relative to src/ (e.g. `diary/2023-09-24.org`);
+// `counterpart` says whether its other-language version is published.
+export async function renderArticle(
+  rel: string,
+  text: string,
+  opts: { counterpart?: boolean } = {},
+): Promise<Rendered> {
   const kw = readKeywords(text);
-  const outRel = rel.replace(/\.org$/u, ".html");
+  const lang = langOf(rel);
+  const outRel = outRelOf(rel);
+  const counterpart = opts.counterpart ?? false;
   const tags = (kw.get("FILETAGS") ?? "")
     .split(":")
     .map((s) => s.trim())
@@ -1191,22 +1293,33 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
     draft: false,
     description: keyword(kw, "DESCRIPTION") ?? firstParagraphText(body),
   };
+  const altHref = `/${outRelOf(counterpartOf(rel))}`;
+  const head = (ui: Lang, url: string, extra: { canonical?: string; alternates: Partial<Record<Lang, string>> }): Raw =>
+    headHtml({
+      ui,
+      title: meta.titleText,
+      description: meta.description,
+      url: SITE_URL + url,
+      thumbnail: meta.thumbnail,
+      // hasMath gates `katex.min.css`. Catch BOTH math forms: `.katex` spans
+      // already rendered by rehype-katex (org `$...$`, in the body or the title),
+      // and raw `\(...\)` / `\[` / `\begin{}` delimiters the bake step renders
+      // later. Missing the former shipped 47 math pages unstyled.
+      hasCode: body.includes("language-"),
+      hasMath:
+        body.includes('class="katex') || meta.titleHtml.includes('class="katex') || /\\\(|\\\[|\\begin\{/u.test(body),
+      ...extra,
+    });
   const html = render(
     page({
-      head: headHtml({
-        title: meta.titleText,
-        description: meta.description,
-        url: SITE_URL + outRel,
-        thumbnail: meta.thumbnail,
-        // hasMath gates `katex.min.css`. Catch BOTH math forms: `.katex` spans
-        // already rendered by rehype-katex (org `$...$`, in the body or the title),
-        // and raw `\(...\)` / `\[` / `\begin{}` delimiters the bake step renders
-        // later. Missing the former shipped 47 math pages unstyled.
-        hasCode: body.includes("language-"),
-        hasMath:
-          body.includes('class="katex') || meta.titleHtml.includes('class="katex') || /\\\(|\\\[|\\begin\{/u.test(body),
+      lang,
+      ui: lang,
+      // a Japanese article always has an `/en/` page (its fallback, if untranslated)
+      alt: lang === "ja" || counterpart ? altHref : null,
+      head: head(lang, outRel, {
+        alternates: counterpart ? { [lang]: meta.href, [other(lang)]: altHref } : {},
       }),
-      titleBlock: articleTitleBlock(meta),
+      titleBlock: articleTitleBlock(meta, lang),
       content: (
         <Fragment>
           {raw(body)}
@@ -1215,7 +1328,41 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
       ),
     }),
   );
-  return { rel: outRel, isDiary: outRel.startsWith("diary/"), draft: keyword(kw, "DRAFT") !== undefined, meta, html };
+  const fallbackRel = fallbackRelOf(rel);
+  const fallback =
+    lang === "ja" && !counterpart
+      ? {
+          rel: fallbackRel,
+          page: (bakedContent: string): string =>
+            render(
+              page({
+                lang: "ja",
+                ui: "en",
+                alt: meta.href,
+                // the same text as the Japanese page: point search engines there
+                head: head("en", fallbackRel, { canonical: meta.href, alternates: {} }),
+                // tags link to the Japanese tag pages, which are sure to list it
+                titleBlock: articleTitleBlock(
+                  meta,
+                  "ja",
+                  <p class="notice" role="note" lang="en">
+                    This article is not translated into English yet. Below is the Japanese original.
+                  </p>,
+                ),
+                content: raw(bakedContent),
+              }),
+            ),
+        }
+      : null;
+  return {
+    rel: outRel,
+    lang,
+    isDiary: rel.startsWith("diary/"),
+    draft: keyword(kw, "DRAFT") !== undefined,
+    meta,
+    html,
+    fallback,
+  };
 }
 
 // A card title may carry KaTeX (e.g. `$\TeX{}$`), rendered into titleHtml by
@@ -1223,67 +1370,115 @@ export async function renderArticle(rel: string, text: string): Promise<Rendered
 // actually needs it -- the common all-prose case stays free of the CSS payload.
 const listingHasMath = (cards: Meta[]): boolean => cards.some((m) => m.titleHtml.includes('class="katex'));
 
-const tagNav = (allTags: string[]): Raw => (
-  <nav aria-label="タグ">
-    <ul class="org-tag-list">{tagListHtml(allTags)}</ul>
+const tagNav = (allTags: string[], ui: Lang): Raw => (
+  <nav aria-label={UI[ui].tags}>
+    <ul class="org-tag-list">{tagListHtml(allTags, ui)}</ul>
   </nav>
 );
 
+// The listing h1's "(EN / JA)": a second, louder language switch than the header's.
+const langPick = (ui: Lang, alt: string): Raw => (
+  <span class="lang-pick">
+    (
+    {(["en", "ja"] as const).map((l, k) => (
+      <Fragment>
+        {k > 0 && " / "}
+        {l === ui ? (
+          <span aria-current="page">{LANG_TAG[l]}</span>
+        ) : (
+          <a href={alt} hreflang={l} lang={l} onclick={rememberLang(l)}>
+            {LANG_TAG[l]}
+          </a>
+        )}
+      </Fragment>
+    ))}
+    )
+  </span>
+);
+
 // index.html: Devlog (timeline) with the tag nav under its heading, then Diary.
-export function buildIndexHtml(metas: Meta[], diaryMetas: Meta[], allTags: string[]): string {
+// `/en/index.html` lists the translated articles only; `redirect` (root index
+// only) sends non-Japanese browsers there.
+export function buildIndexHtml(
+  metas: Meta[],
+  diaryMetas: Meta[],
+  allTags: string[],
+  opts: { ui?: Lang; redirect?: boolean } = {},
+): string {
+  const ui = opts.ui ?? "ja";
   const section = (id: string, cards: Meta[], nav?: Raw): Raw => (
     <Fragment>
       <h2 id={id}>
         <a href={`#${id}`}>{id}</a>
       </h2>
       {nav}
-      <ul class={card.articleList}>{cards.map((m, i) => articleCard(m, i === 0))}</ul>
+      <ul class={card.articleList}>{cards.map((m, i) => articleCard(m, i === 0, ui))}</ul>
     </Fragment>
   );
   const hasMath = listingHasMath([...metas, ...diaryMetas]);
   return render(
     page({
+      lang: ui,
+      ui,
+      alt: homeOf(other(ui)),
       htmlClass: "home",
       head: headHtml({
+        ui,
         title: "Toybeam",
         description: "Devlog of toyboot4e",
-        url: SITE_URL,
+        url: SITE_URL + rootOf(ui).slice(1),
         thumbnail: null,
         hasCode: false,
         hasMath,
+        alternates: { ja: rootOf("ja"), en: rootOf("en") },
+        redirect: opts.redirect ?? false,
       }),
       titleBlock: (
         <div class="title-block">
-          <h1>Toybeam</h1>
+          <h1>Toybeam {langPick(ui, homeOf(other(ui)))}</h1>
         </div>
       ),
       content: (
         <Fragment>
-          {section("Devlog (timeline)", metas, tagNav(allTags))}
-          {section("Diary", diaryMetas)}
+          {section("Devlog (timeline)", metas, tagNav(allTags, ui))}
+          {(ui === "ja" || diaryMetas.length > 0) && section("Diary", diaryMetas)}
         </Fragment>
       ),
     }),
   );
 }
 
-export function buildTagHtml(tag: string, tagged: Meta[], allTags: string[]): string {
+// `altTag`: the other language has a page for this tag too.
+export function buildTagHtml(
+  tag: string,
+  tagged: Meta[],
+  allTags: string[],
+  opts: { ui?: Lang; altTag?: boolean } = {},
+): string {
+  const ui = opts.ui ?? "ja";
+  const altTag = opts.altTag ?? false;
+  const alt = altTag ? tagHref(other(ui), tag) : homeOf(other(ui));
   const hasMath = listingHasMath(tagged);
   return render(
     page({
+      lang: ui,
+      ui,
+      alt,
       htmlClass: "home",
       head: headHtml({
+        ui,
         title: `Toybeam (#${tag})`,
         description: "Devlog of toyboot4e",
-        url: `${SITE_URL}tags/${tag}.html`,
+        url: SITE_URL + tagHref(ui, tag).slice(1),
         thumbnail: null,
         hasCode: false,
         hasMath,
+        alternates: altTag ? { ja: tagHref("ja", tag), en: tagHref("en", tag) } : {},
       }),
       titleBlock: (
         <div class="title-block">
           <h1>
-            Toybeam (<code>#{tag}</code>)
+            Toybeam (<code>#{tag}</code>) {langPick(ui, alt)}
           </h1>
         </div>
       ),
@@ -1294,8 +1489,8 @@ export function buildTagHtml(tag: string, tagged: Meta[], allTags: string[]): st
               Devlog (<code>#{tag}</code>)
             </a>
           </h2>
-          {tagNav(allTags)}
-          <ul class={card.articleList}>{tagged.map((m, i) => articleCard(m, i === 0))}</ul>
+          {tagNav(allTags, ui)}
+          <ul class={card.articleList}>{tagged.map((m, i) => articleCard(m, i === 0, ui))}</ul>
         </Fragment>
       ),
     }),

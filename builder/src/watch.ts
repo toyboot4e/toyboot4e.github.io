@@ -31,7 +31,8 @@ import { join, dirname, relative, sep } from "node:path";
 import { spawn, type ChildProcess } from "node:child_process";
 import { renderAndBake } from "./render-bake.ts";
 import type { Meta } from "./render.tsx";
-import { SRC, OUT, STATIC_RE, byHrefDesc, fullBuild, writeIndexAndTags } from "./build.ts";
+import { SRC, OUT, STATIC_RE, fullBuild, listings, writeIndexAndTags } from "./build.ts";
+import { counterpartOf, fallbackRelOf, isPublished, langOf, outRelOf, type Lang } from "./lang.ts";
 import { startDevServer, type DevServer } from "./dev-server.ts";
 import { errorText } from "./guard.ts";
 
@@ -47,28 +48,14 @@ const urlOf = (outRel: string): string => `/${outRel.split(sep).join("/")}`;
 // --- in-memory article metadata cache, keyed by output rel (e.g. diary/x.html).
 // Seeded from the startup full build, kept in sync on every change; the index +
 // tag pages are regenerated from it (never re-rendering the articles).
-type Entry = { isDiary: boolean; meta: Meta };
+type Entry = { lang: Lang; isDiary: boolean; meta: Meta };
 const cache = new Map<string, Entry>();
 
 // The metadata fields the index/tag cards render -- a change in any of these
 // (not a body-only edit) means the index + tag pages must be regenerated.
 const metaKey = (m: Meta): string => JSON.stringify([m.href, m.titleHtml, m.date, m.tags, m.thumbnail]);
 
-function lists(): { metas: Meta[]; diaryMetas: Meta[]; allTags: string[] } {
-  const metas: Meta[] = [];
-  const diaryMetas: Meta[] = [];
-  for (const e of cache.values()) {
-    (e.isDiary ? diaryMetas : metas).push(e.meta);
-  }
-  metas.sort(byHrefDesc);
-  diaryMetas.sort(byHrefDesc);
-  const allTags = [...new Set(metas.flatMap((m) => m.tags))].toSorted();
-  return { metas, diaryMetas, allTags };
-}
-const regenIndexTags = async (): Promise<void> => {
-  const l = lists();
-  return writeIndexAndTags(l.metas, l.diaryMetas, l.allTags);
-};
+const regenIndexTags = async (): Promise<void> => writeIndexAndTags(listings(cache.values()));
 
 const since = (t: number): string => `${Math.round(performance.now() - t)}ms`;
 const log = (msg: string): void => {
@@ -76,38 +63,47 @@ const log = (msg: string): void => {
 };
 
 // --- one .org change ---------------------------------------------------------
-async function onOrg(relOrg: string): Promise<void> {
+// Drop an unpublished article's page, and its `/en/` stand-in unless a real
+// translation has taken that path.
+async function unpublish(relOrg: string, outRel: string): Promise<void> {
+  if (langOf(relOrg) === "ja" && !isPublished(SRC, counterpartOf(relOrg))) {
+    await rm(join(OUT, fallbackRelOf(relOrg)), { force: true });
+  }
+  if (cache.delete(outRel)) {
+    await rm(join(OUT, outRel), { force: true });
+    await regenIndexTags();
+    dev?.reload();
+  }
+}
+
+async function onOrgFile(relOrg: string): Promise<void> {
   const t = performance.now();
   const abs = join(SRC, relOrg);
-  const outRel = relOrg.replace(/\.org$/u, ".html");
+  const outRel = outRelOf(relOrg);
   // deleted -> drop its page; reindex only if it was a published article
   if (!existsSync(abs)) {
-    if (cache.delete(outRel)) {
-      await rm(join(OUT, outRel), { force: true });
-      await regenIndexTags();
-      dev?.reload();
-    }
+    await unpublish(relOrg, outRel);
     log(`- ${relOrg} removed (${since(t)})`);
     return;
   }
   const text = await readFile(abs, "utf8");
-  const r = await renderAndBake(relOrg, text);
+  const r = await renderAndBake(relOrg, text, { counterpart: isPublished(SRC, counterpartOf(relOrg)) });
   // became a #+DRAFT -> treat like a delete (release build skips drafts)
   if (r.draft) {
-    if (cache.delete(r.rel)) {
-      await rm(join(OUT, r.rel), { force: true });
-      await regenIndexTags();
-      dev?.reload();
-    }
+    await unpublish(relOrg, r.rel);
     log(`~ ${relOrg} draft, skipped (${since(t)})`);
     return;
   }
-  const dest = join(OUT, r.rel);
-  await mkdir(dirname(dest), { recursive: true });
-  await writeFile(dest, r.out);
+  for (const page of [{ rel: r.rel, out: r.out }, ...(r.fallback ? [r.fallback] : [])]) {
+    const dest = join(OUT, page.rel);
+    // oxlint-disable-next-line eslint/no-await-in-loop -- two pages at most
+    await mkdir(dirname(dest), { recursive: true });
+    // oxlint-disable-next-line eslint/no-await-in-loop -- two pages at most
+    await writeFile(dest, page.out);
+  }
   const prev = cache.get(r.rel);
   const reindex = !prev || metaKey(prev.meta) !== metaKey(r.meta);
-  cache.set(r.rel, { isDiary: r.isDiary, meta: r.meta });
+  cache.set(r.rel, { lang: r.lang, isDiary: r.isDiary, meta: r.meta });
   if (reindex) {
     await regenIndexTags();
   }
@@ -119,6 +115,18 @@ async function onOrg(relOrg: string): Promise<void> {
     dev?.reload(urlOf(r.rel));
   }
   log(`✓ ${r.rel}${reindex ? " + index/tags" : ""} (${since(t)})`);
+}
+
+// Publishing/unpublishing one language changes the other's language switch,
+// hreflang links and (Japanese) `/en/` stand-in, so re-render the counterpart
+// too, AFTER the changed file: an unpublished translation's rm of `en/x.html`
+// must come before the Japanese re-render writes the stand-in there.
+async function onOrg(relOrg: string): Promise<void> {
+  await onOrgFile(relOrg);
+  const other = counterpartOf(relOrg);
+  if (existsSync(join(SRC, other))) {
+    await onOrgFile(other);
+  }
 }
 
 // --- one static-file change --------------------------------------------------
@@ -246,7 +254,7 @@ const t0 = performance.now();
 const { outs } = await fullBuild();
 for (const o of outs) {
   for (const r of o.results) {
-    cache.set(r.rel, { isDiary: r.isDiary, meta: r.meta });
+    cache.set(r.rel, { lang: r.lang, isDiary: r.isDiary, meta: r.meta });
   }
 }
 if (DEV_PORT > 0) {

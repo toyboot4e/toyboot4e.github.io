@@ -8,6 +8,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { renderAndBake } from "./render-bake.ts";
 import { getStats } from "./bake.ts";
+import { counterpartOf, isPublished } from "./lang.ts";
 import type { ShardResult } from "./build.ts";
 
 const ROOT = join(import.meta.dirname, "..", "..");
@@ -26,20 +27,22 @@ const texts = await Promise.all(files.map(async (relOrg) => readFile(join(SRC, r
 const writes: Promise<void>[] = [];
 for (const [i, relOrg] of files.entries()) {
   // oxlint-disable-next-line eslint/no-await-in-loop -- one warm tree-sitter/KaTeX setup, rendered one at a time
-  const r = await renderAndBake(relOrg, texts[i] ?? "");
+  const r = await renderAndBake(relOrg, texts[i] ?? "", { counterpart: isPublished(SRC, counterpartOf(relOrg)) });
   // release build: skip drafts
   if (r.draft) {
     continue;
   }
-  const dest = join(OUT, r.rel);
-  const dir = dirname(dest);
-  if (!madeDirs.has(dir)) {
-    // oxlint-disable-next-line eslint/no-await-in-loop -- the dir must exist before the write below is queued
-    await mkdir(dir, { recursive: true });
-    madeDirs.add(dir);
+  for (const page of [{ rel: r.rel, out: r.out }, ...(r.fallback ? [r.fallback] : [])]) {
+    const dest = join(OUT, page.rel);
+    const dir = dirname(dest);
+    if (!madeDirs.has(dir)) {
+      // oxlint-disable-next-line eslint/no-await-in-loop -- the dir must exist before the write below is queued
+      await mkdir(dir, { recursive: true });
+      madeDirs.add(dir);
+    }
+    writes.push(writeFile(dest, page.out));
   }
-  writes.push(writeFile(dest, r.out));
-  results.push({ rel: r.rel, isDiary: r.isDiary, meta: r.meta });
+  results.push({ rel: r.rel, lang: r.lang, isDiary: r.isDiary, meta: r.meta });
 }
 await Promise.all(writes);
 if (process.env.BUILD_PROF !== undefined) {

@@ -20,6 +20,7 @@ import { buildIndexHtml, buildTagHtml, isMeta, type Meta } from "./render.tsx";
 import { copyKatexAssets, isBakeStats, mergeStats, stamp, type BakeStats } from "./bake-util.ts";
 import { arrayOf, isBoolean, isString, objectOf, parseJson } from "./guard.ts";
 import { buildAssets } from "./assets.ts";
+import { isLang, type Lang } from "./lang.ts";
 
 // builder/src/build.ts -> repo root; HERE is builder/src
 const HERE = import.meta.dirname;
@@ -41,10 +42,10 @@ const WORKERS = Math.max(1, Number(process.env.BUILD_WORKERS) || Math.min(cpus()
 const BUILDER = join(ROOT, "builder");
 const SHARD = join(BUILDER, "dist", "render-shard.js");
 
-export type ShardResult = { rel: string; isDiary: boolean; meta: Meta };
+export type ShardResult = { rel: string; lang: Lang; isDiary: boolean; meta: Meta };
 export type WorkerOut = { results: ShardResult[]; stats: BakeStats };
 const isWorkerOut = objectOf<WorkerOut>({
-  results: arrayOf(objectOf<ShardResult>({ rel: isString, isDiary: isBoolean, meta: isMeta })),
+  results: arrayOf(objectOf<ShardResult>({ rel: isString, lang: isLang, isDiary: isBoolean, meta: isMeta })),
   stats: isBakeStats,
 });
 
@@ -155,29 +156,60 @@ export async function writePage(rel: string, html: string): Promise<void> {
   await writeFile(dest, stamp(html));
 }
 
-// (Re)generate index.html + every tag page from the article metadata. The watch
+// One language's listings: newest first; tags come from devlog entries only.
+export type Listing = { metas: Meta[]; diaryMetas: Meta[]; allTags: string[] };
+export type Listings = Record<Lang, Listing>;
+
+const emptyListing = (): Listing => ({ metas: [], diaryMetas: [], allTags: [] });
+
+export function listings(entries: Iterable<{ lang: Lang; isDiary: boolean; meta: Meta }>): Listings {
+  const ls: Listings = { ja: emptyListing(), en: emptyListing() };
+  for (const e of entries) {
+    (e.isDiary ? ls[e.lang].diaryMetas : ls[e.lang].metas).push(e.meta);
+  }
+  for (const l of Object.values(ls)) {
+    l.metas.sort(byHrefDesc);
+    l.diaryMetas.sort(byHrefDesc);
+    l.allTags = [...new Set(l.metas.flatMap((m) => m.tags))].toSorted();
+  }
+  return ls;
+}
+
+// (Re)generate both indexes + every tag page from the article metadata. The watch
 // daemon calls this whenever an article's metadata (title/date/tags) changes.
-export async function writeIndexAndTags(metas: Meta[], diaryMetas: Meta[], allTags: string[]): Promise<void> {
-  await writePage("index.html", buildIndexHtml(metas, diaryMetas, allTags));
-  await Promise.all(
-    allTags.map(async (tag) =>
+export async function writeIndexAndTags(ls: Listings): Promise<void> {
+  const prefix = { ja: "", en: "en/" } as const;
+  const hasEn = ls.en.metas.length + ls.en.diaryMetas.length > 0;
+  const writes: Promise<void>[] = [];
+  for (const ui of ["ja", "en"] as const) {
+    const { metas, diaryMetas, allTags } = ls[ui];
+    const otherTags = new Set(ls[ui === "ja" ? "en" : "ja"].allTags);
+    writes.push(
       writePage(
-        `tags/${tag}.html`,
-        buildTagHtml(
-          tag,
-          metas.filter((m) => m.tags.includes(tag)),
-          allTags,
-        ),
+        `${prefix[ui]}index.html`,
+        buildIndexHtml(metas, diaryMetas, allTags, { ui, redirect: ui === "ja" && hasEn }),
       ),
-    ),
-  );
+    );
+    for (const tag of allTags) {
+      writes.push(
+        writePage(
+          `${prefix[ui]}tags/${tag}.html`,
+          buildTagHtml(
+            tag,
+            metas.filter((m) => m.tags.includes(tag)),
+            allTags,
+            { ui, altTag: otherTags.has(tag) },
+          ),
+        ),
+      );
+    }
+  }
+  await Promise.all(writes);
 }
 
 export type FullBuild = {
   outs: WorkerOut[];
-  metas: Meta[];
-  diaryMetas: Meta[];
-  allTags: string[];
+  listings: Listings;
   stats: BakeStats;
   nStatic: number;
 };
@@ -217,21 +249,9 @@ export async function fullBuild(): Promise<FullBuild> {
   ]);
   lap("render+assets+static+katex");
 
-  const metas: Meta[] = []; // devlog (src/*.org)
-  const diaryMetas: Meta[] = []; // diary (src/diary/*.org)
-  for (const o of outs) {
-    for (const r of o.results) {
-      (r.isDiary ? diaryMetas : metas).push(r.meta);
-    }
-  }
-
-  metas.sort(byHrefDesc);
-  diaryMetas.sort(byHrefDesc);
-  // tags come from devlog entries only (not diary entries)
-  const allTags = [...new Set(metas.flatMap((m) => m.tags))].toSorted();
-
-  await writeIndexAndTags(metas, diaryMetas, allTags);
+  const ls = listings(outs.flatMap((o) => o.results));
+  await writeIndexAndTags(ls);
   lap("index+tags");
 
-  return { outs, metas, diaryMetas, allTags, stats: mergeStats(outs.map((o) => o.stats)), nStatic };
+  return { outs, listings: ls, stats: mergeStats(outs.map((o) => o.stats)), nStatic };
 }

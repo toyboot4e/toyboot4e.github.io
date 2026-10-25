@@ -5,10 +5,12 @@
 import { fullBuild, OUT, STRICT } from "./build.ts";
 
 const t0 = performance.now();
-const { metas, diaryMetas, allTags, stats: s, nStatic } = await fullBuild();
+const { listings, stats: s, nStatic } = await fullBuild();
 const ms = Math.round(performance.now() - t0);
+const { ja, en } = listings;
 console.log(
-  `build: ${metas.length} articles + ${diaryMetas.length} diary + index + ${allTags.length} tags ` +
+  `build: ${ja.metas.length} articles + ${ja.diaryMetas.length} diary + index + ${ja.allTags.length} tags ` +
+    `| en: ${en.metas.length} articles + ${en.diaryMetas.length} diary + ${en.allTags.length} tags ` +
     `+ ${nStatic} static -> ${OUT} in ${ms}ms`,
 );
 console.log(

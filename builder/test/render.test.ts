@@ -260,3 +260,64 @@ test("internal .org link -> .html", async () => {
   const out = await bake("l.org", "see [[./other.org][other]]\n");
   expect(out).toContain('<a href="./other.html">other</a>');
 });
+
+// --- 4. languages ------------------------------------------------------------
+test("lang: untranslated Japanese article gets an /en/ stand-in with English chrome", async () => {
+  const r = await renderAndBake("x.org", "#+TITLE: Hi\n#+FILETAGS: :misc:\n[[./img/a.webp]]\n* Sec\nbody\n");
+  expect(r.rel).toBe("x.html");
+  expect(r.out).toContain('<a href="/en/x.html" hreflang="en" lang="en"'); // switch -> stand-in
+  expect(r.out).not.toContain('rel="alternate"'); // the stand-in is no translation
+  expect(r.out).toContain('src="./img/a.webp"'); // Japanese page untouched
+  expect(r.fallback).toMatchObject({ rel: "en/x.html" });
+  const fb = String(r.fallback?.out);
+  expect(fb).toContain('<html lang="ja">'); // the body is still Japanese
+  expect(fb).toContain('<header role="banner" lang="en">');
+  expect(fb).toContain('<footer role="contentinfo" lang="en">');
+  expect(fb).toContain('<p class="notice" role="note" lang="en">');
+  expect(fb).toContain('<link rel="canonical" href="https://toyboot4e.github.io/x.html"/>');
+  expect(fb).toContain('<a href="/x.html" hreflang="ja" lang="ja"'); // switch back
+  expect(fb).toContain('aria-label="Contents" lang="en"'); // ToC built from the baked body
+  expect(fb).toContain('href="#Sec"');
+  expect(fb).toContain('src="/img/a.webp"'); // asset pinned: the page is one dir deeper
+  expect(fb).toContain('href="/tags/misc.html"'); // Japanese tag pages surely list it
+});
+
+test("lang: translated pair links both ways, no stand-in", async () => {
+  const ja = await renderAndBake("diary/x.org", "#+TITLE: Hi\nbody\n", { counterpart: true });
+  expect(ja.fallback).toBeNull();
+  expect(ja.out).toContain('<link rel="alternate" hreflang="ja" href="https://toyboot4e.github.io/diary/x.html">');
+  expect(ja.out).toContain('<link rel="alternate" hreflang="en" href="https://toyboot4e.github.io/en/diary/x.html">');
+  const en = await renderAndBake(
+    "diary/x.en.org",
+    "#+TITLE: Hi\n#+FILETAGS: :misc:\n[[../img/a.webp]] [[./y.org][y]]\n",
+    {
+      counterpart: true,
+    },
+  );
+  expect(en.rel).toBe("en/diary/x.html");
+  expect(en.lang).toBe("en");
+  expect(en.isDiary).toBe(true);
+  expect(en.out).toContain('<html lang="en">');
+  expect(en.out).toContain('<header role="banner">'); // chrome matches the page: no lang mark
+  expect(en.out).toContain('<a href="/diary/x.html" hreflang="ja" lang="ja"');
+  expect(en.out).toContain('<meta property="og:locale" content="en_US">');
+  expect(en.out).toContain('src="/img/a.webp"');
+  expect(en.out).toContain('href="./y.html"'); // article links stay in /en/
+  expect(en.out).toContain('href="/en/tags/misc.html"');
+});
+
+test("lang: English-only article has no language switch", async () => {
+  const en = await renderAndBake("x.en.org", "#+TITLE: Hi\nbody\n");
+  expect(en.out).not.toContain('hreflang="ja" lang="ja"');
+});
+
+test("lang: only the Japanese index redirects, the English one points back", () => {
+  const ja = buildIndexHtml([], [], [], { redirect: true });
+  expect(ja).toContain("location.replace('/en/')");
+  expect(ja).toContain('<a href="/en/index.html" hreflang="en" lang="en"');
+  const en = buildIndexHtml([], [], [], { ui: "en" });
+  expect(en).not.toContain("location.replace");
+  expect(en).toContain('<html lang="en" class="home">');
+  expect(en).toContain('<span aria-current="page">EN</span> / <a href="/index.html" hreflang="ja" lang="ja"');
+  expect(en).not.toContain('id="Diary"'); // no English diary yet
+});
