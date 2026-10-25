@@ -593,9 +593,10 @@ function makeHandlers(st: RenderState): Handlers {
           kids.length > 0 ? kids : [this.h(org, "span", { className: ["coderef-anchor"] }, [textNode(org.path)])];
         return this.h(org, "a", { href: `#${id}` }, inner);
       }
-      // internal .org links -> .html
+      // internal .org links -> .html; `x.ja.org` and `x.en.org` both mean the
+      // page `x` in the current language tree
       if (rawLink.includes(".org") && !/^[a-z]+:\/\//u.test(rawLink)) {
-        const href = rawLink.replace(/^file:/u, "").replace(/\.org(::.*)?$/u, ".html");
+        const href = rawLink.replace(/^file:/u, "").replace(/(?:\.(?:ja|en))?\.org(::.*)?$/u, ".html");
         return this.h(org, "a", { href }, kids.length > 0 ? kids : [textNode(href)]);
       }
       // image-file links with no description -> <img src alt>. uniorg's default

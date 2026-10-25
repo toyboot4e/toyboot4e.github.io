@@ -20,7 +20,7 @@ import { buildIndexHtml, buildTagHtml, isMeta, type Meta } from "./render.tsx";
 import { copyKatexAssets, isBakeStats, mergeStats, stamp, type BakeStats } from "./bake-util.ts";
 import { arrayOf, isBoolean, isString, objectOf, parseJson } from "./guard.ts";
 import { buildAssets } from "./assets.ts";
-import { destsOf, isLang, type Lang } from "./lang.ts";
+import { destsOf, hasLang, isLang, type Lang } from "./lang.ts";
 
 // builder/src/build.ts -> repo root; HERE is builder/src
 const HERE = import.meta.dirname;
@@ -231,6 +231,10 @@ export async function fullBuild(): Promise<FullBuild> {
   lap("clean OUT");
 
   const files = await listOrg(SRC);
+  const bare = files.filter((f) => !hasLang(f));
+  if (bare.length > 0) {
+    throw new Error(`name the language, as <name>.ja.org or <name>.en.org: ${bare.join(", ")}`);
+  }
   lap("listOrg");
 
   // Round-robin the sources across shards (interleaves big/small, code-heavy/

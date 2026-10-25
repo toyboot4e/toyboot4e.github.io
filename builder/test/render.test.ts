@@ -50,7 +50,7 @@ const bake = async (name: string, org: string): Promise<string> => {
 
 // --- 1. body-fragment goldens (one per fixture) ----------------------------
 const entries = await readdir(FIX);
-const fixtures = entries.filter((f) => f.endsWith(".org")).toSorted();
+const fixtures = entries.filter((f) => f.endsWith(".ja.org")).toSorted();
 const baked = await Promise.all(
   fixtures.map(async (fx) => ({ fx, r: await renderAndBake(fx, await readFile(join(FIX, fx), "utf8")) })),
 );
@@ -58,7 +58,7 @@ const metas: Meta[] = baked.map((b) => b.r.meta);
 const allTags = [...new Set(metas.flatMap((m) => m.tags))].toSorted();
 
 test.each(baked)("body: $fx", async ({ fx, r }) => {
-  await golden(fx.replace(/\.org$/u, ".body.html"), contentOf(r.out));
+  await golden(fx.replace(/\.ja\.org$/u, ".body.html"), contentOf(r.out));
 });
 
 test("index listing", async () => {
@@ -81,7 +81,7 @@ test("tag listing", async () => {
 
 // --- 2. page shell (chrome), asserted once ---------------------------------
 test("page shell", async () => {
-  const out = await bake("x.org", "#+TITLE: Hi\nbody\n");
+  const out = await bake("x.ja.org", "#+TITLE: Hi\nbody\n");
   expect(out).toMatch(/^<!DOCTYPE html>/u);
   expect(out).toContain('<html lang="ja">');
   expect(out).toContain('<link rel="stylesheet" href="/style/components.min.css">');
@@ -93,7 +93,7 @@ test("page shell", async () => {
 });
 
 test("toc: static list from headings, scrollspy shipped only when present", async () => {
-  const out = await bake("t.org", "* First\nbody\n** Nested\nmore\n* Second\n");
+  const out = await bake("t.ja.org", "* First\nbody\n** Nested\nmore\n* Second\n");
   // org level-1 headline -> h2, level-2 -> h3; flat list, indent via scoped class
   expect(out).toContain(`<nav id="toc" class="${toc.toc}" aria-label="目次"><ul class="${toc.tocList}">`);
   expect(out).toContain(`<a class="${toc.tocLink} ${toc.nodeH2}" href="#First">First</a>`);
@@ -104,7 +104,7 @@ test("toc: static list from headings, scrollspy shipped only when present", asyn
 
 // --- 3. behavior assertions (components, tiny inputs) ----------------------
 test("coderef: line wrapped in .coderef-off, marker -> anchor, prose link styled", async () => {
-  const out = await bake("c.org", "#+BEGIN_SRC haskell\nmain = a -- (ref:a)\n#+END_SRC\n\nsee [[(a)]]\n");
+  const out = await bake("c.ja.org", "#+BEGIN_SRC haskell\nmain = a -- (ref:a)\n#+END_SRC\n\nsee [[(a)]]\n");
   // the whole line IS a single `<a class="coderef-off">` self-link, so the
   // entire full-width highlight is clickable and clicking sets the URL to the
   // coderef and `:target`-highlights it
@@ -119,7 +119,7 @@ test("coderef: line wrapped in .coderef-off, marker -> anchor, prose link styled
 
 test("coderef: only coderef-bearing blocks are numbered (a plain block before it doesn't bump N)", async () => {
   const out = await bake(
-    "c.org",
+    "c.ja.org",
     "#+BEGIN_SRC bash\necho hi\n#+END_SRC\n" + // no coderef -> not numbered
       "#+BEGIN_SRC haskell\nx -- (ref:1)\n#+END_SRC\nsee [[(1)]]\n",
   );
@@ -131,7 +131,7 @@ test("coderef: only coderef-bearing blocks are numbered (a plain block before it
 test("coderef: repeated labels resolve per-block (positional, not last-wins)", async () => {
   // both blocks use label `1`; each prose `[[(1)]]` must target ITS block.
   const out = await bake(
-    "c.org",
+    "c.ja.org",
     "#+BEGIN_SRC haskell\nx -- (ref:1)\n#+END_SRC\nfirst [[(1)]]\n" +
       "#+BEGIN_SRC haskell\ny -- (ref:1)\n#+END_SRC\nsecond [[(1)]]\n",
   );
@@ -144,7 +144,7 @@ test("coderef: repeated labels resolve per-block (positional, not last-wins)", a
 
 test("captions: Figure/Listing/Table numbering, per kind", async () => {
   const out = await bake(
-    "cap.org",
+    "cap.ja.org",
     "#+CAPTION: one\n[[./img/a.webp]]\n\n#+CAPTION: two\n[[./img/b.webp]]\n\n" +
       "#+CAPTION: code\n#+BEGIN_SRC bash\nx\n#+END_SRC\n\n#+CAPTION: tbl\n| a |\n|---|\n| 1 |\n",
   );
@@ -155,13 +155,13 @@ test("captions: Figure/Listing/Table numbering, per kind", async () => {
 });
 
 test("image: #+ATTR_HTML width lands on <img>, not the container", async () => {
-  const out = await bake("i.org", "#+ATTR_HTML: :width 880px\n[[./img/a.webp]]\n");
+  const out = await bake("i.ja.org", "#+ATTR_HTML: :width 880px\n[[./img/a.webp]]\n");
   expect(out).toContain('<img src="/img/a.webp" alt="a.webp" width="880px"');
   expect(out).not.toMatch(/<(p|figure)[^>]*width=/u);
 });
 
 test("article card: scoped class, org-markup title, thumbnail path", async () => {
-  const { meta } = await renderAndBake("a.org", "#+TITLE: =code= t\n#+THUMBNAIL: img/a.webp\nx\n");
+  const { meta } = await renderAndBake("a.ja.org", "#+TITLE: =code= t\n#+THUMBNAIL: img/a.webp\nx\n");
   const html = buildIndexHtml([meta], [], []);
   expect(html).toContain(`class="${card.articleCard}"`); // CSS-module scoped class
   expect(html).toContain('<code class="inline-verbatim">code</code> t'); // title htmlized
@@ -169,13 +169,13 @@ test("article card: scoped class, org-markup title, thumbnail path", async () =>
 });
 
 test("title: <title> strips org markup, <h1> keeps it", async () => {
-  const out = await bake("t.org", "#+TITLE: =org= and *bold*\nx\n");
+  const out = await bake("t.ja.org", "#+TITLE: =org= and *bold*\nx\n");
   expect(out).toContain("<title>org and bold - Toybeam</title>"); // stripped
   expect(out).toContain('<h1><code class="inline-verbatim">org</code> and <strong>bold</strong></h1>');
 });
 
 test("mathbb: lowercase/digits -> Unicode double-struck, uppercase keeps KaTeX_AMS", async () => {
-  const out = await bake("m.org", "$\\mathbb{R}$ $\\mathbb{n}$ $\\mathbb{1}$ and raw \\(\\mathbb{q}\\)\n");
+  const out = await bake("m.ja.org", "$\\mathbb{R}$ $\\mathbb{n}$ $\\mathbb{1}$ and raw \\(\\mathbb{q}\\)\n");
   expect(out).toContain('mord mathbb">R'); // uppercase: native KaTeX_AMS glyph
   expect(out).toContain("\u{1D55F}"); // \mathbb{n} -> 𝕟 (textbb span, LMMathBB font)
   expect(out).toContain("\u{1D7D9}"); // \mathbb{1} -> 𝟙
@@ -184,7 +184,7 @@ test("mathbb: lowercase/digits -> Unicode double-struck, uppercase keeps KaTeX_A
 });
 
 test("yARUO/AA: verbatim <pre>, org markup NOT parsed", async () => {
-  const out = await bake("y.org", "#+BEGIN_YARUO\n( _人_ )  *not bold*\n#+END_YARUO\n");
+  const out = await bake("y.ja.org", "#+BEGIN_YARUO\n( _人_ )  *not bold*\n#+END_YARUO\n");
   expect(out).toContain('<pre tabindex="0" class="yaruo">( _人_ )  *not bold*</pre>');
   expect(out).not.toContain("<sub>"); // _人_ stays literal, not a subscript
 });
@@ -192,30 +192,30 @@ test("yARUO/AA: verbatim <pre>, org markup NOT parsed", async () => {
 test("every <pre> is keyboard-focusable so it can be scrolled without a mouse", async () => {
   // simple.css makes every <pre> a scroll container, so each needs a tab stop
   // (WCAG 2.1.1) -- highlighted code, a YARUO block and a plain example alike.
-  const code = await bake("c.org", "#+BEGIN_SRC haskell\nmain = pure ()\n#+END_SRC\n");
+  const code = await bake("c.ja.org", "#+BEGIN_SRC haskell\nmain = pure ()\n#+END_SRC\n");
   expect(code).toContain('<pre tabindex="0" class="hl">');
-  const yaruo = await bake("y.org", "#+BEGIN_YARUO\n( _人_ )\n#+END_YARUO\n");
+  const yaruo = await bake("y.ja.org", "#+BEGIN_YARUO\n( _人_ )\n#+END_YARUO\n");
   expect(yaruo).toContain('<pre tabindex="0" class="yaruo">');
   // a src block with no language stays unhighlighted, so its <pre> carries no
   // class at all -- the pass keys off the element, not off a class
-  const plain = await bake("p.org", "#+BEGIN_SRC\nplain text\n#+END_SRC\n");
+  const plain = await bake("p.ja.org", "#+BEGIN_SRC\nplain text\n#+END_SRC\n");
   expect(plain).toContain('<pre tabindex="0">');
 });
 
 test(String.raw`math: $$...$$ / \[...\] render as centered display, $...$ stays inline`, async () => {
-  const out = await bake("m.org", "$$\na=b\n$$\n\ninline $x$ here\n\n\\[ y=2 \\]\n");
+  const out = await bake("m.ja.org", "$$\na=b\n$$\n\ninline $x$ here\n\n\\[ y=2 \\]\n");
   // uniorg-rehype renders every latex-fragment as math-inline; our handler
   // upgrades $$ and \[ to display so KaTeX emits a centered .katex-display.
   expect([...out.matchAll(/katex-display/gu)]).toHaveLength(2); // $$ and \[ , not $x$
 });
 
 test("dETAILS summary: org markup is converted to HTML", async () => {
-  const out = await bake("d.org", "#+BEGIN_DETAILS =code= and *bold*\nhidden\n#+END_DETAILS\n");
+  const out = await bake("d.ja.org", "#+BEGIN_DETAILS =code= and *bold*\nhidden\n#+END_DETAILS\n");
   expect(out).toContain('<summary><code class="inline-verbatim">code</code> and <strong>bold</strong></summary>');
 });
 
 test("diff blocks: changed lines get .diff.add / .diff.remove for +/- backgrounds", async () => {
-  const out = await bake("d.org", "#+BEGIN_SRC diff\n- a\n+ b\n#+END_SRC\n");
+  const out = await bake("d.ja.org", "#+BEGIN_SRC diff\n- a\n+ b\n#+END_SRC\n");
   expect(out).toContain('<pre tabindex="0" class="hl'); // baked by the tree-sitter highlighter
   expect(out).toMatch(/class="line diff remove"/u); // `- a`
   expect(out).toMatch(/class="line diff add"/u); // `+ b`
@@ -227,7 +227,7 @@ test("card: [[card:URL]] -> link-card placeholder (URL with :// kept intact)", a
   // the RENDER placeholder (the bake step would degrade an uncached URL to a
   // plain link) -- the point is the `card:` URL parses to linkType "card" with
   // the full URL intact.
-  const { html } = await renderArticle("c.org", "[[card:https://example.com/a?b=1]]\n");
+  const { html } = await renderArticle("c.ja.org", "[[card:https://example.com/a?b=1]]\n");
   expect(html).toContain('<a class="link-card" data-link-card="" href="https://example.com/a?b=1">');
 });
 
@@ -235,7 +235,7 @@ test("preserve-breaks: soft newline -> <br>, but not against a block boundary", 
   // preserve-breaks (org-export-preserve-breaks): soft newlines in prose/list
   // items become <br>. The newline before a nested block (here the sub-list) is
   // structural and must NOT become a <br>.
-  const out = await bake("b.org", "para X\npara Y\n\n- A\n  B\n\n- top\n  - nested\n");
+  const out = await bake("b.ja.org", "para X\npara Y\n\n- A\n  B\n\n- top\n  - nested\n");
   expect(out).toContain("<p>para X<br>para Y</p>"); // paragraph soft break
   expect(out).toContain("<li>A<br>B</li>"); // list-item continuation
   expect(out).toContain("<li>top<ul><li>nested</li></ul></li>"); // no <br> before nested <ul>
@@ -243,27 +243,37 @@ test("preserve-breaks: soft newline -> <br>, but not against a block boundary", 
 });
 
 test("preserve-breaks: code-block newlines stay literal (no <br>)", async () => {
-  const out = await bake("b.org", "#+BEGIN_SRC bash\nx\ny\n#+END_SRC\n");
+  const out = await bake("b.ja.org", "#+BEGIN_SRC bash\nx\ny\n#+END_SRC\n");
   expect(out).not.toContain("<br>");
 });
 
 test("hardbreak: explicit org `\\\\` -> single <br> in paragraphs and list items", async () => {
   // org's explicit line break `\\` at end of line becomes one <br> (NOT doubled
   // against preserve-breaks' own newline handling), in both prose and list items.
-  const out = await bake("h.org", "line A \\\\\nline B\n\n- item A \\\\\n  item B\n");
+  const out = await bake("h.ja.org", "line A \\\\\nline B\n\n- item A \\\\\n  item B\n");
   expect(out).toContain("<p>line A <br>line B</p>"); // paragraph hard break
   expect(out).toContain("<li>item A <br>  item B</li>"); // list-item hard break
   expect(out).not.toContain("<br><br>"); // not doubled
 });
 
 test("internal .org link -> .html", async () => {
-  const out = await bake("l.org", "see [[./other.org][other]]\n");
+  const out = await bake("l.ja.org", "see [[./other.org][other]]\n");
   expect(out).toContain('<a href="./other.html">other</a>');
+});
+
+test("internal .ja.org / .en.org link -> the page in the current language tree", async () => {
+  const out = await bake("l.en.org", "see [[./a.ja.org][a]] and [[./b.en.org][b]]\n");
+  expect(out).toContain('<a href="./a.html">a</a>');
+  expect(out).toContain('<a href="./b.html">b</a>');
+});
+
+test("lang: a source without a language tag is rejected", async () => {
+  await expect(renderAndBake("x.org", "x\n")).rejects.toThrow("<name>.ja.org");
 });
 
 // --- 4. languages ------------------------------------------------------------
 test("lang: untranslated Japanese article gets a root stand-in with English chrome", async () => {
-  const r = await renderAndBake("x.org", "#+TITLE: Hi\n#+FILETAGS: :misc:\n[[./img/a.webp]]\n* Sec\nbody\n");
+  const r = await renderAndBake("x.ja.org", "#+TITLE: Hi\n#+FILETAGS: :misc:\n[[./img/a.webp]]\n* Sec\nbody\n");
   expect(r.rel).toBe("ja/x.html");
   expect(r.out).toContain('<html lang="ja">');
   expect(r.out).toContain('<a href="/x.html" hreflang="en" lang="en"'); // switch -> stand-in
@@ -287,7 +297,7 @@ test("lang: untranslated Japanese article gets a root stand-in with English chro
 });
 
 test("lang: translated pair links both ways; English at the root and /en/", async () => {
-  const ja = await renderAndBake("diary/x.org", "#+TITLE: Hi\nbody\n", { counterpart: true });
+  const ja = await renderAndBake("diary/x.ja.org", "#+TITLE: Hi\nbody\n", { counterpart: true });
   expect(ja.fallback).toBeNull();
   expect(ja.pages.map((p) => p.rel)).toStrictEqual(["ja/diary/x.html"]);
   expect(ja.out).toContain('<link rel="alternate" hreflang="en" href="https://toyboot4e.github.io/diary/x.html">');

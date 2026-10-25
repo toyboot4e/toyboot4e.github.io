@@ -264,8 +264,11 @@ class="hl">`. Capture names → `hl-<bucket>` CSS classes via `CLASS_TABLE`. Fea
 
 ### Languages (EN/JA)
 English is the default at the root URLs; Japanese ships under `/ja/`
-(`builder/src/lang.ts` maps paths). An English translation is `<name>.en.org`
-beside its Japanese source and ships at `/<name>.html`. Every root page is
+(`builder/src/lang.ts` maps paths). Every source names its language:
+`<name>.ja.org` ships at `/ja/<name>.html`, and an English translation
+`<name>.en.org` beside it ships at `/<name>.html`; a bare `.org` fails the
+build. Org links may name either (`[[./x.ja.org]]`): they resolve to `x` in
+the current language tree. Every root page is
 also written byte-identical under `/en/`; English pages carry a `canonical`
 to their root URL, so the copies defer to it. The root index and tags list
 translated articles only. Every untranslated Japanese article still gets a
