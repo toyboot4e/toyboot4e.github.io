@@ -61,7 +61,7 @@
 
 .articleCardMeta time {
   color: var(--text-light);
-  padding-right: 0.5em;
+  padding-right: 1em;
   font-family: var(--mono-font);
 }
 
