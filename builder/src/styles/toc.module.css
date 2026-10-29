@@ -99,9 +99,8 @@
   box-shadow: var(--disco-shadow);
 }
 
-/* Article/tag pages only: lift the toc 0.6rem to meet the title backdrop, which
- * ::before extends 0.6rem above the title box. The homepage title is a plain chip
- * (no upward ::before), so its toc keeps the base 2.5rem top and aligns there. */
-:global(html.disco-on:not(.home)) .toc {
+/* lift the toc 0.6rem to meet the title backdrop, which ::before extends 0.6rem
+ * above the title box */
+:global(html.disco-on) .toc {
   margin-top: calc(2.5rem - 0.6rem);
 }

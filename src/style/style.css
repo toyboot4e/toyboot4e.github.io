@@ -1175,12 +1175,13 @@ html.disco-on {
   background-color: var(--disco-tag-bg-hover);
 }
 
-/* Homepage: disco off, every item (cards, title, section h2s, the section tag
-   list) spans the article text column and the headings' text and underline run
+/* Homepage: disco off, every item (cards, section h2s, the section tag list)
+   spans the article text column and the headings' text and underline run
    edge to edge like the cards. Disco on, every item grows outward by
    --panel-pad-x, like the article backdrop, and the non-card items become
-   card-like panels with the cards' padding and border. */
-.home :where(.title-block h1, #content > h2, #content > nav > .org-tag-list) {
+   card-like panels with the cards' padding and border. The title keeps the
+   article pages' title block, so it lines up with the ToC. */
+.home :where(#content > h2, #content > nav > .org-tag-list) {
   padding-block: 0.3em;
   border-radius: 8px;
 }
@@ -1199,18 +1200,14 @@ html.disco-on {
 .home #content > nav {
   margin-bottom: 0.75rem;
 }
-.disco-on.home .title-block h1,
 .disco-on.home #content > * {
   margin-inline: calc(-1 * var(--panel-pad-x));
 }
-.disco-on.home :where(.title-block h1, #content > h2, #content > nav > .org-tag-list) {
+.disco-on.home :where(#content > h2, #content > nav > .org-tag-list) {
   padding-inline: var(--panel-pad-x);
   border: var(--border-width) solid transparent;
   background-color: var(--disco-heading-bg);
   box-shadow: var(--disco-shadow);
-}
-.disco-on.home .title-block h1 {
-  border-color: var(--border); /* beats the :where() above */
 }
 
 /* In disco mode, make the sticky header and the footer glassy so the effect shows
@@ -1223,19 +1220,19 @@ html.disco-on {
   backdrop-filter: blur(6px);
 }
 
-/* On article/tag pages (not the homepage `home` class) in disco mode, give the
-   title, content column, and TOC a backdrop so long-form text stays readable over
-   the effect. The homepage keeps its translucent cards. The backdrop is drawn as
+/* In disco mode, give the title (every page) and the article content column a
+   backdrop so long-form text stays readable over the effect. Listing pages
+   (`home`) keep their translucent cards instead of a content backdrop. The backdrop is drawn as
    a ::before that extends OUTWARD, so it never changes the text box width (padding
    would shrink characters-per-row vs non-disco mode). `isolation` makes a stacking
    context so the ::before sits behind the text but above the canvas. Tune the mix
    percentages for more/less transparency. */
-html.disco-on:not(.home) .title-block,
+html.disco-on .title-block,
 html.disco-on:not(.home) #content {
   position: relative;
   isolation: isolate;
 }
-html.disco-on:not(.home) .title-block::before,
+html.disco-on .title-block::before,
 html.disco-on:not(.home) #content::before {
   content: "";
   position: absolute;
