@@ -5,9 +5,10 @@ cannot measure.
 
 Everything here is **dev-only**. It has its own `package.json` on purpose: the
 hermetic nix/CI build resolves `builder/node_modules` from a pinned
-`package-lock.json`, and adding a browser driver there would bloat that closure
-and force an `npmDepsHash` bump for tooling the build never runs. `bun install`
-in this directory is all the setup there is; `out/` must already be built.
+`pnpm-lock.yaml`, and adding a browser driver there would bloat that closure
+and force a deps-hash bump for tooling the build never runs. `pnpm install`
+in this directory is all the setup there is (the `just` recipes run it); `out/`
+must already be built.
 
 **Do not rebuild while a scan runs.** The tools serve `out/` straight off disk,
 so a concurrent `just build` gets caught mid-write and reports nonsense —

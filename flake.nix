@@ -18,15 +18,14 @@
           system: f (import nixpkgs { inherit system; })
         );
 
-      # node_modules for the Vite builder (builder/). Vendored from
-      # builder/package-lock.json (generated with `--legacy-peer-deps`, mirrored
-      # by npmFlags below).
+      # node_modules for the Vite builder (builder/), vendored from
+      # builder/pnpm-lock.yaml.
       #
-      # After bumping deps: regenerate builder/package-lock.json, set
-      # `npmDepsHash` to `lib.fakeHash`, run `nix build`, and copy the `got:` hash.
+      # After bumping deps: run `pnpm install` in builder/, set the `hash` below
+      # to `lib.fakeHash`, run `nix build`, and copy the `got:` hash.
       nodeModulesFor =
         pkgs:
-        pkgs.buildNpmPackage {
+        pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
           pname = "devlog-node-deps";
           version = "0";
           src = pkgs.lib.cleanSourceWith {
@@ -36,11 +35,20 @@
               let
                 b = baseNameOf path;
               in
-              b == "package.json" || b == "package-lock.json";
+              b == "package.json" || b == "pnpm-lock.yaml";
           };
-          npmDepsHash = "sha256-6W26kCUhPkjHb6XaFyfoXSITp8XIxYw30Z5fqhM/6ps=";
-          npmFlags = [ "--legacy-peer-deps" ];
-          dontNpmBuild = true;
+          pnpmDeps = pkgs.fetchPnpmDeps {
+            inherit (finalAttrs) pname version src;
+            pnpm = pkgs.pnpm_12;
+            fetcherVersion = 5;
+            hash = "sha256-ylArnP7KOrwbNSYVifxPR4WM3bBU8d2XhhGSKAbjOCk=";
+          };
+          nativeBuildInputs = [
+            pkgs.nodejs
+            pkgs.pnpm_12
+            pkgs.pnpmConfigHook
+          ];
+          dontBuild = true;
           # We only want node_modules, not a packaged/installed app.
           installPhase = ''
             runHook preInstall
@@ -48,7 +56,7 @@
             cp -r node_modules "$out/node_modules"
             runHook postInstall
           '';
-        };
+        });
 
       # Everything `just build` shells out to. Single source of truth, shared by
       # the hermetic package build (runtimeInputs) and the devShell, so the two
@@ -153,6 +161,7 @@
             buildToolsFor pkgs
             ++ (with pkgs; [
               # dev-only tooling (not needed by the hermetic build)
+              pnpm_12 # installs builder/ and scripts/a11y/ deps
               pinact
               watchexec
               zizmor

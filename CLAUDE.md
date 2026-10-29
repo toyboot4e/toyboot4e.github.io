@@ -209,6 +209,11 @@ global CSS stays in `src/style/style.css`.
   used directly to bundle browser TS / minify plain CSS), `vitest` (tests). Bun
   runs the bundle, `assets.ts` and `fetch-linkcards.ts`; recipes go through
   `builder/package.json` scripts (`bun run <script>`).
+- **Installing**: **pnpm** only (in the devShell), never `bun install` / `npm`.
+  `builder/pnpm-lock.yaml` is also what nix vendors (`fetchPnpmDeps` in
+  `flake.nix`): after changing deps, run `pnpm install` in `builder/` and
+  refresh the hash there. pnpm is strict, so an import of an undeclared
+  (transitive) package fails instead of silently working.
 - **Node deps**: `web-tree-sitter`, `katex`, `linkedom`, `uniorg` (render/bake)
 - **Frontend**: Simple.css, custom fonts, `katex.min.css` (no runtime highlighter/MathJax)
 

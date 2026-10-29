@@ -86,7 +86,7 @@ audit page="index.html":
         echo "no server on :{{port}} — run \`just serve\` in another shell first" >&2
         exit 1
     fi
-    CHROME_PATH="$(command -v chromium)" npx --yes lighthouse@latest \
+    CHROME_PATH="$(command -v chromium)" pnpm dlx lighthouse@latest \
         "http://localhost:{{port}}/{{page}}" \
         --quiet --output=html --output=json --output-path={{lh_report}} \
         --chrome-flags="--headless=new --no-sandbox --disable-gpu" \
@@ -117,7 +117,7 @@ audit-ai page="index.html": (audit page)
 #   just a11y index.html      # just these pages
 #   just a11y --theme=dark --json
 a11y *args:
-    cd scripts/a11y && bun install --silent
+    cd scripts/a11y && pnpm install --silent --frozen-lockfile
     bun scripts/a11y/a11y.ts scan {{args}}
 
 [private]
@@ -128,20 +128,20 @@ alias a11 := a11y
 # before and after any markup change -- it catches the things axe cannot, like an
 # unnamed landmark or a run of links with no list around it.
 a11y-tree page="index.html" *args:
-    cd scripts/a11y && bun install --silent
+    cd scripts/a11y && pnpm install --silent --frozen-lockfile
     bun scripts/a11y/a11y.ts tree {{page}} {{args}}
 
 # Walk the page with Tab like a keyboard-only user: what takes focus, in what
 # order, under what name, and whether it shows a focus ring.
 a11y-tab page="index.html" *args:
-    cd scripts/a11y && bun install --silent
+    cd scripts/a11y && pnpm install --silent --frozen-lockfile
     bun scripts/a11y/a11y.ts tab {{page}} {{args}}
 
 # One row per syntax-highlight bucket with its measured contrast ratio, per
 # theme. Run this after touching either `.hl` palette in style.css -- axe reports
 # the same handful of palette entries as thousands of nodes.
 a11y-contrast *args:
-    cd scripts/a11y && bun install --silent
+    cd scripts/a11y && pnpm install --silent --frozen-lockfile
     bun scripts/a11y/a11y.ts contrast {{args}}
 
 # warm watch daemon + live preview: one full build at startup, then keep the
